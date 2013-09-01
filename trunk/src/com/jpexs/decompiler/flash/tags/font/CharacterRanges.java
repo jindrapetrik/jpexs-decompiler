@@ -29,45 +29,44 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class CharacterRanges {
-    
-    
-    public static int rangeCount(){
+
+    public static int rangeCount() {
         return languages.size();
     }
-    
-    public static String rangeName(int index){
+
+    public static String rangeName(int index) {
         return languages.get(index).name;
     }
-    
-    public static int glyphCount(int index){
-        List<Range> ranges=languages.get(index).ranges;
-        int cnt=0;
-        for(Range r:ranges){
-            for(int i=r.from;i<=r.to;i++){
+
+    public static int glyphCount(int index) {
+        List<Range> ranges = languages.get(index).ranges;
+        int cnt = 0;
+        for (Range r : ranges) {
+            for (int i = r.from; i <= r.to; i++) {
                 cnt++;
             }
         }
         return cnt;
     }
-    
-    public static List<String> rangeNames(){
-        List<String> ret=new ArrayList<>();
-        for(int i=0;i<rangeCount();i++){
+
+    public static List<String> rangeNames() {
+        List<String> ret = new ArrayList<>();
+        for (int i = 0; i < rangeCount(); i++) {
             ret.add(rangeName(i));
         }
         return ret;
     }
-    
-    public static int[] rangeCodes(int index){
-        List<Range> ranges=languages.get(index).ranges;
-        List<Integer> ret=new ArrayList<>();
-        for(Range r:ranges){
-            for(int i=r.from;i<=r.to;i++){
+
+    public static int[] rangeCodes(int index) {
+        List<Range> ranges = languages.get(index).ranges;
+        List<Integer> ret = new ArrayList<>();
+        for (Range r : ranges) {
+            for (int i = r.from; i <= r.to; i++) {
                 ret.add(i);
             }
         }
-        int retArr[]=new int[ret.size()];
-        for(int i=0;i<ret.size();i++){
+        int retArr[] = new int[ret.size()];
+        for (int i = 0; i < ret.size(); i++) {
             retArr[i] = ret.get(i);
         }
         return retArr;
@@ -115,18 +114,18 @@ public class CharacterRanges {
     private static final List<Language> languages = new ArrayList<>();
 
     static {
-        BufferedReader br =new BufferedReader(new InputStreamReader(CharacterRanges.class.getResourceAsStream("/com/jpexs/decompiler/flash/tags/font/character_ranges.txt")));
+        BufferedReader br = new BufferedReader(new InputStreamReader(CharacterRanges.class.getResourceAsStream("/com/jpexs/decompiler/flash/tags/font/character_ranges.txt")));
         String s;
         try {
-            while((s=br.readLine())!=null){
-                String parts[]=s.split(":");
-                Language lng=new Language(parts[0]);
+            while ((s = br.readLine()) != null) {
+                String parts[] = s.split(":");
+                Language lng = new Language(parts[0]);
                 String ranges[] = parts[1].split(",");
-                for(String r:ranges){
-                    if(r.contains("-")){
-                        String fromTo[]=r.split("-");
-                        lng.ranges.add(new Range(Integer.parseInt(fromTo[0], 16),Integer.parseInt(fromTo[1], 16)));
-                    }else{
+                for (String r : ranges) {
+                    if (r.contains("-")) {
+                        String fromTo[] = r.split("-");
+                        lng.ranges.add(new Range(Integer.parseInt(fromTo[0], 16), Integer.parseInt(fromTo[1], 16)));
+                    } else {
                         lng.ranges.add(new Range(Integer.parseInt(r, 16)));
                     }
                 }

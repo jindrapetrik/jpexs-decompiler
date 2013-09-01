@@ -151,7 +151,11 @@ public class Cache {
 
                 return;
             }
-            temp.deleteOnExit();
+            try {
+                temp.deleteOnExit();
+            } catch (IllegalStateException iex) {
+                return;
+            }
             try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(temp))) {
                 oos.writeObject(value);
                 oos.flush();
@@ -159,9 +163,8 @@ public class Cache {
                 cacheFiles.put(key, temp);
 
 
-            } catch (IOException ex) {
-                Logger.getLogger(Helper.class
-                        .getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                //ignore
             }
         } else if (storageType == STORAGE_MEMORY) {
             cacheMemory.put(key, value);

@@ -2293,9 +2293,9 @@ public class XFLConverter {
                         fontStyle = font.getFontStyle();
                     }
                     String installedFont;
-                    if((installedFont = FontTag.isFontInstalled(fontName))!=null){
+                    if ((installedFont = FontTag.isFontInstalled(fontName)) != null) {
                         psFontName = new Font(installedFont, fontStyle, 10).getPSName();
-                    }else{
+                    } else {
                         psFontName = fontName;
                     }
                 }
@@ -2450,12 +2450,12 @@ public class XFLConverter {
                         bold = ft.isBold();
                         size = det.fontHeight;
                         fontFace = fontName;
-                        String installedFont=null;
-                        if((installedFont=FontTag.isFontInstalled(fontName))!=null){
+                        String installedFont = null;
+                        if ((installedFont = FontTag.isFontInstalled(fontName)) != null) {
                             fontName = installedFont;
                             fontFace = new Font(installedFont, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
-                        }                        
-                        
+                        }
+
                     }
                 }
                 if (det.hasLayout) {
@@ -3178,9 +3178,9 @@ public class XFLConverter {
                                     fontName = ft.getFontName(tags);
                                 }
                                 String installedFont;
-                                if((installedFont = FontTag.isFontInstalled(fontName))!=null){
+                                if ((installedFont = FontTag.isFontInstalled(fontName)) != null) {
                                     fontFace = new Font(installedFont, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
-                                }else{
+                                } else {
                                     fontFace = fontName;
                                 }
                                 break;

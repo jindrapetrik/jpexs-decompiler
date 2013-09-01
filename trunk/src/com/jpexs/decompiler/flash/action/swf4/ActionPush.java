@@ -199,7 +199,7 @@ public class ActionPush extends Action {
                     if (constantPool.contains((String) symb.value)) {
                         values.add(new ConstantIndex(constantPool.indexOf(symb.value), constantPool));
                     } else {
-                    values.add(symb.value);
+                        values.add(symb.value);
                     }
                     break;
                 case ASMParsedSymbol.TYPE_FLOAT:
@@ -226,7 +226,7 @@ public class ActionPush extends Action {
             }
         }
     }
-    
+
     @Override
     public String getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, boolean highlight) {
         if (replacement == null || replacement.size() < values.size()) {

@@ -64,28 +64,29 @@ public class Configuration {
      * List of replacements
      */
     public static java.util.List<Replacement> replacements = new ArrayList<>();
-
-    private static HashMap<String, Object> configDefaults = new HashMap<String, Object>() {{
-        put("decompile", true);
-        put("parallelSpeedUp", true);
-        put("autoDeobfuscate", true);
-        put("cacheOnDisk", true);
-        put("internalFlashViewer", false);
-        put("gotoMainClassOnStartup", false);
-        put("deobfuscateUsePrevTagOnly", true);
-        put("decompilationTimeoutSingleMethod", 60);
-        put("lastSaveDir", ".");
-        put("lastOpenDir", ".");
-        put("offeredAssociation", false);
-        put("locale", "en");
-        put("lastUpdatesCheckDate", null);
-        put("gui.window.width", 1000);
-        put("gui.window.height", 700);
-        put("gui.window.maximized.horizontal", false);
-        put("gui.window.maximized.vertical", false);
-        put("lastRenameType", 1);
-        put("removeNops", true);
-    }};
+    private static HashMap<String, Object> configDefaults = new HashMap<String, Object>() {
+        {
+            put("decompile", true);
+            put("parallelSpeedUp", true);
+            put("autoDeobfuscate", true);
+            put("cacheOnDisk", true);
+            put("internalFlashViewer", false);
+            put("gotoMainClassOnStartup", false);
+            put("deobfuscateUsePrevTagOnly", true);
+            put("decompilationTimeoutSingleMethod", 60);
+            put("lastSaveDir", ".");
+            put("lastOpenDir", ".");
+            put("offeredAssociation", false);
+            put("locale", "en");
+            put("lastUpdatesCheckDate", null);
+            put("gui.window.width", 1000);
+            put("gui.window.height", 700);
+            put("gui.window.maximized.horizontal", false);
+            put("gui.window.maximized.vertical", false);
+            put("lastRenameType", 1);
+            put("removeNops", true);
+        }
+    };
 
     /**
      * Saves replacements to file for future use
@@ -137,7 +138,7 @@ public class Configuration {
         T defaultValue = null;
         if (configDefaults.containsKey(cfg)) {
             @SuppressWarnings("unchecked")
-            T def = (T)configDefaults.get(cfg);
+            T def = (T) configDefaults.get(cfg);
             defaultValue = def;
         }
         return getConfig(cfg, defaultValue);
@@ -148,7 +149,7 @@ public class Configuration {
             return defaultValue;
         }
         @SuppressWarnings("unchecked")
-        T result = (T)config.get(cfg);
+        T result = (T) config.get(cfg);
         return result;
     }
 
@@ -157,7 +158,7 @@ public class Configuration {
             cfg = "parallelSpeedUp";
         }
         @SuppressWarnings("unchecked")
-        T result = (T)config.put(cfg, value);
+        T result = (T) config.put(cfg, value);
         return result;
     }
 

@@ -784,8 +784,7 @@ public class Main {
                         System.out.println("Configuration saved");
                         return;
                     }
-                }
-                else if (args[pos].equals("-onerror")) {
+                } else if (args[pos].equals("-onerror")) {
                     parameterProcessed = true;
                     pos++;
                     if (args.length <= pos) {
@@ -817,8 +816,7 @@ public class Main {
                     }
 
                     pos++;
-                }
-                else if (args[pos].equals("-timeout")) {
+                } else if (args[pos].equals("-timeout")) {
                     parameterProcessed = true;
                     pos++;
                     if (args.length <= pos) {
@@ -1072,12 +1070,12 @@ public class Main {
             }
         }
     }
-    
-    private static Boolean parseBooleanConfigValue(String value){
-        if (value == null){
+
+    private static Boolean parseBooleanConfigValue(String value) {
+        if (value == null) {
             return null;
         }
-        
+
         Boolean bValue = null;
         value = value.toLowerCase();
         if (value.equals("0") || value.equals("false") || value.equals("no") || value.equals("off")) {
@@ -1088,7 +1086,7 @@ public class Main {
         }
         return bValue;
     }
-    
+
     public static String tempFile(String url) throws IOException {
         File f = new File(getFFDecHome() + "saved" + File.separator);
         if (!f.exists()) {

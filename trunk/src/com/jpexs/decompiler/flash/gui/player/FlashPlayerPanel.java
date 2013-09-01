@@ -2,6 +2,7 @@ package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.View;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;
@@ -30,7 +31,7 @@ import javax.swing.JFrame;
  *
  * @author JPEXS
  */
-public class FlashPlayerPanel extends Panel {
+public class FlashPlayerPanel extends Panel implements FlashDisplay {
 
     private boolean executed = false;
     private String flash;
@@ -38,11 +39,18 @@ public class FlashPlayerPanel extends Panel {
     private static List<HANDLE> processes = new ArrayList<>();
     private static List<HANDLE> pipes = new ArrayList<>();
     private JFrame frame;
-    private boolean stopped=false;
-    
+    private boolean stopped = true;
     private static final int CMD_PLAY = 1;
     private static final int CMD_RESIZE = 2;
     private static final int CMD_BGCOLOR = 3;
+    private static final int CMD_CURRENT_FRAME = 4;
+    private static final int CMD_TOTAL_FRAMES = 5;
+    private static final int CMD_PAUSE = 6;
+    private static final int CMD_RESUME = 7;
+    private static final int CMD_PLAYING = 8;
+    private static final int CMD_REWIND = 9;
+    private static final int CMD_GOTO = 10;
+    private int frameRate;
 
     private synchronized void resize() {
         if (pipe != null) {
@@ -54,12 +62,37 @@ public class FlashPlayerPanel extends Panel {
         }
     }
 
-    public synchronized void setBackgroundColor(Color color) {
+    @Override
+    public synchronized int getCurrentFrame() {
+        byte[] res = new byte[2];
+        IntByReference ibr = new IntByReference();
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_CURRENT_FRAME}, 1, ibr, null);
+        if (Kernel32.INSTANCE.ReadFile(pipe, res, res.length, ibr, null)) {
+            return ((res[0] & 0xff) << 8) + (res[1] & 0xff);
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public synchronized int getTotalFrames() {
+        byte[] res = new byte[2];
+        IntByReference ibr = new IntByReference();
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_TOTAL_FRAMES}, 1, ibr, null);
+        if (Kernel32.INSTANCE.ReadFile(pipe, res, res.length, ibr, null)) {
+            return ((res[0] & 0xff) << 8) + (res[1] & 0xff);
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public synchronized void setBackground(Color color) {
         IntByReference ibr = new IntByReference();
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_BGCOLOR}, 1, ibr, null);
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte)color.getRed(),(byte)color.getGreen(),(byte)color.getBlue()},3,ibr,null);
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()}, 3, ibr, null);
     }
-    
+
     public FlashPlayerPanel(JFrame frame) {
         if (!Platform.isWindows()) {
             throw new FlashUnsupportedException();
@@ -95,7 +128,7 @@ public class FlashPlayerPanel extends Panel {
         hwndFrame.setPointer(Native.getComponentPointer(frame));
 
 
-        pipe = Kernel32.INSTANCE.CreateNamedPipe("\\\\.\\pipe\\ffdec_flashplayer_" + hwnd.getPointer().hashCode(), Kernel32.PIPE_ACCESS_OUTBOUND, Kernel32.PIPE_TYPE_BYTE, 1, 0, 0, 0, null);
+        pipe = Kernel32.INSTANCE.CreateNamedPipe("\\\\.\\pipe\\ffdec_flashplayer_" + hwnd.getPointer().hashCode(), Kernel32.PIPE_ACCESS_DUPLEX, Kernel32.PIPE_TYPE_BYTE, 1, 0, 0, 0, null);
 
 
 
@@ -121,21 +154,19 @@ public class FlashPlayerPanel extends Panel {
         executed = true;
     }
 
-    public synchronized void stopSWF(){
-        displaySWF("-",null);
+    public synchronized void stopSWF() {
+        displaySWF("-", null, 1);
         stopped = true;
     }
 
     public synchronized boolean isStopped() {
         return stopped;
     }
-    public synchronized void displaySWF(String flash){
-        displaySWF(flash, Color.white);
-    }
-    
-    public synchronized void displaySWF(String flash,Color bgColor) {
+
+    public synchronized void displaySWF(String flash, Color bgColor, int frameRate) {
         this.flash = flash;
         repaint();
+        this.frameRate = frameRate;
         if (!executed) {
             execute();
             try {
@@ -143,9 +174,9 @@ public class FlashPlayerPanel extends Panel {
             } catch (InterruptedException ex) {
                 Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }        
-        if(bgColor!=null){
-            setBackgroundColor(bgColor);
+        }
+        if (bgColor != null) {
+            setBackground(bgColor);
         }
         if (pipe != null) {
             IntByReference ibr = new IntByReference();
@@ -172,5 +203,52 @@ public class FlashPlayerPanel extends Panel {
             execute();
         }
         super.paint(g);
+    }
+
+    @Override
+    public void pause() {
+        IntByReference ibr = new IntByReference();
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PAUSE}, 1, ibr, null);
+    }
+
+    @Override
+    public void rewind() {
+        IntByReference ibr = new IntByReference();
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_REWIND}, 1, ibr, null);
+    }
+
+    @Override
+    public void play() {
+        IntByReference ibr = new IntByReference();
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_RESUME}, 1, ibr, null);
+    }
+
+    @Override
+    public boolean isPlaying() {
+        IntByReference ibr = new IntByReference();
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PLAYING}, 1, ibr, null);
+        byte res[] = new byte[1];
+        if (Kernel32.INSTANCE.ReadFile(pipe, res, res.length, ibr, null)) {
+            return res[0] == 1;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void gotoFrame(int frame) {
+        IntByReference ibr = new IntByReference();
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_GOTO}, 1, ibr, null);
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((frame >> 8) & 0xff), (byte) (frame & 0xff)}, 2, ibr, null);
+    }
+
+    @Override
+    public int getFrameRate() {
+        return frameRate;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return !isStopped();
     }
 }

@@ -99,13 +99,27 @@ buffer:TBuf;
 pipename:PAnsiChar;
 len:integer;
 cmd:integer;
+written:cardinal;
+val:cardinal;
+
+const
+ CMD_PLAY = 1;
+ CMD_RESIZE = 2;
+ CMD_BGCOLOR = 3;
+ CMD_CURRENT_FRAME = 4;
+ CMD_TOTAL_FRAMES = 5;
+ CMD_PAUSE = 6;
+ CMD_RESUME = 7;
+ CMD_PLAYING = 8;
+ CMD_REWIND = 9;
+ CMD_GOTO = 10;
 begin
 
 pipename:=PAnsiChar('\\.\\pipe\ffdec_flashplayer_'+ParamStr(1));
 while (not self.Terminated) do
 begin
-  pipe:=CreateFile(pipename,GENERIC_READ,
-		FILE_SHARE_READ + FILE_SHARE_WRITE,
+  pipe:=CreateFile(pipename,GENERIC_READ or GENERIC_WRITE,
+		FILE_SHARE_READ or FILE_SHARE_WRITE,
 		nil,
 		OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL,
@@ -117,7 +131,8 @@ begin
   begin
         ReadFile(pipe,buffer,1,numBytesRead,nil);
         cmd:=buffer[0];
-        if(cmd=1) then
+        case cmd of
+        CMD_PLAY:
         begin
           ReadFile(pipe,buffer,1,numBytesRead,nil);
           if(numBytesRead>0) then
@@ -128,18 +143,68 @@ begin
             Synchronize(displaySWF);
           end;
         end;
-        if(cmd=2) then
+        CMD_RESIZE:
         begin
           ReadFile(pipe,buffer,4,numBytesRead,nil);
           self.w:=buffer[0]*256+buffer[1];
           self.h:=buffer[2]*256+buffer[3];
           Synchronize(setPos);
         end;
-        if(cmd=3) then
+        CMD_BGCOLOR:
         begin
           ReadFile(pipe,buffer,3,numBytesRead,nil);
           self.bgColor := RGB(buffer[0],buffer[1],buffer[2]);
           Synchronize(setBGColor);
+        end;
+        CMD_CURRENT_FRAME:
+        begin
+          if flaPreview.ReadyState = 4 then
+            val:=flaPreview.CurrentFrame
+            else
+            val:=0;
+          buffer[0]:=(val shr 8) mod 256;
+          buffer[1]:=val mod 256;
+          WriteFile(pipe,buffer,2,written,nil);
+        end;
+        CMD_TOTAL_FRAMES:
+        begin
+          if flaPreview.ReadyState = 4 then
+            val:=flaPreview.TotalFrames
+            else
+            val:=0;
+          buffer[0]:=(val shr 8) mod 256;
+          buffer[1]:=val mod 256;
+          WriteFile(pipe,buffer,2,written,nil);
+        end;
+        CMD_PAUSE:
+        begin
+          flaPreview.Stop;
+        end;
+        CMD_RESUME:
+        begin
+          flaPreview.Play;
+        end;
+        CMD_PLAYING:
+        begin
+          buffer[0]:=0;
+          if flaPreview.ReadyState = 4 then
+            if flaPreview.IsPlaying then
+              buffer[0]:=1;
+
+
+          WriteFile(pipe,buffer,1,written,nil);
+        end;
+        CMD_REWIND:
+        begin
+          flaPreview.Rewind;
+        end;
+        CMD_GOTO:
+        begin
+          ReadFile(pipe,buffer,2,numBytesRead,nil);
+          val := (buffer[0] shl 8) + buffer[1];
+          flaPreview.GotoFrame(val);
+        end;
+
         end;
   end
   until numBytesRead<=0;

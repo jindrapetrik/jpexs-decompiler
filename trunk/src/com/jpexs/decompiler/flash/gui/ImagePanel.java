@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import java.awt.BorderLayout;
@@ -35,13 +36,16 @@ import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class ImagePanel extends JPanel implements ActionListener {
+public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
 
     public JLabel label = new JLabel();
     public DrawableTag drawable;
     private Timer timer;
     private int percent;
     private int frame;
+    private SWF swf;
+    private HashMap<Integer, CharacterTag> characters;
+    private int frameRate;
 
     @Override
     public void setBackground(Color bg) {
@@ -97,39 +101,22 @@ public class ImagePanel extends JPanel implements ActionListener {
         label.setIcon(icon);
     }
 
-    public void setDrawable(final DrawableTag drawable, final SWF swf, final HashMap<Integer, CharacterTag> characters) {
+    public void setDrawable(final DrawableTag drawable, final SWF swf, final HashMap<Integer, CharacterTag> characters, int frameRate) {
+        pause();
         this.drawable = drawable;
-        if (timer != null) {
-            timer.cancel();
-        }
+        this.swf = swf;
+        this.characters = characters;
 
         if (drawable.getNumFrames() == 0) {
             label.setIcon(null);
             return;
         }
+        percent = 0;
         if (drawable.getNumFrames() == 1) {
             setImage(drawable.toImage(0, swf.tags, swf.displayRect, characters, new Stack<Integer>()));
             return;
         }
-        timer = new Timer();
-
-        percent = 0;
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                int nframe = percent * drawable.getNumFrames() / 100;
-                if (nframe != frame) {
-                    ImageIcon icon = new ImageIcon(drawable.toImage(nframe, swf.tags, swf.displayRect, characters, new Stack<Integer>()));
-                    label.setIcon(icon);
-                }
-                if (percent == 100) {
-                    percent = 0;
-                } else {
-                    percent++;
-                }
-
-            }
-        }, 0, 20);
+        play();
     }
 
     public void setImage(Image image) {
@@ -139,5 +126,91 @@ public class ImagePanel extends JPanel implements ActionListener {
         }
         ImageIcon icon = new ImageIcon(image);
         label.setIcon(icon);
+    }
+
+    @Override
+    public int getCurrentFrame() {
+        if (drawable == null) {
+            return 0;
+        }
+        return percent * drawable.getNumFrames() / 100;
+    }
+
+    @Override
+    public int getTotalFrames() {
+        if (drawable == null) {
+            return 0;
+        }
+        return drawable.getNumFrames();
+    }
+
+    @Override
+    public void pause() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+    private void drawFrame() {
+        int nframe = percent * drawable.getNumFrames() / 100;
+        if (nframe != frame) {
+            ImageIcon icon = new ImageIcon(drawable.toImage(nframe, swf.tags, swf.displayRect, characters, new Stack<Integer>()));
+            label.setIcon(icon);
+        }
+    }
+
+    @Override
+    public void play() {
+        pause();
+        if (drawable.getNumFrames() > 1) {
+
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    drawFrame();
+                    if (percent == 100) {
+                        percent = 0;
+                    } else {
+                        percent++;
+                    }
+
+                }
+            }, 0, 20);
+        }
+    }
+
+    @Override
+    public void rewind() {
+        percent = 0;
+        drawFrame();
+    }
+
+    @Override
+    public boolean isPlaying() {
+        if (drawable == null) {
+            return false;
+        }
+        return (drawable.getNumFrames() <= 1) || (timer != null);
+    }
+
+    @Override
+    public void gotoFrame(int frame) {
+        percent = frame * 100 / drawable.getNumFrames();
+        drawFrame();
+    }
+
+    @Override
+    public int getFrameRate() {
+        if (drawable == null) {
+            return 1;
+        }
+        return drawable.getNumFrames() / 2;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return drawable != null;
     }
 }

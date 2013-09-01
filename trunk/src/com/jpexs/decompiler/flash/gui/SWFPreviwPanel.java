@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -59,7 +60,8 @@ public class SWFPreviwPanel extends JPanel {
         prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         add(prevLabel, BorderLayout.NORTH);
-        add(buffering, BorderLayout.SOUTH);
+        //add(buffering, BorderLayout.SOUTH);
+        add(new PlayerControls(pan), BorderLayout.SOUTH);
     }
     private SWF swf;
 

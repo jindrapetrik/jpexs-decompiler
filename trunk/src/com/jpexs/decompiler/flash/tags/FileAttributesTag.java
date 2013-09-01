@@ -37,10 +37,10 @@ public class FileAttributesTag extends Tag {
     private int reserved3;
     public static final int ID = 69;
 
-    public FileAttributesTag(){
+    public FileAttributesTag() {
         super(null, ID, "FileAttributes", new byte[]{}, 0);
     }
-    
+
     public FileAttributesTag(SWF swf, byte data[], int version, long pos) throws IOException {
         super(swf, ID, "FileAttributes", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);

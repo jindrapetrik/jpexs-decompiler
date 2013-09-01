@@ -841,7 +841,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records, Color defaultColor) {
         String key = "shape_" + records.hashCode() + "_" + (defaultColor == null ? "null" : defaultColor.hashCode());
         if (cache.contains(key)) {
-            return (BufferedImage) ((SerializableImage)cache.get(key)).getImage();
+            return (BufferedImage) ((SerializableImage) cache.get(key)).getImage();
         }
         RECT rect = new RECT();
         List<Path> paths = getPaths(rect, shapeNum, fillStyles, lineStylesList, /*numFillBits, numLineBits,*/ records);

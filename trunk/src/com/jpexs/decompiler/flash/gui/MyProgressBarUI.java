@@ -36,14 +36,14 @@ import org.pushingpixels.trident.ease.Spline;
  */
 public class MyProgressBarUI extends SubstanceProgressBarUI {
 
-    private final class SubstanceChangeListener implements ChangeListener {
+    private final class MySubstanceChangeListener implements ChangeListener {
 
         @Override
         public void stateChanged(ChangeEvent e) {
             SubstanceCoreUtilities.testComponentStateChangeThreadingViolation(progressBar);
 
             if (displayTimeline != null) { //Main Change - this should be first                
-                displayTimeline.abort();
+                //displayTimeline.abort();                
             }
             int currValue = progressBar.getValue();
             int span = progressBar.getMaximum() - progressBar.getMinimum();
@@ -57,24 +57,24 @@ public class MyProgressBarUI extends SubstanceProgressBarUI {
                     * totalPixels / span;
 
 
-            displayTimeline = new Timeline(progressBar);
-            displayTimeline.addPropertyToInterpolate(Timeline
-                    .<Integer>property("displayedValue").from(displayedValue)
-                    .to(currValue).setWith(new TimelinePropertyBuilder.PropertySetter<Integer>() {
-                @Override
-                public void set(Object obj, String fieldName,
-                        Integer value) {
-                    displayedValue = value;
-                    progressBar.repaint();
-                }
-            }));
-            displayTimeline.setEase(new Spline(0.4f));
-            AnimationConfigurationManager.getInstance().configureTimeline(
-                    displayTimeline);
+            /*displayTimeline = new Timeline(progressBar);
+             displayTimeline.addPropertyToInterpolate(Timeline
+             .<Integer>property("displayedValue").from(displayedValue)
+             .to(currValue).setWith(new TimelinePropertyBuilder.PropertySetter<Integer>() {
+             @Override
+             public void set(Object obj, String fieldName,
+             Integer value) {
+             displayedValue = value;
+             progressBar.repaint();
+             }
+             }));
+             displayTimeline.setEase(new Spline(0.4f));
+             AnimationConfigurationManager.getInstance().configureTimeline(
+             displayTimeline);*/
 
             boolean isInCellRenderer = (SwingUtilities.getAncestorOfClass(
                     CellRendererPane.class, progressBar) != null);
-            if (currValue > 0 && !isInCellRenderer && Math.abs(pixelDelta) > 5) {
+            if (false) {//currValue > 0 && !isInCellRenderer && Math.abs(pixelDelta) > 5) {
                 displayTimeline.play();
             } else {
                 displayedValue = currValue;
@@ -92,7 +92,7 @@ public class MyProgressBarUI extends SubstanceProgressBarUI {
     protected void installListeners() {
         super.installListeners();
         this.progressBar.removeChangeListener(substanceValueChangeListener);
-        substanceValueChangeListener = new MyProgressBarUI.SubstanceChangeListener();
+        this.substanceValueChangeListener = new MySubstanceChangeListener();
         this.progressBar.addChangeListener(this.substanceValueChangeListener);
     }
 }

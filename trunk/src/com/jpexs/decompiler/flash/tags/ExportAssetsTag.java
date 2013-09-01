@@ -40,13 +40,12 @@ public class ExportAssetsTag extends Tag {
     public List<String> names;
     public static final int ID = 56;
 
-    
-    public ExportAssetsTag(){
+    public ExportAssetsTag() {
         super(null, ID, "ExportAssets", new byte[]{}, 0);
         tags = new ArrayList<>();
         names = new ArrayList<>();
     }
-    
+
     /**
      * Constructor
      *

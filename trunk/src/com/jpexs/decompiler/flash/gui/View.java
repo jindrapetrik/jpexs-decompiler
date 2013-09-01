@@ -55,9 +55,9 @@ import org.pushingpixels.substance.api.skin.SubstanceOfficeBlue2007LookAndFeel;
  */
 public class View {
 
-    public static final Color DEFAULT_BACKGROUND_COLOR = new Color(217,231,250);
+    public static final Color DEFAULT_BACKGROUND_COLOR = new Color(217, 231, 250);
     public static Color swfBackgroundColor = DEFAULT_BACKGROUND_COLOR;
-        
+
     /**
      * Sets windows Look and Feel
      */

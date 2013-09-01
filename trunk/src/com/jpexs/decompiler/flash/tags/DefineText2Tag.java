@@ -326,9 +326,9 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
                         tr.glyphEntries = new GLYPHENTRY[txt.length()];
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);
-                            Character nextChar=null;
-                            if(i+1<txt.length()){
-                                nextChar = txt.charAt(i+1);
+                            Character nextChar = null;
+                            if (i + 1 < txt.length()) {
+                                nextChar = txt.charAt(i + 1);
                             }
 
                             if (!font.containsChar(tags, c)) {
@@ -336,7 +336,7 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
                                     return false;
                                 }
                             }
-                            if (nextChar!=null && !font.containsChar(tags, nextChar)) {
+                            if (nextChar != null && !font.containsChar(tags, nextChar)) {
                                 if (!missingCharHandler.handle(font, tags, nextChar)) {
                                     return false;
                                 }
@@ -347,12 +347,12 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
                             int advance;
                             if (font.hasLayout()) {
                                 int kerningAdjustment = 0;
-                                if(nextChar!=null){
+                                if (nextChar != null) {
                                     kerningAdjustment = font.getGlyphKerningAdjustment(tags, tr.glyphEntries[i].glyphIndex, font.charToGlyph(tags, nextChar));
                                 }
-                                advance = (int)Math.round(20.0 * Math.round((double) textHeight * (font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex)+kerningAdjustment) / (font.getDivider() * 1024.0)));
+                                advance = (int) Math.round(20.0 * Math.round((double) textHeight * (font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
                             } else {
-                                advance = (int)Math.round(20.0 * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), textHeight / 20, c,nextChar));
+                                advance = (int) Math.round(20.0 * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), textHeight / 20, c, nextChar));
                             }
                             tr.glyphEntries[i].glyphAdvance = advance;
 

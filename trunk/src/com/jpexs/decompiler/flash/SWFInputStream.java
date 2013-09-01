@@ -629,8 +629,8 @@ public class SWFInputStream extends InputStream {
         //pools = getConstantPool(listeners, new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
 
         /*if (pools.size() == 1) {
-            Action.setConstantPool(ret, pools.get(0));
-        }*/
+         Action.setConstantPool(ret, pools.get(0));
+         }*/
         if (goesPrev && (!DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG)) {
             ActionJump aj = new ActionJump(ip);
             int skip = aj.getBytes(version).length;
@@ -706,7 +706,7 @@ public class SWFInputStream extends InputStream {
 
             /*if(a instanceof ActionConstantPool){
              throw new IllegalArgumentException("CP found");
-             }     */   
+             }     */
             if (a instanceof ActionPush) {
                 if (cpool != null) {
                     ((ActionPush) a).constantPool = cpool.constants;

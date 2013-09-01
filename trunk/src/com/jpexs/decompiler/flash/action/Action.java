@@ -419,9 +419,9 @@ public class Action implements GraphSourceItem {
             importantOffsets = getActionsAllRefs(list, version);
         }
         /*List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
-        if (!cps.isEmpty()) {
-            setConstantPool(list, cps.get(cps.size() - 1));
-        }*/
+         if (!cps.isEmpty()) {
+         setConstantPool(list, cps.get(cps.size() - 1));
+         }*/
         HashMap<Long, List<GraphSourceItemContainer>> containers = new HashMap<>();
         HashMap<GraphSourceItemContainer, Integer> containersPos = new HashMap<>();
         offset = address;

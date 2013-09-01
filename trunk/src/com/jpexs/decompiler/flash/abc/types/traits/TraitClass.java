@@ -504,7 +504,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             String stripped = highlight ? Highlighting.stripHilights(s) : s;
             if (!stripped.trim().equals("")) {
                 if (s.contains("/*classInitializer*/")) {
-                    s = s.replace("/*classInitializer*/", "");                    
+                    s = s.replace("/*classInitializer*/", "");
                     s = s + "\r\n";
                 } else {
                     if (!first) {

@@ -101,6 +101,6 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
 
     @Override
     public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
-        return new RECT(0, 20*width, 0, 20*height);
+        return new RECT(0, 20 * width, 0, 20 * height);
     }
 }

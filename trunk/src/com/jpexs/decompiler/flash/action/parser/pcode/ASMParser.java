@@ -54,7 +54,7 @@ public class ASMParser {
         cpool.setAddress(address, version, false);
         address += cpool.getBytes(version).length;
         list.add(cpool);
-        
+
         while (true) {
             ASMParsedSymbol symb = lexer.yylex();
             if (symb.type == ASMParsedSymbol.TYPE_LABEL) {
@@ -347,7 +347,7 @@ public class ASMParser {
         }
         return a;
     }
-    
+
     private static List<Action> parseAllActions(FlasmLexer lexer, int version) throws IOException, ParseException {
         List<Action> list = new ArrayList<>();
         Stack<GraphSourceItemContainer> containers = new Stack<>();
@@ -380,14 +380,14 @@ public class ASMParser {
     public static List<Action> parse(long address, long containerSWFOffset, boolean ignoreNops, String source, int version) throws IOException, ParseException {
         FlasmLexer lexer = new FlasmLexer(new StringReader(source));
         List<Action> list = parseAllActions(lexer, version);
-        
+
         List<String> constantPool = new ArrayList<>();
-        for(Action a : list) {
+        for (Action a : list) {
             if (a instanceof ActionConstantPool) {
                 constantPool.addAll(((ActionConstantPool) a).constantPool);
             }
         }
-        
+
         lexer = new FlasmLexer(new StringReader(source));
         List<Label> labels = new ArrayList<>();
         List<Action> ret = parse(containerSWFOffset, ignoreNops, labels, address, lexer, constantPool, version);

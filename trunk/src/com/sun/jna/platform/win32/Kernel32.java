@@ -78,6 +78,8 @@ public interface Kernel32 extends WinNT {
     boolean WriteFile(HANDLE hFile, byte[] lpBuffer, int nNumberOfBytesToWrite,
             IntByReference lpNumberOfBytesWritten,
             WinBase.OVERLAPPED lpOverlapped);
+
+    boolean ReadFile(HANDLE hFile, byte[] lpBuffer, int nNumberOfBytesToRead, IntByReference lpNumberOfBytesRead, WinBase.OVERLAPPED lpOverlapped);
     //
     // Define the NamedPipe definitions
     //

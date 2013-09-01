@@ -267,9 +267,9 @@ public class DefineFontTag extends FontTag {
         }
         return ret;
     }
-    
+
     @Override
-    public int getGlyphKerningAdjustment(List<Tag> tags, int glyphIndex,int nextGlyphIndex) {
+    public int getGlyphKerningAdjustment(List<Tag> tags, int glyphIndex, int nextGlyphIndex) {
         return 0;
     }
 }
