@@ -2240,7 +2240,7 @@ public class Graph {
                 level--;
             }
             ret.append(tabString(level));
-            ret.append(parts[p]);
+            ret.append(parts[p].trim());
             ret.append("\r\n");
             if (strippedP.equals("{")) {
                 level++;

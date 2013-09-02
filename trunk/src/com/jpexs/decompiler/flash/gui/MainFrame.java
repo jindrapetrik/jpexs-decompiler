@@ -3236,7 +3236,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                     + "Push \"start\"\n"
                                     + "CallMethod\n"
                                     + "Pop\n"
-                                    + "Stop", SWF.DEFAULT_VERSION);
+                                    + "Stop", SWF.DEFAULT_VERSION, false);
                             doa.setActions(actions, SWF.DEFAULT_VERSION);
                             sos2.writeTag(doa);
                             sos2.writeTag(new ShowFrameTag(null));

@@ -203,7 +203,6 @@ public class Action implements GraphSourceItem {
             List<Long> part = a.getAllRefs(version);
             ret.addAll(part);
             if (a.afterInsert != null) {
-                a.afterInsert.setAddress(a.getAddress(), version, false);
                 ret.addAll(a.afterInsert.getAllRefs(version));
             }
         }
@@ -1199,9 +1198,9 @@ public class Action implements GraphSourceItem {
         String s = null;
         try {
             s = Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, false, false, swfPos, path);
-            ret = ASMParser.parse(address, swfPos, true, s, SWF.DEFAULT_VERSION);
+            ret = ASMParser.parse(address, swfPos, true, s, SWF.DEFAULT_VERSION, false);
         } catch (Exception ex) {
-            Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
+            Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error. path: " + path, ex);
         }
         return ret;
     }

@@ -29,6 +29,10 @@ public class ActionCall extends Action {
         super(0x9E, 0);
     }
 
+    public ActionCall(int actionLength) {
+        super(0x9E, actionLength);
+    }
+
     @Override
     public String toString() {
         return "Call";

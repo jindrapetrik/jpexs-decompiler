@@ -377,7 +377,7 @@ public class ASMParser {
         }
     }
 
-    public static List<Action> parse(long address, long containerSWFOffset, boolean ignoreNops, String source, int version) throws IOException, ParseException {
+    public static List<Action> parse(long address, long containerSWFOffset, boolean ignoreNops, String source, int version, boolean throwOnError) throws IOException, ParseException {
         FlasmLexer lexer = new FlasmLexer(new StringReader(source));
         List<Action> list = parseAllActions(lexer, version);
 
@@ -421,7 +421,11 @@ public class ASMParser {
             }
             if ((link instanceof ActionJump) || (link instanceof ActionIf)) {
                 if (!found) {
-                    Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, "TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()));
+                    if (throwOnError) {
+                        throw new ParseException("TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()), -1);
+                    } else {
+                        Logger.getLogger(ASMParser.class.getName()).log(Level.SEVERE, "TARGET NOT FOUND - identifier:" + identifier + " addr: ofs" + Helper.formatAddress(link.getAddress()));
+                    }
                 }
             }
         }

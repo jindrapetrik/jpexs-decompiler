@@ -53,8 +53,8 @@ public class ActionIf extends Action {
         setJumpOffset(offset);
     }
 
-    public ActionIf(SWFInputStream sis) throws IOException {
-        super(0x9D, 2);
+    public ActionIf(int actionLength, SWFInputStream sis) throws IOException {
+        super(0x9D, actionLength);
         setJumpOffset(sis.readSI16());
     }
 

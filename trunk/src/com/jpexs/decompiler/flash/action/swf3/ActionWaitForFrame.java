@@ -30,10 +30,8 @@ import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
-import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,12 +45,12 @@ public class ActionWaitForFrame extends Action implements ActionStore {
     public int skipCount;
     public List<Action> skipped;
 
-    public ActionWaitForFrame(SWFInputStream sis, ConstantPool cpool) throws IOException {
-        super(0x8A, 3);
+    public ActionWaitForFrame(int actionLength, SWFInputStream sis, ConstantPool cpool) throws IOException {
+        super(0x8A, actionLength);
         frame = sis.readUI16();
         skipCount = sis.readUI8();
         skipped = new ArrayList<>();
-        for (int i = 0; i < skipCount; i++) {
+        /*for (int i = 0; i < skipCount; i++) {
             Action a = sis.readAction(cpool);
             if (a instanceof ActionEnd) {
                 skipCount = i;
@@ -65,7 +63,6 @@ public class ActionWaitForFrame extends Action implements ActionStore {
             if (a instanceof ActionPush) {
                 if (cpool != null) {
                     ((ActionPush) a).constantPool = cpool.constants;
-                    cpool.count++;
                 }
             }
             skipped.add(a);
@@ -85,7 +82,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
                 }
             }
             skipCount = skipped.size();
-        }
+        }*/
     }
 
     @Override

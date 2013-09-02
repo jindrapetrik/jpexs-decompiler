@@ -48,8 +48,8 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
         this.registerNumber = registerNumber;
     }
 
-    public ActionStoreRegister(SWFInputStream sis) throws IOException {
-        super(0x87, 1);
+    public ActionStoreRegister(int actionLength, SWFInputStream sis) throws IOException {
+        super(0x87, actionLength);
         registerNumber = sis.readUI8();
     }
 

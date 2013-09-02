@@ -56,8 +56,8 @@ public class ActionGetURL2 extends Action {
         this.sendVarsMethod = sendVarsMethod;
     }
 
-    public ActionGetURL2(SWFInputStream sis) throws IOException {
-        super(0x9A, 1);
+    public ActionGetURL2(int actionLength, SWFInputStream sis) throws IOException {
+        super(0x9A, actionLength);
         loadVariablesFlag = sis.readUB(1) == 1;
         loadTargetFlag = sis.readUB(1) == 1;
         sis.readUB(4); //reserved

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionGraphSource;
+import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.StoreTypeAction;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -31,8 +31,8 @@ import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.*;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.*;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
@@ -63,9 +63,11 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.concurrent.Callable;
@@ -241,8 +243,8 @@ public class SWFInputStream extends InputStream {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int r;
         while (true) {
-            r = read();
-            if (r <= 0) {
+            r = readEx();
+            if (r == 0) {
                 return new String(baos.toByteArray(), "utf8");
             }
             baos.write(r);
@@ -539,461 +541,11 @@ public class SWFInputStream extends InputStream {
 
     public List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, String path) throws IOException {
         ReReadableInputStream rri = new ReReadableInputStream(this);
-        return readActionList(listeners, containerSWFOffset, rri, version, 0, -1, path);
+        return ActionListReader.readActionList(listeners, containerSWFOffset, rri, version, 0, -1, path);
     }
 
     public List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int maxlen, String path) throws IOException {
-        return readActionList(listeners, containerSWFOffset, rri, version, rri.getPos(), rri.getPos() + maxlen, path);
-    }
-
-    private static List<Object> prepareLocalBranch(List<Object> localData) {
-        @SuppressWarnings("unchecked")
-        HashMap<Integer, String> regNames = (HashMap<Integer, String>) localData.get(0);
-        @SuppressWarnings("unchecked")
-        HashMap<String, GraphTargetItem> variables = (HashMap<String, GraphTargetItem>) localData.get(1);
-        @SuppressWarnings("unchecked")
-        HashMap<String, GraphTargetItem> functions = (HashMap<String, GraphTargetItem>) localData.get(2);
-        List<Object> ret = new ArrayList<>();
-        ret.add(new HashMap<Integer, String>(regNames));
-        ret.add(new HashMap<String, GraphTargetItem>(variables));
-        ret.add(new HashMap<String, GraphTargetItem>(functions));
-        return ret;
-    }
-
-    /**
-     * Reads list of actions from the stream. Reading ends with
-     * ActionEndFlag(=0) or end of the stream.
-     *
-     * @param listeners
-     * @param address
-     * @param ip
-     * @param rri
-     * @param version
-     * @param containerSWFOffset
-     * @param endip
-     * @param path
-     * @return List of actions
-     * @throws IOException
-     */
-    public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int version, int ip, int endip, String path) throws IOException {
-        List<Action> retdups = new ArrayList<>();
-        ConstantPool cpool = new ConstantPool();
-
-        Stack<GraphTargetItem> stack = new Stack<>();
-
-        List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-
-
-        SWFInputStream sis = new SWFInputStream(rri, version);
-        boolean goesPrev = false;
-        int method = 1;
-        /*try {
-         goesPrev = readActionListAtPos(false, localData, stack, cpool, sis, rri, ip, retdups, ip);
-         } catch (Exception ex) {
-         method = 2;
-         goesPrev = readActionListAtPos(true, localData, stack, cpool, sis, rri, ip, retdups, ip);
-         }*/
-        goesPrev = readActionListAtPos(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, sis, rri, ip, retdups, ip, endip, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>());
-
-        if (goesPrev) {
-        } else {
-            if (!retdups.isEmpty()) {
-                for (int i = 0; i < ip; i++) {
-                    retdups.remove(0);
-                }
-            }
-        }
-        List<Action> ret = new ArrayList<>();
-        Action last = null;
-        for (Action a : retdups) {
-            if (a != last) {
-                ret.add(a);
-            }
-            last = a;
-        }
-        for (int i = 0; i < retdups.size(); i++) {
-            Action a = retdups.get(i);
-            if (a instanceof ActionEnd) {
-                if (i < retdups.size() - 1) {
-                    ActionJump jmp = new ActionJump(0);
-                    jmp.setJumpOffset(retdups.size() - i - jmp.getBytes(version).length);
-                    a.replaceWith = jmp;
-                }
-            }
-        }
-
-        //List<ConstantPool> pools;
-        if (Configuration.getConfig("removeNops", true)) {
-            ret = Action.removeNops(0, ret, version, 0, path);
-        }
-        //pools = getConstantPool(listeners, new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
-
-        /*if (pools.size() == 1) {
-         Action.setConstantPool(ret, pools.get(0));
-         }*/
-        if (goesPrev && (!DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG)) {
-            ActionJump aj = new ActionJump(ip);
-            int skip = aj.getBytes(version).length;
-            for (GraphSourceItem s : ret) {
-
-                if (s instanceof Action) {
-                    Action a = (Action) s;
-                    a.setAddress(a.getAddress() + skip, version);
-                }
-            }
-            ret.add(0, aj);
-        }
-        String s = null;
-        List<Action> reta = new ArrayList<>();
-        for (Object o : ret) {
-            if (o instanceof Action) {
-                reta.add((Action) o);
-            }
-        }
-        return reta;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static boolean readActionListAtPos(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates) throws IOException {
-        boolean debugMode = false;
-        boolean decideBranch = false;
-
-        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
-        boolean retv = false;
-        rri.setPos(ip);
-        Action a;
-        long filePos = rri.getPos();
-        Scanner sc = new Scanner(System.in, "utf-8");
-        int prevIp = ip;
-        loopip:
-        while (((endip == -1) || (endip > ip)) && (a = sis.readAction(rri, cpool)) != null) {
-            if (!visited.containsKey(ip)) {
-                visited.put(ip, 0);
-            }
-            int curVisited = visited.get(ip);
-            curVisited++;
-            visited.put(ip, curVisited);
-            for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progress("Reading", rri.getCount(), rri.length());
-            }
-            if ((ip < ret.size()) && (!(ret.get(ip) instanceof ActionNop))) {
-                a = ret.get(ip);
-                if (a.getAddress() != ip) {
-                    Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Jump to the middle of the instruction ip " + ip + " ins " + a.getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), SWF.DEFAULT_VERSION, false));
-                }
-            }
-            a.containerSWFOffset = containerSWFOffset;
-            a.setAddress(prevIp, SWF.DEFAULT_VERSION, false);
-            int info = a.actionLength + 1 + ((a.actionCode > 0x80) ? 2 : 0);
-            byte b[] = a.getBytes(sis.version);
-            int infoCorrect = info;
-            /*if (b.length != infoCorrect) {
-             throw new RuntimeException("Wrong length "+a.toString()+" info:"+infoCorrect+" actual:"+b.length+" datalen:"+(infoCorrect-info));
-             }*/
-            //int actual = a.getBytes(sis.version).length;
-            if ((!(a instanceof ActionStore)) && (!(a instanceof GraphSourceItemContainer))) {
-                int change = info - (rri.getPos() - ip);
-                if (change > 0) {
-                    a.afterInsert = new ActionJump(change);
-                }
-            } else {
-                info = rri.getPos() - ip;
-            }
-            if (ip < startIp) {
-                retv = true;
-            }
-
-
-            /*if(a instanceof ActionConstantPool){
-             throw new IllegalArgumentException("CP found");
-             }     */
-            if (a instanceof ActionPush) {
-                if (cpool != null) {
-                    ((ActionPush) a).constantPool = cpool.constants;
-                    cpool.count++;
-                }
-            }
-            if (a instanceof ActionDefineFunction) {
-                if (cpool != null) {
-                    //((ActionDefineFunction) a).setConstantPool(cpool.constants);
-                    cpool.count++;
-                }
-            }
-            if (a instanceof ActionDefineFunction2) {
-                if (cpool != null) {
-                    //((ActionDefineFunction2) a).setConstantPool(cpool.constants);
-                    cpool.count++;
-                }
-            }
-
-            if (debugMode) {
-                //if(a instanceof ActionIf){                
-                String atos = a.getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, sis.version, false);
-                if (a instanceof GraphSourceItemContainer) {
-                    atos = a.toString();
-                }
-                System.err.println("readActionListAtPos ip: " + (ip - startIp) + " (0x" + Helper.formatAddress(ip - startIp) + ") " + " action(len " + a.actionLength + "): " + atos + (a.isIgnored() ? " (ignored)" : "") + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
-                @SuppressWarnings("unchecked")
-                HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
-                System.err.print("variables: ");
-                for (Entry<String, GraphTargetItem> v : vars.entrySet()) {
-                    System.err.print("'" + v + "' = " + v.getValue().toString(false, cpool) + ", ");
-                }
-                System.err.println();
-                String add = "";
-                if (a instanceof ActionIf) {
-                    add = " change: " + ((ActionIf) a).getJumpOffset();
-                }
-                if (a instanceof ActionJump) {
-                    add = " change: " + ((ActionJump) a).getJumpOffset();
-                }
-                System.err.println(add);
-            }
-            long newFilePos = rri.getPos();
-            long actionLen = newFilePos - filePos;
-
-            ensureCapacity(ret, ip);
-            int newip = -1;
-
-            if (a instanceof ActionConstantPool) {
-                if (cpool == null) {
-                    cpool = new ConstantPool();
-                }
-                cpool.setNew(((ActionConstantPool) a).constantPool);
-            }
-            ActionIf aif = null;
-            boolean goaif = false;
-            if (!a.isIgnored()) {
-                String varname = null;
-                if (a instanceof StoreTypeAction) {
-                    StoreTypeAction sta = (StoreTypeAction) a;
-                    varname = sta.getVariableName(stack, cpool);
-                }
-
-                try {
-                    if (a instanceof ActionIf) {
-                        aif = (ActionIf) a;
-
-                        GraphTargetItem top = null;
-                        if (deobfuscate) {
-                            top = stack.pop();
-                        }
-                        int nip = rri.getPos() + aif.getJumpOffset();
-
-                        if (decideBranch) {
-                            System.out.print("newip " + nip + ", ");
-                            System.out.print("Action: jump(j),ignore(i),compute(c)?");
-                            String next = sc.next();
-                            if (next.equals("j")) {
-                                newip = rri.getPos() + aif.getJumpOffset();
-                                rri.setPos(newip);
-
-                            } else if (next.equals("i")) {
-                            } else if (next.equals("c")) {
-                                goaif = true;
-                            }
-                        } else if (deobfuscate && top.isCompileTime() && (!top.hasSideEffect())) {
-                            ((ActionIf) a).compileTime = true;
-                            if (debugMode) {
-                                System.err.print("is compiletime -> ");
-                            }
-                            if (EcmaScript.toBoolean(top.getResult())) {
-                                newip = rri.getPos() + aif.getJumpOffset();
-                                aif.jumpUsed = true;
-                                if (aif.ignoreUsed) {
-                                    aif.compileTime = false;
-                                }
-                                if (debugMode) {
-                                    System.err.println("jump");
-                                }
-                            } else {
-                                aif.ignoreUsed = true;
-                                if (aif.jumpUsed) {
-                                    aif.compileTime = false;
-                                }
-                                if (debugMode) {
-                                    System.err.println("ignore");
-                                }
-                            }
-                        } else {
-                            if (debugMode) {
-                                System.err.println("goaif");
-                            }
-                            //throw new RuntimeException("goaif");
-                            goaif = true;
-                        }
-                    } else if (a instanceof ActionJump) {
-                        newip = rri.getPos() + ((ActionJump) a).getJumpOffset();
-                        //if(newip>=0){
-                        //rri.setPos(newip);
-                        //}
-                    } else if (!(a instanceof GraphSourceItemContainer)) {
-                        if (deobfuscate) {
-                            //return in for..in,   TODO:Handle this better way
-                            if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
-                                stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
-                            }
-                            if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
-                                stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
-                            }
-                            a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
-                        }
-                    }
-                } catch (RuntimeException ex) {
-                    /*if (!enableVariables) {
-                     throw ex;
-                     }*/
-                    log.log(Level.SEVERE, "Disassembly exception", ex);
-                    break;
-                }
-
-                HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
-                if (varname != null) {
-                    GraphTargetItem varval = vars.get(varname);
-                    if (varval != null && varval.isCompileTime() && indeterminate) {
-                        vars.put(varname, new NotCompileTimeItem(null, varval));
-                    }
-                }
-            }
-            int nopos = -1;
-            for (int i = 0; i < actionLen; i++) {
-                ensureCapacity(ret, ip + i);
-                if (a instanceof ActionNop) {
-                    int prevPos = (int) a.getAddress();
-                    a = new ActionNop();
-                    a.setAddress(prevPos, SWF.DEFAULT_VERSION);
-                    nopos++;
-                    if (nopos > 0) {
-                        a.setAddress(a.getAddress() + 1, SWF.DEFAULT_VERSION);
-                    }
-
-                }
-                ret.set(ip + i, a);
-            }
-
-            if (a instanceof GraphSourceItemContainer) {
-                GraphSourceItemContainer cnt = (GraphSourceItemContainer) a;
-                if (a instanceof Action) {
-                    long endAddr = a.getAddress() + cnt.getHeaderSize();
-                    /*if(!containers.containsKey(endAddr)){
-                     containers.put(endAddr, new ArrayList<ActionContainer>());
-                     }
-                     containers.get(endAddr).add((ActionContainer)a);
-                     */
-                    String cntName = cnt.getName();
-                    List<List<GraphTargetItem>> output2s = new ArrayList<>();
-                    for (long size : cnt.getContainerSizes()) {
-                        if (size == 0) {
-                            output2s.add(new ArrayList<GraphTargetItem>());
-                            continue;
-                        }
-                        List<Object> localData2;
-                        List<GraphTargetItem> output2 = new ArrayList<>();
-                        if ((cnt instanceof ActionDefineFunction) || (cnt instanceof ActionDefineFunction2)) {
-                            localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-                        } else {
-                            localData2 = localData;
-                        }
-                        readActionListAtPos(listeners, output2, containers, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates);
-                        output2s.add(output2);
-                        endAddr += size;
-                    }
-                    if (deobfuscate) {
-                        cnt.translateContainer(output2s, stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
-                    }
-                    ip = (int) endAddr;
-                    prevIp = ip;
-                    rri.setPos(ip);
-                    filePos = rri.getPos();
-                    continue;
-                }
-                //infoCorrect += ((ActionContainer) a).getDataLength();
-            }
-
-            if (a instanceof ActionEnd) {
-                break;
-            }
-            if (newip > -1) {
-                ip = newip;
-            } else {
-                ip = ip + info; //(int) actionLen;
-            }
-            rri.setPos(ip);
-            filePos = rri.getPos();
-            if (goaif) {
-                aif.ignoreUsed = true;
-                aif.jumpUsed = true;
-                indeterminate = true;
-
-                HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
-                boolean stateChanged = false;
-                if (decisionStates.containsKey(ip)) {
-                    HashMap<String, GraphTargetItem> oldstate = decisionStates.get(ip);
-                    if (oldstate.size() != vars.size()) {
-                        stateChanged = true;
-                    } else {
-                        for (String k : vars.keySet()) {
-                            if (!oldstate.containsKey(k)) {
-                                stateChanged = true;
-                                break;
-                            }
-                            if (!vars.get(k).isCompileTime() && oldstate.get(k).isCompileTime()) {
-                                stateChanged = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                HashMap<String, GraphTargetItem> curstate = new HashMap<>();
-                curstate.putAll(vars);
-                decisionStates.put(ip, curstate);
-
-                if ((!stateChanged) && curVisited > 1) {
-                    List<Integer> branches = new ArrayList<>();
-                    branches.add(rri.getPos() + aif.getJumpOffset());
-                    branches.add(rri.getPos());
-                    for (int br : branches) {
-                        int visc = 0;
-                        if (visited.containsKey(br)) {
-                            visc = visited.get(br);
-                        }
-                        if (visc == 0) {//<curVisited){
-                            ip = br;
-                            prevIp = ip;
-                            rri.setPos(br);
-                            filePos = rri.getPos();
-                            continue loopip;
-                        }
-                    }
-                    break loopip;
-                }
-
-                int oldPos = rri.getPos();
-                @SuppressWarnings("unchecked")
-                Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                if (readActionListAtPos(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates)) {
-                    retv = true;
-                }
-                rri.setPos(oldPos);
-            }
-            prevIp = ip;
-            if (a.isExit()) {
-                break;
-            }
-        }
-        for (DisassemblyListener listener : listeners) {
-            listener.progress("Reading", rri.getCount(), rri.length());
-        }
-        return retv;
-    }
-
-    private static void ensureCapacity(List<Action> ret, int index) {
-        int pos = ret.size();
-        while (ret.size() <= index) {
-            Action a = new ActionNop();
-            a.setAddress(pos++, SWF.DEFAULT_VERSION);
-            ret.add(a);
-        }
+        return ActionListReader.readActionList(listeners, containerSWFOffset, rri, version, rri.getPos(), rri.getPos() + maxlen, path);
     }
 
     private static void dumpTag(PrintStream out, int version, Tag tag, int level) {
@@ -1076,7 +628,7 @@ public class SWFInputStream extends InputStream {
 
     /**
      * Reads list of tags from the stream. Reading ends with End tag(=0) or end
-     * of the stream. Optinally can skip AS1/2 tags when file is AS3
+     * of the stream. Optionally can skip AS1/2 tags when file is AS3
      *
      * @param swf
      * @param level
@@ -1529,233 +1081,233 @@ public class SWFInputStream extends InputStream {
 
             try {
                 actionCode = readUI8();
-            } catch (EndOfStreamException eos) {
+                if (actionCode == 0) {
+                    return new ActionEnd();
+                }
+                if (actionCode == -1) {
+                    return null;
+                }
+                int actionLength = 0;
+                if (actionCode >= 0x80) {
+                    actionLength = readUI16();
+                }
+                switch (actionCode) {
+                    //SWF3 Actions
+                    case 0x81:
+                        return new ActionGotoFrame(actionLength, this);
+                    case 0x83:
+                        return new ActionGetURL(actionLength, this, version);
+                    case 0x04:
+                        return new ActionNextFrame();
+                    case 0x05:
+                        return new ActionPrevFrame();
+                    case 0x06:
+                        return new ActionPlay();
+                    case 0x07:
+                        return new ActionStop();
+                    case 0x08:
+                        return new ActionToggleQuality();
+                    case 0x09:
+                        return new ActionStopSounds();
+                    case 0x8A:
+                        return new ActionWaitForFrame(actionLength, this, cpool);
+                    case 0x8B:
+                        return new ActionSetTarget(actionLength, this, version);
+                    case 0x8C:
+                        return new ActionGoToLabel(actionLength, this, version);
+                    //SWF4 Actions
+                    case 0x96:
+                        return new ActionPush(actionLength, this, version);
+                    case 0x17:
+                        return new ActionPop();
+                    case 0x0A:
+                        return new ActionAdd();
+                    case 0x0B:
+                        return new ActionSubtract();
+                    case 0x0C:
+                        return new ActionMultiply();
+                    case 0x0D:
+                        return new ActionDivide();
+                    case 0x0E:
+                        return new ActionEquals();
+                    case 0x0F:
+                        return new ActionLess();
+                    case 0x10:
+                        return new ActionAnd();
+                    case 0x11:
+                        return new ActionOr();
+                    case 0x12:
+                        return new ActionNot();
+                    case 0x13:
+                        return new ActionStringEquals();
+                    case 0x14:
+                        return new ActionStringLength();
+                    case 0x21:
+                        return new ActionStringAdd();
+                    case 0x15:
+                        return new ActionStringExtract();
+                    case 0x29:
+                        return new ActionStringLess();
+                    case 0x31:
+                        return new ActionMBStringLength();
+                    case 0x35:
+                        return new ActionMBStringExtract();
+                    case 0x18:
+                        return new ActionToInteger();
+                    case 0x32:
+                        return new ActionCharToAscii();
+                    case 0x33:
+                        return new ActionAsciiToChar();
+                    case 0x36:
+                        return new ActionMBCharToAscii();
+                    case 0x37:
+                        return new ActionMBAsciiToChar();
+                    case 0x99:
+                        return new ActionJump(actionLength, this);
+                    case 0x9D:
+                        return new ActionIf(actionLength, this);
+                    case 0x9E:
+                        return new ActionCall(actionLength);
+                    case 0x1C:
+                        return new ActionGetVariable();
+                    case 0x1D:
+                        return new ActionSetVariable();
+                    case 0x9A:
+                        return new ActionGetURL2(actionLength, this);
+                    case 0x9F:
+                        return new ActionGotoFrame2(actionLength, this);
+                    case 0x20:
+                        return new ActionSetTarget2();
+                    case 0x22:
+                        return new ActionGetProperty();
+                    case 0x23:
+                        return new ActionSetProperty();
+                    case 0x24:
+                        return new ActionCloneSprite();
+                    case 0x25:
+                        return new ActionRemoveSprite();
+                    case 0x27:
+                        return new ActionStartDrag();
+                    case 0x28:
+                        return new ActionEndDrag();
+                    case 0x8D:
+                        return new ActionWaitForFrame2(actionLength, this, cpool);
+                    case 0x26:
+                        return new ActionTrace();
+                    case 0x34:
+                        return new ActionGetTime();
+                    case 0x30:
+                        return new ActionRandomNumber();
+                    //SWF5 Actions
+                    case 0x3D:
+                        return new ActionCallFunction();
+                    case 0x52:
+                        return new ActionCallMethod();
+                    case 0x88:
+                        return new ActionConstantPool(actionLength, this, version);
+                    case 0x9B:
+                        return new ActionDefineFunction(actionLength, this, rri, version);
+                    case 0x3C:
+                        return new ActionDefineLocal();
+                    case 0x41:
+                        return new ActionDefineLocal2();
+                    case 0x3A:
+                        return new ActionDelete();
+                    case 0x3B:
+                        return new ActionDelete2();
+                    case 0x46:
+                        return new ActionEnumerate();
+                    case 0x49:
+                        return new ActionEquals2();
+                    case 0x4E:
+                        return new ActionGetMember();
+                    case 0x42:
+                        return new ActionInitArray();
+                    case 0x43:
+                        return new ActionInitObject();
+                    case 0x53:
+                        return new ActionNewMethod();
+                    case 0x40:
+                        return new ActionNewObject();
+                    case 0x4F:
+                        return new ActionSetMember();
+                    case 0x45:
+                        return new ActionTargetPath();
+                    case 0x94:
+                        return new ActionWith(actionLength, this, rri, version);
+                    case 0x4A:
+                        return new ActionToNumber();
+                    case 0x4B:
+                        return new ActionToString();
+                    case 0x44:
+                        return new ActionTypeOf();
+                    case 0x47:
+                        return new ActionAdd2();
+                    case 0x48:
+                        return new ActionLess2();
+                    case 0x3F:
+                        return new ActionModulo();
+                    case 0x60:
+                        return new ActionBitAnd();
+                    case 0x63:
+                        return new ActionBitLShift();
+                    case 0x61:
+                        return new ActionBitOr();
+                    case 0x64:
+                        return new ActionBitRShift();
+                    case 0x65:
+                        return new ActionBitURShift();
+                    case 0x62:
+                        return new ActionBitXor();
+                    case 0x51:
+                        return new ActionDecrement();
+                    case 0x50:
+                        return new ActionIncrement();
+                    case 0x4C:
+                        return new ActionPushDuplicate();
+                    case 0x3E:
+                        return new ActionReturn();
+                    case 0x4D:
+                        return new ActionStackSwap();
+                    case 0x87:
+                        return new ActionStoreRegister(actionLength, this);
+                    //SWF6 Actions
+                    case 0x54:
+                        return new ActionInstanceOf();
+                    case 0x55:
+                        return new ActionEnumerate2();
+                    case 0x66:
+                        return new ActionStrictEquals();
+                    case 0x67:
+                        return new ActionGreater();
+                    case 0x68:
+                        return new ActionStringGreater();
+                    //SWF7 Actions
+                    case 0x8E:
+                        return new ActionDefineFunction2(actionLength, this, rri, version);
+                    case 0x69:
+                        return new ActionExtends();
+                    case 0x2B:
+                        return new ActionCastOp();
+                    case 0x2C:
+                        return new ActionImplementsOp();
+                    case 0x8F:
+                        return new ActionTry(actionLength, this, rri, version);
+                    case 0x2A:
+                        return new ActionThrow();
+                    default:
+                        /*if (actionLength > 0) {
+                         //skip(actionLength);
+                         }*/
+                        //throw new UnknownActionException(actionCode);
+                        Action r = new ActionNop();
+                        r.actionCode = actionCode;
+                        r.actionLength = actionLength;
+                        return r;
+                    //return new Action(actionCode, actionLength);
+                }
+            } catch (EndOfStreamException | ArrayIndexOutOfBoundsException eos) {
                 return null;
-            }
-            if (actionCode == 0) {
-                return new ActionEnd();
-            }
-            if (actionCode == -1) {
-                return null;
-            }
-            int actionLength = 0;
-            if (actionCode >= 0x80) {
-                actionLength = readUI16();
-            }
-            switch (actionCode) {
-                //SWF3 Actions
-                case 0x81:
-                    return new ActionGotoFrame(this);
-                case 0x83:
-                    return new ActionGetURL(actionLength, this, version);
-                case 0x04:
-                    return new ActionNextFrame();
-                case 0x05:
-                    return new ActionPrevFrame();
-                case 0x06:
-                    return new ActionPlay();
-                case 0x07:
-                    return new ActionStop();
-                case 0x08:
-                    return new ActionToggleQuality();
-                case 0x09:
-                    return new ActionStopSounds();
-                case 0x8A:
-                    return new ActionWaitForFrame(this, cpool);
-                case 0x8B:
-                    return new ActionSetTarget(actionLength, this, version);
-                case 0x8C:
-                    return new ActionGoToLabel(actionLength, this, version);
-                //SWF4 Actions
-                case 0x96:
-                    return new ActionPush(actionLength, this, version);
-                case 0x17:
-                    return new ActionPop();
-                case 0x0A:
-                    return new ActionAdd();
-                case 0x0B:
-                    return new ActionSubtract();
-                case 0x0C:
-                    return new ActionMultiply();
-                case 0x0D:
-                    return new ActionDivide();
-                case 0x0E:
-                    return new ActionEquals();
-                case 0x0F:
-                    return new ActionLess();
-                case 0x10:
-                    return new ActionAnd();
-                case 0x11:
-                    return new ActionOr();
-                case 0x12:
-                    return new ActionNot();
-                case 0x13:
-                    return new ActionStringEquals();
-                case 0x14:
-                    return new ActionStringLength();
-                case 0x21:
-                    return new ActionStringAdd();
-                case 0x15:
-                    return new ActionStringExtract();
-                case 0x29:
-                    return new ActionStringLess();
-                case 0x31:
-                    return new ActionMBStringLength();
-                case 0x35:
-                    return new ActionMBStringExtract();
-                case 0x18:
-                    return new ActionToInteger();
-                case 0x32:
-                    return new ActionCharToAscii();
-                case 0x33:
-                    return new ActionAsciiToChar();
-                case 0x36:
-                    return new ActionMBCharToAscii();
-                case 0x37:
-                    return new ActionMBAsciiToChar();
-                case 0x99:
-                    return new ActionJump(this);
-                case 0x9D:
-                    return new ActionIf(this);
-                case 0x9E:
-                    return new ActionCall();
-                case 0x1C:
-                    return new ActionGetVariable();
-                case 0x1D:
-                    return new ActionSetVariable();
-                case 0x9A:
-                    return new ActionGetURL2(this);
-                case 0x9F:
-                    return new ActionGotoFrame2(actionLength, this);
-                case 0x20:
-                    return new ActionSetTarget2();
-                case 0x22:
-                    return new ActionGetProperty();
-                case 0x23:
-                    return new ActionSetProperty();
-                case 0x24:
-                    return new ActionCloneSprite();
-                case 0x25:
-                    return new ActionRemoveSprite();
-                case 0x27:
-                    return new ActionStartDrag();
-                case 0x28:
-                    return new ActionEndDrag();
-                case 0x8D:
-                    return new ActionWaitForFrame2(this, cpool);
-                case 0x26:
-                    return new ActionTrace();
-                case 0x34:
-                    return new ActionGetTime();
-                case 0x30:
-                    return new ActionRandomNumber();
-                //SWF5 Actions
-                case 0x3D:
-                    return new ActionCallFunction();
-                case 0x52:
-                    return new ActionCallMethod();
-                case 0x88:
-                    return new ActionConstantPool(actionLength, this, version);
-                case 0x9B:
-                    return new ActionDefineFunction(actionLength, this, rri, version);
-                case 0x3C:
-                    return new ActionDefineLocal();
-                case 0x41:
-                    return new ActionDefineLocal2();
-                case 0x3A:
-                    return new ActionDelete();
-                case 0x3B:
-                    return new ActionDelete2();
-                case 0x46:
-                    return new ActionEnumerate();
-                case 0x49:
-                    return new ActionEquals2();
-                case 0x4E:
-                    return new ActionGetMember();
-                case 0x42:
-                    return new ActionInitArray();
-                case 0x43:
-                    return new ActionInitObject();
-                case 0x53:
-                    return new ActionNewMethod();
-                case 0x40:
-                    return new ActionNewObject();
-                case 0x4F:
-                    return new ActionSetMember();
-                case 0x45:
-                    return new ActionTargetPath();
-                case 0x94:
-                    return new ActionWith(this, rri, version);
-                case 0x4A:
-                    return new ActionToNumber();
-                case 0x4B:
-                    return new ActionToString();
-                case 0x44:
-                    return new ActionTypeOf();
-                case 0x47:
-                    return new ActionAdd2();
-                case 0x48:
-                    return new ActionLess2();
-                case 0x3F:
-                    return new ActionModulo();
-                case 0x60:
-                    return new ActionBitAnd();
-                case 0x63:
-                    return new ActionBitLShift();
-                case 0x61:
-                    return new ActionBitOr();
-                case 0x64:
-                    return new ActionBitRShift();
-                case 0x65:
-                    return new ActionBitURShift();
-                case 0x62:
-                    return new ActionBitXor();
-                case 0x51:
-                    return new ActionDecrement();
-                case 0x50:
-                    return new ActionIncrement();
-                case 0x4C:
-                    return new ActionPushDuplicate();
-                case 0x3E:
-                    return new ActionReturn();
-                case 0x4D:
-                    return new ActionStackSwap();
-                case 0x87:
-                    return new ActionStoreRegister(this);
-                //SWF6 Actions
-                case 0x54:
-                    return new ActionInstanceOf();
-                case 0x55:
-                    return new ActionEnumerate2();
-                case 0x66:
-                    return new ActionStrictEquals();
-                case 0x67:
-                    return new ActionGreater();
-                case 0x68:
-                    return new ActionStringGreater();
-                //SWF7 Actions
-                case 0x8E:
-                    return new ActionDefineFunction2(actionLength, this, rri, version);
-                case 0x69:
-                    return new ActionExtends();
-                case 0x2B:
-                    return new ActionCastOp();
-                case 0x2C:
-                    return new ActionImplementsOp();
-                case 0x8F:
-                    return new ActionTry(actionLength, this, rri, version);
-                case 0x2A:
-                    return new ActionThrow();
-                default:
-                    /*if (actionLength > 0) {
-                     //skip(actionLength);
-                     }*/
-                    //throw new UnknownActionException(actionCode);
-                    Action r = new ActionNop();
-                    r.actionCode = actionCode;
-                    r.actionLength = actionLength;
-                    return r;
-                //return new Action(actionCode, actionLength);
             }
         }
     }

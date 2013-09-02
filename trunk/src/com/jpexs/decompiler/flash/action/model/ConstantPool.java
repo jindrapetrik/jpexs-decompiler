@@ -21,10 +21,7 @@ import java.util.List;
 
 public class ConstantPool {
 
-    public List<List<String>> archive = new ArrayList<>();
-    public List<Integer> archiveCounts = new ArrayList<>();
     public List<String> constants = new ArrayList<>();
-    public int count;
 
     public ConstantPool() {
     }
@@ -34,31 +31,15 @@ public class ConstantPool {
     }
 
     public void setNew(List<String> constants) {
-        archive.add(this.constants);
         this.constants = constants;
-        archiveCounts.add(count);
-        count = 0;
     }
 
     @Override
     public String toString() {
-        return "" + count + "x " + constants.toString();
+        return "x " + constants.toString();
     }
 
     public boolean isEmpty() {
         return constants.isEmpty();
-    }
-
-    public void getLastUsed() {
-        if (count > 0) {
-            return;
-        }
-        for (int i = archive.size() - 1; i >= 0; i--) {
-            if (archiveCounts.get(i) > 0) {
-                count = archiveCounts.get(i);
-                constants = archive.get(i);
-                break;
-            }
-        }
     }
 }
