@@ -202,8 +202,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         if ((txt != null) && (!txt.equals(""))) {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
-            List<Object> tags = new ArrayList<Object>(Main.swf.tags);
-            List<TagNode> list = Main.swf.createASTagList(tags, null);
+            List<TagNode> list = Main.swf.createASTagList(Main.swf.tags, null);
             Map<String, ASMSource> asms = getASMs("", list);
             found = new ArrayList<>();
             Pattern pat = null;

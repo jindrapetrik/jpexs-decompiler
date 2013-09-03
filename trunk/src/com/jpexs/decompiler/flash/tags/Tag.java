@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import java.util.HashMap;
@@ -28,7 +29,7 @@ import java.util.Set;
 /**
  * Represents Tag inside SWF file
  */
-public class Tag implements NeedsCharacters, Exportable {
+public class Tag implements NeedsCharacters, Exportable, ContainerItem {
 
     /**
      * Identifier of tag type

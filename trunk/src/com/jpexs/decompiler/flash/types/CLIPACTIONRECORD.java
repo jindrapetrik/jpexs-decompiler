@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.helpers.ReReadableInputStream;
 import java.io.ByteArrayInputStream;
@@ -38,7 +39,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class CLIPACTIONRECORD implements ASMSource, Exportable {
+public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
 
     public static String keyToString(int key) {
         if ((key < CLIPACTIONRECORD.KEYNAMES.length) && (key > 0) && (CLIPACTIONRECORD.KEYNAMES[key] != null)) {

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReReadableInputStream;
@@ -39,7 +40,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class BUTTONCONDACTION implements ASMSource, Exportable {
+public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
 
     private long pos;
 
