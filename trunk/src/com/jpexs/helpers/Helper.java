@@ -17,7 +17,6 @@
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.gui.Freed;
-import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.awt.Component;
 import java.io.ByteArrayInputStream;
@@ -551,5 +550,14 @@ public class Helper {
         FutureTask<T> task = new FutureTask<>(c);
         THREAD_POOL.execute(task);
         return task.get(timeout, timeUnit);
+    }
+    
+    public static boolean contains(int[] array, int value) {
+        for (int i : array) {
+            if (i == value) {
+                return true;
+            }
+        }
+        return false;
     }
 }

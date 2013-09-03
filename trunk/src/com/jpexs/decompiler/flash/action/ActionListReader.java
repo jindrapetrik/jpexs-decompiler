@@ -86,7 +86,7 @@ public class ActionListReader {
 
         SWFInputStream sis = new SWFInputStream(rri, version);
 
-        // List of the actions. Item 0 contains the first (entry) action
+        // List of the actions. N. item contains the action which starts in offset N.
         List<Action> actionMap = new ArrayList<>();
         List<Long> nextOffsets = new ArrayList<>();
         Action entryAction = readActionListAtPos(listeners, containerSWFOffset, cpool, 
@@ -248,7 +248,7 @@ public class ActionListReader {
         Map<Long, Action> map = new HashMap<>(actions.size());
         for (Action a : actions) {
             long address = a.getAddress();
-            // There are multiple action in the same address (2nd action is a jump for deobfuscated code)
+            // There are multiple actions in the same address (2nd action is a jump for obfuscated code)
             // So this check is required
             if (!map.containsKey(address)) {
                 map.put(a.getAddress(), a);
@@ -319,7 +319,6 @@ public class ActionListReader {
             Action a = actions.get(i);
             a.setAddress(address, version);
             int length = a.getBytes(version).length;
-            //a.actionLength = length - 1 - ((a.actionCode >= 0x80) ? 2 : 0);
             if ((i != actions.size() - 1) && (a instanceof ActionEnd)) {
                 // placeholder for jump action
                 length = getTotalActionLength(new ActionJump(0));

@@ -960,16 +960,29 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 if (SwingUtilities.isRightMouseButton(e)) {
 
                     int row = tagTree.getClosestRowForLocation(e.getX(), e.getY());
-                    tagTree.setSelectionRow(row);
-                    Object tagObj = tagTree.getLastSelectedPathComponent();
-                    if (tagObj == null) {
+                    int[] selectionRows = tagTree.getSelectionRows();
+                    if (!Helper.contains(selectionRows, row)) {
+                        tagTree.setSelectionRow(row);
+                    }
+                    
+                    TreePath[] paths = tagTree.getSelectionPaths();
+                    if (paths == null || paths.length == 0) {
                         return;
                     }
+                    boolean allSelectedIsTag = true;
+                    for (TreePath treePath : paths) {
+                        Object tagObj = treePath.getLastPathComponent();
 
-                    if (tagObj instanceof TagNode) {
-                        tagObj = ((TagNode) tagObj).tag;
+                        if (tagObj instanceof TagNode) {
+                            Object tag = ((TagNode) tagObj).tag;
+                            if (!(tag instanceof Tag)) {
+                                allSelectedIsTag = false;
+                                break;
+                            }
+                        }
                     }
-                    removeMenuItem.setVisible(tagObj instanceof Tag);
+
+                    removeMenuItem.setVisible(allSelectedIsTag);
                     contextPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -1923,6 +1936,21 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
+    public List<Object> getSelected(JTree tree) {
+        TreeSelectionModel tsm = tree.getSelectionModel();
+        TreePath tps[] = tsm.getSelectionPaths();
+        List<Object> ret = new ArrayList<>();
+        if (tps == null) {
+            return ret;
+        }
+
+        for (TreePath tp : tps) {
+            Object o = tp.getLastPathComponent();
+            ret.add(o);
+        }
+        return ret;
+    }
+
     public List<Object> getAllSubs(JTree tree, Object o) {
         TreeModel tm = tree.getModel();
         List<Object> ret = new ArrayList<>();
@@ -2424,17 +2452,31 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 }
                 break;
             case "REMOVEITEM":
-                tagObj = tagTree.getLastSelectedPathComponent();
-                if (tagObj == null) {
-                    return;
-                }
+                List<Object> sel = getSelected(tagTree);
 
-                if (tagObj instanceof TagNode) {
-                    tagObj = ((TagNode) tagObj).tag;
+                List<Tag> tagsToRemove = new ArrayList<>();
+                for (Object o : sel) {
+                    Object tag = o;
+                    if (o instanceof TagNode) {
+                        tag = ((TagNode) o).tag;
+                    }
+                    if (tag instanceof Tag) {
+                        tagsToRemove.add((Tag) tag);
+                    }
                 }
-                if (tagObj instanceof Tag) {
-                    if (View.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tagObj.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                        swf.removeTag((Tag) tagObj);
+                
+                if (tagsToRemove.size() == 1) {
+                    Tag tag = tagsToRemove.get(0);
+                    if (View.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tag.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                        swf.removeTag(tag);
+                        showCard(CARDEMPTYPANEL);
+                        refreshTree();
+                    }
+                } else if (tagsToRemove.size() > 1) {
+                    if (View.showConfirmDialog(this, translate("message.confirm.removemultiple").replace("%count%", Integer.toString(tagsToRemove.size())), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                        for (Tag tag : tagsToRemove) {
+                            swf.removeTag(tag);
+                        }
                         showCard(CARDEMPTYPANEL);
                         refreshTree();
                     }
