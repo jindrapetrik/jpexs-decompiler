@@ -20,8 +20,10 @@ import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReReadableInputStream;
@@ -38,7 +40,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class BUTTONCONDACTION implements ASMSource, Exportable {
+public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
 
     private long pos;
 
@@ -169,11 +171,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable {
     @Override
     public List<Action> getActions(int version) {
         try {
-            boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
-            List<Action> list = SWFInputStream.readActionList(listeners, getPos() + 4, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1, toString()/*FIXME?*/);
-            if (deobfuscate) {
-                list = Action.removeNops(0, list, version, getPos() + 4, toString()/*FIXME?*/);
-            }
+            List<Action> list = ActionListReader.readActionList(listeners, getPos() + 4, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1, toString()/*FIXME?*/);
             return list;
 
         } catch (Exception ex) {

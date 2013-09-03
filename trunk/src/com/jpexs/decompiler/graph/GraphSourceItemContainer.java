@@ -31,6 +31,8 @@ public interface GraphSourceItemContainer {
 
     public List<Long> getContainerSizes();
 
+    public void setContainerSize(int index, long size);
+
     public String getASMSourceBetween(int pos);
 
     public boolean parseDivision(long size, FlasmLexer lexer);

@@ -363,6 +363,15 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     }
 
     @Override
+    public void setContainerSize(int index, long size) {
+        if (index == 0) {
+            codeSize = (int) size;
+        } else {
+            throw new IllegalArgumentException("Index must be 0.");
+        }
+    }
+
+    @Override
     public boolean parseDivision(long size, FlasmLexer lexer) {
         codeSize = (int) (size - getHeaderSize());
         return false;

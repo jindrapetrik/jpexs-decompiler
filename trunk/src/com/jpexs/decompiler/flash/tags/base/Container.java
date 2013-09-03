@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.tags.Tag;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public interface Container {
      *
      * @return List of sub-items
      */
-    public List<Object> getSubItems();
+    public List<ContainerItem> getSubItems();
 
     /**
      * Returns number of sub-items

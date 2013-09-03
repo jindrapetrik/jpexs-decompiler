@@ -83,6 +83,7 @@ import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -149,6 +150,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -793,7 +795,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
         //setJMenuBar(menuBar);
 
-        List<Object> objs = new ArrayList<>();
+        List<ContainerItem> objs = new ArrayList<>();
         if (swf != null) {
             objs.addAll(swf.tags);
         }
@@ -958,16 +960,29 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 if (SwingUtilities.isRightMouseButton(e)) {
 
                     int row = tagTree.getClosestRowForLocation(e.getX(), e.getY());
-                    tagTree.setSelectionRow(row);
-                    Object tagObj = tagTree.getLastSelectedPathComponent();
-                    if (tagObj == null) {
+                    int[] selectionRows = tagTree.getSelectionRows();
+                    if (!Helper.contains(selectionRows, row)) {
+                        tagTree.setSelectionRow(row);
+                    }
+                    
+                    TreePath[] paths = tagTree.getSelectionPaths();
+                    if (paths == null || paths.length == 0) {
                         return;
                     }
+                    boolean allSelectedIsTag = true;
+                    for (TreePath treePath : paths) {
+                        Object tagObj = treePath.getLastPathComponent();
 
-                    if (tagObj instanceof TagNode) {
-                        tagObj = ((TagNode) tagObj).tag;
+                        if (tagObj instanceof TagNode) {
+                            Object tag = ((TagNode) tagObj).tag;
+                            if (!(tag instanceof Tag)) {
+                                allSelectedIsTag = false;
+                                break;
+                            }
+                        }
                     }
-                    removeMenuItem.setVisible(tagObj instanceof Tag);
+
+                    removeMenuItem.setVisible(allSelectedIsTag);
                     contextPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -1050,7 +1065,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             }
         }
         characters = new HashMap<>();
-        List<Object> list2 = new ArrayList<>();
+        List<ContainerItem> list2 = new ArrayList<>();
         if (swf != null) {
             list2.addAll(swf.tags);
         }
@@ -1649,8 +1664,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
-    private void parseCharacters(List<Object> list) {
-        for (Object t : list) {
+    private void parseCharacters(List<ContainerItem> list) {
+        for (ContainerItem t : list) {
             if (t instanceof CharacterTag) {
                 characters.put(((CharacterTag) t).getCharacterId(), (CharacterTag) t);
             }
@@ -1660,8 +1675,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
-    public static void getShapes(List<Object> list, List<Tag> shapes) {
-        for (Object t : list) {
+    public static void getShapes(List<ContainerItem> list, List<Tag> shapes) {
+        for (ContainerItem t : list) {
             if (t instanceof Container) {
                 getShapes(((Container) t).getSubItems(), shapes);
             }
@@ -1674,8 +1689,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
-    public static void getFonts(List<Object> list, List<Tag> fonts) {
-        for (Object t : list) {
+    public static void getFonts(List<ContainerItem> list, List<Tag> fonts) {
+        for (ContainerItem t : list) {
             if (t instanceof Container) {
                 getFonts(((Container) t).getSubItems(), fonts);
             }
@@ -1688,8 +1703,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
-    public static void getActionScript3(List<Object> list, List<ABCContainerTag> actionScripts) {
-        for (Object t : list) {
+    public static void getActionScript3(List<ContainerItem> list, List<ABCContainerTag> actionScripts) {
+        for (ContainerItem t : list) {
             if (t instanceof Container) {
                 getActionScript3(((Container) t).getSubItems(), actionScripts);
             }
@@ -1699,8 +1714,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
-    public static void getMorphShapes(List<Object> list, List<Tag> morphShapes) {
-        for (Object t : list) {
+    public static void getMorphShapes(List<ContainerItem> list, List<Tag> morphShapes) {
+        for (ContainerItem t : list) {
             if (t instanceof Container) {
                 getMorphShapes(((Container) t).getSubItems(), morphShapes);
             }
@@ -1710,8 +1725,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
-    public static void getImages(List<Object> list, List<Tag> images) {
-        for (Object t : list) {
+    public static void getImages(List<ContainerItem> list, List<Tag> images) {
+        for (ContainerItem t : list) {
             if (t instanceof Container) {
                 getImages(((Container) t).getSubItems(), images);
             }
@@ -1726,8 +1741,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
-    public static void getTexts(List<Object> list, List<Tag> texts) {
-        for (Object t : list) {
+    public static void getTexts(List<ContainerItem> list, List<Tag> texts) {
+        for (ContainerItem t : list) {
             if (t instanceof Container) {
                 getTexts(((Container) t).getSubItems(), texts);
             }
@@ -1739,8 +1754,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
-    public static void getSprites(List<Object> list, List<Tag> sprites) {
-        for (Object t : list) {
+    public static void getSprites(List<ContainerItem> list, List<Tag> sprites) {
+        for (ContainerItem t : list) {
             if (t instanceof Container) {
                 getSprites(((Container) t).getSubItems(), sprites);
             }
@@ -1750,8 +1765,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
-    public static void getButtons(List<Object> list, List<Tag> buttons) {
-        for (Object t : list) {
+    public static void getButtons(List<ContainerItem> list, List<Tag> buttons) {
+        for (ContainerItem t : list) {
             if (t instanceof Container) {
                 getButtons(((Container) t).getSubItems(), buttons);
             }
@@ -1859,10 +1874,10 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         return ret;
     }
 
-    public List<TagNode> getTagNodesWithType(List<Object> list, String type, Object parent, boolean display) {
+    public List<TagNode> getTagNodesWithType(List<? extends ContainerItem> list, String type, Object parent, boolean display) {
         List<TagNode> ret = new ArrayList<>();
         int frameCnt = 0;
-        for (Object o : list) {
+        for (ContainerItem o : list) {
             String ttype = getTagType(o);
             if ("showframe".equals(ttype) && "frame".equals(type)) {
                 frameCnt++;
@@ -1921,6 +1936,21 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
+    public List<Object> getSelected(JTree tree) {
+        TreeSelectionModel tsm = tree.getSelectionModel();
+        TreePath tps[] = tsm.getSelectionPaths();
+        List<Object> ret = new ArrayList<>();
+        if (tps == null) {
+            return ret;
+        }
+
+        for (TreePath tp : tps) {
+            Object o = tp.getLastPathComponent();
+            ret.add(o);
+        }
+        return ret;
+    }
+
     public List<Object> getAllSubs(JTree tree, Object o) {
         TreeModel tm = tree.getModel();
         List<Object> ret = new ArrayList<>();
@@ -1968,7 +1998,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         return null;
     }
 
-    public List<TagNode> createTagList(List<Object> list, Object parent) {
+    public List<TagNode> createTagList(List<ContainerItem> list, Object parent) {
         List<TagNode> ret = new ArrayList<>();
         List<TagNode> frames = getTagNodesWithType(list, "frame", parent, true);
         List<TagNode> shapes = getTagNodesWithType(list, "shape", parent, true);
@@ -1995,7 +2025,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
 
         for (TagNode n : sprites) {
-            n.subItems = getTagNodesWithType(new ArrayList<Object>(((DefineSpriteTag) n.tag).subTags), "frame", n.tag, true);
+            n.subItems = getTagNodesWithType(((DefineSpriteTag) n.tag).subTags, "frame", n.tag, true);
         }
 
         List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
@@ -2010,7 +2040,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             if (t instanceof Container) {
                 TagNode tti = new TagNode(t);
                 if (((Container) t).getItemCount() > 0) {
-                    List<Object> subItems = ((Container) t).getSubItems();
+                    List<ContainerItem> subItems = ((Container) t).getSubItems();
                     tti.subItems = createTagList(subItems, t);
                 }
                 //ret.add(tti);
@@ -2422,17 +2452,31 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 }
                 break;
             case "REMOVEITEM":
-                tagObj = tagTree.getLastSelectedPathComponent();
-                if (tagObj == null) {
-                    return;
-                }
+                List<Object> sel = getSelected(tagTree);
 
-                if (tagObj instanceof TagNode) {
-                    tagObj = ((TagNode) tagObj).tag;
+                List<Tag> tagsToRemove = new ArrayList<>();
+                for (Object o : sel) {
+                    Object tag = o;
+                    if (o instanceof TagNode) {
+                        tag = ((TagNode) o).tag;
+                    }
+                    if (tag instanceof Tag) {
+                        tagsToRemove.add((Tag) tag);
+                    }
                 }
-                if (tagObj instanceof Tag) {
-                    if (View.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tagObj.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                        swf.removeTag((Tag) tagObj);
+                
+                if (tagsToRemove.size() == 1) {
+                    Tag tag = tagsToRemove.get(0);
+                    if (View.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tag.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                        swf.removeTag(tag);
+                        showCard(CARDEMPTYPANEL);
+                        refreshTree();
+                    }
+                } else if (tagsToRemove.size() > 1) {
+                    if (View.showConfirmDialog(this, translate("message.confirm.removemultiple").replace("%count%", Integer.toString(tagsToRemove.size())), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                        for (Tag tag : tagsToRemove) {
+                            swf.removeTag(tag);
+                        }
                         showCard(CARDEMPTYPANEL);
                         refreshTree();
                     }
@@ -3024,13 +3068,13 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 DefineVideoStreamTag vs = null;
                 if (tagObj instanceof DefineVideoStreamTag) {
                     vs = (DefineVideoStreamTag) tagObj;
-                    swf.populateVideoFrames(vs.getCharacterId(), new ArrayList<Object>(swf.tags), videoFrames);
+                    swf.populateVideoFrames(vs.getCharacterId(), swf.tags, videoFrames);
                     frameCount = videoFrames.size();
                 }
 
                 List<SoundStreamBlockTag> soundFrames = new ArrayList<>();
                 if (tagObj instanceof SoundStreamHeadTypeTag) {
-                    SWF.populateSoundStreamBlocks(new ArrayList<Object>(swf.tags), (Tag) tagObj, soundFrames);
+                    SWF.populateSoundStreamBlocks(swf.tags, (Tag) tagObj, soundFrames);
                     frameCount = soundFrames.size();
                 }
 
@@ -3077,7 +3121,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     if (tagObj instanceof FrameNode) {
                         FrameNode fn = (FrameNode) tagObj;
                         Object parent = fn.getParent();
-                        List<Object> subs = new ArrayList<>();
+                        List<ContainerItem> subs = new ArrayList<>();
                         if (parent == null) {
                             subs.addAll(swf.tags);
                         } else {
@@ -3236,7 +3280,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                     + "Push \"start\"\n"
                                     + "CallMethod\n"
                                     + "Pop\n"
-                                    + "Stop", SWF.DEFAULT_VERSION);
+                                    + "Stop", SWF.DEFAULT_VERSION, false);
                             doa.setActions(actions, SWF.DEFAULT_VERSION);
                             sos2.writeTag(doa);
                             sos2.writeTag(new ShowFrameTag(null));
@@ -3322,11 +3366,69 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     }
 
     public void refreshTree() {
-        List<Object> objs = new ArrayList<>();
+        List<ContainerItem> objs = new ArrayList<>();
         objs.addAll(swf.tags);
+
+        List<List<String>> expandedNodes = getExpandedNodes(tagTree);
+
         tagTree.setModel(new TagTreeModel(createTagList(objs, null), new SWFRoot((new File(Main.file)).getName())));
+
+        expandTreeNodes(tagTree, expandedNodes);
     }
 
+    private List<List<String>> getExpandedNodes(JTree tree) {
+        List<List<String>> expandedNodes = new ArrayList<>();
+        int rowCount = tree.getRowCount();
+        for (int i = 0; i < rowCount; i++){
+            TreePath path = tree.getPathForRow(i);
+            if (tree.isExpanded(path)) {
+                List<String> pathAsStringList = new ArrayList<>();
+                for (Object pathCompnent : path.getPath()) {
+                    pathAsStringList.add(pathCompnent.toString());
+                }
+                expandedNodes.add(pathAsStringList);
+            }
+        }
+        return expandedNodes;
+    }
+    
+    private void expandTreeNodes(JTree tree, List<List<String>> pathsToExpand) {
+        for(List<String> pathAsStringList : pathsToExpand) {
+            expandTreeNode(tree, pathAsStringList);
+        }
+    }
+    
+    private void expandTreeNode(JTree tree, List<String> pathAsStringList) {
+        TreeModel model = tree.getModel();
+        Object node = model.getRoot();
+        
+        if (pathAsStringList.isEmpty()) {
+            return;
+        }
+        if (!pathAsStringList.get(0).equals(node.toString())) {
+            return;
+        }
+        
+        List<Object> path = new ArrayList<>();
+        path.add(node);
+        
+        for (int i = 1; i < pathAsStringList.size(); i++) {
+            String name = pathAsStringList.get(i);
+            int childCount = model.getChildCount(node);
+            for (int j = 0; j < childCount; j++) {
+                Object child = model.getChild(node, j);
+                if (child.toString().equals(name)) {
+                    node = child;
+                    path.add(node);
+                    break;
+                }
+            }
+        }
+
+        TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
+        tree.expandPath(tp);
+    }
+    
     public void setEditText(boolean edit) {
         textValue.setEditable(edit);
         textSaveButton.setVisible(edit);

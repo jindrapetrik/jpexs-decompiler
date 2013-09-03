@@ -78,11 +78,21 @@ public class ExportTest {
     }
 
     @Test(dataProvider = "swfFiles")
-    public void testDecompile(File f) {
+    public void testDecompileAS(File f) {
+        testDecompile(f, false);
+    }
+    
+    @Test(dataProvider = "swfFiles")
+    public void testDecompilePcode(File f) {
+        testDecompile(f, true);
+    }
+    
+    public void testDecompile(File f, boolean isPcode) {
         try {
             SWF swf = new SWF(new FileInputStream(f), false);
             Configuration.DEBUG_COPY = true;
-            File fdir = new File(TESTDATADIR + File.separator + "output" + File.separator + f.getName());
+            String folderName = isPcode ? "outputp" : "output";
+            File fdir = new File(TESTDATADIR + File.separator + folderName + File.separator + f.getName());
             fdir.mkdirs();
 
             swf.exportActionScript(new AbortRetryIgnoreHandler() {
@@ -96,7 +106,7 @@ public class ExportTest {
                     return this;
                 }
                 
-            }, fdir.getAbsolutePath(), false, false);
+            }, fdir.getAbsolutePath(), isPcode, false);
         } catch (Exception ex) {
             fail();
         }

@@ -75,6 +75,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -610,7 +611,7 @@ public class SWF {
 
     public List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean parallel, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
-        List<Object> list2 = new ArrayList<>();
+        List<ContainerItem> list2 = new ArrayList<>();
         list2.addAll(tags);
         List<TagNode> list = createASTagList(list2, null);
 
@@ -684,13 +685,13 @@ public class SWF {
         return ret;
     }
 
-    public static List<TagNode> createASTagList(List<Object> list, Object parent) {
+    public static List<TagNode> createASTagList(List<? extends ContainerItem> list, Object parent) {
         List<TagNode> ret = new ArrayList<>();
         int frame = 1;
         List<TagNode> frames = new ArrayList<>();
 
         List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
-        for (Object t : list) {
+        for (ContainerItem t : list) {
             if (t instanceof ExportAssetsTag) {
                 exportAssetsTags.add((ExportAssetsTag) t);
             }
@@ -722,7 +723,7 @@ public class SWF {
                 if (((Container) t).getItemCount() > 0) {
 
                     TagNode tti = new TagNode(t);
-                    List<Object> subItems = ((Container) t).getSubItems();
+                    List<ContainerItem> subItems = ((Container) t).getSubItems();
 
                     tti.subItems = createASTagList(subItems, t);
                     addNode = tti;
@@ -870,9 +871,9 @@ public class SWF {
         return false;
     }
 
-    public static void populateSoundStreamBlocks(List<Object> tags, Tag head, List<SoundStreamBlockTag> output) {
+    public static void populateSoundStreamBlocks(List<? extends ContainerItem> tags, Tag head, List<SoundStreamBlockTag> output) {
         boolean found = false;
-        for (Object t : tags) {
+        for (ContainerItem t : tags) {
             if (t == head) {
                 found = true;
                 continue;
@@ -892,8 +893,8 @@ public class SWF {
         }
     }
 
-    public void populateVideoFrames(int streamId, List<Object> tags, HashMap<Integer, VideoFrameTag> output) {
-        for (Object t : tags) {
+    public void populateVideoFrames(int streamId, List<? extends ContainerItem> tags, HashMap<Integer, VideoFrameTag> output) {
+        for (ContainerItem t : tags) {
             if (t instanceof VideoFrameTag) {
                 output.put(((VideoFrameTag) t).frameNum, (VideoFrameTag) t);
             }
@@ -934,8 +935,7 @@ public class SWF {
         if (t instanceof SoundStreamHeadTypeTag) {
             SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
             List<SoundStreamBlockTag> blocks = new ArrayList<>();
-            List<Object> objs = new ArrayList<Object>(this.tags);
-            populateSoundStreamBlocks(objs, t, blocks);
+            populateSoundStreamBlocks(this.tags, t, blocks);
             if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 for (int b = 0; b < blocks.size(); b++) {
@@ -1087,7 +1087,8 @@ public class SWF {
                 if (t instanceof SoundStreamHeadTypeTag) {
                     final SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
                     final List<SoundStreamBlockTag> blocks = new ArrayList<>();
-                    List<Object> objs = new ArrayList<Object>(this.tags);
+                    List<ContainerItem> objs = new ArrayList<>();
+                    objs.addAll(this.tags);
                     populateSoundStreamBlocks(objs, t, blocks);
                     if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
                         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1157,8 +1158,7 @@ public class SWF {
 
     public byte[] exportMovie(DefineVideoStreamTag videoStream) throws IOException {
         HashMap<Integer, VideoFrameTag> frames = new HashMap<>();
-        List<Object> os = new ArrayList<Object>(this.tags);
-        populateVideoFrames(videoStream.characterID, os, frames);
+        populateVideoFrames(videoStream.characterID, this.tags, frames);
         if (frames.isEmpty()) {
             return new byte[0];
         }
@@ -1723,9 +1723,9 @@ public class SWF {
     }
     private HashMap<ASMSource, List<Action>> actionsMap = new HashMap<>();
 
-    private void getVariables(List<Object> objs, String path) {
+    private void getVariables(List<ContainerItem> objs, String path) {
         List<String> processed = new ArrayList<>();
-        for (Object o : objs) {
+        for (ContainerItem o : objs) {
             if (o instanceof ASMSource) {
                 String infPath = path + "/" + o.toString();
                 int pos = 1;
@@ -1893,7 +1893,7 @@ public class SWF {
         allVariableNames = new ArrayList<>();
         allStrings = new HashMap<>();
 
-        List<Object> objs = new ArrayList<>();
+        List<ContainerItem> objs = new ArrayList<>();
         int ret = 0;
         objs.addAll(tags);
         getVariables(objs, "");

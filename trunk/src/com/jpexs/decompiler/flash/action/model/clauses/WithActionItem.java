@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.swf5.ActionWith;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -50,9 +51,11 @@ public class WithActionItem extends ActionItem {
         List<Object> localData = new ArrayList<>();
         localData.add(constants);
         ret = hilight("with(", highlight) + scope.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
         for (GraphTargetItem ti : items) {
             ret += ti.toString(highlight, localData) + "\r\n";
         }
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight);
         return ret;
     }

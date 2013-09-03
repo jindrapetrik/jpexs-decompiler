@@ -1375,7 +1375,7 @@ public class AVM2Code implements Serializable {
             list.remove(lastPos);
         }
 
-        s = Graph.graphToString(list, hilighted, constants, localRegNames, fullyQualifiedNames);
+        s = Graph.graphToString(list, hilighted, true, constants, localRegNames, fullyQualifiedNames);
 
         return s;
     }

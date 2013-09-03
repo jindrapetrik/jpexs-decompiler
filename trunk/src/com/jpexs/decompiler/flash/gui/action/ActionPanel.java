@@ -49,13 +49,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -89,6 +90,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     public JButton saveDecompiledButton = new JButton(translate("button.save"), View.getIcon("save16"));
     public JButton cancelDecompiledButton = new JButton(translate("button.cancel"), View.getIcon("cancel16"));
     public JToggleButton hexButton;
+    public JToggleButton hexOnlyButton;
     public JLabel asmLabel = new HeaderLabel(translate("panel.disassembled"));
     public JLabel decLabel = new HeaderLabel(translate("panel.decompiled"));
     public List<Highlighting> decompiledHilights = new ArrayList<>();
@@ -102,6 +104,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     public JPanel topButtonsPan;
     private String srcWithHex;
     private String srcNoHex;
+    private String srcHexOnly;
     private String lastDecompiled = "";
     private ASMSource lastASM;
     public JPanel searchPanel;
@@ -199,8 +202,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         if ((txt != null) && (!txt.equals(""))) {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
-            List<Object> tags = new ArrayList<Object>(Main.swf.tags);
-            List<TagNode> list = Main.swf.createASTagList(tags, null);
+            List<TagNode> list = Main.swf.createASTagList(Main.swf.tags, null);
             Map<String, ASMSource> asms = getASMs("", list);
             found = new ArrayList<>();
             Pattern pat = null;
@@ -272,8 +274,8 @@ public class ActionPanel extends JPanel implements ActionListener {
 
     }
 
-    public void setHex(boolean hex) {
-        setText(hex ? srcWithHex : srcNoHex);
+    public void setHex(boolean hex, boolean hexOnly) {
+        setText(hex ? srcWithHex : (hexOnly ? srcHexOnly : srcNoHex));
     }
 
     public void setSource(ASMSource src, final boolean useCache) {
@@ -309,7 +311,8 @@ public class ActionPanel extends JPanel implements ActionListener {
                 asm.removeDisassemblyListener(listener);
                 srcWithHex = Helper.hexToComments(lastDisasm);
                 srcNoHex = Helper.stripComments(lastDisasm);
-                setHex(hexButton.isSelected());
+                srcHexOnly = getHexText(srcWithHex);
+                setHex(hexButton.isSelected(), hexOnlyButton.isSelected());
                 if (Configuration.getConfig("decompile", true)) {
                     decompiledEditor.setText("//" + translate("work.decompiling") + "...");
                     String stripped = "";
@@ -378,10 +381,19 @@ public class ActionPanel extends JPanel implements ActionListener {
         hexButton.setToolTipText(translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
+        // todo: find icon, and set visible
+        hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
+        hexOnlyButton.setActionCommand("HEXONLY");
+        hexOnlyButton.addActionListener(this);
+        hexOnlyButton.setToolTipText(translate("button.viewhex"));
+        hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
+        hexOnlyButton.setVisible(false);
+
         topButtonsPan = new JPanel();
         topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
         topButtonsPan.add(graphButton);
         topButtonsPan.add(hexButton);
+        topButtonsPan.add(hexOnlyButton);
         JPanel panCode = new JPanel(new BorderLayout());
         panCode.add(new JScrollPane(editor), BorderLayout.CENTER);
         panCode.add(topButtonsPan, BorderLayout.NORTH);
@@ -548,8 +560,11 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
 
     public void setEditMode(boolean val) {
+        // todo: create UI for editing raw data
+        final boolean rawEdit = false;
+        
         if (val) {
-            setText(srcNoHex);
+            setText(rawEdit ? srcHexOnly : srcNoHex);
             editor.setEditable(true);
             saveButton.setVisible(true);
             editButton.setVisible(false);
@@ -640,13 +655,19 @@ public class ActionPanel extends JPanel implements ActionListener {
         } else if (e.getActionCommand().equals("EDITACTION")) {
             setEditMode(true);
         } else if (e.getActionCommand().equals("HEX")) {
-            setHex(hexButton.isSelected());
+            setHex(hexButton.isSelected(), hexOnlyButton.isSelected());
         } else if (e.getActionCommand().equals("CANCELACTION")) {
             setEditMode(false);
-            setHex(hexButton.isSelected());
+            setHex(hexButton.isSelected(), hexOnlyButton.isSelected());
         } else if (e.getActionCommand().equals("SAVEACTION")) {
             try {
-                src.setActions(ASMParser.parse(0, src.getPos(), true, editor.getText(), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
+                String text = editor.getText();
+                if (text.trim().startsWith("#hexdata")) {
+                    src.setActionBytes(getBytesFromHexaText(text));
+                }
+                else {
+                    src.setActions(ASMParser.parse(0, src.getPos(), true, text, SWF.DEFAULT_VERSION, false), SWF.DEFAULT_VERSION);
+                }
                 setSource(this.src, false);
                 View.showMessageDialog(this, translate("message.action.saved"));
                 saveButton.setVisible(false);
@@ -678,6 +699,53 @@ public class ActionPanel extends JPanel implements ActionListener {
         }
     }
 
+    public byte[] getBytesFromHexaText(String text) {
+        Scanner scanner = new Scanner(text);
+        scanner.nextLine(); // ignore first line
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine().trim();
+            if (line.startsWith(";")) {
+                continue;
+            }
+            line = line.replace(" ", "");
+            for (int i = 0; i < line.length() / 2; i++) {
+                String hexStr = line.substring(i * 2, (i + 1) * 2);
+                byte b = (byte)Integer.parseInt(hexStr, 16);
+                baos.write(b);
+            }
+        }
+        byte[] data = baos.toByteArray();
+        return data;
+    }
+
+    private String getHexText(String srcWithHex) {
+        StringBuilder result = new StringBuilder();
+        String nl = System.getProperty("line.separator");
+        result.append("#hexdata").append(nl);
+
+        /* // hex data from decompiled actions
+        Scanner scanner = new Scanner(srcWithHex);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine().trim();
+            if (line.startsWith(";")) {
+                result.append(line.substring(1).trim()).append(nl);
+            } else {
+                result.append(";").append(line).append(nl);
+            }
+        }*/
+
+        byte[] data = src.getActionBytes();
+        for (int i = 0; i < data.length; i++) {
+            if (i % 8 == 0) {
+                result.append(nl);
+            }
+            result.append(String.format("%02x ", data[i]));
+        }
+        
+        return result.toString();
+    }
+    
     public void updateSearchPos() {
         searchPos.setText((foundPos + 1) + "/" + found.size());
         setSource(found.get(foundPos), true);

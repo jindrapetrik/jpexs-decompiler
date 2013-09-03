@@ -45,7 +45,12 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("ifFrameLoaded(", highlight) + frame.toString(highlight, constants) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n" + Graph.graphToString(actions, highlight, constants) + "}";
+        String ret = hilight("ifFrameLoaded(", highlight) + frame.toString(highlight, constants) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
+        ret += Graph.graphToString(actions, highlight, false, constants);
+        ret += Graph.INDENTCLOSE + "\r\n";
+        ret += hilight("}", highlight);
+        return ret;
     }
 
     @Override

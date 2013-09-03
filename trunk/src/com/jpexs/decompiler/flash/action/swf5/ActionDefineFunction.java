@@ -228,6 +228,15 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
+    public void setContainerSize(int index, long size) {
+        if (index == 0) {
+            codeSize = (int) size;
+        } else {
+            throw new IllegalArgumentException("Index must be 0.");
+        }
+    }
+
+    @Override
     public String getASMSourceBetween(int pos) {
         return "";
     }

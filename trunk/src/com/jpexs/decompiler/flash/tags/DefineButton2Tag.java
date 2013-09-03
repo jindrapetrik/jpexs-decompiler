@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -177,8 +178,8 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
      * @return List of sub-items
      */
     @Override
-    public List<Object> getSubItems() {
-        List<Object> ret = new ArrayList<>();
+    public List<ContainerItem> getSubItems() {
+        List<ContainerItem> ret = new ArrayList<>();
         ret.addAll(actions);
         return ret;
     }

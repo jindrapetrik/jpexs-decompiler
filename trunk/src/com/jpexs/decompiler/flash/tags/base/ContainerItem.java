@@ -14,32 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.model;
+package com.jpexs.decompiler.flash.tags.base;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class ConstantPool {
-
-    public List<String> constants = new ArrayList<>();
-
-    public ConstantPool() {
-    }
-
-    public ConstantPool(List<String> constants) {
-        this.constants = constants;
-    }
-
-    public void setNew(List<String> constants) {
-        this.constants = constants;
-    }
-
-    @Override
-    public String toString() {
-        return "x " + constants.toString();
-    }
-
-    public boolean isEmpty() {
-        return constants.isEmpty();
-    }
+/**
+ * Object which contains other objects
+ *
+ * @author JPEXS
+ */
+public interface ContainerItem {
+    
 }

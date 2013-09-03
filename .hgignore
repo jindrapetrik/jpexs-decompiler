@@ -11,6 +11,8 @@
 ^trunk/javadoc$
 ^trunk/coverage$
 ^trunk/dist$
+^trunk/testdata/decompile$
 ^trunk/build_exe\.xml$
+^trunk/coverage\.ec$
 ^trunk/libsrc/jsyntaxpane/jsyntaxpane/src/target$
 \.~.*$ 

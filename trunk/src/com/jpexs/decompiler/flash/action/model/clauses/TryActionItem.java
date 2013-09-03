@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -59,6 +60,7 @@ public class TryActionItem extends ActionItem implements Block {
     public String toString(boolean highlight, ConstantPool constants) {
         String ret = "";
         ret += hilight("try", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
         List<Object> localData = new ArrayList<>();
         localData.add(constants);
         for (GraphTargetItem ti : tryCommands) {
@@ -66,24 +68,29 @@ public class TryActionItem extends ActionItem implements Block {
                 ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
             }
         }
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight);
         for (int e = 0; e < catchExceptions.size(); e++) {
             ret += "\r\n" + hilight("catch(", highlight) + catchExceptions.get(e).toStringNoQuotes(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+            ret += Graph.INDENTOPEN + "\r\n";
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
                     ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
                 }
             }
+            ret += Graph.INDENTCLOSE + "\r\n";
             ret += hilight("}", highlight);
         }
         if (finallyCommands.size() > 0) {
             ret += "\r\n" + hilight("finally", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+            ret += Graph.INDENTOPEN + "\r\n";
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
                     ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
                 }
             }
+            ret += Graph.INDENTCLOSE + "\r\n";
             ret += hilight("}", highlight);
         }
         return ret;

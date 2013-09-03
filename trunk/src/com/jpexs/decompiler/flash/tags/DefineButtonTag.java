@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -169,11 +170,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
             rri.setPos(prevLength);
 
-            boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
-            List<Action> list = SWFInputStream.readActionList(listeners, getPos() + hdrSize - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
-            if (deobfuscate) {
-                list = Action.removeNops(0, list, version, getPos() + hdrSize, toString()/*FIXME?*/);
-            }
+            List<Action> list = ActionListReader.readActionList(listeners, getPos() + hdrSize - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
             return list;
         } catch (Exception ex) {
             Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);

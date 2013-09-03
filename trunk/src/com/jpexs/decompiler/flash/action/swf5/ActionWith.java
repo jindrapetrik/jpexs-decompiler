@@ -50,8 +50,8 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         return false;
     }
 
-    public ActionWith(SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
-        super(0x94, 2);
+    public ActionWith(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
+        super(0x94, actionLength);
         codeSize = sis.readUI16();
         this.version = version;
     }
@@ -105,6 +105,16 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         List<Long> ret = new ArrayList<>();
         ret.add((Long) (long) codeSize);
         return ret;
+    }
+
+    @Override
+    public void setContainerSize(int index, long size) {
+        if (index == 0) {
+            codeSize = (int) size;
+        }
+        else {
+            throw new IllegalArgumentException("Index must be 0.");
+        }
     }
 
     @Override

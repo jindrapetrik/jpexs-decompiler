@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.helpers.Helper;
@@ -55,29 +56,35 @@ public class TryAVM2Item extends AVM2Item implements Block {
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String ret = "";
         ret += hilight("try", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
             }
         }
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight);
         for (int e = 0; e < catchExceptions.size(); e++) {
             ret += "\r\n" + hilight("catch(" + catchExceptions.get(e).getVarName(constants, fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(constants, fullyQualifiedNames) + ")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+            ret += Graph.INDENTOPEN + "\r\n";
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
                     ret += ti.toStringSemicoloned(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
                 }
             }
+            ret += Graph.INDENTCLOSE + "\r\n";
             ret += hilight("}", highlight);
         }
         if (finallyCommands.size() > 0) {
             ret += "\r\n" + hilight("finally", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+            ret += Graph.INDENTOPEN + "\r\n";
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
                     ret += ti.toStringSemicoloned(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
                 }
             }
+            ret += Graph.INDENTCLOSE + "\r\n";
             ret += hilight("}", highlight);
         }
         return ret;

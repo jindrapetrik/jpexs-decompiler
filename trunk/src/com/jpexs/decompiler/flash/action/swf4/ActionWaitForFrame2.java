@@ -47,6 +47,7 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
     public ActionWaitForFrame2(int skipCount) {
         super(0x8D, 1);
         this.skipCount = skipCount;
+        skipped = new ArrayList<>();
     }
 
     @Override
@@ -60,11 +61,11 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
         skipCount = store.size();
     }
 
-    public ActionWaitForFrame2(SWFInputStream sis, ConstantPool cpool) throws IOException {
-        super(0x8D, 1);
+    public ActionWaitForFrame2(int actionLength, SWFInputStream sis, ConstantPool cpool) throws IOException {
+        super(0x8D, actionLength);
         skipCount = sis.readUI8();
         skipped = new ArrayList<>();
-        for (int i = 0; i < skipCount; i++) {
+        /*for (int i = 0; i < skipCount; i++) {
             Action a = sis.readAction(cpool);
             if (a instanceof ActionEnd) {
                 skipCount = i;
@@ -91,12 +92,13 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
                 }
             }
             skipCount = skipped.size();
-        }
+        }*/
     }
 
     public ActionWaitForFrame2(FlasmLexer lexer) throws IOException, ParseException {
         super(0x8D, -1);
         skipCount = (int) lexLong(lexer);
+        skipped = new ArrayList<>();
     }
 
     @Override

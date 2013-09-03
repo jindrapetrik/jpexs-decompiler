@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
@@ -66,9 +67,11 @@ public class ForInActionItem extends LoopActionItem implements Block {
         String ret = "";
         ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
         ret += hilight("for(", highlight) + ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber) ? "var " : "") + stripQuotes(variableName, constants, highlight) + " in " + enumVariable.toString(highlight, constants) + ")\r\n{\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
         for (GraphTargetItem ti : commands) {
             ret += ti.toStringSemicoloned(highlight, constants) + "\r\n";
         }
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight) + "\r\n";
         ret += hilight(":loop" + loop.id, highlight);
         return ret;

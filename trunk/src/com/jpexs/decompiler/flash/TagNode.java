@@ -45,6 +45,7 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Helper;
@@ -83,7 +84,7 @@ public class TagNode {
         return tag.toString();
     }
 
-    public static List<TagNode> createTagList(List<Object> list) {
+    public static List<TagNode> createTagList(List<ContainerItem> list) {
         List<TagNode> ret = new ArrayList<>();
         int frame = 1;
         List<TagNode> frames = new ArrayList<>();
@@ -162,7 +163,7 @@ public class TagNode {
             if (t instanceof Container) {
                 TagNode tti = new TagNode(t);
                 if (((Container) t).getItemCount() > 0) {
-                    List<Object> subItems = ((Container) t).getSubItems();
+                    List<ContainerItem> subItems = ((Container) t).getSubItems();
                     tti.subItems = createTagList(subItems);
                 }
                 //ret.add(tti);

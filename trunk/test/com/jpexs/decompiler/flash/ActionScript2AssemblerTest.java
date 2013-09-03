@@ -52,7 +52,7 @@ public class ActionScript2AssemblerTest {
             "Jump loc000d\n" +
             "loc002f:";
         try {
-            List<Action> actions = ASMParser.parse(0, 0, true, actionsString, swf.version);
+            List<Action> actions = ASMParser.parse(0, 0, true, actionsString, swf.version, false);
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));

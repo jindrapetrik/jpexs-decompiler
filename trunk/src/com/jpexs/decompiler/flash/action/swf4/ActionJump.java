@@ -52,8 +52,8 @@ public class ActionJump extends Action {
         setJumpOffset(offset);
     }
 
-    public ActionJump(SWFInputStream sis) throws IOException {
-        super(0x99, 2);
+    public ActionJump(int actionLength, SWFInputStream sis) throws IOException {
+        super(0x99, actionLength);
         setJumpOffset(sis.readSI16());
     }
 

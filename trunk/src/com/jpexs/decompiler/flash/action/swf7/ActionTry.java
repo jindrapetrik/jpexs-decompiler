@@ -206,6 +206,10 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         return surroundWithAction(baos.toByteArray(), version).length;
     }
 
+    public long getTrySize() {
+        return trySize;
+    }
+    
     @Override
     public List<Long> getContainerSizes() {
         List<Long> ret = new ArrayList<>();
@@ -213,6 +217,23 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         ret.add(catchSize);
         ret.add(finallySize);
         return ret;
+    }
+
+    @Override
+    public void setContainerSize(int index, long size) {
+        switch (index) {
+            case 0:
+                trySize = size;
+                break;
+            case 1:
+                catchSize = size;
+                break;
+            case 2:
+                finallySize = size;
+                break;
+            default:
+                throw new IllegalArgumentException("Valid indexes are 0, 1, and 2.");
+        }
     }
 
     @Override

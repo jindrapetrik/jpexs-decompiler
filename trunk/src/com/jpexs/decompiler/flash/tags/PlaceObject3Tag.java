@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
@@ -356,8 +357,8 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
      * @return List of sub-items
      */
     @Override
-    public List<Object> getSubItems() {
-        List<Object> ret = new ArrayList<>();
+    public List<ContainerItem> getSubItems() {
+        List<ContainerItem> ret = new ArrayList<>();
         if (placeFlagHasClipActions) {
             ret.addAll(clipActions.clipActionRecords);
         }
