@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
@@ -41,11 +42,13 @@ public class UniversalLoopItem extends LoopItem implements Block {
         ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
         ret += hilight("while(true)", highlight);
         ret += "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
             }
         }
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight) + "\r\n";
         ret += hilight(":loop" + loop.id, highlight);
         return ret;

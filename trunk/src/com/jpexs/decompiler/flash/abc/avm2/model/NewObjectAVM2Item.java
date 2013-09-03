@@ -43,6 +43,12 @@ public class NewObjectAVM2Item extends AVM2Item {
         if (pairs.size() < 2) {
             return hilight("{", highlight) + params + hilight("}", highlight);
         }
-        return "\r\n" + Graph.INDENTOPEN + "\r\n" + hilight("{", highlight) + "\r\n" + params + "\r\n" + hilight("}", highlight) + "\r\n" + Graph.INDENTCLOSE + "\r\n";
+        String ret = "\r\n" + Graph.INDENTOPEN + "\r\n";
+        ret += hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
+        ret += params + "\r\n";
+        ret += Graph.INDENTCLOSE + "\r\n";
+        ret += hilight("}", highlight) + "\r\n" + Graph.INDENTCLOSE + "\r\n";
+        return ret;
     }
 }

@@ -91,7 +91,11 @@ public class FunctionActionItem extends ActionItem {
             }
             ret += hilight(pname, highlight);
         }
-        ret += hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n" + Graph.graphToString(actions, highlight, constants) + hilight("}", highlight);
+        ret += hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
+        ret += Graph.graphToString(actions, highlight, false, constants);
+        ret += Graph.INDENTCLOSE + "\r\n";
+        ret += hilight("}", highlight);
         return ret;
     }
 

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
@@ -71,11 +72,13 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
         String ret = "";
         ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
         ret += hilight("for each (", highlight) + expression.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
             }
         }
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight) + "\r\n";
         ret += hilight(":loop" + loop.id, highlight);
         return ret;

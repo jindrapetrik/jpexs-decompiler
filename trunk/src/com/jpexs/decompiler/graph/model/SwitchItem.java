@@ -55,6 +55,7 @@ public class SwitchItem extends LoopItem implements Block {
         String ret = "";
         ret += hilight("loopswitch" + loop.id + ":", highlight) + "\r\n";
         ret += hilight("switch(", highlight) + switchedObject.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
         for (int i = 0; i < caseCommands.size(); i++) {
             for (int k = 0; k < valuesMapping.size(); k++) {
                 if (valuesMapping.get(k) == i) {
@@ -81,6 +82,7 @@ public class SwitchItem extends LoopItem implements Block {
                 ret += Graph.INDENTCLOSE + "\r\n";
             }
         }
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight) + "\r\n";
         ret += ":loop" + loop.id;
         return ret;

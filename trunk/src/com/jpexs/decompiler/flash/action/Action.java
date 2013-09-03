@@ -725,7 +725,7 @@ public class Action implements GraphSourceItem {
 
                     List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
 
-                    return Graph.graphToString(tree, highlight);
+                    return Graph.graphToString(tree, highlight, true);
                 }
             }, timeout, TimeUnit.SECONDS);
         } catch (TimeoutException ex) {

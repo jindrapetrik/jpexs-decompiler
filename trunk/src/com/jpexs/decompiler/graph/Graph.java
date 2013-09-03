@@ -2155,7 +2155,7 @@ public class Graph {
      * @param localData
      * @return String
      */
-    public static String graphToString(List<GraphTargetItem> tree, boolean highlight, Object... localData) {
+    public static String graphToString(List<GraphTargetItem> tree, boolean highlight, boolean replaceIndents, Object... localData) {
         StringBuilder ret = new StringBuilder();
         List<Object> localDataList = Arrays.asList(localData);
         for (GraphTargetItem ti : tree) {
@@ -2228,23 +2228,20 @@ public class Graph {
                 continue;
             }
             strippedP = Highlighting.stripHilights(parts[p]).trim();
-            if (strippedP.equals(INDENTOPEN)) {
-                level++;
-                continue;
-            }
-            if (strippedP.equals(INDENTCLOSE)) {
-                level--;
-                continue;
-            }
-            if (strippedP.startsWith("}")) {
-                level--;
+            
+            if (replaceIndents) {
+                if (strippedP.equals(INDENTOPEN)) {
+                    level++;
+                    continue;
+                }
+                if (strippedP.equals(INDENTCLOSE)) {
+                    level--;
+                    continue;
+                }
             }
             ret.append(tabString(level));
             ret.append(parts[p].trim());
             ret.append("\r\n");
-            if (strippedP.equals("{")) {
-                level++;
-            }
         }
         return ret.toString();
     }

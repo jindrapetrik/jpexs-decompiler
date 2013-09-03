@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -173,6 +174,7 @@ public class ClassActionItem extends ActionItem implements Block {
             }
         }
         ret += "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
 
         if (constructor != null) {
             ret += constructor.toString(highlight, constants) + "\r\n";
@@ -196,6 +198,7 @@ public class ClassActionItem extends ActionItem implements Block {
             ret += hilight("static ", highlight) + f.toString(highlight, constants) + "\r\n";
         }
 
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight) + "\r\n";
         return ret;
     }

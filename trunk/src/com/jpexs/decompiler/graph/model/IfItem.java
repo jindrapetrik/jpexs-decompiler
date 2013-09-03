@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -71,19 +72,23 @@ public class IfItem extends GraphTargetItem implements Block {
             }
         }
         ret = hilight("if(", highlight) + expr.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
         for (GraphTargetItem ti : ifBranch) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
             }
         }
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight);
         if (elseBranch.size() > 0) {
             ret += "\r\n" + hilight("else", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+            ret += Graph.INDENTOPEN + "\r\n";
             for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
                     ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
                 }
             }
+            ret += Graph.INDENTCLOSE + "\r\n";
             ret += hilight("}", highlight);
         }
         return ret;

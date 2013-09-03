@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
@@ -52,6 +53,7 @@ public class DoWhileItem extends LoopItem implements Block {
         String ret = "";
         ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
         ret += hilight("do", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
@@ -67,6 +69,7 @@ public class DoWhileItem extends LoopItem implements Block {
             }
             expStr += expression.get(i).toString(highlight, localData);
         }
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight) + "\r\n" + hilight("while(", highlight) + expStr + hilight(");", highlight) + "\r\n";
         ret += hilight(":loop" + loop.id, highlight);
 

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.swf3.ActionSetTarget;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetTarget2;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -40,9 +41,11 @@ public class TellTargetActionItem extends ActionItem {
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
         String ret = hilight("tellTarget(", highlight) + target.toString(highlight, constants) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
         for (GraphTargetItem ti : commands) {
             ret += ti.toString(highlight, constants) + "\r\n";
         }
+        ret += Graph.INDENTCLOSE + "\r\n";
         ret += hilight("}", highlight);
         return ret;
     }
