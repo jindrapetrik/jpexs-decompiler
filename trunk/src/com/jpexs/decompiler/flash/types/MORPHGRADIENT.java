@@ -22,9 +22,16 @@ package com.jpexs.decompiler.flash.types;
  */
 public class MORPHGRADIENT {
 
+    /**
+     * Spread mode. See GRADIENT.SPREAD_* constants
+     */
+    public int spreadMode;
+    /**
+     * Interpolation mode. See GRADIENT.INTERPOLATION_* constants
+     */
+    public int interPolationMode;    
     public int numGradients;
     public MORPHGRADRECORD gradientRecords[];
-    public int numGradientsExtra;
 
     public static RGBA morphColor(RGBA c1, RGBA c2, int ratio) {
         int r = (c1.red + (c2.red - c1.red) * ratio / 65535);

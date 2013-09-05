@@ -22,11 +22,17 @@ package com.jpexs.decompiler.flash.types;
  */
 public class GRADIENT {
 
+    /**
+     * Spread mode
+     */
     public int spreadMode;
     public static final int SPREAD_PAD_MODE = 0;
     public static final int SPREAD_REFLECT_MODE = 1;
     public static final int SPREAD_REPEAT_MODE = 2;
     public static final int SPREAD_RESERVED = 3;
+    /**
+     * Interpolation mode
+     */
     public int interPolationMode;
     public static final int INTERPOLATION_RGB_MODE = 0;
     public static final int INTERPOLATION_LINEAR_RGB_MODE = 1;

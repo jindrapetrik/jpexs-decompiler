@@ -2288,9 +2288,11 @@ public class SWFInputStream extends InputStream {
      */
     public MORPHGRADIENT readMORPHGRADIENT() throws IOException {
         MORPHGRADIENT ret = new MORPHGRADIENT();
-        int numGradients = (int) readUI8();
-        ret.numGradientsExtra = numGradients & 0xf0;  //some extra data. Are these the same as in GRADIENT or just obfuscator junk???
-        numGradients = numGradients & 0x0f;
+        //Despite of documentation (UI8 1-8), there are two fields 
+        // spreadMode and interPolationMode which are same as in GRADIENT
+        ret.spreadMode = (int) readUB(2);
+        ret.interPolationMode = (int) readUB(2);
+        int numGradients = (int) readUB(4);
         ret.gradientRecords = new MORPHGRADRECORD[numGradients];
         for (int i = 0; i < numGradients; i++) {
             ret.gradientRecords[i] = readMORPHGRADRECORD();

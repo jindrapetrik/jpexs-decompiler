@@ -1471,7 +1471,11 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeMORPHGRADIENT(MORPHGRADIENT value, int shapeNum) throws IOException {
-        writeUI8(value.gradientRecords.length + value.numGradientsExtra);
+        //Despite of documentation (UI8 1-8), there are two fields 
+        // spreadMode and interPolationMode which are same as in GRADIENT
+        writeUB(2, value.spreadMode);
+        writeUB(2, value.interPolationMode);
+        writeUB(4, value.gradientRecords.length);
         for (int i = 0; i < value.gradientRecords.length; i++) {
             writeMORPHGRADRECORD(value.gradientRecords[i]);
         }
