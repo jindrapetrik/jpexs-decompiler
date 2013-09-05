@@ -2289,6 +2289,8 @@ public class SWFInputStream extends InputStream {
     public MORPHGRADIENT readMORPHGRADIENT() throws IOException {
         MORPHGRADIENT ret = new MORPHGRADIENT();
         int numGradients = (int) readUI8();
+        ret.numGradientsExtra = numGradients & 0xf0;  //some extra data. Are these the same as in GRADIENT or just obfuscator junk???
+        numGradients = numGradients & 0x0f;
         ret.gradientRecords = new MORPHGRADRECORD[numGradients];
         for (int i = 0; i < numGradients; i++) {
             ret.gradientRecords[i] = readMORPHGRADRECORD();

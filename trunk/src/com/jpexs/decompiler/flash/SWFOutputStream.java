@@ -1471,7 +1471,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeMORPHGRADIENT(MORPHGRADIENT value, int shapeNum) throws IOException {
-        writeUI8(value.gradientRecords.length);
+        writeUI8(value.gradientRecords.length + value.numGradientsExtra);
         for (int i = 0; i < value.gradientRecords.length; i++) {
             writeMORPHGRADRECORD(value.gradientRecords[i]);
         }
