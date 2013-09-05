@@ -24,6 +24,7 @@ public class MORPHGRADIENT {
 
     public int numGradients;
     public MORPHGRADRECORD gradientRecords[];
+    public int numGradientsExtra;
 
     public static RGBA morphColor(RGBA c1, RGBA c2, int ratio) {
         int r = (c1.red + (c2.red - c1.red) * ratio / 65535);
