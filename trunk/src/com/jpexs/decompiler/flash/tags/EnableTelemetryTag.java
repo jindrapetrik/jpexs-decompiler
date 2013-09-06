@@ -48,7 +48,9 @@ public class EnableTelemetryTag extends Tag {
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
             sos.writeUB(16, reserved);
-            sos.write(passwordHash);
+            if (passwordHash != null) {
+                sos.write(passwordHash);
+            }
         } catch (IOException e) {
         }
         return baos.toByteArray();
@@ -67,6 +69,8 @@ public class EnableTelemetryTag extends Tag {
         super(swf, ID, "", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         reserved = (int) sis.readUB(16);
-        passwordHash = sis.readBytes(32);
+        if (sis.available() > 0) {
+            passwordHash = sis.readBytes(32);
+        }
     }
 }
