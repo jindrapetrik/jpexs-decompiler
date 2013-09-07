@@ -59,7 +59,7 @@ public class TraitMethodGetterSetter extends Trait {
         String bodyStr = "";
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, fullyQualifiedNames, null), 3);
+            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, true, fullyQualifiedNames, null), 3);
         }
         return ABC.IDENT_STRING + ABC.IDENT_STRING + header + ((classIndex != -1 && abc.instance_info[classIndex].isInterface()) ? ";" : " {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}");
     }

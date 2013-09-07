@@ -1190,7 +1190,7 @@ public class AVM2Code implements Serializable {
     }
 
     public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
-        return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, staticOperation, localRegAssigmentIps, refs);
+        return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, body, false, true, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, staticOperation, localRegAssigmentIps, refs);
     }
 
     public int getRegisterCount() {
@@ -1260,7 +1260,7 @@ public class AVM2Code implements Serializable {
         ignoredIns = new ArrayList<>();
     }
 
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
+    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, boolean replaceIndents, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
         initToSource();
         List<GraphTargetItem> list;
         String s;
@@ -1375,7 +1375,7 @@ public class AVM2Code implements Serializable {
             list.remove(lastPos);
         }
 
-        s = Graph.graphToString(list, hilighted, true, constants, localRegNames, fullyQualifiedNames);
+        s = Graph.graphToString(list, hilighted, replaceIndents, constants, localRegNames, fullyQualifiedNames);
 
         return s;
     }

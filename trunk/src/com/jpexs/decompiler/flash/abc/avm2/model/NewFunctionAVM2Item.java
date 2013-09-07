@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
+import com.jpexs.decompiler.graph.Graph;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,6 +40,12 @@ public class NewFunctionAVM2Item extends AVM2Item {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight("function" + (!functionName.equals("") ? " " + functionName : "") + "(" + paramStr + "):" + returnStr + "\r\n{\r\n", highlight) + (highlight ? functionBody : Highlighting.stripHilights(functionBody)) + "\r\n" + hilight("}", highlight);
+        String ret = hilight("function" + (!functionName.equals("") ? " " + functionName : "") + "(" + paramStr + "):" + returnStr, highlight);
+        ret += "\r\n" + hilight("{", highlight) + "\r\n";
+        ret += Graph.INDENTOPEN + "\r\n";
+        ret += (highlight ? functionBody : Highlighting.stripHilights(functionBody)) + "\r\n";
+        ret += Graph.INDENTCLOSE + "\r\n";
+        ret += hilight("}", highlight);
+        return ret;
     }
 }

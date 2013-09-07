@@ -108,7 +108,7 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public String toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final ConstantPool constants, final MethodInfo method_info[], final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final boolean hilight, final List<String> fullyQualifiedNames, final Traits initTraits) {
+    public String toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final ConstantPool constants, final MethodInfo method_info[], final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final boolean hilight, final boolean replaceIndents, final List<String> fullyQualifiedNames, final Traits initTraits) {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
@@ -128,7 +128,7 @@ public class MethodBody implements Cloneable, Serializable {
                 s += Helper.timedCall(new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, scopeStack, isStaticInitializer, hilight, fullyQualifiedNames, initTraits);
+                        return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, scopeStack, isStaticInitializer, hilight, replaceIndents, fullyQualifiedNames, initTraits);
                     }
                 }, timeout, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
@@ -139,7 +139,7 @@ public class MethodBody implements Cloneable, Serializable {
         return s;
     }
 
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
+    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, boolean replaceIndents, List<String> fullyQualifiedNames, Traits initTraits) {
         AVM2Code deobfuscated = null;
         MethodBody b = (MethodBody) Helper.deepCopy(this);
         deobfuscated = b.code;
@@ -153,7 +153,7 @@ public class MethodBody implements Cloneable, Serializable {
         }
         //deobfuscated.restoreControlFlow(constants, b);
         //try {
-        String s = deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
+        String s = deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, replaceIndents, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
         s = s.trim();
         if (s.equals("")) {
             s = " ";
