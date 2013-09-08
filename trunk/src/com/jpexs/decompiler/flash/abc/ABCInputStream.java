@@ -34,7 +34,11 @@ public class ABCInputStream extends InputStream {
     public static final boolean DEBUG_READ = false;
 
     public void startBuffer() {
-        bufferOs = new ByteArrayOutputStream();
+        if (bufferOs == null) {
+            bufferOs = new ByteArrayOutputStream();
+        } else {
+            bufferOs.reset();
+        }
     }
 
     public byte[] stopBuffer() {
@@ -42,7 +46,7 @@ public class ABCInputStream extends InputStream {
             return new byte[0];
         }
         byte ret[] = bufferOs.toByteArray();
-        bufferOs = null;
+        bufferOs.reset();
         return ret;
     }
 

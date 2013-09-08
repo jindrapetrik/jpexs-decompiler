@@ -34,7 +34,7 @@ public interface ASMSource {
      * @param hex Add hexadecimal?
      * @return ASM source
      */
-    public String getASMSource(int version, boolean hex, boolean highlight);
+    public String getASMSource(int version, boolean hex, boolean highlight, List<Action> actions);
 
     /**
      * Whether or not this object contains ASM source

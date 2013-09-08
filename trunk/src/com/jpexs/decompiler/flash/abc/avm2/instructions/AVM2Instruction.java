@@ -52,7 +52,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     public long mappedOffset = -1;
     public int changeJumpTo = -1;
 
-    public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands, byte bytes[]) {
+    public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands, byte[] bytes) {
         this.definition = definition;
         this.operands = operands;
         this.offset = offset;

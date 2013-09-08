@@ -299,7 +299,7 @@ public class TagNode {
                             String res;
                             ASMSource asm = ((ASMSource) node.tag);
                             if (isPcode) {
-                                res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), asm.getASMSource(SWF.DEFAULT_VERSION, false, false), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
+                                res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), asm.getASMSource(SWF.DEFAULT_VERSION, false, false, null), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
                             } else {
                                 List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                                 Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);

@@ -168,10 +168,12 @@ public class ActionPanel extends JPanel implements ActionListener {
         return cache.contains(src);
     }
 
-    private void cacheScript(ASMSource src) {
+    private void cacheScript(ASMSource src, List<Action> actions) {
         if (!cache.contains(src)) {
-            List<Action> as = src.getActions(SWF.DEFAULT_VERSION);
-            String s = Action.actionsToSource(as, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, true);
+            if (actions == null) {
+                actions = src.getActions(SWF.DEFAULT_VERSION);
+            }
+            String s = Action.actionsToSource(actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, true);
             List<Highlighting> hilights = Highlighting.getInstrHighlights(s);
             String srcNoHex = Highlighting.stripHilights(s);
             cache.put(src, new CachedScript(srcNoHex, hilights));
@@ -221,7 +223,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 }
                 Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ");
 
-                cacheScript(item.getValue());
+                cacheScript(item.getValue(), null);
                 if (pat.matcher(getCached(item.getValue()).text).find()) {
                     found.add(item.getValue());
                 }
@@ -307,7 +309,9 @@ public class ActionPanel extends JPanel implements ActionListener {
                     }
                 };
                 asm.addDisassemblyListener(listener);
-                lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true, true);
+                List<Action> actions = asm.getActions(SWF.DEFAULT_VERSION);
+                lastCode = actions;
+                lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true, true, actions);
                 asm.removeDisassemblyListener(listener);
                 srcWithHex = Helper.hexToComments(lastDisasm);
                 srcNoHex = Helper.stripComments(lastDisasm);
@@ -319,9 +323,8 @@ public class ActionPanel extends JPanel implements ActionListener {
                     if (!useCache) {
                         uncache(asm);
                     }
-                    cacheScript(asm);
+                    cacheScript(asm, actions);
                     CachedScript sc = getCached(asm);
-                    lastCode = asm.getActions(SWF.DEFAULT_VERSION);
                     decompiledHilights = sc.hilights;
                     lastDecompiled = sc.text;
                     lastASM = asm;

@@ -78,7 +78,8 @@ public class ActionPush extends Action {
         values = new ArrayList<>();
         sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);
         try {
-            while ((type = sis.readUI8()) > -1) {
+            while (sis.available() > 0) {
+                type = sis.readUI8();
                 switch (type) {
                     case 0:
                         values.add(sis.readString());
