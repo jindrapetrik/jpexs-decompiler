@@ -42,7 +42,7 @@ public class AS2Generator {
                 }
                
 
-                String srcs[] = src.split("[\r\n]+");
+                String[] srcs = src.split("[\r\n]+");
                 String testName="frame"+frame+"_Test";
                 String pref="trace(\"";
                 for(String p:srcs){

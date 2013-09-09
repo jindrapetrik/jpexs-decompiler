@@ -57,7 +57,7 @@ public class ActionScript2AssemblerTest {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             String actualResult = Action.actionsToSource(doa.getActions(swf.version), swf.version, "", false);
-            String decompiled = doa.getASMSource(swf.version, false, false);
+            String decompiled = doa.getASMSource(swf.version, false, false, null);
 
             assertEquals(actualResult.trim(), "ok = false;");
             assertTrue(decompiled.contains("Push \"ok\" false"));

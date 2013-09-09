@@ -64,7 +64,7 @@ public class ExportTest {
         if (!dir.exists()) {
             return new Object[0][0];
         }
-        File files[] = dir.listFiles(new FilenameFilter() {
+        File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".swf");

@@ -134,7 +134,6 @@ public class Traits implements Serializable {
         } else {
             traitConvertTasks = new ArrayList<>();
         }
-        pcode = true;
         for (int t = 0; t < traits.length; t++) {
             TraitConvertTask task = new TraitConvertTask(traits[t], makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, t, parallel);
             if (parallel) {
