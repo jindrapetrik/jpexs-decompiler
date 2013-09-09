@@ -38,7 +38,7 @@ public class ThrowActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItemPos> getNeededSources() {
-        List<com.jpexs.decompiler.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        List<GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(value.getNeededSources());
         return ret;
     }

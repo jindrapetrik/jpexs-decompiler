@@ -130,7 +130,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (!showModifier) {
             modifier = "";
         }
-        String ret = ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + getNameStr(abc, fullyQualifiedNames);
+        String ret = Graph.INDENT_STRING + Graph.INDENT_STRING + modifier + getNameStr(abc, fullyQualifiedNames);
         String valueStr = getValueStr(abc, fullyQualifiedNames);
         if (valueStr != null) {
             ret += " = ";
@@ -142,15 +142,18 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                     continue;
                 }
                 if (Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTOPEN)) {
-                    //befLen+=ABC.IDENT_STRING.length();
+                    if (!first) {
+                        befLen += Graph.INDENT_STRING.length();
+                    }
                     continue;
                 }
                 if (Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTCLOSE)) {
-                    //befLen-=ABC.IDENT_STRING.length();
+                    if (!first) {
+                        befLen -= Graph.INDENT_STRING.length();
+                    }
                     continue;
                 }
                 if (!first) {
-                    ret += ABC.IDENT_STRING + ABC.IDENT_STRING;
                     for (int j = 0; j < befLen; j++) {
                         ret += " ";
                     }

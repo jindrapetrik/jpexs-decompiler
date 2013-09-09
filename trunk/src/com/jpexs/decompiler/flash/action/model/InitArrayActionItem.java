@@ -53,7 +53,7 @@ public class InitArrayActionItem extends ActionItem {
     }
 
     @Override
-    public List<com.jpexs.decompiler.graph.GraphSourceItemPos> getNeededSources() {
+    public List<GraphSourceItemPos> getNeededSources() {
         List<GraphSourceItemPos> ret = super.getNeededSources();
         for (GraphTargetItem value : values) {
             ret.addAll(value.getNeededSources());

@@ -34,7 +34,7 @@ public class ActionNop extends Action {
     }
 
     @Override
-    public void translate(Stack<com.jpexs.decompiler.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         //output.add(new SimpleActionTreeItem(this, "nop();"));
     }
 }

@@ -2,7 +2,6 @@ package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.View;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;

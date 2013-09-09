@@ -23,12 +23,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ComponentUI;
-import org.pushingpixels.lafwidget.animation.AnimationConfigurationManager;
 import org.pushingpixels.substance.internal.ui.SubstanceProgressBarUI;
 import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
-import org.pushingpixels.trident.Timeline;
-import org.pushingpixels.trident.TimelinePropertyBuilder;
-import org.pushingpixels.trident.ease.Spline;
 
 /**
  *

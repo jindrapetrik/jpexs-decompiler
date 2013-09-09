@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
@@ -419,12 +420,12 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         for (String imp : imports) {
             if (!imp.startsWith(".")) {
-                out.println(ABC.IDENT_STRING + "import " + imp + ";");
+                out.println(Graph.INDENT_STRING + "import " + imp + ";");
             }
         }
         out.println();
         for (String us : uses) {
-            out.println(ABC.IDENT_STRING + "use namespace " + us + ";");
+            out.println(Graph.INDENT_STRING + "use namespace " + us + ";");
         }
         out.println();
 
@@ -433,8 +434,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (classHeader.startsWith("private ")) {
             classHeader = classHeader.substring("private ".length());
         }
-        out.println(ABC.IDENT_STRING + classHeader);
-        out.println(ABC.IDENT_STRING + "{");
+        out.println(Graph.INDENT_STRING + classHeader);
+        out.println(Graph.INDENT_STRING + "{");
 
         String toPrint;
         List<String> outTraits = new LinkedList<>();
@@ -449,7 +450,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (Highlighting.stripHilights(bodyStr).trim().equals("")) {
             toPrint = ABC.addTabs(bodyStr + "/*classInitializer*/", 3);
         } else {
-            toPrint = ABC.IDENT_STRING + ABC.IDENT_STRING + "{\r\n" + ABC.addTabs(bodyStr, 3) + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}";
+            toPrint = Graph.INDENT_STRING + Graph.INDENT_STRING + "{\r\n" + ABC.addTabs(bodyStr, 3) + "\r\n" + Graph.INDENT_STRING + Graph.INDENT_STRING + "}";
         }
         if (highlight) {
             toPrint = Highlighting.hilighTrait(toPrint, abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length + 1);
@@ -483,7 +484,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             } else {
                 constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, null, abc, fullyQualifiedNames);
             }
-            toPrint = ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + "function " + abc.constants.constant_multiname[abc.instance_info[class_info].name_index].getName(abc.constants, new ArrayList<String>()/*do not want full names here*/) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}";
+            toPrint = Graph.INDENT_STRING + Graph.INDENT_STRING + modifier + "function " + abc.constants.constant_multiname[abc.instance_info[class_info].name_index].getName(abc.constants, new ArrayList<String>()/*do not want full names here*/) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + Graph.INDENT_STRING + Graph.INDENT_STRING + "}";
             if (highlight) {
                 toPrint = Highlighting.hilighTrait(toPrint, abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length);
             }
@@ -514,7 +515,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     }
                 }
             } else {
-                s = s.replace(ABC.IDENT_STRING, "");
+                s = s.replace(Graph.INDENT_STRING, "");
             }
             bui.append(s);
         }
@@ -522,7 +523,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         //out.println(Helper.joinStrings(outTraits, "\r\n\r\n"));
         out.println(bui.toString());
-        out.println(ABC.IDENT_STRING + "}");//class
+        out.println(Graph.INDENT_STRING + "}");//class
         out.flush();
         //Highlighting.doHighlight = true;
         try {

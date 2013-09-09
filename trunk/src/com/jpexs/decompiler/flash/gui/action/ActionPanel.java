@@ -99,7 +99,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     private boolean ignoreCarret = false;
     private boolean editMode = false;
     private boolean editDecompiledMode = false;
-    private List<com.jpexs.decompiler.flash.action.Action> lastCode;
+    private List<Action> lastCode;
     private ASMSource src;
     public JPanel topButtonsPan;
     private String srcWithHex;
