@@ -27,8 +27,8 @@ class Connection
     static{
        String ksName = ProxyConfig.httpsKeyStoreFile;      
       if(ksName!=null){
-            char ksPass[] = ProxyConfig.httpsKeyStorePass.toCharArray();
-            char ctPass[] = ProxyConfig.httpsKeyPass.toCharArray();
+            char[] ksPass = ProxyConfig.httpsKeyStorePass.toCharArray();
+            char[] ctPass = ProxyConfig.httpsKeyPass.toCharArray();
             try{
                KeyStore ks = KeyStore.getInstance("JKS");
                ks.load(new FileInputStream(ksName), ksPass);

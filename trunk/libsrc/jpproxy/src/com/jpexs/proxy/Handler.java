@@ -534,7 +534,7 @@ void processContent(boolean uncompress) throws IOException
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 try {
                     FileInputStream fis = new FileInputStream(r.targetFile);
-                    byte buf[] = new byte[2048];
+                    byte[] buf = new byte[2048];
                     int pos = 0;
                     while ((pos = fis.read(buf)) > 0) {
                         buffer.write(buf, 0, pos);
@@ -544,7 +544,7 @@ void processContent(boolean uncompress) throws IOException
                 } catch (IOException ex) {
                     
                 }
-                byte bytes[] = buffer.toByteArray();
+                byte[] bytes = buffer.toByteArray();
                 contentLength = bytes.length;
                 reply.setHeaderField("Content-length", contentLength);
                 disableReplyCaching();
@@ -645,7 +645,7 @@ void processContent(boolean uncompress) throws IOException
 	}
 
 	int n;
-	byte buffer[] = new byte[8192];
+	byte[] buffer = new byte[8192];
 	long start = System.currentTimeMillis();
 	long now = 0, then = start;
 	
@@ -714,7 +714,7 @@ void processContent(boolean uncompress) throws IOException
 	}
 
 	int n;
-	byte buffer[] = new byte[8192];
+	byte[] buffer = new byte[8192];
 	long start = System.currentTimeMillis();
 	bytesPerSecond = 0;
 	

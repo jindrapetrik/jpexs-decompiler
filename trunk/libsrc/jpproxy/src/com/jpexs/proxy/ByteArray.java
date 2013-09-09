@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ByteArray {
-    public byte bytes[];
+    public byte[] bytes;
     public int offset = 0;
 
     /**
@@ -32,7 +32,7 @@ public class ByteArray {
     /**
      * Create a ByteArray from an array of bytes.
      */
-    public ByteArray(byte b[]) {
+    public ByteArray(byte[] b) {
         this(b.length);
         append(b);
     }
@@ -42,7 +42,7 @@ public class ByteArray {
      */
     public void append(byte ch) {
         if (offset == bytes.length) {
-            byte tmpbytes[] = bytes;
+            byte[] tmpbytes = bytes;
             bytes = new byte[tmpbytes.length * 2];
             System.arraycopy(tmpbytes, 0, bytes, 0, offset);
         }
@@ -54,7 +54,7 @@ public class ByteArray {
      */
     public void append(ByteArray b) {
         if (bytes.length - offset < b.length()) {
-            byte tmpbytes[] = bytes;
+            byte[] tmpbytes = bytes;
             bytes = new byte[tmpbytes.length + b.length()];
             System.arraycopy(tmpbytes, 0, bytes, 0, offset);
         }
@@ -65,9 +65,9 @@ public class ByteArray {
     /**
      * Append an array of bytes.
      */
-    public void append(byte b[]) {
+    public void append(byte[] b) {
         if (bytes.length - offset < b.length) {
-            byte tmpbytes[] = bytes;
+            byte[] tmpbytes = bytes;
             bytes = new byte[tmpbytes.length + b.length];
             System.arraycopy(tmpbytes, 0, bytes, 0, offset);
         }

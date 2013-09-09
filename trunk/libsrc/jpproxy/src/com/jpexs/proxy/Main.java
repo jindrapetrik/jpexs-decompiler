@@ -14,7 +14,7 @@ public class Main
    public static final String REPLACEMENTSFILE = "." + File.separator + "config" + File.separator + "replacements.ini";
     public static boolean DEBUG_MODE = false;
 
-    public static void main(String argv[])
+    public static void main(String[] argv)
     {
 	List<Replacement> replacements = new ArrayList<Replacement>();
         if ((new File(REPLACEMENTSFILE)).exists()) {

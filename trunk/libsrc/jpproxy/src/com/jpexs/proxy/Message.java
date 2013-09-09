@@ -19,7 +19,7 @@ public abstract class Message
 
     public String readLine(InputStream in) throws IOException
     {
-	char buf[] = new char[128];
+	char[] buf = new char[128];
 	int offset = 0;
 	int ch;
 
@@ -47,7 +47,7 @@ public abstract class Message
 	    {
 		if (offset == buf.length)
 		{
-		    char tmpbuf[] = buf;
+		    char[] tmpbuf = buf;
 		    buf = new char[tmpbuf.length * 2];
 		    System.arraycopy(tmpbuf, 0, buf, 0, offset);
 		}

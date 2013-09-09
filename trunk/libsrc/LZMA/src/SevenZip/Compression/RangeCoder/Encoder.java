@@ -93,13 +93,13 @@ public class Encoder
 	static final int kNumMoveReducingBits = 2;
 	public static final int kNumBitPriceShiftBits = 6;
 	
-	public static void InitBitModels(short []probs)
+	public static void InitBitModels(short[] probs)
 	{
 		for (int i = 0; i < probs.length; i++)
 			probs[i] = (kBitModelTotal >>> 1);
 	}
 	
-	public void Encode(short []probs, int index, int symbol) throws IOException
+	public void Encode(short[] probs, int index, int symbol) throws IOException
 	{
 		int prob = probs[index];
 		int newBound = (Range >>> kNumBitModelTotalBits) * prob;

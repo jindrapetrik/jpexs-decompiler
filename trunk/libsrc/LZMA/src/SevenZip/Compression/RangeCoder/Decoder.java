@@ -51,7 +51,7 @@ public class Decoder
 		return result;
 	}
 	
-	public int DecodeBit(short []probs, int index) throws IOException
+	public int DecodeBit(short[] probs, int index) throws IOException
 	{
 		int prob = probs[index];
 		int newBound = (Range >>> kNumBitModelTotalBits) * prob;
@@ -80,7 +80,7 @@ public class Decoder
 		}
 	}
 	
-	public static void InitBitModels(short []probs)
+	public static void InitBitModels(short[] probs)
 	{
 		for (int i = 0; i < probs.length; i++)
 			probs[i] = (kBitModelTotal >>> 1);

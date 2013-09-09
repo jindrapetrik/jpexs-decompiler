@@ -19,7 +19,7 @@ class Copy implements Runnable
     public void run()
     {
 	int n;
-	byte buffer[] = new byte[8192];
+	byte[] buffer = new byte[8192];
 
 	try
 	{

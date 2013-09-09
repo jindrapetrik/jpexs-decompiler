@@ -82,7 +82,7 @@ public class Reply extends Message
 		{
 		}
 		int n;
-		byte buffer[] = new byte[8192];
+		byte[] buffer = new byte[8192];
 		while ((n = in.read(buffer, 0, buffer.length)) > 0)
 		{
 		    /* ignore */
