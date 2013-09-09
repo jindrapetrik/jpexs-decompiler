@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.ArrayList;
@@ -50,8 +51,8 @@ public class GetVariableActionItem extends ActionItem {
     }
 
     @Override
-    public List<com.jpexs.decompiler.graph.GraphSourceItemPos> getNeededSources() {
-        List<com.jpexs.decompiler.graph.GraphSourceItemPos> ret = super.getNeededSources();
+    public List<GraphSourceItemPos> getNeededSources() {
+        List<GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(name.getNeededSources());
         return ret;
     }

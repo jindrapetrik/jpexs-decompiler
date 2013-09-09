@@ -55,7 +55,7 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
 
     @Override
     public List<GraphSourceItemPos> getNeededSources() {
-        List<com.jpexs.decompiler.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        List<GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(value.getNeededSources());
         return ret;
     }

@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action.swf3;
 
-import com.jpexs.decompiler.flash.Configuration;
-import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;

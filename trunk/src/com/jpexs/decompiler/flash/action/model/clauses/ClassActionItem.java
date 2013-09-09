@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
-import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;

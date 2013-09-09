@@ -61,7 +61,6 @@ import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -633,7 +632,7 @@ public class Action implements GraphSourceItem {
      * @param staticOperation the value of staticOperation
      * @param path the value of path
      */
-    public void translate(Stack<com.jpexs.decompiler.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
     }
 
     /**

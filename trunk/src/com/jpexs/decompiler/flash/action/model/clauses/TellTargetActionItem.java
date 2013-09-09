@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.swf3.ActionSetTarget;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetTarget2;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.ArrayList;
@@ -51,8 +52,8 @@ public class TellTargetActionItem extends ActionItem {
     }
 
     @Override
-    public List<com.jpexs.decompiler.graph.GraphSourceItemPos> getNeededSources() {
-        List<com.jpexs.decompiler.graph.GraphSourceItemPos> ret = super.getNeededSources();
+    public List<GraphSourceItemPos> getNeededSources() {
+        List<GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(target.getNeededSources());
         return ret;
     }

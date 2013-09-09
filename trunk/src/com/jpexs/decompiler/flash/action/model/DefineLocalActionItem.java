@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.ArrayList;
@@ -75,8 +76,8 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    public List<com.jpexs.decompiler.graph.GraphSourceItemPos> getNeededSources() {
-        List<com.jpexs.decompiler.graph.GraphSourceItemPos> ret = super.getNeededSources();
+    public List<GraphSourceItemPos> getNeededSources() {
+        List<GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(value.getNeededSources());
         ret.addAll(name.getNeededSources());
         return ret;

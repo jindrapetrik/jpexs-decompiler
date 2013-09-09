@@ -42,7 +42,7 @@ public class ExtendsActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItemPos> getNeededSources() {
-        List<com.jpexs.decompiler.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        List<GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(subclass.getNeededSources());
         ret.addAll(superclass.getNeededSources());
         return ret;
