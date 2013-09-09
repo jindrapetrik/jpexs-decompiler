@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.*;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.graph.Graph;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,10 +59,9 @@ public class ABC {
     public MethodBody[] bodies;
     private int[] bodyIdxFromMethodIdx;
     public long[] stringOffsets;
-    public static final String IDENT_STRING = "   ";
     public static final int MINORwithDECIMAL = 17;
     protected HashSet<EventListener> listeners = new HashSet<>();
-    private static Logger logger = Logger.getLogger(ABC.class.getName());
+    private static final Logger logger = Logger.getLogger(ABC.class.getName());
 
     public void addEventListener(EventListener listener) {
         listeners.add(listener);
@@ -608,7 +608,7 @@ public class ABC {
         StringBuilder ret = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
             for (int t = 0; t < tabs; t++) {
-                ret.append(IDENT_STRING);
+                ret.append(Graph.INDENT_STRING);
             }
             ret.append(parts[i]);
             if (i < parts.length - 1) {

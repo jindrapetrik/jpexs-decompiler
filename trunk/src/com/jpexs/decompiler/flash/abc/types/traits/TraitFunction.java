@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.util.List;
@@ -57,7 +58,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         if (bodyIndex != -1) {
             bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, true, fullyQualifiedNames, null), 3);
         }
-        return ABC.IDENT_STRING + ABC.IDENT_STRING + header + (abc.instance_info[classIndex].isInterface() ? ";" : " {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}");
+        return Graph.INDENT_STRING + Graph.INDENT_STRING + header + (abc.instance_info[classIndex].isInterface() ? ";" : " {\r\n" + bodyStr + "\r\n" + Graph.INDENT_STRING + Graph.INDENT_STRING + "}");
 
     }
 

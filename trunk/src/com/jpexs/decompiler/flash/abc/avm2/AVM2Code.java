@@ -1184,7 +1184,7 @@ public class AVM2Code implements Serializable {
     public String tabString(int len) {
         StringBuilder ret = new StringBuilder();
         for (int i = 0; i < len; i++) {
-            ret.append(ABC.IDENT_STRING);
+            ret.append(Graph.INDENT_STRING);
         }
         return ret.toString();
     }
