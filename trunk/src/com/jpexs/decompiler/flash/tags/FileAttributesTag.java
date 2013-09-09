@@ -41,7 +41,7 @@ public class FileAttributesTag extends Tag {
         super(null, ID, "FileAttributes", new byte[]{}, 0);
     }
 
-    public FileAttributesTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public FileAttributesTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "FileAttributes", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         reserved1 = (int) sis.readUB(1); // reserved

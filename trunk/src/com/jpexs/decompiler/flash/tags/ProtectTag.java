@@ -64,7 +64,7 @@ public class ProtectTag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public ProtectTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public ProtectTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "Protect", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         if (sis.available() > 0) {

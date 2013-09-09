@@ -26,11 +26,11 @@ import java.io.OutputStream;
 
 public class SymbolClassTag extends Tag {
 
-    public int tagIDs[];
-    public String classNames[];
+    public int[] tagIDs;
+    public String[] classNames;
     public static final int ID = 76;
 
-    public SymbolClassTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public SymbolClassTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "SymbolClass", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         int numSymbols = sis.readUI16();

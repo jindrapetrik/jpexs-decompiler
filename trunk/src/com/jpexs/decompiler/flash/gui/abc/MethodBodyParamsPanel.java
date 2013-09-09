@@ -50,7 +50,7 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
         setLayout(null);
         this.abcPanel = abcPanel;
 
-        JComponent cmps[][] = new JComponent[][]{
+        JComponent[][] cmps = new JComponent[][]{
             {maxStackLabel = new JLabel(translate("abc.detail.body.params.maxstack"), SwingConstants.RIGHT), maxStackField = new MyFormattedTextField(NumberFormat.getNumberInstance())},
             {localCountLabel = new JLabel(translate("abc.detail.body.params.localregcount"), SwingConstants.RIGHT), localCountField = new MyFormattedTextField(NumberFormat.getNumberInstance())},
             {initScopeDepthLabel = new JLabel(translate("abc.detail.body.params.minscope"), SwingConstants.RIGHT), initScopeDepthField = new MyFormattedTextField(NumberFormat.getNumberInstance())},

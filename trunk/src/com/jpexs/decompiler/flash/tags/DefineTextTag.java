@@ -443,7 +443,7 @@ public class DefineTextTag extends TextTag implements DrawableTag {
      * @param pos
      * @throws IOException
      */
-    public DefineTextTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineTextTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineText", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();

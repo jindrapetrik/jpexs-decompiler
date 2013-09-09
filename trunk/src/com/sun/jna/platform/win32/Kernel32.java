@@ -277,7 +277,7 @@ public interface Kernel32 extends WinNT {
     public static int TH32CS_SNAPPROCESS = 0x00000002;
 
     //Needed for some Windows 7 Versions
-    //boolean EnumProcesses(int []ProcessIDsOut,int size , int[] BytesReturned);
+    //boolean EnumProcesses(int[] ProcessIDsOut, int size, int[] BytesReturned);
     int GetProcessImageFileNameW(HANDLE Process, char[] outputname, int lenght);
 
     DWORD QueryDosDevice(String lpDeviceName, char[] lpTargetPath, int lenght);

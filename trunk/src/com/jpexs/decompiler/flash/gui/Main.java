@@ -107,7 +107,7 @@ public class Main {
         }
         loadFromMemoryFrame.setVisible(true);
     }
-    private static String commandlineConfigBoolean[] = new String[]{
+    private static String[] commandlineConfigBoolean = new String[]{
         "decompile",
         "parallelSpeedUp",
         "internalFlashViewer",
@@ -482,7 +482,7 @@ public class Main {
         }
         String license = "/*\r\n *  Copyright (C) {year} {author}\r\n * \r\n *  This program is free software: you can redistribute it and/or modify\r\n *  it under the terms of the GNU General Public License as published by\r\n *  the Free Software Foundation, either version 3 of the License, or\r\n *  (at your option) any later version.\r\n * \r\n *  This program is distributed in the hope that it will be useful,\r\n *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n *  GNU General Public License for more details.\r\n * \r\n *  You should have received a copy of the GNU General Public License\r\n *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\r\n */";
 
-        File files[] = dir.listFiles();
+        File[] files = dir.listFiles();
         for (File f : files) {
             if (f.isDirectory()) {
                 updateLicenseInDir(f);
@@ -864,7 +864,7 @@ public class Main {
                 if (args.length < pos + 4) {
                     badArguments();
                 }
-                String validExportFormats[] = new String[]{
+                String[] validExportFormats = new String[]{
                     "as",
                     "pcode",
                     "image",
@@ -1040,7 +1040,7 @@ public class Main {
     }
 
     private static void setConfigurations(String cfgStr) {
-        String cfgs[];
+        String[] cfgs;
         if (cfgStr.contains(",")) {
             cfgs = cfgStr.split(",");
         } else {
@@ -1048,7 +1048,7 @@ public class Main {
         }
 
         for (String c : cfgs) {
-            String cp[];
+            String[] cp;
             if (c.contains("=")) {
                 cp = c.split("=");
             } else {

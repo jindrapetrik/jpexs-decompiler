@@ -227,7 +227,7 @@ public class View {
     }
 
     public static int showOptionDialog(final Component parentComponent, final Object message, final String title, final int optionType, final int messageType, final Icon icon, final Object[] options, final Object initialValue) {
-        final int ret[] = new int[1];
+        final int[] ret = new int[1];
         execInEventDispatch(new Runnable() {
             @Override
             public void run() {
@@ -271,7 +271,7 @@ public class View {
     }
 
     public static String showInputDialog(final Object message, final Object initialSelection) {
-        final String ret[] = new String[1];
+        final String[] ret = new String[1];
         execInEventDispatch(new Runnable() {
             @Override
             public void run() {

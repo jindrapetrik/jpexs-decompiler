@@ -45,7 +45,7 @@ public class CONVOLUTIONFILTER extends FILTER {
     /**
      * Matrix values
      */
-    public float matrix[][] = new float[0][0];
+    public float[][] matrix = new float[0][0];
     /**
      * Default color for pixels outside the image
      */
@@ -70,7 +70,7 @@ public class CONVOLUTIONFILTER extends FILTER {
     public BufferedImage apply(BufferedImage src) {
         int height = matrix.length;
         int width = matrix[0].length;
-        float matrix2[] = new float[width * height];
+        float[] matrix2 = new float[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 matrix2[y * width + x] = matrix[x][y] * divisor + bias;

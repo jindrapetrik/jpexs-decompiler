@@ -65,7 +65,7 @@ public class EnableDebugger2Tag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public EnableDebugger2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public EnableDebugger2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "EnableDebugger2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         reserved = sis.readUI16();

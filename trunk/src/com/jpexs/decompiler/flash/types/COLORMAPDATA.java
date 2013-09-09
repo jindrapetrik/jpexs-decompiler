@@ -21,6 +21,6 @@ package com.jpexs.decompiler.flash.types;
  */
 public class COLORMAPDATA {
 
-    public RGB colorTableRGB[];
-    public byte colorMapPixelData[];
+    public RGB[] colorTableRGB;
+    public byte[] colorMapPixelData;
 }

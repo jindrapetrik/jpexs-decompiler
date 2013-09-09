@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 public class Traits implements Serializable {
 
-    public Trait traits[] = new Trait[0];
+    public Trait[] traits = new Trait[0];
 
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {
         int ret = 0;
@@ -98,7 +98,7 @@ public class Traits implements Serializable {
         }
 
         @Override
-        public String call() throws Exception {
+        public String call() {
             String plus;
             if (makePackages) {
                 plus = trait.convertPackaged(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, parallel);
@@ -123,25 +123,43 @@ public class Traits implements Serializable {
     }
 
     public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames, boolean parallel) {
-        String s = "";
-        ExecutorService executor = Executors.newFixedThreadPool(parallel ? 20 : 1);
-        List<Future<String>> futureResults = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        ExecutorService executor = null;
+        List<Future<String>> futureResults = null;
+        List<TraitConvertTask> traitConvertTasks = null;
+        
+        if (parallel) {
+            executor = Executors.newFixedThreadPool(20);
+            futureResults = new ArrayList<>();
+        } else {
+            traitConvertTasks = new ArrayList<>();
+        }
+        pcode = true;
         for (int t = 0; t < traits.length; t++) {
-            Future<String> future = executor.submit(new TraitConvertTask(traits[t], makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, t, parallel));
-            futureResults.add(future);
+            TraitConvertTask task = new TraitConvertTask(traits[t], makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, t, parallel);
+            if (parallel) {
+                Future<String> future = executor.submit(task);
+                futureResults.add(future);
+            } else {
+                traitConvertTasks.add(task);
+            }
         }
 
-        for (int f = 0; f < futureResults.size(); f++) {
+        int taskCount = parallel ? futureResults.size() : traitConvertTasks.size();
+        for (int f = 0; f < taskCount; f++) {
             if (f > 0) {
-                s += "\r\n\r\n";
+                sb.append("\r\n\r\n");
             }
             try {
-                s += futureResults.get(f).get();
+                String taskResult = parallel ? futureResults.get(f).get() : traitConvertTasks.get(f).call();
+                sb.append(taskResult);
             } catch (InterruptedException | ExecutionException ex) {
                 Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during traits converting", ex);
             }
         }
-        executor.shutdown();
-        return s;
+        if (parallel) {
+            executor.shutdown();
+        }
+        return sb.toString();
     }
 }

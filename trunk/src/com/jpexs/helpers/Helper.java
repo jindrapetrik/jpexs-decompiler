@@ -61,7 +61,7 @@ public class Helper {
      * @param array Array of int values
      * @return String representation of the array
      */
-    public static String intArrToString(int array[]) {
+    public static String intArrToString(int[] array) {
         String s = "[";
         for (int i = 0; i < array.length; i++) {
             if (i > 0) {
@@ -79,7 +79,7 @@ public class Helper {
      * @param array Array of byte values
      * @return String representation of the array
      */
-    public static String byteArrToString(byte array[]) {
+    public static String byteArrToString(byte[] array) {
         String s = "[";
         for (int i = 0; i < array.length; i++) {
             if (i > 0) {
@@ -221,7 +221,7 @@ public class Helper {
         } else if (s.endsWith("\n")) {
             s = s.substring(0, s.length() - 1);
         }
-        String parts[] = s.split("(\r\n|\r|\n)");
+        String[] parts = s.split("(\r\n|\r|\n)");
         return parts.length;
     }
 
@@ -233,11 +233,11 @@ public class Helper {
         return ret;
     }
 
-    public static String bytesToHexString(byte bytes[]) {
+    public static String bytesToHexString(byte[] bytes) {
         return bytesToHexString(bytes, 0);
     }
 
-    public static String bytesToHexString(byte bytes[], int start) {
+    public static String bytesToHexString(byte[] bytes, int start) {
         StringBuilder sb = new StringBuilder();
         if (start < bytes.length) {
             for (int ii = start; ii < bytes.length; ii++) {
@@ -249,12 +249,12 @@ public class Helper {
         return sb.toString();
     }
 
-    public static String bytesToHexString(int maxByteCountInString, byte bytes[], int start) {
+    public static String bytesToHexString(int maxByteCountInString, byte[] bytes, int start) {
         if (bytes.length - start <= maxByteCountInString) {
             return bytesToHexString(bytes, start);
         }
-        byte trailingBytes[] = new byte[maxByteCountInString / 2];
-        byte headingBytes[] = new byte[maxByteCountInString - trailingBytes.length];
+        byte[] trailingBytes = new byte[maxByteCountInString / 2];
+        byte[] headingBytes = new byte[maxByteCountInString - trailingBytes.length];
         System.arraycopy(bytes, start, headingBytes, 0, headingBytes.length);
         int startOfTrailingBytes = bytes.length - trailingBytes.length;
         System.arraycopy(bytes, startOfTrailingBytes, trailingBytes, 0, trailingBytes.length);
@@ -292,7 +292,7 @@ public class Helper {
         return ret;
     }
 
-    public static String joinStrings(String arr[], String glue) {
+    public static String joinStrings(String[] arr, String glue) {
         String ret = "";
         boolean first = true;
         for (String s : arr) {
@@ -348,7 +348,7 @@ public class Helper {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (String f : file) {
             try (FileInputStream fis = new FileInputStream(f)) {
-                byte buf[] = new byte[4096];
+                byte[] buf = new byte[4096];
                 int cnt = 0;
                 while ((cnt = fis.read(buf)) > 0) {
                     baos.write(buf, 0, cnt);
@@ -362,7 +362,7 @@ public class Helper {
 
     public static void writeFile(String file, byte[]... data) {
         try (FileOutputStream fos = new FileOutputStream(file)) {
-            for (byte d[] : data) {
+            for (byte[] d : data) {
                 fos.write(d);
             }
         } catch (IOException ex) {
@@ -463,7 +463,7 @@ public class Helper {
     }
 
     public static String strToHex(String s) {
-        byte bs[];
+        byte[] bs;
         try {
             bs = s.getBytes("utf-8");
         } catch (UnsupportedEncodingException ex) {

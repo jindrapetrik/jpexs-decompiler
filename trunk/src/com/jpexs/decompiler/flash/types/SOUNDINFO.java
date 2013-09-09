@@ -31,5 +31,5 @@ public class SOUNDINFO {
     public long inPoint;
     public long outPoint;
     public int loopCount;
-    public SOUNDENVELOPE envelopeRecords[] = new SOUNDENVELOPE[0];
+    public SOUNDENVELOPE[] envelopeRecords = new SOUNDENVELOPE[0];
 }

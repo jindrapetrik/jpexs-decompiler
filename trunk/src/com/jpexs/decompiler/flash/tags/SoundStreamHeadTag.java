@@ -107,7 +107,7 @@ public class SoundStreamHeadTag extends CharacterTag implements SoundStreamHeadT
      * @param version SWF version
      * @throws IOException
      */
-    public SoundStreamHeadTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public SoundStreamHeadTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "SoundStreamHead", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         sis.readUB(4);//reserved

@@ -38,5 +38,5 @@ public class GRADIENT {
     public static final int INTERPOLATION_LINEAR_RGB_MODE = 1;
     public static final int INTERPOLATION_RESERVED1 = 2;
     public static final int INTERPOLATION_RESERVED2 = 3;
-    public GRADRECORD gradientRecords[];
+    public GRADRECORD[] gradientRecords;
 }

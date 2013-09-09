@@ -209,7 +209,7 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
      * @param pos
      * @throws IOException
      */
-    public PlaceObject2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public PlaceObject2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "PlaceObject2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         placeFlagHasClipActions = sis.readUB(1) == 1;

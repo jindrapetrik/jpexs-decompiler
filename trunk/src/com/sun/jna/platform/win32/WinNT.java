@@ -255,7 +255,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
          * Specifies an array of LUID_AND_ATTRIBUTES structures. Each structure
          * contains the LUID and attributes of a privilege.
          */
-        public LUID_AND_ATTRIBUTES Privileges[];
+        public LUID_AND_ATTRIBUTES[] Privileges;
 
         @Override
         protected List<String> getFieldOrder() {
@@ -1234,7 +1234,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
          * Pointer to a null-terminated string, such as "Service Pack 3", that
          * indicates the latest Service Pack installed on the system.
          */
-        public char szCSDVersion[];
+        public char[] szCSDVersion;
 
         @Override
         protected List<String> getFieldOrder() {
@@ -1286,7 +1286,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
          * the latest Service Pack installed on the system. If no Service Pack
          * has been installed, the string is empty.
          */
-        public char szCSDVersion[];
+        public char[] szCSDVersion;
         /**
          * The major version number of the latest Service Pack installed on the
          * system. For example, for Service Pack 3, the major version number is

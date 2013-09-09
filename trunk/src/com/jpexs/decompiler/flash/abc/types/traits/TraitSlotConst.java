@@ -135,7 +135,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (valueStr != null) {
             ret += " = ";
             int befLen = ret.length();
-            String valueStrParts[] = valueStr.split("\r\n");
+            String[] valueStrParts = valueStr.split("\r\n");
             boolean first = true;
             for (int i = 0; i < valueStrParts.length; i++) {
                 if (valueStrParts[i].equals("")) {

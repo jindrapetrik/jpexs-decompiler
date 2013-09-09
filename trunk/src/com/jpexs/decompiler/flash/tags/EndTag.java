@@ -47,7 +47,7 @@ public class EndTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public EndTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public EndTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "End", data, pos);
 
     }

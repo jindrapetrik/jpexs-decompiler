@@ -32,7 +32,7 @@ public class DefineFont4Tag extends CharacterTag {
     public boolean fontFlagsItalic;
     public boolean fontFlagsBold;
     public String fontName;
-    public byte fontData[];
+    public byte[] fontData;
     public static final int ID = 91;
 
     @Override
@@ -40,7 +40,7 @@ public class DefineFont4Tag extends CharacterTag {
         return fontID;
     }
 
-    public DefineFont4Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineFont4Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineFont4", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontID = sis.readUI16();

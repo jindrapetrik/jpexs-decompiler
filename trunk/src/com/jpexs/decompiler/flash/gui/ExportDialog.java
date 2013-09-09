@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 public class ExportDialog extends AppDialog {
 
     boolean cancelled = false;
-    String options[][] = {
+    String[][] options = {
         {translate("shapes.svg")},
         {translate("texts.plain"), translate("texts.formatted")},
         {translate("images.pngjpeg")},
@@ -28,7 +28,7 @@ public class ExportDialog extends AppDialog {
         {translate("sounds.mp3wavflv"), translate("sounds.flv")},
         {translate("actionscript.as"), translate("actionscript.pcode")}
     };
-    String optionNames[] = {
+    String[] optionNames = {
         translate("shapes"),
         translate("texts"),
         translate("images"),
@@ -42,7 +42,7 @@ public class ExportDialog extends AppDialog {
     public static final int OPTION_MOVIES = 3;
     public static final int OPTION_SOUNDS = 4;
     public static final int OPTION_ACTIONSCRIPT = 5;
-    private JComboBox combos[];
+    private JComboBox[] combos;
 
     public int getOption(int index) {
         return combos[index].getSelectedIndex();
@@ -61,7 +61,7 @@ public class ExportDialog extends AppDialog {
         cnt.setLayout(new BorderLayout());
         JPanel comboPanel = new JPanel(null);
         combos = new JComboBox[optionNames.length];
-        JLabel labels[] = new JLabel[optionNames.length];
+        JLabel[] labels = new JLabel[optionNames.length];
         int labWidth = 0;
         for (int i = 0; i < optionNames.length; i++) {
             labels[i] = new JLabel(optionNames[i]);

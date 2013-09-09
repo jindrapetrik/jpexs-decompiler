@@ -2012,7 +2012,7 @@ public class Graph {
     private List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<Integer> alternateEntries) {
         HashMap<Integer, List<Integer>> refs = code.visitCode(alternateEntries);
         List<GraphPart> ret = new ArrayList<>();
-        boolean visited[] = new boolean[code.size()];
+        boolean[] visited = new boolean[code.size()];
         ret.add(makeGraph(null, new GraphPath(), code, 0, 0, allBlocks, refs, visited));
         for (int pos : alternateEntries) {
             GraphPart e1 = new GraphPart(-1, -1);
@@ -2027,7 +2027,7 @@ public class Graph {
         return ip;
     }
 
-    private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startip, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean visited2[]) {
+    private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startip, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean[] visited2) {
 
         int ip = startip;
         for (GraphPart p : allBlocks) {
@@ -2164,7 +2164,7 @@ public class Graph {
                 ret.append("\r\n");
             }
         }
-        String parts[] = ret.toString().split("\r\n");
+        String[] parts = ret.toString().split("\r\n");
         ret = new StringBuilder();
 
         String labelPattern = "loop(switch)?[0-9]*:";

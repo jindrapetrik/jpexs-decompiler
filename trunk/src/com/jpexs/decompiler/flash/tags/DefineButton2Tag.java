@@ -92,7 +92,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
      * @param pos
      * @throws IOException
      */
-    public DefineButton2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineButton2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineButton2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
@@ -132,7 +132,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
 
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
             OutputStream os2 = baos2;
-            byte origbrdata[] = null;
+            byte[] origbrdata = null;
             if (Configuration.DEBUG_COPY) {
                 SWFInputStream sis = new SWFInputStream(bais, version);
                 int len = sis.readUI16();
@@ -144,7 +144,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
             try (SWFOutputStream sos2 = new SWFOutputStream(os2, version)) {
                 sos2.writeBUTTONRECORDList(characters, true);
             }
-            byte brdata[] = baos2.toByteArray();
+            byte[] brdata = baos2.toByteArray();
             if (Configuration.DEBUG_COPY) {
                 if (origbrdata != null) {
                     if (origbrdata.length != brdata.length) {

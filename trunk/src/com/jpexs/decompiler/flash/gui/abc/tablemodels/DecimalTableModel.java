@@ -23,8 +23,8 @@ import javax.swing.table.TableModel;
 public class DecimalTableModel implements TableModel {
 
     private ABC abc;
-    private static final String columnNames[] = new String[]{"Index", "Value"};
-    private static final Class classes[] = new Class[]{Long.class, String.class};
+    private static final String[] columnNames = new String[]{"Index", "Value"};
+    private static final Class[] classes = new Class[]{Long.class, String.class};
 
     public DecimalTableModel(ABC abc) {
         this.abc = abc;

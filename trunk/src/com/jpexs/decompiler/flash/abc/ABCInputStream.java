@@ -45,7 +45,7 @@ public class ABCInputStream extends InputStream {
         if (bufferOs == null) {
             return new byte[0];
         }
-        byte ret[] = bufferOs.toByteArray();
+        byte[] ret = bufferOs.toByteArray();
         bufferOs.reset();
         return ret;
     }
@@ -164,7 +164,7 @@ public class ABCInputStream extends InputStream {
     }
 
     public final long readLong() throws IOException {
-        byte readBuffer[] = safeRead(8);
+        byte[] readBuffer = safeRead(8);
         return (((long) readBuffer[7] << 56)
                 + ((long) (readBuffer[6] & 255) << 48)
                 + ((long) (readBuffer[5] & 255) << 40)
@@ -182,7 +182,7 @@ public class ABCInputStream extends InputStream {
     }
 
     private byte[] safeRead(int count) throws IOException {
-        byte ret[] = new byte[count];
+        byte[] ret = new byte[count];
         for (int i = 0; i < count; i++) {
             ret[i] = (byte) read();
         }
@@ -238,7 +238,7 @@ public class ABCInputStream extends InputStream {
     public MethodInfo readMethodInfo() throws IOException {
         int param_count = readU30();
         int ret_type = readU30();
-        int param_types[] = new int[param_count];
+        int[] param_types = new int[param_count];
         for (int i = 0; i < param_count; i++) {
             param_types[i] = readU30();
         }
@@ -247,7 +247,7 @@ public class ABCInputStream extends InputStream {
 
         //// 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional (16=ignore_rest, 32=explicit,) 64=setsdxns, 128=has_paramnames
 
-        ValueKind optional[] = new ValueKind[0];
+        ValueKind[] optional = new ValueKind[0];
         if ((flags & 8) == 8) { //if has_optional
             int optional_count = readU30();
             optional = new ValueKind[optional_count];
@@ -256,7 +256,7 @@ public class ABCInputStream extends InputStream {
             }
         }
 
-        int param_names[] = new int[param_count];
+        int[] param_names = new int[param_count];
         if ((flags & 128) == 128) { //if has_paramnames
             for (int i = 0; i < param_count; i++) {
                 param_names[i] = readU30();
@@ -335,7 +335,7 @@ public class ABCInputStream extends InputStream {
     }
 
     public byte[] readBytes(int count) throws IOException {
-        byte ret[] = new byte[count];
+        byte[] ret = new byte[count];
         for (int i = 0; i < count; i++) {
             ret[i] = (byte) read();
         }
@@ -343,7 +343,7 @@ public class ABCInputStream extends InputStream {
     }
 
     public Decimal readDecimal() throws IOException {
-        byte data[] = readBytes(16);
+        byte[] data = readBytes(16);
         return new Decimal(data);
     }
 
@@ -367,7 +367,7 @@ public class ABCInputStream extends InputStream {
 
     public String readString() throws IOException {
         int length = readU30();
-        byte b[] = safeRead(length);
+        byte[] b = safeRead(length);
         String r = new String(b, "UTF-8");
         return r;
     }

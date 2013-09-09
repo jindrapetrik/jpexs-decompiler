@@ -208,11 +208,11 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     }
 
 
-                    float focRadFractions[] = new float[ratiosFocRad.size()];
+                    float[] focRadFractions = new float[ratiosFocRad.size()];
                     for (int i = 0; i < ratiosFocRad.size(); i++) {
                         focRadFractions[i] = ratiosFocRad.get(i);
                     }
-                    Color focRadColors[] = colorsFocRad.toArray(new Color[colorsFocRad.size()]);
+                    Color[] focRadColors = colorsFocRad.toArray(new Color[colorsFocRad.size()]);
 
                     RGB focEndColor = fillStyle0.focalGradient.gradientRecords[fillStyle0.focalGradient.gradientRecords.length - 1].color;
                     RGBA focEndColorA = fillStyle0.focalGradient.gradientRecords[fillStyle0.focalGradient.gradientRecords.length - 1].colorA;
@@ -260,11 +260,11 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
 
 
 
-                    float ratiosRadAr[] = new float[ratiosRad.size()];
+                    float[] ratiosRadAr = new float[ratiosRad.size()];
                     for (int i = 0; i < ratiosRad.size(); i++) {
                         ratiosRadAr[i] = ratiosRad.get(i);
                     }
-                    Color colorsRadArr[] = colorsRad.toArray(new Color[colorsRad.size()]);
+                    Color[] colorsRadArr = colorsRad.toArray(new Color[colorsRad.size()]);
 
                     RGB endColor = fillStyle0.gradient.gradientRecords[fillStyle0.gradient.gradientRecords.length - 1].color;
                     RGBA endColorA = fillStyle0.gradient.gradientRecords[fillStyle0.gradient.gradientRecords.length - 1].colorA;
@@ -312,11 +312,11 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
 
 
 
-                    float ratiosAr[] = new float[ratios.size()];
+                    float[] ratiosAr = new float[ratios.size()];
                     for (int i = 0; i < ratios.size(); i++) {
                         ratiosAr[i] = ratios.get(i);
                     }
-                    Color colorsArr[] = colors.toArray(new Color[colors.size()]);
+                    Color[] colorsArr = colors.toArray(new Color[colors.size()]);
 
                     GeneralPath pathLin = toGeneralPath(startX, startY);
                     g.fill(pathLin);
@@ -883,7 +883,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             fontSize = 1024;
         }
         List<SHAPERECORD> retList = new ArrayList<>();
-        String defaultFonts[] = new String[]{"Times New Roman", "Arial"};
+        String[] defaultFonts = new String[]{"Times New Roman", "Arial"};
         Font f = null;
         if (existingFonts.contains(fontName)) {
             f = new Font(fontName, fontStyle, fontSize);
@@ -900,7 +900,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         }
         GlyphVector v = f.createGlyphVector((new JPanel()).getFontMetrics(f).getFontRenderContext(), "" + character);
         Shape shp = v.getOutline();
-        double points[] = new double[6];
+        double[] points = new double[6];
         int lastX = 0;
         int lastY = 0;
         int startX = 0;
@@ -938,13 +938,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     lastY = (int) Math.round(points[1]);
                     break;
                 case PathIterator.SEG_CUBICTO:
-                    double cubicCoords[] = new double[]{
+                    double[] cubicCoords = new double[]{
                         lastX, lastY,
                         Math.round(points[0]), Math.round(points[1]),
                         Math.round(points[2]), Math.round(points[3]),
                         Math.round(points[4]), Math.round(points[5])
                     };
-                    double quadCoords[][] = approximateCubic(cubicCoords);
+                    double[][] quadCoords = approximateCubic(cubicCoords);
                     for (int i = 0; i < quadCoords.length; i++) {
                         CurvedEdgeRecord cer = new CurvedEdgeRecord();
                         cer.controlDeltaX = multiplier * (((int) Math.round(quadCoords[i][0])) - lastX);

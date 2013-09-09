@@ -41,7 +41,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     public int bitmapWidth;
     public int bitmapHeight;
     public int bitmapColorTableSize;
-    public byte zlibBitmapData[]; //TODO: Parse ALPHACOLORMAPDATA,ALPHABITMAPDATA
+    public byte[] zlibBitmapData; //TODO: Parse ALPHACOLORMAPDATA,ALPHABITMAPDATA
     public static final int FORMAT_8BIT_COLORMAPPED = 3;
     public static final int FORMAT_32BIT_ARGB = 5;
     public static final int ID = 36;
@@ -52,7 +52,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public void setImage(byte data[]) throws IOException {
+    public void setImage(byte[] data) throws IOException {
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
         ALPHABITMAPDATA bitmapData = new ALPHABITMAPDATA();
         bitmapFormat = DefineBitsLosslessTag.FORMAT_24BIT_RGB;
@@ -90,7 +90,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         decompressed = false;
     }
 
-    public DefineBitsLossless2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineBitsLossless2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineBitsLossless2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();

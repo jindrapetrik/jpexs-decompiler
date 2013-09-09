@@ -23,8 +23,8 @@ import javax.swing.table.TableModel;
 public class NamespaceTableModel implements TableModel {
 
     private ABC abc;
-    private static final String columnNames[] = new String[]{"Index", "Kind", "Name"};
-    private static final Class classes[] = new Class[]{Long.class, String.class, String.class};
+    private static final String[] columnNames = new String[]{"Index", "Kind", "Name"};
+    private static final Class[] classes = new Class[]{Long.class, String.class, String.class};
 
     public NamespaceTableModel(ABC abc) {
         this.abc = abc;

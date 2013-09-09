@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 
 public class NamespaceSet {
 
-    public int namespaces[];
+    public int[] namespaces;
 
     public String toString(ConstantPool constants) {
         String s = "";

@@ -139,7 +139,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                 onFalse = generateToActionList(localData, onFalseCmds);
             }
         }
-        byte onTrueBytes[] = Action.actionsToBytes(onTrue, false, SWF.DEFAULT_VERSION);
+        byte[] onTrueBytes = Action.actionsToBytes(onTrue, false, SWF.DEFAULT_VERSION);
         int onTrueLen = onTrueBytes.length;
 
         ActionIf ifaif = new ActionIf(0);
@@ -157,7 +157,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                 onTrueLen += ajmp.getBytes(SWF.DEFAULT_VERSION).length;
             }
             ifaif.setJumpOffset(onTrueLen);
-            byte onFalseBytes[] = Action.actionsToBytes(onFalse, false, SWF.DEFAULT_VERSION);
+            byte[] onFalseBytes = Action.actionsToBytes(onFalse, false, SWF.DEFAULT_VERSION);
             int onFalseLen = onFalseBytes.length;
             if (ajmp != null) {
                 ajmp.setJumpOffset(onFalseLen);

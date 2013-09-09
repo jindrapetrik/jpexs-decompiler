@@ -475,7 +475,7 @@ public class DefineEditTextTag extends TextTag {
      * @param pos
      * @throws IOException
      */
-    public DefineEditTextTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineEditTextTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineEditText", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();

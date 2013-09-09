@@ -71,7 +71,7 @@ public class CSMTextSettingsTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public CSMTextSettingsTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public CSMTextSettingsTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "CSMTextSettings", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         textID = sis.readUI16();

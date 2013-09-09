@@ -45,11 +45,11 @@ public class InstructionDefinition implements Serializable {
     protected String hilighOffset(String text, long offset) {
         return Highlighting.hilighOffset(text, offset);
     }
-    public int operands[];
+    public int[] operands;
     public String instructionName = "";
     public int instructionCode = 0;
 
-    public InstructionDefinition(int instructionCode, String instructionName, int operands[]) {
+    public InstructionDefinition(int instructionCode, String instructionName, int[] operands) {
         this.instructionCode = instructionCode;
         this.instructionName = instructionName;
         this.operands = operands;

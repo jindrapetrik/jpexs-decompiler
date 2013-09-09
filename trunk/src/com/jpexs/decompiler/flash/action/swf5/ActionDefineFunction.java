@@ -58,7 +58,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     public ActionDefineFunction(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x9B, actionLength);
         this.version = version;
-        //byte data[]=sis.readBytes(actionLength);
+        //byte[] data=sis.readBytes(actionLength);
         //sis=new SWFInputStream(new ByteArrayInputStream(data),version);
         long startPos = sis.getPos();
         functionName = sis.readString();
@@ -117,7 +117,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
             for (String s : paramNames) {
                 sos.writeString(s);
             }
-            //byte codeBytes[] = Action.actionsToBytes(code, false, version);
+            //byte[] codeBytes = Action.actionsToBytes(code, false, version);
             sos.writeUI16(codeSize); //codeBytes.length);
             sos.close();
 

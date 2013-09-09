@@ -227,7 +227,7 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     public boolean isPlaying() {
         IntByReference ibr = new IntByReference();
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PLAYING}, 1, ibr, null);
-        byte res[] = new byte[1];
+        byte[] res = new byte[1];
         if (Kernel32.INSTANCE.ReadFile(pipe, res, res.length, ibr, null)) {
             return res[0] == 1;
         } else {

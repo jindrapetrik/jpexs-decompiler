@@ -22,9 +22,9 @@ package com.jpexs.decompiler.flash.abc.types;
  */
 public class Decimal {
 
-    public byte data[];
+    public byte[] data;
 
-    public Decimal(byte data[]) {
+    public Decimal(byte[] data) {
         this.data = data;
     }
 

@@ -92,7 +92,7 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
         }
     }
 
-    public void setImage(byte data[]) {
+    public void setImage(byte[] data) {
         setBackground(View.swfBackgroundColor);
         if (timer != null) {
             timer.cancel();

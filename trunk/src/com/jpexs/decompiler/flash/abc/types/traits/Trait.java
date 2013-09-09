@@ -33,9 +33,9 @@ public abstract class Trait implements Serializable {
     public int name_index;
     public int kindType;
     public int kindFlags;
-    public int metadata[] = new int[0];
+    public int[] metadata = new int[0];
     public long fileOffset;
-    public byte bytes[];
+    public byte[] bytes;
     public static final int ATTR_Final = 0x1;
     public static final int ATTR_Override = 0x2;
     public static final int ATTR_Metadata = 0x4;

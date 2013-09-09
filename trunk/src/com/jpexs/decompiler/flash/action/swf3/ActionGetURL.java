@@ -49,7 +49,7 @@ public class ActionGetURL extends Action {
 
     public ActionGetURL(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x83, actionLength);
-        //byte data[] = sis.readBytes(actionLength);
+        //byte[] data = sis.readBytes(actionLength);
         //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         urlString = sis.readString();
         targetString = sis.readString();

@@ -298,7 +298,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         @Override
         public int handle(Throwable thrown) {
             synchronized (MainFrame.class) {
-                String options[] = new String[]{translate("button.abort"), translate("button.retry"), translate("button.ignore")};
+                String[] options = new String[]{translate("button.abort"), translate("button.retry"), translate("button.ignore")};
                 return View.showOptionDialog(null, translate("error.occured").replace("%error%", thrown.getLocalizedMessage()), translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, options, "");
             }
         }
@@ -901,7 +901,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 files = exportSelection(errorHandler, tempDir, export);
                                 files.clear();
 
-                                File fs[] = ftemp.listFiles();
+                                File[] fs = ftemp.listFiles();
                                 for (File f : fs) {
                                     files.add(f);
                                 }
@@ -1116,7 +1116,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         final JPanel fontPanel = new JPanel();
         final JPanel fontParams2 = new JPanel();
         fontParams2.setLayout(null);
-        final Component ctable[][] = new Component[][]{
+        final Component[][] ctable = new Component[][]{
             {new JLabel(translate("font.name")), fontNameLabel = new JLabel(translate("value.unknown"))},
             {new JLabel(translate("font.isbold")), fontIsBoldLabel = new JLabel(translate("value.unknown"))},
             {new JLabel(translate("font.isitalic")), fontIsItalicLabel = new JLabel(translate("value.unknown"))},
@@ -1133,7 +1133,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
         final int borderLeft = 10;
 
-        final int maxws[] = new int[ctable[0].length];
+        final int[] maxws = new int[ctable[0].length];
         for (int x = 0; x < ctable[0].length; x++) {
             int maxw = 0;
             for (int y = 0; y < ctable.length; y++) {
@@ -1778,7 +1778,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
     public List<TagNode> getSelectedNodes() {
         List<TagNode> ret = new ArrayList<>();
-        TreePath tps[] = tagTree.getSelectionPaths();
+        TreePath[] tps = tagTree.getSelectionPaths();
         if (tps == null) {
             return ret;
         }
@@ -1938,7 +1938,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
     public List<Object> getSelected(JTree tree) {
         TreeSelectionModel tsm = tree.getSelectionModel();
-        TreePath tps[] = tsm.getSelectionPaths();
+        TreePath[] tps = tsm.getSelectionPaths();
         List<Object> ret = new ArrayList<>();
         if (tps == null) {
             return ret;
@@ -1964,7 +1964,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
     public List<Object> getAllSelected(JTree tree) {
         TreeSelectionModel tsm = tree.getSelectionModel();
-        TreePath tps[] = tsm.getSelectionPaths();
+        TreePath[] tps = tsm.getSelectionPaths();
         List<Object> ret = new ArrayList<>();
         if (tps == null) {
             return ret;
@@ -2438,7 +2438,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         if (returnVal == JFileChooser.APPROVE_OPTION) {
                             Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
                             File selfile = Helper.fixDialogFile(fc.getSelectedFile());
-                            byte data[] = Helper.readFile(selfile.getAbsolutePath());
+                            byte[] data = Helper.readFile(selfile.getAbsolutePath());
                             try {
                                 it.setImage(data);
                                 swf.clearImageCache();
@@ -3315,7 +3315,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     }//not showframe
 
                     sos2.writeTag(new EndTag(null));
-                    byte data[] = baos.toByteArray();
+                    byte[] data = baos.toByteArray();
 
                     sos.writeUI32(sos.getPos() + data.length + 4);
                     sos.write(data);

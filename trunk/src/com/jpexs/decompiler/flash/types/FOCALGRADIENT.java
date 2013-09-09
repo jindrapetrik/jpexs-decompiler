@@ -24,6 +24,6 @@ public class FOCALGRADIENT {
 
     public int spreadMode;
     public int interPolationMode;
-    public GRADRECORD gradientRecords[] = new GRADRECORD[0];
+    public GRADRECORD[] gradientRecords = new GRADRECORD[0];
     public float focalPoint;
 }

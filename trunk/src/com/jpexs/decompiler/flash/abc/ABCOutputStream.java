@@ -118,7 +118,7 @@ public class ABCOutputStream extends OutputStream {
     }
 
     public void writeLong(long value) throws IOException {
-        byte writeBuffer[] = new byte[8];
+        byte[] writeBuffer = new byte[8];
         writeBuffer[7] = (byte) (value >>> 56);
         writeBuffer[6] = (byte) (value >>> 48);
         writeBuffer[5] = (byte) (value >>> 40);
@@ -144,7 +144,7 @@ public class ABCOutputStream extends OutputStream {
     }
 
     public void writeString(String s) throws IOException {
-        byte sbytes[] = s.getBytes("UTF-8");
+        byte[] sbytes = s.getBytes("UTF-8");
         writeU30(sbytes.length);
         write(sbytes);
     }

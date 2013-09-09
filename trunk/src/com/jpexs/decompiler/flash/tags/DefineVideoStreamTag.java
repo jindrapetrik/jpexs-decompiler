@@ -86,7 +86,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
      * @param version SWF version
      * @throws IOException
      */
-    public DefineVideoStreamTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineVideoStreamTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineVideoStream", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();

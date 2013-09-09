@@ -26,7 +26,7 @@ import java.util.Set;
  */
 public class MORPHFILLSTYLEARRAY implements NeedsCharacters {
 
-    public MORPHFILLSTYLE fillStyles[];
+    public MORPHFILLSTYLE[] fillStyles;
 
     @Override
     public Set<Integer> getNeededCharacters() {

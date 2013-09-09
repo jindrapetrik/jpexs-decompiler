@@ -63,7 +63,7 @@ public class VideoFrameTag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public VideoFrameTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public VideoFrameTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "VideoFrame", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         streamID = sis.readUI16();

@@ -31,12 +31,12 @@ import javax.imageio.ImageIO;
 public class DefineBitsTag extends ImageTag {
 
     public int characterID;
-    public byte jpegData[];
+    public byte[] jpegData;
     private JPEGTablesTag jtt = null;
     public static final int ID = 6;
 
     @Override
-    public void setImage(byte data[]) {
+    public void setImage(byte[] data) {
         throw new UnsupportedOperationException("Set image is not supported for DefineBits");
     }
 
@@ -45,7 +45,7 @@ public class DefineBitsTag extends ImageTag {
         return false;
     }
 
-    public DefineBitsTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineBitsTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineBits", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
@@ -68,7 +68,7 @@ public class DefineBitsTag extends ImageTag {
         getJPEGTables(tags);
         if ((jtt != null)) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                byte jttdata[] = jtt.getData(10);
+                byte[] jttdata = jtt.getData(10);
                 if (jttdata.length != 0) {
                     baos.write(jttdata, SWF.hasErrorHeader(jttdata) ? 4 : 0, jttdata.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
                     baos.write(jpegData, SWF.hasErrorHeader(jpegData) ? 6 : 2, jpegData.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));

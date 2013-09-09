@@ -183,7 +183,7 @@ public class SWF {
     /**
      * LZMA Properties
      */
-    public byte lzmaProperties[];
+    public byte[] lzmaProperties;
     public FileAttributesTag fileAttributes;
 
     /**
@@ -230,7 +230,7 @@ public class SWF {
             os.write('W');
             os.write('S');
             os.write(version);
-            byte data[] = baos.toByteArray();
+            byte[] data = baos.toByteArray();
             sos = new SWFOutputStream(os, version);
             sos.writeUI32(data.length + 8);
 
@@ -252,7 +252,7 @@ public class SWF {
                     enc.SetEndMarkerMode(true);
                     enc.Code(new ByteArrayInputStream(data), baos, -1, -1, null);
                     data = baos.toByteArray();
-                    byte udata[] = new byte[4];
+                    byte[] udata = new byte[4];
                     udata[0] = (byte) (data.length & 0xFF);
                     udata[1] = (byte) ((data.length >> 8) & 0xFF);
                     udata[2] = (byte) ((data.length >> 16) & 0xFF);
@@ -297,7 +297,7 @@ public class SWF {
      * @throws IOException
      */
     public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException {
-        byte hdr[] = new byte[3];
+        byte[] hdr = new byte[3];
         is.read(hdr);
         String shdr = new String(hdr, "utf-8");
         if ((!shdr.equals("FWS")) && (!shdr.equals("CWS")) && (!shdr.equals("ZWS"))) {
@@ -424,7 +424,7 @@ public class SWF {
      */
     public static boolean fws2cws(InputStream fis, OutputStream fos) {
         try {
-            byte swfHead[] = new byte[8];
+            byte[] swfHead = new byte[8];
             fis.read(swfHead);
 
             if (swfHead[0] != 'F') {
@@ -451,7 +451,7 @@ public class SWF {
 
     public static boolean decompress(InputStream fis, OutputStream fos) {
         try {
-            byte hdr[] = new byte[3];
+            byte[] hdr = new byte[3];
             fis.read(hdr);
             String shdr = new String(hdr, "utf-8");
             if (shdr.equals("CWS")) {
@@ -478,7 +478,7 @@ public class SWF {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 sis.readUI32(); //outSize
                 int propertiesSize = 5;
-                byte lzmaProperties[] = new byte[propertiesSize];
+                byte[] lzmaProperties = new byte[propertiesSize];
                 if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
                     throw new IOException("LZMA:input .lzma file is too short");
                 }
@@ -737,7 +737,7 @@ public class SWF {
                     if (path == null) {
                         path = "";
                     }
-                    String pathParts[];
+                    String[] pathParts;
                     if (path.contains(".")) {
                         pathParts = path.split("\\.");
                     } else {
@@ -856,7 +856,7 @@ public class SWF {
         }
     }
 
-    public static boolean hasErrorHeader(byte data[]) {
+    public static boolean hasErrorHeader(byte[] data) {
         if (data.length > 4) {
             if ((data[0] & 0xff) == 0xff) {
                 if ((data[1] & 0xff) == 0xd9) {
@@ -939,7 +939,7 @@ public class SWF {
             if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 for (int b = 0; b < blocks.size(); b++) {
-                    byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                    byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
                     baos.write(data);
                 }
                 fos = new ByteArrayOutputStream();
@@ -947,7 +947,7 @@ public class SWF {
             } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
                 fos = new ByteArrayOutputStream();
                 for (int b = 0; b < blocks.size(); b++) {
-                    byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                    byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
                     fos.write(data, 4, data.length - 4);
                 }
             } else {
@@ -957,7 +957,7 @@ public class SWF {
 
                 int ms = (int) (1000.0f / ((float) frameRate));
                 for (int b = 0; b < blocks.size(); b++) {
-                    byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                    byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
                     if (shead.getSoundFormat() == 2) { //MP3
                         data = Arrays.copyOfRange(data, 4, data.length);
                     }
@@ -975,16 +975,16 @@ public class SWF {
         }
     }
 
-    private static void createWavFromAdpcm(OutputStream fos, int soundRate, int soundSize, int soundType, byte data[]) throws IOException {
+    private static void createWavFromAdpcm(OutputStream fos, int soundRate, int soundSize, int soundType, byte[] data) throws IOException {
         try {
-            byte pcmData[] = AdpcmDecoder.decode(data, soundType == 1 ? true : false);
+            byte[] pcmData = AdpcmDecoder.decode(data, soundType == 1 ? true : false);
 
             ByteArrayOutputStream subChunk1Data = new ByteArrayOutputStream();
             int audioFormat = 1; //PCM
             writeLE(subChunk1Data, audioFormat, 2);
             int numChannels = soundType == 1 ? 2 : 1;
             writeLE(subChunk1Data, numChannels, 2);
-            int rateMap[] = {5512, 11025, 22050, 44100};
+            int[] rateMap = {5512, 11025, 22050, 44100};
             int sampleRate = rateMap[soundRate];
             writeLE(subChunk1Data, sampleRate, 4);
             int bitsPerSample = soundSize == 1 ? 16 : 8;
@@ -996,7 +996,7 @@ public class SWF {
 
             ByteArrayOutputStream chunks = new ByteArrayOutputStream();
             chunks.write("fmt ".getBytes("utf-8"));
-            byte subChunk1DataBytes[] = subChunk1Data.toByteArray();
+            byte[] subChunk1DataBytes = subChunk1Data.toByteArray();
             writeLE(chunks, subChunk1DataBytes.length, 4);
             chunks.write(subChunk1DataBytes);
 
@@ -1006,7 +1006,7 @@ public class SWF {
             chunks.write(pcmData);
 
             fos.write("RIFF".getBytes("utf-8"));
-            byte chunkBytes[] = chunks.toByteArray();
+            byte[] chunkBytes = chunks.toByteArray();
             writeLE(fos, 4 + chunkBytes.length, 4);
             fos.write("WAVE".getBytes("utf-8"));
             fos.write(chunkBytes);
@@ -1773,7 +1773,7 @@ public class SWF {
         if (deobfuscated.containsKey(pkg)) {
             return deobfuscated.get(pkg);
         }
-        String parts[] = null;
+        String[] parts = null;
         if (pkg.contains(".")) {
             parts = pkg.split("\\.");
         } else {
@@ -1919,7 +1919,7 @@ public class SWF {
                 DoInitActionTag dia = (DoInitActionTag) t;
                 String exportName = dia.getExportName();
                 final String pkgPrefix = "__Packages.";
-                String classNameParts[] = null;
+                String[] classNameParts = null;
                 if ((exportName != null) && exportName.startsWith(pkgPrefix)) {
                     String className = exportName.substring(pkgPrefix.length());
                     if (className.contains(".")) {
@@ -2132,7 +2132,7 @@ public class SWF {
 
     private static class CachedImage implements Serializable {
 
-        private int data[];
+        private int[] data;
         private int width;
         private int height;
         private int type;

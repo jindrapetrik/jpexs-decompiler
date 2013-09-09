@@ -28,9 +28,9 @@ public class Namespace {
     public static final int KIND_PROTECTED = 24;
     public static final int KIND_EXPLICIT = 25;
     public static final int KIND_STATIC_PROTECTED = 26;
-    public static final int nameSpaceKinds[] = new int[]{KIND_NAMESPACE, KIND_PRIVATE, KIND_PACKAGE, KIND_PACKAGE_INTERNAL, KIND_PROTECTED, KIND_EXPLICIT, KIND_STATIC_PROTECTED};
-    public static final String nameSpaceKindNames[] = new String[]{"Namespace", "PrivateNamespace", "PackageNamespace", "PackageInternalNamespace", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNamespace"};
-    public static final String namePrefixes[] = new String[]{"", "private", "public", "", "protected", "explicit", "protected"};
+    public static final int[] nameSpaceKinds = new int[]{KIND_NAMESPACE, KIND_PRIVATE, KIND_PACKAGE, KIND_PACKAGE_INTERNAL, KIND_PROTECTED, KIND_EXPLICIT, KIND_STATIC_PROTECTED};
+    public static final String[] nameSpaceKindNames = new String[]{"Namespace", "PrivateNamespace", "PackageNamespace", "PackageInternalNamespace", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNamespace"};
+    public static final String[] namePrefixes = new String[]{"", "private", "public", "", "protected", "explicit", "protected"};
     public int kind;
     public int name_index;
 

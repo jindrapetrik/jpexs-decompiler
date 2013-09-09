@@ -61,7 +61,7 @@ public class StartSound2Tag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public StartSound2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public StartSound2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "StartSound2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         soundClassName = sis.readString();

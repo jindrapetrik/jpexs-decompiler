@@ -91,7 +91,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      * @param pos
      * @throws IOException
      */
-    public DefineButtonTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineButtonTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineButton", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
@@ -165,7 +165,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int prevLength = 0;
             if (previousTag != null) {
-                byte prevData[] = previousTag.getData(version);
+                byte[] prevData = previousTag.getData(version);
                 baos.write(prevData);
                 prevLength = prevData.length;
             }

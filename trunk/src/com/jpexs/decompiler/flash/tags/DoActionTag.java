@@ -53,7 +53,7 @@ public class DoActionTag extends Tag implements ASMSource {
      * @param version SWF version
      * @param pos
      */
-    public DoActionTag(SWF swf, byte data[], int version, long pos) {
+    public DoActionTag(SWF swf, byte[] data, int version, long pos) {
         super(swf, ID, "DoAction", data, pos);
         actionBytes = data;
     }
@@ -109,10 +109,10 @@ public class DoActionTag extends Tag implements ASMSource {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int prevLength = 0;
             if (previousTag != null) {
-                byte prevData[] = previousTag.getData(version);
+                byte[] prevData = previousTag.getData(version);
                 baos.write(prevData);
                 prevLength = prevData.length;
-                byte header[] = SWFOutputStream.getTagHeader(this, data, version);
+                byte[] header = SWFOutputStream.getTagHeader(this, data, version);
                 baos.write(header);
                 prevLength += header.length;
             }

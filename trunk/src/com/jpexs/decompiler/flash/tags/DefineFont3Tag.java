@@ -50,7 +50,7 @@ public class DefineFont3Tag extends FontTag {
     public LANGCODE languageCode;
     public String fontName;
     public int numGlyphs;
-    //public long offsetTable[];
+    //public long[] offsetTable];
     public List<SHAPE> glyphShapeTable;
     public List<Integer> codeTable;
     public int fontAscent;
@@ -58,7 +58,7 @@ public class DefineFont3Tag extends FontTag {
     public int fontLeading;
     public List<Integer> fontAdvanceTable;
     public List<RECT> fontBoundsTable;
-    public KERNINGRECORD fontKerningTable[];
+    public KERNINGRECORD[] fontKerningTable;
     public static final int ID = 75;
 
     @Override
@@ -90,7 +90,7 @@ public class DefineFont3Tag extends FontTag {
         return codeTable.indexOf((Integer) (int) c);
     }
 
-    public DefineFont3Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineFont3Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineFont3", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontId = sis.readUI16();
@@ -189,7 +189,7 @@ public class DefineFont3Tag extends FontTag {
                 offsetTable.add((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
                 sos3.writeSHAPE(glyphShapeTable.get(i), 1);
             }
-            byte baGlyphShapes[] = baosGlyphShapes.toByteArray();
+            byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
             for (Long offset : offsetTable) {
                 if (fontFlagsWideOffsets) {
                     sos.writeUI32(offset);

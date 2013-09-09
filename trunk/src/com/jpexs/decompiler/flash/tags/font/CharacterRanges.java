@@ -65,7 +65,7 @@ public class CharacterRanges {
                 ret.add(i);
             }
         }
-        int retArr[] = new int[ret.size()];
+        int[] retArr = new int[ret.size()];
         for (int i = 0; i < ret.size(); i++) {
             retArr[i] = ret.get(i);
         }
@@ -118,12 +118,12 @@ public class CharacterRanges {
         String s;
         try {
             while ((s = br.readLine()) != null) {
-                String parts[] = s.split(":");
+                String[] parts = s.split(":");
                 Language lng = new Language(parts[0]);
-                String ranges[] = parts[1].split(",");
+                String[] ranges = parts[1].split(",");
                 for (String r : ranges) {
                     if (r.contains("-")) {
-                        String fromTo[] = r.split("-");
+                        String[] fromTo = r.split("-");
                         lng.ranges.add(new Range(Integer.parseInt(fromTo[0], 16), Integer.parseInt(fromTo[1], 16)));
                     } else {
                         lng.ranges.add(new Range(Integer.parseInt(r, 16)));

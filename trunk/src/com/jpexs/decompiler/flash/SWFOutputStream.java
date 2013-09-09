@@ -193,7 +193,7 @@ public class SWFOutputStream extends OutputStream {
     }
 
     private void writeLong(long value) throws IOException {
-        byte writeBuffer[] = new byte[8];
+        byte[] writeBuffer = new byte[8];
         writeBuffer[3] = (byte) (value >>> 56);
         writeBuffer[2] = (byte) (value >>> 48);
         writeBuffer[1] = (byte) (value >>> 40);
@@ -371,7 +371,7 @@ public class SWFOutputStream extends OutputStream {
         }
     }
 
-    public static byte[] getTagHeader(Tag tag, byte data[], int version) {
+    public static byte[] getTagHeader(Tag tag, byte[] data, int version) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
 
@@ -399,7 +399,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeTag(Tag tag) throws IOException {
-        byte data[] = tag.getData(version);
+        byte[] data = tag.getData(version);
         write(getTagHeader(tag, data, version));
         write(data);
     }
@@ -672,7 +672,7 @@ public class SWFOutputStream extends OutputStream {
             }
             sos.write(value.actionBytes);
         }
-        byte data[] = baos.toByteArray();
+        byte[] data = baos.toByteArray();
         writeUI32(data.length);     //actionRecordSize
         write(data);
     }
@@ -1014,7 +1014,7 @@ public class SWFOutputStream extends OutputStream {
             sos.writeUB(1, value.condOverDownToIddle ? 1 : 0);
             sos.write(value.actionBytes);
         }
-        byte data[] = baos.toByteArray();
+        byte[] data = baos.toByteArray();
         if (isLast) {
             writeUI16(0);
         } else {
@@ -1628,7 +1628,7 @@ public class SWFOutputStream extends OutputStream {
         writeUI16(value.range);
     }
 
-    public void writeBytesZlib(byte data[]) throws IOException {
+    public void writeBytesZlib(byte[] data) throws IOException {
         DeflaterOutputStream deflater = new DeflaterOutputStream(this, new Deflater(9));
         deflater.write(data);
         deflater.finish();

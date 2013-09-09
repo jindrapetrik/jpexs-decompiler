@@ -125,7 +125,7 @@ public class FLVOutputStream extends OutputStream {
     public void writeTag(FLVTAG tag) throws IOException {
         long posBefore = getPos();
         writeUI8(tag.tagType);
-        byte data[] = tag.data.getBytes();
+        byte[] data = tag.data.getBytes();
         writeUI24(data.length);
         writeUI24(tag.timeStamp & 0xffffff);
         writeUI8((int) ((tag.timeStamp >> 24) & 0xff));
@@ -149,7 +149,7 @@ public class FLVOutputStream extends OutputStream {
     }
 
     private void writeLong(long value) throws IOException {
-        byte writeBuffer[] = new byte[8];
+        byte[] writeBuffer = new byte[8];
         writeBuffer[3] = (byte) (value >>> 56);
         writeBuffer[2] = (byte) (value >>> 48);
         writeBuffer[1] = (byte) (value >>> 40);

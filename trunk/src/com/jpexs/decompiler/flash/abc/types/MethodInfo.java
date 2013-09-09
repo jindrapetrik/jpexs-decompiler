@@ -25,13 +25,13 @@ import java.util.List;
 
 public class MethodInfo {
 
-    public int param_types[];
+    public int[] param_types;
     public int ret_type;
     public int name_index; //0=no name
     // 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional 16=ignore_rest, 32=explicit, 64=setsdxns, 128=has_paramnames
     public int flags;
-    public ValueKind optional[];
-    public int paramNames[];
+    public ValueKind[] optional;
+    public int[] paramNames;
     private MethodBody body;
 
     public void setFlagSetsdxns() {
@@ -156,7 +156,7 @@ public class MethodInfo {
         return (flags & 128) == 128;
     }
 
-    public MethodInfo(int param_types[], int ret_type, int name_index, int flags, ValueKind optional[], int paramNames[]) {
+    public MethodInfo(int[] param_types, int ret_type, int name_index, int flags, ValueKind[] optional, int[] paramNames) {
         this.param_types = param_types;
         this.ret_type = ret_type;
         this.name_index = name_index;

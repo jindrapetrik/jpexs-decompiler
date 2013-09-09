@@ -32,11 +32,11 @@ public class GRADIENTGLOWFILTER extends FILTER {
     /**
      * Gradient colors
      */
-    public RGBA gradientColors[] = new RGBA[0];
+    public RGBA[] gradientColors = new RGBA[0];
     /**
      * Gradient ratios
      */
-    public int gradientRatio[];
+    public int[] gradientRatio;
     /**
      * Horizontal blur amount
      */
@@ -103,7 +103,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
             type = Filtering.OUTER;
         }
 
-        float ratiosAr[] = new float[ratios.size()];
+        float[] ratiosAr = new float[ratios.size()];
         for (int i = 0; i < ratios.size(); i++) {
             ratiosAr[i] = ratios.get(i);
         }

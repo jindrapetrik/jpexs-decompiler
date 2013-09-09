@@ -50,14 +50,14 @@ public class ABC {
     public int major_version = 0;
     public int minor_version = 0;
     public ConstantPool constants;
-    public MethodInfo method_info[];
-    public MetadataInfo metadata_info[];
-    public InstanceInfo instance_info[];
-    public ClassInfo class_info[];
-    public ScriptInfo script_info[];
-    public MethodBody bodies[];
-    private int bodyIdxFromMethodIdx[];
-    public long stringOffsets[];
+    public MethodInfo[] method_info;
+    public MetadataInfo[] metadata_info;
+    public InstanceInfo[] instance_info;
+    public ClassInfo[] class_info;
+    public ScriptInfo[] script_info;
+    public MethodBody[] bodies;
+    private int[] bodyIdxFromMethodIdx;
+    public long[] stringOffsets;
     public static final String IDENT_STRING = "   ";
     public static final int MINORwithDECIMAL = 17;
     protected HashSet<EventListener> listeners = new HashSet<>();
@@ -375,11 +375,11 @@ public class ABC {
         for (int i = 0; i < metadata_count; i++) {
             int name_index = ais.readU30();
             int values_count = ais.readU30();
-            int keys[] = new int[values_count];
+            int[] keys = new int[values_count];
             for (int v = 0; v < values_count; v++) {
                 keys[v] = ais.readU30();
             }
-            int values[] = new int[values_count];
+            int[] values = new int[values_count];
             for (int v = 0; v < values_count; v++) {
                 values[v] = ais.readU30();
             }
@@ -531,7 +531,7 @@ public class ABC {
             aos.writeU30(bodies[i].max_regs);
             aos.writeU30(bodies[i].init_scope_depth);
             aos.writeU30(bodies[i].max_scope_depth);
-            byte codeBytes[] = bodies[i].code.getBytes();
+            byte[] codeBytes = bodies[i].code.getBytes();
             aos.writeU30(codeBytes.length);
             aos.write(codeBytes);
             aos.writeU30(bodies[i].exceptions.length);
@@ -601,7 +601,7 @@ public class ABC {
     }
 
     public static String addTabs(String s, int tabs) {
-        String parts[] = s.split("\r\n");
+        String[] parts = s.split("\r\n");
         if (!s.contains("\r\n")) {
             parts = s.split("\n");
         }
@@ -899,7 +899,7 @@ public class ABC {
             if (namesMap.containsKey(s)) {
                 newName = constants.constant_string[strIndex] = namesMap.get(s);
             } else {
-                String parts[] = null;
+                String[] parts = null;
                 if (s.contains(".")) {
                     parts = s.split("\\.");
                 } else {

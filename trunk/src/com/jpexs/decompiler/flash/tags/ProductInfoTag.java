@@ -32,7 +32,7 @@ public class ProductInfoTag extends Tag {
     public long compilationDate;
     public static final int ID = 41;
 
-    public ProductInfoTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public ProductInfoTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "ProductInfo", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         /*

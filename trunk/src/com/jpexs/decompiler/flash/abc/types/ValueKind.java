@@ -37,8 +37,8 @@ public class ValueKind {
     public static final int CONSTANT_ExplicitNamespace = 0x19;// Namespace
     public static final int CONSTANT_StaticProtectedNs = 0x1A;// Namespace
     public static final int CONSTANT_PrivateNs = 0x05;// namespace
-    private static final int optionalKinds[] = new int[]{0x03, 0x04, 0x06, 0x02, 0x01, 0x0B, 0x0A, 0x0C, 0x00, 0x08, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x05};
-    private static final String optionalKindNames[] = new String[]{"Int", "UInt", "Double", "Decimal", "Utf8", "True", "False", "Null", "Undefined", "Namespace", "PackageNamespace", "PackageInternalNs", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNs", "PrivateNs"};
+    private static final int[] optionalKinds = new int[]{0x03, 0x04, 0x06, 0x02, 0x01, 0x0B, 0x0A, 0x0C, 0x00, 0x08, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x05};
+    private static final String[] optionalKindNames = new String[]{"Int", "UInt", "Double", "Decimal", "Utf8", "True", "False", "Null", "Undefined", "Namespace", "PackageNamespace", "PackageInternalNs", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNs", "PrivateNs"};
     public int value_index;
     public int value_kind;
 

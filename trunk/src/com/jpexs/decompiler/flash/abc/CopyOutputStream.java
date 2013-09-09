@@ -26,7 +26,7 @@ public class CopyOutputStream extends OutputStream {
     private InputStream is;
     private long pos = 0;
     private int TEMPSIZE = 5;
-    private int temp[] = new int[TEMPSIZE];
+    private int[] temp = new int[TEMPSIZE];
     private int tempPos = 0;
     public int ignoreFirst = 0;
 

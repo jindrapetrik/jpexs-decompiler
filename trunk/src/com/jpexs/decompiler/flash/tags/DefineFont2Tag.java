@@ -59,7 +59,7 @@ public class DefineFont2Tag extends FontTag {
     public int fontLeading;
     public List<Integer> fontAdvanceTable;
     public List<RECT> fontBoundsTable;
-    public KERNINGRECORD fontKerningTable[];
+    public KERNINGRECORD[] fontKerningTable;
     public static final int ID = 48;
 
     @Override
@@ -114,7 +114,7 @@ public class DefineFont2Tag extends FontTag {
                 offsetTable.add((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
                 sos3.writeSHAPE(glyphShapeTable.get(i), 1);
             }
-            byte baGlyphShapes[] = baosGlyphShapes.toByteArray();
+            byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
             for (Long offset : offsetTable) {
                 if (fontFlagsWideOffsets) {
                     sos.writeUI32(offset);
@@ -170,7 +170,7 @@ public class DefineFont2Tag extends FontTag {
      * @param pos
      * @throws IOException
      */
-    public DefineFont2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineFont2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineFont2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontId = sis.readUI16();

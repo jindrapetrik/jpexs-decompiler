@@ -46,7 +46,7 @@ public class DefineSoundTag extends CharacterTag {
     public int soundSize;
     public int soundType;
     public long soundSampleCount;
-    public byte soundData[];
+    public byte[] soundData;
     public static final int ID = 14;
 
     @Override
@@ -85,7 +85,7 @@ public class DefineSoundTag extends CharacterTag {
      * @param version SWF version
      * @throws IOException
      */
-    public DefineSoundTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineSoundTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineSound", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         soundId = sis.readUI16();

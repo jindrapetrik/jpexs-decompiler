@@ -35,7 +35,7 @@ public abstract class ImageTag extends CharacterTag {
 
     public abstract BufferedImage getImage(List<Tag> tags);
 
-    public abstract void setImage(byte data[]) throws IOException;
+    public abstract void setImage(byte[] data) throws IOException;
 
     public abstract String getImageFormat();
 
@@ -43,7 +43,7 @@ public abstract class ImageTag extends CharacterTag {
         return true;
     }
 
-    public static String getImageFormat(byte data[]) {
+    public static String getImageFormat(byte[] data) {
         if (SWF.hasErrorHeader(data)) {
             return "jpg";
         }

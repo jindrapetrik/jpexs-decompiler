@@ -22,8 +22,8 @@ package com.jpexs.decompiler.flash.types;
  */
 public class MORPHLINESTYLEARRAY {
 
-    public MORPHLINESTYLE lineStyles[];
-    public MORPHLINESTYLE2 lineStyles2[];
+    public MORPHLINESTYLE[] lineStyles;
+    public MORPHLINESTYLE2[] lineStyles2;
 
     public LINESTYLEARRAY getLineStylesAt(int shapeNum, int ratio) {
         LINESTYLEARRAY ret = new LINESTYLEARRAY();

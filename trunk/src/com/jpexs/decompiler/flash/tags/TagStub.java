@@ -60,7 +60,7 @@ public class TagStub extends Tag {
      * @param pos
      * @throws IOException
      */
-    public TagStub(SWF swf, byte data[], int version, long pos) throws IOException {
+    public TagStub(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
 

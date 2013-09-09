@@ -146,7 +146,7 @@ public class Win32ProcessTools extends ProcessTools {
     public static Map<String, Character> getDriveMappings() {
         Map<String, Character> ret = new HashMap<>();
         for (char d = 'A'; d <= 'Z'; d++) {
-            char buf[] = new char[1024];
+            char[] buf = new char[1024];
             int len = Kernel32.INSTANCE.QueryDosDevice("" + d + ":", buf, buf.length).intValue();
             String tar = new String(buf, 0, len);
             tar = tar.trim();
@@ -392,7 +392,7 @@ public class Win32ProcessTools extends ProcessTools {
         }
 
         long actualPos = 0;
-        byte prevBytes[] = new byte[0];
+        byte[] prevBytes = new byte[0];
         List<Integer> guardedPages = new ArrayList<>();
         for (int pg = 0; pg < pages.size(); pg++) {
             MEMORY_BASIC_INFORMATION mbi = pages.get(pg);
@@ -412,10 +412,10 @@ public class Win32ProcessTools extends ProcessTools {
                         break;
                     }
 
-                    byte data[] = buf.getByteArray(0, bytesReadRef.getValue());
+                    byte[] data = buf.getByteArray(0, bytesReadRef.getValue());
 
                     prevBytes = Arrays.copyOfRange(data, data.length - maxFindLen, data.length);
-                    byte dataPlusPrev[] = mergeArrays(prevBytes, data);
+                    byte[] dataPlusPrev = mergeArrays(prevBytes, data);
                     loopi:
                     for (int i = 0; i < dataPlusPrev.length - maxFindLen; i++) {
                         loopk:
@@ -538,7 +538,7 @@ public class Win32ProcessTools extends ProcessTools {
         private int currentPage = 0;
         private int pagePos = 0;
         private static int BUFFER_SIZE = 1024;
-        private byte buf[];
+        private byte[] buf;
         private int bufPos;
         private HANDLE hOtherProcess;
 

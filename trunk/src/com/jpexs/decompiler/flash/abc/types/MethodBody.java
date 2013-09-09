@@ -47,9 +47,9 @@ public class MethodBody implements Cloneable, Serializable {
     public int max_regs;
     public int init_scope_depth;
     public int max_scope_depth;
-    public byte codeBytes[];
+    public byte[] codeBytes;
     public AVM2Code code;
-    public ABCException exceptions[] = new ABCException[0];
+    public ABCException[] exceptions = new ABCException[0];
     public Traits traits = new Traits();
 
     public List<Integer> getExceptionEntries() {
@@ -108,7 +108,7 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public String toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final ConstantPool constants, final MethodInfo method_info[], final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final boolean hilight, final boolean replaceIndents, final List<String> fullyQualifiedNames, final Traits initTraits) {
+    public String toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final boolean hilight, final boolean replaceIndents, final List<String> fullyQualifiedNames, final Traits initTraits) {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
@@ -139,7 +139,7 @@ public class MethodBody implements Cloneable, Serializable {
         return s;
     }
 
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, boolean replaceIndents, List<String> fullyQualifiedNames, Traits initTraits) {
+    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, boolean replaceIndents, List<String> fullyQualifiedNames, Traits initTraits) {
         AVM2Code deobfuscated = null;
         MethodBody b = (MethodBody) Helper.deepCopy(this);
         deobfuscated = b.code;

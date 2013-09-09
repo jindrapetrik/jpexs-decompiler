@@ -360,7 +360,7 @@ public class XFLConverter {
                 ret += ">";
 
                 ret += "<matrix>" + convertMatrix(fs.gradientMatrix) + "</matrix>";
-                GRADRECORD records[];
+                GRADRECORD[] records;
                 if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
                     records = fs.focalGradient.gradientRecords;
                 } else {
@@ -1167,7 +1167,7 @@ public class XFLConverter {
 
                     ButtonTag button = (ButtonTag) symbol;
                     List<BUTTONRECORD> records = button.getRecords();
-                    String frames[] = {"", "", "", ""};
+                    String[] frames = {"", "", "", ""};
 
                     int maxDepth = 0;
                     for (BUTTONRECORD rec : records) {
@@ -1318,8 +1318,8 @@ public class XFLConverter {
                 int soundType = 0;
                 int soundSize = 0;
                 long soundSampleCount = 0;
-                byte soundData[] = new byte[0];
-                int rateMap[] = {5, 11, 22, 44};
+                byte[] soundData = new byte[0];
+                int[] rateMap = {5, 11, 22, 44};
                 String exportFormat = "flv";
                 if (symbol instanceof SoundStreamHeadTypeTag) {
                     SoundStreamHeadTypeTag sstream = (SoundStreamHeadTypeTag) symbol;
@@ -1439,7 +1439,7 @@ public class XFLConverter {
                         Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                byte data[] = new byte[0];
+                byte[] data = new byte[0];
                 try {
                     data = swf.exportSound(symbol);
                 } catch (IOException ex) {
@@ -1486,7 +1486,7 @@ public class XFLConverter {
                         break;
                 }
 
-                byte data[] = new byte[0];
+                byte[] data = new byte[0];
                 try {
                     data = swf.exportMovie(video);
                 } catch (IOException ex) {
@@ -2114,7 +2114,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private static void writeFile(AbortRetryIgnoreHandler handler, final byte data[], final String file) throws IOException {
+    private static void writeFile(AbortRetryIgnoreHandler handler, final byte[] data, final String file) throws IOException {
         new RetryTask(new RunnableIOEx() {
             @Override
             public void run() throws IOException {
@@ -2249,7 +2249,7 @@ public class XFLConverter {
             FontTag font = null;
             String fontName = null;
             String psFontName = null;
-            String availableFonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+            String[] availableFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
             int textHeight = -1;
             RGB textColor = null;
             RGBA textColorA = null;
@@ -2463,7 +2463,7 @@ public class XFLConverter {
                     rightMargin = det.rightMargin;
                     indent = det.indent;
                     lineSpacing = det.leading;
-                    String alignNames[] = {"left", "right", "center", "justify"};
+                    String[] alignNames = {"left", "right", "center", "justify"};
                     alignment = alignNames[det.align];
                 }
                 ret += "<textAttrs>";
@@ -2919,7 +2919,7 @@ public class XFLConverter {
     }
 
     private static int normContrast(double c) {
-        double ctrMap[] = {
+        double[] ctrMap = {
             //      0     1     2     3     4     5     6     7     8     9
             /*0*/0, 0.01, 0.02, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1, 0.11,
             /*1*/ 0.12, 0.14, 0.15, 0.16, 0.17, 0.18, 0.20, 0.21, 0.22, 0.24,
@@ -2953,7 +2953,7 @@ public class XFLConverter {
     }
 
     public static String convertAdjustColorFilter(COLORMATRIXFILTER filter) {
-        float matrix[][] = new float[5][5];
+        float[][] matrix = new float[5][5];
         int index = 0;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 5; j++) {
@@ -3108,7 +3108,7 @@ public class XFLConverter {
                 rightMargin = det.rightMargin;
                 indent = det.indent;
                 lineSpacing = det.leading;
-                String alignNames[] = {"left", "right", "center", "justify"};
+                String[] alignNames = {"left", "right", "center", "justify"};
                 alignment = alignNames[det.align];
             }
             this.tags = tags;

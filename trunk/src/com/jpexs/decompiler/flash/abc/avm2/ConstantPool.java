@@ -30,15 +30,15 @@ import java.util.logging.Logger;
 
 public class ConstantPool {
 
-    public long constant_int[];
-    public long constant_uint[];
-    public double constant_double[];
+    public long[] constant_int;
+    public long[] constant_uint;
+    public double[] constant_double;
     /* Only for some minor versions */
-    public Decimal constant_decimal[];
-    public String constant_string[];
-    public Namespace constant_namespace[];
-    public NamespaceSet constant_namespace_set[];
-    public Multiname constant_multiname[];
+    public Decimal[] constant_decimal;
+    public String[] constant_string;
+    public Namespace[] constant_namespace;
+    public NamespaceSet[] constant_namespace_set;
+    public Multiname[] constant_multiname;
 
     public int addInt(long value) {
         constant_int = Arrays.copyOf(constant_int, constant_int.length + 1);

@@ -31,7 +31,7 @@ import java.io.OutputStream;
  */
 public class DebugIDTag extends Tag {
 
-    public byte debugId[];
+    public byte[] debugId;
     public static final int ID = 63;
 
     /**
@@ -60,7 +60,7 @@ public class DebugIDTag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public DebugIDTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DebugIDTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DebugID", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         debugId = sis.readBytes(16);

@@ -28,7 +28,7 @@ public class COLORMATRIXFILTER extends FILTER {
     /**
      * Color matrix values
      */
-    public float matrix[] = new float[20];
+    public float[] matrix = new float[20];
 
     /**
      * Constructor
@@ -39,7 +39,7 @@ public class COLORMATRIXFILTER extends FILTER {
 
     @Override
     public BufferedImage apply(BufferedImage src) {
-        float matrix2[][] = new float[4][4];
+        float[][] matrix2 = new float[4][4];
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {
                 matrix2[y][x] = matrix[y * 5 + x];

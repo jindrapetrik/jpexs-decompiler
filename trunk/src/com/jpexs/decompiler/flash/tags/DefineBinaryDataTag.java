@@ -28,7 +28,7 @@ import java.io.OutputStream;
 public class DefineBinaryDataTag extends CharacterTag {
 
     public int tag;
-    public byte binaryData[];
+    public byte[] binaryData;
     public long reserved;
     public static final int ID = 87;
 
@@ -52,7 +52,7 @@ public class DefineBinaryDataTag extends CharacterTag {
         return baos.toByteArray();
     }
 
-    public DefineBinaryDataTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineBinaryDataTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineBinaryData", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         tag = sis.readUI16();

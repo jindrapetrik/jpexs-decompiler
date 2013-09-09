@@ -69,7 +69,7 @@ public class RemoveObjectTag extends CharacterIdTag implements RemoveTag {
      * @param version SWF version
      * @throws IOException
      */
-    public RemoveObjectTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public RemoveObjectTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "RemoveObject", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterId = sis.readUI16();

@@ -32,19 +32,19 @@ import java.io.OutputStream;
  */
 public class AdpcmDecoder {
 
-    private static final int indexAdjustTable2bit[] = {
+    private static final int[] indexAdjustTable2bit = {
         -1, 2,
         -1, 2};
-    private static final int indexAdjustTable3bit[] = {
+    private static final int[] indexAdjustTable3bit = {
         -1, -1, 2, 4,
         -1, -1, 2, 4};
-    private static final int indexAdjustTable4bit[] = {
+    private static final int[] indexAdjustTable4bit = {
         -1, -1, -1, -1, 2, 4, 6, 8,
         -1, -1, -1, -1, 2, 4, 6, 8};
-    private static final int indexAdjustTable5bit[] = {
+    private static final int[] indexAdjustTable5bit = {
         -1, -1, -1, -1, -1, -1, -1, -1, 1, 2, 4, 6, 8, 10, 13, 16,
         -1, -1, -1, -1, -1, -1, -1, -1, 1, 2, 4, 6, 8, 10, 13, 16};
-    private static final int stepSizeTable[] = {
+    private static final int[] stepSizeTable = {
         7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34,
         37, 41, 45, 50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143,
         157, 173, 190, 209, 230, 253, 279, 307, 337, 371, 408, 449, 494,
@@ -200,7 +200,7 @@ public class AdpcmDecoder {
         return state.sample;
     }
 
-    public static byte[] decode(byte data[], boolean isStereo) throws IOException {
+    public static byte[] decode(byte[] data, boolean isStereo) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         decode(new ByteArrayInputStream(data), baos, isStereo);
         return baos.toByteArray();

@@ -86,7 +86,7 @@ public class DefineFontInfoTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public DefineFontInfoTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineFontInfoTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineFontInfo", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontId = sis.readUI16();

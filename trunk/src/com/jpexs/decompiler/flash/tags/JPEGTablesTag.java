@@ -23,7 +23,7 @@ public class JPEGTablesTag extends Tag {
 
     public static final int ID = 8;
 
-    public JPEGTablesTag(SWF swf, byte data[], long pos) throws IOException {
+    public JPEGTablesTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "JPEGTables", data, pos); //data is JPEG data   
     }
 }

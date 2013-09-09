@@ -31,10 +31,10 @@ import java.io.OutputStream;
  */
 public class DefineSceneAndFrameLabelDataTag extends Tag {
 
-    public long sceneOffsets[];
-    public String sceneNames[];
-    public long frameNums[];
-    public String frameNames[];
+    public long[] sceneOffsets;
+    public String[] sceneNames;
+    public long[] frameNums;
+    public String[] frameNames;
     public static final int ID = 86;
 
     /**
@@ -73,7 +73,7 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public DefineSceneAndFrameLabelDataTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineSceneAndFrameLabelDataTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineSceneAndFrameLabelData", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         int sceneCount = (int) sis.readEncodedU32();

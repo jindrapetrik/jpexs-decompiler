@@ -38,7 +38,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
     /**
      * Data in the tag
      */
-    protected byte data[];
+    protected byte[] data;
     /**
      * If true, then Tag is written to the stream as longer than 0x3f even if it
      * is not
@@ -76,7 +76,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
      * @param data Bytes of data
      * @param pos
      */
-    public Tag(SWF swf, int id, String name, byte data[], long pos) {
+    public Tag(SWF swf, int id, String name, byte[] data, long pos) {
         this.id = id;
         this.name = name;
         this.data = data;

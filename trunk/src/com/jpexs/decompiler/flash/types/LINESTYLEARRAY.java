@@ -22,6 +22,6 @@ package com.jpexs.decompiler.flash.types;
  */
 public class LINESTYLEARRAY {
 
-    public LINESTYLE lineStyles[] = new LINESTYLE[0];
-    public LINESTYLE2 lineStyles2[] = new LINESTYLE2[0];
+    public LINESTYLE[] lineStyles = new LINESTYLE[0];
+    public LINESTYLE2[] lineStyles2 = new LINESTYLE2[0];
 }

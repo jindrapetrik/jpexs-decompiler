@@ -22,8 +22,8 @@ import com.jpexs.helpers.Helper;
 public class MetadataInfo {
 
     public int name_index;
-    public int keys[];
-    public int values[];
+    public int[] keys;
+    public int[] values;
 
     public MetadataInfo(int name_index, int[] keys, int[] values) {
         this.name_index = name_index;

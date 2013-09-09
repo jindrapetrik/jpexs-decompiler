@@ -38,7 +38,7 @@ import java.util.List;
  */
 public abstract class FontTag extends CharacterTag implements AloneTag {
 
-    public FontTag(SWF swf, int id, String name, byte data[], long pos) {
+    public FontTag(SWF swf, int id, String name, byte[] data, long pos) {
         super(swf, id, name, data, pos);
     }
 

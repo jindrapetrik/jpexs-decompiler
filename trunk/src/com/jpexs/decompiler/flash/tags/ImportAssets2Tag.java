@@ -47,7 +47,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
      * @param version SWF version
      * @throws IOException
      */
-    public ImportAssets2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public ImportAssets2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "ImportAssets2", data, pos);
         assets = new HashMap<>();
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);

@@ -33,7 +33,7 @@ public class EnableTelemetryTag extends Tag {
 
     public static final int ID = 93;
     public int reserved;
-    public byte passwordHash[];
+    public byte[] passwordHash;
 
     /**
      * Gets data bytes
@@ -65,7 +65,7 @@ public class EnableTelemetryTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public EnableTelemetryTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public EnableTelemetryTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         reserved = (int) sis.readUB(16);

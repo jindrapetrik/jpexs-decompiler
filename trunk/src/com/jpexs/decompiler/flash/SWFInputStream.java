@@ -345,7 +345,7 @@ public class SWFInputStream extends InputStream {
     }
 
     private long readLong() throws IOException {
-        byte readBuffer[] = readBytes(8);
+        byte[] readBuffer = readBytes(8);
         return (((long) readBuffer[3] << 56)
                 + ((long) (readBuffer[2] & 255) << 48)
                 + ((long) (readBuffer[1] & 255) << 40)
@@ -412,7 +412,7 @@ public class SWFInputStream extends InputStream {
         if (count <= 0) {
             return new byte[0];
         }
-        byte ret[] = new byte[(int) count];
+        byte[] ret = new byte[(int) count];
         for (int i = 0; i < count; i++) {
             ret[i] = (byte) readEx();
         }
@@ -420,10 +420,10 @@ public class SWFInputStream extends InputStream {
     }
 
     public byte[] readBytesZlib(long count) throws IOException {
-        byte data[] = readBytes(count);
+        byte[] data = readBytes(count);
         InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte buf[] = new byte[4096];
+        byte[] buf = new byte[4096];
         int c = 0;
         while ((c = dis.read(buf)) > 0) {
             baos.write(buf, 0, c);
@@ -738,7 +738,7 @@ public class SWFInputStream extends InputStream {
     public static Tag resolveTag(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags) {
         Tag ret;
 
-        byte data[] = tag.getData(version);
+        byte[] data = tag.getData(version);
         long pos = tag.getPos();
         try {
             switch (tag.getId()) {
@@ -1022,10 +1022,10 @@ public class SWFInputStream extends InputStream {
             tagLength = readSI32();
             readLong = true;
         }
-        byte data[] = readBytes((int) tagLength);
+        byte[] data = readBytes((int) tagLength);
         Tag ret = new Tag(swf, tagID, "Unknown", data, pos);
         ret.forceWriteAsLong = readLong;
-        byte dataNew[] = ret.getData(version);
+        byte[] dataNew = ret.getData(version);
 
         int ignoreFirst = 0;
         for (int i = 0; i < data.length; i++) {

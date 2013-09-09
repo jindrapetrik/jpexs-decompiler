@@ -61,7 +61,7 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
         return shapeBounds;
     }
 
-    public DefineShapeTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineShapeTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineShape", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         shapeId = sis.readUI16();

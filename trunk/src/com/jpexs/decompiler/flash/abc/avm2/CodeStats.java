@@ -30,7 +30,7 @@ public class CodeStats {
     public int maxlocal = 0;
     public boolean has_set_dxns = false;
     public boolean has_activation = false;
-    public InstructionStats instructionStats[];
+    public InstructionStats[] instructionStats;
 
     public String toString(boolean highlight, ABC abc, List<String> fullyQualifiedNames) {
         String ret = "Stats: maxstack=" + maxstack + ", maxscope=" + maxscope + ", maxlocal=" + maxlocal + "\r\n";

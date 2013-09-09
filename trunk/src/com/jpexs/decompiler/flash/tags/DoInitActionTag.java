@@ -57,7 +57,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      * @param pos
      * @throws IOException
      */
-    public DoInitActionTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DoInitActionTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DoInitAction", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         spriteId = sis.readUI16();
@@ -115,13 +115,13 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int prevLength = 0;
             if (previousTag != null) {
-                byte prevData[] = previousTag.getData(version);
+                byte[] prevData = previousTag.getData(version);
                 baos.write(prevData);
                 prevLength = prevData.length;
                 baos.write(0);
                 baos.write(0);
                 prevLength += 2;
-                byte header[] = SWFOutputStream.getTagHeader(this, data, version);
+                byte[] header = SWFOutputStream.getTagHeader(this, data, version);
                 baos.write(header);
                 prevLength += header.length;
             }
@@ -173,7 +173,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
         if ((expName == null) || expName.equals("")) {
             return super.toString();
         }
-        String pathParts[];
+        String[] pathParts;
         if (expName.contains(".")) {
             pathParts = expName.split("\\.");
         } else {
@@ -188,7 +188,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
         if ((expName == null) || expName.equals("")) {
             return super.toString();
         }
-        String pathParts[];
+        String[] pathParts;
         if (expName.contains(".")) {
             pathParts = expName.split("\\.");
         } else {

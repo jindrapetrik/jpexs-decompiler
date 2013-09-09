@@ -32,11 +32,11 @@ public class GRADIENTBEVELFILTER extends FILTER {
     /**
      * Gradient colors
      */
-    public RGBA gradientColors[] = new RGBA[0];
+    public RGBA[] gradientColors = new RGBA[0];
     /**
      * Gradient ratios
      */
-    public int gradientRatio[] = new int[0];
+    public int[] gradientRatio = new int[0];
     /**
      * Horizontal blur amount
      */
@@ -93,11 +93,11 @@ public class GRADIENTBEVELFILTER extends FILTER {
             colors.add(gradientColors[i].toColor());
             ratios.add(gradientRatio[i] / 255f);
         }
-        float ratiosAr[] = new float[ratios.size()];
+        float[] ratiosAr = new float[ratios.size()];
         for (int i = 0; i < ratios.size(); i++) {
             ratiosAr[i] = ratios.get(i);
         }
-        Color colorsArr[] = colors.toArray(new Color[colors.size()]);
+        Color[] colorsArr = colors.toArray(new Color[colors.size()]);
         int type = Filtering.INNER;
         if (onTop && !innerShadow) {
             type = Filtering.FULL;

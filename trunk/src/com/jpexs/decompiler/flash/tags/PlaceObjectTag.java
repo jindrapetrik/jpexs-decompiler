@@ -102,7 +102,7 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
      * @param pos
      * @throws IOException
      */
-    public PlaceObjectTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public PlaceObjectTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "PlaceObject", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterId = sis.readUI16();

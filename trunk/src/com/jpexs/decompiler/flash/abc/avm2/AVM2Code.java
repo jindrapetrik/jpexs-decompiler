@@ -113,7 +113,7 @@ public class AVM2Code implements Serializable {
     public static final int DAT_DECIMAL_INDEX = OPT_U30 + 0x11;
     public static final int DAT_CASE_BASEOFFSET = OPT_S24 + 0x12;
     public static final int DAT_DECIMAL_PARAMS = OPT_U30 + 0x13;
-    public static InstructionDefinition instructionSet[] = new InstructionDefinition[]{
+    public static InstructionDefinition[] instructionSet = new InstructionDefinition[]{
         new AddIns(),
         new InstructionDefinition(0x9b, "add_d", new int[]{}) {
             @Override
@@ -557,11 +557,11 @@ public class AVM2Code implements Serializable {
         }
     };
     //endoflist
-    public static InstructionDefinition instructionSetByCode[] = buildInstructionSetByCode();
+    public static InstructionDefinition[] instructionSetByCode = buildInstructionSetByCode();
     public boolean hideTemporaryRegisters = true;
 
     private static InstructionDefinition[] buildInstructionSetByCode() {
-        InstructionDefinition result[] = new InstructionDefinition[256];
+        InstructionDefinition[] result = new InstructionDefinition[256];
         for (InstructionDefinition id : instructionSet) {
             if (result[id.instructionCode] != null) {
                 Logger.getLogger(AVM2Code.class.getName()).log(Level.WARNING, "Duplicate OPCODE for instruction {0} {1}", new Object[]{result[id.instructionCode], id});
@@ -627,7 +627,7 @@ public class AVM2Code implements Serializable {
             int instructionCode = ais.read();
             InstructionDefinition instr = instructionSetByCode[instructionCode];
             if (instr != null) {
-                int actualOperands[];
+                int[] actualOperands;
                 if (instructionCode == 0x1b) { //switch
                     int firstOperand = ais.readS24();
                     int case_count = ais.readU30();
@@ -673,7 +673,7 @@ public class AVM2Code implements Serializable {
         return getBytes(null);
     }
 
-    public byte[] getBytes(byte origBytes[]) {
+    public byte[] getBytes(byte[] origBytes) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         OutputStream cos;
@@ -721,7 +721,7 @@ public class AVM2Code implements Serializable {
 
     public String toASMSource(ConstantPool constants, MethodBody body, List<Integer> outputMap, boolean hex, boolean highlight) {
         invalidateCache();
-        StringBuffer ret = new StringBuffer();
+        StringBuilder ret = new StringBuilder();
         String t = "";
         for (int e = 0; e < body.exceptions.length; e++) {
             ret.append("exception " + e + " m[" + body.exceptions[e].name_index + "]\"" + Helper.escapeString(body.exceptions[e].getVarName(constants, new ArrayList<String>())) + "\" "
@@ -932,7 +932,7 @@ public class AVM2Code implements Serializable {
         return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
     }
 
-    public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean visited[], HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException {
+    public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException {
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
             System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1189,7 +1189,7 @@ public class AVM2Code implements Serializable {
         return ret.toString();
     }
 
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
+    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
         return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, body, false, true, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, staticOperation, localRegAssigmentIps, refs);
     }
 
@@ -1260,7 +1260,7 @@ public class AVM2Code implements Serializable {
         ignoredIns = new ArrayList<>();
     }
 
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, boolean replaceIndents, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
+    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, boolean hilighted, boolean replaceIndents, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
         initToSource();
         List<GraphTargetItem> list;
         String s;
@@ -1329,7 +1329,7 @@ public class AVM2Code implements Serializable {
             }
         }
         //Declarations
-        boolean declaredRegisters[] = new boolean[regCount];
+        boolean[] declaredRegisters = new boolean[regCount];
         for (int b = 0; b < declaredRegisters.length; b++) {
             declaredRegisters[b] = false;
         }
@@ -1714,7 +1714,7 @@ public class AVM2Code implements Serializable {
         return refs;
     }
 
-    private int visitCodeTrap(int ip, int visited[], AVM2Instruction prev, AVM2Instruction prev2) {
+    private int visitCodeTrap(int ip, int[] visited, AVM2Instruction prev, AVM2Instruction prev2) {
         int ret = 0;
         while (ip < visited.length) {
             visited[ip]++;
@@ -1837,7 +1837,7 @@ public class AVM2Code implements Serializable {
         }
     }
 
-    public void restoreControlFlow(int ip, HashMap<Integer, List<Integer>> refs, int visited2[], HashMap<Integer, List<Object>> appended) throws ConvertException {
+    public void restoreControlFlow(int ip, HashMap<Integer, List<Integer>> refs, int[] visited2, HashMap<Integer, List<Object>> appended) throws ConvertException {
         List<Object> buf = new ArrayList<>();
         boolean cont = false;
         int continueip = 0;
@@ -1930,7 +1930,7 @@ public class AVM2Code implements Serializable {
     private void restoreControlFlowPass(ConstantPool constants, MethodBody body, boolean secondpass) {
         try {
             HashMap<Integer, List<Integer>> refs;
-            int visited2[] = new int[code.size()];
+            int[] visited2 = new int[code.size()];
             refs = visitCode(body);
             HashMap<Integer, List<Object>> appended = new HashMap<>();
             /*if (secondpass) {

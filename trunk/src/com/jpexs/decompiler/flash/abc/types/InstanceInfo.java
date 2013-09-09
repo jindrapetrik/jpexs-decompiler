@@ -29,7 +29,7 @@ public class InstanceInfo {
     public int super_index;
     public int flags; // 1 = sealed, 0 = dynamic, 2 = final, 4 = interface, 8 = ProtectedNs
     public int protectedNS; //if flags & 8
-    public int interfaces[];
+    public int[] interfaces;
     public int iinit_index; // MethodInfo - constructor
     public Traits instance_traits;
     public static final int CLASS_SEALED = 1; //not dynamic

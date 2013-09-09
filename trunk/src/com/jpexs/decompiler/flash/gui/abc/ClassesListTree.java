@@ -65,7 +65,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
     public List<ScriptPack> getSelectedScripts() {
         TreeSelectionModel tsm = getSelectionModel();
         final List<ScriptPack> selectedScripts = new ArrayList<>();
-        TreePath tps[] = tsm.getSelectionPaths();
+        TreePath[] tps = tsm.getSelectionPaths();
         if (tps == null) {
             return selectedScripts;
         }

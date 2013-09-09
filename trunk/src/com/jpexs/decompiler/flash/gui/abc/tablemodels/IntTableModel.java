@@ -23,8 +23,8 @@ import javax.swing.table.TableModel;
 public class IntTableModel implements TableModel {
 
     private ABC abc;
-    private static final String columnNames[] = new String[]{"Index", "Value"};
-    private static final Class classes[] = new Class[]{Long.class, Long.class};
+    private static final String[] columnNames = new String[]{"Index", "Value"};
+    private static final Class[] classes = new Class[]{Long.class, Long.class};
 
     public IntTableModel(ABC abc) {
         this.abc = abc;

@@ -35,8 +35,8 @@ import javax.imageio.ImageIO;
 public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     public int characterID;
-    public byte imageData[];
-    public byte bitmapAlphaData[];
+    public byte[] imageData;
+    public byte[] bitmapAlphaData;
     public static final int ID = 35;
 
     @Override
@@ -45,11 +45,11 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public void setImage(byte data[]) {
+    public void setImage(byte[] data) {
         imageData = data;
         if (ImageTag.getImageFormat(data).equals("jpg")) {
             BufferedImage image = getImage(new ArrayList<Tag>());
-            byte ba[] = new byte[image.getWidth() * image.getHeight()];
+            byte[] ba = new byte[image.getWidth() * image.getHeight()];
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
             }
@@ -90,7 +90,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         return null;
     }
 
-    public DefineBitsJPEG3Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineBitsJPEG3Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineBitsJPEG3", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();

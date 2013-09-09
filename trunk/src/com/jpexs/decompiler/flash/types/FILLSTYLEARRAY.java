@@ -26,7 +26,7 @@ import java.util.Set;
  */
 public class FILLSTYLEARRAY implements NeedsCharacters {
 
-    public FILLSTYLE fillStyles[];
+    public FILLSTYLE[] fillStyles;
 
     @Override
     public Set<Integer> getNeededCharacters() {

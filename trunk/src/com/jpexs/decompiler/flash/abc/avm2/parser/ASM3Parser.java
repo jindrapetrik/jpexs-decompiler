@@ -278,7 +278,7 @@ public class ASM3Parser {
                             }
                         }
 
-                        int operands[] = new int[operandsList.size()];
+                        int[] operands = new int[operandsList.size()];
                         for (int i = 0; i < operandsList.size(); i++) {
                             operands[i] = operandsList.get(i);
                         }

@@ -89,7 +89,7 @@ public class ScriptPack {
         if (packageName.equals("")) {
             return "";
         }
-        String pathParts[];
+        String[] pathParts;
         if (packageName.contains(".")) {
             pathParts = packageName.split("\\.");
         } else {

@@ -117,7 +117,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
             sos2.writeMORPHFILLSTYLEARRAY(morphFillStyles, 2);
             sos2.writeMORPHLINESTYLEARRAY(morphLineStyles, 2);
             sos2.writeSHAPE(startEdges, 1);
-            byte ba2[] = baos2.toByteArray();
+            byte[] ba2 = baos2.toByteArray();
             sos.writeUI32(ba2.length);
             sos.write(ba2);
             sos.writeSHAPE(endEdges, 1);
@@ -134,7 +134,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
      * @param pos
      * @throws IOException
      */
-    public DefineMorphShape2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public DefineMorphShape2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineMorphShape2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterId = sis.readUI16();

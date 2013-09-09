@@ -172,7 +172,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
     private boolean bitmapCacheBug;
     private int reserved;
     public static final int ID = 94;
-    public byte amfData[];  //TODO: Parse AMF data?
+    public byte[] amfData;  //TODO: Parse AMF data?
 
     @Override
     public List<FILTER> getFilters() {
@@ -282,7 +282,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
      * @param pos
      * @throws IOException
      */
-    public PlaceObject4Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public PlaceObject4Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "PlaceObject4", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         placeFlagHasClipActions = sis.readUB(1) == 1;

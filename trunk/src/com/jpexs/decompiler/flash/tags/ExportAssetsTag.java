@@ -53,7 +53,7 @@ public class ExportAssetsTag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public ExportAssetsTag(SWF swf, byte data[], int version, long pos) throws IOException {
+    public ExportAssetsTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "ExportAssets", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         int count = sis.readUI16();

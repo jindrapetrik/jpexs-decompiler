@@ -346,7 +346,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         }
         if (!listModel.contains(url)) {
             try {
-                byte hdr[] = new byte[3];
+                byte[] hdr = new byte[3];
                 data.read(hdr);
                 String shdr = new String(hdr);
                 if ((swfOnly) && ((!shdr.equals("FWS")) && (!shdr.equals("CWS")))) {
@@ -356,7 +356,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
                 File f = new File(Main.tempFile(url));
                 try (FileOutputStream fos = new FileOutputStream(f)) {
                     fos.write(hdr);
-                    byte buf[] = new byte[2048];
+                    byte[] buf = new byte[2048];
                     int count;
                     while ((count = data.read(buf)) > 0) {
                         fos.write(buf, 0, count);

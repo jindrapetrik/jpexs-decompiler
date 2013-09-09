@@ -43,9 +43,9 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
 
     public static final long serialVersionUID = 1L;
     public InstructionDefinition definition;
-    public int operands[];
+    public int[] operands;
     public long offset;
-    public byte bytes[];
+    public byte[] bytes;
     public String comment;
     public boolean ignored = false;
     public String labelname;
@@ -96,7 +96,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
 
     @Override
     public String toString() {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         s.append(definition.instructionName);
         for (int i = 0; i < operands.length; i++) {
             s.append(" ");

@@ -183,7 +183,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
                 sos.writeUI8(paramRegisters.get(i));
                 sos.writeString(paramNames.get(i));
             }
-            //byte codeBytes[] = Action.actionsToBytes(code, false, version);
+            //byte[] codeBytes = Action.actionsToBytes(code, false, version);
             sos.writeUI16(codeSize);//codeBytes.length);
             sos.close();
 
