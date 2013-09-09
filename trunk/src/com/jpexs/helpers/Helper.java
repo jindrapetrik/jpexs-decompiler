@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -559,5 +560,15 @@ public class Helper {
             }
         }
         return false;
+    }
+    
+    public static void saveStream(InputStream is,File output) throws IOException {
+        byte[] buf=new byte[1024];
+        int cnt;
+        try (FileOutputStream fos = new FileOutputStream(output)) {
+            while((cnt=is.read(buf))>0){
+                fos.write(buf,0,cnt);
+            }
+        }
     }
 }

@@ -421,18 +421,23 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
         JCommandButton searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchas")), View.getResizableIcon("search32"));
         assignListener(searchCommandButton, "SEARCHAS");
-        JCommandButton proxyCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.proxy")), View.getResizableIcon("proxy32"));
-        assignListener(proxyCommandButton, "SHOWPROXY");
         JCommandButton gotoDocumentClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.gotodocumentclass")), View.getResizableIcon("gotomainclass32"));
         assignListener(gotoDocumentClassCommandButton, "GOTODOCUMENTCLASS");
 
-        JCommandButton loadMemoryCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchmemory")), View.getResizableIcon("open_process32"));
+        JCommandButton proxyCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.proxy")), View.getResizableIcon("proxy16"));
+        assignListener(proxyCommandButton, "SHOWPROXY");
+
+        JCommandButton loadMemoryCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchmemory")), View.getResizableIcon("loadmemory16"));
         assignListener(loadMemoryCommandButton, "LOADMEMORY");
 
+        JCommandButton loadCacheCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchcache")), View.getResizableIcon("loadcache16"));
+        assignListener(loadCacheCommandButton, "LOADCACHE");
+
         toolsBand.addCommandButton(searchCommandButton, RibbonElementPriority.TOP);
-        toolsBand.addCommandButton(proxyCommandButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(gotoDocumentClassCommandButton, RibbonElementPriority.TOP);
-        toolsBand.addCommandButton(loadMemoryCommandButton, RibbonElementPriority.TOP);
+        toolsBand.addCommandButton(proxyCommandButton, RibbonElementPriority.MEDIUM);
+        toolsBand.addCommandButton(loadMemoryCommandButton, RibbonElementPriority.MEDIUM);
+        toolsBand.addCommandButton(loadCacheCommandButton, RibbonElementPriority.MEDIUM);
         if (!ProcessTools.toolsAvailable()) {
             loadMemoryCommandButton.setEnabled(false);
         }
@@ -604,6 +609,11 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 }
                 if (Main.loadFromMemoryFrame != null) {
                     if (Main.loadFromMemoryFrame.isVisible()) {
+                        return;
+                    }
+                }
+                if (Main.loadFromCacheFrame != null) {
+                    if (Main.loadFromCacheFrame.isVisible()) {
                         return;
                     }
                 }
@@ -964,7 +974,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     if (!Helper.contains(selectionRows, row)) {
                         tagTree.setSelectionRow(row);
                     }
-                    
+
                     TreePath[] paths = tagTree.getSelectionPaths();
                     if (paths == null || paths.length == 0) {
                         return;
@@ -2270,6 +2280,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             case "LOADMEMORY":
                 Main.loadFromMemory();
                 break;
+            case "LOADCACHE":
+                Main.loadFromCache();
+                break;
             case "SHOWERRORLOG":
                 errorLogFrame.setVisible(true);
                 break;
@@ -2464,7 +2477,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         tagsToRemove.add((Tag) tag);
                     }
                 }
-                
+
                 if (tagsToRemove.size() == 1) {
                     Tag tag = tagsToRemove.get(0);
                     if (View.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tag.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
@@ -2991,7 +3004,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 showCard(CARDFLASHPANEL);
                 parametersPanel.setVisible(false);
                 if (flashPanel != null) {
-                    Color backgroundColor=View.DEFAULT_BACKGROUND_COLOR;
+                    Color backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
                     for (Tag t : swf.tags) {
                         if (t instanceof SetBackgroundColorTag) {
                             backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
@@ -3002,12 +3015,12 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         if (tempFile != null) {
                             tempFile.delete();
                         }
-                        try{
+                        try {
                             tempFile = File.createTempFile("temp", ".swf");
                             tempFile.deleteOnExit();
                             swf.saveTo(new FileOutputStream(tempFile));
                             flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
-                        }catch(IOException iex){
+                        } catch (IOException iex) {
                             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);
                         }
                     }
@@ -3379,7 +3392,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     private List<List<String>> getExpandedNodes(JTree tree) {
         List<List<String>> expandedNodes = new ArrayList<>();
         int rowCount = tree.getRowCount();
-        for (int i = 0; i < rowCount; i++){
+        for (int i = 0; i < rowCount; i++) {
             TreePath path = tree.getPathForRow(i);
             if (tree.isExpanded(path)) {
                 List<String> pathAsStringList = new ArrayList<>();
@@ -3391,27 +3404,27 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
         return expandedNodes;
     }
-    
+
     private void expandTreeNodes(JTree tree, List<List<String>> pathsToExpand) {
-        for(List<String> pathAsStringList : pathsToExpand) {
+        for (List<String> pathAsStringList : pathsToExpand) {
             expandTreeNode(tree, pathAsStringList);
         }
     }
-    
+
     private void expandTreeNode(JTree tree, List<String> pathAsStringList) {
         TreeModel model = tree.getModel();
         Object node = model.getRoot();
-        
+
         if (pathAsStringList.isEmpty()) {
             return;
         }
         if (!pathAsStringList.get(0).equals(node.toString())) {
             return;
         }
-        
+
         List<Object> path = new ArrayList<>();
         path.add(node);
-        
+
         for (int i = 1; i < pathAsStringList.size(); i++) {
             String name = pathAsStringList.get(i);
             int childCount = model.getChildCount(node);
@@ -3428,7 +3441,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
         tree.expandPath(tp);
     }
-    
+
     public void setEditText(boolean edit) {
         textValue.setEditable(edit);
         textSaveButton.setVisible(edit);

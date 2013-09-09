@@ -99,7 +99,15 @@ public class Main {
     private static final int UPDATE_SYSTEM_MAJOR = 1;
     private static final int UPDATE_SYSTEM_MINOR = 0;
     public static LoadFromMemoryFrame loadFromMemoryFrame;
+    public static LoadFromCacheFrame loadFromCacheFrame;
     public static boolean readOnly = false;
+
+    public static void loadFromCache() {
+        if (loadFromCacheFrame == null) {
+            loadFromCacheFrame = new LoadFromCacheFrame();
+        }
+        loadFromCacheFrame.setVisible(true);
+    }
 
     public static void loadFromMemory() {
         if (loadFromMemoryFrame == null) {
@@ -340,6 +348,10 @@ public class Main {
         if (loadFromMemoryFrame != null) {
             loadFromMemoryFrame.setVisible(false);
             loadFromMemoryFrame = null;
+        }
+        if (loadFromCacheFrame != null) {
+            loadFromCacheFrame.setVisible(false);
+            loadFromCacheFrame = null;
         }
         reloadSWF();
     }
