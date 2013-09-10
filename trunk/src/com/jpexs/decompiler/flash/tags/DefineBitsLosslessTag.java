@@ -58,6 +58,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         bitmapFormat = FORMAT_24BIT_RGB;
         bitmapWidth = image.getWidth();
         bitmapHeight = image.getHeight();
+        bitmapData = new BITMAPDATA();
         bitmapData.bitmapPixelDataPix24 = new PIX24[bitmapWidth * bitmapHeight];
         int pos = 0;
         for (int y = 0; y < bitmapHeight; y++) {
