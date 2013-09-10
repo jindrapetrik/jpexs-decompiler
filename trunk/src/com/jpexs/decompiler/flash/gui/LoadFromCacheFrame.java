@@ -21,6 +21,7 @@ import com.jpexs.browsers.cache.CacheImplementation;
 import com.jpexs.browsers.cache.CacheReader;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ReReadableInputStream;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -61,7 +62,7 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
     private List<CacheEntry> entries;
 
     public LoadFromCacheFrame() {
-        setSize(800, 600);
+        setSize(900, 600);
         View.setWindowIcon(this);
         View.centerScreen(this);
         setTitle(translate("dialog.title"));
@@ -184,8 +185,7 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
     private void openSWF() {
         CacheEntry en = list.getSelectedValue();
         if (en != null) {
-            BufferedInputStream str = new BufferedInputStream(en.getResponseDataStream());
-            str.mark(Integer.MAX_VALUE);
+            ReReadableInputStream str = new ReReadableInputStream(en.getResponseDataStream());
             Main.openFile(entryToFileName(en), str);
         }
     }
@@ -231,7 +231,7 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
                                 Helper.saveStream(selected.get(0).getResponseDataStream(), file);
                             } else {
                                 for (CacheEntry sel : selected) {
-                                    Helper.saveStream(selected.get(0).getResponseDataStream(), new File(file, entryToFileName(sel)));
+                                    Helper.saveStream(sel.getResponseDataStream(), new File(file, entryToFileName(sel)));
                                 }
                             }
                             Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());

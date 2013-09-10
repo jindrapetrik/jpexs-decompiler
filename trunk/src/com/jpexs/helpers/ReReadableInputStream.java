@@ -29,7 +29,7 @@ public class ReReadableInputStream extends InputStream {
     InputStream is;
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     byte[] converted;
-    int pos = 0;
+    long pos = 0;
     int count = 0;
 
     public int getCount() {
@@ -40,7 +40,7 @@ public class ReReadableInputStream extends InputStream {
         return baos.toByteArray();
     }
 
-    public int getPos() {
+    public long getPos() {
         return pos;
     }
 
@@ -48,7 +48,7 @@ public class ReReadableInputStream extends InputStream {
         this.is = is;
     }
 
-    public void setPos(int pos) throws IOException {
+    public void setPos(long pos) throws IOException {
         if (pos > count) {
             this.pos = count;
             skip(pos - count);
@@ -62,7 +62,7 @@ public class ReReadableInputStream extends InputStream {
             if (converted == null) {
                 converted = baos.toByteArray();
             }
-            int ret = converted[pos] & 0xff;
+            int ret = converted[(int)pos] & 0xff;
             pos++;
             return ret;
         }
@@ -79,7 +79,7 @@ public class ReReadableInputStream extends InputStream {
 
     @Override
     public int available() throws IOException {
-        return (count + is.available()) - pos;
+        return (count + is.available()) - (int)pos;
     }
 
     public long length() throws IOException {

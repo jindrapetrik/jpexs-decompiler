@@ -568,7 +568,8 @@ public class Helper {
         try (FileOutputStream fos = new FileOutputStream(output)) {
             while((cnt=is.read(buf))>0){
                 fos.write(buf,0,cnt);
-            }
+                fos.flush();
+            }            
         }
     }
 }

@@ -635,14 +635,14 @@ public class ActionListReader {
                         if (deobfuscate) {
                             top = stack.pop();
                         }
-                        int nip = rri.getPos() + aif.getJumpOffset();
+                        int nip = (int)rri.getPos() + aif.getJumpOffset();
 
                         if (decideBranch) {
                             System.out.print("newip " + nip + ", ");
                             System.out.print("Action: jump(j),ignore(i),compute(c)?");
                             String next = sc.next();
                             if (next.equals("j")) {
-                                newip = rri.getPos() + aif.getJumpOffset();
+                                newip = (int)rri.getPos() + aif.getJumpOffset();
                                 rri.setPos(newip);
 
                             } else if (next.equals("i")) {
@@ -655,7 +655,7 @@ public class ActionListReader {
                                 System.err.print("is compiletime -> ");
                             }
                             if (EcmaScript.toBoolean(top.getResult())) {
-                                newip = rri.getPos() + aif.getJumpOffset();
+                                newip = (int)rri.getPos() + aif.getJumpOffset();
                                 aif.jumpUsed = true;
                                 if (aif.ignoreUsed) {
                                     aif.compileTime = false;
@@ -679,7 +679,7 @@ public class ActionListReader {
                             goaif = true;
                         }
                     } else if (a instanceof ActionJump) {
-                        newip = rri.getPos() + ((ActionJump) a).getJumpOffset();
+                        newip = (int)rri.getPos() + ((ActionJump) a).getJumpOffset();
                     } else if (!(a instanceof GraphSourceItemContainer)) {
                         if (deobfuscate) {
                             //return in for..in,   TODO:Handle this better way
@@ -793,8 +793,8 @@ public class ActionListReader {
 
                 if ((!stateChanged) && curVisited > 1) {
                     List<Integer> branches = new ArrayList<>();
-                    branches.add(rri.getPos() + aif.getJumpOffset());
-                    branches.add(rri.getPos());
+                    branches.add((int)rri.getPos() + aif.getJumpOffset());
+                    branches.add((int)rri.getPos());
                     for (int br : branches) {
                         int visc = 0;
                         if (visited.containsKey(br)) {
@@ -811,10 +811,10 @@ public class ActionListReader {
                     break loopip;
                 }
 
-                int oldPos = rri.getPos();
+                int oldPos = (int)rri.getPos();
                 @SuppressWarnings("unchecked")
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version);
+                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, (int)rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version);
                 rri.setPos(oldPos);
             }
             prevIp = ip;

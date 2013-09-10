@@ -1,5 +1,6 @@
 package com.jpexs.browsers.cache;
 
+import com.jpexs.helpers.LimitedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;

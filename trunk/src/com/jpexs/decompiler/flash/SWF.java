@@ -352,7 +352,7 @@ public class SWF {
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
         if (checkOnly) {
-            return;
+            //return;
         }
         tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly);
         if (!checkOnly) {

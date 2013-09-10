@@ -1,4 +1,4 @@
-package com.jpexs.browsers.cache;
+package com.jpexs.helpers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,10 +10,10 @@ import java.io.InputStream;
 public class LimitedInputStream extends InputStream {
 
     private InputStream is;
-    private int pos = 0;
-    private int limit;
+    private long pos = 0;
+    private long limit;
 
-    public LimitedInputStream(InputStream is, int limit) {
+    public LimitedInputStream(InputStream is, long limit) {
         this.is = is;
         this.limit = limit;
     }
@@ -31,7 +31,7 @@ public class LimitedInputStream extends InputStream {
     public int available() throws IOException {
         int avail = is.available();
         if (pos + avail > limit) {
-            avail = limit - pos;
+            avail = (int)(limit - pos);
         }
         return avail;
     }

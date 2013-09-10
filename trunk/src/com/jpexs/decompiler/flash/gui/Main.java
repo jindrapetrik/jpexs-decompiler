@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.ReReadableInputStream;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.Advapi32Util;
@@ -324,6 +325,13 @@ public class Main {
         } else {
             if (inputStream instanceof FileInputStream) {
                 openFile(file);
+            } else if(inputStream instanceof ReReadableInputStream){
+                try {
+                    ((ReReadableInputStream) inputStream).setPos(0);
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return openFile(fileTitle, inputStream);
             } else if (inputStream instanceof BufferedInputStream) {
                 try {
                     ((BufferedInputStream) inputStream).reset();

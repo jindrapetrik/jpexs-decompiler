@@ -179,7 +179,7 @@ public class SWFInputStream extends InputStream {
     public int read(byte[] b, int off, int len) throws IOException {
         int bytesRead = super.read(b, off, len);
         bitPos = 0;
-        pos += bytesRead;
+        //pos += bytesRead;
         return bytesRead;
     }
 
@@ -528,7 +528,7 @@ public class SWFInputStream extends InputStream {
     }
 
     public List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int maxlen, String path) throws IOException {
-        return ActionListReader.readActionList(listeners, containerSWFOffset, rri, version, rri.getPos(), rri.getPos() + maxlen, path);
+        return ActionListReader.readActionList(listeners, containerSWFOffset, rri, version, (int)rri.getPos(), (int)rri.getPos() + maxlen, path);
     }
 
     private static void dumpTag(PrintStream out, int version, Tag tag, int level) {

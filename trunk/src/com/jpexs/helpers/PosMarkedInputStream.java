@@ -25,7 +25,7 @@ import java.io.InputStream;
  */
 public class PosMarkedInputStream extends InputStream {
 
-    private int pos = 0;
+    private long pos = 0;
     private InputStream is;
 
     public PosMarkedInputStream(InputStream is) {
@@ -38,11 +38,11 @@ public class PosMarkedInputStream extends InputStream {
         return is.read();
     }
 
-    public int getPos() {
+    public long getPos() {
         return pos;
     }
 
-    public void setPos(int pos) throws IOException {
+    public void setPos(long pos) throws IOException {
         this.pos = pos;
     }
 

@@ -1,7 +1,13 @@
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.LimitedInputStream;
+import com.jpexs.helpers.PosMarkedInputStream;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.process.ProcessTools;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -19,6 +25,7 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,6 +40,8 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -41,6 +50,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -49,9 +59,9 @@ import javax.swing.SwingWorker.StateValue;
 public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
 
     private List<com.jpexs.process.Process> processlist;
-    private List<BufferedInputStream> foundIs;
+    private List<ReReadableInputStream> foundIs;
     private com.jpexs.process.Process selProcess;
-    private JList list;
+    private JList<com.jpexs.process.Process> list;
     private DefaultListModel<com.jpexs.process.Process> model;
     private DefaultListModel<String> resModel;
     private final JList listRes;
@@ -59,7 +69,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
     private boolean processing = false;
     private JProgressBar progress;
 
-    private class SelectProcessWorker extends SwingWorker<List<BufferedInputStream>, Object> {
+    private class SelectProcessWorker extends SwingWorker<List<ReReadableInputStream>, Object> {
 
         private com.jpexs.process.Process proc;
 
@@ -77,7 +87,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         }
 
         @Override
-        protected List<BufferedInputStream> doInBackground() throws Exception {
+        protected List<ReReadableInputStream> doInBackground() throws Exception {
             Map<Long, InputStream> ret = new HashMap<>();
             ret = proc.search(new ProgressListener() {
                 @Override
@@ -85,19 +95,23 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                     setProgress(p);
                 }
             }, "CWS".getBytes(), "FWS".getBytes(), "ZWS".getBytes());
-            List<BufferedInputStream> swfStreams = new ArrayList<>();
+            List<ReReadableInputStream> swfStreams = new ArrayList<>();
             int pos = 0;
             for (Long addr : ret.keySet()) {
                 setProgress(pos * 100 / ret.size());
                 pos++;
                 try {
-                    BufferedInputStream is = new BufferedInputStream(ret.get(addr));
-                    is.mark(Integer.MAX_VALUE);
+                    PosMarkedInputStream pmi=new PosMarkedInputStream(ret.get(addr));
+                    ReReadableInputStream is = new ReReadableInputStream(pmi);
                     SWF swf = new SWF(is, null, false, true);
-                    if (swf.fileSize > 0 && swf.version > 0 && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
-                        publish(translate("swfitem").replace("%version%", "" + swf.version).replace("%size%", "" + swf.fileSize));
+                    long limit = pmi.getPos();
+                    is.setPos(0);                    
+                    is = new ReReadableInputStream(new LimitedInputStream(is, limit));
+                    if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
+                        String p=translate("swfitem").replace("%version%", "" + swf.version).replace("%size%", "" + swf.fileSize);
+                        publish(p);
                         swfStreams.add(is);
-                    }
+                    }                    
 
                 } catch (OutOfMemoryError ome) {
                     System.gc();
@@ -128,9 +142,9 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         }
         int index = listRes.getSelectedIndex();
         if (index > -1) {
-            BufferedInputStream str = foundIs.get(index);
+            ReReadableInputStream str = foundIs.get(index);
             try {
-                str.reset();
+                str.setPos(0);
             } catch (IOException ex) {
                 Logger.getLogger(LoadFromMemoryFrame.class.getName()).log(Level.SEVERE, null, ex);
                 return;
@@ -189,7 +203,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
     @SuppressWarnings("unchecked")
     public LoadFromMemoryFrame() {
         setSize(800, 600);
-        setAlwaysOnTop(true);
+        //setAlwaysOnTop(true);
         setTitle(translate("dialog.title"));
 
         addWindowListener(new WindowAdapter() {
@@ -278,7 +292,13 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         JButton openButton = new JButton(translate("button.open"));
         openButton.setActionCommand("OPENSWF");
         openButton.addActionListener(this);
+        
+        JButton saveButton = new JButton(translate("button.save"));
+        saveButton.setActionCommand("SAVE");
+        saveButton.addActionListener(this);
+        
         rightButtonsPanel.add(openButton);
+        rightButtonsPanel.add(saveButton);
         rightPanel.add(rightButtonsPanel, BorderLayout.SOUTH);
 
         JPanel statePanel = new JPanel();
@@ -309,6 +329,55 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 break;
             case "REFRESHPROCESSLIST":
                 refreshList();
+                break;
+            case "SAVE":
+                if (foundIs == null) {
+                    return;
+                }
+                int[] selected = listRes.getSelectedIndices();
+                if (selected.length>0) {
+                    JFileChooser fc = new JFileChooser();
+                    fc.setCurrentDirectory(new File(Configuration.getConfig("lastSaveDir", ".")));
+                    if (selected.length > 1) {
+                        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    } else {
+                        fc.setSelectedFile(new File(Configuration.getConfig("lastSaveDir", "."), "movie.swf"));
+                        fc.setFileFilter(new FileFilter() {
+                            @Override
+                            public boolean accept(File f) {
+                                return (f.getName().endsWith(".swf")) || (f.isDirectory());
+                            }
+
+                            @Override
+                            public String getDescription() {
+                                return AppStrings.translate("filter.swf");
+                            }
+                        });
+                    }
+                    fc.setAcceptAllFileFilterUsed(false);
+                    JFrame f = new JFrame();
+                    View.setWindowIcon(f);
+                    int returnVal = fc.showSaveDialog(f);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        File file = Helper.fixDialogFile(fc.getSelectedFile());
+                        try {
+                            if (selected.length == 1) {
+                                ReReadableInputStream bis=foundIs.get(selected[0]);
+                                bis.setPos(0);
+                                Helper.saveStream(bis, file);
+                            } else {
+                                for (int sel : selected) {
+                                    ReReadableInputStream bis=foundIs.get(sel);
+                                    bis.setPos(0);
+                                    Helper.saveStream(bis, new File(file, "movie"+sel+".swf"));
+                                }
+                            }
+                            Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());
+                        } catch (IOException ex) {
+                            View.showMessageDialog(null, translate("error.file.write"));
+                        }
+                    }
+                }
                 break;
         }
     }
