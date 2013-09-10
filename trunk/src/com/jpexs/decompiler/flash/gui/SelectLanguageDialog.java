@@ -30,6 +30,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import jsyntaxpane.DefaultSyntaxKit;
 
 /**
  *
@@ -115,6 +116,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
                     updateLanguage();
                     setVisible(false);
                     AppStrings.updateLanguage();
+                    DefaultSyntaxKit.reloadConfigs();
                     Main.reloadApp();
                 }
                 break;

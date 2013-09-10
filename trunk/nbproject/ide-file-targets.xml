@@ -14,7 +14,7 @@
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg value="-Xmx1024m"/>
-            <arg line=""/>
+            <arg line="${RUNPARAMS}"/>
         </java>
     </target>
     <!-- TODO: edit the following target according to your needs -->

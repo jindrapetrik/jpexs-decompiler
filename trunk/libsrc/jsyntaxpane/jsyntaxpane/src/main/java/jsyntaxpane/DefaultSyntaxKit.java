@@ -595,6 +595,14 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
 		return getConfig(this.getClass());
 	}
 
+        /**
+         * JPEXS: Reload configs - for language change
+         */
+        public static void reloadConfigs(){
+            CONFIGS.clear();
+            CONFIGS = null;
+        }
+        
 	/**
 	 * Return the Configurations object for a Kit.  Perfrom lazy creation of a
 	 * Configuration object if nothing is created.
