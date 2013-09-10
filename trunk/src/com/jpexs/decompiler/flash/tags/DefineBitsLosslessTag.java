@@ -89,7 +89,6 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     @Override
     public BufferedImage getImage(List<Tag> tags) {
         BufferedImage bi = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_RGB);
-        Graphics g = bi.getGraphics();
         COLORMAPDATA colorMapData = null;
         BITMAPDATA bitmapData = null;
         if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
@@ -102,17 +101,18 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         int pos = 0;
         for (int y = 0; y < bitmapHeight; y++) {
             for (int x = 0; x < bitmapWidth; x++) {
+                Color c = null;
                 if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
                     RGB color = colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned] & 0xff];
-                    g.setColor(new Color(color.red, color.green, color.blue));
+                    c = (new Color(color.red, color.green, color.blue));
                 }
                 if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
-                    g.setColor(new Color(bitmapData.bitmapPixelDataPix15[pos].red * 8, bitmapData.bitmapPixelDataPix15[pos].green * 8, bitmapData.bitmapPixelDataPix15[pos].blue * 8));
+                    c = (new Color(bitmapData.bitmapPixelDataPix15[pos].red * 8, bitmapData.bitmapPixelDataPix15[pos].green * 8, bitmapData.bitmapPixelDataPix15[pos].blue * 8));
                 }
                 if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
-                    g.setColor(new Color(bitmapData.bitmapPixelDataPix24[pos].red, bitmapData.bitmapPixelDataPix24[pos].green, bitmapData.bitmapPixelDataPix24[pos].blue));
+                    c = (new Color(bitmapData.bitmapPixelDataPix24[pos].red, bitmapData.bitmapPixelDataPix24[pos].green, bitmapData.bitmapPixelDataPix24[pos].blue));
                 }
-                g.fillRect(x, y, 1, 1);
+                bi.setRGB(x, y, c.getRGB());
                 pos32aligned++;
                 pos++;
             }

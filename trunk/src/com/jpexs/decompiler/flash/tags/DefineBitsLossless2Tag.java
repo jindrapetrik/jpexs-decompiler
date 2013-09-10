@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
 import com.jpexs.decompiler.flash.types.ARGB;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -167,7 +168,6 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     @Override
     public BufferedImage getImage(List<Tag> tags) {
         BufferedImage bi = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = bi.getGraphics();
         ALPHACOLORMAPDATA colorMapData = null;
         ALPHABITMAPDATA bitmapData = null;
         if (bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED) {
@@ -180,13 +180,14 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         int pos = 0;
         for (int y = 0; y < bitmapHeight; y++) {
             for (int x = 0; x < bitmapWidth; x++) {
+                Color c = null;
                 if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED)) {
-                    g.setColor(multiplyAlpha(colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned] & 0xff].toColor()));
+                    c = (multiplyAlpha(colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned] & 0xff].toColor()));
                 }
                 if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_32BIT_ARGB)) {
-                    g.setColor(multiplyAlpha(bitmapData.bitmapPixelData[pos].toColor()));
-                }
-                g.fillRect(x, y, 1, 1);
+                    c = (multiplyAlpha(bitmapData.bitmapPixelData[pos].toColor()));
+                } 
+                bi.setRGB(x, y, c.getRGB());
                 pos32aligned++;
                 pos++;
             }
