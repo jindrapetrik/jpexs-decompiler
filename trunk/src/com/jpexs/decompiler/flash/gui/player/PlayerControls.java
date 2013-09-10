@@ -81,7 +81,7 @@ public class PlayerControls extends JPanel implements ActionListener {
         progress.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                int frame = e.getX() * display.getTotalFrames() / progress.getWidth();
+                int frame = 1+(int)Math.floor(e.getX() * display.getTotalFrames() / (double)progress.getWidth());
                 boolean p = paused;
                 display.gotoFrame(frame);
                 if (!p) {
@@ -132,7 +132,7 @@ public class PlayerControls extends JPanel implements ActionListener {
                     progress.setIndeterminate(true);
                 } else {
                     progress.setMaximum(totalFrames);
-                    progress.setMinimum(0);
+                    progress.setMinimum(1);
                     progress.setValue(currentFrame);
                     progress.setIndeterminate(false);
                 }

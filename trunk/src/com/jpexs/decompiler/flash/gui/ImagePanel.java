@@ -46,6 +46,7 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
     private SWF swf;
     private HashMap<Integer, CharacterTag> characters;
     private int frameRate;
+    private boolean loaded;
 
     @Override
     public void setBackground(Color bg) {
@@ -97,15 +98,18 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
         if (timer != null) {
             timer.cancel();
         }
+        drawable = null;
+        loaded = true;
         ImageIcon icon = new ImageIcon(data);
         label.setIcon(icon);
     }
 
     public void setDrawable(final DrawableTag drawable, final SWF swf, final HashMap<Integer, CharacterTag> characters, int frameRate) {
-        pause();
+        pause();        
         this.drawable = drawable;
         this.swf = swf;
         this.characters = characters;
+        loaded = true;
 
         if (drawable.getNumFrames() == 0) {
             label.setIcon(null);
@@ -124,6 +128,8 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
         if (timer != null) {
             timer.cancel();
         }
+        drawable = null;
+        loaded = true;
         ImageIcon icon = new ImageIcon(image);
         label.setIcon(icon);
     }
@@ -133,7 +139,11 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
         if (drawable == null) {
             return 0;
         }
-        return percent * drawable.getNumFrames() / 100;
+        int ret=(int)Math.ceil(percent * drawable.getNumFrames() / 100.0);
+        if(ret==0){
+            ret = 1;
+        }
+        return ret;        
     }
 
     @Override
@@ -218,6 +228,6 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
 
     @Override
     public boolean isLoaded() {
-        return drawable != null;
+        return loaded;
     }
 }
