@@ -34,6 +34,9 @@ public class FirefoxCache implements CacheImplementation {
     @Override
     public void refresh() {
         File dir = getCacheDirectory();
+        if(dir==null){
+            return;
+        }
         File cacheMapFile = new File(dir, "_CACHE_MAP_");
         try {
             map = new CacheMap(cacheMapFile);
@@ -104,6 +107,9 @@ public class FirefoxCache implements CacheImplementation {
         File cacheDir = null;
         if (profileDir != null) {
             cacheDir = new File(profileDir, "Cache");
+        }
+        if(!cacheDir.exists()){
+            return null;
         }
         return cacheDir;
     }

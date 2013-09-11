@@ -147,10 +147,13 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         }
         entries = new ArrayList<>();
         for (CacheImplementation c : caches) {
-            for (CacheEntry en : c.getEntries()) {
-                String contentType = en.getHeader("Content-Type");
-                if ("application/x-shockwave-flash".equals(contentType)) {
-                    entries.add(en);
+            List<CacheEntry> list=c.getEntries();
+            if(list!=null){
+                for (CacheEntry en : c.getEntries()) {
+                    String contentType = en.getHeader("Content-Type");
+                    if ("application/x-shockwave-flash".equals(contentType)) {
+                        entries.add(en);
+                    }
                 }
             }
         }

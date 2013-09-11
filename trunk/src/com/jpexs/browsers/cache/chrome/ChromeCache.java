@@ -47,6 +47,9 @@ public class ChromeCache implements CacheImplementation {
         if (!loaded) {
             refresh();
         }
+        if (!loaded) {
+            return null;
+        }
         List<CacheEntry> ret = new ArrayList<>();
         try {
             List<EntryStore> entries = index.getEntries();
