@@ -108,6 +108,9 @@ public class FirefoxCache implements CacheImplementation {
         if (profileDir != null) {
             cacheDir = new File(profileDir, "Cache");
         }
+        if(cacheDir == null){
+            return null;
+        }
         if(!cacheDir.exists()){
             return null;
         }
