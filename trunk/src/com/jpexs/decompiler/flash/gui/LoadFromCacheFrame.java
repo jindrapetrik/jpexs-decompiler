@@ -45,9 +45,11 @@ import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -60,6 +62,10 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
     private JTextField searchField;
     private List<CacheImplementation> caches;
     private List<CacheEntry> entries;
+    private JProgressBar progressBar;
+    JButton saveButton;
+    JButton refreshButton;
+    JButton openButton;
 
     public LoadFromCacheFrame() {
         setSize(900, 600);
@@ -101,17 +107,17 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
-        JButton openButton = new JButton(translate("button.open"));
+        openButton = new JButton(translate("button.open"));
         openButton.setActionCommand("OPEN");
         openButton.addActionListener(this);
         buttonsPanel.add(openButton);
 
-        JButton saveButton = new JButton(translate("button.save"));
+        saveButton = new JButton(translate("button.save"));
         saveButton.setActionCommand("SAVE");
         saveButton.addActionListener(this);
         buttonsPanel.add(saveButton);
 
-        JButton refreshButton = new JButton(translate("button.refresh"));
+        refreshButton = new JButton(translate("button.refresh"));
         refreshButton.setActionCommand("REFRESH");
         refreshButton.addActionListener(this);
         buttonsPanel.add(refreshButton);
@@ -124,6 +130,10 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         browsersPanel.add(firefoxLabel);
         buttonsPanel.setAlignmentX(0.5f);
 
+        progressBar = new JProgressBar();
+        progressBar.setAlignmentX(0.5f);
+        progressBar.setIndeterminate(true);
+        bottomPanel.add(progressBar);
         bottomPanel.add(buttonsPanel);
         browsersPanel.setAlignmentX(0.5f);
         bottomPanel.add(browsersPanel);
@@ -131,33 +141,59 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         infoLabel.setAlignmentX(0.5f);
         bottomPanel.add(infoLabel);
         cnt.add(bottomPanel, BorderLayout.SOUTH);
+        progressBar.setVisible(false);
+        openButton.setEnabled(false);
+        saveButton.setEnabled(false);
         refresh();
     }
 
     private void refresh() {
-        if (caches == null) {
-            caches = new ArrayList<>();
-            for (String b : CacheReader.availableBrowsers()) {
-                caches.add(CacheReader.getBrowserCache(b));
-            }
-        } else {
-            for (CacheImplementation c : caches) {
-                c.refresh();
-            }
-        }
-        entries = new ArrayList<>();
-        for (CacheImplementation c : caches) {
-            List<CacheEntry> list=c.getEntries();
-            if(list!=null){
-                for (CacheEntry en : c.getEntries()) {
-                    String contentType = en.getHeader("Content-Type");
-                    if ("application/x-shockwave-flash".equals(contentType)) {
-                        entries.add(en);
+        progressBar.setVisible(true);
+        openButton.setEnabled(false);
+        saveButton.setEnabled(false);
+        refreshButton.setEnabled(false);
+        new SwingWorker<Object, Object>() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                if (caches == null) {
+                    caches = new ArrayList<>();
+                    for (String b : CacheReader.availableBrowsers()) {
+                        caches.add(CacheReader.getBrowserCache(b));
+                    }
+                } else {
+                    for (CacheImplementation c : caches) {
+                        c.refresh();
                     }
                 }
+                entries = new ArrayList<>();
+                for (CacheImplementation c : caches) {
+                    List<CacheEntry> list = c.getEntries();
+                    if (list != null) {
+                        for (CacheEntry en : c.getEntries()) {
+                            String contentType = en.getHeader("Content-Type");
+                            if ("application/x-shockwave-flash".equals(contentType)) {
+                                entries.add(en);
+                            }
+                        }
+                    }
+                }
+                filter();
+                
+                
+                return null;
             }
-        }
-        filter();
+
+            @Override
+            protected void done() {
+                openButton.setEnabled(true);
+                saveButton.setEnabled(true);
+                refreshButton.setEnabled(true);
+                progressBar.setVisible(false);
+            }
+            
+        }.execute();
+
+
     }
 
     @SuppressWarnings("unchecked")

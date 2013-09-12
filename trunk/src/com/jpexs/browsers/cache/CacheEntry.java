@@ -82,6 +82,9 @@ public abstract class CacheEntry {
 
     public String getHeader(String header) {
         Map<String, String> m = getResponseHeaders();
+        if(m == null){
+           return null;
+        }
         for (String k : m.keySet()) {
             if (k.toLowerCase().equals(header.toLowerCase())) {
                 return m.get(k);

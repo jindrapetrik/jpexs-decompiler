@@ -24,9 +24,12 @@ public class MetaData {
     public String request;
     public Map<String, String> response;
 
-    public MetaData(InputStream is) throws IOException {
+    public MetaData(InputStream is) throws IOException, IncompatibleVersionException {
         CacheInputStream cis = new CacheInputStream(is);
         majorVersion = cis.readInt16();
+        if(majorVersion!=1){
+           throw new IncompatibleVersionException(majorVersion);                  
+        }
         minorVersion = cis.readInt16();
         location = cis.readInt32();
         fetchCount = cis.readInt32();

@@ -50,7 +50,6 @@ public class CacheMap {
             if (mb.hash == 0) {
                 continue;
             }
-            MetaData m = mb.getMetaData();
             mapBuckets.add(mb);
         }
     }

@@ -38,6 +38,8 @@ public class MapBucket extends CacheEntry {
         if (metadata == null) {
             try {
                 metadata = new MetaData(getMetaDataStream());
+            }catch(IncompatibleVersionException ie){
+               
             } catch (IOException ex) {
                 Logger.getLogger(MapBucket.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -69,6 +71,9 @@ public class MapBucket extends CacheEntry {
             return null;
         }
         String responseHead = m.response.get("response-head");
+        if(responseHead==null){
+           return null;
+        }
         String headers[] = responseHead.split("\r\n");
         Map<String, String> ret = new HashMap<>();
         for (int h = 1; h < headers.length; h++) {
