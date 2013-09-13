@@ -49,7 +49,7 @@ public class PlayerControls extends JPanel implements ActionListener {
     private JLabel timeLabel;
     private JLabel totalTimeLabel;
     private static final Icon pauseIcon = View.getIcon("pause16");
-    private static final Icon playIcon = View.getIcon("play16");
+    private static final Icon playIcon = View.getIcon("play16");    
 
     public PlayerControls(final FlashDisplay display) {
         this.display = display;

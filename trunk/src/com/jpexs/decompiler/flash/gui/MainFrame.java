@@ -290,6 +290,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     private ComponentListener fontChangeList;
     private JComboBox<String> fontSelection;
     private JCommandButton saveCommandButton;
+    private PlayerControls flashControls;
     private Map<Integer, String> sourceFontsMap = new HashMap<>();
     private AbortRetryIgnoreHandler errorHandler = new AbortRetryIgnoreHandler() {
         @Override
@@ -1249,7 +1250,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         if (flashPanel != null) {
             JPanel flashPlayPanel = new JPanel(new BorderLayout());
             flashPlayPanel.add(flashPanel, BorderLayout.CENTER);
-            flashPlayPanel.add(new PlayerControls(flashPanel), BorderLayout.SOUTH);
+            flashPlayPanel.add(flashControls = new PlayerControls(flashPanel), BorderLayout.SOUTH);
             leftComponent = flashPlayPanel;
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
@@ -2953,6 +2954,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         if (!forceReload && (tagObj == oldValue)) {
             return;
         }
+
+        swfPreviewPanel.stop();
+        stopFlashPlayer();
         oldValue = tagObj;
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
@@ -2990,9 +2994,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         } else {
             showDetail(DETAILCARDEMPTYPANEL);
         }
-        swfPreviewPanel.stop();
+
+
         if ((tagObj instanceof SWFRoot)) {
-            stopFlashPlayer();
             if (miInternalViewer.isSelected()) {
                 showCard(CARDSWFPREVIEWPANEL);
                 swfPreviewPanel.load(swf);
@@ -3029,23 +3033,18 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
          } else if ((tagObj instanceof DefineSoundTag) || (tagObj instanceof SoundStreamHeadTag) || (tagObj instanceof SoundStreamHead2Tag)) {
          showCard(CARDEMPTYPANEL);
          } */ else if (tagObj instanceof DefineBinaryDataTag) {
-            stopFlashPlayer();
             showCard(CARDEMPTYPANEL);
         } else if (tagObj instanceof ASMSource) {
-            stopFlashPlayer();
             showCard(CARDACTIONSCRIPTPANEL);
             actionPanel.setSource((ASMSource) tagObj, !forceReload);
         } else if (tagObj instanceof ImageTag) {
-            stopFlashPlayer();
             imageButtonsPanel.setVisible(((ImageTag) tagObj).importSupported());
             showCard(CARDIMAGEPANEL);
             imagePanel.setImage(((ImageTag) tagObj).getImage(swf.tags));
         } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (miInternalViewer.isSelected())) {
-            stopFlashPlayer();
             showCard(CARDDRAWPREVIEWPANEL);
             previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
         } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (miInternalViewer.isSelected())) {
-            stopFlashPlayer();
             showCard(CARDDRAWPREVIEWPANEL);
             FrameNode fn = (FrameNode) tagObj;
             List<Tag> controlTags = swf.tags;
