@@ -20,6 +20,12 @@ type
     { Public declarations }
   end;
 
+type
+  TMySWF = class(TShockwaveFlash)
+  public
+    Procedure CreateWnd; override;
+  end;
+
   type
   TPipeThread = class(TThread)
   protected
@@ -38,7 +44,7 @@ var
   frmMain: TfrmMain;
   k:String;
   t:TPipeThread;
-  flaPreview: TShockwaveFlash;
+  flaPreview: TMySWF;
   target:HWND=0;
 implementation
 
@@ -46,7 +52,10 @@ implementation
 
 
 
-
+Procedure TMySWF.CreateWnd;
+begin
+  inherited;
+end; 
 
 function arrToStr(k:TBuf;len:integer):string ;
 var s:string;
@@ -69,7 +78,7 @@ begin
   flaPreview.Movie := '';
   flaPreview.Free;
   flaPreview := nil;
-  flaPreview := TShockwaveFlash.Create(frmMain);
+  flaPreview := TMySWF.Create(frmMain);
   flaPreview.Left:=0;
   flaPreview.Top:=0;
   flaPreview.Width:=self.w;
@@ -89,7 +98,12 @@ end;
 procedure TPipeThread.setPos();
 begin
 SetWindowPos(frmMain.Handle,0,0,0,self.w,self.h,SWP_SHOWWINDOW);
-displaySWF();
+flaPreview.Left:=0;
+flaPreview.Top:=0;
+flaPreview.Width:=self.w;
+flaPreview.Height:=self.h;
+flaPreview.CreateWnd;
+//displaySWF();
 end;
 
 procedure TPipeThread.Execute();
@@ -101,6 +115,7 @@ len:integer;
 cmd:integer;
 written:cardinal;
 val:cardinal;
+vals:String;
 
 const
  CMD_PLAY = 1;
@@ -113,6 +128,7 @@ const
  CMD_PLAYING = 8;
  CMD_REWIND = 9;
  CMD_GOTO = 10;
+ CMD_CALL = 11;
 begin
 
 pipename:=PAnsiChar('\\.\\pipe\ffdec_flashplayer_'+ParamStr(1));
@@ -204,6 +220,20 @@ begin
           val := (buffer[0] shl 8) + buffer[1];
           flaPreview.GotoFrame(val);
         end;
+        CMD_CALL:
+        begin
+          ReadFile(pipe,buffer,2,numBytesRead,nil);
+          val := (buffer[0] shl 8) + buffer[1];
+          ReadFile(pipe,buffer,val,numBytesRead,nil);
+          SetString(vals, PChar(Addr(buffer)), val);
+          vals:=flaPreview.CallFunction(vals);
+          val:=length(vals);
+          buffer[0]:=(val shr 8) mod 256;
+          buffer[1]:=val mod 256;
+          WriteFile(pipe,buffer,2,written,nil);
+          Move(vals[1], buffer, val);
+          WriteFile(pipe,buffer,val,written,nil);
+        end;
 
         end;
   end
@@ -226,14 +256,14 @@ if(ParamCount>=2) then
    flaPreview.Parent := frmMain;
 
     ShowWindow(Application.Handle, SW_HIDE) ;
-   SetWindowLong(Application.Handle, GWL_EXSTYLE, getWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW) ;
-   ShowWindow(Application.Handle, SW_SHOW);
+    SetWindowLong(Application.Handle, GWL_EXSTYLE, getWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW) ;
+    ShowWindow(Application.Handle, SW_SHOW);
 
     SetForegroundWindow(HWND(strtoint(ParamStr(2))));
     frmMain.Caption:='FlashPlayerWindow_'+ParamStr(2);
     Application.Title:='FlashPlayerWindow_'+ParamStr(2);
     target:=HWND(strtoint(ParamStr(1)));
-    
+
     SetWindowLong(frmMain.Handle, GWL_STYLE, 0);
     ShowWindow(frmMain.Handle, SW_SHOW);
 
@@ -250,9 +280,10 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 begin
  if(ParamCount>=2) then
  begin
-   flaPreview := TShockwaveFlash.Create(frmMain);
+   flaPreview := TMySWF.Create(frmMain);
+   flaPreview.AllowScriptAccess := 'always';
    flaPreview.BackgroundColor:=-1;
- end;
+  end;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
