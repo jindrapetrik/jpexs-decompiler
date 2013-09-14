@@ -60,7 +60,7 @@ public class TraitMethodGetterSetter extends Trait {
         String bodyStr = "";
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, true, fullyQualifiedNames, null), 3);
+            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, true, fullyQualifiedNames, null), 3);
         }
         return Graph.INDENT_STRING + Graph.INDENT_STRING + header + ((classIndex != -1 && abc.instance_info[classIndex].isInterface()) ? ";" : " {\r\n" + bodyStr + "\r\n" + Graph.INDENT_STRING + Graph.INDENT_STRING + "}");
     }
@@ -69,7 +69,7 @@ public class TraitMethodGetterSetter extends Trait {
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            return abc.bodies[bodyIndex].removeTraps(abc.constants, abc, scriptIndex, classIndex, isStatic, path);
+            return abc.bodies[bodyIndex].removeTraps(abc.constants, abc, this, scriptIndex, classIndex, isStatic, path);
         }
         return 0;
     }

@@ -325,7 +325,7 @@ public class Main {
         } else {
             if (inputStream instanceof FileInputStream) {
                 openFile(file);
-            } else if(inputStream instanceof ReReadableInputStream){
+            } else if (inputStream instanceof ReReadableInputStream) {
                 try {
                     ((ReReadableInputStream) inputStream).setPos(0);
                 } catch (IOException ex) {

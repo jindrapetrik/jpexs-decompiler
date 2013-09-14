@@ -565,7 +565,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     public void setEditMode(boolean val) {
         // todo: create UI for editing raw data
         final boolean rawEdit = false;
-        
+
         if (val) {
             setText(rawEdit ? srcHexOnly : srcNoHex);
             editor.setEditable(true);
@@ -667,8 +667,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 String text = editor.getText();
                 if (text.trim().startsWith("#hexdata")) {
                     src.setActionBytes(getBytesFromHexaText(text));
-                }
-                else {
+                } else {
                     src.setActions(ASMParser.parse(0, src.getPos(), true, text, SWF.DEFAULT_VERSION, false), SWF.DEFAULT_VERSION);
                 }
                 setSource(this.src, false);
@@ -714,7 +713,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             line = line.replace(" ", "");
             for (int i = 0; i < line.length() / 2; i++) {
                 String hexStr = line.substring(i * 2, (i + 1) * 2);
-                byte b = (byte)Integer.parseInt(hexStr, 16);
+                byte b = (byte) Integer.parseInt(hexStr, 16);
                 baos.write(b);
             }
         }
@@ -728,15 +727,15 @@ public class ActionPanel extends JPanel implements ActionListener {
         result.append("#hexdata").append(nl);
 
         /* // hex data from decompiled actions
-        Scanner scanner = new Scanner(srcWithHex);
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine().trim();
-            if (line.startsWith(";")) {
-                result.append(line.substring(1).trim()).append(nl);
-            } else {
-                result.append(";").append(line).append(nl);
-            }
-        }*/
+         Scanner scanner = new Scanner(srcWithHex);
+         while (scanner.hasNextLine()) {
+         String line = scanner.nextLine().trim();
+         if (line.startsWith(";")) {
+         result.append(line.substring(1).trim()).append(nl);
+         } else {
+         result.append(";").append(line).append(nl);
+         }
+         }*/
 
         byte[] data = src.getActionBytes();
         for (int i = 0; i < data.length; i++) {
@@ -745,10 +744,10 @@ public class ActionPanel extends JPanel implements ActionListener {
             }
             result.append(String.format("%02x ", data[i]));
         }
-        
+
         return result.toString();
     }
-    
+
     public void updateSearchPos() {
         searchPos.setText((foundPos + 1) + "/" + found.size());
         setSource(found.get(foundPos), true);

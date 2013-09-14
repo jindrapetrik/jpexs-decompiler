@@ -171,15 +171,21 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
                 case AVM2Code.DAT_MULTINAME_INDEX:
-                    s.append(" m[");
-                    s.append(operands[i]);
-                    s.append("]\"");
-                    if (constants.constant_multiname[operands[i]] == null) {
-                        s.append("");
+                    if (operands[i] == 0) {
+                        s.append(" null");
                     } else {
-                        s.append(Helper.escapeString(constants.constant_multiname[operands[i]].toString(constants, fullyQualifiedNames)));
+                        s.append(" ");
+                        s.append(constants.constant_multiname[operands[i]].toString(constants, fullyQualifiedNames));
                     }
-                    s.append("\"");
+                    /*s.append(" m[");
+                     s.append(operands[i]);
+                     s.append("]\"");
+                     if (constants.constant_multiname[operands[i]] == null) {
+                     s.append("");
+                     } else {
+                     s.append(Helper.escapeString(constants.constant_multiname[operands[i]].toString(constants, fullyQualifiedNames)));
+                     }
+                     s.append("\"");*/
                     break;
                 case AVM2Code.DAT_STRING_INDEX:
                     s.append(" \"");

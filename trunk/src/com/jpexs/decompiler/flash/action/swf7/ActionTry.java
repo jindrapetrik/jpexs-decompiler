@@ -208,7 +208,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     public long getTrySize() {
         return trySize;
     }
-    
+
     @Override
     public List<Long> getContainerSizes() {
         List<Long> ret = new ArrayList<>();

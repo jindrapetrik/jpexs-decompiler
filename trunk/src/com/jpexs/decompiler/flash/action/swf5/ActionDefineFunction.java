@@ -69,7 +69,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         long endPos = sis.getPos();
         //code = new ArrayList<Action>();
         hdrSize = endPos - startPos;
-        int posBef2 = (int)rri.getPos();
+        int posBef2 = (int) rri.getPos();
         //code = sis.readActionList(rri.getPos(), getFileAddress() + hdrSize, rri, codeSize);
         //rri.setPos(posBef2 + codeSize);
     }

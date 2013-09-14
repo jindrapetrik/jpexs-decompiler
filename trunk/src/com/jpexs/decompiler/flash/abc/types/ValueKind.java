@@ -38,7 +38,7 @@ public class ValueKind {
     public static final int CONSTANT_StaticProtectedNs = 0x1A;// Namespace
     public static final int CONSTANT_PrivateNs = 0x05;// namespace
     private static final int[] optionalKinds = new int[]{0x03, 0x04, 0x06, 0x02, 0x01, 0x0B, 0x0A, 0x0C, 0x00, 0x08, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x05};
-    private static final String[] optionalKindNames = new String[]{"Int", "UInt", "Double", "Decimal", "Utf8", "True", "False", "Null", "Undefined", "Namespace", "PackageNamespace", "PackageInternalNs", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNs", "PrivateNs"};
+    private static final String[] optionalKindNames = new String[]{"Int", "UInt", "Double", "Decimal", "Utf8", "True", "False", "Null", "Undefined", "Namespace", "PackageNamespace", "PackageInternalNs", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNs", "PrivateNamespace"};
     public int value_index;
     public int value_kind;
 
@@ -116,6 +116,48 @@ public class ValueKind {
             case CONSTANT_StaticProtectedNs:
             case CONSTANT_PrivateNs:
                 ret = "\"" + constants.constant_namespace[value_index].getName(constants) + "\"";
+                break;
+        }
+        return ret;
+    }
+
+    public String toASMString(ConstantPool constants) {
+        String ret = "?";
+        switch (value_kind) {
+            case CONSTANT_Int:
+                ret = "Integer(" + constants.constant_int[value_index] + ")";
+                break;
+            case CONSTANT_UInt:
+                ret = "UInteger(" + constants.constant_uint[value_index] + ")";
+                break;
+            case CONSTANT_Double:
+                ret = "Double(" + constants.constant_double[value_index] + ")";
+                break;
+            case CONSTANT_Decimal:
+                ret = "Decimal(" + constants.constant_decimal[value_index] + ")";
+                break;
+            case CONSTANT_Utf8:
+                ret = "Utf8(\"" + Helper.escapeString(constants.constant_string[value_index]) + "\")";
+                break;
+            case CONSTANT_True:
+                ret = "True";
+                break;
+            case CONSTANT_False:
+                ret = "False";
+                break;
+            case CONSTANT_Null:
+                ret = "Null";
+                break;
+            case CONSTANT_Undefined:
+                ret = "Undefined";
+                break;
+            case CONSTANT_Namespace:
+            case CONSTANT_PackageInternalNs:
+            case CONSTANT_ProtectedNamespace:
+            case CONSTANT_ExplicitNamespace:
+            case CONSTANT_StaticProtectedNs:
+            case CONSTANT_PrivateNs:
+                ret = constants.constant_namespace[value_index].getKindStr() + "(\"" + constants.constant_namespace[value_index].getName(constants) + "\")";
                 break;
         }
         return ret;

@@ -445,7 +445,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         String bodyStr = "";
         bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
         if (bodyIndex != -1) {
-            bodyStr = abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", pcode, true, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, highlight, true, fullyQualifiedNames, abc.class_info[class_info].static_traits);
+            bodyStr = abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", pcode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, highlight, true, fullyQualifiedNames, abc.class_info[class_info].static_traits);
         }
         if (Highlighting.stripHilights(bodyStr).trim().equals("")) {
             toPrint = ABC.addTabs(bodyStr + "/*classInitializer*/", 3);
@@ -479,7 +479,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             bodyStr = "";
             bodyIndex = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
             if (bodyIndex != -1) {
-                bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", pcode, false, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, true, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
+                bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", pcode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, true, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
                 constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, abc.bodies[bodyIndex], abc, fullyQualifiedNames);
             } else {
                 constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, null, abc, fullyQualifiedNames);
@@ -548,11 +548,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
         int iInitializer = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
         int ret = 0;
         if (iInitializer != -1) {
-            ret += abc.bodies[iInitializer].removeTraps(abc.constants, abc, scriptIndex, class_info, false, path);
+            ret += abc.bodies[iInitializer].removeTraps(abc.constants, abc, this, scriptIndex, class_info, false, path);
         }
         int sInitializer = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
         if (sInitializer != -1) {
-            ret += abc.bodies[sInitializer].removeTraps(abc.constants, abc, scriptIndex, class_info, true, path);
+            ret += abc.bodies[sInitializer].removeTraps(abc.constants, abc, this, scriptIndex, class_info, true, path);
         }
         ret += abc.instance_info[class_info].instance_traits.removeTraps(scriptIndex, class_info, false, abc, path);
         ret += abc.class_info[class_info].static_traits.removeTraps(scriptIndex, class_info, true, abc, path);

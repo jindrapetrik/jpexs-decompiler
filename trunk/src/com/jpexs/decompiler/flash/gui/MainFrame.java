@@ -2794,9 +2794,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             } else {
                                 int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
                                 if (bi != -1) {
-                                    abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
+                                    abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants, abcPanel.decompiledTextArea.getCurrentTrait(), abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
                                 }
-                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
+                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, abcPanel.decompiledTextArea.getCurrentTrait());
                             }
                             Main.stopWork();
                             View.showMessageDialog(null, "Control flow restored");
@@ -2862,17 +2862,18 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                     }
                                 } else {
                                     int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                                    Trait t = abcPanel.decompiledTextArea.getCurrentTrait();
                                     if (bi != -1) {
                                         if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
-                                            abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
+                                            abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants, t, abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
                                         } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                            abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
+                                            abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
                                         } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                            abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
-                                            abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
+                                            abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
+                                            abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants, t, abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
                                         }
                                     }
-                                    abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
+                                    abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, t);
                                 }
                             } catch (Exception ex) {
                                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);

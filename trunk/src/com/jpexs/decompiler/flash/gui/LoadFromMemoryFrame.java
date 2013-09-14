@@ -2,7 +2,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LimitedInputStream;
 import com.jpexs.helpers.PosMarkedInputStream;
@@ -24,7 +23,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,17 +99,17 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 setProgress(pos * 100 / ret.size());
                 pos++;
                 try {
-                    PosMarkedInputStream pmi=new PosMarkedInputStream(ret.get(addr));
+                    PosMarkedInputStream pmi = new PosMarkedInputStream(ret.get(addr));
                     ReReadableInputStream is = new ReReadableInputStream(pmi);
                     SWF swf = new SWF(is, null, false, true);
                     long limit = pmi.getPos();
-                    is.setPos(0);                    
+                    is.setPos(0);
                     is = new ReReadableInputStream(new LimitedInputStream(is, limit));
                     if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
-                        String p=translate("swfitem").replace("%version%", "" + swf.version).replace("%size%", "" + swf.fileSize);
+                        String p = translate("swfitem").replace("%version%", "" + swf.version).replace("%size%", "" + swf.fileSize);
                         publish(p);
                         swfStreams.add(is);
-                    }                    
+                    }
 
                 } catch (OutOfMemoryError ome) {
                     System.gc();
@@ -292,11 +290,11 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         JButton openButton = new JButton(translate("button.open"));
         openButton.setActionCommand("OPENSWF");
         openButton.addActionListener(this);
-        
+
         JButton saveButton = new JButton(translate("button.save"));
         saveButton.setActionCommand("SAVE");
         saveButton.addActionListener(this);
-        
+
         rightButtonsPanel.add(openButton);
         rightButtonsPanel.add(saveButton);
         rightPanel.add(rightButtonsPanel, BorderLayout.SOUTH);
@@ -335,7 +333,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                     return;
                 }
                 int[] selected = listRes.getSelectedIndices();
-                if (selected.length>0) {
+                if (selected.length > 0) {
                     JFileChooser fc = new JFileChooser();
                     fc.setCurrentDirectory(new File(Configuration.getConfig("lastSaveDir", ".")));
                     if (selected.length > 1) {
@@ -362,14 +360,14 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                         File file = Helper.fixDialogFile(fc.getSelectedFile());
                         try {
                             if (selected.length == 1) {
-                                ReReadableInputStream bis=foundIs.get(selected[0]);
+                                ReReadableInputStream bis = foundIs.get(selected[0]);
                                 bis.setPos(0);
                                 Helper.saveStream(bis, file);
                             } else {
                                 for (int sel : selected) {
-                                    ReReadableInputStream bis=foundIs.get(sel);
+                                    ReReadableInputStream bis = foundIs.get(sel);
                                     bis.setPos(0);
-                                    Helper.saveStream(bis, new File(file, "movie"+sel+".swf"));
+                                    Helper.saveStream(bis, new File(file, "movie" + sel + ".swf"));
                                 }
                             }
                             Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());

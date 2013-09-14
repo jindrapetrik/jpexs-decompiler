@@ -65,7 +65,10 @@ import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -715,19 +718,147 @@ public class AVM2Code implements Serializable {
         return s.toString();
     }
 
-    public String toASMSource(ConstantPool constants, MethodBody body, boolean hex, boolean highlight) {
-        return toASMSource(constants, body, new ArrayList<Integer>(), hex, highlight);
+    public String toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, boolean hex, boolean highlight) {
+        return toASMSource(constants, trait, info, body, new ArrayList<Integer>(), hex, highlight);
     }
 
-    public String toASMSource(ConstantPool constants, MethodBody body, List<Integer> outputMap, boolean hex, boolean highlight) {
+    public String toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, boolean hex, boolean highlight) {
         invalidateCache();
         StringBuilder ret = new StringBuilder();
         String t = "";
-        for (int e = 0; e < body.exceptions.length; e++) {
-            ret.append("exception " + e + " m[" + body.exceptions[e].name_index + "]\"" + Helper.escapeString(body.exceptions[e].getVarName(constants, new ArrayList<String>())) + "\" "
-                    + "m[" + body.exceptions[e].type_index + "]\"" + Helper.escapeString(body.exceptions[e].getTypeName(constants, new ArrayList<String>())) + "\"\n");
+        if (trait != null) {
+            if (trait instanceof TraitFunction) {
+                TraitFunction tf = (TraitFunction) trait;
+                ret.append("trait function ");
+                ret.append(constants.multinameToString(tf.name_index));
+                ret.append(" slotid ");
+                ret.append(tf.slot_index);
+                ret.append("\n");
+            }
+            if (trait instanceof TraitMethodGetterSetter) {
+                TraitMethodGetterSetter tm = (TraitMethodGetterSetter) trait;
+                ret.append("trait ");
+                switch (tm.kindType) {
+                    case Trait.TRAIT_METHOD:
+                        ret.append("method ");
+                        break;
+                    case Trait.TRAIT_GETTER:
+                        ret.append("getter ");
+                        break;
+                    case Trait.TRAIT_SETTER:
+                        ret.append("setter ");
+                        break;
+                }
+                ret.append(constants.multinameToString(tm.name_index));
+                ret.append(" dispid ");
+                ret.append(tm.disp_id);
+                ret.append("\n");
+            }
         }
+        if (info != null) {
+            ret.append("method\n");
+            ret.append("name ");
+            ret.append(info.name_index == 0 ? "null" : "\"" + Helper.escapeString(info.getName(constants)) + "\"");
+            ret.append("\n");
+            if (info.flagExplicit()) {
+                ret.append("flag EXPLICIT\n");
+            }
+            if (info.flagHas_optional()) {
+                ret.append("flag HAS_OPTIONAL\n");
+            }
+            if (info.flagHas_paramnames()) {
+                ret.append("flag HAS_PARAM_NAMES\n");
+            }
+            if (info.flagIgnore_rest()) {
+                ret.append("flag IGNORE_REST\n");
+            }
+            if (info.flagNeed_activation()) {
+                ret.append("flag NEED_ACTIVATION\n");
+            }
+            if (info.flagNeed_arguments()) {
+                ret.append("flag NEED_ARGUMENTS\n");
+            }
+            if (info.flagNeed_rest()) {
+                ret.append("flag NEED_REST\n");
+            }
+            if (info.flagSetsdxns()) {
+                ret.append("flag SET_DXNS\n");
+            }
+            for (int p : info.param_types) {
+                ret.append("param ");
+                ret.append(constants.multinameToString(p));
+                ret.append("\n");
+            }
+            if (info.flagHas_paramnames()) {
+                for (int n : info.paramNames) {
+                    ret.append("paramname ");
+                    ret.append("\"");
+                    ret.append(constants.constant_string[n]);
+                    ret.append("\"");
+                    ret.append("\n");
+                }
+            }
+            if (info.flagHas_optional()) {
+                for (ValueKind vk : info.optional) {
+                    ret.append("optional ");
+                    ret.append(vk.toString(constants));
+                    ret.append("\n");
+                }
+            }
+            ret.append("returns ");
+            ret.append(constants.multinameToString(info.ret_type));
+            ret.append("\n");
+        }
+        ret.append("\n");
+        ret.append("body\n");
+
+        ret.append("maxstack ");
+        ret.append(body.max_stack);
+        ret.append("\n");
+
+        ret.append("localcount ");
+        ret.append(body.max_regs);
+        ret.append("\n");
+
+        ret.append("initscopedepth ");
+        ret.append(body.init_scope_depth);
+        ret.append("\n");
+
+        ret.append("maxscopedepth ");
+        ret.append(body.max_scope_depth);
+        ret.append("\n");
+
+
         List<Long> offsets = new ArrayList<>();
+        for (int e = 0; e < body.exceptions.length; e++) {
+            ret.append("try");
+
+            ret.append(" from ");
+            ret.append("ofs");
+            ret.append(Helper.formatAddress(body.exceptions[e].start));
+            offsets.add((long) body.exceptions[e].start);
+
+            ret.append(" to ");
+            ret.append("ofs");
+            ret.append(Helper.formatAddress(body.exceptions[e].end));
+            offsets.add((long) body.exceptions[e].end);
+
+            ret.append(" target ");
+            ret.append("ofs");
+            ret.append(Helper.formatAddress(body.exceptions[e].target));
+            offsets.add((long) body.exceptions[e].target);
+
+            ret.append(" type ");
+            ret.append(body.exceptions[e].type_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].type_index].toString(constants, new ArrayList<String>()));
+
+            ret.append(" name ");
+            ret.append(body.exceptions[e].name_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].name_index].toString(constants, new ArrayList<String>()));
+            ret.append("\n");
+        }
+
+        ret.append("\n");
+        ret.append("code\n");
+
         for (AVM2Instruction ins : code) {
             offsets.addAll(ins.getOffsets());
         }
@@ -758,17 +889,17 @@ public class AVM2Code implements Serializable {
             } else if (offsets.contains(ofs)) {
                 ret.append("ofs" + Helper.formatAddress(ofs) + ":");
             }
-            for (int e = 0; e < body.exceptions.length; e++) {
-                if (body.exceptions[e].start == ofs) {
-                    ret.append("exceptionstart " + e + ":");
-                }
-                if (body.exceptions[e].end == ofs) {
-                    ret.append("exceptionend " + e + ":");
-                }
-                if (body.exceptions[e].target == ofs) {
-                    ret.append("exceptiontarget " + e + ":");
-                }
-            }
+            /*for (int e = 0; e < body.exceptions.length; e++) {
+             if (body.exceptions[e].start == ofs) {
+             ret.append("exceptionstart " + e + ":");
+             }
+             if (body.exceptions[e].end == ofs) {
+             ret.append("exceptionend " + e + ":");
+             }
+             if (body.exceptions[e].target == ofs) {
+             ret.append("exceptiontarget " + e + ":");
+             }
+             }*/
             if (ins.replaceWith != null) {
                 for (Object o : ins.replaceWith) {
                     if (o instanceof Integer) {
@@ -1519,8 +1650,8 @@ public class AVM2Code implements Serializable {
         return ret;
     }
 
-    public int removeTraps(ConstantPool constants, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) {
-        removeDeadCode(constants, body);
+    public int removeTraps(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) {
+        removeDeadCode(constants, trait, info, body);
         List<Object> localData = new ArrayList<>();
         localData.add((Boolean) isStatic); //isStatic
         localData.add((Integer) (classIndex)); //classIndex
@@ -1542,9 +1673,9 @@ public class AVM2Code implements Serializable {
         localData.add(refs);
         localData.add(this);
         int ret = 0;
-        ret += removeTraps(constants, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), abc, body, new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), refs), 0, path, refs);
-        removeIgnored(constants, body);
-        removeDeadCode(constants, body);
+        ret += removeTraps(constants, trait, info, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), abc, body, new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), refs), 0, path, refs);
+        removeIgnored(constants, trait, info, body);
+        removeDeadCode(constants, trait, info, body);
 
         return ret;
     }
@@ -1927,7 +2058,7 @@ public class AVM2Code implements Serializable {
 
     }
 
-    private void restoreControlFlowPass(ConstantPool constants, MethodBody body, boolean secondpass) {
+    private void restoreControlFlowPass(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, boolean secondpass) {
         try {
             HashMap<Integer, List<Integer>> refs;
             int[] visited2 = new int[code.size()];
@@ -1956,9 +2087,9 @@ public class AVM2Code implements Serializable {
         invalidateCache();
         try {
             List<Integer> outputMap = new ArrayList<>();
-            String src = toASMSource(constants, body, outputMap, false, false);
+            String src = toASMSource(constants, trait, info, body, outputMap, false, false);
 
-            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, null, body);
+            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, null, body, info);
             for (int i = 0; i < acode.code.size(); i++) {
                 if (outputMap.size() > i) {
                     int tpos = outputMap.get(i);
@@ -1978,11 +2109,11 @@ public class AVM2Code implements Serializable {
             Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
         }
         invalidateCache();
-        removeDeadCode(constants, body);
+        removeDeadCode(constants, trait, info, body);
     }
 
-    public void restoreControlFlow(ConstantPool constants, MethodBody body) {
-        restoreControlFlowPass(constants, body, false);
+    public void restoreControlFlow(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) {
+        restoreControlFlowPass(constants, trait, info, body, false);
         //restoreControlFlowPass(constants, body, true);
     }
 
@@ -1993,11 +2124,11 @@ public class AVM2Code implements Serializable {
      }
      }
      }*/
-    public void removeIgnored(ConstantPool constants, MethodBody body) {
+    public void removeIgnored(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) {
         try {
             List<Integer> outputMap = new ArrayList<>();
-            String src = toASMSource(constants, body, outputMap, false, false);
-            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, body);
+            String src = toASMSource(constants, trait, info, body, outputMap, false, false);
+            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, trait, body, info);
             for (int i = 0; i < acode.code.size(); i++) {
                 if (outputMap.size() > i) {
                     int tpos = outputMap.get(i);
@@ -2015,7 +2146,7 @@ public class AVM2Code implements Serializable {
         invalidateCache();
     }
 
-    public int removeDeadCode(ConstantPool constants, MethodBody body) {
+    public int removeDeadCode(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) {
         HashMap<Integer, List<Integer>> refs = visitCode(body);
 
         int cnt = 0;
@@ -2027,7 +2158,7 @@ public class AVM2Code implements Serializable {
             }
         }
 
-        removeIgnored(constants, body);
+        removeIgnored(constants, trait, info, body);
         for (int i = code.size() - 1; i >= 0; i--) {
             AVM2Instruction ins = code.get(i);
             if (ins.definition instanceof JumpIns) {
@@ -2038,7 +2169,7 @@ public class AVM2Code implements Serializable {
                 }
             }
         }
-        removeIgnored(constants, body);
+        removeIgnored(constants, trait, info, body);
         return cnt;
     }
 
@@ -2476,7 +2607,7 @@ public class AVM2Code implements Serializable {
         return ret;
     }
 
-    public static int removeTraps(ConstantPool constants, MethodBody body, List<Object> localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) {
+    public static int removeTraps(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Object> localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) {
         HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<>();
         removeTraps(refs, false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
         int cnt = 0;
@@ -2503,7 +2634,7 @@ public class AVM2Code implements Serializable {
             }
         }
         //int cnt = removeTraps(refs, true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
-        code.getCode().removeIgnored(constants, body);
+        code.getCode().removeIgnored(constants, trait, info, body);
         return cnt;
     }
     /*public static int removeTraps(List<Object> localData, AVM2GraphSource code, int addr) {

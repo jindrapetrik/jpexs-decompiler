@@ -110,8 +110,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     public void setContainerSize(int index, long size) {
         if (index == 0) {
             codeSize = (int) size;
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Index must be 0.");
         }
     }

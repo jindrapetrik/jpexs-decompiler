@@ -22,5 +22,4 @@ package com.jpexs.decompiler.flash.tags.base;
  * @author JPEXS
  */
 public interface ContainerItem {
-    
 }

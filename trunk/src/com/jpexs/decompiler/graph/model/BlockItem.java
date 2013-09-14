@@ -37,9 +37,9 @@ public class BlockItem extends GraphTargetItem {
 
     @Override
     public String toString(boolean highlight, List<Object> localData) {
-        return hilight("{", highlight) + "\r\n" + Graph.INDENTOPEN + "\r\n" + 
-                Graph.graphToString(commands, highlight, false, localData) + "\r\n" + 
-                Graph.INDENTCLOSE + "\r\n" + hilight("}", highlight);
+        return hilight("{", highlight) + "\r\n" + Graph.INDENTOPEN + "\r\n"
+                + Graph.graphToString(commands, highlight, false, localData) + "\r\n"
+                + Graph.INDENTCLOSE + "\r\n" + hilight("}", highlight);
     }
 
     @Override

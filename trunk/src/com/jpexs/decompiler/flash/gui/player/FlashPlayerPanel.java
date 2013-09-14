@@ -53,31 +53,31 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     private int frameRate;
     public boolean functionPlayback = false;
 
-    public synchronized String call(String callString){
+    public synchronized String call(String callString) {
         if (pipe != null) {
             IntByReference ibr = new IntByReference();
             Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_CALL}, 1, ibr, null);
-            int callLen=callString.getBytes().length;
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte)((callLen>>8) &0xff),(byte)(callLen & 0xff)}, 2, ibr, null);
+            int callLen = callString.getBytes().length;
+            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((callLen >> 8) & 0xff), (byte) (callLen & 0xff)}, 2, ibr, null);
             Kernel32.INSTANCE.WriteFile(pipe, callString.getBytes(), callLen, ibr, null);
-            
+
             byte res[] = new byte[2];
             if (Kernel32.INSTANCE.ReadFile(pipe, res, 2, ibr, null)) {
                 int retLen = ((res[0] & 0xff) << 8) + (res[1] & 0xff);
                 res = new byte[retLen];
                 if (Kernel32.INSTANCE.ReadFile(pipe, res, retLen, ibr, null)) {
-                    String ret=new String(res,0,retLen);
+                    String ret = new String(res, 0, retLen);
                     return ret;
-                }else{
+                } else {
                     return null;
                 }
             } else {
                 return null;
-            }            
+            }
         }
         return null;
     }
-    
+
     private synchronized void resize() {
         if (pipe != null) {
             IntByReference ibr = new IntByReference();

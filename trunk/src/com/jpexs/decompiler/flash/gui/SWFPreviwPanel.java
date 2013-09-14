@@ -66,7 +66,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
             @Override
             public void run() {
                 buffering.setVisible(true);
-                SWF.framesToImage(0, frameImages, 0, swf.frameCount-1, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>());
+                SWF.framesToImage(0, frameImages, 0, swf.frameCount - 1, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>());
                 buffering.setVisible(false);
             }
         }.start();
@@ -104,8 +104,8 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
             }
         }, 0, 1000 / swf.frameRate);
     }
-    
-    private void drawFrame(){
+
+    private void drawFrame() {
         pan.setImage(frameImages.get(frame - 1));
     }
 
@@ -116,7 +116,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
 
     @Override
     public int getTotalFrames() {
-        if(swf==null){
+        if (swf == null) {
             return 0;
         }
         return swf.frameCount;
@@ -124,10 +124,10 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
 
     @Override
     public void pause() {
-        if(timer!=null){
+        if (timer != null) {
             timer.cancel();
             timer = null;
-        }        
+        }
     }
 
     @Override
@@ -138,7 +138,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
 
     @Override
     public boolean isPlaying() {
-        return timer!=null;
+        return timer != null;
     }
 
     @Override
@@ -149,7 +149,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
 
     @Override
     public int getFrameRate() {
-        if(swf==null){
+        if (swf == null) {
             return 1;
         }
         return swf.frameRate;

@@ -22,6 +22,13 @@ public class NamespaceSet {
 
     public int[] namespaces;
 
+    public NamespaceSet() {
+    }
+
+    public NamespaceSet(int[] namespaces) {
+        this.namespaces = namespaces;
+    }
+
     public String toString(ConstantPool constants) {
         String s = "";
         for (int i = 0; i < this.namespaces.length; i++) {

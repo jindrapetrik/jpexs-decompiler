@@ -23,12 +23,25 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
+import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ASM3Parser {
 
@@ -63,8 +76,8 @@ public class ASM3Parser {
         }
     }
 
-    public static AVM2Code parse(InputStream is, ConstantPool constants, MethodBody body) throws IOException, ParseException {
-        return parse(is, constants, null, body);
+    public static AVM2Code parse(InputStream is, ConstantPool constants, Trait trait, MethodBody body, MethodInfo info) throws IOException, ParseException {
+        return parse(is, constants, trait, null, body, info);
     }
 
     private static int checkMultinameIndex(ConstantPool constants, int index, int line) throws ParseException {
@@ -74,7 +87,390 @@ public class ASM3Parser {
         return index;
     }
 
-    public static AVM2Code parse(InputStream is, ConstantPool constants, MissingSymbolHandler missingHandler, MethodBody body) throws IOException, ParseException {
+    private static void expected(int type, String expStr, Flasm3Lexer lexer) throws IOException, ParseException {
+        ParsedSymbol s = lexer.lex();
+        if (s.type != type) {
+            throw new ParseException(expStr + " expected", lexer.yyline());
+        }
+    }
+
+    private static void expected(ParsedSymbol s, int type, String expStr) throws IOException, ParseException {
+        if (s.type != type) {
+            throw new ParseException(expStr + " expected", 0);
+        }
+    }
+
+    public static boolean parseSlotConst(InputStream is, ConstantPool constants, TraitSlotConst tsc) throws IOException, ParseException {
+        Flasm3Lexer lexer = null;
+        try {
+            lexer = new Flasm3Lexer(new InputStreamReader(is, "UTF-8"));
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(ASM3Parser.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        expected(ParsedSymbol.TYPE_KEYWORD_TRAIT, "trait", lexer);
+        int name_index = parseMultiName(constants, lexer);
+
+        ParsedSymbol symb = lexer.lex();
+
+
+        int flags = 0;
+        while (symb.type == ParsedSymbol.TYPE_KEYWORD_FLAG) {
+            symb = lexer.lex();
+            switch (symb.type) {
+                case ParsedSymbol.TYPE_KEYWORD_FINAL:
+                    flags |= Trait.ATTR_Final;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_OVERRIDE:
+                    flags |= Trait.ATTR_Override;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_METADATA:
+                    flags |= Trait.ATTR_Metadata;
+                    break;
+                default:
+                    throw new ParseException("Invalid trait flag", lexer.yyline());
+            }
+            symb = lexer.lex();
+        }
+
+        switch (symb.type) {
+            case ParsedSymbol.TYPE_KEYWORD_SLOT:
+            case ParsedSymbol.TYPE_KEYWORD_CONST:
+                expected(ParsedSymbol.TYPE_KEYWORD_SLOTID, "slotid", lexer);
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
+                int slotid = (int) (long) (Long) symb.value;
+                expected(ParsedSymbol.TYPE_KEYWORD_TYPE, "type", lexer);
+                int type = parseMultiName(constants, lexer);
+                expected(ParsedSymbol.TYPE_KEYWORD_VALUE, "value", lexer);
+                ValueKind val = parseValue(constants, lexer);
+                tsc.slot_id = slotid;
+                tsc.type_index = type;
+                tsc.value_kind = val.value_kind;
+                tsc.value_index = val.value_index;
+                tsc.kindFlags = flags;
+                break;
+            /*case ParsedSymbol.TYPE_KEYWORD_CLASS:
+             break;
+             case ParsedSymbol.TYPE_KEYWORD_FUNCTION:
+             break;
+             case ParsedSymbol.TYPE_KEYWORD_METHOD:
+             case ParsedSymbol.TYPE_KEYWORD_GETTER:
+             case ParsedSymbol.TYPE_KEYWORD_SETTER:
+             break;*/
+            default:
+                throw new ParseException("Unexpected trait type", lexer.yyline());
+        }
+        tsc.name_index = name_index;
+        return true;
+    }
+
+    private static int parseNamespaceSet(ConstantPool constants, Flasm3Lexer lexer) throws ParseException, IOException {
+        List<Integer> namespaceList = new ArrayList<>();
+        ParsedSymbol s = lexer.lex();
+        if (s.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+            return 0;
+        }
+        expected(s, ParsedSymbol.TYPE_BRACKET_OPEN, "[");
+        s = lexer.lex();
+        if (s.type != ParsedSymbol.TYPE_BRACKET_CLOSE) {
+            lexer.pushback(s);
+            do {
+                namespaceList.add(parseNamespace(constants, lexer));
+                s = lexer.lex();
+            } while (s.type == ParsedSymbol.TYPE_COMMA);
+            expected(s, ParsedSymbol.TYPE_BRACKET_CLOSE, "]");
+        }
+        loopn:
+        for (int n = 1; n < constants.constant_namespace_set.length; n++) {
+            int nss[] = constants.constant_namespace_set[n].namespaces;
+            if (nss.length != namespaceList.size()) {
+                continue;
+            }
+            for (int i = 0; i < nss.length; i++) {
+                if (nss[i] != namespaceList.get(i)) {
+                    continue loopn;
+                }
+            }
+            return n;
+        }
+        int nss[] = new int[namespaceList.size()];
+        for (int i = 0; i < nss.length; i++) {
+            nss[i] = namespaceList.get(i);
+        }
+        return constants.addNamespaceSet(new NamespaceSet(nss));
+    }
+
+    private static int parseNamespace(ConstantPool constants, Flasm3Lexer lexer) throws ParseException, IOException {
+
+        ParsedSymbol type = lexer.lex();
+        int kind = 0;
+        switch (type.type) {
+            case ParsedSymbol.TYPE_KEYWORD_NULL:
+                return 0;
+            case ParsedSymbol.TYPE_KEYWORD_NAMESPACE:
+                kind = Namespace.KIND_NAMESPACE;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_PRIVATENAMESPACE:
+                kind = Namespace.KIND_PRIVATE;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_PACKAGENAMESPACE:
+                kind = Namespace.KIND_PACKAGE;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_PACKAGEINTERNALNS:
+                kind = Namespace.KIND_PACKAGE_INTERNAL;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_PROTECTEDNAMESPACE:
+                kind = Namespace.KIND_PROTECTED;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_EXPLICITNAMESPACE:
+                kind = Namespace.KIND_EXPLICIT;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_STATICPROTECTEDNS:
+                kind = Namespace.KIND_STATIC_PROTECTED;
+                break;
+            default:
+                throw new ParseException("Namespace kind expected", lexer.yyline());
+        }
+
+        expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+        ParsedSymbol name = lexer.lex();
+        expected(name, ParsedSymbol.TYPE_STRING, "String");
+        ParsedSymbol c = lexer.lex();
+        int index = 0;
+        if (c.type == ParsedSymbol.TYPE_COMMA) {
+            ParsedSymbol extra = lexer.lex();
+            expected(name, ParsedSymbol.TYPE_STRING, "String");
+            try {
+                index = Integer.parseInt((String) extra.value);
+            } catch (NumberFormatException nfe) {
+                throw new ParseException("Number expected", lexer.yyline());
+            }
+        } else {
+            lexer.pushback(c);
+        }
+        expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+
+        for (int n = 1; n < constants.constant_namespace.length; n++) {
+            Namespace ns = constants.constant_namespace[n];
+            if (ns.getName(constants).equals(name.value) && (ns.kind == kind)) {
+                if (index == 0) {
+                    return n;
+                }
+                index--;
+            }
+        }
+        return constants.addNamespace(new Namespace(kind, constants.forceGetStringId((String) name.value)));
+    }
+
+    private static int parseMultiName(ConstantPool constants, Flasm3Lexer lexer) throws ParseException, IOException {
+        ParsedSymbol s = lexer.lex();
+        int kind = 0;
+        int name_index = -1;
+        int namespace_index = -1;
+        int namespace_set_index = -1;
+        int qname_index = -1;
+        List<Integer> params = new ArrayList<>();
+
+        switch (s.type) {
+            case ParsedSymbol.TYPE_KEYWORD_NULL:
+                return 0;
+            case ParsedSymbol.TYPE_KEYWORD_QNAME:
+                kind = Multiname.QNAME;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_QNAMEA:
+                kind = Multiname.QNAMEA;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_RTQNAME:
+                kind = Multiname.RTQNAME;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_RTQNAMEA:
+                kind = Multiname.RTQNAMEA;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_RTQNAMEL:
+                kind = Multiname.RTQNAMEL;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_RTQNAMELA:
+                kind = Multiname.RTQNAMELA;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_MULTINAME:
+                kind = Multiname.MULTINAME;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_MULTINAMEA:
+                kind = Multiname.MULTINAMEA;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_MULTINAMEL:
+                kind = Multiname.MULTINAMEL;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_MULTINAMELA:
+                kind = Multiname.MULTINAMELA;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_TYPENAME:
+                kind = Multiname.TYPENAME;
+                break;
+            default:
+                throw new ParseException("Name expected", lexer.yyline());
+        }
+
+        switch (s.type) {
+            case ParsedSymbol.TYPE_KEYWORD_QNAME:
+            case ParsedSymbol.TYPE_KEYWORD_QNAMEA:
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                namespace_index = parseNamespace(constants, lexer);
+                expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
+                ParsedSymbol name = lexer.lex();
+                expected(name, ParsedSymbol.TYPE_STRING, "String");
+                name_index = constants.forceGetStringId((String) name.value);
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_RTQNAME:
+            case ParsedSymbol.TYPE_KEYWORD_RTQNAMEA:
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                ParsedSymbol rtqName = lexer.lex();
+                expected(rtqName, ParsedSymbol.TYPE_STRING, "String");
+                name_index = constants.forceGetStringId((String) rtqName.value);
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_RTQNAMEL:
+            case ParsedSymbol.TYPE_KEYWORD_RTQNAMELA:
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_MULTINAME:
+            case ParsedSymbol.TYPE_KEYWORD_MULTINAMEA:
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                ParsedSymbol mName = lexer.lex();
+                expected(mName, ParsedSymbol.TYPE_STRING, "String");
+                name_index = constants.forceGetStringId((String) mName.value);
+                expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
+                namespace_set_index = parseNamespaceSet(constants, lexer);
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_MULTINAMEL:
+            case ParsedSymbol.TYPE_KEYWORD_MULTINAMELA:
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                namespace_set_index = parseNamespaceSet(constants, lexer);
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_TYPENAME:
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                qname_index = parseMultiName(constants, lexer);
+                expected(ParsedSymbol.TYPE_LOWERTHAN, "<", lexer);
+                params.add(parseMultiName(constants, lexer));
+                ParsedSymbol nt = lexer.lex();
+                while (nt.type == ParsedSymbol.TYPE_COMMA) {
+                    params.add(parseMultiName(constants, lexer));
+                    nt = lexer.lex();
+                }
+                expected(nt, ParsedSymbol.TYPE_GREATERTHAN, ">");
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                break;
+        }
+        loopm:
+        for (int m = 1; m < constants.constant_multiname.length; m++) {
+            Multiname mul = constants.constant_multiname[m];
+            if (mul.kind == kind && mul.name_index == name_index && mul.namespace_index == namespace_index && mul.namespace_set_index == namespace_set_index && mul.qname_index == qname_index && mul.params.size() == params.size()) {
+                for (int p = 0; p < mul.params.size(); p++) {
+                    if (mul.params.get(p) != params.get(p)) {
+                        continue loopm;
+                    }
+                }
+                return m;
+            }
+
+        }
+        return constants.addMultiname(new Multiname(kind, name_index, namespace_index, namespace_set_index, qname_index, params));
+    }
+
+    public static ValueKind parseValue(ConstantPool constants, Flasm3Lexer lexer) throws IOException, ParseException {
+        ParsedSymbol type = lexer.lex();
+        ParsedSymbol value;
+        int value_index = 0;
+        int value_kind = 0;
+        switch (type.type) {
+            case ParsedSymbol.TYPE_KEYWORD_INTEGER:
+                value_kind = ValueKind.CONSTANT_Int;
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                value = lexer.lex();
+                expected(value, ParsedSymbol.TYPE_INTEGER, "Integer");
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                value_index = constants.forceGetIntId((Long) value.value);
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_UINTEGER:
+                value_kind = ValueKind.CONSTANT_UInt;
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                value = lexer.lex();
+                expected(value, ParsedSymbol.TYPE_INTEGER, "UInteger");
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                value_index = constants.forceGetUIntId((Long) value.value);
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_DOUBLE:
+                value_kind = ValueKind.CONSTANT_Double;
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                value = lexer.lex();
+                expected(value, ParsedSymbol.TYPE_FLOAT, "Double");
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                value_index = constants.forceGetDoubleId((Double) value.value);
+                break;
+            /*case ParsedSymbol.TYPE_KEYWORD_DECIMAL:
+             value_kind = ValueKind.CONSTANT_Decimal;
+             break;*/
+            case ParsedSymbol.TYPE_KEYWORD_UTF8:
+                value_kind = ValueKind.CONSTANT_Utf8;
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                value = lexer.lex();
+                expected(value, ParsedSymbol.TYPE_STRING, "String");
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                value_index = constants.forceGetStringId((String) value.value);
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_TRUE:
+                value_kind = ValueKind.CONSTANT_True;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_FALSE:
+                value_kind = ValueKind.CONSTANT_False;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_NULL:
+                value_kind = ValueKind.CONSTANT_Null;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_NAMESPACE:
+            case ParsedSymbol.TYPE_KEYWORD_PACKAGEINTERNALNS:
+            case ParsedSymbol.TYPE_KEYWORD_PROTECTEDNAMESPACE:
+            case ParsedSymbol.TYPE_KEYWORD_EXPLICITNAMESPACE:
+            case ParsedSymbol.TYPE_KEYWORD_STATICPROTECTEDNS:
+            case ParsedSymbol.TYPE_KEYWORD_PRIVATENAMESPACE:
+            case ParsedSymbol.TYPE_KEYWORD_PACKAGENAMESPACE:
+
+                switch (type.type) {
+                    case ParsedSymbol.TYPE_KEYWORD_NAMESPACE:
+                        value_kind = ValueKind.CONSTANT_Namespace;
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_PACKAGEINTERNALNS:
+                        value_kind = ValueKind.CONSTANT_PackageInternalNs;
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_PROTECTEDNAMESPACE:
+                        value_kind = ValueKind.CONSTANT_ProtectedNamespace;
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_EXPLICITNAMESPACE:
+                        value_kind = ValueKind.CONSTANT_ExplicitNamespace;
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_STATICPROTECTEDNS:
+                        value_kind = ValueKind.CONSTANT_StaticProtectedNs;
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_PRIVATENAMESPACE:
+                        value_kind = ValueKind.CONSTANT_PrivateNs;
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_PACKAGENAMESPACE:
+                        value_kind = ValueKind.CONSTANT_PackageNamespace;
+                        break;
+                }
+                lexer.pushback(type);
+                value_index = parseNamespace(constants, lexer);
+                break;
+        }
+        return new ValueKind(value_index, value_kind);
+    }
+
+    public static AVM2Code parse(InputStream is, ConstantPool constants, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, ParseException {
         AVM2Code code = new AVM2Code();
 
         List<OffsetItem> offsetItems = new ArrayList<>();
@@ -83,12 +479,170 @@ public class ASM3Parser {
         List<Integer> exceptionIndices = new ArrayList<>();
         int offset = 0;
 
+
         Flasm3Lexer lexer = new Flasm3Lexer(new InputStreamReader(is, "UTF-8"));
 
         ParsedSymbol symb;
         AVM2Instruction lastIns = null;
+        List<String> exceptionsFrom = new ArrayList<>();
+        List<String> exceptionsTo = new ArrayList<>();
+        List<String> exceptionsTargets = new ArrayList<>();
+        info.flags = 0;
+        info.name_index = 0;
+        List<Integer> paramTypes = new ArrayList<>();
+        List<Integer> paramNames = new ArrayList<>();
+        List<ValueKind> optional = new ArrayList<>();
         do {
-            symb = lexer.yylex();
+            symb = lexer.lex();
+            if (Arrays.asList(ParsedSymbol.TYPE_KEYWORD_BODY, ParsedSymbol.TYPE_KEYWORD_CODE, ParsedSymbol.TYPE_KEYWORD_METHOD).contains(symb.type)) {
+                continue;
+            }
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_TRAIT) {
+                if (trait == null) {
+                    throw new ParseException("No trait expected", lexer.yyline());
+                }
+                symb = lexer.lex();
+                switch (symb.type) {
+                    case ParsedSymbol.TYPE_KEYWORD_METHOD:
+                    case ParsedSymbol.TYPE_KEYWORD_GETTER:
+                    case ParsedSymbol.TYPE_KEYWORD_SETTER:
+                        if (!(trait instanceof TraitMethodGetterSetter)) {
+                            throw new ParseException("Unxpected trait type", lexer.yyline());
+                        }
+                        TraitMethodGetterSetter tm = (TraitMethodGetterSetter) trait;
+                        switch (symb.type) {
+                            case ParsedSymbol.TYPE_KEYWORD_METHOD:
+                                tm.kindType = Trait.TRAIT_METHOD;
+                                break;
+                            case ParsedSymbol.TYPE_KEYWORD_GETTER:
+                                tm.kindType = Trait.TRAIT_GETTER;
+                                break;
+                            case ParsedSymbol.TYPE_KEYWORD_SETTER:
+                                tm.kindType = Trait.TRAIT_SETTER;
+                                break;
+                        }
+                        tm.name_index = parseMultiName(constants, lexer);
+                        expected(ParsedSymbol.TYPE_KEYWORD_DISPID, "dispid", lexer);
+                        symb = lexer.lex();
+                        expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
+                        tm.disp_id = (int) (long) (Long) symb.value;
+
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_FUNCTION:
+                        if (!(trait instanceof TraitFunction)) {
+                            throw new ParseException("Unxpected trait type", lexer.yyline());
+                        }
+                        break;
+
+                }
+                continue;
+            }
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_NAME) {
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_STRING, "String");
+                info.name_index = constants.forceGetStringId((String) symb.value);
+                continue;
+            }
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_PARAM) {
+                paramTypes.add(parseMultiName(constants, lexer));
+                continue;
+            }
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_PARAMNAME) {
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_STRING, "String");
+                paramNames.add(constants.forceGetStringId((String) symb.value));
+                continue;
+            }
+
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_OPTIONAL) {
+                optional.add(parseValue(constants, lexer));
+                continue;
+            }
+
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_MAXSTACK) {
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
+                body.max_stack = (int) (long) (Long) symb.value;
+                continue;
+            }
+
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_LOCALCOUNT) {
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
+                body.max_regs = (int) (long) (Long) symb.value;
+                continue;
+            }
+
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_INITSCOPEDEPTH) {
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
+                body.init_scope_depth = (int) (long) (Long) symb.value;
+                continue;
+            }
+
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_MAXSCOPEDEPTH) {
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
+                body.max_scope_depth = (int) (long) (Long) symb.value;
+                continue;
+            }
+
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_RETURNS) {
+                info.ret_type = parseMultiName(constants, lexer);
+                continue;
+            }
+
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_FLAG) {
+                symb = lexer.lex();
+                switch (symb.type) {
+                    case ParsedSymbol.TYPE_KEYWORD_EXPLICIT:
+                        info.setFlagExplicit();
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_HAS_OPTIONAL:
+                        info.setFlagHas_optional();
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_HAS_PARAM_NAMES:
+                        info.setFlagHas_paramnames();
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_IGNORE_REST:
+                        info.setFlagIgnore_Rest();
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_NEED_ACTIVATION:
+                        info.setFlagNeed_activation();
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_NEED_ARGUMENTS:
+                        info.setFlagNeed_Arguments();
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_NEED_REST:
+                        info.setFlagNeed_rest();
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_SET_DXNS:
+                        info.setFlagSetsdxns();
+                        break;
+                }
+                continue;
+            }
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_TRY) {
+                expected(ParsedSymbol.TYPE_KEYWORD_FROM, "From", lexer);
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_IDENTIFIER, "Identifier");
+                exceptionsFrom.add((String) symb.value);
+                expected(ParsedSymbol.TYPE_KEYWORD_TO, "To", lexer);
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_IDENTIFIER, "Identifier");
+                exceptionsTo.add((String) symb.value);
+                expected(ParsedSymbol.TYPE_KEYWORD_TARGET, "Target", lexer);
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_IDENTIFIER, "Identifier");
+                exceptionsTargets.add((String) symb.value);
+                expected(ParsedSymbol.TYPE_KEYWORD_TYPE, "Type", lexer);
+                ABCException ex = new ABCException();
+                ex.type_index = parseMultiName(constants, lexer);
+                expected(ParsedSymbol.TYPE_KEYWORD_NAME, "Name", lexer);
+                ex.name_index = parseMultiName(constants, lexer);
+                exceptions.add(ex);
+                continue;
+            }
             if (symb.type == ParsedSymbol.TYPE_EXCEPTION_START) {
                 int exIndex = (Integer) symb.value;
                 int listIndex = exceptionIndices.indexOf(exIndex);
@@ -127,15 +681,15 @@ public class ASM3Parser {
             }
             if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 if (((String) symb.value).toLowerCase(Locale.ENGLISH).equals("exception")) {
-                    ParsedSymbol exIndex = lexer.yylex();
+                    ParsedSymbol exIndex = lexer.lex();
                     if (exIndex.type != ParsedSymbol.TYPE_INTEGER) {
                         throw new ParseException("Index expected", lexer.yyline());
                     }
-                    ParsedSymbol exName = lexer.yylex();
+                    ParsedSymbol exName = lexer.lex();
                     if (exName.type != ParsedSymbol.TYPE_MULTINAME) {
                         throw new ParseException("Multiname expected", lexer.yyline());
                     }
-                    ParsedSymbol exType = lexer.yylex();
+                    ParsedSymbol exType = lexer.lex();
                     if (exType.type != ParsedSymbol.TYPE_MULTINAME) {
                         throw new ParseException("Multiname expected", lexer.yyline());
                     }
@@ -154,14 +708,16 @@ public class ASM3Parser {
                         List<Integer> operandsList = new ArrayList<>();
 
                         for (int i = 0; i < def.operands.length; i++) {
-                            ParsedSymbol parsedOperand = lexer.yylex();
+                            ParsedSymbol parsedOperand = lexer.lex();
                             switch (def.operands[i]) {
                                 case AVM2Code.DAT_MULTINAME_INDEX:
-                                    if (parsedOperand.type == ParsedSymbol.TYPE_MULTINAME) {
-                                        operandsList.add(checkMultinameIndex(constants, (int) (long) (Long) parsedOperand.value, lexer.yyline()));
-                                    } else {
-                                        throw new ParseException("Multiname expected", lexer.yyline());
-                                    }
+                                    lexer.pushback(parsedOperand);
+                                    operandsList.add(parseMultiName(constants, lexer));
+                                    /*if (parsedOperand.type == ParsedSymbol.TYPE_MULTINAME) {
+                                     operandsList.add(checkMultinameIndex(constants, (int) (long) (Long) parsedOperand.value, lexer.yyline()));
+                                     } else {
+                                     throw new ParseException("Multiname expected", lexer.yyline());
+                                     }*/
                                     break;
                                 case AVM2Code.DAT_STRING_INDEX:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_STRING) {
@@ -257,7 +813,7 @@ public class ASM3Parser {
                                         operandsList.add(patCount);
 
                                         for (int c = 0; c <= patCount; c++) {
-                                            parsedOperand = lexer.yylex();
+                                            parsedOperand = lexer.lex();
                                             if (parsedOperand.type == ParsedSymbol.TYPE_IDENTIFIER) {
                                                 offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i + (c + 1)));
                                                 operandsList.add(0);
@@ -306,6 +862,23 @@ public class ASM3Parser {
         } while (symb.type != ParsedSymbol.TYPE_EOF);
 
         code.compact();
+        for (LabelItem li : labelItems) {
+            int ind;
+            ind = exceptionsFrom.indexOf(li.label);
+            if (ind > -1) {
+                exceptions.get(ind).start = li.offset;
+            }
+
+            ind = exceptionsTo.indexOf(li.label);
+            if (ind > -1) {
+                exceptions.get(ind).end = li.offset;
+            }
+
+            ind = exceptionsTargets.indexOf(li.label);
+            if (ind > -1) {
+                exceptions.get(ind).target = li.offset;
+            }
+        }
 
         for (OffsetItem oi : offsetItems) {
             for (LabelItem li : labelItems) {
@@ -324,6 +897,25 @@ public class ASM3Parser {
         body.exceptions = new ABCException[exceptions.size()];
         for (int e = 0; e < exceptions.size(); e++) {
             body.exceptions[e] = exceptions.get(e);
+        }
+
+        info.param_types = new int[paramTypes.size()];
+        for (int i = 0; i < paramTypes.size(); i++) {
+            info.param_types[i] = paramTypes.get(i);
+        }
+
+        if (info.flagHas_paramnames()) {
+            info.paramNames = new int[paramNames.size()];
+            for (int i = 0; i < paramNames.size(); i++) {
+                info.paramNames[i] = paramNames.get(i);
+            }
+        }
+
+        if (info.flagHas_optional()) {
+            info.optional = new ValueKind[optional.size()];
+            for (int i = 0; i < optional.size(); i++) {
+                info.optional[i] = optional.get(i);
+            }
         }
         return code;
     }

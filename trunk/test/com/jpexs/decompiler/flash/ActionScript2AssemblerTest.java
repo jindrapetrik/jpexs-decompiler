@@ -55,9 +55,7 @@ public class ActionScript2AssemblerTest {
 
             assertEquals(actualResult.trim(), "ok = false;");
             assertTrue(decompiled.contains("Push \"ok\" false"));
-        } catch (IOException ex) {
-            fail();
-        } catch (ParseException ex) {
+        } catch (IOException | ParseException ex) {
             fail();
         }
     }

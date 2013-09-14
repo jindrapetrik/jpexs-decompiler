@@ -105,7 +105,7 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
     }
 
     public void setDrawable(final DrawableTag drawable, final SWF swf, final HashMap<Integer, CharacterTag> characters, int frameRate) {
-        pause();        
+        pause();
         this.drawable = drawable;
         this.swf = swf;
         this.characters = characters;
@@ -139,11 +139,11 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
         if (drawable == null) {
             return 0;
         }
-        int ret=(int)Math.ceil(percent * drawable.getNumFrames() / 100.0);
-        if(ret==0){
+        int ret = (int) Math.ceil(percent * drawable.getNumFrames() / 100.0);
+        if (ret == 0) {
             ret = 1;
         }
-        return ret;        
+        return ret;
     }
 
     @Override
@@ -163,7 +163,7 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
     }
 
     private void drawFrame() {
-        if(drawable == null){
+        if (drawable == null) {
             return;
         }
         int nframe = percent * drawable.getNumFrames() / 100;
@@ -210,9 +210,9 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
 
     @Override
     public void gotoFrame(int frame) {
-        if(drawable==null){
+        if (drawable == null) {
             percent = 0;
-        }else{
+        } else {
             percent = frame * 100 / drawable.getNumFrames();
         }
         drawFrame();

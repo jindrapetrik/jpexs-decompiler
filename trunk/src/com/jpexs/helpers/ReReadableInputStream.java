@@ -62,7 +62,7 @@ public class ReReadableInputStream extends InputStream {
             if (converted == null) {
                 converted = baos.toByteArray();
             }
-            int ret = converted[(int)pos] & 0xff;
+            int ret = converted[(int) pos] & 0xff;
             pos++;
             return ret;
         }
@@ -79,7 +79,7 @@ public class ReReadableInputStream extends InputStream {
 
     @Override
     public int available() throws IOException {
-        return (count + is.available()) - (int)pos;
+        return (count + is.available()) - (int) pos;
     }
 
     public long length() throws IOException {

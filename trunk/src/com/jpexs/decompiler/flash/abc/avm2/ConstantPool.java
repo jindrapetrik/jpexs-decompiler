@@ -46,6 +46,24 @@ public class ConstantPool {
         return constant_int.length - 1;
     }
 
+    public int addNamespace(Namespace ns) {
+        constant_namespace = Arrays.copyOf(constant_namespace, constant_namespace.length + 1);
+        constant_namespace[constant_namespace.length - 1] = ns;
+        return constant_namespace.length - 1;
+    }
+
+    public int addNamespaceSet(NamespaceSet nss) {
+        constant_namespace_set = Arrays.copyOf(constant_namespace_set, constant_namespace_set.length + 1);
+        constant_namespace_set[constant_namespace_set.length - 1] = nss;
+        return constant_namespace_set.length - 1;
+    }
+
+    public int addMultiname(Multiname m) {
+        constant_multiname = Arrays.copyOf(constant_multiname, constant_multiname.length + 1);
+        constant_multiname[constant_multiname.length - 1] = m;
+        return constant_multiname.length - 1;
+    }
+
     public int addUInt(long value) {
         constant_uint = Arrays.copyOf(constant_uint, constant_uint.length + 1);
         constant_uint[constant_uint.length - 1] = value;
@@ -163,5 +181,26 @@ public class ConstantPool {
         for (int i = 1; i < constant_multiname.length; i++) {
             output.println("Multiname[" + i + "]=" + constant_multiname[i].toString(this, new ArrayList<String>()));
         }
+    }
+
+    public String multinameToString(int index) {
+        if (index == 0) {
+            return "null";
+        }
+        return constant_multiname[index].toString(this, new ArrayList<String>());
+    }
+
+    public String namespaceToString(int index) {
+        if (index == 0) {
+            return "null";
+        }
+        return constant_namespace[index].toString(this);
+    }
+
+    public String namespaceSetToString(int index) {
+        if (index == 0) {
+            return "null";
+        }
+        return constant_namespace_set[index].toString(this);
     }
 }

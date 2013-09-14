@@ -49,38 +49,38 @@ public class ActionWaitForFrame extends Action implements ActionStore {
         skipCount = sis.readUI8();
         skipped = new ArrayList<>();
         /*for (int i = 0; i < skipCount; i++) {
-            Action a = sis.readAction(cpool);
-            if (a instanceof ActionEnd) {
-                skipCount = i;
-                break;
-            }
-            if (a == null) {
-                skipCount = i;
-                break;
-            }
-            if (a instanceof ActionPush) {
-                if (cpool != null) {
-                    ((ActionPush) a).constantPool = cpool.constants;
-                }
-            }
-            skipped.add(a);
-        }
-        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
-        if (deobfuscate) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            for (int i = 0; i < skipCount; i++) {
-                baos.write(skipped.get(i).getBytes(sis.getVersion()));
-            }
-            baos.write(new ActionEnd().getBytes(sis.getVersion()));
-            SWFInputStream sis2 = new SWFInputStream(new ByteArrayInputStream(baos.toByteArray()), sis.getVersion());
-            skipped = sis2.readActionList(new ArrayList<DisassemblyListener>(), 0, "");
-            if (!skipped.isEmpty()) {
-                if (skipped.get(skipped.size() - 1) instanceof ActionEnd) {
-                    skipped.remove(skipped.size() - 1);
-                }
-            }
-            skipCount = skipped.size();
-        }*/
+         Action a = sis.readAction(cpool);
+         if (a instanceof ActionEnd) {
+         skipCount = i;
+         break;
+         }
+         if (a == null) {
+         skipCount = i;
+         break;
+         }
+         if (a instanceof ActionPush) {
+         if (cpool != null) {
+         ((ActionPush) a).constantPool = cpool.constants;
+         }
+         }
+         skipped.add(a);
+         }
+         boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
+         if (deobfuscate) {
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         for (int i = 0; i < skipCount; i++) {
+         baos.write(skipped.get(i).getBytes(sis.getVersion()));
+         }
+         baos.write(new ActionEnd().getBytes(sis.getVersion()));
+         SWFInputStream sis2 = new SWFInputStream(new ByteArrayInputStream(baos.toByteArray()), sis.getVersion());
+         skipped = sis2.readActionList(new ArrayList<DisassemblyListener>(), 0, "");
+         if (!skipped.isEmpty()) {
+         if (skipped.get(skipped.size() - 1) instanceof ActionEnd) {
+         skipped.remove(skipped.size() - 1);
+         }
+         }
+         skipCount = skipped.size();
+         }*/
     }
 
     @Override

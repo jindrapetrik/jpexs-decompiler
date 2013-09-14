@@ -31,7 +31,7 @@ public class LimitedInputStream extends InputStream {
     public int available() throws IOException {
         int avail = is.available();
         if (pos + avail > limit) {
-            avail = (int)(limit - pos);
+            avail = (int) (limit - pos);
         }
         return avail;
     }

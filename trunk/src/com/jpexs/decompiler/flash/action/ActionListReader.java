@@ -81,7 +81,7 @@ public class ActionListReader {
      */
     public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int version, int ip, int endIp, String path) throws IOException {
         boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
-        
+
         ConstantPool cpool = new ConstantPool();
 
         SWFInputStream sis = new SWFInputStream(rri, version);
@@ -89,8 +89,8 @@ public class ActionListReader {
         // List of the actions. N. item contains the action which starts in offset N.
         List<Action> actionMap = new ArrayList<>();
         List<Long> nextOffsets = new ArrayList<>();
-        Action entryAction = readActionListAtPos(listeners, containerSWFOffset, cpool, 
-                sis, rri, 
+        Action entryAction = readActionListAtPos(listeners, containerSWFOffset, cpool,
+                sis, rri,
                 actionMap, nextOffsets,
                 ip, ip, endIp, version, path, false, new ArrayList<Long>());
 
@@ -107,7 +107,7 @@ public class ActionListReader {
             jump.setJumpOffset((int) (entryAction.getAddress() - size));
             actions.add(jump);
         }
-        
+
         // remove nulls
         index = getNextNotNullIndex(actionMap, index);
         while (index > -1) {
@@ -126,7 +126,7 @@ public class ActionListReader {
             }
             index = nextIndex;
         }
-        
+
         // Map for storing the targers of the "jump" actions
         // "jump" action can be ActionIf, ActionJump and any ActionStore
         Map<Action, Action> jumps = new HashMap<>();
@@ -137,7 +137,7 @@ public class ActionListReader {
         updateActionStores(actions, jumps);
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
-        
+
         // add end action
         Action lastAction = actions.get(actions.size() - 1);
         if (!(lastAction instanceof ActionEnd)) {
@@ -153,7 +153,7 @@ public class ActionListReader {
 
         return actions;
     }
-    
+
     /**
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
@@ -173,7 +173,7 @@ public class ActionListReader {
         byte[] data = Action.actionsToBytes(actions, true, version);
         ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(data));
         int endIp = data.length;
-        
+
         List<Action> retdups = new ArrayList<>();
         for (int i = 0; i <= endIp; i++) {
             Action a = new ActionNop();
@@ -224,7 +224,7 @@ public class ActionListReader {
         }
         return reta;
     }
-    
+
     private static int getPrevNotNullIndex(List<Action> actionMap, int startIndex) {
         startIndex = Math.min(startIndex, actionMap.size() - 1);
         for (int i = startIndex; i >= 0; i--) {
@@ -234,7 +234,7 @@ public class ActionListReader {
         }
         return -1;
     }
-    
+
     private static int getNextNotNullIndex(List<Action> actionMap, int startIndex) {
         for (int i = startIndex; i < actionMap.size(); i++) {
             if (actionMap.get(i) != null) {
@@ -243,7 +243,7 @@ public class ActionListReader {
         }
         return -1;
     }
-    
+
     private static Map<Long, Action> actionListToMap(List<Action> actions) {
         Map<Long, Action> map = new HashMap<>(actions.size());
         for (Action a : actions) {
@@ -294,7 +294,7 @@ public class ActionListReader {
             if (a == null) {
                 continue;
             }
-                
+
             if (a instanceof GraphSourceItemContainer) {
                 GraphSourceItemContainer container = (GraphSourceItemContainer) a;
                 List<Long> sizes = container.getContainerSizes();
@@ -313,7 +313,7 @@ public class ActionListReader {
             }
         }
     }
-    
+
     private static long updateAddresses(List<Action> actions, long address, int version) {
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
@@ -327,7 +327,7 @@ public class ActionListReader {
         }
         return address;
     }
-    
+
     private static void updateActionLengths(List<Action> actions, int version) {
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
@@ -335,7 +335,7 @@ public class ActionListReader {
             a.actionLength = length - 1 - ((a.actionCode >= 0x80) ? 2 : 0);
         }
     }
-    
+
     private static void updateActionStores(List<Action> actions, Map<Action, Action> jumps) {
         Map<Long, Action> actionMap = actionListToMap(actions);
         for (int i = 0; i < actions.size(); i++) {
@@ -358,7 +358,7 @@ public class ActionListReader {
             }
         }
     }
-    
+
     private static void updateContainerSizes(List<Action> actions, Map<Action, List<Action>> containerLastActions) {
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
@@ -383,7 +383,7 @@ public class ActionListReader {
             }
         }
     }
-    
+
     private static void replaceContainerLastActions(Map<Action, List<Action>> containerLastActions, Action oldTarget, Action newTarget) {
         for (Action a : containerLastActions.keySet()) {
             List<Action> targets = containerLastActions.get(a);
@@ -394,7 +394,7 @@ public class ActionListReader {
             }
         }
     }
-    
+
     private static void updateJumps(List<Action> actions, Map<Action, Action> jumps, Map<Action, List<Action>> containerLastActions, long endAddress, int version) {
         if (actions.isEmpty()) {
             return;
@@ -432,21 +432,21 @@ public class ActionListReader {
                 aJump.setJumpOffset((int) offset);
             }
         }
-    } 
+    }
 
     @SuppressWarnings("unchecked")
-    private static Action readActionListAtPos(List<DisassemblyListener> listeners, long containerSWFOffset, ConstantPool cpool, 
-                                              SWFInputStream sis, ReReadableInputStream rri, 
-                                              List<Action> actions, List<Long> nextOffsets, 
-                                              long ip, long startIp, long endIp, int version, String path, boolean indeterminate, List<Long> visitedContainers) throws IOException {
-        
+    private static Action readActionListAtPos(List<DisassemblyListener> listeners, long containerSWFOffset, ConstantPool cpool,
+            SWFInputStream sis, ReReadableInputStream rri,
+            List<Action> actions, List<Long> nextOffsets,
+            long ip, long startIp, long endIp, int version, String path, boolean indeterminate, List<Long> visitedContainers) throws IOException {
+
         Action entryAction = null;
 
         if (visitedContainers.contains(ip)) {
             return null;
         }
         visitedContainers.add(ip);
-        
+
         Queue<Long> jumpQueue = new LinkedList<>();
         jumpQueue.add(ip);
         while (!jumpQueue.isEmpty()) {
@@ -458,7 +458,7 @@ public class ActionListReader {
                 if ((a = sis.readAction(rri, cpool)) == null) {
                     break;
                 }
-                
+
                 int actionLengthWithHeader = getTotalActionLength(a);
 
                 // unknown action, replace with jump
@@ -470,25 +470,25 @@ public class ActionListReader {
                     a = aJump;
                     actionLengthWithHeader = getTotalActionLength(a);
                 }
-                
+
                 if (entryAction == null) {
                     entryAction = a;
                 }
 
                 ensureCapacity(actions, nextOffsets, ip);
-                
+
                 Action existingAction = actions.get((int) ip);
                 if (existingAction != null) {
                     break;
                 }
-                
+
                 actions.set((int) ip, a);
                 nextOffsets.set((int) ip, ip + actionLengthWithHeader);
-                
+
                 for (int i = 0; i < listeners.size(); i++) {
                     listeners.get(i).progress("Reading", rri.getCount(), rri.length());
                 }
-                
+
                 a.containerSWFOffset = containerSWFOffset;
                 a.setAddress(ip, version, false);
 
@@ -501,7 +501,7 @@ public class ActionListReader {
                     cpool.setNew(((ActionConstantPool) a).constantPool);
                 } else if (a instanceof ActionIf) {
                     ActionIf aIf = (ActionIf) a;
-                    long nIp = ip + actionLengthWithHeader  + aIf.getJumpOffset();
+                    long nIp = ip + actionLengthWithHeader + aIf.getJumpOffset();
                     if (nIp >= 0) {
                         jumpQueue.add(nIp);
                     }
@@ -520,17 +520,17 @@ public class ActionListReader {
                         if (size != 0) {
                             long ip2 = ip + actionLengthWithHeader;
                             //long endIp2 = ip + actionLengthWithHeader + size;
-                            readActionListAtPos(listeners, containerSWFOffset, cpool, 
-                                    sis, rri, 
+                            readActionListAtPos(listeners, containerSWFOffset, cpool,
+                                    sis, rri,
                                     actions, nextOffsets,
                                     ip2, startIp, endIp, version, newPath, indeterminate, visitedContainers);
                             actionLengthWithHeader += size;
                         }
                     }
                 }
-                
+
                 ip = ip + actionLengthWithHeader;
-                
+
                 if (a.isExit()) {
                     break;
                 }
@@ -542,7 +542,7 @@ public class ActionListReader {
     private static int getTotalActionLength(Action action) {
         return action.actionLength + 1 + ((action.actionCode >= 0x80) ? 2 : 0);
     }
-    
+
     private static void ensureCapacity(List<Action> actions, List<Long> nextOffsets, long index) {
         while (actions.size() <= index) {
             actions.add(null);
@@ -635,14 +635,14 @@ public class ActionListReader {
                         if (deobfuscate) {
                             top = stack.pop();
                         }
-                        int nip = (int)rri.getPos() + aif.getJumpOffset();
+                        int nip = (int) rri.getPos() + aif.getJumpOffset();
 
                         if (decideBranch) {
                             System.out.print("newip " + nip + ", ");
                             System.out.print("Action: jump(j),ignore(i),compute(c)?");
                             String next = sc.next();
                             if (next.equals("j")) {
-                                newip = (int)rri.getPos() + aif.getJumpOffset();
+                                newip = (int) rri.getPos() + aif.getJumpOffset();
                                 rri.setPos(newip);
 
                             } else if (next.equals("i")) {
@@ -655,7 +655,7 @@ public class ActionListReader {
                                 System.err.print("is compiletime -> ");
                             }
                             if (EcmaScript.toBoolean(top.getResult())) {
-                                newip = (int)rri.getPos() + aif.getJumpOffset();
+                                newip = (int) rri.getPos() + aif.getJumpOffset();
                                 aif.jumpUsed = true;
                                 if (aif.ignoreUsed) {
                                     aif.compileTime = false;
@@ -679,7 +679,7 @@ public class ActionListReader {
                             goaif = true;
                         }
                     } else if (a instanceof ActionJump) {
-                        newip = (int)rri.getPos() + ((ActionJump) a).getJumpOffset();
+                        newip = (int) rri.getPos() + ((ActionJump) a).getJumpOffset();
                     } else if (!(a instanceof GraphSourceItemContainer)) {
                         if (deobfuscate) {
                             //return in for..in,   TODO:Handle this better way
@@ -793,8 +793,8 @@ public class ActionListReader {
 
                 if ((!stateChanged) && curVisited > 1) {
                     List<Integer> branches = new ArrayList<>();
-                    branches.add((int)rri.getPos() + aif.getJumpOffset());
-                    branches.add((int)rri.getPos());
+                    branches.add((int) rri.getPos() + aif.getJumpOffset());
+                    branches.add((int) rri.getPos());
                     for (int br : branches) {
                         int visc = 0;
                         if (visited.containsKey(br)) {
@@ -811,10 +811,10 @@ public class ActionListReader {
                     break loopip;
                 }
 
-                int oldPos = (int)rri.getPos();
+                int oldPos = (int) rri.getPos();
                 @SuppressWarnings("unchecked")
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, (int)rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version);
+                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, (int) rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version);
                 rri.setPos(oldPos);
             }
             prevIp = ip;
@@ -826,7 +826,7 @@ public class ActionListReader {
             listener.progress("Deobfuscating", rri.getCount(), rri.length());
         }
     }
-    
+
     private static List<Object> prepareLocalBranch(List<Object> localData) {
         @SuppressWarnings("unchecked")
         HashMap<Integer, String> regNames = (HashMap<Integer, String>) localData.get(0);

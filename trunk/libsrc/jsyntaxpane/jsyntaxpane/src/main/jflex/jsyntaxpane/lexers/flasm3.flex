@@ -13,6 +13,7 @@ import jsyntaxpane.TokenType;
 %extends DefaultJFlexLexer
 %final
 %unicode
+%ignorecase
 %char
 %type Token
 
@@ -35,6 +36,9 @@ import jsyntaxpane.TokenType;
         return yychar;
     }
 
+    private static final byte PARAN     = 1;
+    private static final byte BRACKET   = 2;
+    private static final byte LESSGREATER   = 3;
 %}
 
 /* main character classes */
@@ -101,6 +105,28 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
 
   {Label}                        {return token(TokenType.IDENTIFIER,yychar,yylength()-1); }
 
+   
+
+
+  
+
+  "try"                         |
+  "flag"                        |
+  "param"                       |
+  "paramname"                   |
+  "optional"                    |
+  "returns"                     |
+  "body"                        |
+  "maxstack"                    |
+  "localcount"                  |
+  "initscopedepth"              |
+  "maxscopedepth"               |
+  "name"                        |
+  "trait"                       |
+  "method"                      |
+  "code"                        {  yybegin(PARAMETERS);
+                                 return token(TokenType.KEYWORD);}
+
   /* identifiers */ 
   {InstructionName}                   { yybegin(PARAMETERS);
                                         return token(TokenType.KEYWORD); }
@@ -108,6 +134,76 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
 }
 
 <PARAMETERS> {
+    "from"                       |
+    "to"                         |
+    "target"                     |
+    "name"                       |
+    "type"                       {  return token(TokenType.KEYWORD);}
+    /* multinames */
+  "QName"                      |
+  "QNameA"                     |
+  "RTQName"                    |
+  "RTQNameA"                   |
+  "RTQNameL"                   |
+  "RTQNameLA"                  |
+  "Multiname"                  |
+  "MultinameL"                 |
+  "MultinameLA"                |
+  "TypeName"                   |
+  "null"                       {  return token(TokenType.KEYWORD2);}
+  "("                          {  return token(TokenType.OPERATOR,PARAN); }
+  ")"                          {  return token(TokenType.OPERATOR,-PARAN); }
+  "["                          {  return token(TokenType.OPERATOR,BRACKET); }
+  "]"                          {  return token(TokenType.OPERATOR,-BRACKET); }
+  "<"                          {  return token(TokenType.OPERATOR,LESSGREATER); }
+  ">"                          {  return token(TokenType.OPERATOR,-LESSGREATER); }
+  "Namespace"                  |
+  "PrivateNamespace"           |
+  "PackageNamespace"           |
+  "PackageInternalNs"          |
+  "ProtectedNamespace"         |
+  "ExplicitNamespace"          |
+  "StaticProtectedNs"          {  return token(TokenType.KEYWORD2);}
+  ","                          {  return token(TokenType.OPERATOR); }
+
+
+  /*Flags*/
+  "EXPLICIT"                   |
+  "HAS_OPTIONAL"               |
+  "HAS_PARAM_NAMES"            |
+  "IGNORE_REST"                |
+  "NEED_ACTIVATION"            |
+  "NEED_ARGUMENTS"             |
+  "NEED_REST"                  |
+  "SET_DXNS"                   {  return token(TokenType.KEYWORD2);}
+
+  "dispid"                     |
+  "value"                     |
+  "slotid"                     {  return token(TokenType.KEYWORD);}
+    
+
+  /* Value types*/
+  "Integer"                    |
+  "UInteger"                   |
+  "Double"                     |
+  "Decimal"                    |
+  "Utf8"                       |
+  "True"                       |
+  "False"                      |
+  "Undefined"                  {  return token(TokenType.KEYWORD2);}
+   
+  "FINAL"                      |
+  "OVERRIDE"                   |
+  "METADATA"                   {  return token(TokenType.KEYWORD2);}
+
+  "slot"                        |
+  "const"                       |
+  "method"                      |
+  "getter"                      |
+  "setter"                      |
+  "class"                       |
+  "function"                    {  return token(TokenType.KEYWORD2);}
+
   /* string literal */
   \"                             {
                                     yybegin(STRING);

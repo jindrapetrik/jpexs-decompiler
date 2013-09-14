@@ -21,7 +21,9 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -47,6 +49,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     private String textWithHex = "";
     private String textNoHex = "";
     private boolean hex = false;
+    private Trait trait;
 
     public boolean isHex() {
         return hex;
@@ -102,14 +105,15 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         return super.getName();
     }
 
-    public void setBodyIndex(int bodyIndex, ABC abc, String name) {
+    public void setBodyIndex(int bodyIndex, ABC abc, String name, Trait trait) {
         this.bodyIndex = bodyIndex;
         this.abc = abc;
         this.name = name;
+        this.trait = trait;
         if (bodyIndex == -1) {
             return;
         }
-        String textWithHexTags = abc.bodies[bodyIndex].code.toASMSource(abc.constants, abc.bodies[bodyIndex], true, true);
+        String textWithHexTags = abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], true, true);
         textWithHex = Helper.hexToComments(textWithHexTags);
         textNoHex = Helper.stripComments(textWithHexTags);
         setText(hex ? textWithHex : textNoHex);
@@ -130,7 +134,28 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
     public boolean save(ConstantPool constants) {
         try {
-            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes("UTF-8")), constants, new DialogMissingSymbolHandler(), abc.bodies[bodyIndex]);
+            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes("UTF-8")), constants, trait, new MissingSymbolHandler() {
+                //no longer ask for adding new constants
+                @Override
+                public boolean missingString(String value) {
+                    return true;
+                }
+
+                @Override
+                public boolean missingInt(long value) {
+                    return true;
+                }
+
+                @Override
+                public boolean missingUInt(long value) {
+                    return true;
+                }
+
+                @Override
+                public boolean missingDouble(double value) {
+                    return true;
+                }
+            }, abc.bodies[bodyIndex], abc.method_info[abc.bodies[bodyIndex].method_info]);
             acode.getBytes(abc.bodies[bodyIndex].codeBytes);
             abc.bodies[bodyIndex].code = acode;
         } catch (IOException ex) {
@@ -147,6 +172,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         disassembledHilights = Highlighting.getInstrHighlights(t);
         t = Highlighting.stripHilights(t);
         super.setText(t);
+        setCaretPosition(0);
     }
 
     public void selectInstruction(int pos) {

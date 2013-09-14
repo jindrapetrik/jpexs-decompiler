@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
@@ -58,12 +59,12 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         sourceTextArea.hilighOffset(offset);
     }
 
-    public void setBodyIndex(int bodyIndex, ABC abc) {
-        sourceTextArea.setBodyIndex(bodyIndex, abc, sourceTextArea.getName());
+    public void setBodyIndex(int bodyIndex, ABC abc, Trait trait) {
+        sourceTextArea.setBodyIndex(bodyIndex, abc, sourceTextArea.getName(), trait);
     }
 
-    public void setBodyIndex(int bodyIndex, ABC abc, String name) {
-        sourceTextArea.setBodyIndex(bodyIndex, abc, name);
+    public void setBodyIndex(int bodyIndex, ABC abc, String name, Trait trait) {
+        sourceTextArea.setBodyIndex(bodyIndex, abc, name, trait);
     }
 
     public int getBodyIndex() {

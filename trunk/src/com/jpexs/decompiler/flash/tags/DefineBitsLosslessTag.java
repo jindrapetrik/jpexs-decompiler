@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.types.COLORMAPDATA;
 import com.jpexs.decompiler.flash.types.PIX24;
 import com.jpexs.decompiler.flash.types.RGB;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

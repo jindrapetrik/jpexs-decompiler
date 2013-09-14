@@ -22,8 +22,7 @@ package com.jpexs.browsers.cache.firefox;
  */
 public class IncompatibleVersionException extends Exception {
 
-   public IncompatibleVersionException(int version) {
-      super("Incompatible version: "+version);
-   }
-   
+    public IncompatibleVersionException(int version) {
+        super("Incompatible version: " + version);
+    }
 }

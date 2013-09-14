@@ -31,7 +31,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,14 +40,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
@@ -178,8 +175,8 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
                     }
                 }
                 filter();
-                
-                
+
+
                 return null;
             }
 
@@ -190,7 +187,6 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
                 refreshButton.setEnabled(true);
                 progressBar.setVisible(false);
             }
-            
         }.execute();
 
 

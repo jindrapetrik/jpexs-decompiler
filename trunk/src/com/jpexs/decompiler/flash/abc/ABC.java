@@ -88,14 +88,14 @@ public class ABC {
     public int removeDeadCode() {
         int rem = 0;
         for (MethodBody body : bodies) {
-            rem += body.removeDeadCode(constants);
+            rem += body.removeDeadCode(constants, null/*FIXME*/, method_info[body.method_info]);
         }
         return rem;
     }
 
     public void restoreControlFlow() {
         for (MethodBody body : bodies) {
-            body.restoreControlFlow(constants);
+            body.restoreControlFlow(constants, null/*FIXME*/, method_info[body.method_info]);
         }
     }
 

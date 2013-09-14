@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -70,16 +71,16 @@ public class MethodBody implements Cloneable, Serializable {
         return s;
     }
 
-    public int removeDeadCode(ConstantPool constants) {
-        return code.removeDeadCode(constants, this);
+    public int removeDeadCode(ConstantPool constants, Trait trait, MethodInfo info) {
+        return code.removeDeadCode(constants, trait, info, this);
     }
 
-    public void restoreControlFlow(ConstantPool constants) {
-        code.restoreControlFlow(constants, this);
+    public void restoreControlFlow(ConstantPool constants, Trait trait, MethodInfo info) {
+        code.restoreControlFlow(constants, trait, info, this);
     }
 
-    public int removeTraps(ConstantPool constants, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) {
-        return code.removeTraps(constants, this, abc, scriptIndex, classIndex, isStatic, path);
+    public int removeTraps(ConstantPool constants, ABC abc, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) {
+        return code.removeTraps(constants, trait, abc.method_info[method_info], this, abc, scriptIndex, classIndex, isStatic, path);
     }
 
     public HashMap<Integer, String> getLocalRegNames(ABC abc) {
@@ -108,13 +109,13 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public String toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final boolean hilight, final boolean replaceIndents, final List<String> fullyQualifiedNames, final Traits initTraits) {
+    public String toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final boolean hilight, final boolean replaceIndents, final List<String> fullyQualifiedNames, final Traits initTraits) {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
         String s = "";
         if (pcode) {
-            s += code.toASMSource(constants, this, false, hilight);
+            s += code.toASMSource(constants, trait, method_info[this.method_info], this, false, hilight);
         } else {
             if (!Configuration.getConfig("decompile", true)) {
                 s = "//Decompilation skipped";
@@ -128,7 +129,7 @@ public class MethodBody implements Cloneable, Serializable {
                 s += Helper.timedCall(new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, scopeStack, isStaticInitializer, hilight, replaceIndents, fullyQualifiedNames, initTraits);
+                        return toSource(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, hilight, replaceIndents, fullyQualifiedNames, initTraits);
                     }
                 }, timeout, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
@@ -139,14 +140,14 @@ public class MethodBody implements Cloneable, Serializable {
         return s;
     }
 
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, boolean replaceIndents, List<String> fullyQualifiedNames, Traits initTraits) {
+    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, boolean replaceIndents, List<String> fullyQualifiedNames, Traits initTraits) {
         AVM2Code deobfuscated = null;
         MethodBody b = (MethodBody) Helper.deepCopy(this);
         deobfuscated = b.code;
         deobfuscated.markMappedOffsets();
         if (Configuration.getConfig("autoDeobfuscate", true)) {
             try {
-                deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic, path);
+                deobfuscated.removeTraps(constants, trait, method_info[this.method_info], b, abc, scriptIndex, classIndex, isStatic, path);
             } catch (Exception | StackOverflowError ex) {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps in " + path, ex);
             }

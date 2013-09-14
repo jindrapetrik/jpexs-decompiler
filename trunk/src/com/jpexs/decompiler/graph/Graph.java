@@ -2228,7 +2228,7 @@ public class Graph {
                 continue;
             }
             strippedP = Highlighting.stripHilights(parts[p]).trim();
-            
+
             if (replaceIndents) {
                 if (strippedP.equals(INDENTOPEN)) {
                     level++;

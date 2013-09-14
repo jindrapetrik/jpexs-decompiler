@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -49,17 +47,17 @@ public class Index {
     public Index(File file, File externalFilesDir) throws IOException {
         dataFiles = new HashMap<>();
         this.externalFilesDir = externalFilesDir;
-        FileInputStream is = new FileInputStream(file);
-        rootDir = file.getParentFile();
-        header = new IndexHeader(is, rootDir, dataFiles, externalFilesDir);
-        int tsize = kIndexTablesize;
-        if (header.table_len > 0) {
-            tsize = header.table_len;
+        try (FileInputStream is = new FileInputStream(file)) {
+            rootDir = file.getParentFile();
+            header = new IndexHeader(is, rootDir, dataFiles, externalFilesDir);
+            int tsize = kIndexTablesize;
+            if (header.table_len > 0) {
+                tsize = header.table_len;
+            }
+            table = new CacheAddr[tsize];
+            for (int i = 0; i < tsize; i++) {
+                table[i] = new CacheAddr(is, rootDir, dataFiles, externalFilesDir);
+            }
         }
-        table = new CacheAddr[tsize];
-        for (int i = 0; i < tsize; i++) {
-            table[i] = new CacheAddr(is, rootDir, dataFiles, externalFilesDir);
-        }
-        is.close();
     }
 }

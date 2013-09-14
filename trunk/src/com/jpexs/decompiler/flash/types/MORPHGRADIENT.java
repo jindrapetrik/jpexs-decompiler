@@ -29,7 +29,7 @@ public class MORPHGRADIENT {
     /**
      * Interpolation mode. See GRADIENT.INTERPOLATION_* constants
      */
-    public int interPolationMode;    
+    public int interPolationMode;
     public int numGradients;
     public MORPHGRADRECORD[] gradientRecords;
 

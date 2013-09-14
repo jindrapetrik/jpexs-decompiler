@@ -127,7 +127,7 @@ public class Traits implements Serializable {
         ExecutorService executor = null;
         List<Future<String>> futureResults = null;
         List<TraitConvertTask> traitConvertTasks = null;
-        
+
         if (parallel) {
             executor = Executors.newFixedThreadPool(20);
             futureResults = new ArrayList<>();

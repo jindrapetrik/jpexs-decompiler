@@ -16,41 +16,28 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
+import java.awt.BorderLayout;
+import javax.swing.JPanel;
 
 /**
  *
  * @author JPEXS
  */
-public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
+public class MethodTraitDetailPanel extends JPanel implements TraitDetail {
 
     public MethodCodePanel methodCodePanel;
-    public MethodBodyParamsPanel methodBodyParamsPanel;
-    public MethodInfoPanel methodInfoPanel;
     public ABCPanel abcPanel;
 
     public MethodTraitDetailPanel(ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
         methodCodePanel = new MethodCodePanel(abcPanel.decompiledTextArea);
-        methodBodyParamsPanel = new MethodBodyParamsPanel(abcPanel);
-        methodInfoPanel = new MethodInfoPanel();
-        addTab(translate("abc.detail.methodinfo"), methodInfoPanel);
-        addTab(translate("abc.detail.body.code"), methodCodePanel);
-        addTab(translate("abc.detail.body.params"), new JScrollPane(methodBodyParamsPanel));
-        setSelectedIndex(1);
+        setLayout(new BorderLayout());
+        add(methodCodePanel, BorderLayout.CENTER);
     }
 
     @Override
     public boolean save() {
-        if (!methodInfoPanel.save()) {
-            return false;
-        }
         if (!methodCodePanel.save(abcPanel.abc.constants)) {
-            return false;
-        }
-        if (!methodBodyParamsPanel.save()) {
             return false;
         }
 
@@ -60,8 +47,6 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
     @Override
     public void setEditMode(boolean val) {
         methodCodePanel.setEditMode(val);
-        methodBodyParamsPanel.setEditMode(val);
-        methodInfoPanel.setEditMode(val);
     }
     private boolean active = false;
 

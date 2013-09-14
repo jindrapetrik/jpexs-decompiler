@@ -27,8 +27,8 @@ public class MetaData {
     public MetaData(InputStream is) throws IOException, IncompatibleVersionException {
         CacheInputStream cis = new CacheInputStream(is);
         majorVersion = cis.readInt16();
-        if(majorVersion!=1){
-           throw new IncompatibleVersionException(majorVersion);                  
+        if (majorVersion != 1) {
+            throw new IncompatibleVersionException(majorVersion);
         }
         minorVersion = cis.readInt16();
         location = cis.readInt32();

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.helpers.Helper;
 import java.util.List;
 
 public class Multiname {
@@ -135,42 +136,80 @@ public class Multiname {
 
     }
 
-    public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
-        String kindStr = "?";
-        for (int k = 0; k < multinameKinds.length; k++) {
-            if (multinameKinds[k] == kind) {
-                kindStr = multinameKindNames[k] + " ";
+    private static String namespaceToString(ConstantPool constants, int index) {
+        if (index == 0) {
+            return "null";
+        }
+        int type = constants.constant_namespace[index].kind;
+        String name = constants.constant_namespace[index].getName(constants);
+        int sub = -1;
+        for (int n = 1; n < constants.constant_namespace.length; n++) {
+            if (constants.constant_namespace[n].kind == type && constants.constant_namespace[n].getName(constants).equals(name)) {
+                sub++;
+            }
+            if (n == index) {
                 break;
             }
         }
-        String nameStr = "";
-        if (name_index > 0) {
-            nameStr = constants.constant_string[name_index];
-        }
-        if (name_index == 0) {
-            nameStr = "*";
-        }
-        String namespaceStr = "";
-        if (namespace_index > 0) {
-            namespaceStr = constants.constant_namespace[namespace_index].toString(constants);
-        }
-        if (!namespaceStr.equals("")) {
-            namespaceStr = namespaceStr + ".";
-        }
-        if (namespace_index == 0) {
-            namespaceStr = "*.";
-        }
-        String namespaceSetStr = "";
-        if (namespace_set_index > 0) {
-            namespaceSetStr = " <NS:" + constants.constant_namespace_set[namespace_set_index].toString(constants) + ">";
-        }
-        String typeNameStr = "";
-        if (kind == TYPENAME) {
-            typeNameStr = typeNameToStr(constants, fullyQualifiedNames);
-        }
+        return constants.constant_namespace[index].getKindStr() + "(" + "\"" + Helper.escapeString(name) + "\"" + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
+    }
 
-        return namespaceStr + nameStr + namespaceSetStr + typeNameStr;
+    private static String namespaceSetToString(ConstantPool constants, int index) {
+        if (index == 0) {
+            return "null";
+        }
+        String ret = "[";
+        for (int n = 0; n < constants.constant_namespace_set[index].namespaces.length; n++) {
+            if (n > 0) {
+                ret += ",";
+            }
+            int ns = constants.constant_namespace_set[index].namespaces[n];
+            ret += namespaceToString(constants, ns);
+        }
+        ret += "]";
+        return ret;
+    }
 
+    private static String multinameToString(ConstantPool constants, int index, List<String> fullyQualifiedNames) {
+        if (index == 0) {
+            return "null";
+        }
+        return constants.constant_multiname[index].toString(constants, fullyQualifiedNames);
+    }
+
+    public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
+
+        switch (kind) {
+            case QNAME:
+            case QNAMEA:
+                return getKindStr() + "(" + namespaceToString(constants, namespace_index) + "," + "\"" + Helper.escapeString(constants.constant_string[name_index]) + "\"" + ")";
+            case RTQNAME:
+            case RTQNAMEA:
+                return getKindStr() + "(" + "\"" + Helper.escapeString(constants.constant_string[name_index]) + "\"" + ")";
+            case RTQNAMEL:
+            case RTQNAMELA:
+                return getKindStr() + "()";
+            case MULTINAME:
+            case MULTINAMEA:
+                return getKindStr() + "(" + "\"" + Helper.escapeString(constants.constant_string[name_index]) + "\"" + "," + namespaceSetToString(constants, namespace_set_index) + ")";
+            case MULTINAMEL:
+            case MULTINAMELA:
+                return getKindStr() + "(" + namespaceSetToString(constants, namespace_set_index) + ")";
+            case TYPENAME:
+                String tret = getKindStr() + "(";
+                tret += multinameToString(constants, qname_index, fullyQualifiedNames);
+                tret += "<";
+                for (int i = 0; i < params.size(); i++) {
+                    if (i > 0) {
+                        tret += ",";
+                    }
+                    tret += multinameToString(constants, params.get(i), fullyQualifiedNames);
+                }
+                tret += ">";
+                tret += ")";
+                return tret;
+        }
+        return null;
     }
 
     private String typeNameToStr(ConstantPool constants, List<String> fullyQualifiedNames) {

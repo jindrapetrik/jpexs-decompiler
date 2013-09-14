@@ -552,7 +552,7 @@ public class Helper {
         THREAD_POOL.execute(task);
         return task.get(timeout, timeUnit);
     }
-    
+
     public static boolean contains(int[] array, int value) {
         for (int i : array) {
             if (i == value) {
@@ -561,15 +561,15 @@ public class Helper {
         }
         return false;
     }
-    
-    public static void saveStream(InputStream is,File output) throws IOException {
-        byte[] buf=new byte[1024];
+
+    public static void saveStream(InputStream is, File output) throws IOException {
+        byte[] buf = new byte[1024];
         int cnt;
         try (FileOutputStream fos = new FileOutputStream(output)) {
-            while((cnt=is.read(buf))>0){
-                fos.write(buf,0,cnt);
+            while ((cnt = is.read(buf)) > 0) {
+                fos.write(buf, 0, cnt);
                 fos.flush();
-            }            
+            }
         }
     }
 }

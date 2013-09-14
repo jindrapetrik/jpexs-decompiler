@@ -46,7 +46,7 @@ public class NewFunctionIns extends InstructionDefinition {
         String paramStr = "";
         if (mybody != null) {
             try {
-                bodyStr = Highlighting.hilighMethodEnd() + mybody.toString(path + "/inner", false, isStatic, scriptIndex, classIndex, abc, constants, method_info, new Stack<GraphTargetItem>()/*scopeStack*/, false, true, false, fullyQualifiedNames, null) + Highlighting.hilighMethodBegin(body.method_info);
+                bodyStr = Highlighting.hilighMethodEnd() + mybody.toString(path + "/inner", false, isStatic, scriptIndex, classIndex, abc, null, constants, method_info, new Stack<GraphTargetItem>()/*scopeStack*/, false, true, false, fullyQualifiedNames, null) + Highlighting.hilighMethodBegin(body.method_info);
             } catch (Exception ex) {
                 Logger.getLogger(NewFunctionIns.class.getName()).log(Level.SEVERE, "error during newfunction", ex);
             }

@@ -528,7 +528,7 @@ public class SWFInputStream extends InputStream {
     }
 
     public List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int maxlen, String path) throws IOException {
-        return ActionListReader.readActionList(listeners, containerSWFOffset, rri, version, (int)rri.getPos(), (int)rri.getPos() + maxlen, path);
+        return ActionListReader.readActionList(listeners, containerSWFOffset, rri, version, (int) rri.getPos(), (int) rri.getPos() + maxlen, path);
     }
 
     private static void dumpTag(PrintStream out, int version, Tag tag, int level) {

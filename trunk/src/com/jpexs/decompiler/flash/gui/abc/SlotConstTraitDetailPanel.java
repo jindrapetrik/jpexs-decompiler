@@ -17,17 +17,19 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.methodinfo_parser.MethodInfoParser;
-import com.jpexs.decompiler.flash.abc.methodinfo_parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
-import java.util.ArrayList;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
-import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
 
 /**
  *
@@ -41,7 +43,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     private boolean showWarning = false;
 
     public SlotConstTraitDetailPanel() {
-        slotConstEditor = new UndoFixedEditorPane();
+        slotConstEditor = new LineMarkedEditorPane();
         setLayout(new BorderLayout());
         add(new JLabel(translate("abc.detail.slotconst.typevalue")), BorderLayout.NORTH);
         add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
@@ -55,27 +57,30 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
          //warnLabel.setLineWrap(true);
          warnLabel.setFont(new JLabel().getFont().deriveFont(Font.BOLD));
          add(warnLabel, BorderLayout.SOUTH);*/
-        slotConstEditor.setContentType("text/flasm3_methodinfo");
-        Flasm3MethodInfoSyntaxKit sk = (Flasm3MethodInfoSyntaxKit) slotConstEditor.getEditorKit();
-        sk.deinstallComponent(slotConstEditor, "jsyntaxpane.components.LineNumbersRuler");
+        slotConstEditor.setContentType("text/flasm3");
+        //Flasm3SyntaxKit sk = (Flasm3SyntaxKit) slotConstEditor.getEditorKit();
+        //sk.deinstallComponent(slotConstEditor, "jsyntaxpane.components.LineNumbersRuler");
     }
 
     public void load(TraitSlotConst trait, ABC abc, boolean isStatic) {
         this.abc = abc;
         this.trait = trait;
-        String s;
-        String typeStr;
-        if (trait.type_index > 0) {
-            typeStr = "m[" + trait.type_index + "]\"" + Helper.escapeString(abc.constants.constant_multiname[trait.type_index].toString(abc.constants, new ArrayList<String>())) + "\"";
-        } else {
-            typeStr = "*";
-        }
-        String valueStr = "";
-        if (trait.value_kind != 0) {
-            valueStr = " = " + (new ValueKind(trait.value_index, trait.value_kind)).toString(abc.constants);
-        }
+        /*String s;
+         String typeStr;
+         if (trait.type_index > 0) {
+         typeStr = "m[" + trait.type_index + "]\"" + Helper.escapeString(abc.constants.constant_multiname[trait.type_index].toString(abc.constants, new ArrayList<String>())) + "\"";
+         } else {
+         typeStr = "*";
+         }
+         String valueStr = "";
+         if (trait.value_kind != 0) {
+         valueStr = " = " + (new ValueKind(trait.value_index, trait.value_kind)).toString(abc.constants);
+         }
 
-        s = typeStr + valueStr;
+         s = typeStr + valueStr;
+
+         *       */
+        String s = "trait " + abc.constants.multinameToString(trait.name_index) + " " + (trait.isConst() ? "const" : "slot") + " slotid " + trait.slot_id + " type " + abc.constants.multinameToString(trait.type_index) + " value " + (new ValueKind(trait.value_index, trait.value_kind).toASMString(abc.constants));
 
         showWarning = trait.isConst() || isStatic;
         //warnLabel.setVisible(trait.isConst() || isStatic);
@@ -84,12 +89,18 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
 
     @Override
     public boolean save() {
-        try {
-            if (!MethodInfoParser.parseSlotConst(slotConstEditor.getText(), trait, abc)) {
+        try {//(slotConstEditor.getText(), trait, abc)
+            if (!ASM3Parser.parseSlotConst(new ByteArrayInputStream(slotConstEditor.getText().getBytes("UTF-8")), abc.constants, trait)) {
                 return false;
             }
         } catch (ParseException ex) {
             View.showMessageDialog(slotConstEditor, ex.text, translate("error.slotconst.typevalue"), JOptionPane.ERROR_MESSAGE);
+            return false;
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(SlotConstTraitDetailPanel.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        } catch (IOException ex) {
+            Logger.getLogger(SlotConstTraitDetailPanel.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
         return true;

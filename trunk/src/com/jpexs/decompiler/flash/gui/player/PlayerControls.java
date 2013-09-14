@@ -49,7 +49,7 @@ public class PlayerControls extends JPanel implements ActionListener {
     private JLabel timeLabel;
     private JLabel totalTimeLabel;
     private static final Icon pauseIcon = View.getIcon("pause16");
-    private static final Icon playIcon = View.getIcon("play16");    
+    private static final Icon playIcon = View.getIcon("play16");
 
     public PlayerControls(final FlashDisplay display) {
         this.display = display;
@@ -81,7 +81,7 @@ public class PlayerControls extends JPanel implements ActionListener {
         progress.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                int frame = 1+(int)Math.floor(e.getX() * display.getTotalFrames() / (double)progress.getWidth());
+                int frame = 1 + (int) Math.floor(e.getX() * display.getTotalFrames() / (double) progress.getWidth());
                 boolean p = paused;
                 display.gotoFrame(frame);
                 if (!p) {

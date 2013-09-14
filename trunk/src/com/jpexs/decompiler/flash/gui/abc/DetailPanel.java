@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.FlowLayout;
@@ -54,7 +53,7 @@ public class DetailPanel extends JPanel implements ActionListener {
     private boolean editMode = false;
     private JPanel buttonsPanel;
     private ABCPanel abcPanel;
-    private JLabel traitNameLabel;
+    private JTextArea traitNameLabel;
 
     public DetailPanel(ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
@@ -106,7 +105,7 @@ public class DetailPanel extends JPanel implements ActionListener {
         selectedLabel.setHorizontalAlignment(SwingConstants.CENTER);
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(selectedLabel, BorderLayout.NORTH);
-        traitNameLabel = new JLabel("");
+        traitNameLabel = new JTextArea("");
         JPanel traitInfoPanel = new JPanel();
         traitInfoPanel.setLayout(new BoxLayout(traitInfoPanel, BoxLayout.LINE_AXIS));
         traitInfoPanel.add(new JLabel("  " + translate("abc.detail.traitname")));
@@ -156,7 +155,7 @@ public class DetailPanel extends JPanel implements ActionListener {
         if (trait == null) {
             traitNameLabel.setText("-");
         } else {
-            traitNameLabel.setText(" m[" + trait.name_index + "]\"" + Helper.escapeString(trait.getName(abcPanel.abc).toString(abcPanel.abc.constants, new ArrayList<String>())) + "\"");
+            traitNameLabel.setText(" " + trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, new ArrayList<String>()) + "  Index: " + trait.name_index);
         }
     }
 

@@ -34,6 +34,18 @@ public class MethodInfo {
     public int[] paramNames;
     private MethodBody body;
 
+    public void setFlagIgnore_Rest() {
+        flags |= 16;
+    }
+
+    public void setFlagExplicit() {
+        flags |= 32;
+    }
+
+    public void setFlagNeed_Arguments() {
+        flags |= 1;
+    }
+
     public void setFlagSetsdxns() {
         flags |= 64;
     }
@@ -140,7 +152,7 @@ public class MethodInfo {
         return (flags & 8) == 8;
     }
 
-    public boolean flagIgnore_restHas_optional() {
+    public boolean flagIgnore_rest() {
         return (flags & 16) == 16;
     }
 
