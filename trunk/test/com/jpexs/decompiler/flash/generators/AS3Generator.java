@@ -43,7 +43,7 @@ public class AS3Generator {
                     s.append("(){\r\ndecompileMethod(\"");
                     s.append(name);
                     s.append("\", ");
-                    String src = abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", false, false, -1/*FIX?*/, classId, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, false, true, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
+                    String src = abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", false, false, -1/*FIX?*/, classId, abc, null,abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, false, true, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
                     String[] srcs = src.split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {
                         String ss = srcs[i];
