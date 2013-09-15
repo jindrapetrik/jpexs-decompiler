@@ -273,7 +273,7 @@ public class Highlighting implements Serializable {
      * @return Text with no highlights
      */
     public static String stripHilights(String text) {
-        text = text.replace("\r\n", "\n");
+        //text = text.replace("\r\n", "\n");
         List<HilightToken> tokens = getHilightTokens(text);
         StringBuilder ret = new StringBuilder();
         for (HilightToken token : tokens) {
