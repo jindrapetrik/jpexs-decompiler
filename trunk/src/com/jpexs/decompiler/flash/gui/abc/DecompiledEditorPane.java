@@ -234,6 +234,39 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 }
             }
         }
+        int currentMethod = -1;
+        if (currentTrait instanceof TraitMethodGetterSetter) {
+            currentMethod = ((TraitMethodGetterSetter) currentTrait).method_info;
+        }
+        if (currentMethodHighlight != null) {
+            currentMethod = (int) (long) currentMethodHighlight.getPropertyLong("index");
+        }
+        Highlighting sh = Highlighting.search(specialHighlights, pos);
+        if (sh != null) {
+            switch (sh.getPropertyString("subtype")) {
+                case "traittypename":
+                    if (currentTrait instanceof TraitSlotConst) {
+                        TraitSlotConst ts = (TraitSlotConst) currentTrait;
+                        return ts.type_index;
+                    }
+                    break;
+                case "traitname":
+                    if (currentTrait != null) {
+                        return currentTrait.name_index;
+                    }
+                    break;
+                case "returns":
+                    if (currentMethod > -1) {
+                        return abc.method_info[currentMethod].ret_type;
+                    }
+                    break;
+                case "param":
+                    if (currentMethod > -1) {
+                        return abc.method_info[currentMethod].param_types[(int) (long) sh.getPropertyLong("index")];
+                    }
+                    break;
+            }
+        }
         return -1;
     }
 
@@ -315,7 +348,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                         return;
                     }
                 }
-                currentMethodHighlight = currentTraitHighlight;
+                currentMethodHighlight = null;
                 String name = "";
                 currentTrait = null;
                 if (abc != null) {
