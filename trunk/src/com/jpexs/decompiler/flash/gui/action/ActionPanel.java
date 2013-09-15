@@ -34,7 +34,7 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
-import com.jpexs.decompiler.flash.helpers.Highlighting;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.Graph;
@@ -123,39 +123,39 @@ public class ActionPanel extends JPanel implements ActionListener {
 
     public String getStringUnderCursor() {
         int pos = decompiledEditor.getCaretPosition();
-        for (Highlighting h : decompiledHilights) {
-            if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
-                List<Action> list = lastCode;
-                Action lastIns = null;
-                int inspos = 0;
-                Action selIns = null;
-                for (Action ins : list) {
-                    if (h.offset == ins.getOffset()) {
-                        selIns = ins;
-                        break;
-                    }
-                    if (ins.getOffset() > h.offset) {
-                        inspos = (int) (h.offset - lastIns.getAddress());
-                        selIns = lastIns;
-                        break;
-                    }
-                    lastIns = ins;
+        Highlighting h = Highlighting.search(decompiledHilights, pos);
+        if (h != null) {
+            List<Action> list = lastCode;
+            Action lastIns = null;
+            int inspos = 0;
+            Action selIns = null;
+            for (Action ins : list) {
+                if (h.getPropertyLong("offset") == ins.getOffset()) {
+                    selIns = ins;
+                    break;
                 }
-                if (selIns != null) {
-                    if (selIns instanceof ActionPush) {
-                        ActionPush ap = (ActionPush) selIns;
-                        Object var = ap.values.get(inspos - 1);
-                        String identifier = null;
-                        if (var instanceof String) {
-                            identifier = (String) var;
-                        }
-                        if (var instanceof ConstantIndex) {
-                            identifier = ap.constantPool.get(((ConstantIndex) var).index);
-                        }
-                        return identifier;
+                if (ins.getOffset() > h.getPropertyLong("offset")) {
+                    inspos = (int) (h.getPropertyLong("offset") - lastIns.getAddress());
+                    selIns = lastIns;
+                    break;
+                }
+                lastIns = ins;
+            }
+            if (selIns != null) {
+                if (selIns instanceof ActionPush) {
+                    ActionPush ap = (ActionPush) selIns;
+                    Object var = ap.values.get(inspos - 1);
+                    String identifier = null;
+                    if (var instanceof String) {
+                        identifier = (String) var;
                     }
+                    if (var instanceof ConstantIndex) {
+                        identifier = ap.constantPool.get(((ConstantIndex) var).index);
+                    }
+                    return identifier;
                 }
             }
+
         }
         return null;
     }
@@ -255,7 +255,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             }
             lastH = h;
         }
-        long offset = lastH.offset;
+        String offset = lastH == null ? "0" : lastH.getPropertyString("offset");
         editor.setText("; " + translate("work.gettinghilights") + "...");
         disassembledHilights = Highlighting.getInstrHighlights(text);
         String stripped = Highlighting.stripHilights(text);
@@ -265,12 +265,10 @@ public class ActionPanel extends JPanel implements ActionListener {
          editor.setContentType("text/flasm");
          }*/
         editor.setText(stripped);
-        for (Highlighting h : disassembledHilights) {
-            if (h.offset == offset) {
-                if (h.startPos <= editor.getText().length()) {
-                    editor.setCaretPosition(h.startPos);
-                }
-                break;
+        Highlighting h = Highlighting.search(disassembledHilights, "offset", offset);
+        if (h != null) {
+            if (h.startPos <= editor.getText().length()) {
+                editor.setCaretPosition(h.startPos);
             }
         }
 
@@ -500,21 +498,21 @@ public class ActionPanel extends JPanel implements ActionListener {
                 }
                 editor.getCaret().setVisible(true);
                 int pos = editor.getCaretPosition();
-                Highlighting lastH = new Highlighting(0, 0, 0);
+                Highlighting lastH = null;
                 for (Highlighting h : disassembledHilights) {
                     if (pos < h.startPos) {
                         break;
                     }
                     lastH = h;
                 }
-                for (Highlighting h2 : decompiledHilights) {
-                    if (h2.offset == lastH.offset) {
-                        ignoreCarret = true;
-                        decompiledEditor.setCaretPosition(h2.startPos);
-                        decompiledEditor.getCaret().setVisible(true);
-                        ignoreCarret = false;
-                        break;
-                    }
+                String ofs = lastH == null ? "0" : lastH.getPropertyString("offset");
+                Highlighting h2 = Highlighting.search(decompiledHilights, "offset", ofs);
+                if (h2 != null) {
+                    ignoreCarret = true;
+                    decompiledEditor.setCaretPosition(h2.startPos);
+                    decompiledEditor.getCaret().setVisible(true);
+                    ignoreCarret = false;
+
                 }
             }
         });
@@ -529,20 +527,16 @@ public class ActionPanel extends JPanel implements ActionListener {
                 }
                 decompiledEditor.getCaret().setVisible(true);
                 int pos = decompiledEditor.getCaretPosition();
-                for (Highlighting h : decompiledHilights) {
-                    if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
-                        for (Highlighting h2 : disassembledHilights) {
-                            if (h2.offset == h.offset) {
-                                ignoreCarret = true;
-                                if (h2.startPos > 0 && h2.startPos < editor.getText().length()) {
-                                    editor.setCaretPosition(h2.startPos);
-                                }
-                                editor.getCaret().setVisible(true);
-                                ignoreCarret = false;
-                                break;
-                            }
+                Highlighting h = Highlighting.search(decompiledHilights, pos);
+                if (h != null) {
+                    Highlighting h2 = Highlighting.search(disassembledHilights, "offset", h.getPropertyString("offset"));
+                    if (h2 != null) {
+                        ignoreCarret = true;
+                        if (h2.startPos > 0 && h2.startPos < editor.getText().length()) {
+                            editor.setCaretPosition(h2.startPos);
                         }
-                        break;
+                        editor.getCaret().setVisible(true);
+                        ignoreCarret = false;
                     }
                 }
             }

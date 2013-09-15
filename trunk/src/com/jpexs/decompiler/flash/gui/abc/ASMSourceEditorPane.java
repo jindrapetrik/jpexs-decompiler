@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.helpers.Highlighting;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
@@ -86,17 +86,15 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         if (isEditable()) {
             return;
         }
-        for (Highlighting h2 : disassembledHilights) {
-            if (h2.offset == offset) {
-                ignoreCarret = true;
-                try {
-                    setCaretPosition(h2.startPos);
-                } catch (IllegalArgumentException iex) {
-                }
-                getCaret().setVisible(true);
-                ignoreCarret = false;
-                break;
+        Highlighting h2 = Highlighting.search(disassembledHilights, "offset", "" + offset);
+        if (h2 != null) {
+            ignoreCarret = true;
+            try {
+                setCaretPosition(h2.startPos);
+            } catch (IllegalArgumentException iex) {
             }
+            getCaret().setVisible(true);
+            ignoreCarret = false;
         }
     }
 
@@ -232,14 +230,14 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
     public long getSelectedOffset() {
         int pos = getCaretPosition();
-        Highlighting lastH = new Highlighting(0, 0, 0);
+        Highlighting lastH = null;
         for (Highlighting h : disassembledHilights) {
             if (pos < h.startPos) {
                 break;
             }
             lastH = h;
         }
-        return lastH.offset;
+        return lastH == null ? 0 : lastH.getPropertyLong("offset");
     }
 
     @Override

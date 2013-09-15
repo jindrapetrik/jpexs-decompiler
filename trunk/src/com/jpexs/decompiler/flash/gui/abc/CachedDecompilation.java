@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.helpers.Highlighting;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import java.io.Serializable;
 import java.util.List;
 

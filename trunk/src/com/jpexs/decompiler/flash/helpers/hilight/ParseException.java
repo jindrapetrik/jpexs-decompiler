@@ -14,23 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui.action;
-
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
-import java.io.Serializable;
-import java.util.List;
+package com.jpexs.decompiler.flash.helpers.hilight;
 
 /**
  *
  * @author JPEXS
  */
-public class CachedScript implements Serializable {
+public class ParseException extends Exception {
 
-    public String text;
-    List<Highlighting> hilights;
+    public String message;
+    public int line;
 
-    public CachedScript(String text, List<Highlighting> hilights) {
-        this.text = text;
-        this.hilights = hilights;
+    public ParseException(String message, int line) {
+        super("ParseException:" + message + " on line " + line);
+        this.message = message;
+        this.line = line;
+
     }
 }

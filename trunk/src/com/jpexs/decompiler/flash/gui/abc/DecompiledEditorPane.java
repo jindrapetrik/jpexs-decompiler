@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2013 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,7 +28,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.helpers.Highlighting;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.Cache;
 import java.util.ArrayList;
@@ -77,19 +77,16 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (currentMethodHighlight == null) {
             return;
         }
-        for (Highlighting h2 : highlights) {
-            if ((h2.startPos >= currentMethodHighlight.startPos) && (h2.startPos + h2.len <= currentMethodHighlight.startPos + currentMethodHighlight.len)) {
-                if (h2.offset == offset) {
-                    ignoreCarret = true;
-                    try {
-                        setCaretPosition(h2.startPos);
-                    } catch (IllegalArgumentException ie) {
-                    }
-                    getCaret().setVisible(true);
-                    ignoreCarret = false;
-                    break;
-                }
+        Highlighting h2 = Highlighting.search(highlights, "offset", "" + offset, currentMethodHighlight.startPos, currentMethodHighlight.startPos + currentMethodHighlight.len);
+        if (h2 != null) {
+            ignoreCarret = true;
+            try {
+                setCaretPosition(h2.startPos);
+            } catch (IllegalArgumentException ie) {
+                //ignored
             }
+            getCaret().setVisible(true);
+            ignoreCarret = false;
         }
     }
 
@@ -130,12 +127,10 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             this.isStatic = isStatic;
         }
         boolean success = false;
-        for (Highlighting h : highlights) {
-            if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
-                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.hilighOffset(h.offset);
-                success = true;
-                //return true;
-            }
+        Highlighting h = Highlighting.search(highlights, pos);
+        if (h != null) {
+            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.hilighOffset(h.getPropertyLong("offset"));
+            success = true;
         }
         return success;
     }
@@ -154,29 +149,28 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public int getMultinameUnderCursor() {
         int pos = getCaretPosition();
-        for (Highlighting h : highlights) {
-            if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
-                List<AVM2Instruction> list = abc.bodies[abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex()].code.code;
-                AVM2Instruction lastIns = null;
-                long inspos = 0;
-                AVM2Instruction selIns = null;
-                for (AVM2Instruction ins : list) {
-                    if (h.offset == ins.getOffset()) {
-                        selIns = ins;
-                        break;
-                    }
-                    if (ins.getOffset() > h.offset) {
-                        inspos = h.offset - lastIns.offset;
-                        selIns = lastIns;
-                        break;
-                    }
-                    lastIns = ins;
+        Highlighting h = Highlighting.search(highlights, pos);
+        if (h != null) {
+            List<AVM2Instruction> list = abc.bodies[abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex()].code.code;
+            AVM2Instruction lastIns = null;
+            long inspos = 0;
+            AVM2Instruction selIns = null;
+            for (AVM2Instruction ins : list) {
+                if (h.getPropertyLong("offset") == ins.getOffset()) {
+                    selIns = ins;
+                    break;
                 }
-                if (selIns != null) {
-                    for (int i = 0; i < selIns.definition.operands.length; i++) {
-                        if (selIns.definition.operands[i] == AVM2Code.DAT_MULTINAME_INDEX) {
-                            return selIns.operands[i];
-                        }
+                if (ins.getOffset() > h.getPropertyLong("offset")) {
+                    inspos = h.getPropertyLong("offset") - lastIns.offset;
+                    selIns = lastIns;
+                    break;
+                }
+                lastIns = ins;
+            }
+            if (selIns != null) {
+                for (int i = 0; i < selIns.definition.operands.length; i++) {
+                    if (selIns.definition.operands[i] == AVM2Code.DAT_MULTINAME_INDEX) {
+                        return selIns.operands[i];
                     }
                 }
             }
@@ -207,42 +201,35 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setIgnoreCarret(true);
         try {
             classIndex = -1;
-            for (Highlighting cm : classHighlights) {
-                if ((pos >= cm.startPos) && (pos < cm.startPos + cm.len)) {
-                    classIndex = (int) cm.offset;
-                    displayClass(classIndex, script.scriptIndex);
-                    break;
-                }
+            Highlighting cm = Highlighting.search(classHighlights, pos);
+            if (cm != null) {
+                classIndex = (int) (long) cm.getPropertyLong("index");
+                displayClass(classIndex, script.scriptIndex);
             }
-
-            for (Highlighting tm : methodHighlights) {
-                if ((pos >= tm.startPos) && ((pos < tm.startPos + tm.len) || (tm.len == 0 && pos == tm.startPos))) {
-                    String name = "";
-                    if (abc != null) {
-                        if (classIndex > -1) {
-                            name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
-                        }
+            Highlighting tm = Highlighting.search(methodHighlights, pos);
+            if (tm != null) {
+                String name = "";
+                if (abc != null) {
+                    if (classIndex > -1) {
+                        name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
                     }
-                    currentTrait = null;
-                    for (Highlighting th : traitHighlights) {
-                        if ((pos >= th.startPos) && (pos < th.startPos + th.len)) {
-                            lastTraitIndex = (int) th.offset;
-                            if ((abc != null) && (classIndex != -1)) {
-                                currentTrait = abc.findTraitByTraitId(classIndex, lastTraitIndex);
-                                isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
-                                if (currentTrait != null) {
-                                    name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<String>());
-                                }
-                            }
-                        }
-                    }
-
-                    displayMethod(pos, (int) tm.offset, name, currentTrait, isStatic);
-                    currentMethodHighlight = tm;
-
-
-                    return;
                 }
+                currentTrait = null;
+                Highlighting th = Highlighting.search(traitHighlights, pos);
+                if (th != null) {
+                    lastTraitIndex = (int) (long) th.getPropertyLong("index");
+                    if ((abc != null) && (classIndex != -1)) {
+                        currentTrait = abc.findTraitByTraitId(classIndex, lastTraitIndex);
+                        isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
+                        if (currentTrait != null) {
+                            name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<String>());
+                        }
+                    }
+                }
+
+                displayMethod(pos, (int) (long) tm.getPropertyLong("index"), name, currentTrait, isStatic);
+                currentMethodHighlight = tm;
+                return;
             }
 
             if (classIndex == -1) {
@@ -250,34 +237,33 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 return;
             }
             currentTrait = null;
-            for (Highlighting th : traitHighlights) {
-                if ((pos >= th.startPos) && (pos < th.startPos + th.len)) {
-                    lastTraitIndex = (int) th.offset;
-                    currentTrait = abc.findTraitByTraitId(classIndex, (int) th.offset);
-                    if (currentTrait != null) {
-                        if (currentTrait instanceof TraitSlotConst) {
-                            abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) currentTrait, abc,
-                                    abc.isStaticTraitId(classIndex, lastTraitIndex));
-                            abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, currentTrait);
-                            abcPanel.detailPanel.setEditMode(false);
-                            return;
-                        }
+            Highlighting th = Highlighting.search(traitHighlights, pos);
+            if (th != null) {
+                lastTraitIndex = (int) (long) th.getPropertyLong("index");
+                currentTrait = abc.findTraitByTraitId(classIndex, (int) (long) th.getPropertyLong("index"));
+                if (currentTrait != null) {
+                    if (currentTrait instanceof TraitSlotConst) {
+                        abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) currentTrait, abc,
+                                abc.isStaticTraitId(classIndex, lastTraitIndex));
+                        abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, currentTrait);
+                        abcPanel.detailPanel.setEditMode(false);
+                        return;
                     }
-                    currentMethodHighlight = th;
-                    String name = "";
-                    currentTrait = null;
-                    if (abc != null) {
-                        name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
-                        currentTrait = abc.findTraitByTraitId(classIndex, lastTraitIndex);
-                        isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
-                        if (currentTrait != null) {
-                            name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<String>());
-                        }
-                    }
-
-                    displayMethod(pos, abc.findMethodIdByTraitId(classIndex, (int) th.offset), name, currentTrait, isStatic);
-                    return;
                 }
+                currentMethodHighlight = th;
+                String name = "";
+                currentTrait = null;
+                if (abc != null) {
+                    name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
+                    currentTrait = abc.findTraitByTraitId(classIndex, lastTraitIndex);
+                    isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
+                    if (currentTrait != null) {
+                        name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<String>());
+                    }
+                }
+
+                displayMethod(pos, abc.findMethodIdByTraitId(classIndex, (int) (long) th.getPropertyLong("index")), name, currentTrait, isStatic);
+                return;
             }
             setNoTrait();
         } finally {
@@ -314,32 +300,27 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             return;
         }
 
-        for (Highlighting tc : classHighlights) {
-            if (tc.offset == classIndex) {
-                for (Highlighting th : traitHighlights) {
-                    if ((th.startPos > tc.startPos) && (th.startPos + th.len < tc.startPos + tc.len)) {
-                        if (th.offset == traitId) {
-                            try {
-                                ignoreCarret = true;
-                                setCaretPosition(th.startPos + th.len - 1);
-                                ignoreCarret = false;
-                            } catch (IllegalArgumentException iae) {
-                            }
-                            final int pos = th.startPos;
-                            new Timer().schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        setCaretPosition(pos);
-                                    } catch (IllegalArgumentException iae) {
-                                    }
-                                }
-                            }, 100);
-                            return;
+        Highlighting tc = Highlighting.search(classHighlights, "index", "" + classIndex);
+        if (tc != null) {
+            Highlighting th = Highlighting.search(traitHighlights, "index", "" + traitId, tc.startPos, tc.startPos + tc.len);
+            if (th != null) {
+                try {
+                    ignoreCarret = true;
+                    setCaretPosition(th.startPos + th.len - 1);
+                    ignoreCarret = false;
+                } catch (IllegalArgumentException iae) {
+                }
+                final int pos = th.startPos;
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            setCaretPosition(pos);
+                        } catch (IllegalArgumentException iae) {
                         }
                     }
-                }
-                break;
+                }, 100);
+                return;
             }
         }
 

@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
-import com.jpexs.decompiler.flash.helpers.Highlighting;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.model.BinaryOp;
 import java.io.Serializable;
 import java.util.ArrayList;
