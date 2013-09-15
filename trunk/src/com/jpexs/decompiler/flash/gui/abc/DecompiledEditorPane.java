@@ -94,7 +94,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             if (h.getPropertyString("index").equals("" + lastTraitIndex)) {
                 for (Highlighting sh : specialHighlights) {
                     if (sh.startPos >= h.startPos && (sh.startPos + sh.len < h.startPos + h.len)) {
-                        allh.add(h);
+                        allh.add(sh);
                     }
                 }
             }
