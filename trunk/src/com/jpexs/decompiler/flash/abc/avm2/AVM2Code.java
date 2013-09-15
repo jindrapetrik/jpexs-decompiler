@@ -729,10 +729,11 @@ public class AVM2Code implements Serializable {
         if (trait != null) {
             if (trait instanceof TraitFunction) {
                 TraitFunction tf = (TraitFunction) trait;
-                ret.append("trait function ");
-                ret.append(constants.multinameToString(tf.name_index));
+                ret.append("trait ");
+                ret.append(Highlighting.hilighSpecial(highlight, "function ", "traittype"));
+                ret.append(Highlighting.hilighSpecial(highlight, constants.multinameToString(tf.name_index), "traitname"));
                 ret.append(" slotid ");
-                ret.append(tf.slot_index);
+                ret.append(Highlighting.hilighSpecial(highlight, "" + tf.slot_index, "slotid"));
                 ret.append("\n");
             }
             if (trait instanceof TraitMethodGetterSetter) {
@@ -740,53 +741,70 @@ public class AVM2Code implements Serializable {
                 ret.append("trait ");
                 switch (tm.kindType) {
                     case Trait.TRAIT_METHOD:
-                        ret.append("method ");
+                        ret.append(Highlighting.hilighSpecial(highlight, "method ", "traittype"));
                         break;
                     case Trait.TRAIT_GETTER:
-                        ret.append("getter ");
+                        ret.append(Highlighting.hilighSpecial(highlight, "getter ", "traittype"));
                         break;
                     case Trait.TRAIT_SETTER:
-                        ret.append("setter ");
+                        ret.append(Highlighting.hilighSpecial(highlight, "setter ", "traittype"));
                         break;
                 }
-                ret.append(constants.multinameToString(tm.name_index));
+                ret.append(Highlighting.hilighSpecial(highlight, constants.multinameToString(tm.name_index), "traitname"));
                 ret.append(" dispid ");
-                ret.append(tm.disp_id);
+                ret.append(Highlighting.hilighSpecial(highlight, "" + tm.disp_id, "dispid"));
                 ret.append("\n");
             }
         }
         if (info != null) {
             ret.append("method\n");
             ret.append("name ");
-            ret.append(info.name_index == 0 ? "null" : "\"" + Helper.escapeString(info.getName(constants)) + "\"");
+            ret.append(Highlighting.hilighSpecial(highlight, info.name_index == 0 ? "null" : "\"" + Helper.escapeString(info.getName(constants)) + "\"", "methodname"));
             ret.append("\n");
             if (info.flagExplicit()) {
-                ret.append("flag EXPLICIT\n");
+                ret.append("flag ");
+                ret.append(Highlighting.hilighSpecial(highlight, "EXPLICIT", "flag.EXPLICIT"));
+                ret.append("\n");
             }
             if (info.flagHas_optional()) {
+                ret.append("flag ");
+                ret.append(Highlighting.hilighSpecial(highlight, "HAS_OPTIONAL", "flag.HAS_OPTIONAL"));
+                ret.append("\n");
                 ret.append("flag HAS_OPTIONAL\n");
             }
             if (info.flagHas_paramnames()) {
-                ret.append("flag HAS_PARAM_NAMES\n");
+                ret.append("flag ");
+                ret.append(Highlighting.hilighSpecial(highlight, "HAS_PARAM_NAMES", "flag.HAS_PARAM_NAMES"));
+                ret.append("\n");
             }
             if (info.flagIgnore_rest()) {
-                ret.append("flag IGNORE_REST\n");
+                ret.append("flag ");
+                ret.append(Highlighting.hilighSpecial(highlight, "EXPLICIT", "flag.IGNORE_REST"));
+                ret.append("\n");
             }
             if (info.flagNeed_activation()) {
-                ret.append("flag NEED_ACTIVATION\n");
+                ret.append("flag ");
+                ret.append(Highlighting.hilighSpecial(highlight, "NEED_ACTIVATION", "flag.NEED_ACTIVATION"));
+                ret.append("\n");
             }
             if (info.flagNeed_arguments()) {
-                ret.append("flag NEED_ARGUMENTS\n");
+                ret.append("flag ");
+                ret.append(Highlighting.hilighSpecial(highlight, "NEED_ARGUMENTS", "flag.NEED_ARGUMENTS"));
+                ret.append("\n");
             }
             if (info.flagNeed_rest()) {
-                ret.append("flag NEED_REST\n");
+                ret.append("flag ");
+                ret.append(Highlighting.hilighSpecial(highlight, "NEED_REST", "flag.NEED_REST"));
+                ret.append("\n");
             }
             if (info.flagSetsdxns()) {
-                ret.append("flag SET_DXNS\n");
+                ret.append("flag ");
+                ret.append(Highlighting.hilighSpecial(highlight, "SET_DXNS", "flag.SET_DXNS"));
+                ret.append("\n");
             }
-            for (int p : info.param_types) {
+            for (int p = 0; p < info.param_types.length; p++) {
                 ret.append("param ");
-                ret.append(constants.multinameToString(p));
+                ret.append(Highlighting.hilighSpecial(highlight, constants.multinameToString(info.param_types[p]), "param", p));
                 ret.append("\n");
             }
             if (info.flagHas_paramnames()) {
@@ -799,14 +817,15 @@ public class AVM2Code implements Serializable {
                 }
             }
             if (info.flagHas_optional()) {
-                for (ValueKind vk : info.optional) {
+                for (int i = 0; i < info.optional.length; i++) {
+                    ValueKind vk = info.optional[i];
                     ret.append("optional ");
-                    ret.append(vk.toString(constants));
+                    ret.append(Highlighting.hilighSpecial(highlight, vk.toString(constants), "optional", i));
                     ret.append("\n");
                 }
             }
             ret.append("returns ");
-            ret.append(constants.multinameToString(info.ret_type));
+            ret.append(Highlighting.hilighSpecial(highlight, constants.multinameToString(info.ret_type), "returns"));
             ret.append("\n");
         }
         ret.append("\n");
@@ -849,10 +868,10 @@ public class AVM2Code implements Serializable {
             offsets.add((long) body.exceptions[e].target);
 
             ret.append(" type ");
-            ret.append(body.exceptions[e].type_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].type_index].toString(constants, new ArrayList<String>()));
+            ret.append(Highlighting.hilighSpecial(highlight, body.exceptions[e].type_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].type_index].toString(constants, new ArrayList<String>()), "try.type", e));
 
             ret.append(" name ");
-            ret.append(body.exceptions[e].name_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].name_index].toString(constants, new ArrayList<String>()));
+            ret.append(Highlighting.hilighSpecial(highlight, body.exceptions[e].name_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].name_index].toString(constants, new ArrayList<String>()), "try.name", e));
             ret.append("\n");
         }
 
@@ -1631,7 +1650,7 @@ public class AVM2Code implements Serializable {
         List<Object> ret = new ArrayList<>();
         ret.add(localData.get(0)); //isStatic
         ret.add(localData.get(1)); //classIndex
-        ret.add(new HashMap<Integer, GraphTargetItem>((HashMap<Integer, GraphTargetItem>) localData.get(2)));
+        ret.add(new HashMap<>((HashMap<Integer, GraphTargetItem>) localData.get(2)));
         ret.add((Stack<GraphTargetItem>) ((Stack<GraphTargetItem>) localData.get(3)).clone());
         ret.add(localData.get(4)); //constants
         ret.add(localData.get(5)); //method_info

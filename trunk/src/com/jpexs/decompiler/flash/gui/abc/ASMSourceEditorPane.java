@@ -43,6 +43,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     public ABC abc;
     public int bodyIndex = -1;
     private List<Highlighting> disassembledHilights = new ArrayList<>();
+    private List<Highlighting> specialHilights = new ArrayList<>();
     private DecompiledEditorPane decompiledEditor;
     private boolean ignoreCarret = false;
     private String name;
@@ -80,6 +81,27 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     public ASMSourceEditorPane(DecompiledEditorPane decompiledEditor) {
         this.decompiledEditor = decompiledEditor;
         addCaretListener(this);
+    }
+
+    public void hilighSpecial(String type, int index) {
+        Highlighting h2 = null;
+        for (Highlighting sh : specialHilights) {
+            if (type.equals(sh.getPropertyString("subtype"))) {
+                if (sh.getPropertyString("index").equals("" + index)) {
+                    h2 = sh;
+                    break;
+                }
+            }
+        }
+        if (h2 != null) {
+            ignoreCarret = true;
+            try {
+                setCaretPosition(h2.startPos);
+            } catch (IllegalArgumentException iex) {
+            }
+            getCaret().setVisible(true);
+            ignoreCarret = false;
+        }
     }
 
     public void hilighOffset(long offset) {
@@ -168,6 +190,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     @Override
     public void setText(String t) {
         disassembledHilights = Highlighting.getInstrHighlights(t);
+        specialHilights = Highlighting.getSpecialHighlights(t);
         t = Highlighting.stripHilights(t);
         super.setText(t);
         setCaretPosition(0);
@@ -228,6 +251,10 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         requestFocus();
     }
 
+    public Highlighting getSelectedSpecial() {
+        return Highlighting.search(specialHilights, getCaretPosition());
+    }
+
     public long getSelectedOffset() {
         int pos = getCaretPosition();
         Highlighting lastH = null;
@@ -251,5 +278,9 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         getCaret().setVisible(true);
 
         decompiledEditor.hilightOffset(getSelectedOffset());
+        Highlighting spec = getSelectedSpecial();
+        if (spec != null) {
+            decompiledEditor.hilightSpecial(spec.getPropertyString("subtype"), (int) (long) spec.getPropertyLong("index"));
+        }
     }
 }

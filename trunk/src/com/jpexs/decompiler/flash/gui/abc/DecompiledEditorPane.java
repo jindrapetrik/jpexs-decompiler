@@ -42,10 +42,12 @@ import javax.swing.event.CaretListener;
 public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener {
 
     private List<Highlighting> highlights = new ArrayList<>();
+    private List<Highlighting> specialHighlights = new ArrayList<>();
     private List<Highlighting> traitHighlights = new ArrayList<>();
     private List<Highlighting> methodHighlights = new ArrayList<>();
     private List<Highlighting> classHighlights = new ArrayList<>();
     private Highlighting currentMethodHighlight;
+    private Highlighting currentTraitHighlight;
     private ABC abc;
     private ScriptPack script;
     public int lastTraitIndex = 0;
@@ -73,20 +75,72 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null);
     }
 
+    public void hilightSpecial(String type, int index) {
+        int startPos;
+        int endPos;
+        if (currentMethodHighlight == null) {
+            if (currentTraitHighlight == null) {
+                return;
+            }
+            startPos = currentTraitHighlight.startPos;
+            endPos = currentTraitHighlight.startPos + currentTraitHighlight.len;
+        } else {
+            startPos = currentMethodHighlight.startPos;
+            endPos = currentMethodHighlight.startPos + currentMethodHighlight.len;
+        }
+
+        List<Highlighting> allh = new ArrayList<>();
+        for (Highlighting h : traitHighlights) {
+            if (h.getPropertyString("index").equals("" + lastTraitIndex)) {
+                for (Highlighting sh : specialHighlights) {
+                    if (sh.startPos >= h.startPos && (sh.startPos + sh.len < h.startPos + h.len)) {
+                        allh.add(h);
+                    }
+                }
+            }
+        }
+        if (currentMethodHighlight != null) {
+            for (Highlighting h : specialHighlights) {
+                if (h.startPos >= startPos && (h.startPos + h.len < endPos)) {
+                    allh.add(h);
+                }
+            }
+        }
+        for (Highlighting h : allh) {
+            if (h.getPropertyString("subtype").equals(type) && ((long) h.getPropertyLong("index") == index)) {
+                ignoreCarret = true;
+                try {
+                    setCaretPosition(h.startPos);
+                } catch (IllegalArgumentException ie) {
+                    //ignored
+                }
+                getCaret().setVisible(true);
+                ignoreCarret = false;
+                break;
+            }
+        }
+    }
+
     public void hilightOffset(long offset) {
         if (currentMethodHighlight == null) {
             return;
         }
-        Highlighting h2 = Highlighting.search(highlights, "offset", "" + offset, currentMethodHighlight.startPos, currentMethodHighlight.startPos + currentMethodHighlight.len);
-        if (h2 != null) {
-            ignoreCarret = true;
-            try {
-                setCaretPosition(h2.startPos);
-            } catch (IllegalArgumentException ie) {
-                //ignored
+        List<Highlighting> allh = new ArrayList<>();
+        for (Highlighting h : traitHighlights) {
+            if (h.getPropertyString("index").equals("" + lastTraitIndex)) {
+                Highlighting h2 = Highlighting.search(highlights, "offset", "" + offset, h.startPos, h.startPos + h.len);
+                if (h2 != null) {
+                    ignoreCarret = true;
+                    try {
+                        setCaretPosition(h2.startPos);
+                    } catch (IllegalArgumentException ie) {
+                        //ignored
+                    }
+                    getCaret().setVisible(true);
+                    ignoreCarret = false;
+                }
+
             }
-            getCaret().setVisible(true);
-            ignoreCarret = false;
         }
     }
 
@@ -130,6 +184,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         Highlighting h = Highlighting.search(highlights, pos);
         if (h != null) {
             abcPanel.detailPanel.methodTraitPanel.methodCodePanel.hilighOffset(h.getPropertyLong("offset"));
+            success = true;
+        }
+        Highlighting sh = Highlighting.search(specialHighlights, pos);
+        if (sh != null) {
+            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.hilighSpecial(sh.getPropertyString("subtype"), (int) (long) sh.getPropertyLong("index"));
             success = true;
         }
         return success;
@@ -215,9 +274,9 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     }
                 }
                 currentTrait = null;
-                Highlighting th = Highlighting.search(traitHighlights, pos);
-                if (th != null) {
-                    lastTraitIndex = (int) (long) th.getPropertyLong("index");
+                currentTraitHighlight = Highlighting.search(traitHighlights, pos);
+                if (currentTraitHighlight != null) {
+                    lastTraitIndex = (int) (long) currentTraitHighlight.getPropertyLong("index");
                     if ((abc != null) && (classIndex != -1)) {
                         currentTrait = abc.findTraitByTraitId(classIndex, lastTraitIndex);
                         isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
@@ -237,20 +296,26 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 return;
             }
             currentTrait = null;
-            Highlighting th = Highlighting.search(traitHighlights, pos);
-            if (th != null) {
-                lastTraitIndex = (int) (long) th.getPropertyLong("index");
-                currentTrait = abc.findTraitByTraitId(classIndex, (int) (long) th.getPropertyLong("index"));
+            currentTraitHighlight = Highlighting.search(traitHighlights, pos);
+            if (currentTraitHighlight != null) {
+                lastTraitIndex = (int) (long) currentTraitHighlight.getPropertyLong("index");
+                currentTrait = abc.findTraitByTraitId(classIndex, (int) (long) currentTraitHighlight.getPropertyLong("index"));
                 if (currentTrait != null) {
                     if (currentTrait instanceof TraitSlotConst) {
                         abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) currentTrait, abc,
                                 abc.isStaticTraitId(classIndex, lastTraitIndex));
                         abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, currentTrait);
                         abcPanel.detailPanel.setEditMode(false);
+                        currentMethodHighlight = null;
+                        Highlighting spec = Highlighting.search(specialHighlights, pos, "type", "special", currentTraitHighlight.startPos, currentTraitHighlight.startPos + currentTraitHighlight.len);
+                        if (spec != null) {
+                            abcPanel.detailPanel.slotConstTraitPanel.hilightSpecial(spec);
+                        }
+
                         return;
                     }
                 }
-                currentMethodHighlight = th;
+                currentMethodHighlight = currentTraitHighlight;
                 String name = "";
                 currentTrait = null;
                 if (abc != null) {
@@ -262,7 +327,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     }
                 }
 
-                displayMethod(pos, abc.findMethodIdByTraitId(classIndex, (int) (long) th.getPropertyLong("index")), name, currentTrait, isStatic);
+                displayMethod(pos, abc.findMethodIdByTraitId(classIndex, (int) (long) currentTraitHighlight.getPropertyLong("index")), name, currentTrait, isStatic);
                 return;
             }
             setNoTrait();
@@ -353,7 +418,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         if (!cache.contains(scriptLeaf)) {
             for (int scriptTraitIndex : scriptLeaf.traitIndices) {
-                hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged(scriptLeaf.getPath().toString(), abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true)));
+                hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true)));
             }
 
             hilightedCode = hilightedCodeBuf.toString();
@@ -370,6 +435,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         if (script == null) {
             highlights = new ArrayList<>();
+            specialHighlights = new ArrayList<>();
             traitHighlights = new ArrayList<>();
             methodHighlights = new ArrayList<>();
             this.script = scriptLeaf;
@@ -385,6 +451,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         CachedDecompilation cd = getCached(scriptLeaf);
         final String hilightedCode = cd.text;
         highlights = cd.getHighlights();
+        specialHighlights = cd.getSpecialHighligths();
         traitHighlights = cd.getTraitHighlights();
         methodHighlights = cd.getMethodHighlights();
         classHighlights = cd.getClassHighlights();

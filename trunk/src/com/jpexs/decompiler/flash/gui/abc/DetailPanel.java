@@ -69,7 +69,7 @@ public class DetailPanel extends JPanel implements ActionListener {
 
         cardMap.put(UNSUPPORTED_TRAIT_CARD, unsupportedTraitPanel);
 
-        slotConstTraitPanel = new SlotConstTraitDetailPanel();
+        slotConstTraitPanel = new SlotConstTraitDetailPanel(abcPanel.decompiledTextArea);
         cardMap.put(SLOT_CONST_TRAIT_CARD, slotConstTraitPanel);
 
         for (String key : cardMap.keySet()) {

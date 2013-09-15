@@ -231,6 +231,17 @@ public class Highlighting implements Serializable {
         return hilight(text, "type=instruction;offset=" + offset);
     }
 
+    public static String hilighSpecial(boolean higlight, String text, String type) {
+        return hilighSpecial(higlight, text, type, 0);
+    }
+
+    public static String hilighSpecial(boolean higlight, String text, String type, long index) {
+        if (!higlight) {
+            return text;
+        }
+        return hilight(text, "type=special;subtype=" + type + ";index=" + index);
+    }
+
     /**
      * Highlights specified text as method by adding special tags
      *
@@ -273,7 +284,6 @@ public class Highlighting implements Serializable {
      * @return Text with no highlights
      */
     public static String stripHilights(String text) {
-        //text = text.replace("\r\n", "\n");
         List<HilightToken> tokens = getHilightTokens(text);
         StringBuilder ret = new StringBuilder();
         for (HilightToken token : tokens) {
@@ -282,6 +292,48 @@ public class Highlighting implements Serializable {
             }
         }
         return ret.toString();
+    }
+
+    public static String trim(String highlighted) {
+
+        List<HilightToken> tokens = getHilightTokens(highlighted);
+        boolean first = true;
+        StringBuilder str = new StringBuilder();
+        int lastPos = 0;
+        int lastLen = 0;
+        for (HilightToken t : tokens) {
+            switch (t.type) {
+                case TEXT:
+                    String s = t.value;
+                    if (first) {
+                        while ((!s.equals("")) && "\r\n ".contains("" + s.charAt(0))) {
+                            s = s.substring(1);
+                        }
+                        first = false;
+                    }
+                    String s2 = s;
+                    lastLen = 0;
+                    while ((!s2.equals("")) && "\r\n ".contains("" + s2.charAt(s2.length() - 1))) {
+                        s2 = s2.substring(0, s2.length() - 1);
+                        lastLen++;
+                    }
+                    str.append(s);
+                    lastPos = str.length();
+                    break;
+                case HILIGHTEND:
+                    str.append(HLCLOSE);
+                    break;
+                case HILIGHTSTART:
+                    str.append(HLOPEN);
+                    str.append(Helper.escapeString(t.value));
+                    str.append(HLEND);
+                    break;
+            }
+        }
+        if (lastLen > 0) {
+            str.replace(lastPos - lastLen, lastPos, "");
+        }
+        return str.toString();
     }
 
     /**
@@ -302,6 +354,16 @@ public class Highlighting implements Serializable {
      */
     public static List<Highlighting> getMethodHighlights(String text) {
         return getHilights(text, "type=method;");
+    }
+
+    /**
+     * Gets all special highlight objects from specified text
+     *
+     * @param text Text to get highlights from
+     * @return List of special highlights
+     */
+    public static List<Highlighting> getSpecialHighlights(String text) {
+        return getHilights(text, "type=special;");
     }
 
     /**

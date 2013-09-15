@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -41,18 +42,18 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
+    public String convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         if (modifier.equals(" ")) {
             modifier = "";
         }
         MethodBody body = abc.findBody(method_info);
-        return modifier + "function " + abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames) + "(" + abc.method_info[method_info].getParamStr(abc.constants, body, abc, fullyQualifiedNames) + ") : " + abc.method_info[method_info].getReturnTypeStr(abc.constants, fullyQualifiedNames);
+        return modifier + Highlighting.hilighSpecial(highlight, "function ", "traittype") + Highlighting.hilighSpecial(highlight, abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames), "traitname") + "(" + abc.method_info[method_info].getParamStr(highlight, abc.constants, body, abc, fullyQualifiedNames) + ") : " + abc.method_info[method_info].getReturnTypeStr(highlight, abc.constants, fullyQualifiedNames);
     }
 
     @Override
-    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
-        String header = convertHeader(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames, parallel);
+    public String convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
+        String header = convertHeader(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames, parallel);
         String bodyStr = "";
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {

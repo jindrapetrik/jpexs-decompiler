@@ -29,18 +29,22 @@ public class NewFunctionAVM2Item extends AVM2Item {
     public String returnStr;
     public String functionBody;
     public String functionName;
+    public int methodIndex;
 
-    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String paramStr, String returnStr, String functionBody) {
+    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String paramStr, String returnStr, String functionBody, int methodIndex) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.paramStr = paramStr;
         this.returnStr = returnStr;
         this.functionBody = functionBody;
         this.functionName = functionName;
+        this.methodIndex = methodIndex;
     }
 
     @Override
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String ret = hilight("function" + (!functionName.equals("") ? " " + functionName : "") + "(" + paramStr + "):" + returnStr, highlight);
+        String ret = hilight("function" + (!functionName.equals("") ? " " + functionName : ""), highlight);
+        String mhead = "(" + (highlight ? paramStr : Highlighting.stripHilights(paramStr)) + "):" + (highlight ? returnStr : Highlighting.stripHilights(returnStr));
+        ret += highlight ? Highlighting.hilighMethod(mhead, methodIndex) : mhead;
         ret += "\r\n" + hilight("{", highlight) + "\r\n";
         ret += Graph.INDENTOPEN + "\r\n";
         ret += (highlight ? functionBody : Highlighting.stripHilights(functionBody)) + "\r\n";

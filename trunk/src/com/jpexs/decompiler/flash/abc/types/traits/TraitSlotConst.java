@@ -59,7 +59,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return typeStr;
     }
 
-    public String getNameStr(ABC abc, List<String> fullyQualifiedNames) {
+    public String getNameStr(boolean highlight, ABC abc, List<String> fullyQualifiedNames) {
         String typeStr = getType(abc.constants, fullyQualifiedNames);
         if (typeStr.equals("*")) {
             typeStr = "";
@@ -78,27 +78,36 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (val != null && val.isNamespace()) {
             slotconst = "namespace";
         }
-        return slotconst + " " + getName(abc).getName(abc.constants, fullyQualifiedNames) + typeStr;
+        return Highlighting.hilighSpecial(highlight, slotconst, "traittype") + " " + Highlighting.hilighSpecial(highlight, getName(abc).getName(abc.constants, fullyQualifiedNames), "traitname") + Highlighting.hilighSpecial(highlight, typeStr, "traittypename");
 
     }
 
-    public String getValueStr(ABC abc, List<String> fullyQualifiedNames) {
+    public String getValueStr(Trait parent, boolean highlight, ABC abc, List<String> fullyQualifiedNames) {
         String valueStr = null;
         ValueKind val = null;
         if (value_kind != 0) {
             val = new ValueKind(value_index, value_kind);
             valueStr = val.toString(abc.constants);
+            valueStr = Highlighting.hilighSpecial(highlight, valueStr, "traitvalue");
         }
 
         if (assignedValue != null) {
-            valueStr = assignedValue.toString(false, abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames);
+            valueStr = Highlighting.trim(assignedValue.toString(true, abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
+            if (highlight && (parent instanceof TraitClass)) {
+                TraitClass tc = (TraitClass) parent;
+                int traitInitId = abc.class_info[tc.class_info].static_traits.traits.length
+                        + abc.instance_info[tc.class_info].instance_traits.traits.length + 1;
+                int initMethod = abc.class_info[tc.class_info].cinit_index;
+                valueStr = Highlighting.hilighMethod(valueStr, initMethod);
+                valueStr = Highlighting.hilighTrait(valueStr, traitInitId);
+            }
         }
         return valueStr;
     }
 
-    public String getNameValueStr(ABC abc, List<String> fullyQualifiedNames) {
-        String valueStr = getValueStr(abc, fullyQualifiedNames);
-        return getNameStr(abc, fullyQualifiedNames) + (valueStr == null ? "" : " = " + valueStr) + ";";
+    public String getNameValueStr(Trait parent, boolean highlight, ABC abc, List<String> fullyQualifiedNames) {
+        String valueStr = getValueStr(parent, highlight, abc, fullyQualifiedNames);
+        return getNameStr(highlight, abc, fullyQualifiedNames) + (valueStr == null ? "" : " = " + valueStr) + ";";
     }
 
     public boolean isNamespace() {
@@ -110,7 +119,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
+    public String convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         if (modifier.equals(" ")) {
             modifier = "";
@@ -130,11 +139,12 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (!showModifier) {
             modifier = "";
         }
-        String ret = Graph.INDENT_STRING + Graph.INDENT_STRING + modifier + getNameStr(abc, fullyQualifiedNames);
-        String valueStr = getValueStr(abc, fullyQualifiedNames);
+        String ret = modifier + getNameStr(highlight, abc, fullyQualifiedNames);
+        String valueStr = getValueStr(parent, highlight, abc, fullyQualifiedNames);
+
         if (valueStr != null) {
             ret += " = ";
-            int befLen = ret.length();
+            int befLen = Highlighting.stripHilights(Graph.INDENT_STRING + Graph.INDENT_STRING + ret).length();
             String[] valueStrParts = valueStr.split("\r\n");
             boolean first = true;
             for (int i = 0; i < valueStrParts.length; i++) {
@@ -145,12 +155,14 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                     if (!first) {
                         befLen += Graph.INDENT_STRING.length();
                     }
+                    ret += valueStrParts[i].replace(Graph.INDENTOPEN, ""); //there can be highlights!
                     continue;
                 }
                 if (Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTCLOSE)) {
                     if (!first) {
                         befLen -= Graph.INDENT_STRING.length();
                     }
+                    ret += valueStrParts[i].replace(Graph.INDENTCLOSE, ""); //there can be highlights!
                     continue;
                 }
                 if (!first) {
@@ -163,10 +175,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 first = false;
             }
         }
-        if (ret.endsWith("\r\n")) {
-            ret = ret.substring(0, ret.length() - 2);
-        }
-        ret += ";";
+        ret = Graph.INDENT_STRING + Graph.INDENT_STRING + Highlighting.trim(ret) + ";";
         return ret;
     }
 

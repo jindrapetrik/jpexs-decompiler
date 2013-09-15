@@ -23,13 +23,17 @@ import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import java.awt.BorderLayout;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 
 /**
  *
@@ -41,50 +45,55 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     private ABC abc;
     private TraitSlotConst trait;
     private boolean showWarning = false;
+    private List<Highlighting> specialHilights;
+    private boolean ignoreCaret = false;
 
-    public SlotConstTraitDetailPanel() {
+    public SlotConstTraitDetailPanel(final DecompiledEditorPane editor) {
         slotConstEditor = new LineMarkedEditorPane();
         setLayout(new BorderLayout());
-        //add(new JLabel(translate("abc.detail.slotconst.typevalue")), BorderLayout.NORTH);
         add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
-        /*StyledDocument doc = warnLabel.getStyledDocument();
-         SimpleAttributeSet center = new SimpleAttributeSet();
-         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
-         doc.setParagraphAttributes(0, doc.getLength(), center, false);
-         warnLabel.setOpaque(false);
-         warnLabel.setFocusable(false);
-         //warnLabel.setWrapStyleWord(true);  
-         //warnLabel.setLineWrap(true);
-         warnLabel.setFont(new JLabel().getFont().deriveFont(Font.BOLD));
-         add(warnLabel, BorderLayout.SOUTH);*/
         slotConstEditor.setContentType("text/flasm3");
-        //Flasm3SyntaxKit sk = (Flasm3SyntaxKit) slotConstEditor.getEditorKit();
-        //sk.deinstallComponent(slotConstEditor, "jsyntaxpane.components.LineNumbersRuler");
+        slotConstEditor.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                if (ignoreCaret) {
+                    return;
+                }
+                Highlighting spec = Highlighting.search(specialHilights, slotConstEditor.getCaretPosition());
+                if (spec != null) {
+                    editor.hilightSpecial(spec.getPropertyString("subtype"), (int) (long) spec.getPropertyLong("index"));
+                    slotConstEditor.getCaret().setVisible(true);
+                }
+            }
+        });
+    }
+
+    public void hilightSpecial(Highlighting special) {
+        Highlighting sel = null;
+        for (Highlighting h : specialHilights) {
+            if (h.getPropertyString("subtype").equals(special.getPropertyString("subtype"))) {
+                if (h.getPropertyString("index").equals(special.getPropertyString("index"))) {
+                    sel = h;
+                    break;
+                }
+            }
+        }
+        if (sel != null) {
+            ignoreCaret = true;
+            slotConstEditor.setCaretPosition(sel.startPos);
+            slotConstEditor.getCaret().setVisible(true);
+            ignoreCaret = false;
+        }
     }
 
     public void load(TraitSlotConst trait, ABC abc, boolean isStatic) {
         this.abc = abc;
         this.trait = trait;
-        /*String s;
-         String typeStr;
-         if (trait.type_index > 0) {
-         typeStr = "m[" + trait.type_index + "]\"" + Helper.escapeString(abc.constants.constant_multiname[trait.type_index].toString(abc.constants, new ArrayList<String>())) + "\"";
-         } else {
-         typeStr = "*";
-         }
-         String valueStr = "";
-         if (trait.value_kind != 0) {
-         valueStr = " = " + (new ValueKind(trait.value_index, trait.value_kind)).toString(abc.constants);
-         }
-
-         s = typeStr + valueStr;
-
-         *       */
-        String s = "trait " + abc.constants.multinameToString(trait.name_index) + " " + (trait.isConst() ? "const" : "slot") + " slotid " + trait.slot_id + " type " + abc.constants.multinameToString(trait.type_index) + " value " + (new ValueKind(trait.value_index, trait.value_kind).toASMString(abc.constants));
-
+        boolean highlight = true;
+        String s = "trait " + Highlighting.hilighSpecial(highlight, abc.constants.multinameToString(trait.name_index), "traitname") + " " + Highlighting.hilighSpecial(highlight, (trait.isConst() ? "const" : "slot"), "traittype") + " slotid " + Highlighting.hilighSpecial(highlight, "" + trait.slot_id, "slotid") + " type " + Highlighting.hilighSpecial(highlight, abc.constants.multinameToString(trait.type_index), "traittypename") + " value " + Highlighting.hilighSpecial(highlight, (new ValueKind(trait.value_index, trait.value_kind).toASMString(abc.constants)), "traitvalue");
+        specialHilights = Highlighting.getSpecialHighlights(s);
         showWarning = trait.isConst() || isStatic;
-        //warnLabel.setVisible(trait.isConst() || isStatic);
-        slotConstEditor.setText(s);
+        slotConstEditor.setText(Highlighting.stripHilights(s));
     }
 
     @Override

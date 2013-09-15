@@ -45,6 +45,10 @@ public class CachedDecompilation implements Serializable {
         return Highlighting.getClassHighlights(hilightedText);
     }
 
+    public List<Highlighting> getSpecialHighligths() {
+        return Highlighting.getSpecialHighlights(hilightedText);
+    }
+
     public CachedDecompilation(String hilightedText) {
         this.hilightedText = hilightedText;
         this.text = Highlighting.stripHilights(hilightedText);

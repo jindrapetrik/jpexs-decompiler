@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -241,7 +242,7 @@ public class MethodInfo {
         return constants.constant_string[name_index];
     }
 
-    public String getParamStr(ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
+    public String getParamStr(boolean highlight, ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
         HashMap<Integer, String> localRegNames = new HashMap<>();
         if (body != null) {
             localRegNames = body.code.getLocalRegNamesFromDebug(abc);
@@ -260,36 +261,38 @@ public class MethodInfo {
             }
             paramStr += ":";
             if (param_types[i] == 0) {
-                paramStr += "*";
+                paramStr += Highlighting.hilighSpecial(highlight, "*", "param", i);
             } else {
-                paramStr += constants.constant_multiname[param_types[i]].getName(constants, fullyQualifiedNames);
+                paramStr += Highlighting.hilighSpecial(highlight, constants.constant_multiname[param_types[i]].getName(constants, fullyQualifiedNames), "param", i);
             }
             if (optional != null) {
                 if (i >= param_types.length - optional.length) {
-                    paramStr += "=" + optional[i - (param_types.length - optional.length)].toString(constants);
+                    int optionalIndex = i - (param_types.length - optional.length);
+                    paramStr += "=" + Highlighting.hilighSpecial(highlight, optional[optionalIndex].toString(constants), "optional", optionalIndex);
                 }
             }
         }
         if (flagNeed_rest()) {
+            String restAdd = "";
             if ((param_types != null) && (param_types.length > 0)) {
-                paramStr += ", ";
+                restAdd += ", ";
             }
-            paramStr += "... ";
+            restAdd += "... ";
             if (!localRegNames.isEmpty()) {
-                paramStr += localRegNames.get(param_types.length + 1);
+                restAdd += localRegNames.get(param_types.length + 1);
             } else {
-                paramStr += "rest";
+                restAdd += "rest";
             }
-
+            paramStr += Highlighting.hilighSpecial(highlight, restAdd, "flag.NEED_REST");
         }
         return paramStr;
     }
 
-    public String getReturnTypeStr(ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String getReturnTypeStr(boolean highlight, ConstantPool constants, List<String> fullyQualifiedNames) {
         if (ret_type == 0) {
-            return "*";
+            return Highlighting.hilighSpecial(highlight, "*", "returns");
         }
-        return constants.constant_multiname[ret_type].getName(constants, fullyQualifiedNames);
+        return Highlighting.hilighSpecial(highlight, constants.constant_multiname[ret_type].getName(constants, fullyQualifiedNames), "returns");
     }
 
     public void setBody(MethodBody body) {

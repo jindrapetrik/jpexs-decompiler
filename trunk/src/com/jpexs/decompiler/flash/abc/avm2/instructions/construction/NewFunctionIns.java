@@ -45,14 +45,14 @@ public class NewFunctionIns extends InstructionDefinition {
         String paramStr = "";
         if (mybody != null) {
             try {
-                bodyStr = /*Highlighting.hilighMethodEnd() +*/ mybody.toString(path + "/inner", false, isStatic, scriptIndex, classIndex, abc, null, constants, method_info, new Stack<GraphTargetItem>()/*scopeStack*/, false, true, false, fullyQualifiedNames, null);// + Highlighting.hilighMethodBegin(body.method_info);
+                bodyStr = mybody.toString(path + "/inner", false, isStatic, scriptIndex, classIndex, abc, null, constants, method_info, new Stack<GraphTargetItem>()/*scopeStack*/, false, true, false, fullyQualifiedNames, null);
             } catch (Exception ex) {
                 Logger.getLogger(NewFunctionIns.class.getName()).log(Level.SEVERE, "error during newfunction", ex);
             }
-            paramStr = method_info[methodIndex].getParamStr(constants, mybody, abc, fullyQualifiedNames);
+            paramStr = method_info[methodIndex].getParamStr(true, constants, mybody, abc, fullyQualifiedNames);
         }
 
-        stack.push(new NewFunctionAVM2Item(ins, "", paramStr, method_info[methodIndex].getReturnTypeStr(constants, fullyQualifiedNames), bodyStr));
+        stack.push(new NewFunctionAVM2Item(ins, "", paramStr, method_info[methodIndex].getReturnTypeStr(true, constants, fullyQualifiedNames), bodyStr, methodIndex));
     }
 
     @Override
