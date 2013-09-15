@@ -45,7 +45,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     public SlotConstTraitDetailPanel() {
         slotConstEditor = new LineMarkedEditorPane();
         setLayout(new BorderLayout());
-        add(new JLabel(translate("abc.detail.slotconst.typevalue")), BorderLayout.NORTH);
+        //add(new JLabel(translate("abc.detail.slotconst.typevalue")), BorderLayout.NORTH);
         add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
         /*StyledDocument doc = warnLabel.getStyledDocument();
          SimpleAttributeSet center = new SimpleAttributeSet();
