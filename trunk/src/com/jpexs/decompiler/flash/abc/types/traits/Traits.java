@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -33,6 +34,12 @@ import java.util.logging.Logger;
 public class Traits implements Serializable {
 
     public Trait[] traits = new Trait[0];
+
+    public int addTrait(Trait t) {
+        traits = Arrays.copyOf(traits, traits.length + 1);
+        traits[traits.length - 1] = t;
+        return traits.length - 1;
+    }
 
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {
         int ret = 0;

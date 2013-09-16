@@ -34,6 +34,24 @@ public class Namespace {
     public int kind;
     public int name_index;
 
+    public static String kindToStr(int kind) {
+        for (int i = 0; i < nameSpaceKinds.length; i++) {
+            if (nameSpaceKinds[i] == kind) {
+                return nameSpaceKindNames[i];
+            }
+        }
+        return null;
+    }
+
+    public static String kindToPrefix(int kind) {
+        for (int i = 0; i < nameSpaceKinds.length; i++) {
+            if (nameSpaceKinds[i] == kind) {
+                return namePrefixes[i];
+            }
+        }
+        return null;
+    }
+
     public Namespace(int kind, int name_index) {
         this.kind = kind;
         this.name_index = name_index;

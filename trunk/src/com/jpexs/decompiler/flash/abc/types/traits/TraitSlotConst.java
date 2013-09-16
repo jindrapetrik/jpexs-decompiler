@@ -92,7 +92,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
 
         if (assignedValue != null) {
-            valueStr = Highlighting.trim(assignedValue.toString(true, abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
+            valueStr = Highlighting.trim(assignedValue.toString(highlight, abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
             if (highlight && (parent instanceof TraitClass)) {
                 TraitClass tc = (TraitClass) parent;
                 int traitInitId = abc.class_info[tc.class_info].static_traits.traits.length

@@ -251,16 +251,7 @@ public class ASM3Parser {
         }
         expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
 
-        for (int n = 1; n < constants.constant_namespace.length; n++) {
-            Namespace ns = constants.constant_namespace[n];
-            if (ns.getName(constants).equals(name.value) && (ns.kind == kind)) {
-                if (index == 0) {
-                    return n;
-                }
-                index--;
-            }
-        }
-        return constants.addNamespace(new Namespace(kind, constants.forceGetStringId((String) name.value)));
+        return constants.getNamespaceId(new Namespace(kind, constants.getStringId((String) name.value, true)), index, true);
     }
 
     private static int parseMultiName(ConstantPool constants, Flasm3Lexer lexer) throws ParseException, IOException {
@@ -320,7 +311,7 @@ public class ASM3Parser {
                 expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
                 ParsedSymbol name = lexer.lex();
                 expected(name, ParsedSymbol.TYPE_STRING, "String");
-                name_index = constants.forceGetStringId((String) name.value);
+                name_index = constants.getStringId((String) name.value, true);
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
                 break;
             case ParsedSymbol.TYPE_KEYWORD_RTQNAME:
@@ -328,7 +319,7 @@ public class ASM3Parser {
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 ParsedSymbol rtqName = lexer.lex();
                 expected(rtqName, ParsedSymbol.TYPE_STRING, "String");
-                name_index = constants.forceGetStringId((String) rtqName.value);
+                name_index = constants.getStringId((String) rtqName.value, true);
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
                 break;
             case ParsedSymbol.TYPE_KEYWORD_RTQNAMEL:
@@ -341,7 +332,7 @@ public class ASM3Parser {
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 ParsedSymbol mName = lexer.lex();
                 expected(mName, ParsedSymbol.TYPE_STRING, "String");
-                name_index = constants.forceGetStringId((String) mName.value);
+                name_index = constants.getStringId((String) mName.value, true);
                 expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
                 namespace_set_index = parseNamespaceSet(constants, lexer);
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
@@ -366,20 +357,8 @@ public class ASM3Parser {
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
                 break;
         }
-        loopm:
-        for (int m = 1; m < constants.constant_multiname.length; m++) {
-            Multiname mul = constants.constant_multiname[m];
-            if (mul.kind == kind && mul.name_index == name_index && mul.namespace_index == namespace_index && mul.namespace_set_index == namespace_set_index && mul.qname_index == qname_index && mul.params.size() == params.size()) {
-                for (int p = 0; p < mul.params.size(); p++) {
-                    if (mul.params.get(p) != params.get(p)) {
-                        continue loopm;
-                    }
-                }
-                return m;
-            }
 
-        }
-        return constants.addMultiname(new Multiname(kind, name_index, namespace_index, namespace_set_index, qname_index, params));
+        return constants.getMultinameId(new Multiname(kind, name_index, namespace_index, namespace_set_index, qname_index, params), true);
     }
 
     public static ValueKind parseValue(ConstantPool constants, Flasm3Lexer lexer) throws IOException, ParseException {
@@ -394,7 +373,7 @@ public class ASM3Parser {
                 value = lexer.lex();
                 expected(value, ParsedSymbol.TYPE_INTEGER, "Integer");
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
-                value_index = constants.forceGetIntId((Long) value.value);
+                value_index = constants.getIntId((Long) value.value, true);
                 break;
             case ParsedSymbol.TYPE_KEYWORD_UINTEGER:
                 value_kind = ValueKind.CONSTANT_UInt;
@@ -402,7 +381,7 @@ public class ASM3Parser {
                 value = lexer.lex();
                 expected(value, ParsedSymbol.TYPE_INTEGER, "UInteger");
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
-                value_index = constants.forceGetUIntId((Long) value.value);
+                value_index = constants.getUIntId((Long) value.value, true);
                 break;
             case ParsedSymbol.TYPE_KEYWORD_DOUBLE:
                 value_kind = ValueKind.CONSTANT_Double;
@@ -410,7 +389,7 @@ public class ASM3Parser {
                 value = lexer.lex();
                 expected(value, ParsedSymbol.TYPE_FLOAT, "Double");
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
-                value_index = constants.forceGetDoubleId((Double) value.value);
+                value_index = constants.getDoubleId((Double) value.value, true);
                 break;
             /*case ParsedSymbol.TYPE_KEYWORD_DECIMAL:
              value_kind = ValueKind.CONSTANT_Decimal;
@@ -421,7 +400,7 @@ public class ASM3Parser {
                 value = lexer.lex();
                 expected(value, ParsedSymbol.TYPE_STRING, "String");
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
-                value_index = constants.forceGetStringId((String) value.value);
+                value_index = constants.getStringId((String) value.value, true);
                 break;
             case ParsedSymbol.TYPE_KEYWORD_TRUE:
                 value_kind = ValueKind.CONSTANT_True;
@@ -540,7 +519,7 @@ public class ASM3Parser {
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_NAME) {
                 symb = lexer.lex();
                 expected(symb, ParsedSymbol.TYPE_STRING, "String");
-                info.name_index = constants.forceGetStringId((String) symb.value);
+                info.name_index = constants.getStringId((String) symb.value, true);
                 continue;
             }
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_PARAM) {
@@ -550,7 +529,7 @@ public class ASM3Parser {
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_PARAMNAME) {
                 symb = lexer.lex();
                 expected(symb, ParsedSymbol.TYPE_STRING, "String");
-                paramNames.add(constants.forceGetStringId((String) symb.value));
+                paramNames.add(constants.getStringId((String) symb.value, true));
                 continue;
             }
 

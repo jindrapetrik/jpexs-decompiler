@@ -53,7 +53,7 @@ public class DetailPanel extends JPanel implements ActionListener {
     private boolean editMode = false;
     private JPanel buttonsPanel;
     private ABCPanel abcPanel;
-    private JTextArea traitNameLabel;
+    private JLabel traitNameLabel;
 
     public DetailPanel(ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
@@ -105,10 +105,10 @@ public class DetailPanel extends JPanel implements ActionListener {
         selectedLabel.setHorizontalAlignment(SwingConstants.CENTER);
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(selectedLabel, BorderLayout.NORTH);
-        traitNameLabel = new JTextArea("");
+        traitNameLabel = new JLabel("");
         JPanel traitInfoPanel = new JPanel();
         traitInfoPanel.setLayout(new BoxLayout(traitInfoPanel, BoxLayout.LINE_AXIS));
-        traitInfoPanel.add(new JLabel("  " + translate("abc.detail.traitname")));
+        //traitInfoPanel.add(new JLabel("  " + translate("abc.detail.traitname")));
         traitInfoPanel.add(traitNameLabel);
         topPanel.add(traitInfoPanel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
@@ -155,7 +155,7 @@ public class DetailPanel extends JPanel implements ActionListener {
         if (trait == null) {
             traitNameLabel.setText("-");
         } else {
-            traitNameLabel.setText(" " + trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, new ArrayList<String>()) + "  Index: " + trait.name_index);
+            traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, new ArrayList<String>()));
         }
     }
 

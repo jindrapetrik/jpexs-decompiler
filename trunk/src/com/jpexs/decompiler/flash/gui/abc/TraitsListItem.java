@@ -64,15 +64,18 @@ public class TraitsListItem {
 
     @Override
     public String toString() {
+        String s = "";
         if ((type != Type.INITIALIZER) && isStatic) {
-            return abc.class_info[classIndex].static_traits.traits[index].convertHeader(null, "", abcTags, abc, true, false, scriptIndex, classIndex, false, new ArrayList<String>(), false);
+            s = abc.class_info[classIndex].static_traits.traits[index].convertHeader(null, "", abcTags, abc, true, false, scriptIndex, classIndex, false, new ArrayList<String>(), false);
         } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-            return abc.instance_info[classIndex].instance_traits.traits[index].convertHeader(null, "", abcTags, abc, false, false, scriptIndex, classIndex, false, new ArrayList<String>(), false);
+            s = abc.instance_info[classIndex].instance_traits.traits[index].convertHeader(null, "", abcTags, abc, false, false, scriptIndex, classIndex, false, new ArrayList<String>(), false);
         } else if (!isStatic) {
-            return STR_INSTANCE_INITIALIZER;
+            s = STR_INSTANCE_INITIALIZER;
         } else {
-            return STR_CLASS_INITIALIZER;
+            s = STR_CLASS_INITIALIZER;
         }
+        s = s.replaceAll("[ \r\n]+", " ");
+        return s;
     }
 
     public Type getType() {

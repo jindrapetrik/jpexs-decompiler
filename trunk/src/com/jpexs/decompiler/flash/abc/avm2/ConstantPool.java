@@ -82,6 +82,19 @@ public class ConstantPool {
         return constant_string.length - 1;
     }
 
+    public int getNamespaceId(Namespace val, int index) {
+        for (int n = 1; n < constant_namespace.length; n++) {
+            Namespace ns = constant_namespace[n];
+            if (ns.name_index == val.name_index && (ns.kind == val.kind)) {
+                if (index == 0) {
+                    return n;
+                }
+                index--;
+            }
+        }
+        return 0;
+    }
+
     public int getIntId(long value) {
         for (int i = 1; i < constant_int.length; i++) {
             if (constant_int[i] == value) {
@@ -109,42 +122,82 @@ public class ConstantPool {
         return 0;
     }
 
-    public int getStringId(String s) {
+    public int getStringId(String val) {
         for (int i = 1; i < constant_string.length; i++) {
-            if (constant_string[i].equals(s)) {
+            if (constant_string[i].equals(val)) {
                 return i;
             }
         }
         return 0;
     }
 
-    public int forceGetStringId(String val) {
+    public int getMultinameId(Multiname val) {
+        loopm:
+        for (int m = 1; m < constant_multiname.length; m++) {
+            Multiname mul = constant_multiname[m];
+            if (mul.kind == val.kind && mul.name_index == val.name_index && mul.namespace_index == val.namespace_index && mul.namespace_set_index == val.namespace_set_index && mul.qname_index == val.qname_index && mul.params.size() == val.params.size()) {
+                for (int p = 0; p < mul.params.size(); p++) {
+                    if (mul.params.get(p) != val.params.get(p)) {
+                        continue loopm;
+                    }
+                }
+                return m;
+            }
+        }
+        return 0;
+    }
+
+    public int getQnameId(String name, int namespaceKind, String namespaceName, boolean add) {
+        return getMultinameId(new Multiname(Multiname.QNAME, getStringId(name, add), getNamespaceId(new Namespace(namespaceKind, getStringId(namespaceName, add)), 0, add), -1, -1, new ArrayList<Integer>()), add);
+    }
+
+    public int getPublicQnameId(String name, boolean add) {
+        return getQnameId(name, Namespace.KIND_PACKAGE, "", add);
+    }
+
+    public int getMultinameId(Multiname val, boolean add) {
+        int id = getMultinameId(val);
+        if (add && id == 0) {
+            id = addMultiname(val);
+        }
+        return id;
+    }
+
+    public int getStringId(String val, boolean add) {
         int id = getStringId(val);
-        if (id == 0) {
+        if (add && id == 0) {
             id = addString(val);
         }
         return id;
     }
 
-    public int forceGetIntId(long val) {
+    public int getIntId(long val, boolean add) {
         int id = getIntId(val);
-        if (id == 0) {
+        if (add && id == 0) {
             id = addInt(val);
         }
         return id;
     }
 
-    public int forceGetUIntId(long val) {
+    public int getNamespaceId(Namespace val, int index, boolean add) {
+        int id = getNamespaceId(val, index);
+        if (add && id == 0) {
+            id = addNamespace(val);
+        }
+        return id;
+    }
+
+    public int getUIntId(long val, boolean add) {
         int id = getUIntId(val);
-        if (id == 0) {
+        if (add && id == 0) {
             id = addUInt(val);
         }
         return id;
     }
 
-    public int forceGetDoubleId(double val) {
+    public int getDoubleId(double val, boolean add) {
         int id = getDoubleId(val);
-        if (id == 0) {
+        if (add && id == 0) {
             id = addDouble(val);
         }
         return id;

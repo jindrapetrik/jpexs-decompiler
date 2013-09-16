@@ -62,13 +62,13 @@ public class MethodInfoParser {
                 int id = 0;
                 switch (symbValue.type) {
                     case ParsedSymbol.TYPE_INTEGER:
-                        value = new ValueKind(abc.constants.forceGetIntId((Long) symbValue.value), ValueKind.CONSTANT_Int);
+                        value = new ValueKind(abc.constants.getIntId((Long) symbValue.value, true), ValueKind.CONSTANT_Int);
                         break;
                     case ParsedSymbol.TYPE_FLOAT:
-                        value = new ValueKind(abc.constants.forceGetDoubleId((Double) symbValue.value), ValueKind.CONSTANT_Double);
+                        value = new ValueKind(abc.constants.getDoubleId((Double) symbValue.value, true), ValueKind.CONSTANT_Double);
                         break;
                     case ParsedSymbol.TYPE_STRING:
-                        value = new ValueKind(abc.constants.forceGetStringId((String) symbValue.value), ValueKind.CONSTANT_Utf8);
+                        value = new ValueKind(abc.constants.getStringId((String) symbValue.value, true), ValueKind.CONSTANT_Utf8);
                         break;
                     case ParsedSymbol.TYPE_TRUE:
                         value = new ValueKind(0, ValueKind.CONSTANT_True);
@@ -200,13 +200,13 @@ public class MethodInfoParser {
                         int id = 0;
                         switch (symbValue.type) {
                             case ParsedSymbol.TYPE_INTEGER:
-                                optionalValues.add(new ValueKind(abc.constants.forceGetIntId((Long) symbValue.value), ValueKind.CONSTANT_Int));
+                                optionalValues.add(new ValueKind(abc.constants.getIntId((Long) symbValue.value, true), ValueKind.CONSTANT_Int));
                                 break;
                             case ParsedSymbol.TYPE_FLOAT:
-                                optionalValues.add(new ValueKind(abc.constants.forceGetDoubleId((Double) symbValue.value), ValueKind.CONSTANT_Double));
+                                optionalValues.add(new ValueKind(abc.constants.getDoubleId((Double) symbValue.value, true), ValueKind.CONSTANT_Double));
                                 break;
                             case ParsedSymbol.TYPE_STRING:
-                                optionalValues.add(new ValueKind(abc.constants.forceGetStringId((String) symbValue.value), ValueKind.CONSTANT_Utf8));
+                                optionalValues.add(new ValueKind(abc.constants.getStringId((String) symbValue.value, true), ValueKind.CONSTANT_Utf8));
                                 break;
                             case ParsedSymbol.TYPE_TRUE:
                                 optionalValues.add(new ValueKind(0, ValueKind.CONSTANT_True));
@@ -304,7 +304,7 @@ public class MethodInfoParser {
             update.setFlagHas_paramnames();
             update.paramNames = new int[paramNames.size()];
             for (int p = 0; p < paramNames.size(); p++) {
-                update.paramNames[p] = abc.constants.forceGetStringId(paramNames.get(p));
+                update.paramNames[p] = abc.constants.getStringId(paramNames.get(p), true);
             }
         }
         return true;

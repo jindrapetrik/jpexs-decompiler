@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.Graph;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -62,6 +63,20 @@ public class ABC {
     public static final int MINORwithDECIMAL = 17;
     protected HashSet<EventListener> listeners = new HashSet<>();
     private static final Logger logger = Logger.getLogger(ABC.class.getName());
+
+    public int addMethodBody(MethodBody body) {
+        bodies = Arrays.copyOf(bodies, bodies.length + 1);
+        bodies[bodies.length - 1] = body;
+        bodyIdxFromMethodIdx = Arrays.copyOf(bodyIdxFromMethodIdx, bodyIdxFromMethodIdx.length + 1);
+        bodyIdxFromMethodIdx[bodyIdxFromMethodIdx.length - 1] = body.method_info;
+        return bodies.length - 1;
+    }
+
+    public int addMethodInfo(MethodInfo mi) {
+        method_info = Arrays.copyOf(method_info, method_info.length + 1);
+        method_info[method_info.length - 1] = mi;
+        return method_info.length - 1;
+    }
 
     public void addEventListener(EventListener listener) {
         listeners.add(listener);
@@ -196,7 +211,7 @@ public class ABC {
         Set<Integer> namespaceUsages = getNsStringUsages();
         int strIndex = constants.constant_multiname[multinameIndex].name_index;
         if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { //name is used elsewhere as string literal            
-            strIndex = constants.forceGetStringId(newname);
+            strIndex = constants.getStringId(newname, true);
             constants.constant_multiname[multinameIndex].name_index = strIndex;
         } else {
             constants.constant_string[strIndex] = newname;
@@ -256,11 +271,11 @@ public class ABC {
                                         name = fullname.substring(fullname.lastIndexOf(".") + 1);
                                     }
                                     if (!pkg.equals("")) {
-                                        int pkgStrIndex = constants.forceGetStringId(pkg);
+                                        int pkgStrIndex = constants.getStringId(pkg, true);
                                         pkgStrIndex = deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, pkgStrIndex, renameType);
                                         pkg = constants.constant_string[pkgStrIndex];
                                     }
-                                    int nameStrIndex = constants.forceGetStringId(name);
+                                    int nameStrIndex = constants.getStringId(name, true);
                                     nameStrIndex = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, nameStrIndex, true, renameType);
                                     name = constants.constant_string[nameStrIndex];
                                     String fullChanged = "";
@@ -268,7 +283,7 @@ public class ABC {
                                         fullChanged = pkg + ".";
                                     }
                                     fullChanged += name;
-                                    strIndex = constants.forceGetStringId(fullChanged);
+                                    strIndex = constants.getStringId(fullChanged, true);
                                     body.code.code.get(ip - 1).operands[0] = strIndex;
                                 }
                             }

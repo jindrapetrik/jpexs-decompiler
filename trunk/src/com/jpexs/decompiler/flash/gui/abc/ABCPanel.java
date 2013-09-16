@@ -21,6 +21,17 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.types.ABCException;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.Freed;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
@@ -90,6 +101,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     private String searchFor;
     private boolean searchIgnoreCase;
     private boolean searchRegexp;
+    private NewTraitDialog newTraitDialog;
+    public JLabel scriptNameLabel;
 
     public boolean search(String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.equals(""))) {
@@ -283,9 +296,31 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
         decompiledScrollPane = new JScrollPane(decompiledTextArea);
 
+
+        JPanel iconDecPanel = new JPanel();
+        iconDecPanel.setLayout(new BoxLayout(iconDecPanel, BoxLayout.Y_AXIS));
+        JPanel iconsPanel = new JPanel();
+        iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.X_AXIS));
+
+        JButton newTraitButton = new JButton(View.getIcon("traitadd16"));
+        newTraitButton.setMargin(new Insets(5, 5, 5, 5));
+        newTraitButton.addActionListener(this);
+        newTraitButton.setActionCommand("ADDTRAIT");
+        newTraitButton.setToolTipText(translate("button.addtrait"));
+        iconsPanel.add(newTraitButton);
+
+
+        scriptNameLabel = new JLabel("-");
+        scriptNameLabel.setAlignmentX(0);
+        iconsPanel.setAlignmentX(0);
+        decompiledScrollPane.setAlignmentX(0);
+        iconDecPanel.add(scriptNameLabel);
+        iconDecPanel.add(iconsPanel);
+        iconDecPanel.add(decompiledScrollPane);
+
         JPanel decPanel = new JPanel(new BorderLayout());
         decPanel.add(searchPanel, BorderLayout.NORTH);
-        decPanel.add(decompiledScrollPane, BorderLayout.CENTER);
+        decPanel.add(iconDecPanel, BorderLayout.CENTER);
         detailPanel = new DetailPanel(this);
         JPanel panB = new JPanel();
         panB.setLayout(new BorderLayout());
@@ -535,25 +570,124 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("FILTERSCRIPT")) {
-            doFilter();
-        }
-        if (e.getActionCommand().equals("SEARCHCANCEL")) {
-            foundPos = 0;
-            searchPanel.setVisible(false);
-            found = new ArrayList<>();
-            searchFor = null;
-        }
-        if (e.getActionCommand().equals("SEARCHPREV")) {
-            foundPos--;
-            if (foundPos < 0) {
-                foundPos += found.size();
-            }
-            updateSearchPos();
-        }
-        if (e.getActionCommand().equals("SEARCHNEXT")) {
-            foundPos = (foundPos + 1) % found.size();
-            updateSearchPos();
+        switch (e.getActionCommand()) {
+            case "ADDTRAIT":
+                int class_index = decompiledTextArea.getClassIndex();
+                if (class_index < 0) {
+                    return;
+                }
+                if (newTraitDialog == null) {
+                    newTraitDialog = new NewTraitDialog();
+                }
+                int void_type = abc.constants.getPublicQnameId("void", true);//abc.constants.forceGetMultinameId(new Multiname(Multiname.QNAME, abc.constants.forceGetStringId("void"), abc.constants.forceGetNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.forceGetStringId("")), 0), -1, -1, new ArrayList<Integer>()));
+                int int_type = abc.constants.getPublicQnameId("int", true); //abc.constants.forceGetMultinameId(new Multiname(Multiname.QNAME, abc.constants.forceGetStringId("int"), abc.constants.forceGetNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.forceGetStringId("")), 0), -1, -1, new ArrayList<Integer>()));
+
+                Trait t = null;
+                int kind;
+                int nskind;
+                String name = null;
+                boolean isStatic;
+                Multiname m;
+
+                boolean again = false;
+                loopm:
+                do {
+                    if (again) {
+                        View.showMessageDialog(null, translate("error.trait.exists").replace("%name%", name), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    }
+                    again = false;
+                    if (!newTraitDialog.display()) {
+                        return;
+                    }
+                    kind = newTraitDialog.getTraitType();
+                    nskind = newTraitDialog.getNamespaceKind();
+                    name = newTraitDialog.getTraitName();
+                    isStatic = newTraitDialog.getStatic();
+                    m = new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(nskind, abc.constants.getStringId("", true)), 0, true), -1, -1, new ArrayList<Integer>());
+                    int mid = abc.constants.getMultinameId(m);
+                    if (mid == 0) {
+                        break;
+                    }
+                    for (Trait tr : abc.class_info[class_index].static_traits.traits) {
+                        if (tr.name_index == mid) {
+                            again = true;
+                            break;
+                        }
+                    }
+
+                    for (Trait tr : abc.instance_info[class_index].instance_traits.traits) {
+                        if (tr.name_index == mid) {
+                            again = true;
+                            break;
+                        }
+                    }
+                } while (again);
+                switch (kind) {
+                    case Trait.TRAIT_GETTER:
+                    case Trait.TRAIT_SETTER:
+                    case Trait.TRAIT_METHOD:
+                        TraitMethodGetterSetter tm = new TraitMethodGetterSetter();
+                        MethodInfo mi = new MethodInfo(new int[0], void_type, abc.constants.getStringId(name, true), 0, new ValueKind[0], new int[0]);
+                        int method_info = abc.addMethodInfo(mi);
+                        tm.method_info = method_info;
+                        MethodBody body = new MethodBody();
+                        body.method_info = method_info;
+                        body.init_scope_depth = 1;
+                        body.max_regs = 1;
+                        body.max_scope_depth = 1;
+                        body.max_stack = 1;
+                        body.exceptions = new ABCException[0];
+                        AVM2Code code = new AVM2Code();
+                        body.code = code;
+                        Traits traits = new Traits();
+                        traits.traits = new Trait[0];
+                        body.traits = traits;
+                        abc.addMethodBody(body);
+                        t = tm;
+                        break;
+                    case Trait.TRAIT_SLOT:
+                    case Trait.TRAIT_CONST:
+                        TraitSlotConst ts = new TraitSlotConst();
+                        ts.type_index = int_type;
+                        ts.value_kind = ValueKind.CONSTANT_Int;
+                        ts.value_index = abc.constants.getIntId(0, true);
+                        t = ts;
+                        break;
+                }
+                if (t != null) {
+                    t.kindType = kind;
+                    t.name_index = abc.constants.getMultinameId(m, true);
+                    int traitId;
+                    if (isStatic) {
+                        traitId = abc.class_info[class_index].static_traits.addTrait(t);
+                    } else {
+                        traitId = abc.class_info[class_index].static_traits.traits.length + abc.instance_info[class_index].instance_traits.addTrait(t);
+                    }
+                    reload();
+                    decompiledTextArea.gotoTrait(traitId);
+                }
+
+                break;
+            case "FILTERSCRIPT":
+                doFilter();
+                break;
+            case "SEARCHCANCEL":
+                foundPos = 0;
+                searchPanel.setVisible(false);
+                found = new ArrayList<>();
+                searchFor = null;
+                break;
+            case "SEARCHPREV":
+                foundPos--;
+                if (foundPos < 0) {
+                    foundPos += found.size();
+                }
+                updateSearchPos();
+                break;
+            case "SEARCHNEXT":
+                foundPos = (foundPos + 1) % found.size();
+                updateSearchPos();
+                break;
         }
     }
 }

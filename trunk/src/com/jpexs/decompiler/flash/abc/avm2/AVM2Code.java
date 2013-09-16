@@ -1069,6 +1069,9 @@ public class AVM2Code implements Serializable {
     }
 
     public int fixIPAfterDebugLine(int ip) {
+        if (code.isEmpty()) {
+            return ip;
+        }
         if (ip >= code.size()) {
             return code.size() - 1;
         }
