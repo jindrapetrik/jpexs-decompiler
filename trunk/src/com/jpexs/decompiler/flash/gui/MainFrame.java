@@ -2956,6 +2956,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             return;
         }
 
+        if (flashPanel != null) {
+            flashPanel.specialPlayback = false;
+        }
         swfPreviewPanel.stop();
         stopFlashPlayer();
         oldValue = tagObj;
@@ -3274,19 +3277,50 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             ea.tags.add(ds.soundId);
                             ea.names.add("my_define_sound");
                             sos2.writeTag(ea);
-                            DoActionTag doa = new DoActionTag(null, new byte[]{}, SWF.DEFAULT_VERSION, 0);
-                            List<Action> actions = ASMParser.parse(0, 0, false,
-                                    "ConstantPool \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
+                            List<Action> actions;
+                            DoActionTag doa;
+
+
+                            doa = new DoActionTag(null, new byte[]{}, SWF.DEFAULT_VERSION, 0);
+                            actions = ASMParser.parse(0, 0, false,
+                                    "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
+                                    + "Push \"_root\"\n"
+                                    + "GetVariable\n"
                                     + "Push \"my_sound\" 0.0 \"Sound\"\n"
                                     + "NewObject\n"
-                                    + "DefineLocal\n"
-                                    + "Push \"my_define_sound\" 1 \"my_sound\"\n"
+                                    + "SetMember\n"
+                                    + "Push \"my_define_sound\" 1 \"_root\"\n"
                                     + "GetVariable\n"
+                                    + "Push \"my_sound\"\n"
+                                    + "GetMember\n"
                                     + "Push \"attachSound\"\n"
                                     + "CallMethod\n"
                                     + "Pop\n"
-                                    + "Push 9999 0 2 \"my_sound\"\n"
+                                    + "Stop", SWF.DEFAULT_VERSION, false);
+                            doa.setActions(actions, SWF.DEFAULT_VERSION);
+                            sos2.writeTag(doa);
+                            sos2.writeTag(new ShowFrameTag(null));
+
+
+                            actions = ASMParser.parse(0, 0, false,
+                                    "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
+                                    + "StopSounds\n"
+                                    + "Push \"_root\"\n"
                                     + "GetVariable\n"
+                                    + "Push \"my_sound\" 0.0 \"Sound\"\n"
+                                    + "NewObject\n"
+                                    + "SetMember\n"
+                                    + "Push \"my_define_sound\" 1 \"_root\"\n"
+                                    + "GetVariable\n"
+                                    + "Push \"my_sound\"\n"
+                                    + "GetMember\n"
+                                    + "Push \"attachSound\"\n"
+                                    + "CallMethod\n"
+                                    + "Pop\n"
+                                    + "Push 9999 0.0 2 \"_root\"\n"
+                                    + "GetVariable\n"
+                                    + "Push \"my_sound\"\n"
+                                    + "GetMember\n"
                                     + "Push \"start\"\n"
                                     + "CallMethod\n"
                                     + "Pop\n"
@@ -3294,7 +3328,64 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             doa.setActions(actions, SWF.DEFAULT_VERSION);
                             sos2.writeTag(doa);
                             sos2.writeTag(new ShowFrameTag(null));
+
+                            actions = ASMParser.parse(0, 0, false,
+                                    "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
+                                    + "StopSounds\n"
+                                    + "Push \"_root\"\n"
+                                    + "GetVariable\n"
+                                    + "Push \"my_sound\" 0.0 \"Sound\"\n"
+                                    + "NewObject\n"
+                                    + "SetMember\n"
+                                    + "Push \"my_define_sound\" 1 \"_root\"\n"
+                                    + "GetVariable\n"
+                                    + "Push \"my_sound\"\n"
+                                    + "GetMember\n"
+                                    + "Push \"attachSound\"\n"
+                                    + "CallMethod\n"
+                                    + "Pop\n"
+                                    + "Push \"_root\"\n"
+                                    + "GetVariable\n"
+                                    + "Push \"my_sound\"\n"
+                                    + "GetMember\n"
+                                    + "Push \"onSoundComplete\"\n"
+                                    + "DefineFunction2 \"\" 0 2 false true true false true false true false false  {\n"
+                                    + "Push 0.0 register1 \"my_sound\"\n"
+                                    + "GetMember\n"
+                                    + "Push \"start\"\n"
+                                    + "CallMethod\n"
+                                    + "Pop\n"
+                                    + "}\n"
+                                    + "SetMember\n"
+                                    + "Push \"_root\"\n"
+                                    + "GetVariable\n"
+                                    + "Push \"execParam\"\n"
+                                    + "GetMember\n"
+                                    + "Push 1 \"_root\"\n"
+                                    + "GetVariable\n"
+                                    + "Push \"my_sound\"\n"
+                                    + "GetMember\n"
+                                    + "Push \"start\"\n"
+                                    + "CallMethod\n"
+                                    + "Pop\n"
+                                    + "Stop", SWF.DEFAULT_VERSION, false);
+                            doa.setActions(actions, SWF.DEFAULT_VERSION);
+                            sos2.writeTag(doa);
                             sos2.writeTag(new ShowFrameTag(null));
+
+
+                            actions = ASMParser.parse(0, 0, false,
+                                    "StopSounds\n"
+                                    + "Stop", SWF.DEFAULT_VERSION, false);
+                            doa.setActions(actions, SWF.DEFAULT_VERSION);
+                            sos2.writeTag(doa);
+                            sos2.writeTag(new ShowFrameTag(null));
+
+
+                            sos2.writeTag(new ShowFrameTag(null));
+                            if (flashPanel != null) {
+                                flashPanel.specialPlayback = true;
+                            }
                         } else if (tagObj instanceof DefineVideoStreamTag) {
 
                             sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));

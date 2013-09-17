@@ -116,6 +116,7 @@ cmd:integer;
 written:cardinal;
 val:cardinal;
 vals:String;
+vars:String;
 
 const
  CMD_PLAY = 1;
@@ -129,6 +130,8 @@ const
  CMD_REWIND = 9;
  CMD_GOTO = 10;
  CMD_CALL = 11;
+ CMD_GETVARIABLE = 12;
+ CMD_SETVARIABLE = 13;
 begin
 
 pipename:=PAnsiChar('\\.\\pipe\ffdec_flashplayer_'+ParamStr(1));
@@ -234,7 +237,35 @@ begin
           Move(vals[1], buffer, val);
           WriteFile(pipe,buffer,val,written,nil);
         end;
+        CMD_GETVARIABLE:
+        begin
+          ReadFile(pipe,buffer,2,numBytesRead,nil);
+          val := (buffer[0] shl 8) + buffer[1];
+          ReadFile(pipe,buffer,val,numBytesRead,nil);
+          SetString(vals, PChar(Addr(buffer)), val);
+          vals:=flaPreview.GetVariable(vals);
+          val:=length(vals);
+          buffer[0]:=(val shr 8) mod 256;
+          buffer[1]:=val mod 256;
+          WriteFile(pipe,buffer,2,written,nil);
+          Move(vals[1], buffer, val);
+          WriteFile(pipe,buffer,val,written,nil);
+        end;
+        CMD_SETVARIABLE:
+        begin
+          ReadFile(pipe,buffer,2,numBytesRead,nil);
+          val := (buffer[0] shl 8) + buffer[1];
+          ReadFile(pipe,buffer,val,numBytesRead,nil);
+          SetString(vars, PChar(Addr(buffer)), val);
 
+          ReadFile(pipe,buffer,2,numBytesRead,nil);
+          val := (buffer[0] shl 8) + buffer[1];
+          ReadFile(pipe,buffer,val,numBytesRead,nil);
+          SetString(vals, PChar(Addr(buffer)), val);
+
+          flaPreview.SetVariable(vars,vals);
+
+        end;
         end;
   end
   until numBytesRead<=0;

@@ -50,8 +50,49 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     private static final int CMD_REWIND = 9;
     private static final int CMD_GOTO = 10;
     private static final int CMD_CALL = 11;
+    private static final int CMD_GETVARIABLE = 12;
+    private static final int CMD_SETVARIABLE = 13;
     private int frameRate;
-    public boolean functionPlayback = false;
+    public boolean specialPlayback = false;
+    private boolean specialPlaying = false;
+
+    public synchronized String getVariable(String name) {
+        if (pipe != null) {
+            IntByReference ibr = new IntByReference();
+            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_GETVARIABLE}, 1, ibr, null);
+            int nameLen = name.getBytes().length;
+            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((nameLen >> 8) & 0xff), (byte) (nameLen & 0xff)}, 2, ibr, null);
+            Kernel32.INSTANCE.WriteFile(pipe, name.getBytes(), nameLen, ibr, null);
+            byte res[] = new byte[2];
+            if (Kernel32.INSTANCE.ReadFile(pipe, res, 2, ibr, null)) {
+                int retLen = ((res[0] & 0xff) << 8) + (res[1] & 0xff);
+                res = new byte[retLen];
+                if (Kernel32.INSTANCE.ReadFile(pipe, res, retLen, ibr, null)) {
+                    String ret = new String(res, 0, retLen);
+                    return ret;
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public synchronized void setVariable(String name, String value) {
+        if (pipe != null) {
+            IntByReference ibr = new IntByReference();
+            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_SETVARIABLE}, 1, ibr, null);
+            int nameLen = name.getBytes().length;
+            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((nameLen >> 8) & 0xff), (byte) (nameLen & 0xff)}, 2, ibr, null);
+            Kernel32.INSTANCE.WriteFile(pipe, name.getBytes(), nameLen, ibr, null);
+
+            int valLen = value.getBytes().length;
+            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((valLen >> 8) & 0xff), (byte) (valLen & 0xff)}, 2, ibr, null);
+            Kernel32.INSTANCE.WriteFile(pipe, value.getBytes(), valLen, ibr, null);
+        }
+    }
 
     public synchronized String call(String callString) {
         if (pipe != null) {
@@ -88,8 +129,7 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         }
     }
 
-    @Override
-    public synchronized int getCurrentFrame() {
+    private int __getCurrentFrame() {
         byte[] res = new byte[2];
         IntByReference ibr = new IntByReference();
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_CURRENT_FRAME}, 1, ibr, null);
@@ -101,7 +141,27 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     }
 
     @Override
+    public synchronized int getCurrentFrame() {
+        if (specialPlayback) {
+            if (!specialPlaying) {
+                return specialPosition;
+            }
+            String posStr = getVariable("_root.my_sound.position");
+            if (posStr != null) {
+                return Integer.parseInt(posStr);
+            }
+        }
+        return __getCurrentFrame();
+    }
+
+    @Override
     public synchronized int getTotalFrames() {
+        if (specialPlayback) {
+            String durStr = getVariable("_root.my_sound.duration");
+            if (durStr != null) {
+                return Integer.parseInt(durStr);
+            }
+        }
         byte[] res = new byte[2];
         IntByReference ibr = new IntByReference();
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_TOTAL_FRAMES}, 1, ibr, null);
@@ -212,6 +272,11 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         }
         resize();
         stopped = false;
+        specialPlaying = false;
+        specialPosition = 0;
+        if (specialPlayback) {
+            play();
+        }
     }
 
     public static void unload() {
@@ -230,27 +295,64 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         }
         super.paint(g);
     }
+    private int specialPosition = 0;
 
-    @Override
-    public void pause() {
+    private synchronized void __pause() {
         IntByReference ibr = new IntByReference();
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PAUSE}, 1, ibr, null);
     }
 
     @Override
+    public void pause() {
+        if (specialPlayback) {
+            specialPosition = getCurrentFrame();
+            __gotoFrame(3);
+            __play();
+            specialPlaying = false;
+            return;
+        }
+        __pause();
+    }
+
+    @Override
     public void rewind() {
+        if (specialPlayback) {
+            boolean plays = specialPlaying;
+            pause();
+            specialPosition = 0;
+            if (plays) {
+                play();
+            }
+
+            return;
+        }
         IntByReference ibr = new IntByReference();
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_REWIND}, 1, ibr, null);
     }
 
-    @Override
-    public void play() {
+    private synchronized void __play() {
         IntByReference ibr = new IntByReference();
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_RESUME}, 1, ibr, null);
     }
 
     @Override
+    public void play() {
+        if (specialPlayback) {
+            double p = (((double) specialPosition) / 1000.0);
+            setVariable("_root.execParam", "" + p);
+            __gotoFrame(1);
+            __play();
+            specialPlaying = true;
+            return;
+        }
+        __play();
+    }
+
+    @Override
     public boolean isPlaying() {
+        if (specialPlayback) {
+            return specialPlaying;
+        }
         IntByReference ibr = new IntByReference();
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PLAYING}, 1, ibr, null);
         byte[] res = new byte[1];
@@ -261,15 +363,32 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         }
     }
 
-    @Override
-    public void gotoFrame(int frame) {
+    private synchronized void __gotoFrame(int frame) {
         IntByReference ibr = new IntByReference();
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_GOTO}, 1, ibr, null);
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((frame >> 8) & 0xff), (byte) (frame & 0xff)}, 2, ibr, null);
     }
 
     @Override
+    public void gotoFrame(int frame) {
+        if (specialPlayback) {
+            if (specialPlaying) {
+                pause();
+                specialPosition = frame;
+                play();
+            } else {
+                specialPosition = frame;
+            }
+            return;
+        }
+        __gotoFrame(frame);
+    }
+
+    @Override
     public int getFrameRate() {
+        if (specialPlayback) {
+            return 1000;
+        }
         return frameRate;
     }
 
