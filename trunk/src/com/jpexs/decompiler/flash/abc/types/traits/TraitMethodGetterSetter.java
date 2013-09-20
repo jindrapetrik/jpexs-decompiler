@@ -50,6 +50,11 @@ public class TraitMethodGetterSetter extends Trait {
             addKind = "set ";
         }
         MethodBody body = abc.findBody(method_info);
+
+        if (((classIndex == -1) || (!abc.instance_info[classIndex].isInterface())) && (body == null)) {
+            modifier = "native " + modifier;
+        }
+
         return modifier + Highlighting.hilighSpecial(highlight, "function " + addKind, "traittype") + Highlighting.hilighSpecial(highlight, getName(abc).getName(abc.constants, fullyQualifiedNames), "traitname") + "(" + abc.method_info[method_info].getParamStr(highlight, abc.constants, body, abc, fullyQualifiedNames) + ") : " + abc.method_info[method_info].getReturnTypeStr(highlight, abc.constants, fullyQualifiedNames);
 
     }
@@ -62,7 +67,7 @@ public class TraitMethodGetterSetter extends Trait {
         if (bodyIndex != -1) {
             bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, true, fullyQualifiedNames, null), 3);
         }
-        return Graph.INDENT_STRING + Graph.INDENT_STRING + header + ((classIndex != -1 && abc.instance_info[classIndex].isInterface()) ? ";" : " {\r\n" + bodyStr + "\r\n" + Graph.INDENT_STRING + Graph.INDENT_STRING + "}");
+        return Graph.INDENT_STRING + Graph.INDENT_STRING + header + ((classIndex != -1 && abc.instance_info[classIndex].isInterface() || bodyIndex == -1) ? ";" : " {\r\n" + bodyStr + "\r\n" + Graph.INDENT_STRING + Graph.INDENT_STRING + "}");
     }
 
     @Override
