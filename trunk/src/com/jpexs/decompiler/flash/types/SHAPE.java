@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.List;
@@ -53,8 +54,8 @@ public class SHAPE implements NeedsCharacters {
         return SHAPERECORD.shapeToSVG(shapeNum, null, null, numFillBits, numLineBits, shapeRecords);
     }
 
-    public BufferedImage toImage(int shapeNum, List<Tag> tags) {
-        return SHAPERECORD.shapeToImage(tags, shapeNum, null, null,/* numFillBits, numLineBits, */ shapeRecords);
+    public BufferedImage toImage(int shapeNum, List<Tag> tags, Color defaultColor) {
+        return SHAPERECORD.shapeToImage(tags, shapeNum, null, null,/* numFillBits, numLineBits, */ shapeRecords, defaultColor);
     }
 
     public RECT getBounds() {

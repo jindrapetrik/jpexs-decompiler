@@ -166,6 +166,7 @@ public class SWFInputStream extends InputStream {
             return readNoBitReset();
         } catch (EndOfStreamException ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
         }
         return -1;
     }
@@ -952,6 +953,36 @@ public class SWFInputStream extends InputStream {
                     break;
                 case 94:
                     ret = new PlaceObject4Tag(swf, data, version, pos);
+                    break;
+                case 1000:
+                    ret = new GFxExporterInfoTag(swf, data, version, pos);
+                    break;
+                case 1001:
+                    ret = new GFxDefineExternalImage(swf, data, version, pos);
+                    break;
+                case 1002:
+                    ret = new GFxFontTextureInfo(swf, data, version, pos);
+                    break;
+                case 1003:
+                    ret = new GFxDefineExternalGradient(swf, data, version, pos);
+                    break;
+                case 1004:
+                    ret = new GFxDefineGradientMap(swf, data, version, pos);
+                    break;
+                case 1005:
+                    ret = new GFxDefineCompactedFont(swf, data, version, pos);
+                    break;
+                case 1006:
+                    ret = new GFxDefineExternalSound(swf, data, version, pos);
+                    break;
+                case 1007:
+                    ret = new GFxDefineExternalStreamSound(swf, data, version, pos);
+                    break;
+                case 1008:
+                    ret = new GFxDefineSubImage(swf, data, version, pos);
+                    break;
+                case 1009:
+                    ret = new GFxDefineExternalImage2(swf, data, version, pos);
                     break;
                 default:
                     ret = new Tag(swf, tag.getId(), "Unknown", data, pos);

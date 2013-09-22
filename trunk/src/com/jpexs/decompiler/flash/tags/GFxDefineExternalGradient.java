@@ -29,9 +29,16 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class TagStub extends Tag {
+public class GFxDefineExternalGradient extends Tag {
 
-    public static final int ID = -1; //TODO: Enter correct ID
+    public static final int ID = 1003;
+    public static final int BITMAP_FORMAT_DEFAULT = 0;
+    public static final int BITMAP_FORMAT_TGA = 1;
+    public static final int BITMAP_FORMAT_DDS = 2;
+    public int gradientId;
+    public int bitmapsFormat;
+    public int gradientSize;
+    public String fileName;
 
     /**
      * Gets data bytes
@@ -44,10 +51,15 @@ public class TagStub extends Tag {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
-        /*try {
-         //sos.write
-         } catch (IOException e) {
-         }*/
+        try {
+            sos.writeUI16(gradientId);
+            sos.writeUI16(bitmapsFormat);
+            sos.writeUI16(gradientSize);
+            byte fileNameBytes[] = fileName.getBytes();
+            sos.writeUI8(fileNameBytes.length);
+            sos.write(fileNameBytes);
+        } catch (IOException e) {
+        }
         return baos.toByteArray();
     }
 
@@ -60,9 +72,13 @@ public class TagStub extends Tag {
      * @param pos
      * @throws IOException
      */
-    public TagStub(SWF swf, byte[] data, int version, long pos) throws IOException {
-        super(swf, ID, "" /*TODO:Insert name here*/, data, pos);
+    public GFxDefineExternalGradient(SWF swf, byte[] data, int version, long pos) throws IOException {
+        super(swf, ID, "DefineExternalGradient", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-
+        gradientId = sis.readUI16();
+        bitmapsFormat = sis.readUI16();
+        gradientSize = sis.readUI16();
+        int fileNameLen = sis.readUI8();
+        fileName = new String(sis.readBytes(fileNameLen));
     }
 }

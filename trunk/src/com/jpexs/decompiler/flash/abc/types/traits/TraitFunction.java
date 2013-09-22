@@ -43,7 +43,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     @Override
     public String convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
-        String modifier = getModifiers(abcTags, abc, isStatic) + " ";                
+        String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         MethodBody body = abc.findBody(method_info);
         if (body == null) {
             modifier = "native " + modifier;

@@ -67,6 +67,7 @@ import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
+import com.jpexs.decompiler.flash.tags.GFxDefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
@@ -1801,7 +1802,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         if ((t instanceof DefineFontTag)
                 || (t instanceof DefineFont2Tag)
                 || (t instanceof DefineFont3Tag)
-                || (t instanceof DefineFont4Tag)) {
+                || (t instanceof DefineFont4Tag)
+                || (t instanceof GFxDefineCompactedFont)) {
             return "font";
         }
         if ((t instanceof DefineTextTag)

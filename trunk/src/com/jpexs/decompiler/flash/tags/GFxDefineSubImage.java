@@ -29,9 +29,15 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class TagStub extends Tag {
+public class GFxDefineSubImage extends Tag {
 
-    public static final int ID = -1; //TODO: Enter correct ID
+    public static final int ID = 1008;
+    public int characterId;
+    public int imageCharacterId;
+    public int x1;
+    public int y1;
+    public int x2;
+    public int y2;
 
     /**
      * Gets data bytes
@@ -44,10 +50,15 @@ public class TagStub extends Tag {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
-        /*try {
-         //sos.write
-         } catch (IOException e) {
-         }*/
+        try {
+            sos.writeUI16(characterId);
+            sos.writeUI16(imageCharacterId);
+            sos.writeUI16(x1);
+            sos.writeUI16(y1);
+            sos.writeUI16(x2);
+            sos.writeUI16(y2);
+        } catch (IOException e) {
+        }
         return baos.toByteArray();
     }
 
@@ -60,9 +71,14 @@ public class TagStub extends Tag {
      * @param pos
      * @throws IOException
      */
-    public TagStub(SWF swf, byte[] data, int version, long pos) throws IOException {
-        super(swf, ID, "" /*TODO:Insert name here*/, data, pos);
+    public GFxDefineSubImage(SWF swf, byte[] data, int version, long pos) throws IOException {
+        super(swf, ID, "DefineSubImage", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-
+        characterId = sis.readUI16();
+        imageCharacterId = sis.readUI16();
+        x1 = sis.readUI16();
+        y1 = sis.readUI16();
+        x2 = sis.readUI16();
+        y2 = sis.readUI16();
     }
 }

@@ -29,9 +29,10 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class TagStub extends Tag {
+public class GFxDefineGradientMap extends Tag {
 
-    public static final int ID = -1; //TODO: Enter correct ID
+    public static final int ID = 1004;
+    public int indices[];
 
     /**
      * Gets data bytes
@@ -44,10 +45,13 @@ public class TagStub extends Tag {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
-        /*try {
-         //sos.write
-         } catch (IOException e) {
-         }*/
+        try {
+            sos.writeUI16(indices.length);
+            for (int i = 0; i < indices.length; i++) {
+                sos.writeUI16(indices[i]);
+            }
+        } catch (IOException e) {
+        }
         return baos.toByteArray();
     }
 
@@ -60,9 +64,13 @@ public class TagStub extends Tag {
      * @param pos
      * @throws IOException
      */
-    public TagStub(SWF swf, byte[] data, int version, long pos) throws IOException {
-        super(swf, ID, "" /*TODO:Insert name here*/, data, pos);
+    public GFxDefineGradientMap(SWF swf, byte[] data, int version, long pos) throws IOException {
+        super(swf, ID, "DefineGradientMap", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-
+        int numGradients = sis.readUI16();
+        indices = new int[numGradients];
+        for (int i = 0; i < numGradients; i++) {
+            indices[i] = sis.readUI16();
+        }
     }
 }

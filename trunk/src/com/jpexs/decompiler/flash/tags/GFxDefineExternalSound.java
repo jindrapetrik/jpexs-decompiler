@@ -29,9 +29,19 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class TagStub extends Tag {
+public class GFxDefineExternalSound extends Tag {
 
-    public static final int ID = -1; //TODO: Enter correct ID
+    public static final int ID = 1006;
+    public int characterId;
+    public int soundFormat;
+    public int bits;
+    public int channels;
+    public long sampleRate;
+    public long sampleCount;
+    public long seekSample;
+    public String exportName;
+    public String fileName;
+    public static final int SOUND_FORMAT_WAV = 0;
 
     /**
      * Gets data bytes
@@ -44,10 +54,22 @@ public class TagStub extends Tag {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
-        /*try {
-         //sos.write
-         } catch (IOException e) {
-         }*/
+        try {
+            sos.writeUI16(characterId);
+            sos.writeUI16(soundFormat);
+            sos.writeUI16(bits);
+            sos.writeUI16(channels);
+            sos.writeUI32(sampleRate);
+            sos.writeUI32(sampleCount);
+            sos.writeUI32(seekSample);
+            byte[] exportNameBytes = exportName.getBytes();
+            sos.writeUI8(exportNameBytes.length);
+            sos.write(exportNameBytes);
+            byte[] fileNameBytes = fileName.getBytes();
+            sos.writeUI8(fileNameBytes.length);
+            sos.write(fileNameBytes);
+        } catch (IOException e) {
+        }
         return baos.toByteArray();
     }
 
@@ -60,9 +82,20 @@ public class TagStub extends Tag {
      * @param pos
      * @throws IOException
      */
-    public TagStub(SWF swf, byte[] data, int version, long pos) throws IOException {
-        super(swf, ID, "" /*TODO:Insert name here*/, data, pos);
+    public GFxDefineExternalSound(SWF swf, byte[] data, int version, long pos) throws IOException {
+        super(swf, ID, "DefineExternalSound", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        characterId = sis.readUI16();
+        soundFormat = sis.readUI16();
+        bits = sis.readUI16();
+        channels = sis.readUI16();
+        sampleRate = sis.readUI32();
+        sampleCount = sis.readUI32();
+        seekSample = sis.readUI32();
+        int exportNameLen = sis.readUI8();
+        exportName = new String(sis.readBytes(exportNameLen));
+        int fileNameLen = sis.readUI8();
+        fileName = new String(sis.readBytes(fileNameLen));
 
     }
 }

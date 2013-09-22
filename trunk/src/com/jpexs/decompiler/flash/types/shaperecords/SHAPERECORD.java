@@ -36,6 +36,7 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.LinearGradientPaint;
@@ -74,7 +75,7 @@ import javax.swing.JPanel;
  */
 public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
 
-    private static final float DESCALE = 20; //20
+    private static final float DESCALE = 20;
 
     @Override
     public Set<Integer> getNeededCharacters() {
@@ -835,6 +836,46 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         for (Path p : paths) {
             ret.add(p.toGeneralPath(-rect.Xmin, -rect.Ymin));
         }
+        return ret;
+    }
+
+    public static BufferedImage shapeListToImage(List<SHAPE> shapes, int prevWidth, int prevHeight, Color color) {
+        BufferedImage ret = new BufferedImage(prevWidth, prevHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = ret.getGraphics();
+        int p = 0;
+        List<BufferedImage> images = new ArrayList<>();
+        for (SHAPE s : shapes) {
+            images.add(s.toImage(1, new ArrayList<Tag>(), color));
+        }
+        int cols = (int) Math.ceil(Math.sqrt(images.size()));
+        int pos = 0;
+        int w2 = prevWidth / cols;
+        int h2 = prevHeight / cols;
+        loopy:
+        for (int y = 0; y < cols; y++) {
+            for (int x = 0; x < cols; x++) {
+                if (pos >= images.size()) {
+                    break loopy;
+                }
+                int w1 = images.get(pos).getWidth();
+                int h1 = images.get(pos).getHeight();
+
+
+                int h = h1 * w2 / w1;
+                int w;
+                if (h > h2) {
+                    w = w1 * h2 / h1;
+                    h = h2;
+                } else {
+                    w = w2;
+                }
+                int px = x * w2 + w2 / 2 - w / 2;
+                int py = y * h2 + h2 / 2 - h / 2;
+                g.drawImage(images.get(pos), px, py, px + w, py + h, 0, 0, w1, h1, null);
+                pos++;
+            }
+        }
+
         return ret;
     }
 

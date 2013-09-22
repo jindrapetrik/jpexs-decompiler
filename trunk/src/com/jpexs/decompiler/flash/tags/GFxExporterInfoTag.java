@@ -29,9 +29,21 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class TagStub extends Tag {
+public class GFxExporterInfoTag extends Tag {
 
-    public static final int ID = -1; //TODO: Enter correct ID
+    public static final int ID = 1000;
+    //Version (1.10 will be encoded as 0x10A)
+    public int version;
+    //Version 1.10 (0x10A) and above - flags
+    public long flags;
+    public int bitmapFormat;
+    public byte[] prefix;
+    public String swfName;
+    public static final int BITMAP_FORMAT_TGA = 1;
+    public static final int BITMAP_FORMAT_DDS = 2;
+    public static final int FLAG_CONTAINS_GLYPH_TEXTURES = 1;
+    public static final int FLAG_GLYPHS_STRIPPED_FROM_DEFINEFONT = 2;
+    public static final int FLAG_GRADIENT_IMAGES_EXPORTED = 4;
 
     /**
      * Gets data bytes
@@ -44,10 +56,19 @@ public class TagStub extends Tag {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
-        /*try {
-         //sos.write
-         } catch (IOException e) {
-         }*/
+        try {
+            sos.writeUI16(version);
+            if (version >= 0x10a) {
+                sos.writeUI32(flags);
+            }
+            sos.writeUI16(bitmapFormat);
+            sos.writeUI8(prefix.length);
+            sos.write(prefix);
+            byte swfNameBytes[] = swfName.getBytes();
+            sos.writeUI8(swfNameBytes.length);
+            sos.write(swfNameBytes);
+        } catch (IOException e) {
+        }
         return baos.toByteArray();
     }
 
@@ -60,9 +81,17 @@ public class TagStub extends Tag {
      * @param pos
      * @throws IOException
      */
-    public TagStub(SWF swf, byte[] data, int version, long pos) throws IOException {
-        super(swf, ID, "" /*TODO:Insert name here*/, data, pos);
+    public GFxExporterInfoTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+        super(swf, ID, "ExporterInfo", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-
+        version = sis.readUI16();
+        if (version >= 0x10a) {
+            flags = sis.readUI32();
+        }
+        bitmapFormat = sis.readUI16();
+        int prefixLen = sis.readUI8();
+        prefix = sis.readBytes(prefixLen);
+        int swfNameLen = sis.readUI8();
+        swfName = new String(sis.readBytes(swfNameLen));
     }
 }
