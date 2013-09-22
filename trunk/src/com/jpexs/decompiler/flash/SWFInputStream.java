@@ -166,7 +166,6 @@ public class SWFInputStream extends InputStream {
             return readNoBitReset();
         } catch (EndOfStreamException ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, null, ex);
-            System.exit(1);
         }
         return -1;
     }
