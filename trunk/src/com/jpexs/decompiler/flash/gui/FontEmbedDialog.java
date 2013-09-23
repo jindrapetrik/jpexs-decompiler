@@ -120,7 +120,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
 
         JPanel specialPanel = new JPanel();
         specialPanel.setLayout(new BoxLayout(specialPanel, BoxLayout.X_AXIS));
-        specialPanel.add(new JLabel(translate("label.idividual")));
+        specialPanel.add(new JLabel(translate("label.individual")));
         individualCharsField = new JTextField();
         individualCharsField.setPreferredSize(new Dimension(100, individualCharsField.getPreferredSize().height));
         individialSample = new JLabel();
