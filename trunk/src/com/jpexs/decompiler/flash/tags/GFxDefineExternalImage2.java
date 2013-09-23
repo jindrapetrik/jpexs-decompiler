@@ -37,6 +37,7 @@ public class GFxDefineExternalImage2 extends Tag {
     public int targetWidth;
     public int targetHeight;
     public String fileName;
+    public byte[] extraData; //?
     public static final int BITMAP_FORMAT_DEFAULT = 0;
     public static final int BITMAP_FORMAT_TGA = 1;
     public static final int BITMAP_FORMAT_DDS = 2;
@@ -60,6 +61,9 @@ public class GFxDefineExternalImage2 extends Tag {
             byte fileNameBytes[] = fileName.getBytes();
             sos.writeUI8(fileNameBytes.length);
             sos.write(fileNameBytes);
+            if (extraData != null) {
+                sos.write(extraData);
+            }
         } catch (IOException e) {
         }
         return baos.toByteArray();
@@ -83,5 +87,8 @@ public class GFxDefineExternalImage2 extends Tag {
         targetHeight = sis.readUI16();
         int fileNameLen = sis.readUI8();
         fileName = new String(sis.readBytes(fileNameLen));
+        if (sis.available() > 0) {
+            extraData = sis.readBytes(sis.available());
+        }
     }
 }

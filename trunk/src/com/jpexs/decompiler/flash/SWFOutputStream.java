@@ -379,7 +379,7 @@ public class SWFOutputStream extends OutputStream {
             int tagLength = data.length;
             int tagID = tag.getId();
             int tagIDLength = (tagID << 6);
-            if ((tagLength < 0x3f) && (!tag.forceWriteAsLong)) {
+            if ((tagLength <= 62) && (!tag.forceWriteAsLong)) {
                 tagIDLength += tagLength;
                 sos.writeUI16(tagIDLength);
             } else {

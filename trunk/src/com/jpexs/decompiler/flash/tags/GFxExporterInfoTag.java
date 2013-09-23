@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -39,6 +41,7 @@ public class GFxExporterInfoTag extends Tag {
     public int bitmapFormat;
     public byte[] prefix;
     public String swfName;
+    public List<Long> codeOffsets;
     public static final int BITMAP_FORMAT_TGA = 1;
     public static final int BITMAP_FORMAT_DDS = 2;
     public static final int FLAG_CONTAINS_GLYPH_TEXTURES = 1;
@@ -57,8 +60,8 @@ public class GFxExporterInfoTag extends Tag {
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
-            sos.writeUI16(version);
-            if (version >= 0x10a) {
+            sos.writeUI16(this.version);
+            if (this.version >= 0x10a) {
                 sos.writeUI32(flags);
             }
             sos.writeUI16(bitmapFormat);
@@ -67,6 +70,12 @@ public class GFxExporterInfoTag extends Tag {
             byte swfNameBytes[] = swfName.getBytes();
             sos.writeUI8(swfNameBytes.length);
             sos.write(swfNameBytes);
+            if (codeOffsets != null) {
+                sos.writeUI16(codeOffsets.size());
+                for (long l : codeOffsets) {
+                    sos.writeUI32(l);
+                }
+            }
         } catch (IOException e) {
         }
         return baos.toByteArray();
@@ -84,8 +93,8 @@ public class GFxExporterInfoTag extends Tag {
     public GFxExporterInfoTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "ExporterInfo", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        version = sis.readUI16();
-        if (version >= 0x10a) {
+        this.version = sis.readUI16();
+        if (this.version >= 0x10a) {
             flags = sis.readUI32();
         }
         bitmapFormat = sis.readUI16();
@@ -93,5 +102,13 @@ public class GFxExporterInfoTag extends Tag {
         prefix = sis.readBytes(prefixLen);
         int swfNameLen = sis.readUI8();
         swfName = new String(sis.readBytes(swfNameLen));
+        if (sis.available() > 0) // (version >= 0x401) //?                
+        {
+            codeOffsets = new ArrayList<>();
+            int numCodeOffsets = sis.readUI16();
+            for (int i = 0; i < numCodeOffsets; i++) {
+                codeOffsets.add(sis.readUI32());
+            }
+        }
     }
 }

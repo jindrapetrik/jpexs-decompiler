@@ -105,7 +105,7 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData(int version) {        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
