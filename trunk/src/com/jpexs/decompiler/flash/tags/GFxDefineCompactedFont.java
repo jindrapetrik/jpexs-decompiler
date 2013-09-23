@@ -105,7 +105,7 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {        
+    public byte[] getData(int version) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
@@ -205,8 +205,12 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
 
         int code = (int) character;
         int pos = -1;
+        boolean exists = false;
         for (int i = 0; i < font.glyphInfo.size(); i++) {
-            if (font.glyphInfo.get(i).glyphCode > code) {
+            if (font.glyphInfo.get(i).glyphCode >= code) {
+                if (font.glyphInfo.get(i).glyphCode == code) {
+                    exists = true;
+                }
                 pos = i;
                 break;
             }
@@ -215,13 +219,21 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
             pos = font.glyphInfo.size();
         }
 
-        FontTag.shiftGlyphIndices(fontId, pos, tags);
+        if (!exists) {
+            FontTag.shiftGlyphIndices(fontId, pos, tags);
+        }
 
         Font fnt = new Font(fontName, fontStyle, 20 * font.nominalSize);
         int advance = (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX());
-        font.glyphInfo.add(pos, new GlyphInfoType(code, advance, 0));
-        font.glyphs.add(pos, new GlyphType(shp.shapeRecords));
-        shapeCache.add(pos, font.glyphs.get(pos).toSHAPE());
+        if (!exists) {
+            font.glyphInfo.add(pos, new GlyphInfoType(code, advance, 0));
+            font.glyphs.add(pos, new GlyphType(shp.shapeRecords));
+            shapeCache.add(pos, font.glyphs.get(pos).toSHAPE());
+        } else {
+            font.glyphInfo.set(pos, new GlyphInfoType(code, advance, 0));
+            font.glyphs.set(pos, new GlyphType(shp.shapeRecords));
+            shapeCache.set(pos, font.glyphs.get(pos).toSHAPE());
+        }
         imageCache.remove("font" + fontId);
     }
 

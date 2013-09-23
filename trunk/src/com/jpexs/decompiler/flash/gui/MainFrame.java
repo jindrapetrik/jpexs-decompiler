@@ -2315,7 +2315,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     if (opt == 3) {
                         notoall = true;
                     }
-                } else if (yestoall) {
+                }
+                if (yestoall) {
                     opt = 0; //yes                
                 } else if (notoall) {
                     opt = 1; //no
