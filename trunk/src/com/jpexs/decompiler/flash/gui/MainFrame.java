@@ -157,6 +157,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -1216,6 +1217,10 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         fontAddCharsButton.addActionListener(this);
         fontAddCharsPanel.add(fontAddCharsButton);
 
+        JButton fontEmbedButton = new JButton(translate("button.font.embed"));
+        fontEmbedButton.setActionCommand("FONTEMBED");
+        fontEmbedButton.addActionListener(this);
+        //fontAddCharsPanel.add(fontEmbedButton);
 
         fontParams1.add(fontAddCharsPanel);
         JPanel fontSelectionPanel = new JPanel(new FlowLayout());
@@ -1240,6 +1245,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         fontCharPanel.add(fontAddCharsPanel);
         fontCharPanel.add(fontSelectionPanel);
         fontParams1.add(fontCharPanel);
+        fontParams1.add(fontEmbedButton);
         fontPanel.setLayout(new BorderLayout());
         fontParams1.add(Box.createVerticalGlue());
         fontPanel.add(new JScrollPane(fontParams1), BorderLayout.CENTER);
@@ -2280,9 +2286,70 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
+    private void fontAddChars(FontTag ft, Set<Integer> selChars, String selFont) {
+        FontTag f = (FontTag) oldValue;
+        String oldchars = f.getCharacters(swf.tags);
+        for (int ic : selChars) {
+            char c = (char) ic;
+            if (oldchars.indexOf((int) c) == -1) {
+                Font font = new Font(selFont, f.getFontStyle(), 1024);
+                if (!font.canDisplay(c)) {
+                    View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + c), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+        }
+
+        String[] yesno = new String[]{translate("button.yes"), translate("button.no"), translate("button.yes.all"), translate("button.no.all")};
+        boolean yestoall = false;
+        boolean notoall = false;
+        for (int ic : selChars) {
+            char c = (char) ic;
+            if (oldchars.indexOf((int) c) > -1) {
+                int opt; //yes
+                if (!(yestoall || notoall)) {
+                    opt = View.showOptionDialog(null, translate("message.font.add.exists").replace("%char%", "" + c), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, translate("button.yes"));
+                    if (opt == 2) {
+                        yestoall = true;
+                    }
+                    if (opt == 3) {
+                        notoall = true;
+                    }
+                } else if (yestoall) {
+                    opt = 0; //yes                
+                } else if (notoall) {
+                    opt = 1; //no
+                } else {
+                    opt = 1;
+                }
+
+                if (opt == 1) {
+                    continue;
+                }
+            }
+            f.addCharacter(swf.tags, c, fontSelection.getSelectedItem().toString());
+            oldchars += c;
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "FONTEMBED":
+                if (oldValue instanceof FontTag) {
+                    FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ((FontTag) oldValue).getFontStyle());
+                    if (fed.display()) {
+                        Set<Integer> selChars = fed.getSelectedChars();
+                        if (!selChars.isEmpty()) {
+                            String selFont = fed.getSelectedFont();
+                            fontSelection.setSelectedItem(selFont);
+                            fontAddChars((FontTag) oldValue, selChars, selFont);
+                            fontAddCharactersField.setText("");
+                            reload(true);
+                        }
+                    }
+                }
+                break;
             case "SELECTCOLOR":
                 Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectcolor.title"), View.swfBackgroundColor);
                 if (newColor != null) {
@@ -2307,27 +2374,11 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             case "FONTADDCHARS":
                 String newchars = fontAddCharactersField.getText();
                 if (oldValue instanceof FontTag) {
-                    FontTag f = (FontTag) oldValue;
-                    String oldchars = f.getCharacters(swf.tags);
-
-                    for (int i = 0; i < newchars.length(); i++) {
-                        char c = newchars.charAt(i);
-                        if (oldchars.indexOf((int) c) == -1) {
-                            Font font = new Font(fontSelection.getSelectedItem().toString(), f.getFontStyle(), 1024);
-                            if (!font.canDisplay(c)) {
-                                View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + c), translate("error"), JOptionPane.ERROR_MESSAGE);
-                                return;
-                            }
-                        }
+                    Set<Integer> selChars = new TreeSet<>();
+                    for (int c = 0; c < newchars.length(); c++) {
+                        selChars.add(newchars.codePointAt(c));
                     }
-
-                    for (int i = 0; i < newchars.length(); i++) {
-                        char c = newchars.charAt(i);
-                        if (oldchars.indexOf((int) c) == -1) {
-                            f.addCharacter(swf.tags, c, fontSelection.getSelectedItem().toString());
-                            oldchars += c;
-                        }
-                    }
+                    fontAddChars((FontTag) oldValue, selChars, fontSelection.getSelectedItem().toString());
                     fontAddCharactersField.setText("");
                     reload(true);
                 }

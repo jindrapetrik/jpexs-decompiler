@@ -236,8 +236,12 @@ public class DefineFontTag extends FontTag {
         }
         int code = (int) character;
         int pos = -1;
+        boolean exists = false;
         for (int i = 0; i < codeTable.size(); i++) {
-            if (codeTable.get(i) > code) {
+            if (codeTable.get(i) >= code) {
+                if (codeTable.get(i) == code) {
+                    exists = true;
+                }
                 pos = i;
                 break;
             }
@@ -245,9 +249,13 @@ public class DefineFontTag extends FontTag {
         if (pos == -1) {
             pos = codeTable.size();
         }
-        FontTag.shiftGlyphIndices(fontId, pos, tags);
-        glyphShapeTable.add(pos, shp);
-        codeTable.add(pos, (int) character);
+        if (!exists) {
+            FontTag.shiftGlyphIndices(fontId, pos, tags);
+            glyphShapeTable.add(pos, shp);
+            codeTable.add(pos, (int) character);
+        } else {
+            glyphShapeTable.set(pos, shp);
+        }
 
     }
 

@@ -317,8 +317,12 @@ public class DefineFont3Tag extends FontTag {
         SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, fontStyle, getDivider() * 1024, character);
         int code = (int) character;
         int pos = -1;
+        boolean exists = false;
         for (int i = 0; i < codeTable.size(); i++) {
-            if (codeTable.get(i) > code) {
+            if (codeTable.get(i) >= code) {
+                if (codeTable.get(i) == code) {
+                    exists = true;
+                }
                 pos = i;
                 break;
             }
@@ -327,15 +331,28 @@ public class DefineFont3Tag extends FontTag {
             pos = codeTable.size();
         }
 
-        FontTag.shiftGlyphIndices(fontId, pos, tags);
-        glyphShapeTable.add(pos, shp);
-        codeTable.add(pos, (int) character);
-        if (fontFlagsHasLayout) {
-            fontBoundsTable.add(pos, shp.getBounds());
-            Font fnt = new Font(fontName, fontStyle, getDivider() * 1024);
-            fontAdvanceTable.add(pos, (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
+        if (!exists) {
+            FontTag.shiftGlyphIndices(fontId, pos, tags);
+            glyphShapeTable.add(pos, shp);
+            codeTable.add(pos, (int) character);
+        } else {
+            glyphShapeTable.set(pos, shp);
         }
-        numGlyphs++;
+        if (fontFlagsHasLayout) {
+
+            Font fnt = new Font(fontName, fontStyle, getDivider() * 1024);
+            if (!exists) {
+                fontBoundsTable.add(pos, shp.getBounds());
+                fontAdvanceTable.add(pos, (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
+            } else {
+                fontBoundsTable.set(pos, shp.getBounds());
+                fontAdvanceTable.set(pos, (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
+
+            }
+        }
+        if (!exists) {
+            numGlyphs++;
+        }
     }
 
     @Override
