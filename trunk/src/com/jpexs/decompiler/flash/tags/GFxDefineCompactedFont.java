@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import java.awt.Color;
 import java.awt.Font;
@@ -44,13 +45,17 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 /**
@@ -63,6 +68,35 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
     public static final int ID = 1005;
     public int fontId;
     public List<FontType> fonts;
+    private List<SHAPE> shapeCache;
+    private static Cache imageCache = Cache.getInstance(false);
+
+    private static class SerializableImage implements Serializable {
+
+        transient BufferedImage image;
+
+        public BufferedImage getImage() {
+            return image;
+        }
+
+        public void setImage(BufferedImage image) {
+            this.image = image;
+        }
+
+        public SerializableImage(BufferedImage image) {
+            this.image = image;
+        }
+
+        private void writeObject(ObjectOutputStream out) throws IOException {
+            out.defaultWriteObject();
+            ImageIO.write(image, "png", out);
+        }
+
+        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            image = ImageIO.read(in);
+        }
+    }
 
     /**
      * Gets data bytes
@@ -104,18 +138,25 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
         while (sis.available() > 0) {
             fonts.add(new FontType(new GFxInputStream(sis)));
         }
+        rebuildShapeCache();
+    }
+
+    public void rebuildShapeCache() {
+        shapeCache = fonts.get(0).getGlyphShapes();
     }
 
     @Override
     public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        if (imageCache.contains("font" + fontId)) {
+            return ((SerializableImage) imageCache.get("font" + fontId)).getImage();
+        }
         List<SHAPE> shapes = new ArrayList<>();
-        for (FontType f : fonts) {
-            shapes.addAll(f.getGlyphShapes());
+        for (int i = 0; i < shapeCache.size(); i++) {
+            shapes.add(SHAPERECORD.resizeSHAPE(shapeCache.get(i), 20));
         }
-        for (int i = 0; i < shapes.size(); i++) {
-            shapes.set(i, SHAPERECORD.resizeSHAPE(shapes.get(i), 20));
-        }
-        return SHAPERECORD.shapeListToImage(shapes, 500, 500, Color.black);
+        BufferedImage ret = SHAPERECORD.shapeListToImage(shapes, 500, 500, Color.black);
+        imageCache.put("font" + fontId, new SerializableImage(ret));
+        return ret;
     }
 
     @Override
@@ -152,7 +193,7 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
 
     @Override
     public List<SHAPE> getGlyphShapeTable() {
-        return fonts.get(0).getGlyphShapes();
+        return shapeCache;
     }
 
     @Override
@@ -180,6 +221,8 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
         int advance = (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX());
         font.glyphInfo.add(pos, new GlyphInfoType(code, advance, 0));
         font.glyphs.add(pos, new GlyphType(shp.shapeRecords));
+        shapeCache.add(pos, font.glyphs.get(pos).toSHAPE());
+        imageCache.remove("font" + fontId);
     }
 
     @Override

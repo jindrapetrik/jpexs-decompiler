@@ -886,15 +886,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 int w1 = images.get(pos).getWidth();
                 int h1 = images.get(pos).getHeight();
 
-
-                /*int h = h1 * mw / w1;
-                 int w;
-                 if (h > mh) {
-                 w = w1 * mh / h1;
-                 h = mh;
-                 } else {
-                 w = mw;
-                 }*/
                 int w = Math.round(ratio * w1);
                 int h = Math.round(ratio * h1);
                 int px = x * mw + mw / 2 - w / 2;
