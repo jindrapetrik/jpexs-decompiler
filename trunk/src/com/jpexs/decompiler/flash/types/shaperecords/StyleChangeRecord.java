@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import java.util.Set;
@@ -104,5 +105,10 @@ public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
             Logger.getLogger(StyleChangeRecord.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    @Override
+    public void calculateBits() {
+        moveBits = SWFOutputStream.getNeededBitsS(moveDeltaX, moveDeltaY);
     }
 }

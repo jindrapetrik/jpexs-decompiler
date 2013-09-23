@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.gfx.FONTINFO;
 import com.jpexs.decompiler.flash.types.gfx.GFxInputStream;
+import com.jpexs.decompiler.flash.types.gfx.GFxOutputStream;
 import com.jpexs.decompiler.flash.types.gfx.TEXGLYPH;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -71,11 +72,11 @@ public class GFxFontTextureInfo extends Tag {
             sos.writeUI16(nominalGlyphSz);
             sos.writeUI16(texGlyphs.length);
             for (int i = 0; i < texGlyphs.length; i++) {
-                texGlyphs[i].write(sos);
+                texGlyphs[i].write(new GFxOutputStream(sos));
             }
             sos.writeUI16(fonts.length);
             for (int i = 0; i < fonts.length; i++) {
-                fonts[i].write(sos);
+                fonts[i].write(new GFxOutputStream(sos));
             }
         } catch (IOException e) {
         }

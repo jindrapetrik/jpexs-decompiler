@@ -292,6 +292,10 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     private JComboBox<String> fontSelection;
     private JCommandButton saveCommandButton;
     private PlayerControls flashControls;
+    private ImagePanel internelViewerPanel;
+    private JPanel viewerCards;
+    public static final String FLASH_VIEWER_CARD = "FLASHVIEWER";
+    public static final String INTERNAL_VIEWER_CARD = "INTERNALVIEWER";
     private Map<Integer, String> sourceFontsMap = new HashMap<>();
     private AbortRetryIgnoreHandler errorHandler = new AbortRetryIgnoreHandler() {
         @Override
@@ -1273,7 +1277,19 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         paramsLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //paramsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         pan.add(prevLabel, BorderLayout.NORTH);
-        pan.add(leftComponent, BorderLayout.CENTER);
+
+        viewerCards = new JPanel();
+        viewerCards.setLayout(new CardLayout());
+        //viewerCards.add(leftComponent,FLASH_VIEWER_CARD);
+
+        internelViewerPanel = new ImagePanel();
+        JPanel ivPanel = new JPanel(new BorderLayout());
+        ivPanel.add(new HeaderLabel(translate("swfpreview.internal")), BorderLayout.NORTH);
+        ivPanel.add(internelViewerPanel, BorderLayout.CENTER);
+        viewerCards.add(ivPanel, INTERNAL_VIEWER_CARD);
+
+        ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
+
         if (flashPanel != null) {
             JPanel bottomPanel = new JPanel(new BorderLayout());
             JPanel buttonsPanel = new JPanel(new FlowLayout());
@@ -1285,7 +1301,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             bottomPanel.add(buttonsPanel, BorderLayout.EAST);
             pan.add(bottomPanel, BorderLayout.SOUTH);
         }
-        previewSplitPane.setLeftComponent(pan);
+        pan.add(leftComponent, BorderLayout.CENTER);
+        viewerCards.add(pan, FLASH_VIEWER_CARD);
+        previewSplitPane.setLeftComponent(viewerCards);
 
         parametersPanel = new JPanel(new BorderLayout());
         parametersPanel.add(paramsLabel, BorderLayout.NORTH);
@@ -2941,6 +2959,13 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
     }
 
+    private static Tag classicTag(Tag t) {
+        if (t instanceof GFxDefineCompactedFont) {
+            return ((GFxDefineCompactedFont) t).toClassicFont();
+        }
+        return t;
+    }
+
     public void reload(boolean forceReload) {
         Object tagObj = tagTree.getLastSelectedPathComponent();
         if (tagObj == null) {
@@ -3047,9 +3072,13 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             imageButtonsPanel.setVisible(((ImageTag) tagObj).importSupported());
             showCard(CARDIMAGEPANEL);
             imagePanel.setImage(((ImageTag) tagObj).getImage(swf.tags));
-        } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (miInternalViewer.isSelected())) {
+        } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (miInternalViewer.isSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
+        } else if ((tagObj instanceof FontTag) && (miInternalViewer.isSelected() || (tagObj instanceof GFxDefineCompactedFont))) {
+            showCard(CARDFLASHPANEL);
+            previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
+            showFontTag((FontTag) tagObj);
         } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (miInternalViewer.isSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             FrameNode fn = (FrameNode) tagObj;
@@ -3065,6 +3094,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             }
             previewImagePanel.setImage(SWF.frameToImage(containerId, ((FrameNode) tagObj).getFrame() - 1, swf.tags, controlTags, rect, totalFrameCount, new Stack<Integer>()));
         } else if (((tagObj instanceof FrameNode) && ((FrameNode) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
+            ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             try {
 
                 if (tempFile != null) {
@@ -3158,14 +3188,14 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             Set<Integer> needed = t.getDeepNeededCharacters(characters, new ArrayList<Integer>());
                             for (int n : needed) {
                                 if (!doneCharacters.contains(n)) {
-                                    sos2.writeTag(characters.get(n));
+                                    sos2.writeTag(classicTag(characters.get(n)));
                                     doneCharacters.add(n);
                                 }
                             }
                             if (t instanceof CharacterTag) {
                                 doneCharacters.add(((CharacterTag) t).getCharacterId());
                             }
-                            sos2.writeTag(t);
+                            sos2.writeTag(classicTag(t));
 
                             if (parent != null) {
                                 if (t instanceof PlaceObjectTypeTag) {
@@ -3201,11 +3231,11 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         } else {
                             Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters, new ArrayList<Integer>());
                             for (int n : needed) {
-                                sos2.writeTag(characters.get(n));
+                                sos2.writeTag(classicTag(characters.get(n)));
                             }
                         }
 
-                        sos2.writeTag(((Tag) tagObj));
+                        sos2.writeTag(classicTag((Tag) tagObj));
 
                         int chtId = 0;
                         if (tagObj instanceof CharacterTag) {
@@ -3441,24 +3471,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 showDetailWithPreview(CARDTEXTPANEL);
                 textValue.setText(((TextTag) tagObj).getFormattedText(swf.tags));
             } else if (tagObj instanceof FontTag) {
-                parametersPanel.setVisible(true);
-                previewSplitPane.setDividerLocation(previewSplitPane.getWidth() / 2);
-                FontTag ft = (FontTag) tagObj;
-                fontNameLabel.setText(ft.getFontName(swf.tags));
-                fontIsBoldLabel.setText(ft.isBold() ? translate("yes") : translate("no"));
-                fontIsItalicLabel.setText(ft.isItalic() ? translate("yes") : translate("no"));
-                fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : "" + ft.getDescent());
-                fontAscentLabel.setText(ft.getAscent() == -1 ? translate("value.unknown") : "" + ft.getAscent());
-                fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : "" + ft.getLeading());
-                String chars = ft.getCharacters(swf.tags);
-                fontCharactersTextArea.setText(chars);
-                if (sourceFontsMap.containsKey(ft.getFontId())) {
-                    fontSelection.setSelectedItem(sourceFontsMap.get(ft.getFontId()));
-                } else {
-                    fontSelection.setSelectedItem(FontTag.findInstalledFontName(ft.getFontName(swf.tags)));
-                }
-                fontChangeList.componentResized(null);
-                showDetailWithPreview(CARDFONTPANEL);
+                showFontTag((FontTag) tagObj);
             } else {
                 parametersPanel.setVisible(false);
             }
@@ -3466,6 +3479,33 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         } else {
             showCard(CARDEMPTYPANEL);
         }
+    }
+
+    private void showFontTag(FontTag ft) {
+        if (miInternalViewer.isSelected() || ft instanceof GFxDefineCompactedFont) {
+            ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
+            internelViewerPanel.setDrawable(ft, swf, characters, 1);
+        } else {
+            ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
+        }
+
+        parametersPanel.setVisible(true);
+        previewSplitPane.setDividerLocation(previewSplitPane.getWidth() / 2);
+        fontNameLabel.setText(ft.getFontName(swf.tags));
+        fontIsBoldLabel.setText(ft.isBold() ? translate("yes") : translate("no"));
+        fontIsItalicLabel.setText(ft.isItalic() ? translate("yes") : translate("no"));
+        fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : "" + ft.getDescent());
+        fontAscentLabel.setText(ft.getAscent() == -1 ? translate("value.unknown") : "" + ft.getAscent());
+        fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : "" + ft.getLeading());
+        String chars = ft.getCharacters(swf.tags);
+        fontCharactersTextArea.setText(chars);
+        if (sourceFontsMap.containsKey(ft.getFontId())) {
+            fontSelection.setSelectedItem(sourceFontsMap.get(ft.getFontId()));
+        } else {
+            fontSelection.setSelectedItem(FontTag.findInstalledFontName(ft.getFontName(swf.tags)));
+        }
+        fontChangeList.componentResized(null);
+        showDetailWithPreview(CARDFONTPANEL);
     }
 
     public void refreshTree() {

@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
-import com.jpexs.decompiler.flash.SWFOutputStream;
 import java.io.IOException;
 
 /**
@@ -38,7 +37,7 @@ public class GLYPHIDX {
         this.indexInTexture = sis.readUI16();
     }
 
-    public void write(SWFOutputStream sos) throws IOException {
+    public void write(GFxOutputStream sos) throws IOException {
         sos.writeUI16(indexInFont);
         sos.writeUI16(indexInTexture);
     }

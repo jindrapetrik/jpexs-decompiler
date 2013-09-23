@@ -21,22 +21,29 @@ import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.Point;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class FontTag extends CharacterTag implements AloneTag {
+public abstract class FontTag extends CharacterTag implements AloneTag, DrawableTag {
 
     public FontTag(SWF swf, int id, String name, byte[] data, long pos) {
         super(swf, id, name, data, pos);
@@ -183,5 +190,20 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
             return fontName;
         }
         return fontNames.get(0);
+    }
+
+    @Override
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        return SHAPERECORD.shapeListToImage(getGlyphShapeTable(), 500, 500, Color.black);
+    }
+
+    @Override
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        return new Point(0, 0);
+    }
+
+    @Override
+    public int getNumFrames() {
+        return 1;
     }
 }

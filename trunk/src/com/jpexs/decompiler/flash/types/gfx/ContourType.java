@@ -16,8 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
-import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +35,39 @@ public class ContourType {
     public EdgeType[] edges;
     public boolean isReference;
     public long reference;
+
+    public ContourType(List<SHAPERECORD> records) {
+        int i = 0;
+        int divider = 20;
+        for (; i < records.size(); i++) {
+            if (records.get(i) instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) records.get(i);
+                if (scr.stateMoveTo) {
+                    moveToX = scr.moveDeltaX / divider;
+                    moveToY = scr.moveDeltaY / divider;
+                    break;
+                }
+            }
+        }
+        List<EdgeType> edgesList = new ArrayList<>();
+        for (; i < records.size(); i++) {
+            SHAPERECORD rec = records.get(i);
+            if (rec instanceof StraightEdgeRecord) {
+                StraightEdgeRecord ser = (StraightEdgeRecord) rec;
+                if (ser.generalLineFlag) {
+                    edgesList.add(new EdgeType(ser.deltaX / divider, ser.deltaY / divider));
+                } else if (ser.vertLineFlag) {
+                    edgesList.add(new EdgeType(true, ser.deltaY / divider));
+                } else {
+                    edgesList.add(new EdgeType(false, ser.deltaX / divider));
+                }
+            } else if (rec instanceof CurvedEdgeRecord) {
+                CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
+                edgesList.add(new EdgeType(cer.controlDeltaX / divider, cer.controlDeltaY / divider, cer.anchorDeltaX / divider, cer.anchorDeltaY / divider));
+            }
+        }
+        edges = edgesList.toArray(new EdgeType[edgesList.size()]);
+    }
 
     public ContourType(GFxInputStream sis) throws IOException {
         moveToX = sis.readSI15();
@@ -59,19 +93,39 @@ public class ContourType {
     }
 
     public List<SHAPERECORD> toSHAPERECORDS() {
-        int multiplier = 20;
+        int multiplier = 1;
         List<SHAPERECORD> recs = new ArrayList<>();
         StyleChangeRecord src = new StyleChangeRecord();
         src.stateMoveTo = true;
         src.moveDeltaX = moveToX * multiplier;
         src.moveDeltaY = moveToY * multiplier;
+        src.calculateBits();
         recs.add(src);
         for (EdgeType e : edges) {
             recs.add(e.toSHAPERECORD());
         }
+        int x = src.moveDeltaX;
+        int y = src.moveDeltaY;
+        for (SHAPERECORD rec : recs) {
+            x = rec.changeX(x);
+            y = rec.changeY(y);
+        }
+        StraightEdgeRecord closeSer = new StraightEdgeRecord();
+        closeSer.generalLineFlag = true;
+        closeSer.deltaX = (src.moveDeltaX - x);
+        closeSer.deltaY = (src.moveDeltaY - y);
+        closeSer.calculateBits();
+        recs.add(closeSer);
+
         return recs;
     }
 
-    public void write(SWFOutputStream sos) throws IOException {
+    public void write(GFxOutputStream sos) throws IOException {
+        sos.writeSI15(moveToX);
+        sos.writeSI15(moveToY);
+        sos.writeUI30(edges.length << 1);
+        for (int i = 0; i < edges.length; i++) {
+            edges[i].write(sos);
+        }
     }
 }

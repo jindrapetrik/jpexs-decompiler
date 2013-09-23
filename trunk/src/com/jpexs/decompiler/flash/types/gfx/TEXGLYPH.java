@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
-import com.jpexs.decompiler.flash.SWFOutputStream;
 import java.io.IOException;
 
 /**
@@ -50,7 +49,7 @@ public class TEXGLYPH {
         this.uvOriginY = sis.readFLOAT();
     }
 
-    public void write(SWFOutputStream sos) throws IOException {
+    public void write(GFxOutputStream sos) throws IOException {
         sos.writeFLOAT(uvBoundsLeft);
         sos.writeFLOAT(uvBoundsTop);
         sos.writeFLOAT(uvBoundsRight);

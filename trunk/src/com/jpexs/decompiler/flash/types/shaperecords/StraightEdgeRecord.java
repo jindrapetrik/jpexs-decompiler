@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 
 /**
  *
@@ -79,5 +80,13 @@ public class StraightEdgeRecord extends SHAPERECORD {
     @Override
     public boolean isMove() {
         return true;
+    }
+
+    @Override
+    public void calculateBits() {
+        numBits = SWFOutputStream.getNeededBitsS(deltaX, deltaY) - 2;
+        if (numBits < 0) {
+            numBits = 0;
+        }
     }
 }

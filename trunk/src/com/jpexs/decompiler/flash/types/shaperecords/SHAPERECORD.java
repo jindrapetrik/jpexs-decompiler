@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.Helper;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -73,9 +74,11 @@ import javax.swing.JPanel;
  *
  * @author JPEXS
  */
-public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
+public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Serializable {
 
     private static final float DESCALE = 20;
+
+    public abstract void calculateBits();
 
     @Override
     public Set<Integer> getNeededCharacters() {
@@ -847,10 +850,33 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         for (SHAPE s : shapes) {
             images.add(s.toImage(1, new ArrayList<Tag>(), color));
         }
+        int maxw = 0;
+        int maxh = 0;
+        for (BufferedImage im : images) {
+            if (im.getWidth() > maxw) {
+                maxw = im.getWidth();
+            }
+            if (im.getHeight() > maxh) {
+                maxh = im.getHeight();
+            }
+        }
         int cols = (int) Math.ceil(Math.sqrt(images.size()));
         int pos = 0;
         int w2 = prevWidth / cols;
         int h2 = prevHeight / cols;
+
+
+        int mh = maxh * w2 / maxw;
+        int mw;
+        if (mh > h2) {
+            mw = maxw * h2 / maxh;
+            mh = h2;
+        } else {
+            mw = w2;
+        }
+
+        float ratio = (float) mw / (float) maxw;
+
         loopy:
         for (int y = 0; y < cols; y++) {
             for (int x = 0; x < cols; x++) {
@@ -861,16 +887,18 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                 int h1 = images.get(pos).getHeight();
 
 
-                int h = h1 * w2 / w1;
-                int w;
-                if (h > h2) {
-                    w = w1 * h2 / h1;
-                    h = h2;
-                } else {
-                    w = w2;
-                }
-                int px = x * w2 + w2 / 2 - w / 2;
-                int py = y * h2 + h2 / 2 - h / 2;
+                /*int h = h1 * mw / w1;
+                 int w;
+                 if (h > mh) {
+                 w = w1 * mh / h1;
+                 h = mh;
+                 } else {
+                 w = mw;
+                 }*/
+                int w = Math.round(ratio * w1);
+                int h = Math.round(ratio * h1);
+                int px = x * mw + mw / 2 - w / 2;
+                int py = y * mh + mh - h;
                 g.drawImage(images.get(pos), px, py, px + w, py + h, 0, 0, w1, h1, null);
                 pos++;
             }
@@ -1138,5 +1166,38 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             in.defaultReadObject();
             image = ImageIO.read(in);
         }
+    }
+
+    public static SHAPE resizeSHAPE(SHAPE shp, int multiplier) {
+        SHAPE ret = new SHAPE();
+        ret.numFillBits = shp.numFillBits;
+        ret.numLineBits = shp.numLineBits;
+        List<SHAPERECORD> recs = new ArrayList<>();
+        for (SHAPERECORD r : shp.shapeRecords) {
+            SHAPERECORD c = (SHAPERECORD) Helper.deepCopy(r);
+            if (c instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) c;
+                scr.moveDeltaX = (multiplier * scr.moveDeltaX);
+                scr.moveDeltaY = (multiplier * scr.moveDeltaY);
+                scr.calculateBits();
+            }
+            if (c instanceof CurvedEdgeRecord) {
+                CurvedEdgeRecord cer = (CurvedEdgeRecord) c;
+                cer.controlDeltaX = (multiplier * cer.controlDeltaX);
+                cer.controlDeltaY = (multiplier * cer.controlDeltaY);
+                cer.anchorDeltaX = (multiplier * cer.anchorDeltaX);
+                cer.anchorDeltaY = (multiplier * cer.anchorDeltaY);
+                cer.calculateBits();
+            }
+            if (c instanceof StraightEdgeRecord) {
+                StraightEdgeRecord ser = (StraightEdgeRecord) c;
+                ser.deltaX = (multiplier * ser.deltaX);
+                ser.deltaY = (multiplier * ser.deltaY);
+                ser.calculateBits();
+            }
+            recs.add(c);
+        }
+        ret.shapeRecords = recs;
+        return ret;
     }
 }

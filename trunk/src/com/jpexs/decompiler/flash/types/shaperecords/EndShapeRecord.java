@@ -53,4 +53,8 @@ public class EndShapeRecord extends SHAPERECORD {
     public boolean isMove() {
         return false;
     }
+
+    @Override
+    public void calculateBits() {
+    }
 }

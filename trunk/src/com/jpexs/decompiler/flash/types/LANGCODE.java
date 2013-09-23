@@ -23,4 +23,11 @@ package com.jpexs.decompiler.flash.types;
 public class LANGCODE {
 
     public int languageCode;
+
+    public LANGCODE() {
+    }
+
+    public LANGCODE(int languageCode) {
+        this.languageCode = languageCode;
+    }
 }

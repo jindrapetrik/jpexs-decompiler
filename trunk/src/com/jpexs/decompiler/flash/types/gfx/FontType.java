@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
-import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,14 +36,13 @@ public class FontType {
     public int ascent;
     public int descent;
     public int leading;
-    public GlyphType[] glyphs;
-    public GlyphInfoType[] glyphInfo;
-    public KerningPairType[] kerning;
+    public List<GlyphType> glyphs;
+    public List<GlyphInfoType> glyphInfo;
+    public List<KerningPairType> kerning;
 
     public FontType(GFxInputStream sis) throws IOException {
         sis = new GFxInputStream(sis);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        //fontId = sis.readUI16();
         int val;
         while ((val = sis.readUI8()) > 0) {
             baos.write(val);
@@ -59,21 +57,21 @@ public class FontType {
         long glyphBytesLen = sis.readUI32();
         byte glyphBytes[] = new byte[(int) glyphBytesLen];
         sis.read(glyphBytes);
-        glyphInfo = new GlyphInfoType[(int) numGlyphs];
+        glyphInfo = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
-            glyphInfo[i] = new GlyphInfoType(sis);
+            glyphInfo.add(new GlyphInfoType(sis));
         }
 
         long kerningTableSize = sis.readUI30();
-        kerning = new KerningPairType[((int) kerningTableSize)];
+        kerning = new ArrayList<>();
         for (int i = 0; i < kerningTableSize; i++) {
-            kerning[i] = new KerningPairType(sis);
+            kerning.add(new KerningPairType(sis));
         }
 
-        glyphs = new GlyphType[glyphInfo.length];
-        for (int i = 0; i < glyphInfo.length; i++) {
-            sis.setPos(glyphInfo[i].globalOffset);
-            glyphs[i] = new GlyphType(sis);
+        glyphs = new ArrayList<>();
+        for (int i = 0; i < glyphInfo.size(); i++) {
+            sis.setPos(glyphInfo.get(i).globalOffset);
+            glyphs.add(new GlyphType(sis));
         }
     }
 
@@ -85,6 +83,32 @@ public class FontType {
         return ret;
     }
 
-    public void write(SWFOutputStream sos) throws IOException {
+    public void write(GFxOutputStream sos) throws IOException {
+        sos = new GFxOutputStream(sos);
+        sos.write(fontName.getBytes());
+        sos.writeUI8(0);
+        sos.writeUI16(flags);
+        sos.writeUI16(nominalSize);
+        sos.writeUI16(ascent);
+        sos.writeUI16(descent);
+        sos.writeUI16(leading);
+        sos.writeUI32(glyphInfo.size()); //numGlyphs
+        long headerLen = sos.getPos() + 4;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        GFxOutputStream sos2 = new GFxOutputStream(baos);
+        for (int i = 0; i < glyphs.size(); i++) {
+            glyphInfo.get(i).globalOffset = headerLen + sos2.getPos();
+            glyphs.get(i).write(sos2);
+        }
+        byte[] glyphBytes = baos.toByteArray();
+        sos.writeUI32(glyphBytes.length);
+        sos.write(glyphBytes);
+        for (int i = 0; i < glyphInfo.size(); i++) {
+            glyphInfo.get(i).write(sos);
+        }
+        sos.writeUI30(kerning.size());
+        for (KerningPairType kp : kerning) {
+            kp.write(sos);
+        }
     }
 }

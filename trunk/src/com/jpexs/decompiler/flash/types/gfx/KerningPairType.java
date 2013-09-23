@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
-import com.jpexs.decompiler.flash.SWFOutputStream;
 import java.io.IOException;
 
 /**
@@ -41,7 +40,7 @@ public class KerningPairType {
         this.advance = sis.readSI16();
     }
 
-    public void write(SWFOutputStream sos) throws IOException {
+    public void write(GFxOutputStream sos) throws IOException {
         sos.writeUI16(char1);
         sos.writeUI16(char2);
         sos.writeSI16(advance);

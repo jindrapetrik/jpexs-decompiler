@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
-import com.jpexs.decompiler.flash.SWFOutputStream;
 import java.io.IOException;
 
 /**
@@ -41,7 +40,7 @@ public class GlyphInfoType {
         this.globalOffset = sis.readUI32();
     }
 
-    public void write(SWFOutputStream sos) throws IOException {
+    public void write(GFxOutputStream sos) throws IOException {
         sos.writeUI16(glyphCode);
         sos.writeSI16(advanceX);
         sos.writeUI32(globalOffset);

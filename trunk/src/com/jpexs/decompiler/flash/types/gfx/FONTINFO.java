@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
-import com.jpexs.decompiler.flash.SWFOutputStream;
 import java.io.IOException;
 
 /**
@@ -42,7 +41,7 @@ public class FONTINFO {
         }
     }
 
-    public void write(SWFOutputStream sos) throws IOException {
+    public void write(GFxOutputStream sos) throws IOException {
         sos.writeUI16(fontId);
         sos.writeUI16(glyphIndices.length);
         for (int i = 0; i < glyphIndices.length; i++) {

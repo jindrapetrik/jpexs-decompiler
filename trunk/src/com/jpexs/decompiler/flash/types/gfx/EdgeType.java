@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
-import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -51,6 +53,32 @@ public class EdgeType {
     private static final int Edge_Quad = 3;
     public int data[];
     public byte raw[];
+
+    public EdgeType(boolean vertical, int v) {
+        data = new int[]{vertical ? Edge_VLine : Edge_HLine, v};
+        calcRaw();
+    }
+
+    public EdgeType(int x, int y) {
+        data = new int[]{Edge_Line, x, y};
+        calcRaw();
+    }
+
+    public EdgeType(int cx, int cy, int ax, int ay) {
+        data = new int[]{Edge_Quad, cx, cy, ax, ay};
+        calcRaw();
+    }
+
+    private void calcRaw() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        GFxOutputStream sos = new GFxOutputStream(baos);
+        try {
+            write(sos);
+        } catch (IOException ex) {
+            Logger.getLogger(EdgeType.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        raw = baos.toByteArray();
+    }
 
     @Override
     public String toString() {
@@ -114,7 +142,7 @@ public class EdgeType {
     }
 
     public SHAPERECORD toSHAPERECORD() {
-        int multiplier = 20;
+        int multiplier = 1;
         StraightEdgeRecord ser;
         CurvedEdgeRecord cer;
         switch (data[0]) {
@@ -122,18 +150,21 @@ public class EdgeType {
                 ser = new StraightEdgeRecord();
                 ser.generalLineFlag = false;
                 ser.deltaX = data[1] * multiplier;
+                ser.calculateBits();
                 return ser;
             case Edge_VLine:
                 ser = new StraightEdgeRecord();
                 ser.generalLineFlag = false;
                 ser.vertLineFlag = true;
                 ser.deltaY = data[1] * multiplier;
+                ser.calculateBits();
                 return ser;
             case Edge_Line:
                 ser = new StraightEdgeRecord();
                 ser.generalLineFlag = true;
                 ser.deltaX = data[1] * multiplier;
                 ser.deltaY = data[2] * multiplier;
+                ser.calculateBits();
                 return ser;
             case Edge_Quad:
                 cer = new CurvedEdgeRecord();
@@ -141,6 +172,7 @@ public class EdgeType {
                 cer.controlDeltaY = data[2] * multiplier;
                 cer.anchorDeltaX = data[3] * multiplier;
                 cer.anchorDeltaY = data[4] * multiplier;
+                cer.calculateBits();
                 return cer;
         }
         return null;
@@ -262,6 +294,168 @@ public class EdgeType {
         return data;
     }
 
-    public void write(SWFOutputStream sos) throws IOException {
+    public void write(GFxOutputStream sos) throws IOException {
+        int x;
+        int y;
+        int m1 = 1;
+        int m2 = 3;
+        int m3 = 7;
+        int m4 = 0xF;
+        int m5 = 0x1F;
+        int m6 = 0x3F;
+        int m7 = 0x7F;
+        switch (data[0]) {
+            case Edge_HLine:
+                x = data[1];
+                if (x >= GFxOutputStream.MinSInt12 && x <= GFxOutputStream.MaxSInt12) {
+                    sos.writeUI8((x << 4) | Edge_H12);
+                    sos.writeUI8(x >> 4);
+                    return;
+                }
+                sos.writeUI8((x << 4) | Edge_H20);
+                sos.writeUI8(x >> 4);
+                sos.writeUI8(x >> 12);
+                break;
+            case Edge_VLine:
+                y = data[1];
+                if (y >= GFxOutputStream.MinSInt12 && y <= GFxOutputStream.MaxSInt12) {
+                    sos.writeUI8((y << 4) | Edge_V12);
+                    sos.writeUI8(y >> 4);
+                    return;
+                }
+                sos.writeUI8((y << 4) | Edge_V20);
+                sos.writeUI8(y >> 4);
+                sos.writeUI8(y >> 12);
+                return;
+            case Edge_Line:
+                x = data[1];
+                y = data[2];
+                if (x >= GFxOutputStream.MinSInt6 && x <= GFxOutputStream.MaxSInt6 && y >= GFxOutputStream.MinSInt6 && y <= GFxOutputStream.MaxSInt6) {
+                    sos.writeUI8((x << 4) | Edge_L6);
+                    sos.writeUI8(((x >> 4) & m2) | (y << 2));
+                    return;
+                }
+                if (x >= GFxOutputStream.MinSInt10 && x <= GFxOutputStream.MaxSInt10 && y >= GFxOutputStream.MinSInt10 && y <= GFxOutputStream.MaxSInt10) {
+                    sos.writeUI8((x << 4) | Edge_L10);
+                    sos.writeUI8(((x >> 4) & m6) | (y << 6));
+                    sos.writeUI8(y >> 2);
+                    return;
+                }
+                if (x >= GFxOutputStream.MinSInt14 && x <= GFxOutputStream.MaxSInt14 && y >= GFxOutputStream.MinSInt14 && y <= GFxOutputStream.MaxSInt14) {
+                    sos.writeUI8((x << 4) | Edge_L14);
+                    sos.writeUI8(x >> 4);
+                    sos.writeUI8(((x >> 12) & m2) | (y << 2));
+                    sos.writeUI8(y >> 6);
+                    return;
+                }
+                sos.writeUI8((x << 4) | Edge_L18);
+                sos.writeUI8(x >> 4);
+                sos.writeUI8(((x >> 12) & m6) | (y << 6));
+                sos.writeUI8(y >> 2);
+                sos.writeUI8(y >> 10);
+                return;
+            case Edge_Quad:
+                int cx = data[1];
+                int cy = data[2];
+                int ax = data[3];
+                int ay = data[4];
+                int minV = cx;
+                int maxV = cx;
+                if (cy < minV) {
+                    minV = cy;
+                }
+                if (cy > maxV) {
+                    maxV = cy;
+                }
+                if (ax < minV) {
+                    minV = ax;
+                }
+                if (ax > maxV) {
+                    maxV = ax;
+                }
+                if (ay < minV) {
+                    minV = ay;
+                }
+                if (ay > maxV) {
+                    maxV = ay;
+                }
+
+
+
+                if (minV >= GFxOutputStream.MinSInt5 && maxV <= GFxOutputStream.MaxSInt5) {
+                    sos.writeUI8(((cx << 4) | Edge_C5));
+                    sos.writeUI8((((cx >> 4) & m1) | ((cy << 1) & m6) | (ax << 6)));
+                    sos.writeUI8((((ax >> 2) & m3) | (ay << 3)));
+                    return;
+                }
+                if (minV >= GFxOutputStream.MinSInt7 && maxV <= GFxOutputStream.MaxSInt7) {
+                    sos.writeUI8(((cx << 4) | Edge_C7));
+                    sos.writeUI8((((cx >> 4) & m3) | (cy << 3)));
+                    sos.writeUI8((((cy >> 5) & m2) | (ax << 2)));
+                    sos.writeUI8((((ax >> 6) & m1) | (ay << 1)));
+                    return;
+                }
+                if (minV >= GFxOutputStream.MinSInt9 && maxV <= GFxOutputStream.MaxSInt9) {
+                    sos.writeUI8(((cx << 4) | Edge_C9));
+                    sos.writeUI8((((cx >> 4) & m5) | (cy << 5)));
+                    sos.writeUI8((((cy >> 3) & m6) | (ax << 6)));
+                    sos.writeUI8((((ax >> 2) & m7) | (ay << 7)));
+                    sos.writeUI8(((ay >> 1)));
+                    return;
+                }
+                if (minV >= GFxOutputStream.MinSInt11 && maxV <= GFxOutputStream.MaxSInt11) {
+                    sos.writeUI8(((cx << 4) | Edge_C11));
+                    sos.writeUI8((((cx >> 4) & m7) | (cy << 7)));
+                    sos.writeUI8(((cy >> 1)));
+                    sos.writeUI8((((cy >> 9) & m2) | (ax << 2)));
+                    sos.writeUI8((((ax >> 6) & m5) | (ay << 5)));
+                    sos.writeUI8(((ay >> 3)));
+                    return;
+                }
+                if (minV >= GFxOutputStream.MinSInt13 && maxV <= GFxOutputStream.MaxSInt13) {
+                    sos.writeUI8(((cx << 4) | Edge_C13));
+                    sos.writeUI8(((cx >> 4)));
+                    sos.writeUI8((((cx >> 12) & m1) | (cy << 1)));
+                    sos.writeUI8((((cy >> 7) & m6) | (ax << 6)));
+                    sos.writeUI8(((ax >> 2)));
+                    sos.writeUI8((((ax >> 10) & m3) | (ay << 3)));
+                    sos.writeUI8(((ay >> 5)));
+                    return;
+                }
+                if (minV >= GFxOutputStream.MinSInt15 && maxV <= GFxOutputStream.MaxSInt15) {
+                    sos.writeUI8(((cx << 4) | Edge_C15));
+                    sos.writeUI8(((cx >> 4)));
+                    sos.writeUI8((((cx >> 12) & m3) | (cy << 3)));
+                    sos.writeUI8(((cy >> 5)));
+                    sos.writeUI8((((cy >> 13) & m2) | (ax << 2)));
+                    sos.writeUI8(((ax >> 6)));
+                    sos.writeUI8((((ax >> 14) & m1) | (ay << 1)));
+                    sos.writeUI8(((ay >> 7)));
+                    return;
+                }
+                if (minV >= GFxOutputStream.MinSInt17 && maxV <= GFxOutputStream.MaxSInt17) {
+                    sos.writeUI8(((cx << 4) | Edge_C17));
+                    sos.writeUI8(((cx >> 4)));
+                    sos.writeUI8((((cx >> 12) & m5) | (cy << 5)));
+                    sos.writeUI8(((cy >> 3)));
+                    sos.writeUI8((((cy >> 11) & m6) | (ax << 6)));
+                    sos.writeUI8(((ax >> 2)));
+                    sos.writeUI8((((ax >> 10) & m7) | (ay << 7)));
+                    sos.writeUI8(((ay >> 1)));
+                    sos.writeUI8(((ay >> 9)));
+                    return;
+                }
+                sos.writeUI8(((cx << 4) | Edge_C19));
+                sos.writeUI8(((cx >> 4)));
+                sos.writeUI8((((cx >> 12) & m7) | (cy << 7)));
+                sos.writeUI8(((cy >> 1)));
+                sos.writeUI8(((cy >> 9)));
+                sos.writeUI8((((cy >> 17) & m2) | (ax << 2)));
+                sos.writeUI8(((ax >> 6)));
+                sos.writeUI8((((ax >> 14) & m5) | (ay << 5)));
+                sos.writeUI8(((ay >> 3)));
+                sos.writeUI8(((ay >> 11)));
+                return;
+        }
     }
 }
