@@ -223,7 +223,7 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
             FontTag.shiftGlyphIndices(fontId, pos, tags);
         }
 
-        Font fnt = new Font(fontName, fontStyle, 20 * font.nominalSize);
+        Font fnt = new Font(fontName, fontStyle, font.nominalSize);
         int advance = (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX());
         if (!exists) {
             font.glyphInfo.add(pos, new GlyphInfoType(code, advance, 0));
