@@ -57,7 +57,9 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Matcher;
@@ -102,6 +104,7 @@ public class Main {
     public static LoadFromMemoryFrame loadFromMemoryFrame;
     public static LoadFromCacheFrame loadFromCacheFrame;
     public static boolean readOnly = false;
+    private static ErrorLogFrame errorLogFrame;
 
     public static void loadFromCache() {
         if (loadFromCacheFrame == null) {
@@ -291,6 +294,9 @@ public class Main {
                     @Override
                     public void run() {
                         mainFrame = new MainFrame(swf);
+                        if (errorState) {
+                            mainFrame.setErrorState();
+                        }
                     }
                 });
 
@@ -470,12 +476,62 @@ public class Main {
         }
     }
 
+    public static void displayErrorFrame() {
+        if (errorLogFrame != null) {
+            errorLogFrame.setVisible(true);
+        }
+    }
+    private static boolean errorState = false;
+
+    private static void initGui() {
+        View.execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                if (errorLogFrame == null) {
+                    errorLogFrame = new ErrorLogFrame();
+                }
+                Logger logger = Logger.getLogger("");
+                logger.addHandler(errorLogFrame.getHandler());
+                logger.addHandler(new Handler() {
+                    @Override
+                    public void publish(final LogRecord record) {
+                        View.execInEventDispatch(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (record.getLevel() == Level.SEVERE) {
+                                    errorState = true;
+                                    if (mainFrame != null) {
+                                        mainFrame.setErrorState();
+                                    }
+                                }
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void flush() {
+                    }
+
+                    @Override
+                    public void close() throws SecurityException {
+                    }
+                });
+            }
+        });
+        autoCheckForUpdates();
+        offerAssociation();
+    }
+
     public static void showModeFrame() {
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
                 if (mainFrame == null) {
                     mainFrame = new MainFrame(null);
+                    if (errorState) {
+                        mainFrame.setErrorState();
+                    }
                 }
                 mainFrame.setVisible(true);
             }
@@ -783,8 +839,7 @@ public class Main {
         int retryCount = 0;
 
         if (args.length < pos + 1) {
-            autoCheckForUpdates();
-            offerAssociation();
+            initGui();
             showModeFrame();
         } else {
             boolean parameterProcessed = true;
@@ -1050,8 +1105,8 @@ public class Main {
                 printCmdLineUsage();
                 System.exit(0);
             } else if (args.length == pos + 1) {
-                autoCheckForUpdates();
-                offerAssociation();
+
+                initGui();
                 openFile(args[pos]);
             } else {
                 badArguments();
@@ -1347,6 +1402,10 @@ public class Main {
         fileTxt.setFormatter(formatterTxt);
         logger.addHandler(fileTxt);
 
+        errorState = false;
+        if (mainFrame != null) {
+            mainFrame.clearErrorState();
+        }
     }
 
     public static void initLogging(boolean debug) {

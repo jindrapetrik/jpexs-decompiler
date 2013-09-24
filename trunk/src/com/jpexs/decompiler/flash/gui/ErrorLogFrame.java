@@ -200,7 +200,6 @@ public class ErrorLogFrame extends AppFrame {
 
 
                 JLabel levelLabel = new JLabel(level.getName());
-                levelLabel.setPreferredSize(new Dimension(75, 25));
                 levelLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 header.add(levelLabel);
                 JTextArea msgLabel = new JTextArea(msg);

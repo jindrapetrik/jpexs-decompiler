@@ -158,9 +158,7 @@ import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
-import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -288,7 +286,6 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     private JTextArea fontCharactersTextArea;
     private JTextField fontAddCharactersField;
     private JButton errorNotificationButton;
-    private ErrorLogFrame errorLogFrame;
     private ComponentListener fontChangeList;
     private JComboBox<String> fontSelection;
     private JCommandButton saveCommandButton;
@@ -1054,7 +1051,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         statusPanel.add(loadingPanel, BorderLayout.WEST);
         statusPanel.add(statusLabel, BorderLayout.CENTER);
 
-        errorLogFrame = new ErrorLogFrame();
+
         errorNotificationButton = new JButton("");
         errorNotificationButton.setIcon(View.getIcon("okay16"));
         errorNotificationButton.setBorderPainted(false);
@@ -1490,66 +1487,6 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
         //Opening files with drag&drop to main window
         enableDrop(true);
-
-        Logger logger = Logger.getLogger("");
-        logger.addHandler(errorLogFrame.getHandler());
-        logger.addHandler(new Handler() {
-            private Timer timer = null;
-            private int pos = 0;
-
-            @Override
-            public void publish(final LogRecord record) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (record.getLevel() == Level.SEVERE) {
-                            if (errorNotificationButton == null) {
-                                // todo: honfika
-                                // why null?
-                                return;
-                            }
-
-                            errorNotificationButton.setIcon(View.getIcon("error16"));
-                            errorNotificationButton.setToolTipText(translate("errors.present"));
-                            if (timer != null) {
-                                timer.cancel();
-                            }
-                            timer = new Timer();
-                            timer.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    View.execInEventDispatch(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            pos++;
-                                            if ((pos % 2) == 0 || (pos >= 4)) {
-                                                errorNotificationButton.setIcon(View.getIcon("error16"));
-                                            } else {
-                                                errorNotificationButton.setIcon(null);
-                                                errorNotificationButton.setSize(16, 16);
-                                            }
-                                        }
-                                    });
-
-                                    if (pos >= 4) {
-                                        cancel();
-                                    }
-                                }
-                            }, 500, 500);
-                        }
-                    }
-                });
-
-            }
-
-            @Override
-            public void flush() {
-            }
-
-            @Override
-            public void close() throws SecurityException {
-            }
-        });
     }
 
     public void enableDrop(boolean value) {
@@ -2370,7 +2307,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 Main.loadFromCache();
                 break;
             case "SHOWERRORLOG":
-                errorLogFrame.setVisible(true);
+                Main.displayErrorFrame();
                 break;
             case "FONTADDCHARS":
                 String newchars = fontAddCharactersField.getText();
@@ -3637,5 +3574,47 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     @Override
     public void free() {
         Helper.emptyObject(this);
+    }
+
+    public void clearErrorState() {
+        errorNotificationButton.setIcon(View.getIcon("okay16"));
+        errorNotificationButton.setToolTipText(translate("errors.none"));
+    }
+    private Timer blinkTimer;
+    private int blinkPos;
+
+    public void setErrorState() {
+        if (errorNotificationButton == null) {
+            // todo: honfika
+            // why null?
+            return;
+        }
+        errorNotificationButton.setIcon(View.getIcon("error16"));
+        errorNotificationButton.setToolTipText(translate("errors.present"));
+        if (blinkTimer != null) {
+            blinkTimer.cancel();
+        }
+        blinkTimer = new Timer();
+        blinkTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                View.execInEventDispatch(new Runnable() {
+                    @Override
+                    public void run() {
+                        blinkPos++;
+                        if ((blinkPos % 2) == 0 || (blinkPos >= 4)) {
+                            errorNotificationButton.setIcon(View.getIcon("error16"));
+                        } else {
+                            errorNotificationButton.setIcon(null);
+                            errorNotificationButton.setSize(16, 16);
+                        }
+                    }
+                });
+
+                if (blinkPos >= 4) {
+                    cancel();
+                }
+            }
+        }, 500, 500);
     }
 }
