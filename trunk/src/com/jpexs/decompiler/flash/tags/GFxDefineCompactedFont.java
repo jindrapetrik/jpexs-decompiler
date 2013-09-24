@@ -154,7 +154,12 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
         for (int i = 0; i < shapeCache.size(); i++) {
             shapes.add(SHAPERECORD.resizeSHAPE(shapeCache.get(i), 20));
         }
-        BufferedImage ret = SHAPERECORD.shapeListToImage(shapes, 500, 500, Color.black);
+        int cols = (int) Math.ceil(Math.sqrt(shapes.size()));
+        int size = 500;
+        if(size/cols < 30){
+            size = cols * 30;
+        }
+        BufferedImage ret = SHAPERECORD.shapeListToImage(shapes, size, size, Color.black);
         imageCache.put("font" + fontId, new SerializableImage(ret));
         return ret;
     }

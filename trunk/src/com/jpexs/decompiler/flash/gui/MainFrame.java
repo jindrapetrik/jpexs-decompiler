@@ -3127,7 +3127,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (miInternalViewer.isSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
-        } else if ((tagObj instanceof FontTag) && (miInternalViewer.isSelected() || (tagObj instanceof GFxDefineCompactedFont))) {
+        } else if ((tagObj instanceof FontTag) && (miInternalViewer.isSelected())) {
             showCard(CARDFLASHPANEL);
             previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
             showFontTag((FontTag) tagObj);
@@ -3534,7 +3534,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     }
 
     private void showFontTag(FontTag ft) {
-        if (miInternalViewer.isSelected() || ft instanceof GFxDefineCompactedFont) {
+        if (miInternalViewer.isSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
             internelViewerPanel.setDrawable(ft, swf, characters, 1);
         } else {

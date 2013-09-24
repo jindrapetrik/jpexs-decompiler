@@ -846,21 +846,24 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         BufferedImage ret = new BufferedImage(prevWidth, prevHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics g = ret.getGraphics();
         int p = 0;
-        List<BufferedImage> images = new ArrayList<>();
-        for (SHAPE s : shapes) {
-            images.add(s.toImage(1, new ArrayList<Tag>(), color));
-        }
+        int ps=0;
+        
         int maxw = 0;
         int maxh = 0;
-        for (BufferedImage im : images) {
-            if (im.getWidth() > maxw) {
-                maxw = im.getWidth();
+        for (SHAPE s : shapes) {
+            RECT r=SHAPERECORD.getBounds(s.shapeRecords);
+            if(r.getWidth() >maxw){
+                maxw = r.getWidth();
             }
-            if (im.getHeight() > maxh) {
-                maxh = im.getHeight();
+            if(r.getHeight()>maxh){
+                maxh = r.getHeight();
             }
         }
-        int cols = (int) Math.ceil(Math.sqrt(images.size()));
+        maxw = maxw / 20;
+        maxh = maxh / 20;
+        
+               
+        int cols = (int) Math.ceil(Math.sqrt(shapes.size()));
         int pos = 0;
         int w2 = prevWidth / cols;
         int h2 = prevHeight / cols;
@@ -880,18 +883,21 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         loopy:
         for (int y = 0; y < cols; y++) {
             for (int x = 0; x < cols; x++) {
-                if (pos >= images.size()) {
+                if (pos >= shapes.size()) {
                     break loopy;
                 }
-                int w1 = images.get(pos).getWidth();
-                int h1 = images.get(pos).getHeight();
+                BufferedImage img=shapes.get(pos).toImage(1, new ArrayList<Tag>(), color);
+                
+                int w1 = img.getWidth();
+                int h1 = img.getHeight();
 
                 int w = Math.round(ratio * w1);
                 int h = Math.round(ratio * h1);
                 int px = x * mw + mw / 2 - w / 2;
                 int py = y * mh + mh - h;
-                g.drawImage(images.get(pos), px, py, px + w, py + h, 0, 0, w1, h1, null);
+                g.drawImage(img, px, py, px + w, py + h, 0, 0, w1, h1, null);
                 pos++;
+                SHAPERECORD.clearShapeCache();
             }
         }
 
