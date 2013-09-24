@@ -156,7 +156,7 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
         }
         int cols = (int) Math.ceil(Math.sqrt(shapes.size()));
         int size = 500;
-        if(size/cols < 30){
+        if (size / cols < 30) {
             size = cols * 30;
         }
         BufferedImage ret = SHAPERECORD.shapeListToImage(shapes, size, size, Color.black);

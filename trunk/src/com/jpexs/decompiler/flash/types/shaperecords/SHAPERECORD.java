@@ -845,24 +845,22 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     public static BufferedImage shapeListToImage(List<SHAPE> shapes, int prevWidth, int prevHeight, Color color) {
         BufferedImage ret = new BufferedImage(prevWidth, prevHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics g = ret.getGraphics();
-        int p = 0;
-        int ps=0;
-        
+
         int maxw = 0;
         int maxh = 0;
         for (SHAPE s : shapes) {
-            RECT r=SHAPERECORD.getBounds(s.shapeRecords);
-            if(r.getWidth() >maxw){
+            RECT r = SHAPERECORD.getBounds(s.shapeRecords);
+            if (r.getWidth() > maxw) {
                 maxw = r.getWidth();
             }
-            if(r.getHeight()>maxh){
+            if (r.getHeight() > maxh) {
                 maxh = r.getHeight();
             }
         }
         maxw = maxw / 20;
         maxh = maxh / 20;
-        
-               
+
+
         int cols = (int) Math.ceil(Math.sqrt(shapes.size()));
         int pos = 0;
         int w2 = prevWidth / cols;
@@ -886,15 +884,15 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 if (pos >= shapes.size()) {
                     break loopy;
                 }
-                BufferedImage img=shapes.get(pos).toImage(1, new ArrayList<Tag>(), color);
-                
+                BufferedImage img = shapes.get(pos).toImage(1, new ArrayList<Tag>(), color);
+
                 int w1 = img.getWidth();
                 int h1 = img.getHeight();
 
                 int w = Math.round(ratio * w1);
                 int h = Math.round(ratio * h1);
-                int px = x * mw + mw / 2 - w / 2;
-                int py = y * mh + mh - h;
+                int px = x * w2 + w2 / 2 - w / 2;
+                int py = y * h2 + w2 - h;
                 g.drawImage(img, px, py, px + w, py + h, 0, 0, w1, h1, null);
                 pos++;
                 SHAPERECORD.clearShapeCache();
