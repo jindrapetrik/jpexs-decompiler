@@ -969,8 +969,10 @@ public class Main {
             }
             if (args[pos].equals("-removefromcontextmenu")) {
                 addToContextMenu(false);
+                System.exit(0);
             } else if (args[pos].equals("-addtocontextmenu")) {
                 addToContextMenu(true);
+                System.exit(0);
             } else if (args[pos].equals("-proxy")) {
                 int port = 55555;
                 for (int i = pos; i < args.length; i++) {
