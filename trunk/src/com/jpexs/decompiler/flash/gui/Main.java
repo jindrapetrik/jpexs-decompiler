@@ -413,7 +413,7 @@ public class Main {
 
     public static boolean saveFileDialog() {
         JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(Configuration.getConfig("lastSaveDir", ".")));   
+        fc.setCurrentDirectory(new File(Configuration.getConfig("lastSaveDir", ".")));
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -425,9 +425,9 @@ public class Main {
                 return translate("filter.swf");
             }
         };
-        if(!swf.gfx){
-            fc.setFileFilter(swfFilter);            
-        }else{
+        if (!swf.gfx) {
+            fc.setFileFilter(swfFilter);
+        } else {
             fc.addChoosableFileFilter(swfFilter);
         }
         FileFilter gfxFilter = new FileFilter() {
@@ -441,11 +441,11 @@ public class Main {
                 return translate("filter.gfx");
             }
         };
-        if(swf.gfx){
+        if (swf.gfx) {
             fc.setFileFilter(gfxFilter);
-        }else{
+        } else {
             fc.addChoosableFileFilter(gfxFilter);
-        }        
+        }
         fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
@@ -455,14 +455,14 @@ public class Main {
             FileFilter selFilter = fc.getFileFilter();
             try {
                 String fileName = file.getAbsolutePath();
-                if(selFilter == swfFilter){
+                if (selFilter == swfFilter) {
                     if (!fileName.toLowerCase().endsWith(".swf")) {
                         fileName += ".swf";
                     }
                     swf.gfx = false;
                 }
-                if(selFilter == gfxFilter){
-                    if (!fileName.toLowerCase().endsWith(".gfx")) {                        
+                if (selFilter == gfxFilter) {
+                    if (!fileName.toLowerCase().endsWith(".gfx")) {
                         fileName += ".gfx";
                     }
                     swf.gfx = true;
@@ -520,7 +520,7 @@ public class Main {
                 return translate("filter.gfx");
             }
         };
-        fc.addChoosableFileFilter(gfxFilter);      
+        fc.addChoosableFileFilter(gfxFilter);
         fc.setAcceptAllFileFilterUsed(true);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
@@ -1613,103 +1613,121 @@ public class Main {
             return true;
         }
 
+        final String extensions[] = new String[]{"swf", "gfx"};
+
         final HKEY REG_CLASSES_HKEY = WinReg.HKEY_LOCAL_MACHINE;
         final String REG_CLASSES_PATH = "Software\\Classes\\";
 
         String appDir = getAppDir();
         String exeName = "ffdec.exe";
         String verb = "ffdec";
+        String verbName = "Open with FFDec";
+        boolean exists;
         try {
-            // 1) Add to context menu of SWF
-            if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + ".swf")) {
-                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + ".swf");
-                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + ".swf", "", "ShockwaveFlash.ShockwaveFlash");
-            }
-
-            String clsName = Advapi32Util.registryGetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + ".swf", "");
-            if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName)) {
-                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName);
-                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName, "", "Flash Movie");
-            }
-
-            if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell")) {
-                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell");
-            }
-
-            boolean exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec");
-
-            if ((!exists) && add) { //add
-                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb);
-                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb, "", "Open with FFDec");
-                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb + "\\command");
-                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb + "\\command", "", "\"" + appDir + exeName + "\" \"%1\"");
-            }
-            if (exists && (!add)) { //remove
-                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb + "\\command");
-                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb);
-            }
 
             exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
             if ((!exists) && add) { //add
                 Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
                 Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell");
                 Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open");
-                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open", "", "Open with FFDec");
+                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open", "", verbName);
                 Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command");
                 Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command", "", "\"" + appDir + exeName + "\" \"%1\"");
 
             }
-            if (exists && (!add)) { //remove
-                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command");
-                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open");
-                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell");
-                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
-            }
-            //2) Add to OpenWith list
-            String mruList = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "MRUList");
-            if (mruList != null) {
-                exists = false;
-                char appChar = 0;
-                for (int i = 0; i < mruList.length(); i++) {
-                    String app = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "" + mruList.charAt(i));
-                    if (app.equals(exeName)) {
-                        appChar = mruList.charAt(i);
-                        exists = true;
-                        break;
-                    }
+
+            for (String ext : extensions) {
+
+                // 1) Add to context menu of SWF
+                if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "." + ext)) {
+                    Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "." + ext);
+                    Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "." + ext, "", "ShockwaveFlash.ShockwaveFlash");
                 }
+
+                String clsName = Advapi32Util.registryGetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "." + ext, "");
+                if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName)) {
+                    Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName);
+                    Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName, "", "Flash Movie");
+                }
+
+                if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell")) {
+                    Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell");
+                }
+
+                exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec");
+
                 if ((!exists) && add) { //add
-                    for (int c = 'a'; c <= 'z'; c++) {
-                        if (mruList.indexOf(c) == -1) {
-                            mruList += (char) c;
-                            Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "" + (char) c, exeName);
-                            Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "MRUList", mruList);
+                    Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb);
+                    Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb, "", verbName);
+                    Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb + "\\command");
+                    Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb + "\\command", "", "\"" + appDir + exeName + "\" \"%1\"");
+                }
+                if (exists && (!add)) { //remove
+                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb + "\\command");
+                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb);
+                }
+
+                if (exists && (!add)) { //remove
+                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command");
+                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open");
+                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell");
+                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
+                }
+                //2) Add to OpenWith list
+                String mruList = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "MRUList");
+                if (mruList != null) {
+                    exists = false;
+                    char appChar = 0;
+                    for (int i = 0; i < mruList.length(); i++) {
+                        String app = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "" + mruList.charAt(i));
+                        if (app.equals(exeName)) {
+                            appChar = mruList.charAt(i);
+                            exists = true;
                             break;
                         }
                     }
-                }
-                if (exists && (!add)) { //remove
-                    mruList = mruList.replace("" + appChar, "");
-                    Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "MRUList", mruList);
-                    Advapi32Util.registryDeleteValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "" + appChar);
-                }
-            }
-            if (Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations")) {
-                exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf\\Shell\\" + verb);
-                if ((!exists) && add) { //add
-                    if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf")) {
-                        Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf");
+                    if ((!exists) && add) { //add
+                        for (int c = 'a'; c <= 'z'; c++) {
+                            if (mruList.indexOf(c) == -1) {
+                                mruList += (char) c;
+                                Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "" + (char) c, exeName);
+                                Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "MRUList", mruList);
+                                break;
+                            }
+                        }
                     }
-                    if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf\\Shell")) {
-                        Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf\\Shell");
+                    if (exists && (!add)) { //remove
+                        mruList = mruList.replace("" + appChar, "");
+                        Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "MRUList", mruList);
+                        Advapi32Util.registryDeleteValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "" + appChar);
                     }
-                    Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf\\Shell\\" + verb);
-                    Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf\\Shell\\" + verb + "\\Command");
-                    Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf\\Shell\\" + verb + "\\Command", "", "\"" + appDir + exeName + "\" \"%1\"");
                 }
-                if (exists && (!add)) { //remove
-                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf\\Shell\\" + verb + "\\Command");
-                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf\\Shell\\" + verb);
+
+                if (Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations")) {
+                    //Remove bad association in older versions (context menu with title "ffdec" instead of "Open with FFDec")
+                    exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb);
+                    if (exists) {
+                        Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb + "\\Command");
+                        Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb);
+                    }
+                }
+                if (Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations")) {
+                    exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verbName);
+                    if ((!exists) && add) { //add
+                        if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "")) {
+                            Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "");
+                        }
+                        if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell")) {
+                            Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell");
+                        }
+                        Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verbName);
+                        Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verbName + "\\Command");
+                        Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verbName + "\\Command", "", "\"" + appDir + exeName + "\" \"%1\"");
+                    }
+                    if (exists && (!add)) { //remove                    
+                        Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verbName + "\\Command");
+                        Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verbName);
+                    }
                 }
             }
             return true;
