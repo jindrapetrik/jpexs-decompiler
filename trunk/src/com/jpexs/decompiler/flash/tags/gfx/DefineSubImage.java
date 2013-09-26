@@ -14,11 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,16 +30,15 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class GFxDefineExternalGradient extends Tag {
+public class DefineSubImage extends Tag {
 
-    public static final int ID = 1003;
-    public static final int BITMAP_FORMAT_DEFAULT = 0;
-    public static final int BITMAP_FORMAT_TGA = 1;
-    public static final int BITMAP_FORMAT_DDS = 2;
-    public int gradientId;
-    public int bitmapsFormat;
-    public int gradientSize;
-    public String fileName;
+    public static final int ID = 1008;
+    public int characterId;
+    public int imageCharacterId;
+    public int x1;
+    public int y1;
+    public int x2;
+    public int y2;
 
     /**
      * Gets data bytes
@@ -52,12 +52,12 @@ public class GFxDefineExternalGradient extends Tag {
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
-            sos.writeUI16(gradientId);
-            sos.writeUI16(bitmapsFormat);
-            sos.writeUI16(gradientSize);
-            byte fileNameBytes[] = fileName.getBytes();
-            sos.writeUI8(fileNameBytes.length);
-            sos.write(fileNameBytes);
+            sos.writeUI16(characterId);
+            sos.writeUI16(imageCharacterId);
+            sos.writeUI16(x1);
+            sos.writeUI16(y1);
+            sos.writeUI16(x2);
+            sos.writeUI16(y2);
         } catch (IOException e) {
         }
         return baos.toByteArray();
@@ -72,13 +72,14 @@ public class GFxDefineExternalGradient extends Tag {
      * @param pos
      * @throws IOException
      */
-    public GFxDefineExternalGradient(SWF swf, byte[] data, int version, long pos) throws IOException {
-        super(swf, ID, "DefineExternalGradient", data, pos);
+    public DefineSubImage(SWF swf, byte[] data, int version, long pos) throws IOException {
+        super(swf, ID, "DefineSubImage", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        gradientId = sis.readUI16();
-        bitmapsFormat = sis.readUI16();
-        gradientSize = sis.readUI16();
-        int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytes(fileNameLen));
+        characterId = sis.readUI16();
+        imageCharacterId = sis.readUI16();
+        x1 = sis.readUI16();
+        y1 = sis.readUI16();
+        x2 = sis.readUI16();
+        y2 = sis.readUI16();
     }
 }

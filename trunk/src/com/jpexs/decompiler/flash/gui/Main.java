@@ -413,28 +413,59 @@ public class Main {
 
     public static boolean saveFileDialog() {
         JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(Configuration.getConfig("lastSaveDir", ".")));
-        fc.setFileFilter(new FileFilter() {
+        fc.setCurrentDirectory(new File(Configuration.getConfig("lastSaveDir", ".")));   
+        FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().endsWith(".swf")) || (f.isDirectory());
+                return (f.getName().toLowerCase().endsWith(".swf")) || (f.isDirectory());
             }
 
             @Override
             public String getDescription() {
                 return translate("filter.swf");
             }
-        });
+        };
+        if(!swf.gfx){
+            fc.setFileFilter(swfFilter);            
+        }else{
+            fc.addChoosableFileFilter(swfFilter);
+        }
+        FileFilter gfxFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase().endsWith(".gfx")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return translate("filter.gfx");
+            }
+        };
+        if(swf.gfx){
+            fc.setFileFilter(gfxFilter);
+        }else{
+            fc.addChoosableFileFilter(gfxFilter);
+        }        
         fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
         int returnVal = fc.showSaveDialog(f);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = Helper.fixDialogFile(fc.getSelectedFile());
+            FileFilter selFilter = fc.getFileFilter();
             try {
                 String fileName = file.getAbsolutePath();
-                if (!fileName.toLowerCase().endsWith(".swf")) {
-                    fileName += ".swf";
+                if(selFilter == swfFilter){
+                    if (!fileName.toLowerCase().endsWith(".swf")) {
+                        fileName += ".swf";
+                    }
+                    swf.gfx = false;
+                }
+                if(selFilter == gfxFilter){
+                    if (!fileName.toLowerCase().endsWith(".gfx")) {                        
+                        fileName += ".gfx";
+                    }
+                    swf.gfx = true;
                 }
                 Main.saveFile(fileName);
                 Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());
@@ -452,17 +483,45 @@ public class Main {
         fileTitle = null;
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.getConfig("lastOpenDir", ".")));
-        fc.setFileFilter(new FileFilter() {
+        FileFilter allSupportedFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().endsWith(".swf")) || (f.isDirectory());
+                return (f.getName().toLowerCase().toLowerCase().endsWith(".swf"))
+                        || (f.getName().toLowerCase().toLowerCase().endsWith(".gfx"))
+                        || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return translate("filter.supported");
+            }
+        };
+        fc.setFileFilter(allSupportedFilter);
+        FileFilter swfFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase().endsWith(".swf")) || (f.isDirectory());
             }
 
             @Override
             public String getDescription() {
                 return translate("filter.swf");
             }
-        });
+        };
+        fc.addChoosableFileFilter(swfFilter);
+        FileFilter gfxFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase().endsWith(".gfx")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return translate("filter.gfx");
+            }
+        };
+        fc.addChoosableFileFilter(gfxFilter);      
+        fc.setAcceptAllFileFilterUsed(true);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
         int returnVal = fc.showOpenDialog(f);

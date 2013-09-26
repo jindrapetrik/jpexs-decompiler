@@ -14,11 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +32,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class GFxExporterInfoTag extends Tag {
+public class ExporterInfoTag extends Tag {
 
     public static final int ID = 1000;
     //Version (1.10 will be encoded as 0x10A)
@@ -90,7 +91,7 @@ public class GFxExporterInfoTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public GFxExporterInfoTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public ExporterInfoTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "ExporterInfo", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         this.version = sis.readUI16();

@@ -14,11 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.gfx.FONTINFO;
 import com.jpexs.decompiler.flash.types.gfx.GFxInputStream;
 import com.jpexs.decompiler.flash.types.gfx.GFxOutputStream;
@@ -33,7 +34,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class GFxFontTextureInfo extends Tag {
+public class FontTextureInfo extends Tag {
 
     public static final int ID = 1002;
     public long textureID;
@@ -92,7 +93,7 @@ public class GFxFontTextureInfo extends Tag {
      * @param pos
      * @throws IOException
      */
-    public GFxFontTextureInfo(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public FontTextureInfo(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "FontTextureInfo", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         textureID = sis.readUI32();

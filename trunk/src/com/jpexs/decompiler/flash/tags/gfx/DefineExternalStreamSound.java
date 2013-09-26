@@ -14,11 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,17 +30,19 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class GFxDefineExternalImage extends Tag {
+public class DefineExternalStreamSound extends Tag {
 
-    public static final int ID = 1001;
-    public int characterId;
-    public int bitmapFormat;
-    public int targetWidth;
-    public int targetHeight;
+    public static final int ID = 1007;
+    public int soundFormat;
+    public int bits;
+    public int channels;
+    public long sampleRate;
+    public long sampleCount;
+    public long seekSample;
+    public long startFrame;
+    public long lastFrame;
     public String fileName;
-    public static final int BITMAP_FORMAT_DEFAULT = 0;
-    public static final int BITMAP_FORMAT_TGA = 1;
-    public static final int BITMAP_FORMAT_DDS = 2;
+    public static final int SOUND_FORMAT_WAV = 0;
 
     /**
      * Gets data bytes
@@ -53,11 +56,15 @@ public class GFxDefineExternalImage extends Tag {
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
-            sos.writeUI16(characterId);
-            sos.writeUI16(bitmapFormat);
-            sos.writeUI16(targetWidth);
-            sos.writeUI16(targetHeight);
-            byte fileNameBytes[] = fileName.getBytes();
+            sos.writeUI16(soundFormat);
+            sos.writeUI16(bits);
+            sos.writeUI16(channels);
+            sos.writeUI32(sampleRate);
+            sos.writeUI32(sampleCount);
+            sos.writeUI32(seekSample);
+            sos.writeUI32(startFrame);
+            sos.writeUI32(lastFrame);
+            byte[] fileNameBytes = fileName.getBytes();
             sos.writeUI8(fileNameBytes.length);
             sos.write(fileNameBytes);
         } catch (IOException e) {
@@ -74,13 +81,17 @@ public class GFxDefineExternalImage extends Tag {
      * @param pos
      * @throws IOException
      */
-    public GFxDefineExternalImage(SWF swf, byte[] data, int version, long pos) throws IOException {
-        super(swf, ID, "DefineExternalImage", data, pos);
+    public DefineExternalStreamSound(SWF swf, byte[] data, int version, long pos) throws IOException {
+        super(swf, ID, "DefineExternalStreamSound", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        characterId = sis.readUI16();
-        bitmapFormat = sis.readUI16();
-        targetWidth = sis.readUI16();
-        targetHeight = sis.readUI16();
+        soundFormat = sis.readUI16();
+        bits = sis.readUI16();
+        channels = sis.readUI16();
+        sampleRate = sis.readUI32();
+        sampleCount = sis.readUI32();
+        seekSample = sis.readUI32();
+        startFrame = sis.readUI32();
+        lastFrame = sis.readUI32();
         int fileNameLen = sis.readUI8();
         fileName = new String(sis.readBytes(fileNameLen));
 

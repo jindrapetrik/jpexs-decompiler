@@ -14,11 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,15 +30,17 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class GFxDefineSubImage extends Tag {
+public class DefineExternalImage extends Tag {
 
-    public static final int ID = 1008;
+    public static final int ID = 1001;
     public int characterId;
-    public int imageCharacterId;
-    public int x1;
-    public int y1;
-    public int x2;
-    public int y2;
+    public int bitmapFormat;
+    public int targetWidth;
+    public int targetHeight;
+    public String fileName;
+    public static final int BITMAP_FORMAT_DEFAULT = 0;
+    public static final int BITMAP_FORMAT_TGA = 1;
+    public static final int BITMAP_FORMAT_DDS = 2;
 
     /**
      * Gets data bytes
@@ -52,11 +55,12 @@ public class GFxDefineSubImage extends Tag {
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
             sos.writeUI16(characterId);
-            sos.writeUI16(imageCharacterId);
-            sos.writeUI16(x1);
-            sos.writeUI16(y1);
-            sos.writeUI16(x2);
-            sos.writeUI16(y2);
+            sos.writeUI16(bitmapFormat);
+            sos.writeUI16(targetWidth);
+            sos.writeUI16(targetHeight);
+            byte fileNameBytes[] = fileName.getBytes();
+            sos.writeUI8(fileNameBytes.length);
+            sos.write(fileNameBytes);
         } catch (IOException e) {
         }
         return baos.toByteArray();
@@ -71,14 +75,15 @@ public class GFxDefineSubImage extends Tag {
      * @param pos
      * @throws IOException
      */
-    public GFxDefineSubImage(SWF swf, byte[] data, int version, long pos) throws IOException {
-        super(swf, ID, "DefineSubImage", data, pos);
+    public DefineExternalImage(SWF swf, byte[] data, int version, long pos) throws IOException {
+        super(swf, ID, "DefineExternalImage", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterId = sis.readUI16();
-        imageCharacterId = sis.readUI16();
-        x1 = sis.readUI16();
-        y1 = sis.readUI16();
-        x2 = sis.readUI16();
-        y2 = sis.readUI16();
+        bitmapFormat = sis.readUI16();
+        targetWidth = sis.readUI16();
+        targetHeight = sis.readUI16();
+        int fileNameLen = sis.readUI8();
+        fileName = new String(sis.readBytes(fileNameLen));
+
     }
 }

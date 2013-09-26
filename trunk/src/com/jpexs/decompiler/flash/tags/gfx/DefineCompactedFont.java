@@ -14,11 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -63,7 +65,7 @@ import javax.swing.JPanel;
  *
  * @author JPEXS
  */
-public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
+public class DefineCompactedFont extends FontTag implements DrawableTag {
 
     public static final int ID = 1005;
     public int fontId;
@@ -128,7 +130,7 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
      * @param pos
      * @throws IOException
      */
-    public GFxDefineCompactedFont(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineCompactedFont(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "DefineCompactedFont", data, pos);
 
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
@@ -409,7 +411,7 @@ public class GFxDefineCompactedFont extends FontTag implements DrawableTag {
              }*/
             return ret;
         } catch (IOException ex) {
-            Logger.getLogger(GFxDefineCompactedFont.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DefineCompactedFont.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

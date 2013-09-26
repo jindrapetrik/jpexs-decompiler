@@ -16,6 +16,16 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
+import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage;
+import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
+import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
+import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
@@ -954,34 +964,34 @@ public class SWFInputStream extends InputStream {
                     ret = new PlaceObject4Tag(swf, data, version, pos);
                     break;
                 case 1000:
-                    ret = new GFxExporterInfoTag(swf, data, version, pos);
+                    ret = new ExporterInfoTag(swf, data, version, pos);
                     break;
                 case 1001:
-                    ret = new GFxDefineExternalImage(swf, data, version, pos);
+                    ret = new DefineExternalImage(swf, data, version, pos);
                     break;
                 case 1002:
-                    ret = new GFxFontTextureInfo(swf, data, version, pos);
+                    ret = new FontTextureInfo(swf, data, version, pos);
                     break;
                 case 1003:
-                    ret = new GFxDefineExternalGradient(swf, data, version, pos);
+                    ret = new DefineExternalGradient(swf, data, version, pos);
                     break;
                 case 1004:
-                    ret = new GFxDefineGradientMap(swf, data, version, pos);
+                    ret = new DefineGradientMap(swf, data, version, pos);
                     break;
                 case 1005:
-                    ret = new GFxDefineCompactedFont(swf, data, version, pos);
+                    ret = new DefineCompactedFont(swf, data, version, pos);
                     break;
                 case 1006:
-                    ret = new GFxDefineExternalSound(swf, data, version, pos);
+                    ret = new DefineExternalSound(swf, data, version, pos);
                     break;
                 case 1007:
-                    ret = new GFxDefineExternalStreamSound(swf, data, version, pos);
+                    ret = new DefineExternalStreamSound(swf, data, version, pos);
                     break;
                 case 1008:
-                    ret = new GFxDefineSubImage(swf, data, version, pos);
+                    ret = new DefineSubImage(swf, data, version, pos);
                     break;
                 case 1009:
-                    ret = new GFxDefineExternalImage2(swf, data, version, pos);
+                    ret = new DefineExternalImage2(swf, data, version, pos);
                     break;
                 default:
                     ret = new Tag(swf, tag.getId(), "Unknown", data, pos);

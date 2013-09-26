@@ -185,7 +185,11 @@ public class SWF {
      */
     public byte[] lzmaProperties;
     public FileAttributesTag fileAttributes;
-
+    /**
+     * ScaleForm GFx
+     */
+    public boolean gfx = false;
+    
     /**
      * Gets all tags with specified id
      *
@@ -225,10 +229,19 @@ public class SWF {
             } else if (compressed) {
                 os.write('C');
             } else {
-                os.write('F');
+                if (gfx) {
+                    os.write('G');
+                } else {
+                    os.write('F');
+                }
             }
-            os.write('W');
-            os.write('S');
+            if (gfx) {
+                os.write('F');
+                os.write('X');
+            } else {
+                os.write('W');
+                os.write('S');
+            }
             os.write(version);
             byte[] data = baos.toByteArray();
             sos = new SWFOutputStream(os, version);
@@ -300,13 +313,22 @@ public class SWF {
         byte[] hdr = new byte[3];
         is.read(hdr);
         String shdr = new String(hdr, "utf-8");
-        if ((!shdr.equals("FWS")) && (!shdr.equals("CWS")) && (!shdr.equals("ZWS"))) {
+        if (!Arrays.asList(
+                "FWS",  //Uncompressed Flash
+                "CWS",  //ZLib compressed Flash
+                "ZWS",  //LZMA compressed Flash
+                "GFX",  //Uncompressed ScaleForm GFx
+                "CFX"   //Compressed ScaleForm GFx
+                ).contains(shdr)) {
             throw new IOException("Invalid SWF file");
         }
         version = is.read();
         SWFInputStream sis = new SWFInputStream(is, version, 4);
         fileSize = sis.readUI32();
 
+        if(hdr[1] == 'F' && hdr[2] == 'X'){
+            gfx = true;
+        }
         if (hdr[0] == 'C') {
             sis = new SWFInputStream(new InflaterInputStream(is), version, 8);
             compressed = true;

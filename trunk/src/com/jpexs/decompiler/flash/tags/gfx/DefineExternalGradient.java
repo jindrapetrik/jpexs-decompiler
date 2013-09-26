@@ -14,11 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,19 +30,16 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class GFxDefineExternalSound extends Tag {
+public class DefineExternalGradient extends Tag {
 
-    public static final int ID = 1006;
-    public int characterId;
-    public int soundFormat;
-    public int bits;
-    public int channels;
-    public long sampleRate;
-    public long sampleCount;
-    public long seekSample;
-    public String exportName;
+    public static final int ID = 1003;
+    public static final int BITMAP_FORMAT_DEFAULT = 0;
+    public static final int BITMAP_FORMAT_TGA = 1;
+    public static final int BITMAP_FORMAT_DDS = 2;
+    public int gradientId;
+    public int bitmapsFormat;
+    public int gradientSize;
     public String fileName;
-    public static final int SOUND_FORMAT_WAV = 0;
 
     /**
      * Gets data bytes
@@ -55,17 +53,10 @@ public class GFxDefineExternalSound extends Tag {
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
-            sos.writeUI16(characterId);
-            sos.writeUI16(soundFormat);
-            sos.writeUI16(bits);
-            sos.writeUI16(channels);
-            sos.writeUI32(sampleRate);
-            sos.writeUI32(sampleCount);
-            sos.writeUI32(seekSample);
-            byte[] exportNameBytes = exportName.getBytes();
-            sos.writeUI8(exportNameBytes.length);
-            sos.write(exportNameBytes);
-            byte[] fileNameBytes = fileName.getBytes();
+            sos.writeUI16(gradientId);
+            sos.writeUI16(bitmapsFormat);
+            sos.writeUI16(gradientSize);
+            byte fileNameBytes[] = fileName.getBytes();
             sos.writeUI8(fileNameBytes.length);
             sos.write(fileNameBytes);
         } catch (IOException e) {
@@ -82,20 +73,13 @@ public class GFxDefineExternalSound extends Tag {
      * @param pos
      * @throws IOException
      */
-    public GFxDefineExternalSound(SWF swf, byte[] data, int version, long pos) throws IOException {
-        super(swf, ID, "DefineExternalSound", data, pos);
+    public DefineExternalGradient(SWF swf, byte[] data, int version, long pos) throws IOException {
+        super(swf, ID, "DefineExternalGradient", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        characterId = sis.readUI16();
-        soundFormat = sis.readUI16();
-        bits = sis.readUI16();
-        channels = sis.readUI16();
-        sampleRate = sis.readUI32();
-        sampleCount = sis.readUI32();
-        seekSample = sis.readUI32();
-        int exportNameLen = sis.readUI8();
-        exportName = new String(sis.readBytes(exportNameLen));
+        gradientId = sis.readUI16();
+        bitmapsFormat = sis.readUI16();
+        gradientSize = sis.readUI16();
         int fileNameLen = sis.readUI8();
         fileName = new String(sis.readBytes(fileNameLen));
-
     }
 }
