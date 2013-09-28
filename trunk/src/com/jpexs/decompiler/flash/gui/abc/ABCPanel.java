@@ -22,6 +22,11 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -638,11 +643,15 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                         body.max_stack = 1;
                         body.exceptions = new ABCException[0];
                         AVM2Code code = new AVM2Code();
+                        code.code.add(new AVM2Instruction(0, new GetLocal0Ins(), new int[0], new byte[0]));
+                        code.code.add(new AVM2Instruction(0, new PushScopeIns(), new int[0], new byte[0]));
+                        code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[0], new byte[0]));
                         body.code = code;
                         Traits traits = new Traits();
                         traits.traits = new Trait[0];
                         body.traits = traits;
                         abc.addMethodBody(body);
+                        mi.setBody(body);
                         t = tm;
                         break;
                     case Trait.TRAIT_SLOT:

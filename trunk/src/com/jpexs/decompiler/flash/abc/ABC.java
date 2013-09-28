@@ -67,8 +67,15 @@ public class ABC {
     public int addMethodBody(MethodBody body) {
         bodies = Arrays.copyOf(bodies, bodies.length + 1);
         bodies[bodies.length - 1] = body;
-        bodyIdxFromMethodIdx = Arrays.copyOf(bodyIdxFromMethodIdx, bodyIdxFromMethodIdx.length + 1);
-        bodyIdxFromMethodIdx[bodyIdxFromMethodIdx.length - 1] = body.method_info;
+        if (body.method_info >= bodyIdxFromMethodIdx.length) {
+            int newlen = body.method_info + 1;
+            int oldlen = bodyIdxFromMethodIdx.length;
+            bodyIdxFromMethodIdx = Arrays.copyOf(bodyIdxFromMethodIdx, newlen);
+            for (int i = oldlen; i < newlen; i++) {
+                bodyIdxFromMethodIdx[i] = -1;
+            }
+            bodyIdxFromMethodIdx[body.method_info] = bodies.length - 1;
+        }
         return bodies.length - 1;
     }
 
