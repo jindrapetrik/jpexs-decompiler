@@ -64,17 +64,16 @@ public class ActionListReader {
 
     private static final Logger log = Logger.getLogger(SWFInputStream.class.getName());
 
+    
     /**
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
-     *
      * @param listeners
-     * @param address
-     * @param ip
+     * @param containerSWFOffset
      * @param rri
      * @param version
-     * @param containerSWFOffset
-     * @param endip
+     * @param ip
+     * @param endIp
      * @param path
      * @return List of actions
      * @throws IOException
@@ -154,17 +153,15 @@ public class ActionListReader {
         return actions;
     }
 
+    
     /**
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
-     *
      * @param listeners
-     * @param address
-     * @param ip
-     * @param rri
-     * @param version
      * @param containerSWFOffset
-     * @param endip
+     * @param actions
+     * @param version
+     * @param ip
      * @param path
      * @return List of actions
      * @throws IOException

@@ -124,13 +124,12 @@ public class Highlighting implements Serializable {
     public String toString() {
         return "" + startPos + "-" + (startPos + len) + " data:" + data;
     }
-
+    
     /**
-     * Constructor
      *
      * @param startPos Starting position
      * @param len Length of highlighted text
-     * @param offset Offset of instruction or trait
+     * @param data Highlighting data
      */
     public Highlighting(int startPos, int len, String data) {
         this.startPos = startPos;
@@ -257,7 +256,7 @@ public class Highlighting implements Serializable {
      * Highlights specified text as trait by adding special tags
      *
      * @param text Text to highlight
-     * @param offset Offset of trait
+     * @param index Trait index
      * @return Highlighted text
      */
     public static String hilighTrait(String text, long index) {
@@ -269,7 +268,7 @@ public class Highlighting implements Serializable {
      * Highlights specified text as class by adding special tags
      *
      * @param text Text to highlight
-     * @param offset Offset of trait
+     * @param index Class index
      * @return Highlighted text
      */
     public static String hilighClass(String text, long index) {
