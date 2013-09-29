@@ -810,9 +810,13 @@ public class AVM2Code implements Serializable {
             if (info.flagHas_paramnames()) {
                 for (int n : info.paramNames) {
                     ret.append("paramname ");
-                    ret.append("\"");
-                    ret.append(constants.constant_string[n]);
-                    ret.append("\"");
+                    if (n == 0) {
+                        ret.append("null");
+                    } else {
+                        ret.append("\"");
+                        ret.append(constants.constant_string[n]);
+                        ret.append("\"");
+                    }
                     ret.append("\n");
                 }
             }

@@ -188,21 +188,37 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
                      s.append("\"");*/
                     break;
                 case AVM2Code.DAT_STRING_INDEX:
-                    s.append(" \"");
-                    s.append(Helper.escapeString(constants.constant_string[operands[i]]));
-                    s.append("\"");
+                    if (operands[i] == 0) {
+                        s.append(" null");
+                    } else {
+                        s.append(" \"");
+                        s.append(Helper.escapeString(constants.constant_string[operands[i]]));
+                        s.append("\"");
+                    }
                     break;
                 case AVM2Code.DAT_INT_INDEX:
-                    s.append(" ");
-                    s.append(constants.constant_int[operands[i]]);
+                    if (operands[i] == 0) {
+                        s.append(" null");
+                    } else {
+                        s.append(" ");
+                        s.append(constants.constant_int[operands[i]]);
+                    }
                     break;
                 case AVM2Code.DAT_UINT_INDEX:
-                    s.append(" ");
-                    s.append(constants.constant_uint[operands[i]]);
+                    if (operands[i] == 0) {
+                        s.append(" null");
+                    } else {
+                        s.append(" ");
+                        s.append(constants.constant_uint[operands[i]]);
+                    }
                     break;
                 case AVM2Code.DAT_DOUBLE_INDEX:
-                    s.append(" ");
-                    s.append(constants.constant_double[operands[i]]);
+                    if (operands[i] == 0) {
+                        s.append(" null");
+                    } else {
+                        s.append(" ");
+                        s.append(constants.constant_double[operands[i]]);
+                    }
                     break;
                 case AVM2Code.DAT_OFFSET:
                     s.append(" ");

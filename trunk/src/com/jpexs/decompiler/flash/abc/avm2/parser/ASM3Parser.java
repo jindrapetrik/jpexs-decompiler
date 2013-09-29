@@ -371,25 +371,38 @@ public class ASM3Parser {
                 value_kind = ValueKind.CONSTANT_Int;
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 value = lexer.lex();
-                expected(value, ParsedSymbol.TYPE_INTEGER, "Integer");
+                if (value.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                    value_index = 0;
+                } else {
+                    expected(value, ParsedSymbol.TYPE_INTEGER, "Integer or null");
+                    value_index = constants.getIntId((Long) value.value, true);
+                }
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
-                value_index = constants.getIntId((Long) value.value, true);
                 break;
             case ParsedSymbol.TYPE_KEYWORD_UINTEGER:
                 value_kind = ValueKind.CONSTANT_UInt;
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 value = lexer.lex();
-                expected(value, ParsedSymbol.TYPE_INTEGER, "UInteger");
+                if (value.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                    value_index = 0;
+                } else {
+                    expected(value, ParsedSymbol.TYPE_INTEGER, "UInteger");
+                    value_index = constants.getUIntId((Long) value.value, true);
+                }
+
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
-                value_index = constants.getUIntId((Long) value.value, true);
                 break;
             case ParsedSymbol.TYPE_KEYWORD_DOUBLE:
                 value_kind = ValueKind.CONSTANT_Double;
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 value = lexer.lex();
-                expected(value, ParsedSymbol.TYPE_FLOAT, "Double");
+                if (value.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                    value_index = 0;
+                } else {
+                    expected(value, ParsedSymbol.TYPE_FLOAT, "Double or null");
+                    value_index = constants.getDoubleId((Double) value.value, true);
+                }
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
-                value_index = constants.getDoubleId((Double) value.value, true);
                 break;
             /*case ParsedSymbol.TYPE_KEYWORD_DECIMAL:
              value_kind = ValueKind.CONSTANT_Decimal;
@@ -398,9 +411,13 @@ public class ASM3Parser {
                 value_kind = ValueKind.CONSTANT_Utf8;
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 value = lexer.lex();
-                expected(value, ParsedSymbol.TYPE_STRING, "String");
-                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
-                value_index = constants.getStringId((String) value.value, true);
+                if (value.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                    value_index = 0;
+                } else {
+                    expected(value, ParsedSymbol.TYPE_STRING, "String or null");
+                    expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                    value_index = constants.getStringId((String) value.value, true);
+                }
                 break;
             case ParsedSymbol.TYPE_KEYWORD_TRUE:
                 value_kind = ValueKind.CONSTANT_True;
@@ -518,8 +535,12 @@ public class ASM3Parser {
             }
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_NAME) {
                 symb = lexer.lex();
-                expected(symb, ParsedSymbol.TYPE_STRING, "String");
-                info.name_index = constants.getStringId((String) symb.value, true);
+                if (symb.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                    info.name_index = 0;
+                } else {
+                    expected(symb, ParsedSymbol.TYPE_STRING, "String or null");
+                    info.name_index = constants.getStringId((String) symb.value, true);
+                }
                 continue;
             }
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_PARAM) {
@@ -528,8 +549,12 @@ public class ASM3Parser {
             }
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_PARAMNAME) {
                 symb = lexer.lex();
-                expected(symb, ParsedSymbol.TYPE_STRING, "String");
-                paramNames.add(constants.getStringId((String) symb.value, true));
+                if (symb.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                    paramNames.add(0);
+                } else {
+                    expected(symb, ParsedSymbol.TYPE_STRING, "String or null");
+                    paramNames.add(constants.getStringId((String) symb.value, true));
+                }
                 continue;
             }
 
@@ -699,74 +724,90 @@ public class ASM3Parser {
                                      }*/
                                     break;
                                 case AVM2Code.DAT_STRING_INDEX:
-                                    if (parsedOperand.type == ParsedSymbol.TYPE_STRING) {
-                                        int sid = constants.getStringId((String) parsedOperand.value);
-                                        if (sid == 0) {
-                                            if ((missingHandler != null) && (missingHandler.missingString((String) parsedOperand.value))) {
-                                                sid = constants.addString((String) parsedOperand.value);
-                                            } else {
-                                                throw new ParseException("Unknown String", lexer.yyline());
-                                            }
-                                        }
-                                        operandsList.add(sid);
+                                    if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                                        operandsList.add(0);
                                     } else {
-                                        throw new ParseException("String expected", lexer.yyline());
+                                        if (parsedOperand.type == ParsedSymbol.TYPE_STRING) {
+                                            int sid = constants.getStringId((String) parsedOperand.value);
+                                            if (sid == 0) {
+                                                if ((missingHandler != null) && (missingHandler.missingString((String) parsedOperand.value))) {
+                                                    sid = constants.addString((String) parsedOperand.value);
+                                                } else {
+                                                    throw new ParseException("Unknown String", lexer.yyline());
+                                                }
+                                            }
+                                            operandsList.add(sid);
+                                        } else {
+                                            throw new ParseException("String or null expected", lexer.yyline());
+                                        }
                                     }
                                     break;
                                 case AVM2Code.DAT_INT_INDEX:
 
-                                    if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                        long intVal = (Long) parsedOperand.value;
-                                        int iid = constants.getIntId(intVal);
-                                        if (iid == 0) {
-                                            if ((missingHandler != null) && (missingHandler.missingInt(intVal))) {
-                                                iid = constants.addInt(intVal);
-                                            } else {
-                                                throw new ParseException("Unknown int", lexer.yyline());
-                                            }
-                                        }
-                                        operandsList.add(iid);
+                                    if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                                        operandsList.add(0);
                                     } else {
-                                        throw new ParseException("Integer expected", lexer.yyline());
+                                        if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
+                                            long intVal = (Long) parsedOperand.value;
+                                            int iid = constants.getIntId(intVal);
+                                            if (iid == 0) {
+                                                if ((missingHandler != null) && (missingHandler.missingInt(intVal))) {
+                                                    iid = constants.addInt(intVal);
+                                                } else {
+                                                    throw new ParseException("Unknown int", lexer.yyline());
+                                                }
+                                            }
+                                            operandsList.add(iid);
+                                        } else {
+                                            throw new ParseException("Integer or null expected", lexer.yyline());
+                                        }
                                     }
                                     break;
                                 case AVM2Code.DAT_UINT_INDEX:
-                                    if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                        long intVal = (Long) parsedOperand.value;
-                                        int iid = constants.getUIntId(intVal);
-                                        if (iid == 0) {
-                                            if ((missingHandler != null) && (missingHandler.missingUInt(intVal))) {
-                                                iid = constants.addUInt(intVal);
-                                            } else {
-                                                throw new ParseException("Unknown uint", lexer.yyline());
-                                            }
-                                        }
-                                        operandsList.add(iid);
+                                    if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                                        operandsList.add(0);
                                     } else {
-                                        throw new ParseException("Integer expected", lexer.yyline());
+                                        if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
+                                            long intVal = (Long) parsedOperand.value;
+                                            int iid = constants.getUIntId(intVal);
+                                            if (iid == 0) {
+                                                if ((missingHandler != null) && (missingHandler.missingUInt(intVal))) {
+                                                    iid = constants.addUInt(intVal);
+                                                } else {
+                                                    throw new ParseException("Unknown uint", lexer.yyline());
+                                                }
+                                            }
+                                            operandsList.add(iid);
+                                        } else {
+                                            throw new ParseException("Integer or null expected", lexer.yyline());
+                                        }
                                     }
                                     break;
                                 case AVM2Code.DAT_DOUBLE_INDEX:
-                                    if ((parsedOperand.type == ParsedSymbol.TYPE_INTEGER) || (parsedOperand.type == ParsedSymbol.TYPE_FLOAT)) {
-
-                                        double doubleVal = 0;
-                                        if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                            doubleVal = (Long) parsedOperand.value;
-                                        }
-                                        if (parsedOperand.type == ParsedSymbol.TYPE_FLOAT) {
-                                            doubleVal = (Double) parsedOperand.value;
-                                        }
-                                        int did = constants.getDoubleId(doubleVal);
-                                        if (did == 0) {
-                                            if ((missingHandler != null) && (missingHandler.missingDouble(doubleVal))) {
-                                                did = constants.addDouble(doubleVal);
-                                            } else {
-                                                throw new ParseException("Unknown double", lexer.yyline());
-                                            }
-                                        }
-                                        operandsList.add(did);
+                                    if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                                        operandsList.add(0);
                                     } else {
-                                        throw new ParseException("Float value expected", lexer.yyline());
+                                        if ((parsedOperand.type == ParsedSymbol.TYPE_INTEGER) || (parsedOperand.type == ParsedSymbol.TYPE_FLOAT)) {
+
+                                            double doubleVal = 0;
+                                            if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
+                                                doubleVal = (Long) parsedOperand.value;
+                                            }
+                                            if (parsedOperand.type == ParsedSymbol.TYPE_FLOAT) {
+                                                doubleVal = (Double) parsedOperand.value;
+                                            }
+                                            int did = constants.getDoubleId(doubleVal);
+                                            if (did == 0) {
+                                                if ((missingHandler != null) && (missingHandler.missingDouble(doubleVal))) {
+                                                    did = constants.addDouble(doubleVal);
+                                                } else {
+                                                    throw new ParseException("Unknown double", lexer.yyline());
+                                                }
+                                            }
+                                            operandsList.add(did);
+                                        } else {
+                                            throw new ParseException("Float or null expected", lexer.yyline());
+                                        }
                                     }
                                     break;
                                 case AVM2Code.DAT_OFFSET:
