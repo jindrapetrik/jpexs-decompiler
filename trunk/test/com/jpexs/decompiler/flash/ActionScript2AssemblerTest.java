@@ -16,23 +16,12 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
-public class ActionScript2AssemblerTest {
-
-    private SWF swf;
+public class ActionScript2AssemblerTest extends ActionStript2TestBase {
 
     @BeforeClass
     public void init() throws IOException {
         Configuration.setConfig("autoDeobfuscate", false);
         swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
-    }
-
-    private DoActionTag getFirstActionTag() {
-        for (Tag t : swf.tags) {
-            if (t instanceof DoActionTag) {
-                return (DoActionTag) t;
-            }
-        }
-        return null;
     }
 
     @Test

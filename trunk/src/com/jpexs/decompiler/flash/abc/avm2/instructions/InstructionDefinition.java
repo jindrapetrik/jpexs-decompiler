@@ -42,9 +42,6 @@ public class InstructionDefinition implements Serializable {
 
     public static final long serialVersionUID = 1L;
 
-    protected String hilighOffset(String text, long offset) {
-        return Highlighting.hilighOffset(text, offset);
-    }
     public int[] operands;
     public String instructionName = "";
     public int instructionCode = 0;
@@ -120,7 +117,7 @@ public class InstructionDefinition implements Serializable {
         if (constants.constant_multiname[multinameIndex].needsName()) {
             name = stack.get(pos).toString();
         } else {
-            name = hilighOffset(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), ins.offset);
+            name = Highlighting.hilighOffset(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), ins.offset);
         }
         return name + ns;
     }

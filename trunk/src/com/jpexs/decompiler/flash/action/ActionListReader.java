@@ -132,22 +132,25 @@ public class ActionListReader {
         getJumps(actions, jumps);
 
         long endAddress = updateAddresses(actions, ip, version);
+
+        // add end action
+        Action lastAction = actions.get(actions.size() - 1);
+        Action aEnd = new ActionEnd();
+        if (!(lastAction instanceof ActionEnd)) {
+            aEnd.setAddress(endAddress, version);
+            actions.add(aEnd);
+        } else {
+            endAddress -= getTotalActionLength(aEnd);
+        }
+
         updateJumps(actions, jumps, containerLastActions, endAddress, version);
         updateActionStores(actions, jumps);
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
 
-        // add end action
-        Action lastAction = actions.get(actions.size() - 1);
-        if (!(lastAction instanceof ActionEnd)) {
-            Action aEnd = new ActionEnd();
-            aEnd.setAddress(endAddress, version);
-            actions.add(aEnd);
-            endAddress += getTotalActionLength(aEnd);
-        }
-
         if (deobfuscate) {
-            return deobfuscateActionList(listeners, containerSWFOffset, actions, version, 0, path);
+            actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, 0, path);
+            removeZeroJumps(actions);
         }
 
         return actions;
@@ -172,7 +175,7 @@ public class ActionListReader {
         int endIp = data.length;
 
         List<Action> retdups = new ArrayList<>();
-        for (int i = 0; i <= endIp; i++) {
+        for (int i = 0; i < endIp; i++) {
             Action a = new ActionNop();
             a.setAddress(i, version);
             retdups.add(a);
@@ -431,6 +434,28 @@ public class ActionListReader {
         }
     }
 
+    private static void removeZeroJumps(List<Action> actions) {
+        for (int i = 0; i < actions.size(); i++) {
+            Action a = actions.get(i);
+            if (a instanceof ActionJump) {
+                ActionJump aJump = (ActionJump)a;
+                if (aJump.getOffset() == 0) {
+                    removeAction(actions, i);
+                    i--;
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes an action from the action list, and updates all references
+     * @param actions
+     * @param index 
+     */
+    private static void removeAction(List<Action> actions, int index) {
+    
+    }
+    
     @SuppressWarnings("unchecked")
     private static Action readActionListAtPos(List<DisassemblyListener> listeners, long containerSWFOffset, ConstantPool cpool,
             SWFInputStream sis, ReReadableInputStream rri,

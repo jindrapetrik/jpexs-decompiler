@@ -30,9 +30,7 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
-public class ActionScript2Test {
-
-    private SWF swf;
+public class ActionScript2Test extends ActionStript2TestBase {
 
     @BeforeClass
     public void init() throws IOException {

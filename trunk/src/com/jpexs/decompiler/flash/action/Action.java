@@ -352,13 +352,15 @@ public class Action implements GraphSourceItem {
      */
     public static byte[] actionsToBytes(List<Action> list, boolean addZero, int version) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Action lastAction = null;
         for (Action a : list) {
             try {
+                lastAction = a;
                 baos.write(a.getBytes(version));
             } catch (IOException e) {
             }
         }
-        if (addZero) {
+        if (addZero && (lastAction == null || !(lastAction instanceof ActionEnd))) {
             baos.write(0);
         }
         return baos.toByteArray();
