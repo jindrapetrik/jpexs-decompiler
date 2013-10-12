@@ -45,7 +45,7 @@ public class SetSuperAVM2Item extends AVM2Item {
 
     @Override
     public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        if (!object.toString(false, constants, localRegNames, fullyQualifiedNames).equals("this.")) {
+        if (!object.toString(false, constants, localRegNames, fullyQualifiedNames).equals("this")) {
             object.toString(writer, constants, localRegNames, fullyQualifiedNames);
             hilight(".", writer);
         }

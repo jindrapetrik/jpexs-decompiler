@@ -466,9 +466,7 @@ public class ActionListReader {
         
         List<Action> actionMap = new ArrayList<>(lastIdx);
         for (int i = 0; i <= lastIdx; i++) {
-            Action a = new ActionNop();
-            a.setAddress(i, version);
-            actionMap.add(a);
+            actionMap.add(null);
         }
         for (Action a : actions) {
             actionMap.set((int) a.getAddress(), a);
