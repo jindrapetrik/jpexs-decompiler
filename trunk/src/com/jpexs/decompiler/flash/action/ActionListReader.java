@@ -150,7 +150,8 @@ public class ActionListReader {
 
         if (deobfuscate) {
             actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, 0, path);
-            removeZeroJumps(actions);
+            updateActionLengths(actions, version);
+            removeZeroJumps(actions, version);
         }
 
         return actions;
@@ -434,13 +435,13 @@ public class ActionListReader {
         }
     }
 
-    private static void removeZeroJumps(List<Action> actions) {
+    private static void removeZeroJumps(List<Action> actions, int version) {
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
             if (a instanceof ActionJump) {
                 ActionJump aJump = (ActionJump)a;
-                if (aJump.getOffset() == 0) {
-                    removeAction(actions, i);
+                if (aJump.getJumpOffset() == 0) {
+                    removeAction(actions, i, version);
                     i--;
                 }
             }
@@ -452,8 +453,64 @@ public class ActionListReader {
      * @param actions
      * @param index 
      */
-    private static void removeAction(List<Action> actions, int index) {
-    
+    private static void removeAction(List<Action> actions, int index, int version) {
+        
+        if (index < 0 || actions.size() <= index) {
+            return;
+        }
+        
+        long startIp = actions.get(0).getAddress();
+        Action lastAction = actions.get(actions.size() - 1);
+        int lastIdx = (int) lastAction.getAddress();
+        long endAddress = lastAction.getAddress() + getTotalActionLength(lastAction);
+        
+        List<Action> actionMap = new ArrayList<>(lastIdx);
+        for (int i = 0; i <= lastIdx; i++) {
+            Action a = new ActionNop();
+            a.setAddress(i, version);
+            actionMap.add(a);
+        }
+        for (Action a : actions) {
+            actionMap.set((int) a.getAddress(), a);
+        }
+        
+        Map<Action, List<Action>> containerLastActions = new HashMap<>();
+        getContainerLastActions(actionMap, containerLastActions);
+
+        Map<Action, Action> jumps = new HashMap<>();
+        getJumps(actions, jumps);
+        
+        Action prevAction = index > 0 ? actions.get(index - 1) : null;
+        Action nextAction = index + 1 < actions.size() ? actions.get(index + 1) : null;
+        Action actionToRemove = actions.get(index);
+        for (Action a : containerLastActions.keySet()) {
+            List<Action> lastActions = containerLastActions.get(a);
+            for (int i = 0; i < lastActions.size(); i++) {
+                if (lastActions.get(i) == actionToRemove) {
+                    lastActions.set(i, prevAction);
+                }
+            }
+        }
+        for (Action a : jumps.keySet()) {
+            Action targetAction = jumps.get(a);
+            if (targetAction == actionToRemove) {
+                jumps.put(a, nextAction);
+            }
+        }
+        if (containerLastActions.containsKey(actionToRemove)) {
+            containerLastActions.remove(actionToRemove);
+        }
+        if (jumps.containsKey(actionToRemove)) {
+            jumps.remove(actionToRemove);
+        }
+        
+        actions.remove(index);
+
+        updateAddresses(actions, startIp, version);
+        updateJumps(actions, jumps, containerLastActions, endAddress, version);
+        updateActionStores(actions, jumps);
+        updateContainerSizes(actions, containerLastActions);
+        updateActionLengths(actions, version);
     }
     
     @SuppressWarnings("unchecked")
