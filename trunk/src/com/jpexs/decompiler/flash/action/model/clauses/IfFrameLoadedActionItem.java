@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model.clauses;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.swf4.ActionWaitForFrame2;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -44,13 +45,15 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String ret = hilight("ifFrameLoaded(", highlight) + frame.toString(highlight, constants) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
-        ret += Graph.graphToString(actions, highlight, false, constants);
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight);
-        return ret;
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("ifFrameLoaded(", writer);
+        frame.toString(writer, constants);
+        hilight(")", writer).appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.appendNoHilight(Graph.graphToString(actions, writer.getIsHighlighted(), false, constants));
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        return hilight("}", writer);
     }
 
     @Override

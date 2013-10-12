@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf5.ActionInitArray;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -41,15 +42,15 @@ public class InitArrayActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String arrStr = "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("[", writer);
         for (int i = 0; i < values.size(); i++) {
             if (i > 0) {
-                arrStr += hilight(",", highlight);
+                hilight(",", writer);
             }
-            arrStr += values.get(i).toString(highlight, constants);
+            values.get(i).toString(writer, constants);
         }
-        return hilight("[", highlight) + arrStr + hilight("]", highlight);
+        return hilight("]", writer);
     }
 
     @Override

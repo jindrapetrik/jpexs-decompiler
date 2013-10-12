@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.model.BinaryOp;
 import java.io.Serializable;
@@ -82,23 +83,30 @@ public abstract class GraphTargetItem implements Serializable {
         return ret;
     }
 
-    public String hilight(String str, boolean highlight) {
-        if (src == null || !highlight) {
-            return str;
-        }
-        return Highlighting.hilighOffset(str, src.getOffset() + pos + 1);
+    public HilightedTextWriter hilight(String str, HilightedTextWriter writer) {
+        return writer.append(str, src, pos);
     }
 
     public String toStringSemicoloned(boolean highlight, List<Object> localData) {
-        return toString(highlight, localData) + (needsSemicolon() ? hilight(";", highlight) : "");
+        HilightedTextWriter writer = new HilightedTextWriter(highlight);
+        toStringSemicoloned(writer, localData);
+        return writer.toString();
     }
 
-    public String toStringSemicoloned(boolean highlight, Object... localData) {
+    public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, List<Object> localData) {
+        toString(writer, localData);
+        if (needsSemicolon()) { 
+            hilight(";", writer);
+        }
+        return writer;
+    }
+
+    public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, Object... localData) {
         List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
-        return toStringSemicoloned(highlight, localData2);
+        return toStringSemicoloned(writer, localData2);
     }
 
     public boolean needsSemicolon() {
@@ -110,14 +118,20 @@ public abstract class GraphTargetItem implements Serializable {
         return this.getClass().getName();
     }
 
-    public abstract String toString(boolean highlight, List<Object> localData);
+    public abstract HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData);
 
     public String toString(boolean highlight, Object... localData) {
+        HilightedTextWriter writer = new HilightedTextWriter(highlight);
+        toString(writer, localData);
+        return writer.toString();
+    }
+    
+    public HilightedTextWriter toString(HilightedTextWriter writer, Object... localData) {
         List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
-        return toString(highlight, localData2);
+        return toString(writer, localData2);
     }
 
     public int getPrecedence() {
@@ -148,15 +162,27 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public String toStringNoQuotes(boolean highlight, List<Object> localData) {
-        return toString(highlight, localData);
+        HilightedTextWriter writer = new HilightedTextWriter(highlight);
+        toStringNoQuotes(writer, localData);
+        return writer.toString();
+    }
+
+    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, List<Object> localData) {
+        return toString(writer, localData);
     }
 
     public String toStringNoQuotes(boolean highlight, Object... localData) {
+        HilightedTextWriter writer = new HilightedTextWriter(highlight);
+        toStringNoQuotes(writer, localData);
+        return writer.toString();
+    }
+
+    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, Object... localData) {
         List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
-        return toStringNoQuotes(highlight, localData2);
+        return toStringNoQuotes(writer, localData2);
     }
 
     public GraphTargetItem getNotCoerced() {
@@ -171,12 +197,12 @@ public abstract class GraphTargetItem implements Serializable {
         return false;
     }
 
-    public String toStringNL(boolean highlight, Object... localData) {
+    public String toStringNL(HilightedTextWriter writer, Object... localData) {
         List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
-        return toString(highlight, localData2) + (needsNewLine() ? "\r\n" : "");
+        return toString(writer, localData2) + (needsNewLine() ? "\r\n" : "");
     }
 
     public boolean isEmpty() {

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class DeclarationAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         if (assignment instanceof SetLocalAVM2Item) {
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
             String type = "*";
@@ -57,12 +58,20 @@ public class DeclarationAVM2Item extends AVM2Item {
             if (lti.value instanceof ConvertAVM2Item) {
                 type = ((ConvertAVM2Item) lti.value).type;
             }
-            return hilight("var ", highlight) + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ", highlight) + lti.value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
+            hilight("var ", writer);
+            hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ", writer);
+            return lti.value.toString(writer, constants, localRegNames, fullyQualifiedNames);
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
-            return hilight("var ", highlight) + ssti.getName(highlight, constants, localRegNames, fullyQualifiedNames) + hilight(":", highlight) + hilight(type, highlight) + hilight(" = ", highlight) + ssti.value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
+            hilight("var ", writer);
+            ssti.getName(writer, constants, localRegNames, fullyQualifiedNames);
+            hilight(":", writer);
+            hilight(type, writer);
+            hilight(" = ", writer);
+            return ssti.value.toString(writer, constants, localRegNames, fullyQualifiedNames);
         }
-        return hilight("var ", highlight) + assignment.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+        hilight("var ", writer);
+        return assignment.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
     }
 }

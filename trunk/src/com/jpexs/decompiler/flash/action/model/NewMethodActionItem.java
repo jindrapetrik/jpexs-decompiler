@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf5.ActionNewMethod;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -47,16 +48,8 @@ public class NewMethodActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String paramStr = "";
-        for (int t = 0; t < arguments.size(); t++) {
-            if (t > 0) {
-                paramStr += hilight(",", highlight);
-            }
-            paramStr += arguments.get(t).toString(highlight, constants);
-        }
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         boolean blankMethod = false;
-        String methodNameStr = "";
         if (methodName instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) methodName).value instanceof Undefined) {
                 blankMethod = true;
@@ -64,17 +57,33 @@ public class NewMethodActionItem extends ActionItem {
                 if (((DirectValueActionItem) methodName).value.equals("")) {
                     blankMethod = true;
                 }
-                methodNameStr = ((DirectValueActionItem) methodName).toStringNoQuotes(highlight, constants);
-            } else {
-                methodNameStr = methodName.toString(highlight, constants);
             }
-        } else {
-            methodNameStr = methodName.toString(highlight, constants);
         }
-        if (blankMethod) {
-            return scriptObject.toString(highlight, constants) + "(" + paramStr + ")";
+        if (!blankMethod) {
+            hilight("new ", writer);
         }
-        return hilight("new ", highlight) + scriptObject.toString(highlight, constants) + hilight(".", highlight) + methodNameStr + hilight("(", highlight) + paramStr + hilight(")", highlight);
+        scriptObject.toString(writer, constants);
+        if (!blankMethod) {
+            hilight(".", writer);
+            if (methodName instanceof DirectValueActionItem) {
+                if (((DirectValueActionItem) methodName).value instanceof Undefined) {
+                } else if (((DirectValueActionItem) methodName).value instanceof String) {
+                    ((DirectValueActionItem) methodName).toStringNoQuotes(writer, constants);
+                } else {
+                    methodName.toString(writer, constants);
+                }
+            } else {
+                methodName.toString(writer, constants);
+            }
+        }
+        hilight("(", writer);
+        for (int t = 0; t < arguments.size(); t++) {
+            if (t > 0) {
+                hilight(",", writer);
+            }
+            arguments.get(t).toString(writer, constants);
+        }
+        return hilight(")", writer);        
     }
 
     @Override

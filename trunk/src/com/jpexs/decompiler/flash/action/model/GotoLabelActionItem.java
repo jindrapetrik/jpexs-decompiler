@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf3.ActionGoToLabel;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.helpers.Helper;
@@ -32,8 +33,10 @@ public class GotoLabelActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("gotoAndStop(\"", highlight) + hilight(Helper.escapeString(label), highlight) + hilight("\")", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("gotoAndStop(\"", writer);
+        hilight(Helper.escapeString(label), writer);
+        return hilight("\")", writer);
     }
 
     @Override

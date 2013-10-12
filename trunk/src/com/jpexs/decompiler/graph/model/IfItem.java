@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -51,8 +52,7 @@ public class IfItem extends GraphTargetItem implements Block {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        String ret;
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
         GraphTargetItem expr = expression;
         List<GraphTargetItem> ifBranch = onTrue;
         List<GraphTargetItem> elseBranch = onFalse;
@@ -71,27 +71,30 @@ public class IfItem extends GraphTargetItem implements Block {
                 elseBranch = onTrue;
             }
         }
-        ret = hilight("if(", highlight) + expr.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
+        hilight("if(", writer);
+        expr.toString(writer, localData);
+        hilight(")", writer).appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : ifBranch) {
             if (!ti.isEmpty()) {
-                ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
+                ti.toStringSemicoloned(writer, localData).appendNewLine();
             }
         }
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight);
+        hilight(Graph.INDENTCLOSE + "\r\n", writer);
+        hilight("}", writer);
         if (elseBranch.size() > 0) {
-            ret += "\r\n" + hilight("else", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
-            ret += Graph.INDENTOPEN + "\r\n";
+            hilight("\r\nelse\r\n", writer);
+            hilight("{\r\n" + Graph.INDENTOPEN + "\r\n", writer);
             for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
-                    ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
+                    ti.toStringSemicoloned(writer, localData);
+                    hilight("\r\n", writer);
                 }
             }
-            ret += Graph.INDENTCLOSE + "\r\n";
-            ret += hilight("}", highlight);
+            hilight(Graph.INDENTCLOSE + "\r\n}", writer);
         }
-        return ret;
+        return writer;
     }
 
     @Override

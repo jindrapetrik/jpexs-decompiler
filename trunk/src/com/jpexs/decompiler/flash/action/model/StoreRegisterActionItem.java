@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -66,8 +67,17 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return temporary ? value.toString(highlight, constants) : ((define ? hilight("var ", highlight) : "") + hilight(register.translate() + " = ", highlight) + value.toString(highlight, constants));
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        if (temporary) {
+            value.toString(writer, constants);
+        } else {
+            if (define) {
+                hilight("var ", writer);
+            }
+            hilight(register.translate() + " = ", writer); 
+            value.toString(writer, constants);
+        }
+        return writer;
     }
 
     @Override

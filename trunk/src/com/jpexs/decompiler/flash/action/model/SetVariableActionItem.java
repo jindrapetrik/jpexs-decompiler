@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -66,11 +67,17 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         if (name instanceof DirectValueActionItem || name instanceof GetVariableActionItem) {
-            return stripQuotes(name, constants, highlight) + hilight(" = ", highlight) + value.toString(highlight, constants);
+            stripQuotes(name, constants, writer);
+            hilight(" = ", writer);
+            return value.toString(writer, constants);
         } else {
-            return hilight("set(", highlight) + name.toString(highlight, constants) + hilight(",", highlight) + value.toString(highlight, constants) + hilight(")", highlight);
+            hilight("set(", writer);
+            name.toString(writer, constants);
+            hilight(",", writer);
+            value.toString(writer, constants);
+            return hilight(")", writer);
         }
     }
 

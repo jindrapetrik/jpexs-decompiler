@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -45,19 +46,23 @@ public class InitObjectActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String objStr = "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("{", writer);
         for (int i = 0; i < values.size(); i++) {
             if (i > 0) {
-                objStr += hilight(",", highlight);
+                hilight(",", writer);
             }
-            String valueStr = values.get(i).toString(highlight, constants);
+            names.get(i).toStringNoQuotes(writer, constants); //AS1/2 do not allow quotes in name here
+            hilight(":", writer);
             if (values.get(i) instanceof TernarOpItem) { //Ternar operator contains ":"
-                valueStr = hilight("(", highlight) + valueStr + hilight(")", highlight);
+                hilight("(", writer);
+                values.get(i).toString(writer, constants);
+                hilight(")", writer);
+            } else {
+                values.get(i).toString(writer, constants);
             }
-            objStr += names.get(i).toStringNoQuotes(highlight, constants) + hilight(":", highlight) + valueStr; //AS1/2 do not allow quotes in name here
         }
-        return hilight("{", highlight) + objStr + hilight("}", highlight);
+        return hilight("}", writer);
     }
 
     @Override

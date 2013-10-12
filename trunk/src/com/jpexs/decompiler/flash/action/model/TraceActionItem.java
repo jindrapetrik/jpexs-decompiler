@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionTrace;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -31,8 +32,10 @@ public class TraceActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("trace(", highlight) + value.toString(highlight, constants) + hilight(")", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("trace(", writer);
+        value.toString(writer, constants);
+        return hilight(")", writer);
     }
 
     @Override

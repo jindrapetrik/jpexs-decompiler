@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
@@ -15,8 +16,8 @@ public class TrueItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        return hilight("true", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        return hilight("true", writer);
     }
 
     @Override

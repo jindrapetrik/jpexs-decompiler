@@ -18,8 +18,10 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import static com.jpexs.decompiler.graph.GraphTargetItem.PRECEDENCE_PRIMARY;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -35,18 +37,20 @@ public abstract class AVM2Item extends GraphTargetItem {
 
     @Override
     @SuppressWarnings("unchecked")
-    public String toString(boolean highlight, List<Object> localData) {
-        return toString(highlight, (ConstantPool) localData.get(0), (HashMap<Integer, String>) localData.get(1), (List<String>) localData.get(2));
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        return toString(writer, (ConstantPool) localData.get(0), (HashMap<Integer, String>) localData.get(1), (List<String>) localData.get(2));
     }
 
-    public abstract String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
+    public abstract HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
 
     public String toStringNoH(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return toString(false, constants, localRegNames, fullyQualifiedNames);
+        HilightedTextWriter writer = new HilightedTextWriter(false);
+        toString(writer, constants, localRegNames, fullyQualifiedNames);
+        return writer.toString();
     }
 
-    public String toStringSemicoloned(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return toString(highlight, constants, localRegNames, fullyQualifiedNames) + (needsSemicolon() ? ";" : "");
+    public String toStringSemicoloned(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return toString(writer, constants, localRegNames, fullyQualifiedNames) + (needsSemicolon() ? ";" : "");
     }
 
     @Override
@@ -54,29 +58,45 @@ public abstract class AVM2Item extends GraphTargetItem {
         return true;
     }
 
-    protected String formatProperty(boolean highlight, ConstantPool constants, GraphTargetItem object, GraphTargetItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String obStr = object.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
-        if (object.precedence > PRECEDENCE_PRIMARY) {
-            obStr = hilight("(", highlight) + obStr + hilight(")", highlight);
-        }
+    protected HilightedTextWriter formatProperty(HilightedTextWriter writer, ConstantPool constants, GraphTargetItem object, GraphTargetItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        boolean empty = false;
         if (object instanceof LocalRegAVM2Item) {
             if (((LocalRegAVM2Item) object).computedValue != null) {
                 if (((LocalRegAVM2Item) object).computedValue.getThroughNotCompilable() instanceof FindPropertyAVM2Item) {
-                    obStr = "";
+                    empty = true;
                 }
             }
         }
-        if (obStr.equals("")) {
-            return propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+
+        if (!empty) {
+            if (object.precedence > PRECEDENCE_PRIMARY) {
+                hilight("(", writer);
+                object.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                hilight(")", writer);
+                empty = false;
+            } else {
+                int writerLength = writer.getLength();
+                object.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                if (writerLength == writer.getLength()) {
+                    empty = true;
+                }
+            }
+        }
+
+        if (empty) {
+            return propertyName.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
         }
         if (propertyName instanceof FullMultinameAVM2Item) {
             if (((FullMultinameAVM2Item) propertyName).name != null) {
-                return obStr + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                return propertyName.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
             } else {
-                return obStr + hilight(".", highlight) + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                hilight(".", writer);
+                return propertyName.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
             }
         } else {
-            return obStr + hilight("[", highlight) + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("]", highlight);
+            hilight("[", writer);
+            propertyName.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+            return hilight("]", writer);
         }
     }
 

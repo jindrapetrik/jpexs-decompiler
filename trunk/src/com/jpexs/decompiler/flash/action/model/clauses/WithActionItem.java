@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.swf5.ActionWith;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -46,18 +47,20 @@ public class WithActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         String ret;
         List<Object> localData = new ArrayList<>();
         localData.add(constants);
-        ret = hilight("with(", highlight) + scope.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
+        hilight("with(", writer);
+        scope.toString(writer, localData);
+        hilight(")", writer).appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : items) {
-            ret += ti.toString(highlight, localData) + "\r\n";
+            ti.toString(writer, localData).appendNewLine();
         }
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight);
-        return ret;
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        return hilight("}", writer);
     }
 
     @Override

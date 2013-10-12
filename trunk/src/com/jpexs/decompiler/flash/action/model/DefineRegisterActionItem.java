@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+
 /**
  *
  * @author JPEXS
@@ -32,8 +34,8 @@ public class DefineRegisterActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("var " + identifier, highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        return hilight("var " + identifier, writer);
     }
 
     @Override

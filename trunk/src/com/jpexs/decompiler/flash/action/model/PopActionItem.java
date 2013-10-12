@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.List;
@@ -32,8 +33,8 @@ public class PopActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        return writer;
     }
 
     @Override

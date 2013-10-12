@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionStartDrag;
 import com.jpexs.decompiler.flash.ecma.*;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -46,14 +47,28 @@ public class StartDragActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueActionItem) {
             if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
                 hasConstrains = false;
             }
         }
-        return hilight("startDrag(", highlight) + target.toString(highlight, constants) + hilight(",", highlight) + lockCenter.toString(highlight, constants) + (hasConstrains ? hilight(",", highlight) + x1.toString(highlight, constants) + hilight(",", highlight) + y1.toString(highlight, constants) + hilight(",", highlight) + x2.toString(highlight, constants) + hilight(",", highlight) + y2.toString(highlight, constants) : "") + hilight(")", highlight);
+        hilight("startDrag(", writer);
+        target.toString(writer, constants);
+        hilight(",", writer);
+        lockCenter.toString(writer, constants);
+        if (hasConstrains) {
+            hilight(",", writer);
+            x1.toString(writer, constants);
+            hilight(",", writer);
+            y1.toString(writer, constants);
+            hilight(",", writer);
+            x2.toString(writer, constants);
+            hilight(",", writer);
+            y2.toString(writer, constants);
+        }
+        return hilight(")", writer);
     }
 
     @Override

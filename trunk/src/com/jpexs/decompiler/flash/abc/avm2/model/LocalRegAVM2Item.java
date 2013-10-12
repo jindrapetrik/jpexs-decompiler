@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
@@ -49,11 +50,11 @@ public class LocalRegAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         if (computedValue instanceof FilterAVM2Item) {
-            return computedValue.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+            return computedValue.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
         }
-        return hilight(localRegName(localRegNames, regIndex), highlight);
+        return hilight(localRegName(localRegNames, regIndex), writer);
     }
 
     @Override

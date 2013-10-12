@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -43,12 +44,17 @@ public class GetMemberActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         if (!((memberName instanceof DirectValueActionItem) && (((DirectValueActionItem) memberName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
-            return object.toString(highlight, constants) + hilight("[", highlight) + stripQuotes(memberName, constants, highlight) + hilight("]", highlight);
+            object.toString(writer, constants);
+            hilight("[", writer);
+            stripQuotes(memberName, constants, writer);
+            return hilight("]", writer);
         }
-        return object.toString(highlight, constants) + hilight(".", highlight) + stripQuotes(memberName, constants, highlight);
+        object.toString(writer, constants);
+        hilight(".", writer);
+        return stripQuotes(memberName, constants, writer);
     }
 
     @Override

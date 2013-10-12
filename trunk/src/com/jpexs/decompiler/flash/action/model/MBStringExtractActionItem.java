@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionMBStringExtract;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -47,8 +48,14 @@ public class MBStringExtractActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("mbsubstring(", highlight) + value.toString(highlight, constants) + hilight(",", highlight) + index.toString(highlight, constants) + hilight(",", highlight) + count.toString(highlight, constants) + hilight(")", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("mbsubstring(", writer);
+        value.toString(writer, constants);
+        hilight(",", writer);
+        index.toString(writer, constants);
+        hilight(",", writer);
+        count.toString(writer, constants);
+        return hilight(")", writer);
     }
 
     @Override

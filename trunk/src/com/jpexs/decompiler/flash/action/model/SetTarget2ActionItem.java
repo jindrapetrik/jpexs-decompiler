@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -32,8 +33,10 @@ public class SetTarget2ActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("tellTarget(", highlight) + target.toString(highlight, constants) + hilight(")", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("tellTarget(", writer);
+        target.toString(writer, constants);
+        return hilight(")", writer);
     }
 
     @Override

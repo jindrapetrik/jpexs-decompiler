@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionStringExtract;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -37,8 +38,13 @@ public class StringExtractActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return value.toString(highlight, constants) + hilight(".substr(", highlight) + index.toString(highlight, constants) + hilight(",", highlight) + count.toString(highlight, constants) + hilight(")", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        value.toString(writer, constants);
+        hilight(".substr(", writer);
+        index.toString(writer, constants);
+        hilight(",", writer);
+        count.toString(writer, constants);
+        return hilight(")", writer);
     }
 
     @Override

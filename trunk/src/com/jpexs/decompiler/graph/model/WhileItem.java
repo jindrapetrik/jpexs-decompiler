@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -44,30 +45,30 @@ public class WhileItem extends LoopItem implements Block {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        String ret = "";
-        ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
-        String expStr = "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        hilight("loop" + loop.id + ":", writer).appendNewLine();
+        hilight("while(", writer);
         for (int i = 0; i < expression.size(); i++) {
             if (expression.get(i).isEmpty()) {
                 continue;
             }
-            if (!expStr.equals("")) {
-                expStr += hilight(", ", highlight);
+            if (i != 0) {
+                hilight(", ", writer);
             }
-            expStr += expression.get(i).toString(highlight, localData);
+            expression.get(i).toString(writer, localData);
         }
-        ret += hilight("while(", highlight) + expStr + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
+        hilight(")", writer).appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
-                ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
+                ti.toStringSemicoloned(writer, localData).appendNewLine();
             }
         }
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight) + "\r\n";
-        ret += hilight(":loop" + loop.id, highlight);
-        return ret;
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        hilight("}", writer).appendNewLine();
+        hilight(":loop" + loop.id, writer);
+        return writer;
     }
 
     @Override

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -51,7 +52,7 @@ public class LoadMovieNumActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         String methodStr = "";
         if (method == 1) {
             methodStr = ",\"GET\"";
@@ -59,7 +60,11 @@ public class LoadMovieNumActionItem extends ActionItem {
         if (method == 2) {
             methodStr = ",\"POST\"";
         }
-        return hilight("loadMovieNum(", highlight) + urlString.toString(highlight, constants) + hilight(",", highlight) + num.toString(highlight, constants) + hilight(methodStr + ")", highlight);
+        hilight("loadMovieNum(", writer);
+        urlString.toString(writer, constants);
+        hilight(",", writer);
+        num.toString(writer, constants);
+        return hilight(methodStr + ")", writer);
     }
 
     @Override

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -33,14 +34,20 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        String s = (value == null ? hilight("null", highlight) : value.toString(highlight, localData));
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        hilight(operator, writer);
         if (value != null) {
             if (value.precedence > precedence) {
-                s = hilight("(", highlight) + s + hilight(")", highlight);
+                hilight("(", writer);
+                value.toString(writer, localData);
+                hilight(")", writer);
+            } else {
+                value.toString(writer, localData);
             }
+        } else {
+            hilight("null", writer);            
         }
-        return hilight(operator, highlight) + s;
+        return writer;
     }
 
     @Override

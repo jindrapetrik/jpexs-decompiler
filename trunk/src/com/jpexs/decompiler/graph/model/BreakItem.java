@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -19,8 +20,9 @@ public class BreakItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        return hilight("break", highlight) + " " + hilight("loop" + loopId, highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        hilight("break ", writer);
+        return hilight("loop" + loopId, writer);
     }
 
     @Override

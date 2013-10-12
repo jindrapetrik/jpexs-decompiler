@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -71,33 +72,35 @@ public class FunctionActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         if (true) {
-            //return "<func>";
+            //return writer.appendNoHilight("<func>")
         }
-        String ret = hilight("function", highlight);
+        hilight("function", writer);
         if (calculatedFunctionName != null) {
-            ret += " " + calculatedFunctionName.toStringNoQuotes(highlight, constants);
+            hilight(" ", writer);
+            calculatedFunctionName.toStringNoQuotes(writer, constants);
         } else if (!functionName.equals("")) {
-            ret += " " + functionName;
+            hilight(" ", writer);
+            hilight(functionName, writer);
         }
-        ret += hilight("(", highlight);
+        hilight("(", writer);
         for (int p = 0; p < paramNames.size(); p++) {
             if (p > 0) {
-                ret += hilight(", ", highlight);
+                hilight(", ", writer);
             }
             String pname = paramNames.get(p);
             if (pname == null || pname.equals("")) {
                 pname = new RegisterNumber(regStart + p).translate();
             }
-            ret += hilight(pname, highlight);
+            hilight(pname, writer);
         }
-        ret += hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
-        ret += Graph.graphToString(actions, highlight, false, constants);
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight);
-        return ret;
+        hilight(")", writer).appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.appendNoHilight(Graph.graphToString(actions, writer.getIsHighlighted(), false, constants));
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        return hilight("}", writer);
     }
 
     @Override

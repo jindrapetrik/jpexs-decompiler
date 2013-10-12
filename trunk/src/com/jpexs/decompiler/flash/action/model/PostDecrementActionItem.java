@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDecrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -49,8 +50,9 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return object.toString(highlight, constants) + hilight("--", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        object.toString(writer, constants);
+        return hilight("--", writer);
     }
 
     @Override

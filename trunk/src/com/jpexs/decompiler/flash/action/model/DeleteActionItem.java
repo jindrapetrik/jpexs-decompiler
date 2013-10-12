@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf5.ActionDelete;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -44,11 +45,14 @@ public class DeleteActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("delete ", writer);
         if (object == null) {
-            return hilight("delete ", highlight) + propertyName.toString(highlight, constants);
+            return propertyName.toString(writer, constants);
         }
-        return hilight("delete ", highlight) + object.toString(highlight, constants) + hilight(".", highlight) + stripQuotes(propertyName, constants, highlight);
+        object.toString(writer, constants);
+        hilight(".", writer);
+        return stripQuotes(propertyName, constants, writer);
     }
 
     @Override

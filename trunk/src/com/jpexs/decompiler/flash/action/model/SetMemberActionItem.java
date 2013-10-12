@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -77,12 +78,21 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         if (!((objectName instanceof DirectValueActionItem) && (((DirectValueActionItem) objectName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
-            return object.toString(highlight, constants) + hilight("[", highlight) + stripQuotes(objectName, constants, highlight) + hilight("]", highlight) + hilight(" = ", highlight) + value.toString(highlight, constants);
+            object.toString(writer, constants);
+            hilight("[", writer);
+            stripQuotes(objectName, constants, writer);
+            hilight("]", writer);
+            hilight(" = ", writer);
+            return value.toString(writer, constants);
         }
-        return object.toString(highlight, constants) + hilight(".", highlight) + stripQuotes(objectName, constants, highlight) + hilight(" = ", highlight) + value.toString(highlight, constants);
+        object.toString(writer, constants);
+        hilight(".", writer);
+        stripQuotes(objectName, constants, writer);
+        hilight(" = ", writer);
+        return value.toString(writer, constants);
     }
 
     @Override

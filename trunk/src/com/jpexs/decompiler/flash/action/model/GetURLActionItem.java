@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.helpers.Helper;
@@ -28,8 +29,10 @@ public class GetURLActionItem extends ActionItem {
     public String targetString;
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("getUrl(\"", highlight) + hilight(Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString), highlight) + hilight("\")", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("getUrl(\"", writer);
+        hilight(Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString), writer);
+        return hilight("\")", writer);
     }
 
     public GetURLActionItem(GraphSourceItem instruction, String urlString, String targetString) {

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model.operations;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
 import com.jpexs.decompiler.flash.ecma.*;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -35,21 +36,24 @@ public class AddActionItem extends BinaryOpItem {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
         if (rightSide.precedence >= precedence) { //string + vs number +
             String ret = "";
             if (leftSide.precedence > precedence) {
-                ret += hilight("(", highlight) + leftSide.toString(highlight, localData) + hilight(")", highlight);
+                hilight("(", writer);
+                leftSide.toString(writer, localData);
+                hilight(")", writer);
             } else {
-                ret += leftSide.toString(highlight, localData);
+                leftSide.toString(writer, localData);
             }
-            ret += " ";
-            ret += hilight(operator, highlight);
-            ret += " ";
-            ret += hilight("(", highlight) + rightSide.toString(highlight, localData) + hilight(")", highlight);
-            return ret;
+            hilight(" ", writer);
+            hilight(operator, writer);
+            hilight(" ", writer);
+            hilight("(", writer);
+            rightSide.toString(writer, localData);
+            return hilight(")", writer);
         } else {
-            return super.toString(highlight, localData);
+            return super.toString(writer, localData);
         }
     }
 

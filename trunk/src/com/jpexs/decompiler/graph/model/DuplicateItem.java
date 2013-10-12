@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -38,8 +39,8 @@ public class DuplicateItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        return value.toString(highlight, localData);
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        return value.toString(writer, localData);
     }
 
     @Override

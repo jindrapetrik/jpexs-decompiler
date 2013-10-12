@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -38,14 +39,15 @@ public class CallPropertyAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String args = "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        formatProperty(writer, constants, receiver, propertyName, localRegNames, fullyQualifiedNames);
+        hilight("(", writer);
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
-                args = args + hilight(",", highlight);
+                hilight(",", writer);
             }
-            args = args + arguments.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
+            arguments.get(a).toString(writer, constants, localRegNames, fullyQualifiedNames);
         }
-        return formatProperty(highlight, constants, receiver, propertyName, localRegNames, fullyQualifiedNames) + hilight("(", highlight) + args + hilight(")", highlight);
+        return hilight(")", writer);
     }
 }

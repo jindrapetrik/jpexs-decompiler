@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -68,20 +69,22 @@ public class ForInAVM2Item extends LoopItem implements Block {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        String ret = "";
-        ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
-        ret += hilight("for (", highlight) + expression.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        hilight("loop" + loop.id + ":", writer).appendNewLine();
+        hilight("for (", writer);
+        expression.toString(writer, localData);
+        hilight(")", writer).appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
-                ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
+                ti.toStringSemicoloned(writer, localData).appendNewLine();
             }
         }
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight) + "\r\n";
-        ret += hilight(":loop" + loop.id, highlight);
-        return ret;
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        hilight("}", writer).appendNewLine();
+        hilight(":loop" + loop.id, writer);
+        return writer;
     }
 
     @Override

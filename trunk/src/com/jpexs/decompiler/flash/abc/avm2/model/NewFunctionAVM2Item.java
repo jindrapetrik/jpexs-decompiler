@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.Graph;
 import java.util.HashMap;
@@ -41,15 +42,18 @@ public class NewFunctionAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String ret = hilight("function" + (!functionName.equals("") ? " " + functionName : ""), highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        hilight("function" + (!functionName.equals("") ? " " + functionName : ""), writer);
+        boolean highlight = writer.getIsHighlighted();
         String mhead = "(" + (highlight ? paramStr : Highlighting.stripHilights(paramStr)) + "):" + (highlight ? returnStr : Highlighting.stripHilights(returnStr));
-        ret += highlight ? Highlighting.hilighMethod(mhead, methodIndex) : mhead;
-        ret += "\r\n" + hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
-        ret += (highlight ? functionBody : Highlighting.stripHilights(functionBody)) + "\r\n";
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight);
-        return ret;
+        writer.appendNoHilight(writer.getIsHighlighted() ? Highlighting.hilighMethod(mhead, methodIndex) : mhead);
+        writer.appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.appendNoHilight((writer.getIsHighlighted() ? functionBody : Highlighting.stripHilights(functionBody)));
+        writer.appendNewLine();
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        hilight("}", writer);
+        return writer;
     }
 }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 
 public class UnsupportedActionItem extends ActionItem {
@@ -28,8 +29,8 @@ public class UnsupportedActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("//Unsupported by decompiler:" + value, highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        return hilight("//Unsupported by decompiler:" + value, writer);
     }
 
     @Override

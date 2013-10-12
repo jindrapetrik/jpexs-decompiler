@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import java.util.List;
 
 /**
@@ -32,8 +33,8 @@ public class CodeStats {
     public boolean has_activation = false;
     public InstructionStats[] instructionStats;
 
-    public String toString(boolean highlight, ABC abc, List<String> fullyQualifiedNames) {
-        String ret = "Stats: maxstack=" + maxstack + ", maxscope=" + maxscope + ", maxlocal=" + maxlocal + "\r\n";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
+        writer.appendNoHilight("Stats: maxstack=" + maxstack + ", maxscope=" + maxscope + ", maxlocal=" + maxlocal).appendNewLine();
         int i = 0;
         int ms = 0;
         for (InstructionStats stats : instructionStats) {
@@ -41,10 +42,10 @@ public class CodeStats {
             if (stats.stackpos > ms) {
                 ms = stats.stackpos;
             }
-            ret += "" + i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(highlight, abc.constants, fullyQualifiedNames) + "\r\n";
+            writer.appendNoHilight(i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(writer, abc.constants, fullyQualifiedNames)).appendNewLine();
             i++;
         }
-        return ret;
+        return writer;
     }
 
     public CodeStats(AVM2Code code) {

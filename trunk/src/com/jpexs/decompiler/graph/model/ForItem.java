@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -49,18 +50,10 @@ public class ForItem extends LoopItem implements Block {
         this.commands = commands;
     }
 
-    private String stripSemicolon(String s) {
-        if (s.endsWith(";")) {
-            s = s.substring(0, s.length() - 1);
-        }
-        return s;
-    }
-
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        String ret = "";
-        ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
-        ret += hilight("for(", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        hilight("loop" + loop.id + ":", writer).appendNewLine();
+        hilight("for(", writer);
         int p = 0;
         for (int i = 0; i < firstCommands.size(); i++) {
             if (firstCommands.get(i).isEmpty()) {
@@ -68,36 +61,39 @@ public class ForItem extends LoopItem implements Block {
             }
 
             if (p > 0) {
-                ret += hilight(",", highlight);
+                hilight(",", writer);
             }
-            ret += stripSemicolon(firstCommands.get(i).toString(highlight, localData));
+            firstCommands.get(i).toString(writer, localData);
+            writer.stripSemicolon();
             p++;
         }
-        ret += ";";
-        ret += expression.toString(highlight, localData);
-        ret += ";";
+        hilight(";", writer);
+        expression.toString(writer, localData);
+        hilight(";", writer);
         p = 0;
         for (int i = 0; i < finalCommands.size(); i++) {
             if (finalCommands.get(i).isEmpty()) {
                 continue;
             }
             if (p > 0) {
-                ret += ",";
+                hilight(",", writer);
             }
-            ret += stripSemicolon(finalCommands.get(i).toString(highlight, localData));
+            finalCommands.get(i).toString(writer, localData);
+            writer.stripSemicolon();
             p++;
         }
-        ret += hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
+        hilight(")", writer).appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
-                ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
+                ti.toStringSemicoloned(writer, localData).appendNewLine();
             }
         }
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight) + "\r\n";
-        ret += ":loop" + loop.id;
-        return ret;
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        hilight("}", writer).appendNewLine();
+        hilight(":loop" + loop.id, writer).appendNewLine();
+        return writer;
     }
 
     @Override

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import java.util.List;
 
 /**
@@ -32,8 +33,8 @@ public class MarkItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        return hilight("//decompiler mark:" + mark, highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        return hilight("//decompiler mark:" + mark, writer);
     }
 
     public String getMark() {

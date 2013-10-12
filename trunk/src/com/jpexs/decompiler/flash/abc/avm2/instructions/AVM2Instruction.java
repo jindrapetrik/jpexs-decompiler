@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -263,10 +264,10 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         return ignored;
     }
 
-    public String toString(boolean highlight, ConstantPool constants, List<String> fullyQualifiedNames) {
-        String s = Helper.formatAddress(offset) + " " + Helper.padSpaceRight(Helper.byteArrToString(getBytes()), 30) + definition.instructionName;
-        s += getParams(constants, fullyQualifiedNames) + getComment();
-        return s;
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, List<String> fullyQualifiedNames) {
+        writer.appendNoHilight(Helper.formatAddress(offset) + " " + Helper.padSpaceRight(Helper.byteArrToString(getBytes()), 30) + definition.instructionName);
+        writer.appendNoHilight(getParams(constants, fullyQualifiedNames) + getComment());
+        return writer;
     }
 
     public String toStringNoAddress(ConstantPool constants, List<String> fullyQualifiedNames) {

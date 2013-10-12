@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -68,11 +69,14 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("var ", writer);
+        stripQuotes(name, constants, writer);
         if (value == null) {
-            return hilight("var ", highlight) + stripQuotes(name, constants, highlight);
+            return writer;
         }
-        return hilight("var ", highlight) + stripQuotes(name, constants, highlight) + hilight(" = ", highlight) + value.toString(highlight, constants);
+        hilight(" = ", writer);
+        return value.toString(writer, constants);
     }
 
     @Override

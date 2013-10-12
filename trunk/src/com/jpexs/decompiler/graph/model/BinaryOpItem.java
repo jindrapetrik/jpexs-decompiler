@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -46,24 +47,27 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        String ret = "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
         if (leftSide.getPrecedence() > precedence) {
-            ret += hilight("(", highlight) + leftSide.toString(highlight, localData) + hilight(")", highlight);
+            hilight("(", writer);
+            leftSide.toString(writer, localData);
+            hilight(")", writer);
         } else {
-            ret += leftSide.toString(highlight, localData);
+            leftSide.toString(writer, localData);
         }
 
-        ret += " ";
-        ret += hilight(operator, highlight);
-        ret += " ";
+        hilight(" ", writer);
+        hilight(operator, writer);
+        hilight(" ", writer);
 
         if (rightSide.getPrecedence() > precedence) {
-            ret += hilight("(", highlight) + rightSide.toString(highlight, localData) + hilight(")", highlight);
+            hilight("(", writer);
+            rightSide.toString(writer, localData);
+            hilight(")", writer);
         } else {
-            ret += rightSide.toString(highlight, localData);
+            rightSide.toString(writer, localData);
         }
-        return ret;
+        return writer;
     }
 
     @Override

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetProperty;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -45,11 +46,12 @@ public class GetPropertyActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         if (isEmptyString(target)) {
-            return hilight(Action.propertyNames[propertyIndex], highlight);
+            return hilight(Action.propertyNames[propertyIndex], writer);
         }
-        return target.toString(highlight, constants) + hilight("." + Action.propertyNames[propertyIndex], highlight);
+        target.toString(writer, constants);
+        return hilight("." + Action.propertyNames[propertyIndex], writer);
     }
 
     @Override

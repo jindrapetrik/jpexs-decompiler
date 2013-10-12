@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetProperty;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -69,11 +70,14 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         if (isEmptyString(target)) {
-            return hilight(Action.propertyNames[propertyIndex] + " = ", highlight) + value.toString(highlight, constants);
+            hilight(Action.propertyNames[propertyIndex] + " = ", writer);
+            return value.toString(writer, constants);
         }
-        return target.toString(highlight, constants) + hilight("." + Action.propertyNames[propertyIndex] + " = ", highlight) + value.toString(highlight, constants);
+        target.toString(writer, constants);
+        hilight("." + Action.propertyNames[propertyIndex] + " = ", writer);
+        return value.toString(writer, constants);
     }
 
     @Override

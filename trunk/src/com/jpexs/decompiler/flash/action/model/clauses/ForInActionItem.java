@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -63,18 +64,24 @@ public class ForInActionItem extends LoopActionItem implements Block {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String ret = "";
-        ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
-        ret += hilight("for(", highlight) + ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber) ? "var " : "") + stripQuotes(variableName, constants, highlight) + " in " + enumVariable.toString(highlight, constants) + ")\r\n{\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
-        for (GraphTargetItem ti : commands) {
-            ret += ti.toStringSemicoloned(highlight, constants) + "\r\n";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("loop" + loop.id + ":", writer).appendNewLine();
+        hilight("for(", writer);
+        if ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber)) {
+            hilight("var ", writer);
         }
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight) + "\r\n";
-        ret += hilight(":loop" + loop.id, highlight);
-        return ret;
+        stripQuotes(variableName, constants, writer);
+        hilight(" in ", writer);
+        enumVariable.toString(writer, constants);
+        hilight(")", writer).appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        for (GraphTargetItem ti : commands) {
+            ti.toStringSemicoloned(writer, constants).appendNewLine();
+        }
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        hilight("}", writer).appendNewLine();
+        return hilight(":loop" + loop.id, writer);
     }
 
     @Override

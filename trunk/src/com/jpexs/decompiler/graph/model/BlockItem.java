@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -36,10 +37,13 @@ public class BlockItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        return hilight("{", highlight) + "\r\n" + Graph.INDENTOPEN + "\r\n"
-                + Graph.graphToString(commands, highlight, false, localData) + "\r\n"
-                + Graph.INDENTCLOSE + "\r\n" + hilight("}", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.appendNoHilight(Graph.graphToString(commands, writer.getIsHighlighted(), false, localData));
+        writer.appendNewLine();
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        return hilight("}", writer);
     }
 
     @Override

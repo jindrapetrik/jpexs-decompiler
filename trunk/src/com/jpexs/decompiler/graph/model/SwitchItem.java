@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -51,41 +52,46 @@ public class SwitchItem extends LoopItem implements Block {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        String ret = "";
-        ret += hilight("loopswitch" + loop.id + ":", highlight) + "\r\n";
-        ret += hilight("switch(", highlight) + switchedObject.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        hilight("loopswitch" + loop.id + ":", writer).appendNewLine();
+        hilight("switch(", writer);
+        switchedObject.toString(writer, localData);
+        hilight(")", writer).appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (int i = 0; i < caseCommands.size(); i++) {
             for (int k = 0; k < valuesMapping.size(); k++) {
                 if (valuesMapping.get(k) == i) {
-                    ret += hilight("case ", highlight) + caseValues.get(k).toString(highlight, localData) + hilight(":", highlight) + "\r\n";
+                    hilight("case ", writer);
+                    caseValues.get(k).toString(writer, localData);
+                    hilight(":", writer).appendNewLine();
                 }
             }
-            ret += Graph.INDENTOPEN + "\r\n";
+            hilight(Graph.INDENTOPEN, writer).appendNewLine();
             for (int j = 0; j < caseCommands.get(i).size(); j++) {
                 if (!caseCommands.get(i).get(j).isEmpty()) {
-                    ret += caseCommands.get(i).get(j).toStringSemicoloned(highlight, localData) + "\r\n";
+                    caseCommands.get(i).get(j).toStringSemicoloned(writer, localData).appendNewLine();
                 }
             }
-            ret += Graph.INDENTCLOSE + "\r\n";
+            hilight(Graph.INDENTCLOSE, writer).appendNewLine();
         }
         if (defaultCommands != null) {
             if (defaultCommands.size() > 0) {
-                ret += hilight("default", highlight) + hilight(":", highlight) + "\r\n";
-                ret += Graph.INDENTOPEN + "\r\n";
+                hilight("default", writer);
+                hilight(":", writer).appendNewLine();
+                hilight(Graph.INDENTOPEN, writer).appendNewLine();
                 for (int j = 0; j < defaultCommands.size(); j++) {
                     if (!defaultCommands.get(j).isEmpty()) {
-                        ret += defaultCommands.get(j).toStringSemicoloned(highlight, localData) + "\r\n";
+                        defaultCommands.get(j).toStringSemicoloned(writer, localData).appendNewLine();
                     }
                 }
-                ret += Graph.INDENTCLOSE + "\r\n";
+                hilight(Graph.INDENTCLOSE, writer).appendNewLine();
             }
         }
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight) + "\r\n";
-        ret += ":loop" + loop.id;
-        return ret;
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        hilight("}", writer).appendNewLine();
+        hilight(":loop" + loop.id, writer);
+        return writer;
     }
 
     @Override

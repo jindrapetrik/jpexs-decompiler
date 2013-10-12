@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -42,22 +43,23 @@ public class InterfaceActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String ret = "";
-        ret += hilight("interface ", highlight) + name.toStringNoQuotes(highlight, constants);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("interface ", writer);
+        name.toStringNoQuotes(writer, constants);
         boolean first = true;
         if (!superInterfaces.isEmpty()) {
-            ret += hilight(" extends ", highlight);
+            hilight(" extends ", writer);
         }
         for (GraphTargetItem ti : superInterfaces) {
             if (!first) {
-                ret += hilight(", ", highlight);
+                hilight(", ", writer);
             }
             first = false;
-            ret += Action.getWithoutGlobal(ti).toStringNoQuotes(highlight, constants);
+            Action.getWithoutGlobal(ti).toStringNoQuotes(writer, constants);
         }
-        ret += "\r\n" + hilight("{", highlight) + "\r\n" + hilight("}", highlight) + "\r\n";
-        return ret;
+        writer.appendNewLine();
+        hilight("{", writer).appendNewLine();
+        return hilight("}", writer).appendNewLine();
     }
 
     @Override

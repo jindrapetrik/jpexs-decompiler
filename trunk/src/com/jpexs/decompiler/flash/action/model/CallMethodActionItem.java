@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -47,14 +48,7 @@ public class CallMethodActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String paramStr = "";
-        for (int t = 0; t < arguments.size(); t++) {
-            if (t > 0) {
-                paramStr += hilight(",", highlight);
-            }
-            paramStr += arguments.get(t).toStringNL(highlight, constants);
-        }
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         boolean blankMethod = false;
         if (methodName instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) methodName).value instanceof Undefined) {
@@ -66,14 +60,29 @@ public class CallMethodActionItem extends ActionItem {
                 }
             }
         }
-        if (blankMethod) {
-            return scriptObject.toString(highlight, constants) + hilight("(", highlight) + paramStr + hilight(")", highlight);
+        if (!blankMethod) {
+            if (scriptObject.precedence > this.precedence) {
+                hilight("(", writer);
+                scriptObject.toString(writer, constants);
+                hilight(")", writer);
+            } else {
+                scriptObject.toString(writer, constants);
+            }
+            hilight(".", writer);
+            stripQuotes(methodName, constants, writer);
+        } else {
+            scriptObject.toString(writer, constants);
         }
-        String soStr = scriptObject.toString(highlight, constants);
-        if (scriptObject.precedence > this.precedence) {
-            soStr = hilight("(", highlight) + soStr + hilight(")", highlight);
+        hilight("(", writer);
+
+        for (int t = 0; t < arguments.size(); t++) {
+            if (t > 0) {
+                hilight(",", writer);
+            }
+            arguments.get(t).toStringNL(writer, constants);
         }
-        return soStr + hilight(".", highlight) + stripQuotes(methodName, constants, highlight) + hilight("(", highlight) + paramStr + hilight(")", highlight);
+        
+        return hilight(")", writer);
     }
 
     @Override

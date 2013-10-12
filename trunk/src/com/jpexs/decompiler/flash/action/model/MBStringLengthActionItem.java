@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionMBStringLength;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -32,12 +33,16 @@ public class MBStringLengthActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String s = value.toString(highlight, constants);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("mblength(", writer);
         if (value.precedence > precedence) {
-            s = hilight("(", highlight) + s + hilight(")", highlight);
+            hilight("(", writer);
+            value.toString(writer, constants);
+            hilight(")", writer);
+        } else {
+            value.toString(writer, constants);
         }
-        return hilight("mblength(", highlight) + s + hilight(")", highlight);
+        return hilight(")", writer);
     }
 
     @Override

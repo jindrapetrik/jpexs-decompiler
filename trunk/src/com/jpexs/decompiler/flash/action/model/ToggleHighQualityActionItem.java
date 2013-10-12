@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf3.ActionToggleQuality;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.List;
@@ -24,8 +25,8 @@ import java.util.List;
 public class ToggleHighQualityActionItem extends ActionItem {
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("toggleHighQuality()", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        return hilight("toggleHighQuality()", writer);
     }
 
     public ToggleHighQualityActionItem(GraphSourceItem instruction) {

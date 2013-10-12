@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionCloneSprite;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -47,8 +48,14 @@ public class CloneSpriteActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("duplicateMovieClip(", highlight) + target.toString(highlight, constants) + hilight(",", highlight) + source.toString(highlight, constants) + hilight(",", highlight) + depth.toString(highlight, constants) + hilight(")", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("duplicateMovieClip(", writer);
+        target.toString(writer, constants);
+        hilight(",", writer);
+        source.toString(writer, constants);
+        hilight(",", writer);
+        depth.toString(writer, constants);
+        return hilight(")", writer);
     }
 
     @Override

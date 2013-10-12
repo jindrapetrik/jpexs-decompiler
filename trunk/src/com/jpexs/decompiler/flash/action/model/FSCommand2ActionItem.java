@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -46,13 +47,14 @@ public class FSCommand2ActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String paramStr = "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("FSCommand2(", writer);
+        command.toString(writer, constants);
         for (int t = 0; t < arguments.size(); t++) {
-            paramStr += hilight(",", highlight);
-            paramStr += arguments.get(t).toString(highlight, constants);
+            hilight(",", writer);
+            arguments.get(t).toString(writer, constants);
         }
-        return hilight("FSCommand2(", highlight) + command.toString(highlight, constants) + paramStr + hilight(")", highlight);
+        return hilight(")", writer);
     }
 
     @Override

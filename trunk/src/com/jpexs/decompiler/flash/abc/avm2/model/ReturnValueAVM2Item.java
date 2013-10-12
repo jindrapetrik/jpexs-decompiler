@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
@@ -33,12 +34,8 @@ public class ReturnValueAVM2Item extends AVM2Item implements ExitItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String vaStr = value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
-        String prefix = "\r\n" + Graph.INDENTOPEN + "\r\n";
-        if (vaStr.startsWith(prefix)) { //NewObjectAVM2Item
-            vaStr = vaStr.substring(prefix.length());
-        }
-        return hilight("return ", highlight) + vaStr;
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        hilight("return ", writer);
+        return value.toString(writer, constants, localRegNames, fullyQualifiedNames);
     }
 }

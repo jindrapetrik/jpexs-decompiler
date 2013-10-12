@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,11 @@ public class DeletePropertyAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight("delete ", highlight) + object.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight("[", highlight) + propertyName.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight("]", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        hilight("delete ", writer);
+        object.toString(writer, constants, localRegNames, fullyQualifiedNames);
+        hilight("[", writer);
+        propertyName.toString(writer, constants, localRegNames, fullyQualifiedNames);
+        return hilight("]", writer);
     }
 }

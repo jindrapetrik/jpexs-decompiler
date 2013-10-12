@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
@@ -39,7 +40,9 @@ public class HasNextAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return collection.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight(" hasNext ", highlight) + object.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        collection.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+        hilight(" hasNext ", writer);
+        return object.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
     }
 }

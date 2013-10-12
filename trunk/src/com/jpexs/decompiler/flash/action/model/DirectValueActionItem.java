@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -85,24 +86,24 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    public String toStringNoQuotes(boolean highlight, List<Object> localData) {
+    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, List<Object> localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
-                return hilight("0", highlight);
+                return hilight("0", writer);
             }
         }
         if (value instanceof Float) {
             if (Float.compare((float) (Float) value, 0) == 0) {
-                return hilight("0", highlight);
+                return hilight("0", writer);
             }
         }
         if (value instanceof String) {
-            return hilight((String) value, highlight);
+            return hilight((String) value, writer);
         }
         if (value instanceof ConstantIndex) {
-            return hilight(this.constants.get(((ConstantIndex) value).index), highlight);
+            return hilight(this.constants.get(((ConstantIndex) value).index), writer);
         }
-        return hilight(value.toString(), highlight);
+        return hilight(value.toString(), writer);
     }
 
     public String toStringNoH(ConstantPool constants) {
@@ -126,27 +127,27 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
-                return hilight("0", highlight);
+                return hilight("0", writer);
             }
         }
         if (value instanceof Float) {
             if (Float.compare((float) (Float) value, 0) == 0) {
-                return hilight("0", highlight);
+                return hilight("0", writer);
             }
         }
         if (value instanceof String) {
-            return hilight("\"" + Helper.escapeString((String) value) + "\"", highlight);
+            return hilight("\"" + Helper.escapeString((String) value) + "\"", writer);
         }
         if (value instanceof ConstantIndex) {
-            return hilight("\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"", highlight);
+            return hilight("\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"", writer);
         }
         if (value instanceof RegisterNumber) {
-            return hilight(((RegisterNumber) value).translate(), highlight);
+            return hilight(((RegisterNumber) value).translate(), writer);
         }
-        return hilight(value.toString(), highlight);
+        return hilight(value.toString(), writer);
     }
 
     @Override

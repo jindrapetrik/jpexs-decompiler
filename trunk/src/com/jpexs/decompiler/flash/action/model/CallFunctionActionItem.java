@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -41,15 +42,17 @@ public class CallFunctionActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         String paramStr = "";
+        stripQuotes(functionName, constants, writer);
+        hilight("(", writer);
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
-                paramStr += hilight(",", highlight);
+                hilight(",", writer);
             }
-            paramStr += arguments.get(t).toStringNL(highlight, constants);
+            arguments.get(t).toStringNL(writer, constants);
         }
-        return stripQuotes(functionName, constants, highlight) + hilight("(", highlight) + paramStr + hilight(")", highlight);
+        return hilight(")", writer);
     }
 
     @Override

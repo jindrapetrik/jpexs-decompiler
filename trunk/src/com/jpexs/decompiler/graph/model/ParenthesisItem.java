@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -33,8 +34,10 @@ public class ParenthesisItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        return hilight("(", highlight) + value.toString(highlight, localData) + hilight(")", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        hilight("(", writer);
+        value.toString(writer, localData);
+        return hilight(")", writer);
     }
 
     @Override

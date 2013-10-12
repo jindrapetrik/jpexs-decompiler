@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf7.ActionCastOp;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -45,8 +46,11 @@ public class CastOpActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("(", highlight) + stripQuotes(constructor, constants, highlight) + hilight(")", highlight) + object.toString(highlight, Helper.toList(constants));
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("(", writer);
+        stripQuotes(constructor, constants, writer);
+        hilight(")", writer);
+        return object.toString(writer, Helper.toList(constants));
     }
 
     @Override

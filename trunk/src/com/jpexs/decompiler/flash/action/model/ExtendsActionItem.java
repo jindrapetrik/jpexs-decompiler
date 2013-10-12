@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -34,10 +35,12 @@ public class ExtendsActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         List<Object> localData = new ArrayList<>();
         localData.add(constants);
-        return subclass.toString(highlight, localData) + hilight(" extends ", highlight) + stripQuotes(superclass, constants, highlight);
+        subclass.toString(writer, localData);
+        hilight(" extends ", writer);
+        return stripQuotes(superclass, constants, writer);
     }
 
     @Override

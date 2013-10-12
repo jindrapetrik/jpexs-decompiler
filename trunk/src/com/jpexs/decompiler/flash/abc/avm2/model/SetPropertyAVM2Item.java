@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -43,8 +44,10 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return formatProperty(highlight, constants, object, propertyName, localRegNames, fullyQualifiedNames) + hilight(" = ", highlight) + value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        formatProperty(writer, constants, object, propertyName, localRegNames, fullyQualifiedNames);
+        hilight(" = ", writer);
+        return value.toString(writer, constants, localRegNames, fullyQualifiedNames);
     }
 
     @Override

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import java.util.List;
 
 /**
@@ -45,8 +46,8 @@ public class NotCompileTimeItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        return object.toString(highlight, localData);
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        return object.toString(writer, localData);
     }
 
     @Override

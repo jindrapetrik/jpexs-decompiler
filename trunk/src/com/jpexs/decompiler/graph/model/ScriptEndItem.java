@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
 
@@ -30,8 +31,8 @@ public class ScriptEndItem extends GraphTargetItem implements ExitItem {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        return "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+        return writer;
     }
 
     @Override

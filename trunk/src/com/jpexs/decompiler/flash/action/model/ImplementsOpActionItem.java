@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -34,15 +35,16 @@ public class ImplementsOpActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String impStr = "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        subclass.toString(writer, Helper.toList(constants));
+        hilight(" implements ", writer);
         for (int i = 0; i < superclasses.size(); i++) {
             if (i > 0) {
-                impStr += hilight(",", highlight);
+                hilight(",", writer);
             }
-            impStr += superclasses.get(i).toString(highlight, Helper.toList(constants));
+            superclasses.get(i).toString(writer, Helper.toList(constants));
         }
-        return subclass.toString(highlight, Helper.toList(constants)) + hilight(" implements ", highlight) + impStr;
+        return writer;
     }
 
     @Override

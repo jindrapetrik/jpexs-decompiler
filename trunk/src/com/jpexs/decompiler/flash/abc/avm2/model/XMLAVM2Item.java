@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -36,15 +37,14 @@ public class XMLAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String ret = "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         for (GraphTargetItem part : parts) {
             if (part instanceof StringAVM2Item) {
-                ret += hilight(((StringAVM2Item) part).value, highlight);
+                hilight(((StringAVM2Item) part).value, writer);
             } else {
-                ret += part.toString(highlight, constants, localRegNames, fullyQualifiedNames);
+                part.toString(writer, constants, localRegNames, fullyQualifiedNames);
             }
         }
-        return ret;
+        return writer;
     }
 }

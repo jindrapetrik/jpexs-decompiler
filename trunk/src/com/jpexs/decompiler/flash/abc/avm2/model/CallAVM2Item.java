@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -36,25 +37,28 @@ public class CallAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String args = "";
-        for (int a = 0; a < arguments.size(); a++) {
-            if (a > 0) {
-                args = args + hilight(",", highlight);
-            }
-            args = args + arguments.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
-        }
-        /*String recPart = ""; receiver.toString(constants, localRegNames) + hilight(".", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        /*String recPart = ""; receiver.toString(constants, localRegNames) + hilight(".", writer);
          if (receiver instanceof NewActivationAVM2Item) {
          recPart = "";
          }
          if (receiver instanceof ThisAVM2Item) {
          recPart = "";
          }*/
-        String fstr = function.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         if (function.precedence > precedence) {
-            fstr = hilight("(", highlight) + fstr + hilight(")", highlight);
+            hilight("(", writer);
+            function.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            hilight(")", writer);
+        } else {
+            function.toString(writer, constants, localRegNames, fullyQualifiedNames);
         }
-        return fstr + hilight("(", highlight) + args + hilight(")", highlight);
+        hilight("(", writer);
+        for (int a = 0; a < arguments.size(); a++) {
+            if (a > 0) {
+                hilight(",", writer);
+            }
+            arguments.get(a).toString(writer, constants, localRegNames, fullyQualifiedNames);
+        }
+        return hilight(")", writer);
     }
 }

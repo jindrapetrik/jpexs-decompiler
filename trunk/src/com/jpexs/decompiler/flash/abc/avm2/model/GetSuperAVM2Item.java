@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -35,11 +36,12 @@ public class GetSuperAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String calee = object.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight(".", highlight);
-        if (Highlighting.stripHilights(calee).equals("this.")) {
-            calee = "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        if (!object.toString(false, constants, localRegNames, fullyQualifiedNames).equals("this.")) {
+            object.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            hilight(".", writer);
         }
-        return calee + hilight("super.", highlight) + propertyName.toString(highlight, constants, localRegNames, fullyQualifiedNames);
+        hilight("super.", writer);
+        return propertyName.toString(writer, constants, localRegNames, fullyQualifiedNames);
     }
 }

@@ -72,6 +72,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
@@ -705,17 +706,15 @@ public class AVM2Code implements Serializable {
         return s.toString();
     }
 
-    public String toString(boolean highlight, ConstantPool constants) {
-        StringBuilder s = new StringBuilder();
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         int i = 0;
         for (AVM2Instruction instruction : code) {
-            s.append(Helper.formatAddress(i));
-            s.append(" ");
-            s.append(instruction.toString(highlight, constants, new ArrayList<String>()));
-            s.append("\r\n");
+            writer.appendNoHilight(Helper.formatAddress(i));
+            writer.appendNoHilight(" ");
+            instruction.toString(writer, constants, new ArrayList<String>()).appendNewLine();
             i++;
         }
-        return s.toString();
+        return writer;
     }
 
     public String toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, boolean hex, boolean highlight) {

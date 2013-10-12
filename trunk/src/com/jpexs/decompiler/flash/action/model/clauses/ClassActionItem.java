@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
@@ -155,51 +156,63 @@ public class ClassActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants) {
-        String ret;
-        ret = hilight("class ", highlight) + className.toStringNoQuotes(highlight, Helper.toList(constants));
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        hilight("class ", writer);
+        className.toStringNoQuotes(writer, Helper.toList(constants));
         if (extendsOp != null) {
-            ret += hilight(" extends ", highlight) + extendsOp.toStringNoQuotes(highlight, Helper.toList(constants));
+            hilight(" extends ", writer);
+            extendsOp.toStringNoQuotes(writer, Helper.toList(constants));
         }
         if (!implementsOp.isEmpty()) {
-            ret += hilight(" implements ", highlight);
+            hilight(" implements ", writer);
             boolean first = true;
             for (GraphTargetItem t : implementsOp) {
                 if (!first) {
-                    ret += hilight(", ", highlight);
+                    hilight(", ", writer);
                 }
                 first = false;
-                ret += Action.getWithoutGlobal(t).toString(highlight, constants);
+                Action.getWithoutGlobal(t).toString(writer, constants);
             }
         }
-        ret += "\r\n" + hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
+        writer.appendNewLine();
+        hilight("{", writer).appendNewLine();
+        hilight(Graph.INDENTOPEN, writer).appendNewLine();
 
         if (constructor != null) {
-            ret += constructor.toString(highlight, constants) + "\r\n";
+            constructor.toString(writer, constants).appendNewLine();
         }
 
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : vars) {
-            ret += hilight("var ", highlight) + item.key.toStringNoQuotes(highlight, constants) + hilight(" = ", highlight) + item.value.toString(highlight, constants) + hilight(";", highlight) + "\r\n";
+            hilight("var ", writer);
+            item.key.toStringNoQuotes(writer, constants);
+            hilight(" = ", writer);
+            item.value.toString(writer, constants);
+            hilight(";", writer).appendNewLine();
         }
         for (String v : uninitializedVars) {
-            ret += hilight("var ", highlight) + hilight(v, highlight) + hilight(";", highlight) + "\r\n";
+            hilight("var ", writer);
+            hilight(v, writer);
+            hilight(";", writer).appendNewLine();
         }
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : staticVars) {
-            ret += hilight("static var ", highlight) + item.key.toStringNoQuotes(highlight, constants) + hilight(" = ", highlight) + item.value.toString(highlight, constants) + hilight(";", highlight) + "\r\n";
+            hilight("static var ", writer);
+            item.key.toStringNoQuotes(writer, constants);
+            hilight(" = ", writer);
+            item.value.toString(writer, constants);
+            hilight(";", writer).appendNewLine();
         }
 
 
         for (GraphTargetItem f : functions) {
-            ret += f.toString(highlight, constants) + "\r\n";
+            f.toString(writer, constants).appendNewLine();
         }
         for (GraphTargetItem f : staticFunctions) {
-            ret += hilight("static ", highlight) + f.toString(highlight, constants) + "\r\n";
+            hilight("static ", writer);
+            f.toString(writer, constants).appendNewLine();
         }
 
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight) + "\r\n";
-        return ret;
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        return hilight("}", writer).appendNewLine();
     }
 
     @Override

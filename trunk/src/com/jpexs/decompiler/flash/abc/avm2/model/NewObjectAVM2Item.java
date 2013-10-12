@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Graph;
 import java.util.HashMap;
 import java.util.List;
@@ -32,23 +33,32 @@ public class NewObjectAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String params = "";
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        boolean singleLine = pairs.size() < 2;
+        if (!singleLine) {
+            writer.appendNewLine();
+            hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        }
+        hilight("{", writer);
+        if (!singleLine) {
+            writer.appendNewLine();
+            hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        }
         for (int n = 0; n < pairs.size(); n++) {
             if (n > 0) {
-                params += hilight(",", highlight) + "\r\n";
+                hilight(",", writer).appendNewLine();
             }
-            params += pairs.get(n).toString(highlight, constants, localRegNames, fullyQualifiedNames);
+            pairs.get(n).toString(writer, constants, localRegNames, fullyQualifiedNames);
         }
-        if (pairs.size() < 2) {
-            return hilight("{", highlight) + params + hilight("}", highlight);
+        if (!singleLine) {
+            writer.appendNewLine();
+            hilight(Graph.INDENTCLOSE, writer).appendNewLine();
         }
-        String ret = "\r\n" + Graph.INDENTOPEN + "\r\n";
-        ret += hilight("{", highlight) + "\r\n";
-        ret += Graph.INDENTOPEN + "\r\n";
-        ret += params + "\r\n";
-        ret += Graph.INDENTCLOSE + "\r\n";
-        ret += hilight("}", highlight) + "\r\n" + Graph.INDENTCLOSE + "\r\n";
-        return ret;
+        hilight("}", writer);
+        if (!singleLine) {
+            writer.appendNewLine();
+            hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+        }
+        return writer;
     }
 }

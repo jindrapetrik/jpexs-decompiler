@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
@@ -34,22 +35,24 @@ public class SubtractAVM2Item extends BinaryOpItem {
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
         if (rightSide.precedence >= precedence) { // >=  add or subtract too
-            String ret = "";
             if (leftSide.precedence > precedence) {
-                ret += hilight("(", highlight) + leftSide.toString(highlight, localData) + hilight(")", highlight);
+                hilight("(", writer);
+                leftSide.toString(writer, localData);
+                hilight(")", writer);
             } else {
-                ret += leftSide.toString(highlight, localData);
+                leftSide.toString(writer, localData);
             }
-            ret += " ";
-            ret += hilight(operator, highlight);
-            ret += " ";
+            hilight(" ", writer);
+            hilight(operator, writer);
+            hilight(" ", writer);
 
-            ret += hilight("(", highlight) + rightSide.toString(highlight, localData) + hilight(")", highlight);
-            return ret;
+            hilight("(", writer);
+            rightSide.toString(writer, localData);
+            return hilight(")", writer);
         } else {
-            return super.toString(highlight, localData);
+            return super.toString(writer, localData);
         }
     }
 }

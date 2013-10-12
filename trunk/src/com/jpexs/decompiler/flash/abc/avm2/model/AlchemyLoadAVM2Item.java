@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -38,7 +39,9 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight("op_" + name + "(", highlight) + ofs.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight(") /*Alchemy*/", highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        hilight("op_" + name + "(", writer);
+        ofs.toString(writer, constants, localRegNames, fullyQualifiedNames);
+        return hilight(") /*Alchemy*/", writer);
     }
 }

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -35,11 +36,11 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         super(instruction, precedence);
     }
 
-    public abstract String toString(boolean highlight, ConstantPool constants);
+    public abstract HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants);
 
-    public String toString(boolean highlight) {
+    public HilightedTextWriter toString(HilightedTextWriter writer) {
         ConstantPool c = null;
-        return toString(highlight, c);
+        return toString(writer, c);
     }
 
     protected boolean isEmptyString(GraphTargetItem target) {
@@ -54,26 +55,26 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         return false;
     }
 
-    protected String stripQuotes(GraphTargetItem target, ConstantPool constants, boolean highlight) {
+    protected HilightedTextWriter stripQuotes(GraphTargetItem target, ConstantPool constants, HilightedTextWriter writer) {
         if (target instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) target).value instanceof String) {
-                return (String) ((DirectValueActionItem) target).hilight((String) ((DirectValueActionItem) target).value, highlight);
+                return ((DirectValueActionItem) target).hilight((String) ((DirectValueActionItem) target).value, writer);
             }
         }
         if (target == null) {
-            return "";
+            return writer;
         } else {
-            return target.toString(highlight, constants);
+            return target.toString(writer, constants);
         }
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
         if (localData.isEmpty()) {
             ConstantPool c = null;
-            return toString(highlight, c);
+            return toString(writer, c);
         }
-        return toString(highlight, (ConstantPool) localData.get(0));
+        return toString(writer, (ConstantPool) localData.get(0));
     }
 
     protected List<GraphSourceItem> toSourceCall(List<Object> localData, SourceGenerator gen, List<GraphTargetItem> list) {

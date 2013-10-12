@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -44,12 +45,13 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-
-        return getName(highlight, constants, localRegNames, fullyQualifiedNames) + hilight(" = ", highlight) + value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        getName(writer, constants, localRegNames, fullyQualifiedNames);
+        hilight(" = ", writer);
+        return value.toString(writer, constants, localRegNames, fullyQualifiedNames);
     }
 
-    public String getName(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String getName(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String ret = "";
 
         /*ret = scope.toString(constants, localRegNames) + ".";
@@ -64,9 +66,9 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
          }
          }*/
         if (slotName == null) {
-            return ret + hilight("/*UnknownSlot*/", highlight);
+            return ret + hilight("/*UnknownSlot*/", writer);
         }
-        return ret + hilight(slotName.getName(constants, fullyQualifiedNames), highlight);
+        return ret + hilight(slotName.getName(constants, fullyQualifiedNames), writer);
     }
 
     @Override

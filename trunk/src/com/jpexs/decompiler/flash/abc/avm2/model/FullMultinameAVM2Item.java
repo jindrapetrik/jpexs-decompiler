@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -74,22 +75,24 @@ public class FullMultinameAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String ret = "";
-        if (name != null) {
-            ret = hilight("[", highlight) + name.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight("]", highlight);
-        } else {
-            ret = hilight(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), highlight);
-        }
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         if (namespace != null) {
-            ret = namespace.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight("::", highlight) + ret;
+            namespace.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            hilight("::", writer);
         } else {
             /*Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
              if ((ns != null)&&(ns.name_index!=0)) {
              ret =  hilight(ns.getName(constants) + "::")+ret;
              }*/
         }
-        return ret;
+        if (name != null) {
+            hilight("[", writer);
+            name.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            hilight("]", writer);
+        } else {
+            hilight(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), writer);
+        }
+        return writer;
     }
 
     public boolean compareSame(FullMultinameAVM2Item other) {
