@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.graph;
 
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.model.BinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;

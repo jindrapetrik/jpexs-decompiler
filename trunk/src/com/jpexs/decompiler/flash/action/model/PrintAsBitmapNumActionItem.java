@@ -50,12 +50,6 @@ public class PrintAsBitmapNumActionItem extends ActionItem {
         this.boundingBox = boundingBox;
     }
 
-    /**
-     *
-     * @param writer
-     * @param localData
-     * @return
-     */
     @Override
     public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("printAsBitmapNum(", writer);
