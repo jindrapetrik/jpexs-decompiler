@@ -16,12 +16,9 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
-import java.util.HashMap;
-import java.util.List;
 
 public class ClassAVM2Item extends AVM2Item {
 

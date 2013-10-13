@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import java.io.IOException;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.

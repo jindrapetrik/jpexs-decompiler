@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
@@ -25,9 +24,7 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class TryAVM2Item extends AVM2Item implements Block {

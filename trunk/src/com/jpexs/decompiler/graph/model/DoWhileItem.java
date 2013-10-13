@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.graph.model;
 
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
@@ -25,7 +24,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class DoWhileItem extends LoopItem implements Block {

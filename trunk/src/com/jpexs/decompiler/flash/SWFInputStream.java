@@ -16,16 +16,6 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
-import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
-import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
-import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
-import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage;
-import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
-import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
-import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
-import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
-import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
@@ -37,6 +27,16 @@ import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
 import com.jpexs.decompiler.flash.tags.*;
+import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
+import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
+import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
+import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
+import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
 import com.jpexs.decompiler.flash.types.*;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
