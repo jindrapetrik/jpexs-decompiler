@@ -39,14 +39,6 @@ public abstract class AVM2Item extends GraphTargetItem {
         return writer.toString();
     }
 
-    public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, LocalData localData) {
-        toString(writer, localData);
-        if (needsSemicolon()) {
-            hilight(";", writer);
-        }
-        return writer;
-    }
-
     @Override
     public boolean needsSemicolon() {
         return true;

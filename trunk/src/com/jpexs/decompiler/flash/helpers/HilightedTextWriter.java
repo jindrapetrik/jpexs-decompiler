@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import java.util.Stack;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.
@@ -28,6 +29,7 @@ public class HilightedTextWriter {
     
     private StringBuilder sb = new StringBuilder();
     private boolean hilight;
+    private Stack<GraphSourceItemPosition> offsets = new Stack<>();
 
     public HilightedTextWriter() {
     }
@@ -39,8 +41,25 @@ public class HilightedTextWriter {
     public boolean getIsHighlighted() {
         return hilight;
     }
+
+    public void addOffset(GraphSourceItem src, int pos) {
+        GraphSourceItemPosition itemPos = new GraphSourceItemPosition();
+        itemPos.graphSourceItem = src;
+        itemPos.position = pos;
+        offsets.add(itemPos);
+    }
     
-    public HilightedTextWriter append(String str, GraphSourceItem src, int pos) {
+    public void removeOffset() {
+        offsets.pop();
+    }
+    
+    public HilightedTextWriter append(String str) {
+        if (offsets.isEmpty()) {
+            System.out.println("WTF?");
+        }
+        GraphSourceItemPosition itemPos = offsets.peek();
+        GraphSourceItem src = itemPos.graphSourceItem;
+        int pos = itemPos.position;
         if (src != null && hilight) {
             sb.append(Highlighting.hilighOffset(str, src.getOffset() + pos + 1));
         } else {

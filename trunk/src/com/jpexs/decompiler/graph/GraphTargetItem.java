@@ -84,14 +84,16 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public HilightedTextWriter hilight(String str, HilightedTextWriter writer) {
-        return writer.append(str, src, pos);
+        return writer.append(str);
     }
 
     public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, LocalData localData) {
-        toString(writer, localData);
+        writer.addOffset(src, pos);
+        appendTo(writer, localData);
         if (needsSemicolon()) { 
             hilight(";", writer);
         }
+        writer.removeOffset();
         return writer;
     }
 
@@ -105,7 +107,10 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
-        return appendTo(writer, localData);
+        writer.addOffset(src, pos);
+        appendTo(writer, localData);
+        writer.removeOffset();
+        return writer;
     }
 
     protected abstract HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData);
@@ -150,6 +155,13 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, LocalData localData) {
+        writer.addOffset(src, pos);
+        appendToNoQuotes(writer, localData);
+        writer.removeOffset();
+        return writer;
+    }
+
+    protected HilightedTextWriter appendToNoQuotes(HilightedTextWriter writer, LocalData localData) {
         return toString(writer, localData);
     }
 
@@ -166,10 +178,12 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public HilightedTextWriter toStringNL(HilightedTextWriter writer, LocalData localData) {
-        toString(writer, localData);
+        writer.addOffset(src, pos);
+        appendTo(writer, localData);
         if (needsNewLine()) {
             writer.appendNewLine();
         }
+        writer.removeOffset();
         return writer;
     }
 
