@@ -33,7 +33,7 @@ public class NameValuePair extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         name.toString(writer, localData);
         hilight(":", writer);
         if (value instanceof TernarOpItem) { //Ternar operator contains ":"

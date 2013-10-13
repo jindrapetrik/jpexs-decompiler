@@ -26,7 +26,7 @@ import java.util.List;
 public class StopAllSoundsActionItem extends ActionItem {
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         return hilight("stopAllSounds()", writer);
     }
 

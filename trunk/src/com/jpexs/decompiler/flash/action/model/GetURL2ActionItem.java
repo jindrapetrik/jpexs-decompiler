@@ -41,7 +41,7 @@ public class GetURL2ActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         String methodStr = "";
         if (sendVarsMethod == 1) {
             methodStr = ",\"GET\"";

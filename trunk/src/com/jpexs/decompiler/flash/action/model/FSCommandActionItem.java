@@ -38,7 +38,7 @@ public class FSCommandActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("fscommand(\"", writer);
         hilight(Helper.escapeString(command), writer);
         return hilight("\")", writer);

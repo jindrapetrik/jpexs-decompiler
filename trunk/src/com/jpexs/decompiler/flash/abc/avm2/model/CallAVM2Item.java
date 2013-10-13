@@ -36,7 +36,7 @@ public class CallAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         /*String recPart = ""; receiver.toString(constants, localRegNames) + hilight(".", writer);
          if (receiver instanceof NewActivationAVM2Item) {
          recPart = "";

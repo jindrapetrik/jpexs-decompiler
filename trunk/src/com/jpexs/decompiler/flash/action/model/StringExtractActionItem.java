@@ -39,7 +39,7 @@ public class StringExtractActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         value.toString(writer, localData);
         hilight(".substr(", writer);
         index.toString(writer, localData);

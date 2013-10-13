@@ -33,7 +33,7 @@ public class CallActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("call(", writer);
         stripQuotes(value, localData, writer);
         return hilight(")", writer);

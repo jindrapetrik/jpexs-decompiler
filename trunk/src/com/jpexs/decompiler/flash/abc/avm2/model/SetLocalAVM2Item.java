@@ -34,7 +34,7 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight(localRegName(localData.localRegNames, regIndex) + " = ", writer);
         return value.toString(writer, localData);
     }

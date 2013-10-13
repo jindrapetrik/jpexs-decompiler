@@ -73,7 +73,7 @@ public class FunctionActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (true) {
             //return writer.appendNoHilight("<func>")
         }

@@ -32,7 +32,7 @@ public class NewArrayAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("[", writer);
         for (int a = 0; a < values.size(); a++) {
             if (a > 0) {

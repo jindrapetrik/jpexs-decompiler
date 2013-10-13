@@ -32,7 +32,7 @@ public class NewObjectAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         boolean singleLine = pairs.size() < 2;
         if (!singleLine) {
             writer.appendNewLine();

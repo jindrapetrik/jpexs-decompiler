@@ -51,7 +51,7 @@ public class PrintAsBitmapActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("printAsBitmap(", writer);
         target.toString(writer, localData);
         hilight(",", writer);

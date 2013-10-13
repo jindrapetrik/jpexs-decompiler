@@ -64,7 +64,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("loop" + loop.id + ":", writer).appendNewLine();
         hilight("for(", writer);
         if ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber)) {

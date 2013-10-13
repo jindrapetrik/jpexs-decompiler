@@ -38,7 +38,7 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("op_" + name + "(", writer);
         ofs.toString(writer, localData);
         hilight(",", writer);

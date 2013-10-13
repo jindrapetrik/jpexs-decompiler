@@ -53,7 +53,7 @@ public class LoadMovieNumActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         String methodStr = "";
         if (method == 1) {
             methodStr = ",\"GET\"";

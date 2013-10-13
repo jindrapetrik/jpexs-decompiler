@@ -36,7 +36,7 @@ public class CommaExpressionItem extends GraphTargetItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         boolean first = true;
         for (GraphTargetItem t : commands) {
             if (!first) {

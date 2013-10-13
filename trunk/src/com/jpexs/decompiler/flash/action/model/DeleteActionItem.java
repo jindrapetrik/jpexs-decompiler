@@ -46,7 +46,7 @@ public class DeleteActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("delete ", writer);
         if (object == null) {
             return propertyName.toString(writer, localData);

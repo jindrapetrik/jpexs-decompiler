@@ -49,7 +49,7 @@ public class CallMethodActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         boolean blankMethod = false;
         if (methodName instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) methodName).value instanceof Undefined) {

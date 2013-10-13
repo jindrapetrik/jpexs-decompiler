@@ -45,7 +45,7 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("ifFrameLoaded(", writer);
         frame.toString(writer, localData);
         hilight(")", writer).appendNewLine();

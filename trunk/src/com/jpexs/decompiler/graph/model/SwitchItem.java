@@ -52,7 +52,7 @@ public class SwitchItem extends LoopItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("loopswitch" + loop.id + ":", writer).appendNewLine();
         hilight("switch(", writer);
         switchedObject.toString(writer, localData);

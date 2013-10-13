@@ -30,7 +30,7 @@ public class GetURLActionItem extends ActionItem {
     public String targetString;
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("getUrl(\"", writer);
         hilight(Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString), writer);
         return hilight("\")", writer);

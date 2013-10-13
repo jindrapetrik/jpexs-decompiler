@@ -35,7 +35,7 @@ public class SubtractAVM2Item extends BinaryOpItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (rightSide.precedence >= precedence) { // >=  add or subtract too
             if (leftSide.precedence > precedence) {
                 hilight("(", writer);
@@ -52,7 +52,7 @@ public class SubtractAVM2Item extends BinaryOpItem {
             rightSide.toString(writer, localData);
             return hilight(")", writer);
         } else {
-            return super.toString(writer, localData);
+            return super.appendTo(writer, localData);
         }
     }
 }

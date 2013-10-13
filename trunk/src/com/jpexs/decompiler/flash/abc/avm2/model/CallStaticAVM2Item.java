@@ -36,7 +36,7 @@ public class CallStaticAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         receiver.toString(writer, localData);
         hilight(".", writer);
         hilight(methodName, writer);

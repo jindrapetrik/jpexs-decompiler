@@ -37,7 +37,7 @@ public class HasNextAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         collection.toString(writer, localData);
         hilight(" hasNext ", writer);
         return object.toString(writer, localData);

@@ -30,7 +30,7 @@ public class UnsupportedActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         return hilight("//Unsupported by decompiler:" + value, writer);
     }
 

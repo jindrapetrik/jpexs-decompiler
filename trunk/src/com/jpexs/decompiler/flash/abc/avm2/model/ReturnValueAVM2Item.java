@@ -31,7 +31,7 @@ public class ReturnValueAVM2Item extends AVM2Item implements ExitItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("return ", writer);
         return value.toString(writer, localData);
     }

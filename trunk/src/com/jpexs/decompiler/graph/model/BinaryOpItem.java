@@ -47,7 +47,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (leftSide.getPrecedence() > precedence) {
             hilight("(", writer);
             leftSide.toString(writer, localData);

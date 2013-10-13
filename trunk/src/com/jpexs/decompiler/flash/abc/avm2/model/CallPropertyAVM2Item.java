@@ -38,7 +38,7 @@ public class CallPropertyAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         formatProperty(writer, receiver, propertyName, localData);
         hilight("(", writer);
         for (int a = 0; a < arguments.size(); a++) {

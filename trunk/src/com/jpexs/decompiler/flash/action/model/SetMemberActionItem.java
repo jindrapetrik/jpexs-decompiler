@@ -79,7 +79,7 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (!((objectName instanceof DirectValueActionItem) && (((DirectValueActionItem) objectName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
             object.toString(writer, localData);

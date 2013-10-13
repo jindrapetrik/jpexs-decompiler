@@ -36,7 +36,7 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         formatProperty(writer, object, propertyName, localData);
         hilight(" = ", writer);
         return value.toString(writer, localData);

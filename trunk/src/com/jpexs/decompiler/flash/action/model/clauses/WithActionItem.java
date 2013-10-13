@@ -47,7 +47,7 @@ public class WithActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         String ret;
         hilight("with(", writer);
         scope.toString(writer, localData);

@@ -68,7 +68,7 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (name instanceof DirectValueActionItem || name instanceof GetVariableActionItem) {
             stripQuotes(name, localData, writer);
             hilight(" = ", writer);

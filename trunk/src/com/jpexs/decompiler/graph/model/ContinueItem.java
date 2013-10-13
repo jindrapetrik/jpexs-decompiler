@@ -20,7 +20,7 @@ public class ContinueItem extends GraphTargetItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("continue ", writer);
         return hilight("loop" + loopId, writer);
     }

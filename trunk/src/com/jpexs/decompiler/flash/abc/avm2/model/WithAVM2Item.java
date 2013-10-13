@@ -42,7 +42,7 @@ public class WithAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("with(", writer);
         scope.toString(writer, localData);
         hilight(")", writer).appendNewLine();

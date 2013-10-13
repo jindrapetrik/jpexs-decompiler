@@ -33,8 +33,6 @@ public abstract class AVM2Item extends GraphTargetItem {
         super(instruction, precedence);
     }
 
-    public abstract HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData);
-
     public String toStringNoH(LocalData localData) {
         HilightedTextWriter writer = new HilightedTextWriter(false);
         toString(writer, localData);
@@ -45,7 +43,7 @@ public abstract class AVM2Item extends GraphTargetItem {
         toString(writer, localData);
         if (needsSemicolon()) {
             hilight(";", writer);
-        };
+        }
         return writer;
     }
 

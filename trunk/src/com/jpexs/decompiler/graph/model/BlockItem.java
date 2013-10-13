@@ -37,7 +37,7 @@ public class BlockItem extends GraphTargetItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("{", writer).appendNewLine();
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
         writer.appendNoHilight(Graph.graphToString(commands, writer.getIsHighlighted(), false, localData));

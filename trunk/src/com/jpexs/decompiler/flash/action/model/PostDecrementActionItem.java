@@ -51,7 +51,7 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         object.toString(writer, localData);
         return hilight("--", writer);
     }

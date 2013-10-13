@@ -47,7 +47,7 @@ public class GetPropertyActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (isEmptyString(target)) {
             return hilight(Action.propertyNames[propertyIndex], writer);
         }

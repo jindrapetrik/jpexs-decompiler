@@ -37,8 +37,6 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         super(instruction, precedence);
     }
 
-    public abstract HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData);
-
     protected boolean isEmptyString(GraphTargetItem target) {
         if (target instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) target).value instanceof String) {

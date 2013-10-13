@@ -49,7 +49,7 @@ public class CloneSpriteActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("duplicateMovieClip(", writer);
         target.toString(writer, localData);
         hilight(",", writer);

@@ -104,8 +104,12 @@ public abstract class GraphTargetItem implements Serializable {
         return this.getClass().getName();
     }
 
-    public abstract HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData);
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        return appendTo(writer, localData);
+    }
 
+    protected abstract HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData);
+    
     public String toString(boolean highlight, LocalData localData) {
         HilightedTextWriter writer = new HilightedTextWriter(highlight);
         toString(writer, localData);
@@ -161,8 +165,12 @@ public abstract class GraphTargetItem implements Serializable {
         return false;
     }
 
-    public String toStringNL(HilightedTextWriter writer, LocalData localData) {
-        return toString(writer, localData) + (needsNewLine() ? "\r\n" : "");
+    public HilightedTextWriter toStringNL(HilightedTextWriter writer, LocalData localData) {
+        toString(writer, localData);
+        if (needsNewLine()) {
+            writer.appendNewLine();
+        }
+        return writer;
     }
 
     public boolean isEmpty() {

@@ -48,7 +48,7 @@ public class FSCommand2ActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("FSCommand2(", writer);
         command.toString(writer, localData);
         for (int t = 0; t < arguments.size(); t++) {

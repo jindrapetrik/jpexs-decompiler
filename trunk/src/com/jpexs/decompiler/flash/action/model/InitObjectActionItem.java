@@ -47,7 +47,7 @@ public class InitObjectActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("{", writer);
         for (int i = 0; i < values.size(); i++) {
             if (i > 0) {

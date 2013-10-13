@@ -30,7 +30,7 @@ public class StrictModeActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         return hilight("StrictMode(" + mode + ");", writer); //I still don't know how AS source of Strict Mode instruction looks like, assuming this...
     }
 

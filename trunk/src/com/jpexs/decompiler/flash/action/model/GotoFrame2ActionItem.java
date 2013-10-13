@@ -49,7 +49,7 @@ public class GotoFrame2ActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         String prefix = "gotoAndStop";
         if (playFlag) {
             prefix = "gotoAndPlay";

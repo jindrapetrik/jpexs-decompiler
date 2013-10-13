@@ -43,7 +43,7 @@ public class InterfaceActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("interface ", writer);
         name.toStringNoQuotes(writer, localData);
         boolean first = true;

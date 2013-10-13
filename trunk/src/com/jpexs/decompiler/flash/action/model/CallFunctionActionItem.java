@@ -43,7 +43,7 @@ public class CallFunctionActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         String paramStr = "";
         stripQuotes(functionName, localData, writer);
         hilight("(", writer);

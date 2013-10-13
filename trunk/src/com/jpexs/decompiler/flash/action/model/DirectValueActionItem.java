@@ -128,7 +128,7 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
                 return hilight("0", writer);

@@ -47,7 +47,7 @@ public class LocalRegAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (computedValue instanceof FilterAVM2Item) {
             return computedValue.toString(writer, localData);
         }

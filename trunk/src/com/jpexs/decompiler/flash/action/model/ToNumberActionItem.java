@@ -33,7 +33,7 @@ public class ToNumberActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("Number(", writer);
         value.toString(writer, localData);
         return hilight(")", writer);

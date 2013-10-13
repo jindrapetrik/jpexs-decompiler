@@ -38,7 +38,7 @@ public class FilterAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         collection.toString(writer, localData);
         hilight(".(", writer);
         expression.toString(writer, localData);

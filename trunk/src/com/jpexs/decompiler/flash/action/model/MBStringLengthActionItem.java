@@ -34,7 +34,7 @@ public class MBStringLengthActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("mblength(", writer);
         if (value.precedence > precedence) {
             hilight("(", writer);

@@ -30,7 +30,7 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         return hilight("" + value, writer);
     }
 

@@ -31,7 +31,7 @@ public class AddAVM2Item extends BinaryOpItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (rightSide.precedence >= precedence) { //string + vs number +
             if (leftSide.precedence > precedence) {
                 hilight("(", writer);
@@ -48,7 +48,7 @@ public class AddAVM2Item extends BinaryOpItem {
             rightSide.toString(writer, localData);
             return hilight(")", writer);
         } else {
-            return super.toString(writer, localData);
+            return super.appendTo(writer, localData);
         }
     }
 

@@ -38,7 +38,7 @@ public class SubtractActionItem extends BinaryOpItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (rightSide.precedence >= precedence) { // >=  add or subtract too
             String ret = "";
             if (leftSide.precedence > precedence) {
@@ -56,7 +56,7 @@ public class SubtractActionItem extends BinaryOpItem {
             rightSide.toString(writer, localData);
             return hilight(")", writer);
         } else {
-            return super.toString(writer, localData);
+            return super.appendTo(writer, localData);
         }
     }
 

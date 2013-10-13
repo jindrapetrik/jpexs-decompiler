@@ -34,7 +34,7 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight(operator, writer);
         if (value != null) {
             if (value.precedence > precedence) {

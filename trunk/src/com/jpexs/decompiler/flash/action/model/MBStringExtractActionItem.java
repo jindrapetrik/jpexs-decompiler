@@ -49,7 +49,7 @@ public class MBStringExtractActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("mbsubstring(", writer);
         value.toString(writer, localData);
         hilight(",", writer);

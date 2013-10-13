@@ -51,7 +51,7 @@ public class PrintNumActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("printNum(", writer);
         num.toString(writer, localData);
         hilight(",", writer);

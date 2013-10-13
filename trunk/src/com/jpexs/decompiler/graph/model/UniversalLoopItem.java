@@ -38,7 +38,7 @@ public class UniversalLoopItem extends LoopItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("loop" + loop.id + ":", writer).appendNewLine();
         hilight("while(true)", writer).appendNewLine();
         hilight("{", writer).appendNewLine();

@@ -28,7 +28,7 @@ public class ReturnVoidAVM2Item extends AVM2Item implements ExitItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         return hilight("return", writer);
     }
 }

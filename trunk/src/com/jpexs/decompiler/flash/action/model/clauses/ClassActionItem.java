@@ -156,7 +156,7 @@ public class ClassActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("class ", writer);
         className.toStringNoQuotes(writer, localData);
         if (extendsOp != null) {

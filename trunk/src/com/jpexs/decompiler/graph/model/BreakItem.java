@@ -20,7 +20,7 @@ public class BreakItem extends GraphTargetItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("break ", writer);
         return hilight("loop" + loopId, writer);
     }

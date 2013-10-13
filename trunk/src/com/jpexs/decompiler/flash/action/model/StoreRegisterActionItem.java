@@ -68,7 +68,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (temporary) {
             value.toString(writer, localData);
         } else {

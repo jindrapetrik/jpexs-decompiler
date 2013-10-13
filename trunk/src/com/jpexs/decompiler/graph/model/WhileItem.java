@@ -45,7 +45,7 @@ public class WhileItem extends LoopItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("loop" + loop.id + ":", writer).appendNewLine();
         hilight("while(", writer);
         for (int i = 0; i < expression.size(); i++) {

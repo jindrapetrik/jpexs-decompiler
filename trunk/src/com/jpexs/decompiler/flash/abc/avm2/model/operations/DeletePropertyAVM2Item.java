@@ -35,7 +35,7 @@ public class DeletePropertyAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("delete ", writer);
         object.toString(writer, localData);
         hilight("[", writer);

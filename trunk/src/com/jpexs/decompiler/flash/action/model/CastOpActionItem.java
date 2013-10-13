@@ -46,7 +46,7 @@ public class CastOpActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         hilight("(", writer);
         stripQuotes(constructor, localData, writer);
         hilight(")", writer);
