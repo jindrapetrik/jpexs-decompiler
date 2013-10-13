@@ -160,9 +160,9 @@ public class Highlighting implements Serializable {
     public Highlighting(int startPos, int len, long offset) {
         this(startPos, len, "");
     }
-    private static final String HLOPEN = "<ffdec:\"";
-    private static final String HLEND = "\">";
-    private static final String HLCLOSE = "</ffdec>";
+    public static final String HLOPEN = "<ffdec:\"";
+    public static final String HLEND = "\">";
+    public static final String HLCLOSE = "</ffdec>";
 
     public static String hilight(String text, String data) {
         return HLOPEN + Helper.escapeString(data) + HLEND + text + HLCLOSE;

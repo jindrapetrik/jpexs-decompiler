@@ -31,9 +31,9 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
@@ -420,12 +420,12 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         for (String imp : imports) {
             if (!imp.startsWith(".")) {
-                out.println(Graph.INDENT_STRING + "import " + imp + ";");
+                out.println(HilightedTextWriter.INDENT_STRING + "import " + imp + ";");
             }
         }
         out.println();
         for (String us : uses) {
-            out.println(Graph.INDENT_STRING + "use namespace " + us + ";");
+            out.println(HilightedTextWriter.INDENT_STRING + "use namespace " + us + ";");
         }
         out.println();
 
@@ -434,8 +434,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (classHeader.startsWith("private ")) {
             classHeader = classHeader.substring("private ".length());
         }
-        out.println(Graph.INDENT_STRING + classHeader);
-        out.println(Graph.INDENT_STRING + "{");
+        out.println(HilightedTextWriter.INDENT_STRING + classHeader);
+        out.println(HilightedTextWriter.INDENT_STRING + "{");
 
         String toPrint;
         List<String> outTraits = new LinkedList<>();
@@ -450,7 +450,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (Highlighting.stripHilights(bodyStr).trim().equals("")) {
             toPrint = ABC.addTabs(bodyStr + "/*classInitializer*/", 3);
         } else {
-            toPrint = Graph.INDENT_STRING + Graph.INDENT_STRING + "{\r\n" + ABC.addTabs(bodyStr, 3) + "\r\n" + Graph.INDENT_STRING + Graph.INDENT_STRING + "}";
+            toPrint = HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + "{\r\n" + ABC.addTabs(bodyStr, 3) + "\r\n" + HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + "}";
         }
         if (highlight) {
             toPrint = Highlighting.hilighTrait(toPrint, abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length + 1);
@@ -484,7 +484,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             } else {
                 constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(highlight, abc.constants, null, abc, fullyQualifiedNames);
             }
-            toPrint = Graph.INDENT_STRING + Graph.INDENT_STRING + modifier + "function " + abc.constants.constant_multiname[abc.instance_info[class_info].name_index].getName(abc.constants, new ArrayList<String>()/*do not want full names here*/) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + Graph.INDENT_STRING + Graph.INDENT_STRING + "}";
+            toPrint = HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + modifier + "function " + abc.constants.constant_multiname[abc.instance_info[class_info].name_index].getName(abc.constants, new ArrayList<String>()/*do not want full names here*/) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + "}";
             if (highlight) {
                 toPrint = Highlighting.hilighTrait(toPrint, abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length);
             }
@@ -515,7 +515,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     }
                 }
             } else {
-                s = s.replace(Graph.INDENT_STRING, "");
+                s = s.replace(HilightedTextWriter.INDENT_STRING, "");
             }
             bui.append(s);
         }
@@ -523,7 +523,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         //out.println(Helper.joinStrings(outTraits, "\r\n\r\n"));
         out.println(bui.toString());
-        out.println(Graph.INDENT_STRING + "}");//class
+        out.println(HilightedTextWriter.INDENT_STRING + "}");//class
         out.flush();
         //Highlighting.doHighlight = true;
         try {

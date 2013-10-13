@@ -34,10 +34,10 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
@@ -327,7 +327,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                     lastDecompiled = sc.text;
                     lastASM = asm;
                     stripped = lastDecompiled;
-                    decompiledEditor.setText(asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), lastDecompiled, Graph.INDENT_STRING) + asm.getActionSourceSuffix());
+                    decompiledEditor.setText(asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), lastDecompiled, HilightedTextWriter.INDENT_STRING) + asm.getActionSourceSuffix());
                 }
                 setEditMode(false);
                 setDecompiledEditMode(false);
@@ -608,7 +608,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             decompiledEditor.getCaret().setVisible(true);
             decLabel.setIcon(View.getIcon("editing16"));
         } else {
-            String newText = pref + Helper.indentRows(lastASM.getActionSourceIndent(), lastDecompiled, Graph.INDENT_STRING) + lastASM.getActionSourceSuffix();
+            String newText = pref + Helper.indentRows(lastASM.getActionSourceIndent(), lastDecompiled, HilightedTextWriter.INDENT_STRING) + lastASM.getActionSourceSuffix();
             decompiledEditor.setText(newText);
             if (lastLine > -1) {
                 decompiledEditor.gotoLine(lastLine + prefLines + 1);

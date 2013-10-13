@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class LocalData {
 
+    public static LocalData empty = new LocalData();
     public ConstantPool constants;
     public com.jpexs.decompiler.flash.abc.avm2.ConstantPool constantsAvm2;
     public HashMap<Integer, String> localRegNames;

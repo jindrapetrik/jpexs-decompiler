@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -151,7 +150,7 @@ public class TryActionItem extends ActionItem implements Block {
         String catchName = null;
         if (catchExceptions != null) {
             if (!catchExceptions.isEmpty()) {
-                catchName = catchExceptions.get(0).toStringNoQuotes(false, LocalData.create(new ConstantPool(asGenerator.getConstantPool())));
+                catchName = catchExceptions.get(0).toStringNoQuotes(LocalData.create(new ConstantPool(asGenerator.getConstantPool())));
             }
 
         }

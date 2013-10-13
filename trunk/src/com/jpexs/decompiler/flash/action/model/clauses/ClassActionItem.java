@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -85,11 +84,11 @@ public class ClassActionItem extends ActionItem implements Block {
         }
         Set<String> allMembers = new HashSet<>();
         for (GraphTargetItem it : allUsages) {
-            allMembers.add(it.toStringNoQuotes(false, null));
+            allMembers.add(it.toStringNoQuotes(LocalData.empty));
         }
         uninitializedVars.addAll(allMembers);
         for (MyEntry<GraphTargetItem, GraphTargetItem> v : vars) {
-            String s = v.key.toStringNoQuotes(false, null);
+            String s = v.key.toStringNoQuotes(LocalData.empty);
             if (uninitializedVars.contains(s)) {
                 uninitializedVars.remove(s);
             }

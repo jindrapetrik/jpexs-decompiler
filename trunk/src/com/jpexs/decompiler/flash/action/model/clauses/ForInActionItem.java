@@ -31,8 +31,8 @@ import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.LoopWithType;
 import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
@@ -65,6 +65,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
+        writer.startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
         writer.append("loop" + loop.id + ":").newLine();
         writer.append("for(");
         if ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber)) {
@@ -81,7 +82,9 @@ public class ForInActionItem extends LoopActionItem implements Block {
         }
         writer.unindent();
         writer.append("}").newLine();
-        return writer.append(":loop" + loop.id);
+        writer.append(":loop" + loop.id);
+        writer.endLoop(loop.id);
+        return writer;
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
@@ -46,7 +47,6 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -298,11 +298,11 @@ public class TagNode {
                             String res;
                             ASMSource asm = ((ASMSource) node.tag);
                             if (isPcode) {
-                                res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), asm.getASMSource(SWF.DEFAULT_VERSION, false, false, null), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
+                                res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), asm.getASMSource(SWF.DEFAULT_VERSION, false, false, null), HilightedTextWriter.INDENT_STRING) + asm.getActionSourceSuffix();
                             } else {
                                 List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                                 Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                                res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Action.actionsToSource(as, SWF.DEFAULT_VERSION, ""/*FIXME*/, false), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
+                                res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Action.actionsToSource(as, SWF.DEFAULT_VERSION, ""/*FIXME*/, false), HilightedTextWriter.INDENT_STRING) + asm.getActionSourceSuffix();
                             }
                             try (FileOutputStream fos = new FileOutputStream(f)) {
                                 fos.write(res.getBytes("utf-8"));

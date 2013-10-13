@@ -51,7 +51,7 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
         writer.append(")").newLine();
         writer.append("{").newLine();
         writer.indent();
-        writer.appendNoHilight(Graph.graphToString(actions, writer.getIsHighlighted(), false, localData));
+        Graph.graphToString(actions, writer, false, localData);
         writer.unindent();
         return writer.append("}");
     }

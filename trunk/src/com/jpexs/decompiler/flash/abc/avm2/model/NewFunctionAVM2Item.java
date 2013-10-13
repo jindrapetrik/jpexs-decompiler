@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 public class NewFunctionAVM2Item extends AVM2Item {

@@ -2139,15 +2139,6 @@ public class Graph {
      * String used to unindent line when converting to string
      */
     public static final String INDENTCLOSE = "INDENTCLOSE";
-    public static final String INDENT_STRING = "   ";
-
-    private static String tabString(int len) {
-        String ret = "";
-        for (int i = 0; i < len; i++) {
-            ret += INDENT_STRING;
-        }
-        return ret;
-    }
 
     /**
      * Converts list of TreeItems to string
@@ -2156,50 +2147,19 @@ public class Graph {
      * @param localData
      * @return String
      */
-    public static String graphToString(List<GraphTargetItem> tree, boolean highlight, boolean replaceIndents, LocalData localData) {
-        HilightedTextWriter writer = new HilightedTextWriter(highlight);
+    public static HilightedTextWriter graphToString(List<GraphTargetItem> tree, HilightedTextWriter writer, boolean replaceIndents, LocalData localData) {
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();
             }
         }
-        String[] parts = writer.toString().split("\r\n");
-        StringBuilder ret = new StringBuilder();
+        return writer;
+    }
 
+    public static String removeNonRefenrencedLoopLabels(String source) {
+        String[] parts = source.split("\r\n");
         String labelPattern = "loop(switch)?[0-9]*:";
-        try {
-            Stack<String> loopStack = new Stack<>();
-            for (int p = 0; p < parts.length; p++) {
-                String stripped = Highlighting.stripHilights(parts[p]);
-                if (stripped.matches(labelPattern)) {
-                    loopStack.add(stripped.substring(0, stripped.length() - 1));
-                }
-                if (stripped.startsWith("break ")) {
-                    if (stripped.equals("break " + loopStack.peek().replace("switch", "") + ";")) {
-                        parts[p] = parts[p].replace(" " + loopStack.peek().replace("switch", ""), "");
-                    }
-                }
-                if (stripped.startsWith("continue ")) {
-                    if (loopStack.size() > 0) {
-                        int pos = loopStack.size() - 1;
-                        String loopname = "";
-                        do {
-                            loopname = loopStack.get(pos);
-                            pos--;
-                        } while ((pos >= 0) && (loopname.startsWith("loopswitch")));
-                        if (stripped.equals("continue " + loopname + ";")) {
-                            parts[p] = parts[p].replace(" " + loopname, "");
-                        }
-                    }
-                }
-                if (stripped.startsWith(":")) {
-                    loopStack.pop();
-                }
-            }
-        } catch (Exception ex) {
-        }
-
-        int level = 0;
+        StringBuilder ret = new StringBuilder();
         for (int p = 0; p < parts.length; p++) {
             String strippedP = Highlighting.stripHilights(parts[p]).trim();
             if (strippedP.matches(labelPattern)) {//endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
@@ -2226,20 +2186,8 @@ public class Graph {
             if (strippedP.startsWith(":")) {
                 continue;
             }
-            strippedP = Highlighting.stripHilights(parts[p]).trim();
 
-            if (replaceIndents) {
-                if (strippedP.equals(INDENTOPEN)) {
-                    level++;
-                    continue;
-                }
-                if (strippedP.equals(INDENTCLOSE)) {
-                    level--;
-                    continue;
-                }
-            }
-            ret.append(tabString(level));
-            ret.append(parts[p].trim());
+            ret.append(parts[p]);
             ret.append("\r\n");
         }
         return ret.toString();

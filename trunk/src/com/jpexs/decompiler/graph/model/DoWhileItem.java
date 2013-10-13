@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.LoopWithType;
 import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
@@ -51,6 +51,7 @@ public class DoWhileItem extends LoopItem implements Block {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
+        writer.startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
         writer.append("loop" + loop.id + ":").newLine();
         writer.append("do").newLine();
         writer.append("{").newLine();
@@ -75,7 +76,9 @@ public class DoWhileItem extends LoopItem implements Block {
         }
         
         writer.append(");").newLine();
-        return writer.append(":loop" + loop.id);
+        writer.append(":loop" + loop.id);
+        writer.endLoop(loop.id);
+        return writer;
     }
 
     @Override

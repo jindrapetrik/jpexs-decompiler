@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -129,7 +130,13 @@ public class MethodBody implements Cloneable, Serializable {
                 s += Helper.timedCall(new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return toSource(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, hilight, replaceIndents, fullyQualifiedNames, initTraits);
+                        HilightedTextWriter writer = new HilightedTextWriter(hilight);
+                        toSource(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, replaceIndents, fullyQualifiedNames, initTraits);
+                        String s = writer.toString();
+                        if (replaceIndents) {
+                            s = Graph.removeNonRefenrencedLoopLabels(s);
+                        }
+                        return s;
                     }
                 }, timeout, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
@@ -140,7 +147,7 @@ public class MethodBody implements Cloneable, Serializable {
         return s;
     }
 
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, boolean replaceIndents, List<String> fullyQualifiedNames, Traits initTraits) {
+    public HilightedTextWriter toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, HilightedTextWriter writer, boolean replaceIndents, List<String> fullyQualifiedNames, Traits initTraits) {
         AVM2Code deobfuscated = null;
         MethodBody b = (MethodBody) Helper.deepCopy(this);
         deobfuscated = b.code;
@@ -153,17 +160,11 @@ public class MethodBody implements Cloneable, Serializable {
             }
         }
         //deobfuscated.restoreControlFlow(constants, b);
-        //try {
-        String s = deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, replaceIndents, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
-        s = s.trim();
-        if (s.equals("")) {
-            s = " ";
-        }
-        if (hilight) {
-            s = Highlighting.hilighMethod(s, this.method_info);
-        }
 
-        return s;
+        writer.startMethod(this.method_info);
+        deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, writer, replaceIndents, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
+        writer.endMethod();
+        return writer;
     }
 
     @Override

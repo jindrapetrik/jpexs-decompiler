@@ -1341,13 +1341,15 @@ public class AVM2Code implements Serializable {
     public String tabString(int len) {
         StringBuilder ret = new StringBuilder();
         for (int i = 0; i < len; i++) {
-            ret.append(Graph.INDENT_STRING);
+            ret.append(HilightedTextWriter.INDENT_STRING);
         }
         return ret.toString();
     }
 
     public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
-        return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, body, false, true, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, staticOperation, localRegAssigmentIps, refs);
+        HilightedTextWriter writer = new HilightedTextWriter(false);
+        toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, body, writer, true, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, staticOperation, localRegAssigmentIps, refs);
+        return writer.toString();
     }
 
     public int getRegisterCount() {
@@ -1417,7 +1419,7 @@ public class AVM2Code implements Serializable {
         ignoredIns = new ArrayList<>();
     }
 
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, boolean hilighted, boolean replaceIndents, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
+    public HilightedTextWriter toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, HilightedTextWriter writer, boolean replaceIndents, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
         initToSource();
         List<GraphTargetItem> list;
         String s;
@@ -1434,7 +1436,7 @@ public class AVM2Code implements Serializable {
             if (ex2 instanceof OutOfMemoryError) {
                 System.gc();
             }
-            return "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error type: " + ex2.getClass().getSimpleName() + "\r\n */\r\nthrow new IllegalOperationError(\"Not decompiled due to error\");\r\n";
+            return writer.append("/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error type: " + ex2.getClass().getSimpleName() + "\r\n */\r\nthrow new IllegalOperationError(\"Not decompiled due to error\");\r\n");
         }
         if (initTraits != null) {
             for (int i = 0; i < list.size(); i++) {
@@ -1482,7 +1484,7 @@ public class AVM2Code implements Serializable {
             }
             list = newList;
             if (list.isEmpty()) {
-                return "";
+                return writer;
             }
         }
         //Declarations
@@ -1532,9 +1534,9 @@ public class AVM2Code implements Serializable {
             list.remove(lastPos);
         }
 
-        s = Graph.graphToString(list, hilighted, replaceIndents, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+        Graph.graphToString(list, writer, replaceIndents, LocalData.create(constants, localRegNames, fullyQualifiedNames));
 
-        return s;
+        return writer;
     }
 
     public void removeInstruction(int pos, MethodBody body) {

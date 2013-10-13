@@ -39,7 +39,7 @@ public class ActionDefineLocal extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop();
         GraphTargetItem name = stack.pop();
-        variables.put(name.toStringNoQuotes(false, LocalData.create(null)), value);
+        variables.put(name.toStringNoQuotes(LocalData.empty), value);
         output.add(new DefineLocalActionItem(this, name, value));
     }
 }

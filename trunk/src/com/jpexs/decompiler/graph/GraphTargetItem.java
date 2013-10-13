@@ -84,12 +84,12 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, LocalData localData) {
-        writer.addOffset(src, pos);
+        writer.startOffset(src, pos);
         appendTo(writer, localData);
         if (needsSemicolon()) { 
             writer.append(";");
         }
-        writer.removeOffset();
+        writer.endOffset();
         return writer;
     }
 
@@ -103,9 +103,9 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
-        writer.addOffset(src, pos);
+        writer.startOffset(src, pos);
         appendTo(writer, localData);
-        writer.removeOffset();
+        writer.endOffset();
         return writer;
     }
 
@@ -144,16 +144,16 @@ public abstract class GraphTargetItem implements Serializable {
         return null;
     }
 
-    public String toStringNoQuotes(boolean highlight, LocalData localData) {
-        HilightedTextWriter writer = new HilightedTextWriter(highlight);
+    public String toStringNoQuotes(LocalData localData) {
+        HilightedTextWriter writer = new HilightedTextWriter(false);
         toStringNoQuotes(writer, localData);
         return writer.toString();
     }
 
     public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, LocalData localData) {
-        writer.addOffset(src, pos);
+        writer.startOffset(src, pos);
         appendToNoQuotes(writer, localData);
-        writer.removeOffset();
+        writer.endOffset();
         return writer;
     }
 
@@ -174,12 +174,12 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public HilightedTextWriter toStringNL(HilightedTextWriter writer, LocalData localData) {
-        writer.addOffset(src, pos);
+        writer.startOffset(src, pos);
         appendTo(writer, localData);
         if (needsNewLine()) {
             writer.newLine();
         }
-        writer.removeOffset();
+        writer.endOffset();
         return writer;
     }
 

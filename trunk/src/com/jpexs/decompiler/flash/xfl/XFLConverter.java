@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
@@ -89,7 +90,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Helper;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
@@ -1113,7 +1113,7 @@ public class XFLConverter {
 
     private static String convertActionScript(ASMSource as) {
         String decompiledAS = Action.actionsToSource(as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString(), false);
-        return as.getActionSourcePrefix() + Helper.indentRows(as.getActionSourceIndent(), decompiledAS, Graph.INDENT_STRING) + as.getActionSourceSuffix();
+        return as.getActionSourcePrefix() + Helper.indentRows(as.getActionSourceIndent(), decompiledAS, HilightedTextWriter.INDENT_STRING) + as.getActionSourceSuffix();
     }
 
     private static long getTimestamp() {

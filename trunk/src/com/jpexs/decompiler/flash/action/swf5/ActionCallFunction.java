@@ -45,7 +45,7 @@ public class ActionCallFunction extends Action {
             args.add(stack.pop());
         }
         CallFunctionActionItem cft = new CallFunctionActionItem(this, functionName, args);
-        cft.calculatedFunction = functions.get(functionName.toStringNoQuotes(false, LocalData.create(null)));
+        cft.calculatedFunction = functions.get(functionName.toStringNoQuotes(LocalData.empty));
         stack.push(cft);
     }
 }

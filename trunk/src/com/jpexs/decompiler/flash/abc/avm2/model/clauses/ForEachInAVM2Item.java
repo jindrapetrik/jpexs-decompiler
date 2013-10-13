@@ -20,8 +20,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.LoopWithType;
 import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
@@ -71,6 +71,7 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
+        writer.startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
         writer.append("loop" + loop.id + ":").newLine();
         writer.append("for each (");
         expression.toString(writer, localData);
@@ -85,6 +86,7 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
         writer.unindent();
         writer.append("}").newLine();
         writer.append(":loop" + loop.id);
+        writer.endLoop(loop.id);
         return writer;
     }
 

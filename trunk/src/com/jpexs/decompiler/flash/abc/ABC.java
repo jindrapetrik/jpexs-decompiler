@@ -31,8 +31,8 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.*;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
-import com.jpexs.decompiler.graph.Graph;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -630,7 +630,7 @@ public class ABC {
         StringBuilder ret = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
             for (int t = 0; t < tabs; t++) {
-                ret.append(Graph.INDENT_STRING);
+                ret.append(HilightedTextWriter.INDENT_STRING);
             }
             ret.append(parts[i]);
             if (i < parts.length - 1) {

@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.Graph;
@@ -726,8 +727,10 @@ public class Action implements GraphSourceItem {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
 
                     List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
-
-                    return Graph.graphToString(tree, highlight, true, new LocalData());
+                    HilightedTextWriter writer = new HilightedTextWriter(highlight);
+                    Graph.graphToString(tree, writer, true, new LocalData());
+                    String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
+                    return s;
                 }
             }, timeout, TimeUnit.SECONDS);
         } catch (TimeoutException ex) {

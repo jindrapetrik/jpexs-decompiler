@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.Graph;
@@ -106,9 +107,9 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return valueStr;
     }
 
-    public String getNameValueStr(Trait parent, boolean highlight, ABC abc, List<String> fullyQualifiedNames) {
-        String valueStr = getValueStr(parent, highlight, abc, fullyQualifiedNames);
-        return getNameStr(highlight, abc, fullyQualifiedNames) + (valueStr == null ? "" : " = " + valueStr) + ";";
+    public String getNameValueStr(Trait parent, ABC abc, List<String> fullyQualifiedNames) {
+        String valueStr = getValueStr(parent, false, abc, fullyQualifiedNames);
+        return getNameStr(false, abc, fullyQualifiedNames) + (valueStr == null ? "" : " = " + valueStr) + ";";
     }
 
     public boolean isNamespace() {
@@ -145,7 +146,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
         if (valueStr != null) {
             ret += " = ";
-            int befLen = Highlighting.stripHilights(Graph.INDENT_STRING + Graph.INDENT_STRING + ret).length();
+            int befLen = Highlighting.stripHilights(HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + ret).length();
             String[] valueStrParts = valueStr.split("\r\n");
             boolean first = true;
             for (int i = 0; i < valueStrParts.length; i++) {
@@ -154,14 +155,14 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 }
                 if (Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTOPEN)) {
                     if (!first) {
-                        befLen += Graph.INDENT_STRING.length();
+                        befLen += HilightedTextWriter.INDENT_STRING.length();
                     }
                     ret += valueStrParts[i].replace(Graph.INDENTOPEN, ""); //there can be highlights!
                     continue;
                 }
                 if (Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTCLOSE)) {
                     if (!first) {
-                        befLen -= Graph.INDENT_STRING.length();
+                        befLen -= HilightedTextWriter.INDENT_STRING.length();
                     }
                     ret += valueStrParts[i].replace(Graph.INDENTCLOSE, ""); //there can be highlights!
                     continue;
@@ -176,7 +177,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 first = false;
             }
         }
-        ret = Graph.INDENT_STRING + Graph.INDENT_STRING + Highlighting.trim(ret) + ";";
+        ret = HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + Highlighting.trim(ret) + ";";
         return ret;
     }
 

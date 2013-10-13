@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.LoopWithType;
 import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
@@ -39,6 +39,7 @@ public class UniversalLoopItem extends LoopItem implements Block {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
+        writer.startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
         writer.append("loop" + loop.id + ":").newLine();
         writer.append("while(true)").newLine();
         writer.append("{").newLine();
@@ -51,6 +52,7 @@ public class UniversalLoopItem extends LoopItem implements Block {
         writer.unindent();
         writer.append("}").newLine();
         writer.append(":loop" + loop.id);
+        writer.endLoop(loop.id);
         return writer;
     }
 

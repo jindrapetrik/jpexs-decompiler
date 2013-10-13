@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.helpers.Helper;
 import java.util.Stack;
 
 /**
@@ -28,13 +28,14 @@ import java.util.Stack;
  */
 public class HilightedTextWriter {
     
+    public static final String INDENT_STRING = "   ";
     private StringBuilder sb = new StringBuilder();
     private boolean hilight;
+    private boolean newLine = true;
+    private int indent = 0;
     private Stack<GraphSourceItemPosition> offsets = new Stack<>();
+    private Stack<LoopWithType> loopStack = new Stack<>();
 
-    public HilightedTextWriter() {
-    }
-    
     public HilightedTextWriter(boolean hilight) {
         this.hilight = hilight;
     }
@@ -43,15 +44,75 @@ public class HilightedTextWriter {
         return hilight;
     }
 
-    public void addOffset(GraphSourceItem src, int pos) {
+    public HilightedTextWriter startOffset(GraphSourceItem src, int pos) {
         GraphSourceItemPosition itemPos = new GraphSourceItemPosition();
         itemPos.graphSourceItem = src;
         itemPos.position = pos;
         offsets.add(itemPos);
+        return this;
     }
     
-    public void removeOffset() {
+    public HilightedTextWriter endOffset() {
         offsets.pop();
+        return this;
+    }
+    
+    public HilightedTextWriter startMethod(long index) {
+        if (hilight) {
+            appendNoHilight(Highlighting.HLOPEN);
+            appendNoHilight(Helper.escapeString("type=method;index=" + index));
+            appendNoHilight(Highlighting.HLEND);
+        }
+        return this;
+    }
+    
+    public HilightedTextWriter endMethod() {
+        if (hilight) {
+            appendNoHilight(Highlighting.HLCLOSE);
+        }
+        return this;
+    }
+    
+    public HilightedTextWriter startLoop(long loopId, int loopType) {
+        LoopWithType loop = new LoopWithType();
+        loop.loopId = loopId;
+        loop.type = loopType;
+        loopStack.add(loop);
+        return this;
+    }
+    
+    public HilightedTextWriter endLoop(long loopId)  {
+        LoopWithType loopIdInStack = loopStack.pop();
+        if (loopId != loopIdInStack.loopId) {
+            throw new Error("LoopId mismatch");
+        }
+        return this;
+    }
+    
+    public long getLoop() {
+        if (loopStack.isEmpty()) {
+            return -1;
+        }
+        return loopStack.peek().loopId;
+    }
+    
+    public long getNonSwitchLoop() {
+        if (loopStack.isEmpty()) {
+            return -1;
+        }
+
+        int pos = loopStack.size() - 1;
+        LoopWithType loop;
+        do {
+            loop = loopStack.get(pos);
+            pos--;
+        } while ((pos >= 0) && (loop.type == LoopWithType.LOOP_TYPE_SWITCH));
+
+        if (loop.type == LoopWithType.LOOP_TYPE_SWITCH) {
+            return -1;
+        }
+
+        return loop.loopId;
     }
     
     public HilightedTextWriter append(String str) {
@@ -59,30 +120,31 @@ public class HilightedTextWriter {
         GraphSourceItem src = itemPos.graphSourceItem;
         int pos = itemPos.position;
         if (src != null && hilight) {
-            sb.append(Highlighting.hilighOffset(str, src.getOffset() + pos + 1));
+            appendToSb(Highlighting.hilighOffset(str, src.getOffset() + pos + 1));
         } else {
-            sb.append(str);
+            appendToSb(str);
         }
         return this;
     }
 
     public HilightedTextWriter appendNoHilight(String str) {
-        sb.append(str);
+        appendToSb(str);
         return this;
     }
 
     public HilightedTextWriter indent() {
-        append(Graph.INDENTOPEN).newLine();
+        indent++;
         return this;
     }
 
     public HilightedTextWriter unindent() {
-        append(Graph.INDENTCLOSE).newLine();
+        indent--;
         return this;
     }
 
     public HilightedTextWriter newLine() {
         sb.append("\r\n");
+        newLine = true;
         return this;
     }
 
@@ -100,5 +162,19 @@ public class HilightedTextWriter {
     
     public String toString() {
         return sb.toString();
+    }
+    
+    private void appendToSb(String str) {
+        if (newLine) {
+            newLine = false;
+            appendIndent();
+        }
+        sb.append(str);
+    }
+    
+    private void appendIndent() {
+        for (int i = 0; i < indent; i++) {
+            appendNoHilight(INDENT_STRING);
+        }
     }
 }

@@ -21,8 +21,11 @@ public class ContinueItem extends GraphTargetItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        writer.append("continue ");
-        return writer.append("loop" + loopId);
+        writer.append("continue");
+        if (loopId != writer.getNonSwitchLoop()) {
+            writer.append(" loop" + loopId);            
+        }
+        return writer;
     }
 
     @Override
