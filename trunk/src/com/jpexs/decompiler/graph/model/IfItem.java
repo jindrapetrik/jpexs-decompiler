@@ -81,18 +81,20 @@ public class IfItem extends GraphTargetItem implements Block {
                 ti.toStringSemicoloned(writer, localData).appendNewLine();
             }
         }
-        hilight(Graph.INDENTCLOSE + "\r\n", writer);
+        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
         hilight("}", writer);
         if (elseBranch.size() > 0) {
-            hilight("\r\nelse\r\n", writer);
-            hilight("{\r\n" + Graph.INDENTOPEN + "\r\n", writer);
+            writer.appendNewLine();
+            hilight("else", writer).appendNewLine();
+            hilight("{", writer).appendNewLine();
+            hilight(Graph.INDENTOPEN, writer).appendNewLine();
             for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData);
-                    hilight("\r\n", writer);
+                    ti.toStringSemicoloned(writer, localData).appendNewLine();
                 }
             }
-            hilight(Graph.INDENTCLOSE + "\r\n}", writer);
+            hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+            hilight("}", writer);
         }
         return writer;
     }

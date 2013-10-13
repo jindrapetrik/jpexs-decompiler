@@ -41,7 +41,7 @@ public class ConstructPropAVM2Item extends AVM2Item {
         hilight("new ", writer);
         int idx = writer.getLength();
         object.toString(writer, constants, localRegNames, fullyQualifiedNames);
-        if (idx > writer.getLength()) {
+        if (idx < writer.getLength()) {
             hilight(".", writer);
         }
         propertyName.toString(writer, constants, localRegNames, fullyQualifiedNames);
