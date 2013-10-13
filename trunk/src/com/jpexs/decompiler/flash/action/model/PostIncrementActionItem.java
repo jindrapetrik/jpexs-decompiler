@@ -53,7 +53,7 @@ public class PostIncrementActionItem extends ActionItem implements SetTypeAction
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         object.toString(writer, localData);
-        return hilight("++", writer);
+        return writer.append("++");
     }
 
     @Override

@@ -37,15 +37,15 @@ public class ConstructSuperAVM2Item extends AVM2Item {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (!object.toString(false, localData).equals("this")) {
             object.toString(writer, localData);
-            hilight(".", writer);
+            writer.append(".");
         }
-        hilight("super(", writer);
+        writer.append("super(");
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             args.get(a).toString(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 }

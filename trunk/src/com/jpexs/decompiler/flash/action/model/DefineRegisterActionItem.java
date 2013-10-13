@@ -36,7 +36,7 @@ public class DefineRegisterActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("var " + identifier, writer);
+        return writer.append("var " + identifier);
     }
 
     @Override

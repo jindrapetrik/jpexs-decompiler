@@ -38,10 +38,10 @@ public class NextNameAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("nextName(", writer);
+        writer.append("nextName(");
         index.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         obj.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 }

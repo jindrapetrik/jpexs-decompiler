@@ -43,16 +43,16 @@ public class WithAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("with(", writer);
+        writer.append("with(");
         scope.toString(writer, localData);
-        hilight(")", writer).appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append(")").newLine();
+        writer.append("{").newLine();
+        writer.indent();
         /*for (GraphTargetItem ti : items) {
          ret += ti.toString(constants, localRegNames, fullyQualifiedNames) + "\r\n";
          }*/
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        return hilight("}", writer);
+        writer.unindent();
+        return writer.append("}");
     }
 
     @Override

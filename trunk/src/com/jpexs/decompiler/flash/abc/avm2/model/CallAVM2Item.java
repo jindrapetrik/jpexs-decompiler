@@ -37,7 +37,7 @@ public class CallAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        /*String recPart = ""; receiver.toString(constants, localRegNames) + hilight(".", writer);
+        /*String recPart = ""; receiver.toString(constants, localRegNames) + writer.append(".");
          if (receiver instanceof NewActivationAVM2Item) {
          recPart = "";
          }
@@ -45,19 +45,19 @@ public class CallAVM2Item extends AVM2Item {
          recPart = "";
          }*/
         if (function.precedence > precedence) {
-            hilight("(", writer);
+            writer.append("(");
             function.toString(writer, localData);
-            hilight(")", writer);
+            writer.append(")");
         } else {
             function.toString(writer, localData);
         }
-        hilight("(", writer);
+        writer.append("(");
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             arguments.get(a).toString(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 }

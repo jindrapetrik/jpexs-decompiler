@@ -31,7 +31,7 @@ public class ThrowAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("throw ", writer);
+        writer.append("throw ");
         return value.toString(writer, localData);
     }
 }

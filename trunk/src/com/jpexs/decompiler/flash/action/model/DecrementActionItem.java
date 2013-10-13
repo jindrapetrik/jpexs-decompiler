@@ -46,7 +46,7 @@ public class DecrementActionItem extends ActionItem {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         object.toString(writer, localData);
-        return hilight(" - 1", writer);
+        return writer.append(" - 1");
     }
 
     @Override

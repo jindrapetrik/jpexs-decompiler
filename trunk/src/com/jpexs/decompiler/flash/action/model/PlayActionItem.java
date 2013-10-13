@@ -27,7 +27,7 @@ public class PlayActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("play()", writer);
+        return writer.append("play()");
     }
 
     public PlayActionItem(GraphSourceItem instruction) {

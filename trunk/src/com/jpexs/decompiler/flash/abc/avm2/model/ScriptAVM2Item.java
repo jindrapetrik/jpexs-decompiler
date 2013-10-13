@@ -34,6 +34,6 @@ public class ScriptAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("script" + scriptIndex, writer);
+        return writer.append("script" + scriptIndex);
     }
 }

@@ -79,7 +79,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (namespace != null) {
             namespace.toString(writer, localData);
-            hilight("::", writer);
+            writer.append("::");
         } else {
             /*Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
              if ((ns != null)&&(ns.name_index!=0)) {
@@ -87,13 +87,13 @@ public class FullMultinameAVM2Item extends AVM2Item {
              }*/
         }
         if (name != null) {
-            hilight("[", writer);
+            writer.append("[");
             name.toString(writer, localData);
-            hilight("]", writer);
+            writer.append("]");
         } else {
             ConstantPool constants = localData.constantsAvm2;
             List<String> fullyQualifiedNames = localData.fullyQualifiedNames;
-            hilight(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), writer);
+            writer.append(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
         }
         return writer;
     }

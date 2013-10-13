@@ -42,16 +42,16 @@ public class TellTargetActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("tellTarget(", writer);
+        writer.append("tellTarget(");
         target.toString(writer, localData);
-        hilight(")", writer).appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append(")").newLine();
+        writer.append("{").newLine();
+        writer.indent();
         for (GraphTargetItem ti : commands) {
-            ti.toString(writer, localData).appendNewLine();
+            ti.toString(writer, localData).newLine();
         }
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        return hilight("}", writer);
+        writer.unindent();
+        return writer.append("}");
     }
 
     @Override

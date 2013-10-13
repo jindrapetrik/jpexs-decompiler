@@ -71,30 +71,30 @@ public class IfItem extends GraphTargetItem implements Block {
                 elseBranch = onTrue;
             }
         }
-        hilight("if(", writer);
+        writer.append("if(");
         expr.toString(writer, localData);
-        hilight(")", writer).appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append(")").newLine();
+        writer.append("{").newLine();
+        writer.indent();
         for (GraphTargetItem ti : ifBranch) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).appendNewLine();
+                ti.toStringSemicoloned(writer, localData).newLine();
             }
         }
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        hilight("}", writer);
+        writer.unindent();
+        writer.append("}");
         if (elseBranch.size() > 0) {
-            writer.appendNewLine();
-            hilight("else", writer).appendNewLine();
-            hilight("{", writer).appendNewLine();
-            hilight(Graph.INDENTOPEN, writer).appendNewLine();
+            writer.newLine();
+            writer.append("else").newLine();
+            writer.append("{").newLine();
+            writer.indent();
             for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData).appendNewLine();
+                    ti.toStringSemicoloned(writer, localData).newLine();
                 }
             }
-            hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-            hilight("}", writer);
+            writer.unindent();
+            writer.append("}");
         }
         return writer;
     }

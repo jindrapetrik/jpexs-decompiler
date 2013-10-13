@@ -49,12 +49,12 @@ public class GetMemberActionItem extends ActionItem {
         if (!((memberName instanceof DirectValueActionItem) && (((DirectValueActionItem) memberName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
             object.toString(writer, localData);
-            hilight("[", writer);
+            writer.append("[");
             stripQuotes(memberName, localData, writer);
-            return hilight("]", writer);
+            return writer.append("]");
         }
         object.toString(writer, localData);
-        hilight(".", writer);
+        writer.append(".");
         return stripQuotes(memberName, localData, writer);
     }
 

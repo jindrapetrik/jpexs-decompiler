@@ -52,11 +52,11 @@ public class PrintAsBitmapNumActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("printAsBitmapNum(", writer);
+        writer.append("printAsBitmapNum(");
         num.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         boundingBox.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

@@ -31,9 +31,9 @@ public class GetURLActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("getUrl(\"", writer);
-        hilight(Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString), writer);
-        return hilight("\")", writer);
+        writer.append("getUrl(\"");
+        writer.append(Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString));
+        return writer.append("\")");
     }
 
     public GetURLActionItem(GraphSourceItem instruction, String urlString, String targetString) {

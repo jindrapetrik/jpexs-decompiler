@@ -34,9 +34,9 @@ public class TraceActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("trace(", writer);
+        writer.append("trace(");
         value.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

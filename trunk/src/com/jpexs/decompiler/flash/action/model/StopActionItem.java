@@ -27,7 +27,7 @@ public class StopActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("stop()", writer);
+        return writer.append("stop()");
     }
 
     public StopActionItem(GraphSourceItem instruction) {

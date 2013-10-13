@@ -37,7 +37,7 @@ public class ExtendsActionItem extends ActionItem {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         subclass.toString(writer, localData);
-        hilight(" extends ", writer);
+        writer.append(" extends ");
         return stripQuotes(superclass, localData, writer);
     }
 

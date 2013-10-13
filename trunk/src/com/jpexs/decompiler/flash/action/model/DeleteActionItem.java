@@ -47,12 +47,12 @@ public class DeleteActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("delete ", writer);
+        writer.append("delete ");
         if (object == null) {
             return propertyName.toString(writer, localData);
         }
         object.toString(writer, localData);
-        hilight(".", writer);
+        writer.append(".");
         return stripQuotes(propertyName, localData, writer);
     }
 

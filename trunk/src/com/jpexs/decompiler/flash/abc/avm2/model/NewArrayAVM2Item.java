@@ -33,13 +33,13 @@ public class NewArrayAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("[", writer);
+        writer.append("[");
         for (int a = 0; a < values.size(); a++) {
             if (a > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             values.get(a).toString(writer, localData);
         }
-        return hilight("]", writer);
+        return writer.append("]");
     }
 }

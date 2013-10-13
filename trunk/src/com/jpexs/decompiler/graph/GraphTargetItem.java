@@ -83,15 +83,11 @@ public abstract class GraphTargetItem implements Serializable {
         return ret;
     }
 
-    public HilightedTextWriter hilight(String str, HilightedTextWriter writer) {
-        return writer.append(str);
-    }
-
     public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, LocalData localData) {
         writer.addOffset(src, pos);
         appendTo(writer, localData);
         if (needsSemicolon()) { 
-            hilight(";", writer);
+            writer.append(";");
         }
         writer.removeOffset();
         return writer;
@@ -181,7 +177,7 @@ public abstract class GraphTargetItem implements Serializable {
         writer.addOffset(src, pos);
         appendTo(writer, localData);
         if (needsNewLine()) {
-            writer.appendNewLine();
+            writer.newLine();
         }
         writer.removeOffset();
         return writer;

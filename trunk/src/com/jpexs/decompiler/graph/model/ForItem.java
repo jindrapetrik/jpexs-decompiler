@@ -52,8 +52,8 @@ public class ForItem extends LoopItem implements Block {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("loop" + loop.id + ":", writer).appendNewLine();
-        hilight("for(", writer);
+        writer.append("loop" + loop.id + ":").newLine();
+        writer.append("for(");
         int p = 0;
         for (int i = 0; i < firstCommands.size(); i++) {
             if (firstCommands.get(i).isEmpty()) {
@@ -61,38 +61,38 @@ public class ForItem extends LoopItem implements Block {
             }
 
             if (p > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             firstCommands.get(i).toString(writer, localData);
             writer.stripSemicolon();
             p++;
         }
-        hilight(";", writer);
+        writer.append(";");
         expression.toString(writer, localData);
-        hilight(";", writer);
+        writer.append(";");
         p = 0;
         for (int i = 0; i < finalCommands.size(); i++) {
             if (finalCommands.get(i).isEmpty()) {
                 continue;
             }
             if (p > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             finalCommands.get(i).toString(writer, localData);
             writer.stripSemicolon();
             p++;
         }
-        hilight(")", writer).appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append(")").newLine();
+        writer.append("{").newLine();
+        writer.indent();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).appendNewLine();
+                ti.toStringSemicoloned(writer, localData).newLine();
             }
         }
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        hilight("}", writer).appendNewLine();
-        hilight(":loop" + loop.id, writer).appendNewLine();
+        writer.unindent();
+        writer.append("}").newLine();
+        writer.append(":loop" + loop.id).newLine();
         return writer;
     }
 

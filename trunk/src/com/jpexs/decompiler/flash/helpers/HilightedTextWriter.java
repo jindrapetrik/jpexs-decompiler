@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import java.util.Stack;
 
@@ -54,9 +55,6 @@ public class HilightedTextWriter {
     }
     
     public HilightedTextWriter append(String str) {
-        if (offsets.isEmpty()) {
-            System.out.println("WTF?");
-        }
         GraphSourceItemPosition itemPos = offsets.peek();
         GraphSourceItem src = itemPos.graphSourceItem;
         int pos = itemPos.position;
@@ -73,7 +71,17 @@ public class HilightedTextWriter {
         return this;
     }
 
-    public HilightedTextWriter appendNewLine() {
+    public HilightedTextWriter indent() {
+        append(Graph.INDENTOPEN).newLine();
+        return this;
+    }
+
+    public HilightedTextWriter unindent() {
+        append(Graph.INDENTCLOSE).newLine();
+        return this;
+    }
+
+    public HilightedTextWriter newLine() {
         sb.append("\r\n");
         return this;
     }

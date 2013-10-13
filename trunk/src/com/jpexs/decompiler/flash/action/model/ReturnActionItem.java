@@ -46,7 +46,7 @@ public class ReturnActionItem extends ActionItem implements ExitItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("return ", writer);
+        writer.append("return ");
         return value.toString(writer, localData);
     }
 

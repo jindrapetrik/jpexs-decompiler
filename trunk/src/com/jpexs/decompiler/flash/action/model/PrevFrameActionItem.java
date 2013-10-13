@@ -27,7 +27,7 @@ public class PrevFrameActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("prevFrame()", writer);
+        return writer.append("prevFrame()");
     }
 
     public PrevFrameActionItem(GraphSourceItem instruction) {

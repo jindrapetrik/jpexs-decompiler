@@ -34,9 +34,9 @@ public class RemoveSpriteActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("removeMovieClip(", writer);
+        writer.append("removeMovieClip(");
         value.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

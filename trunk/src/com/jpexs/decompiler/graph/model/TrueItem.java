@@ -16,7 +16,7 @@ public class TrueItem extends GraphTargetItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("true", writer);
+        return writer.append("true");
     }
 
     @Override

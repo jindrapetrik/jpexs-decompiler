@@ -83,16 +83,16 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
         if (!((objectName instanceof DirectValueActionItem) && (((DirectValueActionItem) objectName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
             object.toString(writer, localData);
-            hilight("[", writer);
+            writer.append("[");
             stripQuotes(objectName, localData, writer);
-            hilight("]", writer);
-            hilight(" = ", writer);
+            writer.append("]");
+            writer.append(" = ");
             return value.toString(writer, localData);
         }
         object.toString(writer, localData);
-        hilight(".", writer);
+        writer.append(".");
         stripQuotes(objectName, localData, writer);
-        hilight(" = ", writer);
+        writer.append(" = ");
         return value.toString(writer, localData);
     }
 

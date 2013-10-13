@@ -31,7 +31,7 @@ public class BooleanAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight(value ? "true" : "false", writer);
+        return writer.append(value ? "true" : "false");
     }
 
     @Override

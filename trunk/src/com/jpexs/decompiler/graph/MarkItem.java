@@ -34,7 +34,7 @@ public class MarkItem extends GraphTargetItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("//decompiler mark:" + mark, writer);
+        return writer.append("//decompiler mark:" + mark);
     }
 
     public String getMark() {

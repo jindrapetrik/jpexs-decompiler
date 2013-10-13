@@ -32,7 +32,7 @@ public class WithEndAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("}", writer);
+        return writer.append("}");
     }
 
     @Override

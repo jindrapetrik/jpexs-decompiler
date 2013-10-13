@@ -63,27 +63,27 @@ public class CallMethodActionItem extends ActionItem {
         }
         if (!blankMethod) {
             if (scriptObject.precedence > this.precedence) {
-                hilight("(", writer);
+                writer.append("(");
                 scriptObject.toString(writer, localData);
-                hilight(")", writer);
+                writer.append(")");
             } else {
                 scriptObject.toString(writer, localData);
             }
-            hilight(".", writer);
+            writer.append(".");
             stripQuotes(methodName, localData, writer);
         } else {
             scriptObject.toString(writer, localData);
         }
-        hilight("(", writer);
+        writer.append("(");
 
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             arguments.get(t).toStringNL(writer, localData);
         }
         
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

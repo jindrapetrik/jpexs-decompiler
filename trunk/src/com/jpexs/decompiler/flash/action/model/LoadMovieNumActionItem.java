@@ -61,11 +61,11 @@ public class LoadMovieNumActionItem extends ActionItem {
         if (method == 2) {
             methodStr = ",\"POST\"";
         }
-        hilight("loadMovieNum(", writer);
+        writer.append("loadMovieNum(");
         urlString.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         num.toString(writer, localData);
-        return hilight(methodStr + ")", writer);
+        return writer.append(methodStr + ")");
     }
 
     @Override

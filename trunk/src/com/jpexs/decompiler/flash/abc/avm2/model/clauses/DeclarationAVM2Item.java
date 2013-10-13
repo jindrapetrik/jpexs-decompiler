@@ -55,20 +55,20 @@ public class DeclarationAVM2Item extends AVM2Item {
             if (lti.value instanceof ConvertAVM2Item) {
                 type = ((ConvertAVM2Item) lti.value).type;
             }
-            hilight("var ", writer);
-            hilight(localRegName(localData.localRegNames, lti.regIndex) + ":" + type + " = ", writer);
+            writer.append("var ");
+            writer.append(localRegName(localData.localRegNames, lti.regIndex) + ":" + type + " = ");
             return lti.value.toString(writer, localData);
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
-            hilight("var ", writer);
+            writer.append("var ");
             ssti.getName(writer, localData);
-            hilight(":", writer);
-            hilight(type, writer);
-            hilight(" = ", writer);
+            writer.append(":");
+            writer.append(type);
+            writer.append(" = ");
             return ssti.value.toString(writer, localData);
         }
-        hilight("var ", writer);
+        writer.append("var ");
         return assignment.toString(writer, localData);
     }
 }

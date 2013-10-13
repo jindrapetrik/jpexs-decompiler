@@ -52,11 +52,11 @@ public class PrintNumActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("printNum(", writer);
+        writer.append("printNum(");
         num.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         boundingBox.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

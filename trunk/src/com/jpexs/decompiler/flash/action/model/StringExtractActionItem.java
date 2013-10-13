@@ -41,11 +41,11 @@ public class StringExtractActionItem extends ActionItem {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         value.toString(writer, localData);
-        hilight(".substr(", writer);
+        writer.append(".substr(");
         index.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         count.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

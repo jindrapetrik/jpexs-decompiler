@@ -41,18 +41,18 @@ public class CallSuperAVM2Item extends AVM2Item {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (!receiver.toString(false, localData).equals("this")) {
             receiver.toString(writer, localData);
-            hilight(".", writer);
+            writer.append(".");
         }
-        hilight("super.", writer);
+        writer.append("super.");
         multiname.toString(writer, localData);
-        hilight("(", writer);
+        writer.append("(");
         String args = "";
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             arguments.get(a).toString(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 }

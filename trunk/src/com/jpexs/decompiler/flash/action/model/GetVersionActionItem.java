@@ -36,7 +36,7 @@ public class GetVersionActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("getVersion()", writer);
+        return writer.append("getVersion()");
     }
 
     @Override

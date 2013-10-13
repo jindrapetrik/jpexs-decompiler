@@ -27,7 +27,7 @@ public class NextFrameActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("nextFrame()", writer);
+        return writer.append("nextFrame()");
     }
 
     public NextFrameActionItem(GraphSourceItem instruction) {

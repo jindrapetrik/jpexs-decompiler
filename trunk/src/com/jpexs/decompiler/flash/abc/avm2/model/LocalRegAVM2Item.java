@@ -51,7 +51,7 @@ public class LocalRegAVM2Item extends AVM2Item {
         if (computedValue instanceof FilterAVM2Item) {
             return computedValue.toString(writer, localData);
         }
-        return hilight(localRegName(localData.localRegNames, regIndex), writer);
+        return writer.append(localRegName(localData.localRegNames, regIndex));
     }
 
     @Override

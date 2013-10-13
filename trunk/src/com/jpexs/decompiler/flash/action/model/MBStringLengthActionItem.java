@@ -35,15 +35,15 @@ public class MBStringLengthActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("mblength(", writer);
+        writer.append("mblength(");
         if (value.precedence > precedence) {
-            hilight("(", writer);
+            writer.append("(");
             value.toString(writer, localData);
-            hilight(")", writer);
+            writer.append(")");
         } else {
             value.toString(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

@@ -61,11 +61,11 @@ public class NewMethodActionItem extends ActionItem {
             }
         }
         if (!blankMethod) {
-            hilight("new ", writer);
+            writer.append("new ");
         }
         scriptObject.toString(writer, localData);
         if (!blankMethod) {
-            hilight(".", writer);
+            writer.append(".");
             if (methodName instanceof DirectValueActionItem) {
                 if (((DirectValueActionItem) methodName).value instanceof Undefined) {
                 } else if (((DirectValueActionItem) methodName).value instanceof String) {
@@ -77,14 +77,14 @@ public class NewMethodActionItem extends ActionItem {
                 methodName.toString(writer, localData);
             }
         }
-        hilight("(", writer);
+        writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             arguments.get(t).toString(writer, localData);
         }
-        return hilight(")", writer);        
+        return writer.append(")");        
     }
 
     @Override

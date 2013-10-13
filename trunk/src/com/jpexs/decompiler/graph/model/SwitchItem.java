@@ -53,44 +53,44 @@ public class SwitchItem extends LoopItem implements Block {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("loopswitch" + loop.id + ":", writer).appendNewLine();
-        hilight("switch(", writer);
+        writer.append("loopswitch" + loop.id + ":").newLine();
+        writer.append("switch(");
         switchedObject.toString(writer, localData);
-        hilight(")", writer).appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append(")").newLine();
+        writer.append("{").newLine();
+        writer.indent();
         for (int i = 0; i < caseCommands.size(); i++) {
             for (int k = 0; k < valuesMapping.size(); k++) {
                 if (valuesMapping.get(k) == i) {
-                    hilight("case ", writer);
+                    writer.append("case ");
                     caseValues.get(k).toString(writer, localData);
-                    hilight(":", writer).appendNewLine();
+                    writer.append(":").newLine();
                 }
             }
-            hilight(Graph.INDENTOPEN, writer).appendNewLine();
+            writer.indent();
             for (int j = 0; j < caseCommands.get(i).size(); j++) {
                 if (!caseCommands.get(i).get(j).isEmpty()) {
-                    caseCommands.get(i).get(j).toStringSemicoloned(writer, localData).appendNewLine();
+                    caseCommands.get(i).get(j).toStringSemicoloned(writer, localData).newLine();
                 }
             }
-            hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+            writer.unindent();
         }
         if (defaultCommands != null) {
             if (defaultCommands.size() > 0) {
-                hilight("default", writer);
-                hilight(":", writer).appendNewLine();
-                hilight(Graph.INDENTOPEN, writer).appendNewLine();
+                writer.append("default");
+                writer.append(":").newLine();
+                writer.indent();
                 for (int j = 0; j < defaultCommands.size(); j++) {
                     if (!defaultCommands.get(j).isEmpty()) {
-                        defaultCommands.get(j).toStringSemicoloned(writer, localData).appendNewLine();
+                        defaultCommands.get(j).toStringSemicoloned(writer, localData).newLine();
                     }
                 }
-                hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+                writer.unindent();
             }
         }
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        hilight("}", writer).appendNewLine();
-        hilight(":loop" + loop.id, writer);
+        writer.unindent();
+        writer.append("}").newLine();
+        writer.append(":loop" + loop.id);
         return writer;
     }
 

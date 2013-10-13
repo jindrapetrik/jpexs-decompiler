@@ -34,9 +34,9 @@ public class MBAsciiToCharActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("mbchr(", writer);
+        writer.append("mbchr(");
         value.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

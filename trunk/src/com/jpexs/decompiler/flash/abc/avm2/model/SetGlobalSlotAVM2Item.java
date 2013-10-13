@@ -40,9 +40,9 @@ public class SetGlobalSlotAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("setglobalslot(" + slotId + ",", writer);
+        writer.append("setglobalslot(" + slotId + ",");
         value.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

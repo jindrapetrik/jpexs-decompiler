@@ -32,7 +32,7 @@ public class IncrementAVM2Item extends AVM2Item {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         value.toString(writer, localData);
-        return hilight("+1", writer);
+        return writer.append("+1");
     }
 
     @Override

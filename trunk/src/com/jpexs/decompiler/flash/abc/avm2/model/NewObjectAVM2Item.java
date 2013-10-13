@@ -35,28 +35,28 @@ public class NewObjectAVM2Item extends AVM2Item {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         boolean singleLine = pairs.size() < 2;
         if (!singleLine) {
-            writer.appendNewLine();
-            hilight(Graph.INDENTOPEN, writer).appendNewLine();
+            writer.newLine();
+            writer.indent();
         }
-        hilight("{", writer);
+        writer.append("{");
         if (!singleLine) {
-            writer.appendNewLine();
-            hilight(Graph.INDENTOPEN, writer).appendNewLine();
+            writer.newLine();
+            writer.indent();
         }
         for (int n = 0; n < pairs.size(); n++) {
             if (n > 0) {
-                hilight(",", writer).appendNewLine();
+                writer.append(",").newLine();
             }
             pairs.get(n).toString(writer, localData);
         }
         if (!singleLine) {
-            writer.appendNewLine();
-            hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+            writer.newLine();
+            writer.unindent();
         }
-        hilight("}", writer);
+        writer.append("}");
         if (!singleLine) {
-            writer.appendNewLine();
-            hilight(Graph.INDENTCLOSE, writer).appendNewLine();
+            writer.newLine();
+            writer.unindent();
         }
         return writer;
     }

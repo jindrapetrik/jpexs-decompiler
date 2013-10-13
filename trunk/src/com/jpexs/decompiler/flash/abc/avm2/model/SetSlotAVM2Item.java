@@ -45,7 +45,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         getName(writer, localData);
-        hilight(" = ", writer);
+        writer.append(" = ");
         return value.toString(writer, localData);
     }
 
@@ -62,9 +62,9 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
          }
          }*/
         if (slotName == null) {
-            return hilight("/*UnknownSlot*/", writer);
+            return writer.append("/*UnknownSlot*/");
         }
-        return hilight(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames), writer);
+        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames));
     }
 
     @Override

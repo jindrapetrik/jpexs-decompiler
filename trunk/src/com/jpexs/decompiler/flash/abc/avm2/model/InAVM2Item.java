@@ -35,7 +35,7 @@ public class InAVM2Item extends AVM2Item {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         object.toString(writer, localData);
-        hilight(" in ", writer);
+        writer.append(" in ");
         return collection.toString(writer, localData);
     }
 }

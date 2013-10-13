@@ -77,31 +77,31 @@ public class FunctionActionItem extends ActionItem {
         if (true) {
             //return writer.appendNoHilight("<func>")
         }
-        hilight("function", writer);
+        writer.append("function");
         if (calculatedFunctionName != null) {
-            hilight(" ", writer);
+            writer.append(" ");
             calculatedFunctionName.toStringNoQuotes(writer, localData);
         } else if (!functionName.equals("")) {
-            hilight(" ", writer);
-            hilight(functionName, writer);
+            writer.append(" ");
+            writer.append(functionName);
         }
-        hilight("(", writer);
+        writer.append("(");
         for (int p = 0; p < paramNames.size(); p++) {
             if (p > 0) {
-                hilight(", ", writer);
+                writer.append(", ");
             }
             String pname = paramNames.get(p);
             if (pname == null || pname.equals("")) {
                 pname = new RegisterNumber(regStart + p).translate();
             }
-            hilight(pname, writer);
+            writer.append(pname);
         }
-        hilight(")", writer).appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append(")").newLine();
+        writer.append("{").newLine();
+        writer.indent();
         writer.appendNoHilight(Graph.graphToString(actions, writer.getIsHighlighted(), false, localData));
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        return hilight("}", writer);
+        writer.unindent();
+        return writer.append("}");
     }
 
     @Override

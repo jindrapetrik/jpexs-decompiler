@@ -35,9 +35,9 @@ public class GotoLabelActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("gotoAndStop(\"", writer);
-        hilight(Helper.escapeString(label), writer);
-        return hilight("\")", writer);
+        writer.append("gotoAndStop(\"");
+        writer.append(Helper.escapeString(label));
+        return writer.append("\")");
     }
 
     @Override

@@ -35,7 +35,7 @@ public class CodeStats {
     public InstructionStats[] instructionStats;
 
     public HilightedTextWriter toString(HilightedTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
-        writer.appendNoHilight("Stats: maxstack=" + maxstack + ", maxscope=" + maxscope + ", maxlocal=" + maxlocal).appendNewLine();
+        writer.appendNoHilight("Stats: maxstack=" + maxstack + ", maxscope=" + maxscope + ", maxlocal=" + maxlocal).newLine();
         int i = 0;
         int ms = 0;
         for (InstructionStats stats : instructionStats) {
@@ -43,7 +43,7 @@ public class CodeStats {
             if (stats.stackpos > ms) {
                 ms = stats.stackpos;
             }
-            writer.appendNoHilight(i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(writer, LocalData.create(abc.constants, null, fullyQualifiedNames))).appendNewLine();
+            writer.appendNoHilight(i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(writer, LocalData.create(abc.constants, null, fullyQualifiedNames))).newLine();
             i++;
         }
         return writer;

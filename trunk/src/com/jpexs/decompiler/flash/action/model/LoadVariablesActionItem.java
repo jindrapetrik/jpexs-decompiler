@@ -59,11 +59,11 @@ public class LoadVariablesActionItem extends ActionItem {
         if (method == 2) {
             methodStr = ",\"POST\"";
         }
-        hilight("loadVariables(", writer);
+        writer.append("loadVariables(");
         urlString.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         targetString.toString(writer, localData);
-        return hilight(methodStr + ")", writer);
+        return writer.append(methodStr + ")");
     }
 
     @Override

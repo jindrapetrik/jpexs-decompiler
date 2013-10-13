@@ -21,8 +21,8 @@ public class BreakItem extends GraphTargetItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("break ", writer);
-        return hilight("loop" + loopId, writer);
+        writer.append("break ");
+        return writer.append("loop" + loopId);
     }
 
     @Override

@@ -65,23 +65,23 @@ public class ForInActionItem extends LoopActionItem implements Block {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("loop" + loop.id + ":", writer).appendNewLine();
-        hilight("for(", writer);
+        writer.append("loop" + loop.id + ":").newLine();
+        writer.append("for(");
         if ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber)) {
-            hilight("var ", writer);
+            writer.append("var ");
         }
         stripQuotes(variableName, localData, writer);
-        hilight(" in ", writer);
+        writer.append(" in ");
         enumVariable.toString(writer, localData);
-        hilight(")", writer).appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append(")").newLine();
+        writer.append("{").newLine();
+        writer.indent();
         for (GraphTargetItem ti : commands) {
-            ti.toStringSemicoloned(writer, localData).appendNewLine();
+            ti.toStringSemicoloned(writer, localData).newLine();
         }
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        hilight("}", writer).appendNewLine();
-        return hilight(":loop" + loop.id, writer);
+        writer.unindent();
+        writer.append("}").newLine();
+        return writer.append(":loop" + loop.id);
     }
 
     @Override

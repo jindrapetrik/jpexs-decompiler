@@ -37,10 +37,10 @@ public class ImplementsOpActionItem extends ActionItem {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         subclass.toString(writer, localData);
-        hilight(" implements ", writer);
+        writer.append(" implements ");
         for (int i = 0; i < superclasses.size(); i++) {
             if (i > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             superclasses.get(i).toString(writer, localData);
         }

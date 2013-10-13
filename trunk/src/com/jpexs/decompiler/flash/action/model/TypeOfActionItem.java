@@ -36,9 +36,9 @@ public class TypeOfActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("typeof(", writer);
+        writer.append("typeof(");
         value.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

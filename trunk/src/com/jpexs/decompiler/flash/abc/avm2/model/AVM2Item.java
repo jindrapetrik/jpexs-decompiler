@@ -56,9 +56,9 @@ public abstract class AVM2Item extends GraphTargetItem {
 
         if (!empty) {
             if (object.precedence > PRECEDENCE_PRIMARY) {
-                hilight("(", writer);
+                writer.append("(");
                 object.toString(writer, localData);
-                hilight(")", writer);
+                writer.append(")");
                 empty = false;
             } else {
                 int writerLength = writer.getLength();
@@ -76,13 +76,13 @@ public abstract class AVM2Item extends GraphTargetItem {
             if (((FullMultinameAVM2Item) propertyName).name != null) {
                 return propertyName.toString(writer, localData);
             } else {
-                hilight(".", writer);
+                writer.append(".");
                 return propertyName.toString(writer, localData);
             }
         } else {
-            hilight("[", writer);
+            writer.append("[");
             propertyName.toString(writer, localData);
-            return hilight("]", writer);
+            return writer.append("]");
         }
     }
 

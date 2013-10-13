@@ -36,8 +36,8 @@ public class GetSlotAVM2Item extends AVM2Item {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (slotName == null) {
-            return hilight("/*UnknownSlot*/", writer);
+            return writer.append("/*UnknownSlot*/");
         }
-        return hilight(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames), writer);
+        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames));
     }
 }

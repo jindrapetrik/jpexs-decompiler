@@ -712,7 +712,7 @@ public class AVM2Code implements Serializable {
         for (AVM2Instruction instruction : code) {
             writer.appendNoHilight(Helper.formatAddress(i));
             writer.appendNoHilight(" ");
-            instruction.toString(writer, localData).appendNewLine();
+            instruction.toString(writer, localData).newLine();
             i++;
         }
         return writer;

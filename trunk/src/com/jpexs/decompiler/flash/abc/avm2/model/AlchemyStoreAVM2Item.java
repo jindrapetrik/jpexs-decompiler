@@ -39,10 +39,10 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("op_" + name + "(", writer);
+        writer.append("op_" + name + "(");
         ofs.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         value.toString(writer, localData);
-        return hilight(") /*Alchemy*/", writer);
+        return writer.append(") /*Alchemy*/");
     }
 }

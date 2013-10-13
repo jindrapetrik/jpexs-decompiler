@@ -35,17 +35,17 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight(operator, writer);
+        writer.append(operator);
         if (value != null) {
             if (value.precedence > precedence) {
-                hilight("(", writer);
+                writer.append("(");
                 value.toString(writer, localData);
-                hilight(")", writer);
+                writer.append(")");
             } else {
                 value.toString(writer, localData);
             }
         } else {
-            hilight("null", writer);            
+            writer.append("null");            
         }
         return writer;
     }

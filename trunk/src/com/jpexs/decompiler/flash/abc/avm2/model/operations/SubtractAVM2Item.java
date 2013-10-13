@@ -38,19 +38,19 @@ public class SubtractAVM2Item extends BinaryOpItem {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (rightSide.precedence >= precedence) { // >=  add or subtract too
             if (leftSide.precedence > precedence) {
-                hilight("(", writer);
+                writer.append("(");
                 leftSide.toString(writer, localData);
-                hilight(")", writer);
+                writer.append(")");
             } else {
                 leftSide.toString(writer, localData);
             }
-            hilight(" ", writer);
-            hilight(operator, writer);
-            hilight(" ", writer);
+            writer.append(" ");
+            writer.append(operator);
+            writer.append(" ");
 
-            hilight("(", writer);
+            writer.append("(");
             rightSide.toString(writer, localData);
-            return hilight(")", writer);
+            return writer.append(")");
         } else {
             return super.appendTo(writer, localData);
         }

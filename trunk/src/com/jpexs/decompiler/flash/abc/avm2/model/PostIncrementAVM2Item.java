@@ -34,7 +34,7 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         object.toString(writer, localData);
-        return hilight("++", writer);
+        return writer.append("++");
     }
 
     @Override

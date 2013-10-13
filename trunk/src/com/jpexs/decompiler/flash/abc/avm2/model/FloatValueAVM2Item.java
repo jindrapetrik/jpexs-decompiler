@@ -31,7 +31,7 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("" + value, writer);
+        return writer.append("" + value);
     }
 
     @Override

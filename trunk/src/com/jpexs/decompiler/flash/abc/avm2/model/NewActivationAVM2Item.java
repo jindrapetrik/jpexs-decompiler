@@ -32,6 +32,6 @@ public class NewActivationAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("newactivation()", writer);
+        return writer.append("newactivation()");
     }
 }

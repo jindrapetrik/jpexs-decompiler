@@ -34,9 +34,9 @@ public class GotoFrameActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("gotoAndStop(", writer);
-        hilight("" + (frame + 1), writer);
-        return hilight(")", writer);
+        writer.append("gotoAndStop(");
+        writer.append("" + (frame + 1));
+        return writer.append(")");
     }
 
     @Override

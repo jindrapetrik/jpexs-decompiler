@@ -37,19 +37,19 @@ public class ApplyTypeAVM2Item extends AVM2Item {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         object.toString(writer, localData);
         if (!params.isEmpty()) {
-            hilight(".<", writer);
+            writer.append(".<");
             for (int i = 0; i < params.size(); i++) {
                 if (i > 0) {
-                    hilight(",", writer);
+                    writer.append(",");
                 }
                 GraphTargetItem p = params.get(i);
                 if (p instanceof NullAVM2Item) {
-                    hilight("*", writer);
+                    writer.append("*");
                 } else {
                     p.toString(writer, localData);
                 }
             }
-            hilight(">", writer);
+            writer.append(">");
         }
         return writer;
     }

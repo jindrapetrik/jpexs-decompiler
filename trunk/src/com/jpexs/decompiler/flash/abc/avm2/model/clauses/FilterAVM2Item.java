@@ -40,8 +40,8 @@ public class FilterAVM2Item extends AVM2Item {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         collection.toString(writer, localData);
-        hilight(".(", writer);
+        writer.append(".(");
         expression.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 }

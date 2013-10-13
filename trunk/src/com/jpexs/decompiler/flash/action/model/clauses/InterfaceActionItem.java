@@ -44,22 +44,22 @@ public class InterfaceActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("interface ", writer);
+        writer.append("interface ");
         name.toStringNoQuotes(writer, localData);
         boolean first = true;
         if (!superInterfaces.isEmpty()) {
-            hilight(" extends ", writer);
+            writer.append(" extends ");
         }
         for (GraphTargetItem ti : superInterfaces) {
             if (!first) {
-                hilight(", ", writer);
+                writer.append(", ");
             }
             first = false;
             Action.getWithoutGlobal(ti).toStringNoQuotes(writer, localData);
         }
-        writer.appendNewLine();
-        hilight("{", writer).appendNewLine();
-        return hilight("}", writer).appendNewLine();
+        writer.newLine();
+        writer.append("{").newLine();
+        return writer.append("}").newLine();
     }
 
     @Override

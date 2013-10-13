@@ -50,13 +50,13 @@ public class MBStringExtractActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("mbsubstring(", writer);
+        writer.append("mbsubstring(");
         value.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         index.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         count.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

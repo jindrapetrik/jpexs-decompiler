@@ -38,9 +38,9 @@ public class TernarOpItem extends GraphTargetItem {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         expression.toString(writer, localData);
-        hilight("?", writer);
+        writer.append("?");
         onTrue.toString(writer, localData);
-        hilight(":", writer);
+        writer.append(":");
         onFalse.toString(writer, localData);
         return writer;
     }

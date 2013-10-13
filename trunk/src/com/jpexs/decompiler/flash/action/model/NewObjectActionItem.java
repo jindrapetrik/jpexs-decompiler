@@ -47,16 +47,16 @@ public class NewObjectActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("new ", writer);
+        writer.append("new ");
         stripQuotes(objectName, localData, writer);
-        hilight("(", writer);
+        writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             arguments.get(t).toString(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

@@ -34,9 +34,9 @@ public class SetTargetActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("tellTarget(\"", writer);
-        hilight(Helper.escapeString(target), writer);
-        return hilight("\")", writer);
+        writer.append("tellTarget(\"");
+        writer.append(Helper.escapeString(target));
+        return writer.append("\")");
     }
 
     @Override

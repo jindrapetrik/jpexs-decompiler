@@ -52,7 +52,7 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
     protected HilightedTextWriter stripQuotes(GraphTargetItem target, LocalData localData, HilightedTextWriter writer) {
         if (target instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) target).value instanceof String) {
-                return ((DirectValueActionItem) target).hilight((String) ((DirectValueActionItem) target).value, writer);
+                return writer.append((String) ((DirectValueActionItem) target).value);
             }
         }
         if (target == null) {

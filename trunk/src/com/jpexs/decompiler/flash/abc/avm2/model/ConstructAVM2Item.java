@@ -36,18 +36,18 @@ public class ConstructAVM2Item extends AVM2Item {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (object instanceof NewFunctionAVM2Item) {
-            hilight("new ", writer);
+            writer.append("new ");
             return object.toString(writer, localData);
         }
-        hilight("new ", writer);
+        writer.append("new ");
         object.toString(writer, localData);
-        hilight("(", writer);
+        writer.append("(");
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             args.get(a).toString(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 }

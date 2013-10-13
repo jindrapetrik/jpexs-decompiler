@@ -39,7 +39,7 @@ public class XMLAVM2Item extends AVM2Item {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         for (GraphTargetItem part : parts) {
             if (part instanceof StringAVM2Item) {
-                hilight(((StringAVM2Item) part).value, writer);
+                writer.append(((StringAVM2Item) part).value);
             } else {
                 part.toString(writer, localData);
             }

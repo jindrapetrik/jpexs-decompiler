@@ -27,7 +27,7 @@ public class ToggleHighQualityActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("toggleHighQuality()", writer);
+        return writer.append("toggleHighQuality()");
     }
 
     public ToggleHighQualityActionItem(GraphSourceItem instruction) {

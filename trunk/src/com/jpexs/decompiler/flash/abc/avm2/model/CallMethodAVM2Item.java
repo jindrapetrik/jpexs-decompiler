@@ -38,15 +38,15 @@ public class CallMethodAVM2Item extends AVM2Item {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         receiver.toString(writer, localData);
-        hilight(".", writer);
-        hilight(methodName, writer);
-        hilight("(", writer);
+        writer.append(".");
+        writer.append(methodName);
+        writer.append("(");
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             arguments.get(a).toString(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 }

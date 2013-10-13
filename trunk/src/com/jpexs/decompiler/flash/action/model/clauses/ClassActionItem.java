@@ -157,62 +157,62 @@ public class ClassActionItem extends ActionItem implements Block {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("class ", writer);
+        writer.append("class ");
         className.toStringNoQuotes(writer, localData);
         if (extendsOp != null) {
-            hilight(" extends ", writer);
+            writer.append(" extends ");
             extendsOp.toStringNoQuotes(writer, localData);
         }
         if (!implementsOp.isEmpty()) {
-            hilight(" implements ", writer);
+            writer.append(" implements ");
             boolean first = true;
             for (GraphTargetItem t : implementsOp) {
                 if (!first) {
-                    hilight(", ", writer);
+                    writer.append(", ");
                 }
                 first = false;
                 Action.getWithoutGlobal(t).toString(writer, localData);
             }
         }
-        writer.appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.newLine();
+        writer.append("{").newLine();
+        writer.indent();
 
         if (constructor != null) {
-            constructor.toString(writer, localData).appendNewLine();
+            constructor.toString(writer, localData).newLine();
         }
 
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : vars) {
-            hilight("var ", writer);
+            writer.append("var ");
             item.key.toStringNoQuotes(writer, localData);
-            hilight(" = ", writer);
+            writer.append(" = ");
             item.value.toString(writer, localData);
-            hilight(";", writer).appendNewLine();
+            writer.append(";").newLine();
         }
         for (String v : uninitializedVars) {
-            hilight("var ", writer);
-            hilight(v, writer);
-            hilight(";", writer).appendNewLine();
+            writer.append("var ");
+            writer.append(v);
+            writer.append(";").newLine();
         }
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : staticVars) {
-            hilight("static var ", writer);
+            writer.append("static var ");
             item.key.toStringNoQuotes(writer, localData);
-            hilight(" = ", writer);
+            writer.append(" = ");
             item.value.toString(writer, localData);
-            hilight(";", writer).appendNewLine();
+            writer.append(";").newLine();
         }
 
 
         for (GraphTargetItem f : functions) {
-            f.toString(writer, localData).appendNewLine();
+            f.toString(writer, localData).newLine();
         }
         for (GraphTargetItem f : staticFunctions) {
-            hilight("static ", writer);
-            f.toString(writer, localData).appendNewLine();
+            writer.append("static ");
+            f.toString(writer, localData).newLine();
         }
 
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        return hilight("}", writer).appendNewLine();
+        writer.unindent();
+        return writer.append("}").newLine();
     }
 
     @Override

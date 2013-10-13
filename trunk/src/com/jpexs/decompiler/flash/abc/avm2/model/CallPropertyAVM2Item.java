@@ -40,13 +40,13 @@ public class CallPropertyAVM2Item extends AVM2Item {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         formatProperty(writer, receiver, propertyName, localData);
-        hilight("(", writer);
+        writer.append("(");
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             arguments.get(a).toString(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 }

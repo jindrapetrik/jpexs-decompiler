@@ -35,7 +35,7 @@ public class GetDescendantsAVM2Item extends AVM2Item {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         object.toString(writer, localData);
-        hilight("..", writer);
+        writer.append("..");
         return multiname.toString(writer, localData);
     }
 }

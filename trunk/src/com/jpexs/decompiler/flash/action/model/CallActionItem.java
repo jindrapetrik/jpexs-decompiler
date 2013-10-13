@@ -34,9 +34,9 @@ public class CallActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("call(", writer);
+        writer.append("call(");
         stripQuotes(value, localData, writer);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

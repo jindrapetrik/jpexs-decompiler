@@ -50,13 +50,13 @@ public class CloneSpriteActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("duplicateMovieClip(", writer);
+        writer.append("duplicateMovieClip(");
         target.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         source.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         depth.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

@@ -73,9 +73,9 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
             value.toString(writer, localData);
         } else {
             if (define) {
-                hilight("var ", writer);
+                writer.append("var ");
             }
-            hilight(register.translate() + " = ", writer); 
+            writer.append(register.translate() + " = "); 
             value.toString(writer, localData);
         }
         return writer;

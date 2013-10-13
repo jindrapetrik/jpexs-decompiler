@@ -40,7 +40,7 @@ public class CommaExpressionItem extends GraphTargetItem {
         boolean first = true;
         for (GraphTargetItem t : commands) {
             if (!first) {
-                hilight(", ", writer);
+                writer.append(", ");
             }
             t.toString(writer, localData);
             first = false;

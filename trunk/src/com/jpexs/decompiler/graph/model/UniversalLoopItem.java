@@ -39,18 +39,18 @@ public class UniversalLoopItem extends LoopItem implements Block {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("loop" + loop.id + ":", writer).appendNewLine();
-        hilight("while(true)", writer).appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append("loop" + loop.id + ":").newLine();
+        writer.append("while(true)").newLine();
+        writer.append("{").newLine();
+        writer.indent();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).appendNewLine();
+                ti.toStringSemicoloned(writer, localData).newLine();
             }
         }
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        hilight("}", writer).appendNewLine();
-        hilight(":loop" + loop.id, writer);
+        writer.unindent();
+        writer.append("}").newLine();
+        writer.append(":loop" + loop.id);
         return writer;
     }
 

@@ -73,11 +73,11 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (isEmptyString(target)) {
-            hilight(Action.propertyNames[propertyIndex] + " = ", writer);
+            writer.append(Action.propertyNames[propertyIndex] + " = ");
             return value.toString(writer, localData);
         }
         target.toString(writer, localData);
-        hilight("." + Action.propertyNames[propertyIndex] + " = ", writer);
+        writer.append("." + Action.propertyNames[propertyIndex] + " = ");
         return value.toString(writer, localData);
     }
 

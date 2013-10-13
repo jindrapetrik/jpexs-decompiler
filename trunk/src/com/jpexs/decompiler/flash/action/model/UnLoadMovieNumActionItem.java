@@ -50,9 +50,9 @@ public class UnLoadMovieNumActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("unloadMovieNum(", writer);
+        writer.append("unloadMovieNum(");
         num.toString(writer, localData);
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

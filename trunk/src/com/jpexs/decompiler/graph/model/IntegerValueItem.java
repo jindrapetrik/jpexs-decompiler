@@ -35,7 +35,7 @@ public class IntegerValueItem extends GraphTargetItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("" + intValue, writer);
+        return writer.append("" + intValue);
     }
 
     @Override

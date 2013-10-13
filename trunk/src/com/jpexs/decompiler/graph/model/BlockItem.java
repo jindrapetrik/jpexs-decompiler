@@ -38,12 +38,12 @@ public class BlockItem extends GraphTargetItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append("{").newLine();
+        writer.indent();
         writer.appendNoHilight(Graph.graphToString(commands, writer.getIsHighlighted(), false, localData));
-        writer.appendNewLine();
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        return hilight("}", writer);
+        writer.newLine();
+        writer.unindent();
+        return writer.append("}");
     }
 
     @Override

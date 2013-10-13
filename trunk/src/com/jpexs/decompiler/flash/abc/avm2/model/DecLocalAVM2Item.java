@@ -31,7 +31,7 @@ public class DecLocalAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight(localRegName(localData.localRegNames, regIndex), writer);
-        return hilight("--", writer);
+        writer.append(localRegName(localData.localRegNames, regIndex));
+        return writer.append("--");
     }
 }

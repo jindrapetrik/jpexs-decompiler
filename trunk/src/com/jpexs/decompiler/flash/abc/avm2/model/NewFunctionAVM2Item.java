@@ -41,17 +41,17 @@ public class NewFunctionAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("function" + (!functionName.equals("") ? " " + functionName : ""), writer);
+        writer.append("function" + (!functionName.equals("") ? " " + functionName : ""));
         boolean highlight = writer.getIsHighlighted();
         String mhead = "(" + (highlight ? paramStr : Highlighting.stripHilights(paramStr)) + "):" + (highlight ? returnStr : Highlighting.stripHilights(returnStr));
         writer.appendNoHilight(writer.getIsHighlighted() ? Highlighting.hilighMethod(mhead, methodIndex) : mhead);
-        writer.appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.newLine();
+        writer.append("{").newLine();
+        writer.indent();
         writer.appendNoHilight((writer.getIsHighlighted() ? functionBody : Highlighting.stripHilights(functionBody)));
-        writer.appendNewLine();
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        hilight("}", writer);
+        writer.newLine();
+        writer.unindent();
+        writer.append("}");
         return writer;
     }
 }

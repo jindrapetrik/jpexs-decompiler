@@ -49,13 +49,13 @@ public class FSCommand2ActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("FSCommand2(", writer);
+        writer.append("FSCommand2(");
         command.toString(writer, localData);
         for (int t = 0; t < arguments.size(); t++) {
-            hilight(",", writer);
+            writer.append(",");
             arguments.get(t).toString(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

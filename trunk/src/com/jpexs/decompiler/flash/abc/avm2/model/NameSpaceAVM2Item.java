@@ -33,9 +33,9 @@ public class NameSpaceAVM2Item extends AVM2Item {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (namespaceIndex == 0) {
-            return hilight("*", writer);
+            return writer.append("*");
         }
         ConstantPool constants = localData.constantsAvm2;
-        return hilight(constants.constant_namespace[namespaceIndex].toString(constants), writer);
+        return writer.append(constants.constant_namespace[namespaceIndex].toString(constants));
     }
 }

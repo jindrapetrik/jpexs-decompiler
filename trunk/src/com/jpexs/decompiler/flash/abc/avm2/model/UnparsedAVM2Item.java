@@ -31,6 +31,6 @@ public class UnparsedAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight(value, writer);
+        return writer.append(value);
     }
 }

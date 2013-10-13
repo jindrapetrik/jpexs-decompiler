@@ -71,14 +71,14 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (name instanceof DirectValueActionItem || name instanceof GetVariableActionItem) {
             stripQuotes(name, localData, writer);
-            hilight(" = ", writer);
+            writer.append(" = ");
             return value.toString(writer, localData);
         } else {
-            hilight("set(", writer);
+            writer.append("set(");
             name.toString(writer, localData);
-            hilight(",", writer);
+            writer.append(",");
             value.toString(writer, localData);
-            return hilight(")", writer);
+            return writer.append(")");
         }
     }
 

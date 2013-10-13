@@ -49,21 +49,21 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (leftSide.getPrecedence() > precedence) {
-            hilight("(", writer);
+            writer.append("(");
             leftSide.toString(writer, localData);
-            hilight(")", writer);
+            writer.append(")");
         } else {
             leftSide.toString(writer, localData);
         }
 
-        hilight(" ", writer);
-        hilight(operator, writer);
-        hilight(" ", writer);
+        writer.append(" ");
+        writer.append(operator);
+        writer.append(" ");
 
         if (rightSide.getPrecedence() > precedence) {
-            hilight("(", writer);
+            writer.append("(");
             rightSide.toString(writer, localData);
-            hilight(")", writer);
+            writer.append(")");
         } else {
             rightSide.toString(writer, localData);
         }

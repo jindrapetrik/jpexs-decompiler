@@ -42,7 +42,7 @@ public class EnumerateActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("enumerate ", writer);
+        writer.append("enumerate ");
         return object.toString(writer, localData);
     }
 

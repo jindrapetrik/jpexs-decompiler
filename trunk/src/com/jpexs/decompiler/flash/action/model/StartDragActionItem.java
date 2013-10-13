@@ -55,21 +55,21 @@ public class StartDragActionItem extends ActionItem {
                 hasConstrains = false;
             }
         }
-        hilight("startDrag(", writer);
+        writer.append("startDrag(");
         target.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         lockCenter.toString(writer, localData);
         if (hasConstrains) {
-            hilight(",", writer);
+            writer.append(",");
             x1.toString(writer, localData);
-            hilight(",", writer);
+            writer.append(",");
             y1.toString(writer, localData);
-            hilight(",", writer);
+            writer.append(",");
             x2.toString(writer, localData);
-            hilight(",", writer);
+            writer.append(",");
             y2.toString(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

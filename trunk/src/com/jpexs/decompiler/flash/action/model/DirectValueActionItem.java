@@ -90,21 +90,21 @@ public class DirectValueActionItem extends ActionItem {
     protected HilightedTextWriter appendToNoQuotes(HilightedTextWriter writer, LocalData localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
-                return hilight("0", writer);
+                return writer.append("0");
             }
         }
         if (value instanceof Float) {
             if (Float.compare((float) (Float) value, 0) == 0) {
-                return hilight("0", writer);
+                return writer.append("0");
             }
         }
         if (value instanceof String) {
-            return hilight((String) value, writer);
+            return writer.append((String) value);
         }
         if (value instanceof ConstantIndex) {
-            return hilight(this.constants.get(((ConstantIndex) value).index), writer);
+            return writer.append(this.constants.get(((ConstantIndex) value).index));
         }
-        return hilight(value.toString(), writer);
+        return writer.append(value.toString());
     }
 
     public String toStringNoH(ConstantPool constants) {
@@ -131,24 +131,24 @@ public class DirectValueActionItem extends ActionItem {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
-                return hilight("0", writer);
+                return writer.append("0");
             }
         }
         if (value instanceof Float) {
             if (Float.compare((float) (Float) value, 0) == 0) {
-                return hilight("0", writer);
+                return writer.append("0");
             }
         }
         if (value instanceof String) {
-            return hilight("\"" + Helper.escapeString((String) value) + "\"", writer);
+            return writer.append("\"" + Helper.escapeString((String) value) + "\"");
         }
         if (value instanceof ConstantIndex) {
-            return hilight("\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"", writer);
+            return writer.append("\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"");
         }
         if (value instanceof RegisterNumber) {
-            return hilight(((RegisterNumber) value).translate(), writer);
+            return writer.append(((RegisterNumber) value).translate());
         }
-        return hilight(value.toString(), writer);
+        return writer.append(value.toString());
     }
 
     @Override

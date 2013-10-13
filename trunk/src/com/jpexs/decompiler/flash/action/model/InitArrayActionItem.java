@@ -44,14 +44,14 @@ public class InitArrayActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("[", writer);
+        writer.append("[");
         for (int i = 0; i < values.size(); i++) {
             if (i > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             values.get(i).toString(writer, localData);
         }
-        return hilight("]", writer);
+        return writer.append("]");
     }
 
     @Override

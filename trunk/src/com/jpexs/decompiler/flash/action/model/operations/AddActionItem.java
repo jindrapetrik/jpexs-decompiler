@@ -41,18 +41,18 @@ public class AddActionItem extends BinaryOpItem {
         if (rightSide.precedence >= precedence) { //string + vs number +
             String ret = "";
             if (leftSide.precedence > precedence) {
-                hilight("(", writer);
+                writer.append("(");
                 leftSide.toString(writer, localData);
-                hilight(")", writer);
+                writer.append(")");
             } else {
                 leftSide.toString(writer, localData);
             }
-            hilight(" ", writer);
-            hilight(operator, writer);
-            hilight(" ", writer);
-            hilight("(", writer);
+            writer.append(" ");
+            writer.append(operator);
+            writer.append(" ");
+            writer.append("(");
             rightSide.toString(writer, localData);
-            return hilight(")", writer);
+            return writer.append(")");
         } else {
             return super.appendTo(writer, localData);
         }

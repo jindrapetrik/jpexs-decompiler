@@ -50,11 +50,11 @@ public class GetURL2ActionItem extends ActionItem {
             methodStr = ",\"POST\"";
         }
 
-        hilight("getURL(", writer);
+        writer.append("getURL(");
         urlString.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         targetString.toString(writer, localData);
-        return hilight(methodStr + ")", writer);
+        return writer.append(methodStr + ")");
     }
 
     public GetURL2ActionItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem targetString, int method) {

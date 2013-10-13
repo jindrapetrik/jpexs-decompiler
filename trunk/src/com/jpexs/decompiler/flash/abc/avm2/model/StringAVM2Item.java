@@ -32,7 +32,7 @@ public class StringAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("\"" + Helper.escapeString(value) + "\"", writer);
+        return writer.append("\"" + Helper.escapeString(value) + "\"");
     }
 
     @Override

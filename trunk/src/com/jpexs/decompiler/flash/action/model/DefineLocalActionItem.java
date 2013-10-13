@@ -71,12 +71,12 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("var ", writer);
+        writer.append("var ");
         stripQuotes(name, localData, writer);
         if (value == null) {
             return writer;
         }
-        hilight(" = ", writer);
+        writer.append(" = ");
         return value.toString(writer, localData);
     }
 

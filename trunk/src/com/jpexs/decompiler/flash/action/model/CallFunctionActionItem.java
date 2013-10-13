@@ -46,14 +46,14 @@ public class CallFunctionActionItem extends ActionItem {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         String paramStr = "";
         stripQuotes(functionName, localData, writer);
-        hilight("(", writer);
+        writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
-                hilight(",", writer);
+                writer.append(",");
             }
             arguments.get(t).toStringNL(writer, localData);
         }
-        return hilight(")", writer);
+        return writer.append(")");
     }
 
     @Override

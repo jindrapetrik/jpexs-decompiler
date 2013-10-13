@@ -60,44 +60,44 @@ public class TryActionItem extends ActionItem implements Block {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("try", writer).appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append("try").newLine();
+        writer.append("{").newLine();
+        writer.indent();
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).appendNewLine();
+                ti.toStringSemicoloned(writer, localData).newLine();
             }
         }
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        hilight("}", writer);
+        writer.unindent();
+        writer.append("}");
         for (int e = 0; e < catchExceptions.size(); e++) {
-            writer.appendNewLine();
-            hilight("catch(", writer);
+            writer.newLine();
+            writer.append("catch(");
             catchExceptions.get(e).toStringNoQuotes(writer, localData);
-            hilight(")", writer).appendNewLine();
-            hilight("{", writer).appendNewLine();
-            hilight(Graph.INDENTOPEN, writer).appendNewLine();
+            writer.append(")").newLine();
+            writer.append("{").newLine();
+            writer.indent();
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData).appendNewLine();
+                    ti.toStringSemicoloned(writer, localData).newLine();
                 }
             }
-            hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-            hilight("}", writer);
+            writer.unindent();
+            writer.append("}");
         }
         if (finallyCommands.size() > 0) {
-            writer.appendNewLine();
-            hilight("finally", writer).appendNewLine();
-            hilight("{", writer).appendNewLine();
-            hilight(Graph.INDENTOPEN, writer).appendNewLine();
+            writer.newLine();
+            writer.append("finally").newLine();
+            writer.append("{").newLine();
+            writer.indent();
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData).appendNewLine();
+                    ti.toStringSemicoloned(writer, localData).newLine();
                 }
             }
-            hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-            hilight("}", writer);
+            writer.unindent();
+            writer.append("}");
         }
         return writer;
     }

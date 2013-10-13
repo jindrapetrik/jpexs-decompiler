@@ -36,8 +36,8 @@ public class EscapeXElemAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("{", writer);
+        writer.append("{");
         expression.toString(writer, localData);
-        return hilight("}", writer);
+        return writer.append("}");
     }
 }

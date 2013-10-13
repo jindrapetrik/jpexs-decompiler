@@ -32,7 +32,7 @@ public class GetTimeActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("getTimer()", writer);
+        return writer.append("getTimer()");
     }
 
     @Override

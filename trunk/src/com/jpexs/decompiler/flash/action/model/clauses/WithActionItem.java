@@ -49,16 +49,16 @@ public class WithActionItem extends ActionItem {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         String ret;
-        hilight("with(", writer);
+        writer.append("with(");
         scope.toString(writer, localData);
-        hilight(")", writer).appendNewLine();
-        hilight("{", writer).appendNewLine();
-        hilight(Graph.INDENTOPEN, writer).appendNewLine();
+        writer.append(")").newLine();
+        writer.append("{").newLine();
+        writer.indent();
         for (GraphTargetItem ti : items) {
-            ti.toString(writer, localData).appendNewLine();
+            ti.toString(writer, localData).newLine();
         }
-        hilight(Graph.INDENTCLOSE, writer).appendNewLine();
-        return hilight("}", writer);
+        writer.unindent();
+        return writer.append("}");
     }
 
     @Override

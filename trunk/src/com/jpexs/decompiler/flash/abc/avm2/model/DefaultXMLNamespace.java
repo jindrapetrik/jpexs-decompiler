@@ -36,7 +36,7 @@ public class DefaultXMLNamespace extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("default xml namespace = ", writer);
+        writer.append("default xml namespace = ");
         return ns.toString(writer, localData);
     }
 }

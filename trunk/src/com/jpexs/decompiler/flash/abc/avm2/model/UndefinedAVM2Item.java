@@ -29,7 +29,7 @@ public class UndefinedAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("undefined", writer);
+        return writer.append("undefined");
     }
 
     @Override

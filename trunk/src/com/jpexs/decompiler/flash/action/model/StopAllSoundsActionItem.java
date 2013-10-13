@@ -27,7 +27,7 @@ public class StopAllSoundsActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("stopAllSounds()", writer);
+        return writer.append("stopAllSounds()");
     }
 
     public StopAllSoundsActionItem(GraphSourceItem instruction) {

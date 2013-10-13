@@ -47,9 +47,9 @@ public class CastOpActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("(", writer);
+        writer.append("(");
         stripQuotes(constructor, localData, writer);
-        hilight(")", writer);
+        writer.append(")");
         return object.toString(writer, localData);
     }
 

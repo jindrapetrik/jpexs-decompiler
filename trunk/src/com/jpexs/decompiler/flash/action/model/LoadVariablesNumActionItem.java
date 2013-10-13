@@ -61,11 +61,11 @@ public class LoadVariablesNumActionItem extends ActionItem {
         if (method == 2) {
             methodStr = ",\"POST\"";
         }
-        hilight("loadVariablesNum(", writer);
+        writer.append("loadVariablesNum(");
         urlString.toString(writer, localData);
-        hilight(",", writer);
+        writer.append(",");
         num.toString(writer, localData);
-        return hilight(methodStr + ")", writer);
+        return writer.append(methodStr + ")");
     }
 
     @Override

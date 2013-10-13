@@ -54,10 +54,10 @@ public class GotoFrame2ActionItem extends ActionItem {
         if (playFlag) {
             prefix = "gotoAndPlay";
         }
-        hilight(prefix + "(", writer);
+        writer.append(prefix + "(");
         frame.toString(writer, localData);
-        hilight((sceneBiasFlag ? "," + sceneBias : ""), writer);
-        return hilight(")", writer);
+        writer.append((sceneBiasFlag ? "," + sceneBias : ""));
+        return writer.append(")");
     }
 
     @Override

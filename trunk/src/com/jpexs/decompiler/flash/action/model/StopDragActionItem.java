@@ -27,7 +27,7 @@ public class StopDragActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("stopDrag()", writer);
+        return writer.append("stopDrag()");
     }
 
     public StopDragActionItem(GraphSourceItem instruction) {

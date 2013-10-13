@@ -32,6 +32,6 @@ public class GetLexAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight(propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames), writer);
+        return writer.append(propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames));
     }
 }

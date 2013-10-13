@@ -34,7 +34,7 @@ public class ThrowActionItem extends ActionItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        hilight("throw ", writer);
+        writer.append("throw ");
         return value.toString(writer, localData);
     }
 

@@ -49,10 +49,10 @@ public class GetPropertyActionItem extends ActionItem {
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (isEmptyString(target)) {
-            return hilight(Action.propertyNames[propertyIndex], writer);
+            return writer.append(Action.propertyNames[propertyIndex]);
         }
         target.toString(writer, localData);
-        return hilight("." + Action.propertyNames[propertyIndex], writer);
+        return writer.append("." + Action.propertyNames[propertyIndex]);
     }
 
     @Override

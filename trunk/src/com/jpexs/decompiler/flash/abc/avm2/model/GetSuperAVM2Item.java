@@ -36,9 +36,9 @@ public class GetSuperAVM2Item extends AVM2Item {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         if (!object.toString(false, localData).equals("this")) {
             object.toString(writer, localData);
-            hilight(".", writer);
+            writer.append(".");
         }
-        hilight("super.", writer);
+        writer.append("super.");
         return propertyName.toString(writer, localData);
     }
 }

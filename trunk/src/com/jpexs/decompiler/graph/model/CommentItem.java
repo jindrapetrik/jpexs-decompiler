@@ -34,7 +34,7 @@ public class CommentItem extends GraphTargetItem {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        return hilight("/* " + comment + " */", writer);
+        return writer.append("/* " + comment + " */");
     }
 
     public String getComment() {
