@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -54,7 +55,7 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
         int multinameIndex = ins.operands[0];
         String multiname = resolveMultinameNoPop(1, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
         HilightedTextWriter writer = new HilightedTextWriter(false);
-        stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(writer, abc.constants, localRegNames, fullyQualifiedNames);
+        stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
         String obj = writer.toString();
         return obj + ".super." + multiname;
     }

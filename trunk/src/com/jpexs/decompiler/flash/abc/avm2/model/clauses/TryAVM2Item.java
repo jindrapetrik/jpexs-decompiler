@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,27 +55,27 @@ public class TryAVM2Item extends AVM2Item implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("try", writer).appendNewLine();
         hilight("{", writer).appendNewLine();
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames)).appendNewLine();
+                ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
             }
         }
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();
         hilight("}", writer);
         for (int e = 0; e < catchExceptions.size(); e++) {
             writer.appendNewLine();
-            hilight("catch(" + catchExceptions.get(e).getVarName(constants, fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(constants, fullyQualifiedNames) + ")", writer);
+            hilight("catch(" + catchExceptions.get(e).getVarName(localData.constantsAvm2, localData.fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames) + ")", writer);
             writer.appendNewLine();
             hilight("{", writer).appendNewLine();
             hilight(Graph.INDENTOPEN, writer).appendNewLine();
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames)).appendNewLine();
+                    ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -87,7 +88,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
             hilight(Graph.INDENTOPEN, writer).appendNewLine();
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames)).appendNewLine();
+                    ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();

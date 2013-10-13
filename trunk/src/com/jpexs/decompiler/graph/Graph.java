@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.IntegerValueItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import com.jpexs.decompiler.graph.model.LoopItem;
 import com.jpexs.decompiler.graph.model.NotItem;
@@ -2155,17 +2157,15 @@ public class Graph {
      * @param localData
      * @return String
      */
-    public static String graphToString(List<GraphTargetItem> tree, boolean highlight, boolean replaceIndents, Object... localData) {
-        StringBuilder ret = new StringBuilder();
-        List<Object> localDataList = Arrays.asList(localData);
+    public static String graphToString(List<GraphTargetItem> tree, boolean highlight, boolean replaceIndents, LocalData localData) {
+        HilightedTextWriter writer = new HilightedTextWriter(highlight);
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
-                ret.append(ti.toStringSemicoloned(highlight, localDataList));
-                ret.append("\r\n");
+                ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
             }
         }
-        String[] parts = ret.toString().split("\r\n");
-        ret = new StringBuilder();
+        String[] parts = writer.toString().split("\r\n");
+        StringBuilder ret = new StringBuilder();
 
         String labelPattern = "loop(switch)?[0-9]*:";
         try {

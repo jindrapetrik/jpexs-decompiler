@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,10 +39,10 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        formatProperty(writer, constants, object, propertyName, localRegNames, fullyQualifiedNames);
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        formatProperty(writer, object, propertyName, localData);
         hilight(" = ", writer);
-        return value.toString(writer, constants, localRegNames, fullyQualifiedNames);
+        return value.toString(writer, localData);
     }
 
     @Override

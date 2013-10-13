@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 
@@ -44,15 +45,15 @@ public class SetSuperAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        if (!object.toString(false, constants, localRegNames, fullyQualifiedNames).equals("this")) {
-            object.toString(writer, constants, localRegNames, fullyQualifiedNames);
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        if (!object.toString(false, localData).equals("this")) {
+            object.toString(writer, localData);
             hilight(".", writer);
         }
         hilight("super.", writer);
-        propertyName.toString(writer, constants, localRegNames, fullyQualifiedNames);
+        propertyName.toString(writer, localData);
         hilight(" = ", writer);
-        return value.toString(writer, constants, localRegNames, fullyQualifiedNames);
+        return value.toString(writer, localData);
     }
 
     @Override

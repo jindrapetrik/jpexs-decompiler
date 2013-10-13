@@ -16,10 +16,12 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.HashMap;
 import java.util.List;
 
 public class TernarOpItem extends GraphTargetItem {
@@ -36,7 +38,7 @@ public class TernarOpItem extends GraphTargetItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         expression.toString(writer, localData);
         hilight("?", writer);
         onTrue.toString(writer, localData);

@@ -85,11 +85,11 @@ public class ClassActionItem extends ActionItem implements Block {
         }
         Set<String> allMembers = new HashSet<>();
         for (GraphTargetItem it : allUsages) {
-            allMembers.add(it.toStringNoQuotes(false, new ArrayList<>()));
+            allMembers.add(it.toStringNoQuotes(false, null));
         }
         uninitializedVars.addAll(allMembers);
         for (MyEntry<GraphTargetItem, GraphTargetItem> v : vars) {
-            String s = v.key.toStringNoQuotes(false, new ArrayList<>());
+            String s = v.key.toStringNoQuotes(false, null);
             if (uninitializedVars.contains(s)) {
                 uninitializedVars.remove(s);
             }
@@ -158,10 +158,10 @@ public class ClassActionItem extends ActionItem implements Block {
     @Override
     public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         hilight("class ", writer);
-        className.toStringNoQuotes(writer, Helper.toList(constants));
+        className.toStringNoQuotes(writer, constants);
         if (extendsOp != null) {
             hilight(" extends ", writer);
-            extendsOp.toStringNoQuotes(writer, Helper.toList(constants));
+            extendsOp.toStringNoQuotes(writer, constants);
         }
         if (!implementsOp.isEmpty()) {
             hilight(" implements ", writer);

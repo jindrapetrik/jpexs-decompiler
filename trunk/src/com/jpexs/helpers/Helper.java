@@ -18,6 +18,7 @@ package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.gui.Freed;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.awt.Component;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -379,7 +380,7 @@ public class Helper {
         return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
     }
 
-    public static String stackToString(Stack<GraphTargetItem> stack, List<Object> localData) {
+    public static String stackToString(Stack<GraphTargetItem> stack, LocalData localData) {
         String ret = "[";
         for (int i = stack.size() - 1; i >= 0; i--) {
             if (i < stack.size() - 1) {

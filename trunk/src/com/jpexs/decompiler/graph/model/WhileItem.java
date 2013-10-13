@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
@@ -24,6 +25,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class WhileItem extends LoopItem implements Block {
@@ -45,7 +47,7 @@ public class WhileItem extends LoopItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("loop" + loop.id + ":", writer).appendNewLine();
         hilight("while(", writer);
         for (int i = 0; i < expression.size(); i++) {
@@ -62,7 +64,7 @@ public class WhileItem extends LoopItem implements Block {
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).appendNewLine();
+                ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
             }
         }
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();

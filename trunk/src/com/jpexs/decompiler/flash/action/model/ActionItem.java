@@ -22,8 +22,10 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class ActionItem extends GraphTargetItem implements Serializable {
@@ -37,11 +39,6 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
     }
 
     public abstract HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants);
-
-    public HilightedTextWriter toString(HilightedTextWriter writer) {
-        ConstantPool c = null;
-        return toString(writer, c);
-    }
 
     protected boolean isEmptyString(GraphTargetItem target) {
         if (target instanceof DirectValueActionItem) {
@@ -69,12 +66,8 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
-        if (localData.isEmpty()) {
-            ConstantPool c = null;
-            return toString(writer, c);
-        }
-        return toString(writer, (ConstantPool) localData.get(0));
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        return toString(writer, localData.constants);
     }
 
     protected List<GraphSourceItem> toSourceCall(List<Object> localData, SourceGenerator gen, List<GraphTargetItem> list) {

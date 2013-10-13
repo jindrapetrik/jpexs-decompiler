@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,10 +33,11 @@ public class NameSpaceAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (namespaceIndex == 0) {
             return hilight("*", writer);
         }
+        ConstantPool constants = localData.constantsAvm2;
         return hilight(constants.constant_namespace[namespaceIndex].toString(constants), writer);
     }
 }

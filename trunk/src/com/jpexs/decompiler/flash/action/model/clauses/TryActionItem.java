@@ -62,11 +62,9 @@ public class TryActionItem extends ActionItem implements Block {
         hilight("try", writer).appendNewLine();
         hilight("{", writer).appendNewLine();
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
-        List<Object> localData = new ArrayList<>();
-        localData.add(constants);
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).appendNewLine();
+                ti.toStringSemicoloned(writer, constants).appendNewLine();
             }
         }
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -74,14 +72,14 @@ public class TryActionItem extends ActionItem implements Block {
         for (int e = 0; e < catchExceptions.size(); e++) {
             writer.appendNewLine();
             hilight("catch(", writer);
-            catchExceptions.get(e).toStringNoQuotes(writer, localData);
+            catchExceptions.get(e).toStringNoQuotes(writer, constants);
             hilight(")", writer).appendNewLine();
             hilight("{", writer).appendNewLine();
             hilight(Graph.INDENTOPEN, writer).appendNewLine();
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData).appendNewLine();
+                    ti.toStringSemicoloned(writer, constants).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -94,7 +92,7 @@ public class TryActionItem extends ActionItem implements Block {
             hilight(Graph.INDENTOPEN, writer).appendNewLine();
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData).appendNewLine();
+                    ti.toStringSemicoloned(writer, constants).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();

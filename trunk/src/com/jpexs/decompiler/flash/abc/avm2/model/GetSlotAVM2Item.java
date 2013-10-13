@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,10 +37,10 @@ public class GetSlotAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (slotName == null) {
             return hilight("/*UnknownSlot*/", writer);
         }
-        return hilight(slotName.getName(constants, fullyQualifiedNames), writer);
+        return hilight(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames), writer);
     }
 }

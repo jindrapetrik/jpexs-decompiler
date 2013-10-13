@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +49,7 @@ public class DeclarationAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (assignment instanceof SetLocalAVM2Item) {
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
             String type = "*";
@@ -59,19 +60,19 @@ public class DeclarationAVM2Item extends AVM2Item {
                 type = ((ConvertAVM2Item) lti.value).type;
             }
             hilight("var ", writer);
-            hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ", writer);
-            return lti.value.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            hilight(localRegName(localData.localRegNames, lti.regIndex) + ":" + type + " = ", writer);
+            return lti.value.toString(writer, localData);
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
             hilight("var ", writer);
-            ssti.getName(writer, constants, localRegNames, fullyQualifiedNames);
+            ssti.getName(writer, localData);
             hilight(":", writer);
             hilight(type, writer);
             hilight(" = ", writer);
-            return ssti.value.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            return ssti.value.toString(writer, localData);
         }
         hilight("var ", writer);
-        return assignment.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+        return assignment.toString(writer, localData);
     }
 }

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class TypeOfActionItem extends ActionItem {
     @Override
     public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         hilight("typeof(", writer);
-        value.toString(writer, Helper.toList(constants));
+        value.toString(writer, LocalData.create(constants));
         return hilight(")", writer);
     }
 

@@ -16,10 +16,12 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
@@ -34,7 +36,7 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight(operator, writer);
         if (value != null) {
             if (value.precedence > precedence) {

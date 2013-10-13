@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,12 +38,12 @@ public class XMLAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         for (GraphTargetItem part : parts) {
             if (part instanceof StringAVM2Item) {
                 hilight(((StringAVM2Item) part).value, writer);
             } else {
-                part.toString(writer, constants, localRegNames, fullyQualifiedNames);
+                part.toString(writer, localData);
             }
         }
         return writer;

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class EnumerateActionItem extends ActionItem {
     @Override
     public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
         hilight("enumerate ", writer);
-        return object.toString(writer, Helper.toList(constants));
+        return object.toString(writer, LocalData.create(constants));
     }
 
     @Override

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.List;
 
@@ -36,13 +37,13 @@ public class ImplementsOpActionItem extends ActionItem {
 
     @Override
     public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
-        subclass.toString(writer, Helper.toList(constants));
+        subclass.toString(writer, LocalData.create(constants));
         hilight(" implements ", writer);
         for (int i = 0; i < superclasses.size(); i++) {
             if (i > 0) {
                 hilight(",", writer);
             }
-            superclasses.get(i).toString(writer, Helper.toList(constants));
+            superclasses.get(i).toString(writer, LocalData.create(constants));
         }
         return writer;
     }

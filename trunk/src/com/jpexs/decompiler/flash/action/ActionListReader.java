@@ -40,6 +40,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReReadableInputStream;
 import java.io.ByteArrayInputStream;
@@ -667,12 +668,12 @@ public class ActionListReader {
                 if (a instanceof GraphSourceItemContainer) {
                     atos = a.toString();
                 }
-                System.err.println("readActionListAtPos ip: " + (ip - startIp) + " (0x" + Helper.formatAddress(ip - startIp) + ") " + " action(len " + a.actionLength + "): " + atos + (a.isIgnored() ? " (ignored)" : "") + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)) + " " + Helper.byteArrToString(a.getBytes(version)));
+                System.err.println("readActionListAtPos ip: " + (ip - startIp) + " (0x" + Helper.formatAddress(ip - startIp) + ") " + " action(len " + a.actionLength + "): " + atos + (a.isIgnored() ? " (ignored)" : "") + " stack:" + Helper.stackToString(stack, LocalData.create(cpool)) + " " + Helper.byteArrToString(a.getBytes(version)));
                 @SuppressWarnings("unchecked")
                 HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
                 System.err.print("variables: ");
                 for (Map.Entry<String, GraphTargetItem> v : vars.entrySet()) {
-                    System.err.print("'" + v + "' = " + v.getValue().toString(false, cpool) + ", ");
+                    System.err.print("'" + v + "' = " + v.getValue().toString(false, LocalData.create(cpool)) + ", ");
                 }
                 System.err.println();
                 String add = "";

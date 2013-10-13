@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
@@ -24,6 +25,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class SwitchItem extends LoopItem implements Block {
@@ -52,7 +54,7 @@ public class SwitchItem extends LoopItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("loopswitch" + loop.id + ":", writer).appendNewLine();
         hilight("switch(", writer);
         switchedObject.toString(writer, localData);
@@ -70,7 +72,7 @@ public class SwitchItem extends LoopItem implements Block {
             hilight(Graph.INDENTOPEN, writer).appendNewLine();
             for (int j = 0; j < caseCommands.get(i).size(); j++) {
                 if (!caseCommands.get(i).get(j).isEmpty()) {
-                    caseCommands.get(i).get(j).toStringSemicoloned(writer, localData).appendNewLine();
+                    caseCommands.get(i).get(j).toStringSemicoloned(writer, localData.constants).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -82,7 +84,7 @@ public class SwitchItem extends LoopItem implements Block {
                 hilight(Graph.INDENTOPEN, writer).appendNewLine();
                 for (int j = 0; j < defaultCommands.size(); j++) {
                     if (!defaultCommands.get(j).isEmpty()) {
-                        defaultCommands.get(j).toStringSemicoloned(writer, localData).appendNewLine();
+                        defaultCommands.get(j).toStringSemicoloned(writer, localData.constants).appendNewLine();
                     }
                 }
                 hilight(Graph.INDENTCLOSE, writer).appendNewLine();

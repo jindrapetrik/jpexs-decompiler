@@ -56,6 +56,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
@@ -726,7 +727,7 @@ public class Action implements GraphSourceItem {
 
                     List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
 
-                    return Graph.graphToString(tree, highlight, true);
+                    return Graph.graphToString(tree, highlight, true, new LocalData());
                 }
             }, timeout, TimeUnit.SECONDS);
         } catch (TimeoutException ex) {

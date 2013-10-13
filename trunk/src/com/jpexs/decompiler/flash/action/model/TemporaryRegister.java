@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -45,7 +47,7 @@ public class TemporaryRegister extends GraphTargetItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         return value.toString(writer, localData);
     }
 

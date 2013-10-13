@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -34,7 +36,7 @@ public class CommentItem extends GraphTargetItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         return hilight("/* " + comment + " */", writer);
     }
 

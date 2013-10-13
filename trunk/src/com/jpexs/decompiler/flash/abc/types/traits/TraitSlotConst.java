@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +93,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
 
         if (assignedValue != null) {
-            valueStr = Highlighting.trim(assignedValue.toString(highlight, abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
+            valueStr = Highlighting.trim(assignedValue.toString(highlight, LocalData.create(abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames)));
             if (highlight && (parent instanceof TraitClass)) {
                 TraitClass tc = (TraitClass) parent;
                 int traitInitId = abc.class_info[tc.class_info].static_traits.traits.length

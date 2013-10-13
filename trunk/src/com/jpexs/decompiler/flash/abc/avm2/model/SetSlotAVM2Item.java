@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,15 +46,13 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        getName(writer, constants, localRegNames, fullyQualifiedNames);
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        getName(writer, localData);
         hilight(" = ", writer);
-        return value.toString(writer, constants, localRegNames, fullyQualifiedNames);
+        return value.toString(writer, localData);
     }
 
-    public String getName(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String ret = "";
-
+    public HilightedTextWriter getName(HilightedTextWriter writer, LocalData localData) {
         /*ret = scope.toString(constants, localRegNames) + ".";
          if (!(scope instanceof NewActivationAVM2Item)) {
          ret = scope.toString(constants, localRegNames) + ".";
@@ -66,9 +65,9 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
          }
          }*/
         if (slotName == null) {
-            return ret + hilight("/*UnknownSlot*/", writer);
+            return hilight("/*UnknownSlot*/", writer);
         }
-        return ret + hilight(slotName.getName(constants, fullyQualifiedNames), writer);
+        return hilight(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames), writer);
     }
 
     @Override

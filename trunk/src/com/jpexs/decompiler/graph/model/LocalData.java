@@ -17,8 +17,6 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,29 +24,24 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ScriptEndItem extends GraphTargetItem implements ExitItem {
+public class LocalData {
 
-    public ScriptEndItem() {
-        super(null, NOPRECEDENCE);
+    public ConstantPool constants;
+    public com.jpexs.decompiler.flash.abc.avm2.ConstantPool constantsAvm2;
+    public HashMap<Integer, String> localRegNames;
+    public List<String> fullyQualifiedNames;
+ 
+    public static LocalData create(ConstantPool constants) {
+        LocalData localData = new LocalData();
+        localData.constants = constants;
+        return localData;
     }
 
-    @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
-        return writer;
-    }
-
-    @Override
-    public boolean needsSemicolon() {
-        return false;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return true;
-    }
-
-    @Override
-    public boolean hasReturnValue() {
-        return false;
+    public static LocalData create(com.jpexs.decompiler.flash.abc.avm2.ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        LocalData localData = new LocalData();
+        localData.constantsAvm2 = constants;
+        localData.localRegNames = localRegNames;
+        localData.fullyQualifiedNames = fullyQualifiedNames;
+        return localData;
     }
 }

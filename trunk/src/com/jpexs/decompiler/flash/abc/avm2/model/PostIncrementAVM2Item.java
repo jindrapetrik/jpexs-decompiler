@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +36,8 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        object.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        object.toString(writer, localData);
         return hilight("++", writer);
     }
 

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("function" + (!functionName.equals("") ? " " + functionName : ""), writer);
         boolean highlight = writer.getIsHighlighted();
         String mhead = "(" + (highlight ? paramStr : Highlighting.stripHilights(paramStr)) + "):" + (highlight ? returnStr : Highlighting.stripHilights(returnStr));

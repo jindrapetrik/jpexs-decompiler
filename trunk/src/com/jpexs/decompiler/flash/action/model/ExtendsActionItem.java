@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +37,7 @@ public class ExtendsActionItem extends ActionItem {
 
     @Override
     public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
-        List<Object> localData = new ArrayList<>();
-        localData.add(constants);
-        subclass.toString(writer, localData);
+        subclass.toString(writer, LocalData.create(constants));
         hilight(" extends ", writer);
         return stripQuotes(superclass, constants, writer);
     }

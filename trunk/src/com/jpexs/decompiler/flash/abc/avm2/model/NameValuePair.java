@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import java.util.HashMap;
 import java.util.List;
@@ -35,15 +36,15 @@ public class NameValuePair extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        name.toString(writer, constants, localRegNames, fullyQualifiedNames);
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        name.toString(writer, localData);
         hilight(":", writer);
         if (value instanceof TernarOpItem) { //Ternar operator contains ":"
             hilight("(", writer);
-            value.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            value.toString(writer, localData);
             hilight(")", writer);
         } else {
-            value.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            value.toString(writer, localData);
         }
         return writer;
     }

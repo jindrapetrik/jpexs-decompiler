@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -50,11 +51,11 @@ public class LocalRegAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (computedValue instanceof FilterAVM2Item) {
-            return computedValue.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+            return computedValue.toString(writer, localData);
         }
-        return hilight(localRegName(localRegNames, regIndex), writer);
+        return hilight(localRegName(localData.localRegNames, regIndex), writer);
     }
 
     @Override

@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,7 +99,7 @@ public class FunctionActionItem extends ActionItem {
         hilight(")", writer).appendNewLine();
         hilight("{", writer).appendNewLine();
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
-        writer.appendNoHilight(Graph.graphToString(actions, writer.getIsHighlighted(), false, constants));
+        writer.appendNoHilight(Graph.graphToString(actions, writer.getIsHighlighted(), false, LocalData.create(constants)));
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();
         return hilight("}", writer);
     }

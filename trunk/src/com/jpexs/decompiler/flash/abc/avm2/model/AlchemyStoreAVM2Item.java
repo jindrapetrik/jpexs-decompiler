@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,11 +41,11 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("op_" + name + "(", writer);
-        ofs.toString(writer, constants, localRegNames, fullyQualifiedNames);
+        ofs.toString(writer, localData);
         hilight(",", writer);
-        value.toString(writer, constants, localRegNames, fullyQualifiedNames);
+        value.toString(writer, localData);
         return hilight(") /*Alchemy*/", writer);
     }
 }

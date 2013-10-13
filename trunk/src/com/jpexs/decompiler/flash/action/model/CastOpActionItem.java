@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,7 @@ public class CastOpActionItem extends ActionItem {
         hilight("(", writer);
         stripQuotes(constructor, constants, writer);
         hilight(")", writer);
-        return object.toString(writer, Helper.toList(constants));
+        return object.toString(writer, LocalData.create(constants));
     }
 
     @Override

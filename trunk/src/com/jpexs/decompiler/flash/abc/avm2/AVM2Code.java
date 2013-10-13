@@ -79,6 +79,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
 import java.io.*;
@@ -1531,7 +1532,7 @@ public class AVM2Code implements Serializable {
             list.remove(lastPos);
         }
 
-        s = Graph.graphToString(list, hilighted, replaceIndents, constants, localRegNames, fullyQualifiedNames);
+        s = Graph.graphToString(list, hilighted, replaceIndents, LocalData.create(constants, localRegNames, fullyQualifiedNames));
 
         return s;
     }

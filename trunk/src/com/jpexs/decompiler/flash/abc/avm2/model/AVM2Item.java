@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import static com.jpexs.decompiler.graph.GraphTargetItem.PRECEDENCE_PRIMARY;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -35,22 +36,16 @@ public abstract class AVM2Item extends GraphTargetItem {
         super(instruction, precedence);
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
-        return toString(writer, (ConstantPool) localData.get(0), (HashMap<Integer, String>) localData.get(1), (List<String>) localData.get(2));
-    }
+    public abstract HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData);
 
-    public abstract HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
-
-    public String toStringNoH(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toStringNoH(LocalData localData) {
         HilightedTextWriter writer = new HilightedTextWriter(false);
-        toString(writer, constants, localRegNames, fullyQualifiedNames);
+        toString(writer, localData);
         return writer.toString();
     }
 
-    public String toStringSemicoloned(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return toString(writer, constants, localRegNames, fullyQualifiedNames) + (needsSemicolon() ? ";" : "");
+    public String toStringSemicoloned(HilightedTextWriter writer, LocalData localData) {
+        return toString(writer, localData) + (needsSemicolon() ? ";" : "");
     }
 
     @Override
@@ -58,7 +53,7 @@ public abstract class AVM2Item extends GraphTargetItem {
         return true;
     }
 
-    protected HilightedTextWriter formatProperty(HilightedTextWriter writer, ConstantPool constants, GraphTargetItem object, GraphTargetItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    protected HilightedTextWriter formatProperty(HilightedTextWriter writer, GraphTargetItem object, GraphTargetItem propertyName, LocalData localData) {
         boolean empty = false;
         if (object instanceof LocalRegAVM2Item) {
             if (((LocalRegAVM2Item) object).computedValue != null) {
@@ -71,12 +66,12 @@ public abstract class AVM2Item extends GraphTargetItem {
         if (!empty) {
             if (object.precedence > PRECEDENCE_PRIMARY) {
                 hilight("(", writer);
-                object.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                object.toString(writer, localData);
                 hilight(")", writer);
                 empty = false;
             } else {
                 int writerLength = writer.getLength();
-                object.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                object.toString(writer, localData);
                 if (writerLength == writer.getLength()) {
                     empty = true;
                 }
@@ -84,18 +79,18 @@ public abstract class AVM2Item extends GraphTargetItem {
         }
 
         if (empty) {
-            return propertyName.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+            return propertyName.toString(writer, localData);
         }
         if (propertyName instanceof FullMultinameAVM2Item) {
             if (((FullMultinameAVM2Item) propertyName).name != null) {
-                return propertyName.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                return propertyName.toString(writer, localData);
             } else {
                 hilight(".", writer);
-                return propertyName.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                return propertyName.toString(writer, localData);
             }
         } else {
             hilight("[", writer);
-            propertyName.toString(writer, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+            propertyName.toString(writer, localData);
             return hilight("]", writer);
         }
     }

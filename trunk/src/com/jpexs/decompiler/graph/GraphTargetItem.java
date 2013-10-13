@@ -16,11 +16,14 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.model.BinaryOp;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -87,26 +90,12 @@ public abstract class GraphTargetItem implements Serializable {
         return writer.append(str, src, pos);
     }
 
-    public String toStringSemicoloned(boolean highlight, List<Object> localData) {
-        HilightedTextWriter writer = new HilightedTextWriter(highlight);
-        toStringSemicoloned(writer, localData);
-        return writer.toString();
-    }
-
-    public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, List<Object> localData) {
-        toString(writer, localData);
+    public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, ConstantPool constants) {
+        toString(writer, constants);
         if (needsSemicolon()) { 
             hilight(";", writer);
         }
         return writer;
-    }
-
-    public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, Object... localData) {
-        List<Object> localData2 = new ArrayList<>();
-        for (Object o : localData) {
-            localData2.add(o);
-        }
-        return toStringSemicoloned(writer, localData2);
     }
 
     public boolean needsSemicolon() {
@@ -118,22 +107,20 @@ public abstract class GraphTargetItem implements Serializable {
         return this.getClass().getName();
     }
 
-    public abstract HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData);
+    public abstract HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData);
 
-    public String toString(boolean highlight, Object... localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+        LocalData localData = new LocalData();
+        localData.constants = constants;
+        return toString(writer, localData);
+    }
+    
+    public String toString(boolean highlight, LocalData localData) {
         HilightedTextWriter writer = new HilightedTextWriter(highlight);
         toString(writer, localData);
         return writer.toString();
     }
     
-    public HilightedTextWriter toString(HilightedTextWriter writer, Object... localData) {
-        List<Object> localData2 = new ArrayList<>();
-        for (Object o : localData) {
-            localData2.add(o);
-        }
-        return toString(writer, localData2);
-    }
-
     public int getPrecedence() {
         return precedence;
     }
@@ -161,28 +148,14 @@ public abstract class GraphTargetItem implements Serializable {
         return null;
     }
 
-    public String toStringNoQuotes(boolean highlight, List<Object> localData) {
+    public String toStringNoQuotes(boolean highlight, ConstantPool constants) {
         HilightedTextWriter writer = new HilightedTextWriter(highlight);
-        toStringNoQuotes(writer, localData);
+        toStringNoQuotes(writer, constants);
         return writer.toString();
     }
 
-    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, List<Object> localData) {
-        return toString(writer, localData);
-    }
-
-    public String toStringNoQuotes(boolean highlight, Object... localData) {
-        HilightedTextWriter writer = new HilightedTextWriter(highlight);
-        toStringNoQuotes(writer, localData);
-        return writer.toString();
-    }
-
-    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, Object... localData) {
-        List<Object> localData2 = new ArrayList<>();
-        for (Object o : localData) {
-            localData2.add(o);
-        }
-        return toStringNoQuotes(writer, localData2);
+    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, ConstantPool constants) {
+        return toString(writer, constants);
     }
 
     public GraphTargetItem getNotCoerced() {
@@ -197,12 +170,8 @@ public abstract class GraphTargetItem implements Serializable {
         return false;
     }
 
-    public String toStringNL(HilightedTextWriter writer, Object... localData) {
-        List<Object> localData2 = new ArrayList<>();
-        for (Object o : localData) {
-            localData2.add(o);
-        }
-        return toString(writer, localData2) + (needsNewLine() ? "\r\n" : "");
+    public String toStringNL(HilightedTextWriter writer, LocalData localData) {
+        return toString(writer, localData) + (needsNewLine() ? "\r\n" : "");
     }
 
     public boolean isEmpty() {

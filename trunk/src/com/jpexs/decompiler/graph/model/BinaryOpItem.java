@@ -16,12 +16,14 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
@@ -47,7 +49,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, List<Object> localData) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (leftSide.getPrecedence() > precedence) {
             hilight("(", writer);
             leftSide.toString(writer, localData);

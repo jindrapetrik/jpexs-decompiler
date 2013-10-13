@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,13 +59,13 @@ public class FullMultinameAVM2Item extends AVM2Item {
     public boolean isXML(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String cname;
         if (name != null) {
-            cname = name.toString(false, constants, localRegNames, fullyQualifiedNames);
+            cname = name.toString(false, LocalData.create(constants, localRegNames, fullyQualifiedNames));
         } else {
             cname = (constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
         }
         String cns = "";
         if (namespace != null) {
-            cns = namespace.toString(false, constants, localRegNames, fullyQualifiedNames);
+            cns = namespace.toString(false, LocalData.create(constants, localRegNames, fullyQualifiedNames));
         } else {
             Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
             if ((ns != null) && (ns.name_index != 0)) {
@@ -75,9 +76,9 @@ public class FullMultinameAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (namespace != null) {
-            namespace.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            namespace.toString(writer, localData);
             hilight("::", writer);
         } else {
             /*Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
@@ -87,9 +88,11 @@ public class FullMultinameAVM2Item extends AVM2Item {
         }
         if (name != null) {
             hilight("[", writer);
-            name.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            name.toString(writer, localData);
             hilight("]", writer);
         } else {
+            ConstantPool constants = localData.constantsAvm2;
+            List<String> fullyQualifiedNames = localData.fullyQualifiedNames;
             hilight(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), writer);
         }
         return writer;

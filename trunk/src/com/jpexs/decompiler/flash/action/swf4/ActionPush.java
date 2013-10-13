@@ -179,12 +179,10 @@ public class ActionPush extends Action {
         return surroundWithAction(baos.toByteArray(), version);
     }
 
-    public ActionPush(Object... values) {
+    public ActionPush(Object value) {
         super(0x96, 0);
         this.values = new ArrayList<>();
-        for (Object o : values) {
-            this.values.add(o);
-        }
+        this.values.add(value);
     }
 
     public ActionPush(FlasmLexer lexer, List<String> constantPool) throws IOException, ParseException {

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +80,7 @@ public class CallMethodActionItem extends ActionItem {
             if (t > 0) {
                 hilight(",", writer);
             }
-            arguments.get(t).toStringNL(writer, constants);
+            arguments.get(t).toStringNL(writer, LocalData.create(constants));
         }
         
         return hilight(")", writer);

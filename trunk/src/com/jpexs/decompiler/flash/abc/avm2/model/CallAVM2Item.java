@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class CallAVM2Item extends AVM2Item {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         /*String recPart = ""; receiver.toString(constants, localRegNames) + hilight(".", writer);
          if (receiver instanceof NewActivationAVM2Item) {
          recPart = "";
@@ -47,17 +48,17 @@ public class CallAVM2Item extends AVM2Item {
          }*/
         if (function.precedence > precedence) {
             hilight("(", writer);
-            function.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            function.toString(writer, localData);
             hilight(")", writer);
         } else {
-            function.toString(writer, constants, localRegNames, fullyQualifiedNames);
+            function.toString(writer, localData);
         }
         hilight("(", writer);
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
                 hilight(",", writer);
             }
-            arguments.get(a).toString(writer, constants, localRegNames, fullyQualifiedNames);
+            arguments.get(a).toString(writer, localData);
         }
         return hilight(")", writer);
     }
