@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -264,9 +265,9 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         return ignored;
     }
 
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         writer.appendNoHilight(Helper.formatAddress(offset) + " " + Helper.padSpaceRight(Helper.byteArrToString(getBytes()), 30) + definition.instructionName);
-        writer.appendNoHilight(getParams(constants, fullyQualifiedNames) + getComment());
+        writer.appendNoHilight(getParams(localData.constantsAvm2, localData.fullyQualifiedNames) + getComment());
         return writer;
     }
 

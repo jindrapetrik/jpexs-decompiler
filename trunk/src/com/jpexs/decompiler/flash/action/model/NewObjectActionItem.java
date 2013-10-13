@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,15 +46,15 @@ public class NewObjectActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("new ", writer);
-        stripQuotes(objectName, constants, writer);
+        stripQuotes(objectName, localData, writer);
         hilight("(", writer);
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
                 hilight(",", writer);
             }
-            arguments.get(t).toString(writer, constants);
+            arguments.get(t).toString(writer, localData);
         }
         return hilight(")", writer);
     }

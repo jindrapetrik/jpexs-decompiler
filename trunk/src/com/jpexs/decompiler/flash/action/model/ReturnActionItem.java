@@ -32,6 +32,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.ExitItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,9 +45,9 @@ public class ReturnActionItem extends ActionItem implements ExitItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("return ", writer);
-        return value.toString(writer, constants);
+        return value.toString(writer, localData);
     }
 
     @Override

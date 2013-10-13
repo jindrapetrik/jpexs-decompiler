@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,9 +44,9 @@ public class InterfaceActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("interface ", writer);
-        name.toStringNoQuotes(writer, constants);
+        name.toStringNoQuotes(writer, localData);
         boolean first = true;
         if (!superInterfaces.isEmpty()) {
             hilight(" extends ", writer);
@@ -55,7 +56,7 @@ public class InterfaceActionItem extends ActionItem {
                 hilight(", ", writer);
             }
             first = false;
-            Action.getWithoutGlobal(ti).toStringNoQuotes(writer, constants);
+            Action.getWithoutGlobal(ti).toStringNoQuotes(writer, localData);
         }
         writer.appendNewLine();
         hilight("{", writer).appendNewLine();

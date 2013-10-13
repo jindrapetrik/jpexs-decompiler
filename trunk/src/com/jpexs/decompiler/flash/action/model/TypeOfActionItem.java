@@ -35,9 +35,9 @@ public class TypeOfActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("typeof(", writer);
-        value.toString(writer, LocalData.create(constants));
+        value.toString(writer, localData);
         return hilight(")", writer);
     }
 

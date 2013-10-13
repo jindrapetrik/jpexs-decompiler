@@ -27,6 +27,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 public class SetVariableActionItem extends ActionItem implements SetTypeActionItem {
@@ -67,16 +68,16 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (name instanceof DirectValueActionItem || name instanceof GetVariableActionItem) {
-            stripQuotes(name, constants, writer);
+            stripQuotes(name, localData, writer);
             hilight(" = ", writer);
-            return value.toString(writer, constants);
+            return value.toString(writer, localData);
         } else {
             hilight("set(", writer);
-            name.toString(writer, constants);
+            name.toString(writer, localData);
             hilight(",", writer);
-            value.toString(writer, constants);
+            value.toString(writer, localData);
             return hilight(")", writer);
         }
     }

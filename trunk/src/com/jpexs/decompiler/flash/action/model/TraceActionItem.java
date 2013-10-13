@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 public class TraceActionItem extends ActionItem {
@@ -32,9 +33,9 @@ public class TraceActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("trace(", writer);
-        value.toString(writer, constants);
+        value.toString(writer, localData);
         return hilight(")", writer);
     }
 

@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,13 +59,13 @@ public class TryActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("try", writer).appendNewLine();
         hilight("{", writer).appendNewLine();
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, constants).appendNewLine();
+                ti.toStringSemicoloned(writer, localData).appendNewLine();
             }
         }
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -72,14 +73,14 @@ public class TryActionItem extends ActionItem implements Block {
         for (int e = 0; e < catchExceptions.size(); e++) {
             writer.appendNewLine();
             hilight("catch(", writer);
-            catchExceptions.get(e).toStringNoQuotes(writer, constants);
+            catchExceptions.get(e).toStringNoQuotes(writer, localData);
             hilight(")", writer).appendNewLine();
             hilight("{", writer).appendNewLine();
             hilight(Graph.INDENTOPEN, writer).appendNewLine();
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, constants).appendNewLine();
+                    ti.toStringSemicoloned(writer, localData).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -92,7 +93,7 @@ public class TryActionItem extends ActionItem implements Block {
             hilight(Graph.INDENTOPEN, writer).appendNewLine();
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, constants).appendNewLine();
+                    ti.toStringSemicoloned(writer, localData).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -150,7 +151,7 @@ public class TryActionItem extends ActionItem implements Block {
         String catchName = null;
         if (catchExceptions != null) {
             if (!catchExceptions.isEmpty()) {
-                catchName = catchExceptions.get(0).toStringNoQuotes(false, new ConstantPool(asGenerator.getConstantPool()));
+                catchName = catchExceptions.get(0).toStringNoQuotes(false, LocalData.create(new ConstantPool(asGenerator.getConstantPool())));
             }
 
         }

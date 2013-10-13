@@ -18,8 +18,8 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +45,7 @@ public class ActionCallFunction extends Action {
             args.add(stack.pop());
         }
         CallFunctionActionItem cft = new CallFunctionActionItem(this, functionName, args);
-        cft.calculatedFunction = functions.get(functionName.toStringNoQuotes(false, (ConstantPool) null));
+        cft.calculatedFunction = functions.get(functionName.toStringNoQuotes(false, LocalData.create(null)));
         stack.push(cft);
     }
 }

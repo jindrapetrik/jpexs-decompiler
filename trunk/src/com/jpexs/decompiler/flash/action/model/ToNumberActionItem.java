@@ -33,9 +33,9 @@ public class ToNumberActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("Number(", writer);
-        value.toString(writer, LocalData.create(constants));
+        value.toString(writer, localData);
         return hilight(")", writer);
     }
 

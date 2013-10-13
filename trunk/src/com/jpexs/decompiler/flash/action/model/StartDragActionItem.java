@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 public class StartDragActionItem extends ActionItem {
@@ -47,7 +48,7 @@ public class StartDragActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueActionItem) {
             if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
@@ -55,18 +56,18 @@ public class StartDragActionItem extends ActionItem {
             }
         }
         hilight("startDrag(", writer);
-        target.toString(writer, constants);
+        target.toString(writer, localData);
         hilight(",", writer);
-        lockCenter.toString(writer, constants);
+        lockCenter.toString(writer, localData);
         if (hasConstrains) {
             hilight(",", writer);
-            x1.toString(writer, constants);
+            x1.toString(writer, localData);
             hilight(",", writer);
-            y1.toString(writer, constants);
+            y1.toString(writer, localData);
             hilight(",", writer);
-            x2.toString(writer, constants);
+            x2.toString(writer, localData);
             hilight(",", writer);
-            y2.toString(writer, constants);
+            y2.toString(writer, localData);
         }
         return hilight(")", writer);
     }

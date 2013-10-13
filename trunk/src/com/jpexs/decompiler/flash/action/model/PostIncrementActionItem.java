@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,8 +51,8 @@ public class PostIncrementActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
-        object.toString(writer, constants);
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        object.toString(writer, localData);
         return hilight("++", writer);
     }
 

@@ -34,6 +34,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -156,12 +157,12 @@ public class ClassActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("class ", writer);
-        className.toStringNoQuotes(writer, constants);
+        className.toStringNoQuotes(writer, localData);
         if (extendsOp != null) {
             hilight(" extends ", writer);
-            extendsOp.toStringNoQuotes(writer, constants);
+            extendsOp.toStringNoQuotes(writer, localData);
         }
         if (!implementsOp.isEmpty()) {
             hilight(" implements ", writer);
@@ -171,7 +172,7 @@ public class ClassActionItem extends ActionItem implements Block {
                     hilight(", ", writer);
                 }
                 first = false;
-                Action.getWithoutGlobal(t).toString(writer, constants);
+                Action.getWithoutGlobal(t).toString(writer, localData);
             }
         }
         writer.appendNewLine();
@@ -179,14 +180,14 @@ public class ClassActionItem extends ActionItem implements Block {
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
 
         if (constructor != null) {
-            constructor.toString(writer, constants).appendNewLine();
+            constructor.toString(writer, localData).appendNewLine();
         }
 
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : vars) {
             hilight("var ", writer);
-            item.key.toStringNoQuotes(writer, constants);
+            item.key.toStringNoQuotes(writer, localData);
             hilight(" = ", writer);
-            item.value.toString(writer, constants);
+            item.value.toString(writer, localData);
             hilight(";", writer).appendNewLine();
         }
         for (String v : uninitializedVars) {
@@ -196,19 +197,19 @@ public class ClassActionItem extends ActionItem implements Block {
         }
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : staticVars) {
             hilight("static var ", writer);
-            item.key.toStringNoQuotes(writer, constants);
+            item.key.toStringNoQuotes(writer, localData);
             hilight(" = ", writer);
-            item.value.toString(writer, constants);
+            item.value.toString(writer, localData);
             hilight(";", writer).appendNewLine();
         }
 
 
         for (GraphTargetItem f : functions) {
-            f.toString(writer, constants).appendNewLine();
+            f.toString(writer, localData).appendNewLine();
         }
         for (GraphTargetItem f : staticFunctions) {
             hilight("static ", writer);
-            f.toString(writer, constants).appendNewLine();
+            f.toString(writer, localData).appendNewLine();
         }
 
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();

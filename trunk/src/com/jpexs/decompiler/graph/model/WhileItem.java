@@ -62,7 +62,7 @@ public class WhileItem extends LoopItem implements Block {
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
+                ti.toStringSemicoloned(writer, localData).appendNewLine();
             }
         }
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();

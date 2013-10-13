@@ -17,12 +17,12 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EvalActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -41,7 +41,7 @@ public class ActionGetVariable extends Action {
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem name = stack.pop();
-        GraphTargetItem computedVal = variables.get(name.toStringNoQuotes(false, (ConstantPool) null));
+        GraphTargetItem computedVal = variables.get(name.toStringNoQuotes(false, LocalData.create(null)));
         if (name instanceof DirectValueActionItem && ((DirectValueActionItem) name).value.equals("/:$version")) {
             stack.push(new GetVersionActionItem(this));
         } else if (!(name instanceof DirectValueActionItem) && !(name instanceof GetVariableActionItem)) {

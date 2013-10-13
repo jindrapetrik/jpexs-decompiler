@@ -58,7 +58,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
+                ti.toStringSemicoloned(writer, localData).appendNewLine();
             }
         }
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -72,7 +72,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
+                    ti.toStringSemicoloned(writer, localData).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -85,7 +85,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
             hilight(Graph.INDENTOPEN, writer).appendNewLine();
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
+                    ti.toStringSemicoloned(writer, localData).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class LoadVariablesActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         String methodStr = "";
         if (method == 1) {
             methodStr = ",\"GET\"";
@@ -59,9 +60,9 @@ public class LoadVariablesActionItem extends ActionItem {
             methodStr = ",\"POST\"";
         }
         hilight("loadVariables(", writer);
-        urlString.toString(writer, constants);
+        urlString.toString(writer, localData);
         hilight(",", writer);
-        targetString.toString(writer, constants);
+        targetString.toString(writer, localData);
         return hilight(methodStr + ")", writer);
     }
 

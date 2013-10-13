@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,13 +49,13 @@ public class CloneSpriteActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("duplicateMovieClip(", writer);
-        target.toString(writer, constants);
+        target.toString(writer, localData);
         hilight(",", writer);
-        source.toString(writer, constants);
+        source.toString(writer, localData);
         hilight(",", writer);
-        depth.toString(writer, constants);
+        depth.toString(writer, localData);
         return hilight(")", writer);
     }
 

@@ -121,6 +121,7 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.ParenthesisItem;
@@ -409,12 +410,12 @@ public class ActionScriptParser {
         if (nameStr instanceof GetMemberActionItem) {
             GetMemberActionItem mem = (GetMemberActionItem) nameStr;
             if (mem.memberName instanceof DirectValueActionItem) {
-                classNameStr = ((DirectValueActionItem) mem.memberName).toStringNoQuotes(false, new ConstantPool(constantPool));
+                classNameStr = ((DirectValueActionItem) mem.memberName).toStringNoQuotes(false, LocalData.create(new ConstantPool(constantPool)));
             }
         } else if (nameStr instanceof GetVariableActionItem) {
             GetVariableActionItem var = (GetVariableActionItem) nameStr;
             if (var.name instanceof DirectValueActionItem) {
-                classNameStr = ((DirectValueActionItem) var.name).toStringNoQuotes(false, new ConstantPool(constantPool));
+                classNameStr = ((DirectValueActionItem) var.name).toStringNoQuotes(false, LocalData.create(new ConstantPool(constantPool)));
             }
         }
 

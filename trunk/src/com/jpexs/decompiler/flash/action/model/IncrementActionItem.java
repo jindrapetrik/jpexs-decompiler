@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,8 +44,8 @@ public class IncrementActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
-        object.toString(writer, constants);
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        object.toString(writer, localData);
         return hilight(" + 1", writer);
     }
 

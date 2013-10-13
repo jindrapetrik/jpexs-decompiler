@@ -26,6 +26,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,14 +42,14 @@ public class TellTargetActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("tellTarget(", writer);
-        target.toString(writer, constants);
+        target.toString(writer, localData);
         hilight(")", writer).appendNewLine();
         hilight("{", writer).appendNewLine();
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : commands) {
-            ti.toString(writer, constants).appendNewLine();
+            ti.toString(writer, localData).appendNewLine();
         }
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();
         return hilight("}", writer);

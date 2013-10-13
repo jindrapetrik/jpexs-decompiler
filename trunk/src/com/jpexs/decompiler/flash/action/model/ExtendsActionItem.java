@@ -35,10 +35,10 @@ public class ExtendsActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
-        subclass.toString(writer, LocalData.create(constants));
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        subclass.toString(writer, localData);
         hilight(" extends ", writer);
-        return stripQuotes(superclass, constants, writer);
+        return stripQuotes(superclass, localData, writer);
     }
 
     @Override

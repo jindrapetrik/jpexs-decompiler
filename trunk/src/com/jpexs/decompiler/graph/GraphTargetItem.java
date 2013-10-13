@@ -88,8 +88,8 @@ public abstract class GraphTargetItem implements Serializable {
         return writer.append(str, src, pos);
     }
 
-    public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, ConstantPool constants) {
-        toString(writer, constants);
+    public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, LocalData localData) {
+        toString(writer, localData);
         if (needsSemicolon()) { 
             hilight(";", writer);
         }
@@ -107,12 +107,6 @@ public abstract class GraphTargetItem implements Serializable {
 
     public abstract HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData);
 
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
-        LocalData localData = new LocalData();
-        localData.constants = constants;
-        return toString(writer, localData);
-    }
-    
     public String toString(boolean highlight, LocalData localData) {
         HilightedTextWriter writer = new HilightedTextWriter(highlight);
         toString(writer, localData);
@@ -146,14 +140,14 @@ public abstract class GraphTargetItem implements Serializable {
         return null;
     }
 
-    public String toStringNoQuotes(boolean highlight, ConstantPool constants) {
+    public String toStringNoQuotes(boolean highlight, LocalData localData) {
         HilightedTextWriter writer = new HilightedTextWriter(highlight);
-        toStringNoQuotes(writer, constants);
+        toStringNoQuotes(writer, localData);
         return writer.toString();
     }
 
-    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, ConstantPool constants) {
-        return toString(writer, constants);
+    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, LocalData localData) {
+        return toString(writer, localData);
     }
 
     public GraphTargetItem getNotCoerced() {

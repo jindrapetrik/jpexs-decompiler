@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.swf3.ActionGotoFrame;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 public class GotoFrameActionItem extends ActionItem {
@@ -32,7 +33,7 @@ public class GotoFrameActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("gotoAndStop(", writer);
         hilight("" + (frame + 1), writer);
         return hilight(")", writer);

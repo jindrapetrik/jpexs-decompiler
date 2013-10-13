@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,14 +46,14 @@ public class DeleteActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("delete ", writer);
         if (object == null) {
-            return propertyName.toString(writer, constants);
+            return propertyName.toString(writer, localData);
         }
-        object.toString(writer, constants);
+        object.toString(writer, localData);
         hilight(".", writer);
-        return stripQuotes(propertyName, constants, writer);
+        return stripQuotes(propertyName, localData, writer);
     }
 
     @Override

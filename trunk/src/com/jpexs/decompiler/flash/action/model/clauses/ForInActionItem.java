@@ -39,6 +39,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,20 +65,20 @@ public class ForInActionItem extends LoopActionItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("loop" + loop.id + ":", writer).appendNewLine();
         hilight("for(", writer);
         if ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber)) {
             hilight("var ", writer);
         }
-        stripQuotes(variableName, constants, writer);
+        stripQuotes(variableName, localData, writer);
         hilight(" in ", writer);
-        enumVariable.toString(writer, constants);
+        enumVariable.toString(writer, localData);
         hilight(")", writer).appendNewLine();
         hilight("{", writer).appendNewLine();
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : commands) {
-            ti.toStringSemicoloned(writer, constants).appendNewLine();
+            ti.toStringSemicoloned(writer, localData).appendNewLine();
         }
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();
         hilight("}", writer).appendNewLine();

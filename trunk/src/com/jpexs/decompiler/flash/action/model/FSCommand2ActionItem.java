@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,12 +48,12 @@ public class FSCommand2ActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("FSCommand2(", writer);
-        command.toString(writer, constants);
+        command.toString(writer, localData);
         for (int t = 0; t < arguments.size(); t++) {
             hilight(",", writer);
-            arguments.get(t).toString(writer, constants);
+            arguments.get(t).toString(writer, localData);
         }
         return hilight(")", writer);
     }

@@ -48,9 +48,8 @@ public class WithActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         String ret;
-        LocalData localData = LocalData.create(constants);
         hilight("with(", writer);
         scope.toString(writer, localData);
         hilight(")", writer).appendNewLine();

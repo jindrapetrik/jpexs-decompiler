@@ -70,7 +70,7 @@ public class SwitchItem extends LoopItem implements Block {
             hilight(Graph.INDENTOPEN, writer).appendNewLine();
             for (int j = 0; j < caseCommands.get(i).size(); j++) {
                 if (!caseCommands.get(i).get(j).isEmpty()) {
-                    caseCommands.get(i).get(j).toStringSemicoloned(writer, localData.constants).appendNewLine();
+                    caseCommands.get(i).get(j).toStringSemicoloned(writer, localData).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -82,7 +82,7 @@ public class SwitchItem extends LoopItem implements Block {
                 hilight(Graph.INDENTOPEN, writer).appendNewLine();
                 for (int j = 0; j < defaultCommands.size(); j++) {
                     if (!defaultCommands.get(j).isEmpty()) {
-                        defaultCommands.get(j).toStringSemicoloned(writer, localData.constants).appendNewLine();
+                        defaultCommands.get(j).toStringSemicoloned(writer, localData).appendNewLine();
                     }
                 }
                 hilight(Graph.INDENTCLOSE, writer).appendNewLine();

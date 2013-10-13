@@ -46,13 +46,13 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("ifFrameLoaded(", writer);
-        frame.toString(writer, constants);
+        frame.toString(writer, localData);
         hilight(")", writer).appendNewLine();
         hilight("{", writer).appendNewLine();
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
-        writer.appendNoHilight(Graph.graphToString(actions, writer.getIsHighlighted(), false, LocalData.create(constants)));
+        writer.appendNoHilight(Graph.graphToString(actions, writer.getIsHighlighted(), false, localData));
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();
         return hilight("}", writer);
     }

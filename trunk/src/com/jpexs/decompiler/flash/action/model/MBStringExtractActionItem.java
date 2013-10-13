@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,13 +49,13 @@ public class MBStringExtractActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("mbsubstring(", writer);
-        value.toString(writer, constants);
+        value.toString(writer, localData);
         hilight(",", writer);
-        index.toString(writer, constants);
+        index.toString(writer, localData);
         hilight(",", writer);
-        count.toString(writer, constants);
+        count.toString(writer, localData);
         return hilight(")", writer);
     }
 

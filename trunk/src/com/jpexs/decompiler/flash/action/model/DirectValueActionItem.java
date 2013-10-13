@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,7 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, LocalData localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
                 return hilight("0", writer);
@@ -127,7 +128,7 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
                 return hilight("0", writer);

@@ -707,12 +707,12 @@ public class AVM2Code implements Serializable {
         return s.toString();
     }
 
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         int i = 0;
         for (AVM2Instruction instruction : code) {
             writer.appendNoHilight(Helper.formatAddress(i));
             writer.appendNoHilight(" ");
-            instruction.toString(writer, constants, new ArrayList<String>()).appendNewLine();
+            instruction.toString(writer, localData).appendNewLine();
             i++;
         }
         return writer;

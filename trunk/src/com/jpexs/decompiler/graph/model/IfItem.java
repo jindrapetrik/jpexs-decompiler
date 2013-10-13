@@ -78,7 +78,7 @@ public class IfItem extends GraphTargetItem implements Block {
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
         for (GraphTargetItem ti : ifBranch) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
+                ti.toStringSemicoloned(writer, localData).appendNewLine();
             }
         }
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();
@@ -90,7 +90,7 @@ public class IfItem extends GraphTargetItem implements Block {
             hilight(Graph.INDENTOPEN, writer).appendNewLine();
             for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
+                    ti.toStringSemicoloned(writer, localData).appendNewLine();
                 }
             }
             hilight(Graph.INDENTCLOSE, writer).appendNewLine();

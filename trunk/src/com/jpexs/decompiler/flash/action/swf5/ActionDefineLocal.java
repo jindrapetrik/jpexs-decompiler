@@ -17,9 +17,9 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -39,7 +39,7 @@ public class ActionDefineLocal extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop();
         GraphTargetItem name = stack.pop();
-        variables.put(name.toStringNoQuotes(false, (ConstantPool) null), value);
+        variables.put(name.toStringNoQuotes(false, LocalData.create(null)), value);
         output.add(new DefineLocalActionItem(this, name, value));
     }
 }

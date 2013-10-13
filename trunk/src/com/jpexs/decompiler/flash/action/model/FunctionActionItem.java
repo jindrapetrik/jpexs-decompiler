@@ -73,14 +73,14 @@ public class FunctionActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (true) {
             //return writer.appendNoHilight("<func>")
         }
         hilight("function", writer);
         if (calculatedFunctionName != null) {
             hilight(" ", writer);
-            calculatedFunctionName.toStringNoQuotes(writer, constants);
+            calculatedFunctionName.toStringNoQuotes(writer, localData);
         } else if (!functionName.equals("")) {
             hilight(" ", writer);
             hilight(functionName, writer);
@@ -99,7 +99,7 @@ public class FunctionActionItem extends ActionItem {
         hilight(")", writer).appendNewLine();
         hilight("{", writer).appendNewLine();
         hilight(Graph.INDENTOPEN, writer).appendNewLine();
-        writer.appendNoHilight(Graph.graphToString(actions, writer.getIsHighlighted(), false, LocalData.create(constants)));
+        writer.appendNoHilight(Graph.graphToString(actions, writer.getIsHighlighted(), false, localData));
         hilight(Graph.INDENTCLOSE, writer).appendNewLine();
         return hilight("}", writer);
     }

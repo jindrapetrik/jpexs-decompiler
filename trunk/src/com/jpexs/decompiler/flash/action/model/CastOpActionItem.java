@@ -46,11 +46,11 @@ public class CastOpActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("(", writer);
-        stripQuotes(constructor, constants, writer);
+        stripQuotes(constructor, localData, writer);
         hilight(")", writer);
-        return object.toString(writer, LocalData.create(constants));
+        return object.toString(writer, localData);
     }
 
     @Override

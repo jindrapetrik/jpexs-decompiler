@@ -49,7 +49,7 @@ public class CallMethodActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         boolean blankMethod = false;
         if (methodName instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) methodName).value instanceof Undefined) {
@@ -64,15 +64,15 @@ public class CallMethodActionItem extends ActionItem {
         if (!blankMethod) {
             if (scriptObject.precedence > this.precedence) {
                 hilight("(", writer);
-                scriptObject.toString(writer, constants);
+                scriptObject.toString(writer, localData);
                 hilight(")", writer);
             } else {
-                scriptObject.toString(writer, constants);
+                scriptObject.toString(writer, localData);
             }
             hilight(".", writer);
-            stripQuotes(methodName, constants, writer);
+            stripQuotes(methodName, localData, writer);
         } else {
-            scriptObject.toString(writer, constants);
+            scriptObject.toString(writer, localData);
         }
         hilight("(", writer);
 
@@ -80,7 +80,7 @@ public class CallMethodActionItem extends ActionItem {
             if (t > 0) {
                 hilight(",", writer);
             }
-            arguments.get(t).toStringNL(writer, LocalData.create(constants));
+            arguments.get(t).toStringNL(writer, localData);
         }
         
         return hilight(")", writer);

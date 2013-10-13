@@ -43,15 +43,15 @@ public class CallFunctionActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         String paramStr = "";
-        stripQuotes(functionName, constants, writer);
+        stripQuotes(functionName, localData, writer);
         hilight("(", writer);
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
                 hilight(",", writer);
             }
-            arguments.get(t).toStringNL(writer, LocalData.create(constants));
+            arguments.get(t).toStringNL(writer, localData);
         }
         return hilight(")", writer);
     }

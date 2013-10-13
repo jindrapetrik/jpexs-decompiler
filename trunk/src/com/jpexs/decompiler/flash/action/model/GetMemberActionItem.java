@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,17 +45,17 @@ public class GetMemberActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (!((memberName instanceof DirectValueActionItem) && (((DirectValueActionItem) memberName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
-            object.toString(writer, constants);
+            object.toString(writer, localData);
             hilight("[", writer);
-            stripQuotes(memberName, constants, writer);
+            stripQuotes(memberName, localData, writer);
             return hilight("]", writer);
         }
-        object.toString(writer, constants);
+        object.toString(writer, localData);
         hilight(".", writer);
-        return stripQuotes(memberName, constants, writer);
+        return stripQuotes(memberName, localData, writer);
     }
 
     @Override

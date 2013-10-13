@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 public class StoreRegisterActionItem extends ActionItem implements SetTypeActionItem {
@@ -67,15 +68,15 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         if (temporary) {
-            value.toString(writer, constants);
+            value.toString(writer, localData);
         } else {
             if (define) {
                 hilight("var ", writer);
             }
             hilight(register.translate() + " = ", writer); 
-            value.toString(writer, constants);
+            value.toString(writer, localData);
         }
         return writer;
     }

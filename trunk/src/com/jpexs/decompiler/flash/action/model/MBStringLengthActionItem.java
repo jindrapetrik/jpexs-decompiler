@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 public class MBStringLengthActionItem extends ActionItem {
@@ -33,14 +34,14 @@ public class MBStringLengthActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("mblength(", writer);
         if (value.precedence > precedence) {
             hilight("(", writer);
-            value.toString(writer, constants);
+            value.toString(writer, localData);
             hilight(")", writer);
         } else {
-            value.toString(writer, constants);
+            value.toString(writer, localData);
         }
         return hilight(")", writer);
     }

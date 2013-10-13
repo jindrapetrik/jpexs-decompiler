@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class NewMethodActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         boolean blankMethod = false;
         if (methodName instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) methodName).value instanceof Undefined) {
@@ -62,18 +63,18 @@ public class NewMethodActionItem extends ActionItem {
         if (!blankMethod) {
             hilight("new ", writer);
         }
-        scriptObject.toString(writer, constants);
+        scriptObject.toString(writer, localData);
         if (!blankMethod) {
             hilight(".", writer);
             if (methodName instanceof DirectValueActionItem) {
                 if (((DirectValueActionItem) methodName).value instanceof Undefined) {
                 } else if (((DirectValueActionItem) methodName).value instanceof String) {
-                    ((DirectValueActionItem) methodName).toStringNoQuotes(writer, constants);
+                    ((DirectValueActionItem) methodName).toStringNoQuotes(writer, localData);
                 } else {
-                    methodName.toString(writer, constants);
+                    methodName.toString(writer, localData);
                 }
             } else {
-                methodName.toString(writer, constants);
+                methodName.toString(writer, localData);
             }
         }
         hilight("(", writer);
@@ -81,7 +82,7 @@ public class NewMethodActionItem extends ActionItem {
             if (t > 0) {
                 hilight(",", writer);
             }
-            arguments.get(t).toString(writer, constants);
+            arguments.get(t).toString(writer, localData);
         }
         return hilight(")", writer);        
     }

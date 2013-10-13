@@ -2160,7 +2160,7 @@ public class Graph {
         HilightedTextWriter writer = new HilightedTextWriter(highlight);
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData.constants).appendNewLine();
+                ti.toStringSemicoloned(writer, localData).appendNewLine();
             }
         }
         String[] parts = writer.toString().split("\r\n");

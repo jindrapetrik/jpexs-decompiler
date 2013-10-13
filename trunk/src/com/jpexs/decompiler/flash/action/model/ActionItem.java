@@ -37,7 +37,7 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         super(instruction, precedence);
     }
 
-    public abstract HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants);
+    public abstract HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData);
 
     protected boolean isEmptyString(GraphTargetItem target) {
         if (target instanceof DirectValueActionItem) {
@@ -51,7 +51,7 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         return false;
     }
 
-    protected HilightedTextWriter stripQuotes(GraphTargetItem target, ConstantPool constants, HilightedTextWriter writer) {
+    protected HilightedTextWriter stripQuotes(GraphTargetItem target, LocalData localData, HilightedTextWriter writer) {
         if (target instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) target).value instanceof String) {
                 return ((DirectValueActionItem) target).hilight((String) ((DirectValueActionItem) target).value, writer);
@@ -60,13 +60,8 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         if (target == null) {
             return writer;
         } else {
-            return target.toString(writer, constants);
+            return target.toString(writer, localData);
         }
-    }
-
-    @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
-        return toString(writer, localData.constants);
     }
 
     protected List<GraphSourceItem> toSourceCall(List<Object> localData, SourceGenerator gen, List<GraphTargetItem> list) {

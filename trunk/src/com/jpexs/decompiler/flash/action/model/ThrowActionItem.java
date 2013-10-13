@@ -33,9 +33,9 @@ public class ThrowActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("throw ", writer);
-        return value.toString(writer, LocalData.create(constants));
+        return value.toString(writer, localData);
     }
 
     @Override

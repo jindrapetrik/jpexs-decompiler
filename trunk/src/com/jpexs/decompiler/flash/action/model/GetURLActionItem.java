@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class GetURLActionItem extends ActionItem {
     public String targetString;
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("getUrl(\"", writer);
         hilight(Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString), writer);
         return hilight("\")", writer);

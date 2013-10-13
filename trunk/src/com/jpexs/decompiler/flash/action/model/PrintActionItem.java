@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,11 +51,11 @@ public class PrintActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
         hilight("print(", writer);
-        target.toString(writer, constants);
+        target.toString(writer, localData);
         hilight(",", writer);
-        boundingBox.toString(writer, constants);
+        boundingBox.toString(writer, localData);
         return hilight(")", writer);
     }
 

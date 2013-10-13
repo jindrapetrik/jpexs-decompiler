@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 public class StringExtractActionItem extends ActionItem {
@@ -38,12 +39,12 @@ public class StringExtractActionItem extends ActionItem {
     }
 
     @Override
-    public HilightedTextWriter toString(HilightedTextWriter writer, ConstantPool constants) {
-        value.toString(writer, constants);
+    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+        value.toString(writer, localData);
         hilight(".substr(", writer);
-        index.toString(writer, constants);
+        index.toString(writer, localData);
         hilight(",", writer);
-        count.toString(writer, constants);
+        count.toString(writer, localData);
         return hilight(")", writer);
     }
 
