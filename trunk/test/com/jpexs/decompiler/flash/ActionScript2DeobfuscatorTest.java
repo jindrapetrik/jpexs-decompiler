@@ -73,7 +73,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
-            String actualResult = Action.actionsToSource(doa.getActions(swf.version), swf.version, "", false);
+            String actualResult = Action.actionsToSource(doa.getActions(swf.version), swf.version, "", false, 0);
 
             assertTrue(actualResult.contains("case \"c\":"));
         } catch (IOException | ParseException ex) {

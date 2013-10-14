@@ -41,7 +41,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
     private void compareSrc(int frame, String expectedResult) {
         DoActionTag doa = getFrameSource(frame);
         assertNotNull(doa);
-        String actualResult = Action.actionsToSource(doa.getActions(swf.version), swf.version, "", false);
+        String actualResult = Action.actionsToSource(doa.getActions(swf.version), swf.version, "", false, 0);
         actualResult = actualResult.replaceAll("[ \r\n]", "");
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);

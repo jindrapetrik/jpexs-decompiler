@@ -5,6 +5,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -43,7 +44,7 @@ public class AS3Generator {
                     s.append("(){\r\ndecompileMethod(\"");
                     s.append(name);
                     s.append("\", ");
-                    String src = abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", false, false, -1/*FIX?*/, classId, abc, null,abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, false, true, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
+                    String src = abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", false, false, -1/*FIX?*/, classId, abc, null,abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
                     String[] srcs = src.split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {
                         String ss = srcs[i];

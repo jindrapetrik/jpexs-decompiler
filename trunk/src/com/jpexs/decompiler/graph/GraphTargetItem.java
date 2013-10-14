@@ -111,8 +111,8 @@ public abstract class GraphTargetItem implements Serializable {
 
     protected abstract HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData);
     
-    public String toString(boolean highlight, LocalData localData) {
-        HilightedTextWriter writer = new HilightedTextWriter(highlight);
+    public String toString(LocalData localData) {
+        HilightedTextWriter writer = new HilightedTextWriter(false);
         toString(writer, localData);
         return writer.toString();
     }

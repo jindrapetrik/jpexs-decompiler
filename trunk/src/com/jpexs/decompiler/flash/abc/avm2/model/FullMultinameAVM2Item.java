@@ -59,13 +59,13 @@ public class FullMultinameAVM2Item extends AVM2Item {
     public boolean isXML(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String cname;
         if (name != null) {
-            cname = name.toString(false, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+            cname = name.toString(LocalData.create(constants, localRegNames, fullyQualifiedNames));
         } else {
             cname = (constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
         }
         String cns = "";
         if (namespace != null) {
-            cns = namespace.toString(false, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+            cns = namespace.toString(LocalData.create(constants, localRegNames, fullyQualifiedNames));
         } else {
             Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
             if ((ns != null) && (ns.name_index != 0)) {

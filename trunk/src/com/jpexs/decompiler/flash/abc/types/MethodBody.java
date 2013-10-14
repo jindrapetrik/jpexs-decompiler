@@ -109,6 +109,14 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
+    public String toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits) {
+        HilightedTextWriter writer = new HilightedTextWriter(false);
+        toString(path, pcode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, fullyQualifiedNames, initTraits);
+        String src = writer.toString();
+        src = Graph.removeNonRefenrencedLoopLabels(src);
+        return src;
+    }
+    
     public HilightedTextWriter toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final HilightedTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits) {
         if (debugMode) {
             System.err.println("Decompiling " + path);

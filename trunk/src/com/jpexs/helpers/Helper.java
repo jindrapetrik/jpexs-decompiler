@@ -386,7 +386,7 @@ public class Helper {
             if (i < stack.size() - 1) {
                 ret += ", ";
             }
-            ret += stack.get(i).toString(false, localData);
+            ret += stack.get(i).toString(localData);
         }
         ret += "]";
         return ret;

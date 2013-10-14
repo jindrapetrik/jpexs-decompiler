@@ -673,7 +673,7 @@ public class ActionListReader {
                 HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
                 System.err.print("variables: ");
                 for (Map.Entry<String, GraphTargetItem> v : vars.entrySet()) {
-                    System.err.print("'" + v + "' = " + v.getValue().toString(false, LocalData.create(cpool)) + ", ");
+                    System.err.print("'" + v + "' = " + v.getValue().toString(LocalData.create(cpool)) + ", ");
                 }
                 System.err.println();
                 String add = "";

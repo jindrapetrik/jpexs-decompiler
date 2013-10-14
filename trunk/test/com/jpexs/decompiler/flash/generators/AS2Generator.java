@@ -34,7 +34,7 @@ public class AS2Generator {
                 if (doa == null) {
                     continue;
                 }
-                String src = Action.actionsToSource(doa.getActions(swf.version), swf.version,"",false);
+                String src = Action.actionsToSource(doa.getActions(swf.version), swf.version,"",false, 0);
                 if (src.trim().equals("")) {
                     doa = null;
                     continue;

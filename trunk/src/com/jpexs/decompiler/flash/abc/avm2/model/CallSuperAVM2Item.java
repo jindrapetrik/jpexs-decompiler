@@ -39,7 +39,7 @@ public class CallSuperAVM2Item extends AVM2Item {
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        if (!receiver.toString(false, localData).equals("this")) {
+        if (!receiver.toString(localData).equals("this")) {
             receiver.toString(writer, localData);
             writer.append(".");
         }
