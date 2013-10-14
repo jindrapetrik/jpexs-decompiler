@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class ScriptInfo {
         return "method_index=" + init_index + "\r\n" + traits.toString(abc, fullyQualifiedNames);
     }
 
-    public String convert(List<ABCContainerTag> abcTags, ABC abc, boolean pcode, boolean highlighting, int scriptIndex, boolean parallel) {
-        return traits.convert(null, "", abcTags, abc, false, pcode, true, scriptIndex, -1, highlighting, new ArrayList<String>(), parallel);
+    public HilightedTextWriter convert(List<ABCContainerTag> abcTags, ABC abc, boolean pcode, HilightedTextWriter writer, int scriptIndex, boolean parallel) {
+        return traits.convert(null, "", abcTags, abc, false, pcode, true, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
     }
 }

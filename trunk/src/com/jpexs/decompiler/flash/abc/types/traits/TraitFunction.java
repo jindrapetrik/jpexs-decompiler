@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
@@ -42,7 +41,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public String convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
+    public HilightedTextWriter convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         MethodBody body = abc.findBody(method_info);
         if (body == null) {
@@ -51,19 +50,31 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         if (modifier.equals(" ")) {
             modifier = "";
         }
-        return modifier + Highlighting.hilighSpecial(highlight, "function ", "traittype") + Highlighting.hilighSpecial(highlight, abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames), "traitname") + "(" + abc.method_info[method_info].getParamStr(highlight, abc.constants, body, abc, fullyQualifiedNames) + ") : " + abc.method_info[method_info].getReturnTypeStr(highlight, abc.constants, fullyQualifiedNames);
+        writer.appendNoHilight(modifier);
+        writer.hilightSpecial("function ", "traittype");
+        writer.hilightSpecial(abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames), "traitname");
+        writer.appendNoHilight("(");
+        abc.method_info[method_info].getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
+        writer.appendNoHilight(") : ");
+        abc.method_info[method_info].getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
+        return writer;
     }
 
     @Override
-    public String convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
-        String header = convertHeader(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames, parallel);
-        String bodyStr = "";
-        int bodyIndex = abc.findBodyIndex(method_info);
-        if (bodyIndex != -1) {
-            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, true, fullyQualifiedNames, null), 3);
+    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+        convertHeader(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+        if (abc.instance_info[classIndex].isInterface()) {
+            writer.appendNoHilight(";");
+        } else {
+            writer.appendNoHilight(" {").newLine();
+            int bodyIndex = abc.findBodyIndex(method_info);
+            if (bodyIndex != -1) {
+                abc.bodies[bodyIndex].toString(path + "." + abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null);
+            }
+            writer.newLine();
+            writer.appendNoHilight("}");
         }
-        return HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + header + (abc.instance_info[classIndex].isInterface() ? ";" : " {\r\n" + bodyStr + "\r\n" + HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + "}");
-
+        return writer;
     }
 
     @Override

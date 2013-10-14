@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.usages;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,16 +43,27 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
     @Override
     public String toString(List<ABCContainerTag> abcTags, ABC abc) {
-        return super.toString(abcTags, abc) + " " + (isInitializer
-                ? (isStatic
-                ? "class initializer"
-                : "instance initializer")
-                : ((parentTraitIndex > -1
-                ? (isStatic
-                ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, false, new ArrayList<String>(), false))
-                : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, false, new ArrayList<String>(), false))) + " "
-                : "")
-                + (((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, false, new ArrayList<String>(), false))));
+        HilightedTextWriter writer = new HilightedTextWriter(false);
+        writer.appendNoHilight(super.toString(abcTags, abc));
+        writer.appendNoHilight(" ");
+        if (isInitializer) {
+            if (isStatic) {
+                writer.appendNoHilight("class initializer");
+            } else {
+                writer.appendNoHilight("instance initializer");
+            }
+        } else {
+            if (parentTraitIndex > -1) {
+                if (isStatic){
+                    ((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+                } else {
+                    ((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+                }
+                writer.appendNoHilight(" ");
+            }
+            ((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+        }
+        return writer.toString();
     }
 
     public int getTraitIndex() {

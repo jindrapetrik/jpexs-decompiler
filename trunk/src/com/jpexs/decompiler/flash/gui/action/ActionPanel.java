@@ -173,7 +173,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             if (actions == null) {
                 actions = src.getActions(SWF.DEFAULT_VERSION);
             }
-            String s = Action.actionsToSource(actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, true);
+            String s = Action.actionsToSource(actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, true, 0);
             List<Highlighting> hilights = Highlighting.getInstrHighlights(s);
             String srcNoHex = Highlighting.stripHilights(s);
             cache.put(src, new CachedScript(srcNoHex, hilights));
@@ -309,7 +309,9 @@ public class ActionPanel extends JPanel implements ActionListener {
                 asm.addDisassemblyListener(listener);
                 List<Action> actions = asm.getActions(SWF.DEFAULT_VERSION);
                 lastCode = actions;
-                lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true, true, actions);
+                HilightedTextWriter writer = new HilightedTextWriter(true);
+                asm.getASMSource(SWF.DEFAULT_VERSION, true, writer, actions);
+                lastDisasm = writer.toString();
                 asm.removeDisassemblyListener(listener);
                 srcWithHex = Helper.hexToComments(lastDisasm);
                 srcNoHex = Helper.stripComments(lastDisasm);

@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
@@ -227,26 +227,26 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public String getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, boolean highlight) {
+    public HilightedTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, HilightedTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
-            return toString(highlight);
+            return toString(writer);
         }
         List<Object> oldVal = values;
         values = replacement;
-        String ts = toString(highlight);
+        toString(writer);
         values = oldVal;
-        return ts;
+        return writer;
     }
 
-    public String paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, boolean highlight) {
+    public HilightedTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, HilightedTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
-            return paramsToString(highlight);
+            return paramsToString(writer);
         }
         List<Object> oldVal = values;
         values = replacement;
-        String ts = paramsToString(highlight);
+        paramsToString(writer);
         values = oldVal;
-        return ts;
+        return writer;
     }
 
     public String toStringNoQ(int i) {
@@ -279,29 +279,32 @@ public class ActionPush extends Action {
         return ret;
     }
 
-    public String paramsToString(boolean highlight) {
-        String ret = "";
+    public HilightedTextWriter paramsToString(HilightedTextWriter writer) {
         int pos = 0;
         for (int i = 0; i < values.size(); i++) {
             if (ignoredParts.contains(i)) {
                 continue;
             }
             if (pos > 0) {
-                ret += " ";
+                writer.appendNoHilight(" ");
             }
-            ret += highlight ? Highlighting.hilighOffset(toString(i), getAddress() + pos + 1) : toString(i);
+            writer.append(toString(i), getAddress() + pos + 1);
             pos++;
         }
-        return ret;
+        return writer;
     }
 
     @Override
     public String toString() {
-        return "Push " + paramsToString(false);
+        HilightedTextWriter writer = new HilightedTextWriter(false);
+        toString(writer);
+        return writer.toString();
     }
 
-    public String toString(boolean highlight) {
-        return "Push " + paramsToString(highlight);
+    public HilightedTextWriter toString(HilightedTextWriter writer) {
+        writer.appendNoHilight("Push ");
+        paramsToString(writer);
+        return writer;
     }
 
     @Override

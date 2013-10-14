@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
@@ -147,11 +148,11 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
      * @return ASM source
      */
     @Override
-    public String getASMSource(int version, boolean hex, boolean highlight, List<Action> actions) {
+    public HilightedTextWriter getASMSource(int version, boolean hex, HilightedTextWriter writer, List<Action> actions) {
         if (actions == null) {
             actions = getActions(version);
         }
-        return Action.actionsToString(listeners, 0, actions, null, version, hex, highlight, getPos() + 4, toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, version, hex, writer, getPos() + 4, toString()/*FIXME?*/);
     }
 
     /**

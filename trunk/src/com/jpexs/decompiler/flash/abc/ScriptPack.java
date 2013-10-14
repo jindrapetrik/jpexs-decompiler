@@ -18,7 +18,9 @@ package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -118,11 +120,14 @@ public class ScriptPack {
             for (int t : traitIndices) {
                 Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
                 Namespace ns = name.getNamespace(abc.constants);
+                HilightedTextWriter writer = new HilightedTextWriter(false);
                 if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convertPackaged(null, "", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>(), parallel).getBytes("utf-8"));
+                    abc.script_info[scriptIndex].traits.traits[t].convertPackaged(null, "", abcList, abc, false, pcode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
                 } else {
-                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convert(null, "", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>(), parallel).getBytes("utf-8"));
+                    abc.script_info[scriptIndex].traits.traits[t].convert(null, "", abcList, abc, false, pcode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
                 }
+                String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
+                fos.write(s.getBytes("utf-8"));
             }
         }
         return file;

@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
@@ -133,7 +134,9 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         if (bodyIndex == -1) {
             return;
         }
-        String textWithHexTags = abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], true, true);
+        HilightedTextWriter writer = new HilightedTextWriter(true);
+        abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], true, writer);
+        String textWithHexTags = writer.toString();
         textWithHex = Helper.hexToComments(textWithHexTags);
         textNoHex = Helper.stripComments(textWithHexTags);
         setText(hex ? textWithHex : textNoHex);

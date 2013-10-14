@@ -718,169 +718,167 @@ public class AVM2Code implements Serializable {
         return writer;
     }
 
-    public String toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, boolean hex, boolean highlight) {
-        return toASMSource(constants, trait, info, body, new ArrayList<Integer>(), hex, highlight);
+    public HilightedTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, boolean hex, HilightedTextWriter writer) {
+        return toASMSource(constants, trait, info, body, new ArrayList<Integer>(), hex, writer);
     }
 
-    public String toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, boolean hex, boolean highlight) {
+    public HilightedTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, boolean hex, HilightedTextWriter writer) {
         invalidateCache();
-        StringBuilder ret = new StringBuilder();
-        String t = "";
         if (trait != null) {
             if (trait instanceof TraitFunction) {
                 TraitFunction tf = (TraitFunction) trait;
-                ret.append("trait ");
-                ret.append(Highlighting.hilighSpecial(highlight, "function ", "traittype"));
-                ret.append(Highlighting.hilighSpecial(highlight, constants.multinameToString(tf.name_index), "traitname"));
-                ret.append(" slotid ");
-                ret.append(Highlighting.hilighSpecial(highlight, "" + tf.slot_index, "slotid"));
-                ret.append("\n");
+                writer.appendNoHilight("trait ");
+                writer.hilightSpecial("function ", "traittype");
+                writer.hilightSpecial(constants.multinameToString(tf.name_index), "traitname");
+                writer.appendNoHilight(" slotid ");
+                writer.hilightSpecial("" + tf.slot_index, "slotid");
+                writer.newLine();
             }
             if (trait instanceof TraitMethodGetterSetter) {
                 TraitMethodGetterSetter tm = (TraitMethodGetterSetter) trait;
-                ret.append("trait ");
+                writer.appendNoHilight("trait ");
                 switch (tm.kindType) {
                     case Trait.TRAIT_METHOD:
-                        ret.append(Highlighting.hilighSpecial(highlight, "method ", "traittype"));
+                        writer.hilightSpecial("method ", "traittype");
                         break;
                     case Trait.TRAIT_GETTER:
-                        ret.append(Highlighting.hilighSpecial(highlight, "getter ", "traittype"));
+                        writer.hilightSpecial("getter ", "traittype");
                         break;
                     case Trait.TRAIT_SETTER:
-                        ret.append(Highlighting.hilighSpecial(highlight, "setter ", "traittype"));
+                        writer.hilightSpecial("setter ", "traittype");
                         break;
                 }
-                ret.append(Highlighting.hilighSpecial(highlight, constants.multinameToString(tm.name_index), "traitname"));
-                ret.append(" dispid ");
-                ret.append(Highlighting.hilighSpecial(highlight, "" + tm.disp_id, "dispid"));
-                ret.append("\n");
+                writer.hilightSpecial(constants.multinameToString(tm.name_index), "traitname");
+                writer.appendNoHilight(" dispid ");
+                writer.hilightSpecial("" + tm.disp_id, "dispid");
+                writer.newLine();
             }
         }
         if (info != null) {
-            ret.append("method\n");
-            ret.append("name ");
-            ret.append(Highlighting.hilighSpecial(highlight, info.name_index == 0 ? "null" : "\"" + Helper.escapeString(info.getName(constants)) + "\"", "methodname"));
-            ret.append("\n");
+            writer.appendNoHilight("method").newLine();
+            writer.appendNoHilight("name ");
+            writer.hilightSpecial(info.name_index == 0 ? "null" : "\"" + Helper.escapeString(info.getName(constants)) + "\"", "methodname");
+            writer.newLine();
             if (info.flagExplicit()) {
-                ret.append("flag ");
-                ret.append(Highlighting.hilighSpecial(highlight, "EXPLICIT", "flag.EXPLICIT"));
-                ret.append("\n");
+                writer.appendNoHilight("flag ");
+                writer.hilightSpecial("EXPLICIT", "flag.EXPLICIT");
+                writer.newLine();
             }
             if (info.flagHas_optional()) {
-                ret.append("flag ");
-                ret.append(Highlighting.hilighSpecial(highlight, "HAS_OPTIONAL", "flag.HAS_OPTIONAL"));
-                ret.append("\n");
-                ret.append("flag HAS_OPTIONAL\n");
+                writer.appendNoHilight("flag ");
+                writer.hilightSpecial("HAS_OPTIONAL", "flag.HAS_OPTIONAL");
+                writer.newLine();
+                writer.appendNoHilight("flag HAS_OPTIONAL").newLine();
             }
             if (info.flagHas_paramnames()) {
-                ret.append("flag ");
-                ret.append(Highlighting.hilighSpecial(highlight, "HAS_PARAM_NAMES", "flag.HAS_PARAM_NAMES"));
-                ret.append("\n");
+                writer.appendNoHilight("flag ");
+                writer.hilightSpecial("HAS_PARAM_NAMES", "flag.HAS_PARAM_NAMES");
+                writer.newLine();
             }
             if (info.flagIgnore_rest()) {
-                ret.append("flag ");
-                ret.append(Highlighting.hilighSpecial(highlight, "EXPLICIT", "flag.IGNORE_REST"));
-                ret.append("\n");
+                writer.appendNoHilight("flag ");
+                writer.hilightSpecial("EXPLICIT", "flag.IGNORE_REST");
+                writer.newLine();
             }
             if (info.flagNeed_activation()) {
-                ret.append("flag ");
-                ret.append(Highlighting.hilighSpecial(highlight, "NEED_ACTIVATION", "flag.NEED_ACTIVATION"));
-                ret.append("\n");
+                writer.appendNoHilight("flag ");
+                writer.hilightSpecial("NEED_ACTIVATION", "flag.NEED_ACTIVATION");
+                writer.newLine();
             }
             if (info.flagNeed_arguments()) {
-                ret.append("flag ");
-                ret.append(Highlighting.hilighSpecial(highlight, "NEED_ARGUMENTS", "flag.NEED_ARGUMENTS"));
-                ret.append("\n");
+                writer.appendNoHilight("flag ");
+                writer.hilightSpecial("NEED_ARGUMENTS", "flag.NEED_ARGUMENTS");
+                writer.newLine();
             }
             if (info.flagNeed_rest()) {
-                ret.append("flag ");
-                ret.append(Highlighting.hilighSpecial(highlight, "NEED_REST", "flag.NEED_REST"));
-                ret.append("\n");
+                writer.appendNoHilight("flag ");
+                writer.hilightSpecial("NEED_REST", "flag.NEED_REST");
+                writer.newLine();
             }
             if (info.flagSetsdxns()) {
-                ret.append("flag ");
-                ret.append(Highlighting.hilighSpecial(highlight, "SET_DXNS", "flag.SET_DXNS"));
-                ret.append("\n");
+                writer.appendNoHilight("flag ");
+                writer.hilightSpecial("SET_DXNS", "flag.SET_DXNS");
+                writer.newLine();
             }
             for (int p = 0; p < info.param_types.length; p++) {
-                ret.append("param ");
-                ret.append(Highlighting.hilighSpecial(highlight, constants.multinameToString(info.param_types[p]), "param", p));
-                ret.append("\n");
+                writer.appendNoHilight("param ");
+                writer.hilightSpecial(constants.multinameToString(info.param_types[p]), "param", p);
+                writer.newLine();
             }
             if (info.flagHas_paramnames()) {
                 for (int n : info.paramNames) {
-                    ret.append("paramname ");
+                    writer.appendNoHilight("paramname ");
                     if (n == 0) {
-                        ret.append("null");
+                        writer.appendNoHilight("null");
                     } else {
-                        ret.append("\"");
-                        ret.append(constants.constant_string[n]);
-                        ret.append("\"");
+                        writer.appendNoHilight("\"");
+                        writer.appendNoHilight(constants.constant_string[n]);
+                        writer.appendNoHilight("\"");
                     }
-                    ret.append("\n");
+                    writer.newLine();
                 }
             }
             if (info.flagHas_optional()) {
                 for (int i = 0; i < info.optional.length; i++) {
                     ValueKind vk = info.optional[i];
-                    ret.append("optional ");
-                    ret.append(Highlighting.hilighSpecial(highlight, vk.toString(constants), "optional", i));
-                    ret.append("\n");
+                    writer.appendNoHilight("optional ");
+                    writer.hilightSpecial(vk.toString(constants), "optional", i);
+                    writer.newLine();
                 }
             }
-            ret.append("returns ");
-            ret.append(Highlighting.hilighSpecial(highlight, constants.multinameToString(info.ret_type), "returns"));
-            ret.append("\n");
+            writer.appendNoHilight("returns ");
+            writer.hilightSpecial(constants.multinameToString(info.ret_type), "returns");
+            writer.newLine();
         }
-        ret.append("\n");
-        ret.append("body\n");
+        writer.newLine();
+        writer.appendNoHilight("body").newLine();
 
-        ret.append("maxstack ");
-        ret.append(body.max_stack);
-        ret.append("\n");
+        writer.appendNoHilight("maxstack ");
+        writer.appendNoHilight(body.max_stack);
+        writer.newLine();
 
-        ret.append("localcount ");
-        ret.append(body.max_regs);
-        ret.append("\n");
+        writer.appendNoHilight("localcount ");
+        writer.appendNoHilight(body.max_regs);
+        writer.newLine();
 
-        ret.append("initscopedepth ");
-        ret.append(body.init_scope_depth);
-        ret.append("\n");
+        writer.appendNoHilight("initscopedepth ");
+        writer.appendNoHilight(body.init_scope_depth);
+        writer.newLine();
 
-        ret.append("maxscopedepth ");
-        ret.append(body.max_scope_depth);
-        ret.append("\n");
+        writer.appendNoHilight("maxscopedepth ");
+        writer.appendNoHilight(body.max_scope_depth);
+        writer.newLine();
 
 
         List<Long> offsets = new ArrayList<>();
         for (int e = 0; e < body.exceptions.length; e++) {
-            ret.append("try");
+            writer.appendNoHilight("try");
 
-            ret.append(" from ");
-            ret.append("ofs");
-            ret.append(Helper.formatAddress(body.exceptions[e].start));
+            writer.appendNoHilight(" from ");
+            writer.appendNoHilight("ofs");
+            writer.appendNoHilight(Helper.formatAddress(body.exceptions[e].start));
             offsets.add((long) body.exceptions[e].start);
 
-            ret.append(" to ");
-            ret.append("ofs");
-            ret.append(Helper.formatAddress(body.exceptions[e].end));
+            writer.appendNoHilight(" to ");
+            writer.appendNoHilight("ofs");
+            writer.appendNoHilight(Helper.formatAddress(body.exceptions[e].end));
             offsets.add((long) body.exceptions[e].end);
 
-            ret.append(" target ");
-            ret.append("ofs");
-            ret.append(Helper.formatAddress(body.exceptions[e].target));
+            writer.appendNoHilight(" target ");
+            writer.appendNoHilight("ofs");
+            writer.appendNoHilight(Helper.formatAddress(body.exceptions[e].target));
             offsets.add((long) body.exceptions[e].target);
 
-            ret.append(" type ");
-            ret.append(Highlighting.hilighSpecial(highlight, body.exceptions[e].type_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].type_index].toString(constants, new ArrayList<String>()), "try.type", e));
+            writer.appendNoHilight(" type ");
+            writer.hilightSpecial(body.exceptions[e].type_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].type_index].toString(constants, new ArrayList<String>()), "try.type", e);
 
-            ret.append(" name ");
-            ret.append(Highlighting.hilighSpecial(highlight, body.exceptions[e].name_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].name_index].toString(constants, new ArrayList<String>()), "try.name", e));
-            ret.append("\n");
+            writer.appendNoHilight(" name ");
+            writer.hilightSpecial(body.exceptions[e].name_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].name_index].toString(constants, new ArrayList<String>()), "try.name", e);
+            writer.newLine();
         }
 
-        ret.append("\n");
-        ret.append("code\n");
+        writer.newLine();
+        writer.appendNoHilight("code").newLine();
 
         for (AVM2Instruction ins : code) {
             offsets.addAll(ins.getOffsets());
@@ -903,14 +901,14 @@ public class AVM2Code implements Serializable {
         boolean markOffsets = code.size() <= largeLimit;
         for (AVM2Instruction ins : code) {
             if (hex) {
-                ret.append("<ffdec:hex>");
-                ret.append(Helper.bytesToHexString(ins.getBytes()));
-                ret.append("</ffdec:hex>\n");
+                writer.appendNoHilight("<ffdec:hex>");
+                writer.appendNoHilight(Helper.bytesToHexString(ins.getBytes()));
+                writer.appendNoHilight("</ffdec:hex>\n");
             }
             if (ins.labelname != null) {
-                ret.append(ins.labelname + ":");
+                writer.appendNoHilight(ins.labelname + ":");
             } else if (offsets.contains(ofs)) {
-                ret.append("ofs" + Helper.formatAddress(ofs) + ":");
+                writer.appendNoHilight("ofs" + Helper.formatAddress(ofs) + ":");
             }
             /*for (int e = 0; e < body.exceptions.length; e++) {
              if (body.exceptions[e].start == ofs) {
@@ -930,58 +928,54 @@ public class AVM2Code implements Serializable {
                         if (ins2.isIgnored()) {
                             continue;
                         }
-                        t = highlight ? Highlighting.hilighOffset("", ins2.mappedOffset > -1 ? ins2.mappedOffset : ofs) : "";
-                        t += ins2.toStringNoAddress(constants, new ArrayList<String>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)) + "\n";
-                        ret.append(t);
+                        writer.append("", ins2.mappedOffset > -1 ? ins2.mappedOffset : ofs);
+                        writer.appendNoHilight(ins2.toStringNoAddress(constants, new ArrayList<String>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)));
+                        writer.newLine();
                         outputMap.add((Integer) o);
                     } else if (o instanceof ControlFlowTag) {
                         ControlFlowTag cft = (ControlFlowTag) o;
                         if (cft.name.equals("appendjump")) {
-                            t = "jump ofs" + Helper.formatAddress(pos2adr(cft.value)) + "\n";
-                            ret.append(t);
+                            writer.appendNoHilight("jump ofs" + Helper.formatAddress(pos2adr(cft.value))).newLine();
                             outputMap.add(-1);
                         }
                         if (cft.name.equals("mark")) {
-                            ret.append("ofs" + Helper.formatAddress(pos2adr(cft.value)) + ":");
+                            writer.appendNoHilight("ofs" + Helper.formatAddress(pos2adr(cft.value)) + ":");
                         }
                     }
                 }
             } else {
                 if (!ins.isIgnored()) {
+                    if (markOffsets) {
+                        writer.append("", ins.mappedOffset > -1 ? ins.mappedOffset : ofs);
+                    }
                     int fixBranch = ins.getFixBranch();
                     if (fixBranch > -1) {
                         if (ins.definition instanceof IfTypeIns) {
-                            t = "";
                             for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
-                                t += new DeobfuscatePopIns().instructionName + "\n";
+                                writer.appendNoHilight(new DeobfuscatePopIns().instructionName).newLine();
                             }
                             if (fixBranch == 0) { //jump
-                                t += new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]);
+                                writer.appendNoHilight(new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]));
                             } else {
                                 //nojump, ignore
                             }
                         }
                         //TODO: lookupswitch ?
                     } else {
-                        t = ins.toStringNoAddress(constants, new ArrayList<String>());
                         if (ins.changeJumpTo > -1) {
-                            t = ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo));
+                            writer.appendNoHilight(ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo)));
+                        } else {
+                            writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<String>()));
                         }
                     }
-                    if (markOffsets) {
-                        t = (highlight ? Highlighting.hilighOffset("", ins.mappedOffset > -1 ? ins.mappedOffset : ofs) : "") + t + "\n";
-                    } else {
-                        t = t + "\n";
-                    }
-                    ret.append(t);
+                    writer.newLine();
                     outputMap.add(ip);
                 }
             }
             ofs += ins.getBytes().length;
             ip++;
         }
-        String r = ret.toString();
-        return r;
+        return writer;
     }
     private boolean cacheActual = false;
     private List<Long> posCache;
@@ -1338,20 +1332,6 @@ public class AVM2Code implements Serializable {
         }
     }
 
-    public String tabString(int len) {
-        StringBuilder ret = new StringBuilder();
-        for (int i = 0; i < len; i++) {
-            ret.append(HilightedTextWriter.INDENT_STRING);
-        }
-        return ret.toString();
-    }
-
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
-        HilightedTextWriter writer = new HilightedTextWriter(false);
-        toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, body, writer, true, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, staticOperation, localRegAssigmentIps, refs);
-        return writer.toString();
-    }
-
     public int getRegisterCount() {
         int maxRegister = -1;
         for (AVM2Instruction ins : code) {
@@ -1419,7 +1399,7 @@ public class AVM2Code implements Serializable {
         ignoredIns = new ArrayList<>();
     }
 
-    public HilightedTextWriter toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, HilightedTextWriter writer, boolean replaceIndents, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
+    public HilightedTextWriter toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, HilightedTextWriter writer, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
         initToSource();
         List<GraphTargetItem> list;
         String s;
@@ -1534,7 +1514,7 @@ public class AVM2Code implements Serializable {
             list.remove(lastPos);
         }
 
-        Graph.graphToString(list, writer, replaceIndents, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+        Graph.graphToString(list, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
 
         return writer;
     }
@@ -2115,7 +2095,9 @@ public class AVM2Code implements Serializable {
         invalidateCache();
         try {
             List<Integer> outputMap = new ArrayList<>();
-            String src = toASMSource(constants, trait, info, body, outputMap, false, false);
+            HilightedTextWriter writer = new HilightedTextWriter(false);
+            toASMSource(constants, trait, info, body, outputMap, false, writer);
+            String src = writer.toString();
 
             AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, null, body, info);
             for (int i = 0; i < acode.code.size(); i++) {
@@ -2155,7 +2137,9 @@ public class AVM2Code implements Serializable {
     public void removeIgnored(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) {
         try {
             List<Integer> outputMap = new ArrayList<>();
-            String src = toASMSource(constants, trait, info, body, outputMap, false, false);
+            HilightedTextWriter writer = new HilightedTextWriter(false);
+            toASMSource(constants, trait, info, body, outputMap, false, writer);
+            String src = writer.toString();
             AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, trait, body, info);
             for (int i = 0; i < acode.code.size(); i++) {
                 if (outputMap.size() > i) {

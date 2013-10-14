@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.helpers.ReReadableInputStream;
 import java.io.ByteArrayInputStream;
@@ -74,11 +75,11 @@ public class DoActionTag extends Tag implements ASMSource {
      * @return ASM source
      */
     @Override
-    public String getASMSource(int version, boolean hex, boolean highlight, List<Action> actions) {
+    public HilightedTextWriter getASMSource(int version, boolean hex, HilightedTextWriter writer, List<Action> actions) {
         if (actions == null) {
             actions = getActions(version);
         }
-        return Action.actionsToString(listeners, 0, actions, null, version, hex, highlight, getPos(), toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, version, hex, writer, getPos(), toString()/*FIXME?*/);
     }
 
     /**

@@ -2147,7 +2147,7 @@ public class Graph {
      * @param localData
      * @return String
      */
-    public static HilightedTextWriter graphToString(List<GraphTargetItem> tree, HilightedTextWriter writer, boolean replaceIndents, LocalData localData) {
+    public static HilightedTextWriter graphToString(List<GraphTargetItem> tree, HilightedTextWriter writer, LocalData localData) {
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();

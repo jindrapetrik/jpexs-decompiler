@@ -32,19 +32,12 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class TraitClass extends Trait implements TraitWithSlot {
 
@@ -329,26 +322,15 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public String convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
+    public HilightedTextWriter convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         String classHeader = abc.instance_info[class_info].getClassHeaderStr(abc, fullyQualifiedNames);
-        return classHeader;
+        return writer.appendNoHilight(classHeader);
     }
 
     @Override
-    public String convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
+    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
 
-        if (!highlight) {
-            //Highlighting.doHighlight = false;
-        }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream out = null;
-        try {
-            out = new PrintStream(baos, true, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(TraitClass.class.getName()).log(Level.SEVERE, null, ex);
-            return "";
-        }
-
+        writer.startClass(class_info);
         String packageName = abc.instance_info[class_info].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abcTags) {
@@ -420,43 +402,41 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         for (String imp : imports) {
             if (!imp.startsWith(".")) {
-                out.println(HilightedTextWriter.INDENT_STRING + "import " + imp + ";");
+                writer.appendNoHilight("import " + imp + ";").newLine();
             }
         }
-        out.println();
+        writer.newLine();
         for (String us : uses) {
-            out.println(HilightedTextWriter.INDENT_STRING + "use namespace " + us + ";");
+            writer.appendNoHilight("use namespace " + us + ";").newLine();
         }
-        out.println();
+        writer.newLine();
 
         //class header     
         String classHeader = abc.instance_info[class_info].getClassHeaderStr(abc, fullyQualifiedNames);
         if (classHeader.startsWith("private ")) {
             classHeader = classHeader.substring("private ".length());
         }
-        out.println(HilightedTextWriter.INDENT_STRING + classHeader);
-        out.println(HilightedTextWriter.INDENT_STRING + "{");
+        writer.appendNoHilight(classHeader).newLine();
+        writer.appendNoHilight("{").newLine();
+        writer.indent();
 
-        String toPrint;
-        List<String> outTraits = new LinkedList<>();
-
-
-        int bodyIndex;
-        String bodyStr = "";
-        bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
+        int bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
         if (bodyIndex != -1) {
-            bodyStr = abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", pcode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, highlight, true, fullyQualifiedNames, abc.class_info[class_info].static_traits);
-        }
-        if (Highlighting.stripHilights(bodyStr).trim().equals("")) {
-            toPrint = ABC.addTabs(bodyStr + "/*classInitializer*/", 3);
+            int writerPos = writer.getLength();
+            writer.startTrait(abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length + 1);
+            writer.appendNoHilight("{").newLine();
+            writer.mark();
+            abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", pcode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, writer, fullyQualifiedNames, abc.class_info[class_info].static_traits);
+            boolean empty = !writer.getMark();
+            writer.appendNoHilight("}").newLine();
+            writer.endTrait();
+            writer.newLine();
+            if (empty) {
+                writer.setLength(writerPos);
+            }
         } else {
-            toPrint = HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + "{\r\n" + ABC.addTabs(bodyStr, 3) + "\r\n" + HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + "}";
+            //"/*classInitializer*/";
         }
-        if (highlight) {
-            toPrint = Highlighting.hilighTrait(toPrint, abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length + 1);
-        }
-        outTraits.add(toPrint);
-        //}
 
         //constructor
         if (!abc.instance_info[class_info].isInterface()) {
@@ -474,68 +454,36 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     }
                 }
             }
-            String constructorParams;
 
-            bodyStr = "";
+            writer.startTrait(abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length);
+            writer.appendNoHilight(modifier);
+            writer.appendNoHilight("function ");
+            writer.appendNoHilight(abc.constants.constant_multiname[abc.instance_info[class_info].name_index].getName(abc.constants, new ArrayList<String>()/*do not want full names here*/));
+            writer.appendNoHilight("(");
             bodyIndex = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
             if (bodyIndex != -1) {
-                bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", pcode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, true, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
-                constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(highlight, abc.constants, abc.bodies[bodyIndex], abc, fullyQualifiedNames);
+                abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(writer, abc.constants, abc.bodies[bodyIndex], abc, fullyQualifiedNames);
             } else {
-                constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(highlight, abc.constants, null, abc, fullyQualifiedNames);
+                abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(writer, abc.constants, null, abc, fullyQualifiedNames);
             }
-            toPrint = HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + modifier + "function " + abc.constants.constant_multiname[abc.instance_info[class_info].name_index].getName(abc.constants, new ArrayList<String>()/*do not want full names here*/) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + "}";
-            if (highlight) {
-                toPrint = Highlighting.hilighTrait(toPrint, abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length);
+            writer.appendNoHilight(") {").newLine();
+            if (bodyIndex != -1) {
+                abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", pcode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, abc.instance_info[class_info].instance_traits);
             }
-            outTraits.add(toPrint);
+            writer.appendNoHilight("}").newLine();
+            writer.endTrait();
+            writer.newLine();
         }
-        //}
 
         //static variables,constants & methods
-        outTraits.add(abc.class_info[class_info].static_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames, parallel));
+        abc.class_info[class_info].static_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, pcode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        outTraits.add(abc.instance_info[class_info].instance_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames, parallel));
+        abc.instance_info[class_info].instance_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, pcode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-
-        StringBuilder bui = new StringBuilder();
-        boolean first = true;
-        String glue = "\r\n\r\n";
-        for (String s : outTraits) {
-            String stripped = highlight ? Highlighting.stripHilights(s) : s;
-            if (!stripped.trim().equals("")) {
-                if (s.contains("/*classInitializer*/")) {
-                    s = s.replace("/*classInitializer*/", "");
-                    s = s + "\r\n";
-                } else {
-                    if (!first) {
-                        bui.append(glue);
-                    } else {
-                        first = false;
-                    }
-                }
-            } else {
-                s = s.replace(HilightedTextWriter.INDENT_STRING, "");
-            }
-            bui.append(s);
-        }
-
-
-        //out.println(Helper.joinStrings(outTraits, "\r\n\r\n"));
-        out.println(bui.toString());
-        out.println(HilightedTextWriter.INDENT_STRING + "}");//class
-        out.flush();
-        //Highlighting.doHighlight = true;
-        try {
-            if (highlight) {
-                return Highlighting.hilighClass(new String(baos.toByteArray(), "UTF-8"), class_info);
-            } else {
-                return new String(baos.toByteArray(), "UTF-8");
-            }
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(TraitClass.class.getName()).log(Level.SEVERE, null, ex);
-            return "";
-        }
+        writer.unindent();
+        writer.appendNoHilight("}"); // class
+        writer.endClass();
+        return writer;
     }
 
     @Override

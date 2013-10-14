@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import java.awt.BorderLayout;
 import java.io.ByteArrayInputStream;
@@ -89,8 +90,18 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     public void load(TraitSlotConst trait, ABC abc, boolean isStatic) {
         this.abc = abc;
         this.trait = trait;
-        boolean highlight = true;
-        String s = "trait " + Highlighting.hilighSpecial(highlight, abc.constants.multinameToString(trait.name_index), "traitname") + " " + Highlighting.hilighSpecial(highlight, (trait.isConst() ? "const" : "slot"), "traittype") + " slotid " + Highlighting.hilighSpecial(highlight, "" + trait.slot_id, "slotid") + " type " + Highlighting.hilighSpecial(highlight, abc.constants.multinameToString(trait.type_index), "traittypename") + " value " + Highlighting.hilighSpecial(highlight, (new ValueKind(trait.value_index, trait.value_kind).toASMString(abc.constants)), "traitvalue");
+        HilightedTextWriter writer = new HilightedTextWriter(true);
+        writer.appendNoHilight("trait ");
+        writer.hilightSpecial(abc.constants.multinameToString(trait.name_index), "traitname");
+        writer.appendNoHilight(" ");
+        writer.hilightSpecial(trait.isConst() ? "const" : "slot", "traittype");
+        writer.appendNoHilight(" slotid ");
+        writer.hilightSpecial("" + trait.slot_id, "slotid");
+        writer.appendNoHilight(" type ");
+        writer.hilightSpecial(abc.constants.multinameToString(trait.type_index), "traittypename");
+        writer.appendNoHilight(" value ");
+        writer.hilightSpecial((new ValueKind(trait.value_index, trait.value_kind).toASMString(abc.constants)), "traitvalue");
+        String s = writer.toString();
         specialHilights = Highlighting.getSpecialHighlights(s);
         showWarning = trait.isConst() || isStatic;
         slotConstEditor.setText(Highlighting.stripHilights(s));

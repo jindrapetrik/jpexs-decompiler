@@ -16,38 +16,67 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
+import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NewFunctionAVM2Item extends AVM2Item {
 
-    public String paramStr;
-    public String returnStr;
-    public String functionBody;
     public String functionName;
+    public String path;
+    public boolean isStatic;
+    public int scriptIndex;
+    public int classIndex;
+    public ABC abc;
+    public List<String> fullyQualifiedNames;
+    public ConstantPool constants;
+    public MethodInfo[] methodInfo; 
     public int methodIndex;
 
-    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String paramStr, String returnStr, String functionBody, int methodIndex) {
+    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<String> fullyQualifiedNames, ConstantPool constants, MethodInfo[] methodInfo, int methodIndex) {
         super(instruction, PRECEDENCE_PRIMARY);
-        this.paramStr = paramStr;
-        this.returnStr = returnStr;
-        this.functionBody = functionBody;
         this.functionName = functionName;
+        this.path = path;
+        this.isStatic = isStatic;
+        this.scriptIndex = scriptIndex;
+        this.classIndex = classIndex;
+        this.abc = abc;
+        this.fullyQualifiedNames = fullyQualifiedNames;
+        this.constants = constants;
+        this.methodInfo = methodInfo; 
         this.methodIndex = methodIndex;
     }
 
     @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
+        MethodBody body = abc.findBody(methodIndex);
         writer.append("function" + (!functionName.equals("") ? " " + functionName : ""));
-        boolean highlight = writer.getIsHighlighted();
-        String mhead = "(" + (highlight ? paramStr : Highlighting.stripHilights(paramStr)) + "):" + (highlight ? returnStr : Highlighting.stripHilights(returnStr));
-        writer.appendNoHilight(writer.getIsHighlighted() ? Highlighting.hilighMethod(mhead, methodIndex) : mhead);
+        writer.startMethod(methodIndex);
+        writer.appendNoHilight("(");
+        methodInfo[methodIndex].getParamStr(writer, constants, body, abc, fullyQualifiedNames);
+        writer.appendNoHilight("):");
+        methodInfo[methodIndex].getReturnTypeStr(writer, constants, fullyQualifiedNames);
+        writer.endMethod();
         writer.newLine();
         writer.append("{").newLine();
         writer.indent();
-        writer.appendNoHilight((writer.getIsHighlighted() ? functionBody : Highlighting.stripHilights(functionBody)));
+        if (body != null) {
+            try {
+                body.toString(path + "/inner", false, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null);
+            } catch (Exception ex) {
+                Logger.getLogger(NewFunctionIns.class.getName()).log(Level.SEVERE, "error during newfunction", ex);
+            }
+        }
         writer.newLine();
         writer.unindent();
         writer.append("}");

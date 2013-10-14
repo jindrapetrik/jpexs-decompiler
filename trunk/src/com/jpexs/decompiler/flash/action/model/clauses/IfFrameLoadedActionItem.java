@@ -51,7 +51,7 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
         writer.append(")").newLine();
         writer.append("{").newLine();
         writer.indent();
-        Graph.graphToString(actions, writer, false, localData);
+        Graph.graphToString(actions, writer, localData);
         writer.unindent();
         return writer.append("}");
     }

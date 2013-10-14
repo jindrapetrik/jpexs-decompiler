@@ -40,7 +40,7 @@ public class BlockItem extends GraphTargetItem {
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         writer.append("{").newLine();
         writer.indent();
-        Graph.graphToString(commands, writer, false, localData);
+        Graph.graphToString(commands, writer, localData);
         writer.newLine();
         writer.unindent();
         return writer.append("}");

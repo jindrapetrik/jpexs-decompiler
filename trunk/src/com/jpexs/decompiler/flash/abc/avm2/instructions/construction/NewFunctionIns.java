@@ -28,8 +28,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class NewFunctionIns extends InstructionDefinition {
 
@@ -40,19 +38,8 @@ public class NewFunctionIns extends InstructionDefinition {
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         int methodIndex = ins.operands[0];
-        MethodBody mybody = abc.findBody(methodIndex);
-        String bodyStr = "";
-        String paramStr = "";
-        if (mybody != null) {
-            try {
-                bodyStr = mybody.toString(path + "/inner", false, isStatic, scriptIndex, classIndex, abc, null, constants, method_info, new Stack<GraphTargetItem>()/*scopeStack*/, false, true, false, fullyQualifiedNames, null);
-            } catch (Exception ex) {
-                Logger.getLogger(NewFunctionIns.class.getName()).log(Level.SEVERE, "error during newfunction", ex);
-            }
-            paramStr = method_info[methodIndex].getParamStr(true, constants, mybody, abc, fullyQualifiedNames);
-        }
-
-        stack.push(new NewFunctionAVM2Item(ins, "", paramStr, method_info[methodIndex].getReturnTypeStr(true, constants, fullyQualifiedNames), bodyStr, methodIndex));
+        NewFunctionAVM2Item function = new NewFunctionAVM2Item(ins, "", path, isStatic, scriptIndex, classIndex, abc, fullyQualifiedNames, constants, method_info, methodIndex);
+        stack.push(function);
     }
 
     @Override

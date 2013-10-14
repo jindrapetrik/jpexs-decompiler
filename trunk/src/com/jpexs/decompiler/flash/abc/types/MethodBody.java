@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
@@ -110,44 +109,48 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public String toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final boolean hilight, final boolean replaceIndents, final List<String> fullyQualifiedNames, final Traits initTraits) {
+    public HilightedTextWriter toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final HilightedTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits) {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
-        String s = "";
         if (pcode) {
-            s += code.toASMSource(constants, trait, method_info[this.method_info], this, false, hilight);
+            writer.indent();
+            code.toASMSource(constants, trait, method_info[this.method_info], this, false, writer);
+            writer.unindent();
         } else {
             if (!Configuration.getConfig("decompile", true)) {
-                s = "//Decompilation skipped";
-                if (hilight) {
-                    s = Highlighting.hilighMethod(s, this.method_info);
-                }
-                return s;
+                writer.indent();
+                writer.startMethod(this.method_info);
+                writer.appendNoHilight("//Decompilation skipped");
+                writer.endMethod();
+                writer.unindent();
+                return writer;
             }
+            writer.indent();
             int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
+            int writerPos = writer.getLength();
             try {
-                s += Helper.timedCall(new Callable<String>() {
+                Helper.timedCall(new Callable<Void>() {
                     @Override
-                    public String call() throws Exception {
-                        HilightedTextWriter writer = new HilightedTextWriter(hilight);
-                        toSource(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, replaceIndents, fullyQualifiedNames, initTraits);
-                        String s = writer.toString();
-                        if (replaceIndents) {
-                            s = Graph.removeNonRefenrencedLoopLabels(s);
-                        }
-                        return s;
+                    public Void call() throws Exception {
+                        toSource(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, fullyQualifiedNames, initTraits);
+                        return null;
                     }
                 }, timeout, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
                 Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
-                s += "/*\r\n * Decompilation error\r\n * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached\r\n */";
+                writer.setLength(writerPos); // remove already rendered code
+                writer.appendNoHilight("/*").newLine();
+                writer.appendNoHilight(" * Decompilation error").newLine();
+                writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached").newLine();
+                writer.appendNoHilight(" */");
             }
+            writer.unindent();
         }
-        return s;
+        return writer;
     }
 
-    public HilightedTextWriter toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, HilightedTextWriter writer, boolean replaceIndents, List<String> fullyQualifiedNames, Traits initTraits) {
+    public HilightedTextWriter toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, HilightedTextWriter writer, List<String> fullyQualifiedNames, Traits initTraits) {
         AVM2Code deobfuscated = null;
         MethodBody b = (MethodBody) Helper.deepCopy(this);
         deobfuscated = b.code;
@@ -162,7 +165,7 @@ public class MethodBody implements Cloneable, Serializable {
         //deobfuscated.restoreControlFlow(constants, b);
 
         writer.startMethod(this.method_info);
-        deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, writer, replaceIndents, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
+        deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, writer, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
         writer.endMethod();
         return writer;
     }

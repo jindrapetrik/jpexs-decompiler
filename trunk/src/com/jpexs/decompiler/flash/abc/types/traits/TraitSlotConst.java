@@ -22,9 +22,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
@@ -61,7 +59,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return typeStr;
     }
 
-    public String getNameStr(boolean highlight, ABC abc, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter getNameStr(HilightedTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
         String typeStr = getType(abc.constants, fullyQualifiedNames);
         if (typeStr.equals("*")) {
             typeStr = "";
@@ -80,36 +78,49 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (val != null && val.isNamespace()) {
             slotconst = "namespace";
         }
-        return Highlighting.hilighSpecial(highlight, slotconst, "traittype") + " " + Highlighting.hilighSpecial(highlight, getName(abc).getName(abc.constants, fullyQualifiedNames), "traitname") + Highlighting.hilighSpecial(highlight, typeStr, "traittypename");
-
+        writer.hilightSpecial(slotconst + " ", "traittype");
+        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames), "traitname");
+        writer.hilightSpecial(typeStr, "traittypename");
+        return writer;
     }
 
-    public String getValueStr(Trait parent, boolean highlight, ABC abc, List<String> fullyQualifiedNames) {
-        String valueStr = null;
-        ValueKind val = null;
-        if (value_kind != 0) {
-            val = new ValueKind(value_index, value_kind);
-            valueStr = val.toString(abc.constants);
-            valueStr = Highlighting.hilighSpecial(highlight, valueStr, "traitvalue");
-        }
-
+    public boolean getValueStr(Trait parent, HilightedTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
         if (assignedValue != null) {
-            valueStr = Highlighting.trim(assignedValue.toString(highlight, LocalData.create(abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames)));
-            if (highlight && (parent instanceof TraitClass)) {
+            if (parent instanceof TraitClass) {
                 TraitClass tc = (TraitClass) parent;
                 int traitInitId = abc.class_info[tc.class_info].static_traits.traits.length
                         + abc.instance_info[tc.class_info].instance_traits.traits.length + 1;
                 int initMethod = abc.class_info[tc.class_info].cinit_index;
-                valueStr = Highlighting.hilighMethod(valueStr, initMethod);
-                valueStr = Highlighting.hilighTrait(valueStr, traitInitId);
+                writer.startTrait(traitInitId);
+                writer.startMethod(initMethod);
             }
+            assignedValue.toString(writer, LocalData.create(abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
+            if (parent instanceof TraitClass) {
+                writer.endMethod();
+                writer.endTrait();
+            }
+            return true;
         }
-        return valueStr;
+
+        if (value_kind != 0) {
+            ValueKind val = new ValueKind(value_index, value_kind);
+            writer.hilightSpecial(val.toString(abc.constants), "traitvalue");
+            return true;
+        }
+
+        return false;
     }
 
     public String getNameValueStr(Trait parent, ABC abc, List<String> fullyQualifiedNames) {
-        String valueStr = getValueStr(parent, false, abc, fullyQualifiedNames);
-        return getNameStr(false, abc, fullyQualifiedNames) + (valueStr == null ? "" : " = " + valueStr) + ";";
+        HilightedTextWriter writer = new HilightedTextWriter(false);
+        getNameStr(writer, abc, fullyQualifiedNames);
+        writer.appendNoHilight(" = ");
+        boolean hasValue = getValueStr(parent, writer, abc, fullyQualifiedNames);
+        if (!hasValue) {
+            writer.removeFromEnd(3);
+        }
+        writer.appendNoHilight(";");
+        return writer.toString();
     }
 
     public boolean isNamespace() {
@@ -121,7 +132,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public String convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
+    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         if (modifier.equals(" ")) {
             modifier = "";
@@ -141,44 +152,14 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (!showModifier) {
             modifier = "";
         }
-        String ret = modifier + getNameStr(highlight, abc, fullyQualifiedNames);
-        String valueStr = getValueStr(parent, highlight, abc, fullyQualifiedNames);
-
-        if (valueStr != null) {
-            ret += " = ";
-            int befLen = Highlighting.stripHilights(HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + ret).length();
-            String[] valueStrParts = valueStr.split("\r\n");
-            boolean first = true;
-            for (int i = 0; i < valueStrParts.length; i++) {
-                if (valueStrParts[i].equals("")) {
-                    continue;
-                }
-                if (Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTOPEN)) {
-                    if (!first) {
-                        befLen += HilightedTextWriter.INDENT_STRING.length();
-                    }
-                    ret += valueStrParts[i].replace(Graph.INDENTOPEN, ""); //there can be highlights!
-                    continue;
-                }
-                if (Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTCLOSE)) {
-                    if (!first) {
-                        befLen -= HilightedTextWriter.INDENT_STRING.length();
-                    }
-                    ret += valueStrParts[i].replace(Graph.INDENTCLOSE, ""); //there can be highlights!
-                    continue;
-                }
-                if (!first) {
-                    for (int j = 0; j < befLen; j++) {
-                        ret += " ";
-                    }
-                }
-                ret += valueStrParts[i];
-                ret += "\r\n";
-                first = false;
-            }
+        writer.appendNoHilight(modifier);
+        getNameStr(writer, abc, fullyQualifiedNames);
+        writer.appendNoHilight(" = ");
+        boolean hasValue = getValueStr(parent, writer, abc, fullyQualifiedNames);
+        if (!hasValue) {
+            writer.removeFromEnd(3);
         }
-        ret = HilightedTextWriter.INDENT_STRING + HilightedTextWriter.INDENT_STRING + Highlighting.trim(ret) + ";";
-        return ret;
+        return writer.appendNoHilight(";");
     }
 
     public boolean isConst() {

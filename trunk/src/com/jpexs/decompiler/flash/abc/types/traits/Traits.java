@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -83,13 +83,13 @@ public class Traits implements Serializable {
         boolean pcode;
         int scriptIndex;
         int classIndex;
-        boolean highlighting;
+        HilightedTextWriter writer;
         List<String> fullyQualifiedNames;
         int traitIndex;
         boolean parallel;
         Trait parent;
 
-        public TraitConvertTask(Trait trait, Trait parent, boolean makePackages, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames, int traitIndex, boolean parallel) {
+        public TraitConvertTask(Trait trait, Trait parent, boolean makePackages, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, int traitIndex, boolean parallel) {
             this.trait = trait;
             this.parent = parent;
             this.makePackages = makePackages;
@@ -100,7 +100,7 @@ public class Traits implements Serializable {
             this.pcode = pcode;
             this.scriptIndex = scriptIndex;
             this.classIndex = classIndex;
-            this.highlighting = highlighting;
+            this.writer = writer;
             this.fullyQualifiedNames = fullyQualifiedNames;
             this.traitIndex = traitIndex;
             this.parallel = parallel;
@@ -108,31 +108,32 @@ public class Traits implements Serializable {
 
         @Override
         public String call() {
-            String plus;
-            if (makePackages) {
-                plus = trait.convertPackaged(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, parallel);
+            int h = traitIndex;
+            if (classIndex != -1) {
+                if (!isStatic) {
+                    h = h + abc.class_info[classIndex].static_traits.traits.length;
+                }
+            }
+            if (trait instanceof TraitClass) {
+                writer.startClass(((TraitClass) trait).class_info);
             } else {
-                plus = trait.convert(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, parallel);
+                writer.startTrait(h);
             }
-            if (highlighting) {
-                int h = traitIndex;
-                if (classIndex != -1) {
-                    if (!isStatic) {
-                        h = h + abc.class_info[classIndex].static_traits.traits.length;
-                    }
-                }
-                if (trait instanceof TraitClass) {
-                    plus = Highlighting.hilighClass(plus, ((TraitClass) trait).class_info);
-                } else {
-                    plus = Highlighting.hilighTrait(plus, h);
-                }
+            if (makePackages) {
+                trait.convertPackaged(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+            } else {
+                trait.convert(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             }
-            return plus;
+            if (trait instanceof TraitClass) {
+                writer.endClass();
+            } else {
+                writer.endTrait();
+            }
+            return writer.toString();
         }
     }
 
-    public String convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames, boolean parallel) {
-        StringBuilder sb = new StringBuilder();
+    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         ExecutorService executor = null;
         List<Future<String>> futureResults = null;
         List<TraitConvertTask> traitConvertTasks = null;
@@ -144,7 +145,8 @@ public class Traits implements Serializable {
             traitConvertTasks = new ArrayList<>();
         }
         for (int t = 0; t < traits.length; t++) {
-            TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, t, parallel);
+            HilightedTextWriter writer2 = new HilightedTextWriter(writer.getIsHighlighted(), writer.getIndent());
+            TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, writer2, fullyQualifiedNames, t, parallel);
             if (parallel) {
                 Future<String> future = executor.submit(task);
                 futureResults.add(future);
@@ -156,11 +158,11 @@ public class Traits implements Serializable {
         int taskCount = parallel ? futureResults.size() : traitConvertTasks.size();
         for (int f = 0; f < taskCount; f++) {
             if (f > 0) {
-                sb.append("\r\n\r\n");
+                writer.newLine();
             }
             try {
                 String taskResult = parallel ? futureResults.get(f).get() : traitConvertTasks.get(f).call();
-                sb.append(taskResult);
+                writer.appendWithoutIndent(taskResult);
             } catch (InterruptedException | ExecutionException ex) {
                 Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during traits converting", ex);
             }
@@ -168,6 +170,6 @@ public class Traits implements Serializable {
         if (parallel) {
             executor.shutdown();
         }
-        return sb.toString();
+        return writer;
     }
 }

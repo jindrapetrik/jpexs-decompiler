@@ -5,6 +5,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,9 +67,13 @@ public class TraitsListItem {
     public String toString() {
         String s = "";
         if ((type != Type.INITIALIZER) && isStatic) {
-            s = abc.class_info[classIndex].static_traits.traits[index].convertHeader(null, "", abcTags, abc, true, false, scriptIndex, classIndex, false, new ArrayList<String>(), false);
+            HilightedTextWriter writer = new HilightedTextWriter(false);
+            abc.class_info[classIndex].static_traits.traits[index].convertHeader(null, "", abcTags, abc, true, false, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
+            s = writer.toString();
         } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-            s = abc.instance_info[classIndex].instance_traits.traits[index].convertHeader(null, "", abcTags, abc, false, false, scriptIndex, classIndex, false, new ArrayList<String>(), false);
+            HilightedTextWriter writer = new HilightedTextWriter(false);
+            abc.instance_info[classIndex].instance_traits.traits[index].convertHeader(null, "", abcTags, abc, false, false, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
+            s = writer.toString();
         } else if (!isStatic) {
             s = STR_INSTANCE_INITIALIZER;
         } else {

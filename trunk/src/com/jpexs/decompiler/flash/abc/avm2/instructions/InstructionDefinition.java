@@ -29,7 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -117,7 +117,7 @@ public class InstructionDefinition implements Serializable {
         if (constants.constant_multiname[multinameIndex].needsName()) {
             name = stack.get(pos).toString();
         } else {
-            name = Highlighting.hilighOffset(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), ins.offset);
+            name = HilightedTextWriter.hilighOffset(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), ins.offset);
         }
         return name + ns;
     }

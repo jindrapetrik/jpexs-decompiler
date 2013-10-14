@@ -23,6 +23,6 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 public class IsTypeAVM2Item extends BinaryOpItem {
 
     public IsTypeAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem type) {
-        super(instruction, PRECEDENCE_RELATIONAL, value, type, " is ");
+        super(instruction, PRECEDENCE_RELATIONAL, value, type, "is");
     }
 }

@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -113,25 +115,29 @@ public abstract class Trait implements Serializable {
         return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
-        return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
+    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+        writer.appendNoHilight(abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata));
+        return writer;
     }
 
-    public String convertPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
-        return makePackageFromIndex(abc, name_index, convert(parent, path, abcTags, abc, isStatic, pcod, scriptIndex, classIndex, highlight, fullyQualifiedNames, parallel));
-    }
-
-    public String convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean parallel) {
-        return convert(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames, parallel).trim();
-    }
-
-    protected String makePackageFromIndex(ABC abc, int name_index, String value) {
+    public HilightedTextWriter convertPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         Namespace ns = abc.constants.constant_multiname[name_index].getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
             String nsname = ns.getName(abc.constants);
-            return "package " + nsname + "\r\n{\r\n" + value + "\r\n}";
+            writer.appendNoHilight("package " + nsname).newLine();
+            writer.appendNoHilight("{").newLine();
+            writer.indent();
+            convert(parent, path, abcTags, abc, isStatic, pcod, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+            writer.newLine();
+            writer.unindent();
+            writer.appendNoHilight("}");
         }
-        return value;
+        return writer;
+    }
+
+    public HilightedTextWriter convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+        convert(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+        return writer;
     }
 
     public Multiname getName(ABC abc) {
@@ -167,7 +173,10 @@ public abstract class Trait implements Serializable {
         }
         String fileName = outDir.toString() + File.separator + objectName + ".as";
         try (FileOutputStream fos = new FileOutputStream(fileName)) {
-            fos.write(convertPackaged(parent, "", abcList, abc, isStatic, pcode, scriptIndex, classIndex, false, new ArrayList<String>(), parallel).getBytes());
+            HilightedTextWriter writer = new HilightedTextWriter(false);
+            convertPackaged(parent, "", abcList, abc, isStatic, pcode, scriptIndex, classIndex, writer, new ArrayList<String>(), parallel);
+            String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
+            fos.write(s.getBytes());
         }
     }
 }

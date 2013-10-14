@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public interface ASMSource {
      * @param hex Add hexadecimal?
      * @return ASM source
      */
-    public String getASMSource(int version, boolean hex, boolean highlight, List<Action> actions);
+    public HilightedTextWriter getASMSource(int version, boolean hex, HilightedTextWriter writer, List<Action> actions);
 
     /**
      * Whether or not this object contains ASM source

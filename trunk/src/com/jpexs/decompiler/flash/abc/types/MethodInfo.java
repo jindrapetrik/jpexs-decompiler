@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.types;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -242,33 +242,33 @@ public class MethodInfo {
         return constants.constant_string[name_index];
     }
 
-    public String getParamStr(boolean highlight, ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
+    public HilightedTextWriter getParamStr(HilightedTextWriter writer, ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
         HashMap<Integer, String> localRegNames = new HashMap<>();
         if (body != null) {
             localRegNames = body.code.getLocalRegNamesFromDebug(abc);
         }
-        String paramStr = "";
         for (int i = 0; i < param_types.length; i++) {
             if (i > 0) {
-                paramStr += ", ";
+                writer.appendNoHilight(", ");
             }
             if (!localRegNames.isEmpty()) {
-                paramStr += localRegNames.get(i + 1);
+                writer.appendNoHilight(localRegNames.get(i + 1));
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.PARAM_NAMES_ENABLE) {
-                paramStr += constants.constant_string[paramNames[i]];
+                writer.appendNoHilight(constants.constant_string[paramNames[i]]);
             } else {
-                paramStr += "param" + (i + 1);
+                writer.appendNoHilight("param" + (i + 1));
             }
-            paramStr += ":";
+            writer.appendNoHilight(":");
             if (param_types[i] == 0) {
-                paramStr += Highlighting.hilighSpecial(highlight, "*", "param", i);
+                writer.hilightSpecial("*", "param", i);
             } else {
-                paramStr += Highlighting.hilighSpecial(highlight, constants.constant_multiname[param_types[i]].getName(constants, fullyQualifiedNames), "param", i);
+                writer.hilightSpecial(constants.constant_multiname[param_types[i]].getName(constants, fullyQualifiedNames), "param", i);
             }
             if (optional != null) {
                 if (i >= param_types.length - optional.length) {
                     int optionalIndex = i - (param_types.length - optional.length);
-                    paramStr += "=" + Highlighting.hilighSpecial(highlight, optional[optionalIndex].toString(constants), "optional", optionalIndex);
+                    writer.appendNoHilight("=");
+                    writer.hilightSpecial(optional[optionalIndex].toString(constants), "optional", optionalIndex);
                 }
             }
         }
@@ -283,16 +283,13 @@ public class MethodInfo {
             } else {
                 restAdd += "rest";
             }
-            paramStr += Highlighting.hilighSpecial(highlight, restAdd, "flag.NEED_REST");
+            writer.hilightSpecial(restAdd, "flag.NEED_REST");
         }
-        return paramStr;
+        return writer;
     }
 
-    public String getReturnTypeStr(boolean highlight, ConstantPool constants, List<String> fullyQualifiedNames) {
-        if (ret_type == 0) {
-            return Highlighting.hilighSpecial(highlight, "*", "returns");
-        }
-        return Highlighting.hilighSpecial(highlight, constants.constant_multiname[ret_type].getName(constants, fullyQualifiedNames), "returns");
+    public HilightedTextWriter getReturnTypeStr(HilightedTextWriter writer, ConstantPool constants, List<String> fullyQualifiedNames) {
+        return writer.hilightSpecial(ret_type == 0 ? "*" : constants.constant_multiname[ret_type].getName(constants, fullyQualifiedNames), "returns");
     }
 
     public void setBody(MethodBody body) {

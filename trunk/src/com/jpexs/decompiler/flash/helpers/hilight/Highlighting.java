@@ -164,10 +164,6 @@ public class Highlighting implements Serializable {
     public static final String HLEND = "\">";
     public static final String HLCLOSE = "</ffdec>";
 
-    public static String hilight(String text, String data) {
-        return HLOPEN + Helper.escapeString(data) + HLEND + text + HLCLOSE;
-    }
-
     public static List<Highlighting> getHilights(String text) {
         return getHilights(text, null);
     }
@@ -217,63 +213,6 @@ public class Highlighting implements Serializable {
             Logger.getLogger(Highlighting.class.getName()).log(Level.SEVERE, "Error during getting hilight tokens", ex);
         }
         return ret;
-    }
-
-    /**
-     * Highlights specified text as instruction by adding special tags
-     *
-     * @param text Text to highlight
-     * @param offset Offset of instruction
-     * @return Highlighted text
-     */
-    public static String hilighOffset(String text, long offset) {
-        return hilight(text, "type=instruction;offset=" + offset);
-    }
-
-    public static String hilighSpecial(boolean higlight, String text, String type) {
-        return hilighSpecial(higlight, text, type, 0);
-    }
-
-    public static String hilighSpecial(boolean higlight, String text, String type, long index) {
-        if (!higlight) {
-            return text;
-        }
-        return hilight(text, "type=special;subtype=" + type + ";index=" + index);
-    }
-
-    /**
-     * Highlights specified text as method by adding special tags
-     *
-     * @param text Text to highlight
-     * @param index Methodinfo index
-     * @return Highlighted text
-     */
-    public static String hilighMethod(String text, long index) {
-        return hilight(text, "type=method;index=" + index);
-    }
-
-    /**
-     * Highlights specified text as trait by adding special tags
-     *
-     * @param text Text to highlight
-     * @param index Trait index
-     * @return Highlighted text
-     */
-    public static String hilighTrait(String text, long index) {
-
-        return hilight(text, "type=trait;index=" + index);
-    }
-
-    /**
-     * Highlights specified text as class by adding special tags
-     *
-     * @param text Text to highlight
-     * @param index Class index
-     * @return Highlighted text
-     */
-    public static String hilighClass(String text, long index) {
-
-        return hilight(text, "type=class;index=" + index);
     }
 
     /**

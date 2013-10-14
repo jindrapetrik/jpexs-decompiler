@@ -33,12 +33,6 @@ public abstract class AVM2Item extends GraphTargetItem {
         super(instruction, precedence);
     }
 
-    public String toStringNoH(LocalData localData) {
-        HilightedTextWriter writer = new HilightedTextWriter(false);
-        toString(writer, localData);
-        return writer.toString();
-    }
-
     @Override
     public boolean needsSemicolon() {
         return true;

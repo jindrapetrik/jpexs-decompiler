@@ -28,8 +28,10 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Cache;
 import java.util.ArrayList;
 import java.util.List;
@@ -442,7 +444,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     public void cacheScriptPack(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) {
         int maxCacheSize = 50;
         int scriptIndex = scriptLeaf.scriptIndex;
-        StringBuilder hilightedCodeBuf = new StringBuilder();
         String hilightedCode = "";
         ScriptInfo script = null;
         ABC abc = scriptLeaf.abc;
@@ -450,11 +451,12 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             script = abc.script_info[scriptIndex];
         }
         if (!cache.contains(scriptLeaf)) {
+            HilightedTextWriter writer = new HilightedTextWriter(true);
             for (int scriptTraitIndex : scriptLeaf.traitIndices) {
-                hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true)));
+                script.traits.traits[scriptTraitIndex].convertPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, false, scriptIndex, -1, writer, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true));
             }
-
-            hilightedCode = hilightedCodeBuf.toString();
+            String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
+            hilightedCode = s;
             cache.put(scriptLeaf, new CachedDecompilation(hilightedCode));
         }
     }

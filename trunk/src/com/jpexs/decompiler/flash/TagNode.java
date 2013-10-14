@@ -298,11 +298,13 @@ public class TagNode {
                             String res;
                             ASMSource asm = ((ASMSource) node.tag);
                             if (isPcode) {
-                                res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), asm.getASMSource(SWF.DEFAULT_VERSION, false, false, null), HilightedTextWriter.INDENT_STRING) + asm.getActionSourceSuffix();
+                                HilightedTextWriter writer = new HilightedTextWriter(false, asm.getActionSourceIndent());
+                                asm.getASMSource(SWF.DEFAULT_VERSION, false, writer, null);
+                                res = asm.getActionSourcePrefix() + writer.toString() + asm.getActionSourceSuffix();
                             } else {
                                 List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                                 Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                                res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Action.actionsToSource(as, SWF.DEFAULT_VERSION, ""/*FIXME*/, false), HilightedTextWriter.INDENT_STRING) + asm.getActionSourceSuffix();
+                                res = asm.getActionSourcePrefix() + Action.actionsToSource(as, SWF.DEFAULT_VERSION, ""/*FIXME*/, false, asm.getActionSourceIndent()) + asm.getActionSourceSuffix();
                             }
                             try (FileOutputStream fos = new FileOutputStream(f)) {
                                 fos.write(res.getBytes("utf-8"));
