@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReReadableInputStream;
 import java.io.ByteArrayInputStream;
@@ -148,11 +149,11 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
      * @return ASM source
      */
     @Override
-    public HilightedTextWriter getASMSource(int version, boolean hex, HilightedTextWriter writer, List<Action> actions) {
+    public HilightedTextWriter getASMSource(int version, ExportMode exportMode, HilightedTextWriter writer, List<Action> actions) {
         if (actions == null) {
             actions = getActions(version);
         }
-        return Action.actionsToString(listeners, 0, actions, null, version, hex, writer, getPos() + 4, toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, version, exportMode, writer, getPos() + 4, toString()/*FIXME?*/);
     }
 
     /**
@@ -197,6 +198,12 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = actionBytes;
     }
+
+    @Override
+    public HilightedTextWriter getActionBytesAsHex(HilightedTextWriter writer) {
+        return Helper.byteArrayToHex(writer, actionBytes);
+    }
+
     List<DisassemblyListener> listeners = new ArrayList<>();
 
     @Override

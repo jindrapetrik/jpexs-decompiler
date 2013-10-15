@@ -734,7 +734,7 @@ public class ABC {
         }
     }
 
-    /*public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, boolean parallel) throws IOException {
+    /*public void export(String directory, ExportMode exportMode, List<ABCContainerTag> abcList, boolean parallel) throws IOException {
      export(directory, pcode, abcList, "", parallel);
      }*/
     public List<MyEntry<ClassPath, ScriptPack>> getScriptPacks() {
@@ -744,7 +744,7 @@ public class ABC {
         }
         return ret;
     }
-    /*public List<File> export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr, boolean parallel) throws IOException {
+    /*public List<File> export(String directory, ExportMode exportMode, List<ABCContainerTag> abcList, String abcStr, boolean parallel) throws IOException {
      ExecutorService executor = Executors.newFixedThreadPool(20);
      List<Future<File>> futureResults = new ArrayList<>();
      AtomicInteger cnt = new AtomicInteger(1);

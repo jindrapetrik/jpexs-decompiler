@@ -89,6 +89,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
+import com.jpexs.decompiler.graph.ExportMode;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -2875,7 +2876,7 @@ public class XFLConverter {
         }
         if (useAS3) {
             try {
-                swf.exportActionScript(handler, outDir.getAbsolutePath(), false, parallel);
+                swf.exportActionScript(handler, outDir.getAbsolutePath(), ExportMode.SOURCE, parallel);
             } catch (Exception ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }

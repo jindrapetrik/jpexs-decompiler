@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.helpers.Helper;
@@ -81,7 +82,7 @@ public class ActionJump extends Action {
     }
 
     @Override
-    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode) {
         String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
         return "Jump loc" + ofsStr;
     }

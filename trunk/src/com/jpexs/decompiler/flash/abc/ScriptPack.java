@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Helper;
 import java.io.File;
@@ -103,7 +104,7 @@ public class ScriptPack {
         return Helper.joinStrings(pathParts, File.separator);
     }
 
-    public File export(String directory, List<ABCContainerTag> abcList, boolean pcode, boolean parallel) throws IOException {
+    public File export(String directory, List<ABCContainerTag> abcList, ExportMode exportMode, boolean parallel) throws IOException {
         String scriptName = getPathScriptName();
         String packageName = getPathPackage();
         File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
@@ -122,9 +123,9 @@ public class ScriptPack {
                 Namespace ns = name.getNamespace(abc.constants);
                 HilightedTextWriter writer = new HilightedTextWriter(false);
                 if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                    abc.script_info[scriptIndex].traits.traits[t].convertPackaged(null, "", abcList, abc, false, pcode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+                    abc.script_info[scriptIndex].traits.traits[t].convertPackaged(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
                 } else {
-                    abc.script_info[scriptIndex].traits.traits[t].convert(null, "", abcList, abc, false, pcode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+                    abc.script_info[scriptIndex].traits.traits[t].convert(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
                 }
                 String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
                 fos.write(s.getBytes("utf-8"));

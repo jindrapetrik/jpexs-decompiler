@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.ExportMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,12 +42,12 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         writer.appendNoHilight(super.toString(abcTags, abc) + " ");
         if (parentTraitIndex > -1) {
             if (isStatic) {
-                ((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+                ((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
             } else {
-                ((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+                ((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
             }
         }
-        ((TraitSlotConst) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+        ((TraitSlotConst) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
         return writer.toString();
     }
 

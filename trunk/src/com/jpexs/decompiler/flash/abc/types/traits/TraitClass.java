@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -322,13 +323,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public HilightedTextWriter convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public HilightedTextWriter convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         String classHeader = abc.instance_info[class_info].getClassHeaderStr(abc, fullyQualifiedNames);
         return writer.appendNoHilight(classHeader);
     }
 
     @Override
-    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
 
         writer.startClass(class_info);
         String packageName = abc.instance_info[class_info].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
@@ -426,7 +427,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.startTrait(abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length + 1);
             writer.appendNoHilight("{").newLine();
             writer.mark();
-            abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", pcode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, writer, fullyQualifiedNames, abc.class_info[class_info].static_traits);
+            abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, writer, fullyQualifiedNames, abc.class_info[class_info].static_traits);
             boolean empty = !writer.getMark();
             writer.appendNoHilight("}").newLine();
             writer.endTrait();
@@ -468,7 +469,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
             writer.appendNoHilight(") {").newLine();
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", pcode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, abc.instance_info[class_info].instance_traits);
+                abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, abc.instance_info[class_info].instance_traits);
             }
             writer.appendNoHilight("}").newLine();
             writer.endTrait();
@@ -476,9 +477,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static variables,constants & methods
-        abc.class_info[class_info].static_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, pcode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        abc.class_info[class_info].static_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        abc.instance_info[class_info].instance_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, pcode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        abc.instance_info[class_info].instance_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
         writer.unindent();
         writer.appendNoHilight("}"); // class

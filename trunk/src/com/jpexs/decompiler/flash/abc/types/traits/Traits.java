@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.ExportMode;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +81,7 @@ public class Traits implements Serializable {
         List<ABCContainerTag> abcTags;
         ABC abc;
         boolean isStatic;
-        boolean pcode;
+        ExportMode exportMode;
         int scriptIndex;
         int classIndex;
         HilightedTextWriter writer;
@@ -89,7 +90,7 @@ public class Traits implements Serializable {
         boolean parallel;
         Trait parent;
 
-        public TraitConvertTask(Trait trait, Trait parent, boolean makePackages, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, int traitIndex, boolean parallel) {
+        public TraitConvertTask(Trait trait, Trait parent, boolean makePackages, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, int traitIndex, boolean parallel) {
             this.trait = trait;
             this.parent = parent;
             this.makePackages = makePackages;
@@ -97,7 +98,7 @@ public class Traits implements Serializable {
             this.abcTags = abcTags;
             this.abc = abc;
             this.isStatic = isStatic;
-            this.pcode = pcode;
+            this.exportMode = exportMode;
             this.scriptIndex = scriptIndex;
             this.classIndex = classIndex;
             this.writer = writer;
@@ -120,9 +121,9 @@ public class Traits implements Serializable {
                 writer.startTrait(h);
             }
             if (makePackages) {
-                trait.convertPackaged(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.convertPackaged(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             } else {
-                trait.convert(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             }
             if (trait instanceof TraitClass) {
                 writer.endClass();
@@ -133,7 +134,7 @@ public class Traits implements Serializable {
         }
     }
 
-    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         ExecutorService executor = null;
         List<Future<String>> futureResults = null;
         List<TraitConvertTask> traitConvertTasks = null;
@@ -146,7 +147,7 @@ public class Traits implements Serializable {
         }
         for (int t = 0; t < traits.length; t++) {
             HilightedTextWriter writer2 = new HilightedTextWriter(writer.getIsHighlighted(), writer.getIndent());
-            TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, writer2, fullyQualifiedNames, t, parallel);
+            TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer2, fullyQualifiedNames, t, parallel);
             if (parallel) {
                 Future<String> future = executor.submit(task);
                 futureResults.add(future);

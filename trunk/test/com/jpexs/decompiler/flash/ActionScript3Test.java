@@ -4,6 +4,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class ActionScript3Test {
     private void decompileMethod(String methodName, String expectedResult, boolean isStatic) {
         int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
         assertTrue(bodyIndex > -1);
-        String actualResult = abc.bodies[bodyIndex].toString(methodName, false, isStatic, -1/*FIX?*/, clsIndex, abc,null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false,  new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
+        String actualResult = abc.bodies[bodyIndex].toString(methodName, ExportMode.SOURCE, isStatic, -1/*FIX?*/, clsIndex, abc,null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false,  new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
         actualResult = actualResult.replaceAll("[ \r\n]", "");
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);

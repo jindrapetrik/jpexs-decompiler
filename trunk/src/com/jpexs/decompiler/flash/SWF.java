@@ -93,6 +93,7 @@ import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.sound.AdpcmDecoder;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
@@ -532,7 +533,7 @@ public class SWF {
         return true;
     }
 
-    public boolean exportAS3Class(String className, String outdir, boolean isPcode, boolean parallel) throws Exception {
+    public boolean exportAS3Class(String className, String outdir, ExportMode exportMode, boolean parallel) throws Exception {
         List<ABCContainerTag> abcTags = new ArrayList<>();
 
         for (Tag t : tags) {
@@ -551,7 +552,7 @@ public class SWF {
                 }
                 String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + scr.getPath() + " ...";
                 informListeners("export", exStr);
-                scr.export(outdir, abcTags, isPcode, parallel);
+                scr.export(outdir, abcTags, exportMode, parallel);
                 return true;
             }
         }
@@ -592,7 +593,7 @@ public class SWF {
         ScriptPack pack;
         String directory;
         List<ABCContainerTag> abcList;
-        boolean pcode;
+        ExportMode exportMode;
         ClassPath path;
         AtomicInteger index;
         int count;
@@ -601,11 +602,11 @@ public class SWF {
         long startTime;
         long stopTime;
 
-        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, boolean parallel) {
+        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, ExportMode exportMode, boolean parallel) {
             this.pack = pack;
             this.directory = directory;
             this.abcList = abcList;
-            this.pcode = pcode;
+            this.exportMode = exportMode;
             this.path = path;
             this.index = index;
             this.count = count;
@@ -619,7 +620,7 @@ public class SWF {
                 @Override
                 public void run() throws IOException {
                     startTime = System.currentTimeMillis();
-                    this.result = pack.export(directory, abcList, pcode, parallel);
+                    this.result = pack.export(directory, abcList, exportMode, parallel);
                     stopTime = System.currentTimeMillis();
                 }
             };
@@ -632,7 +633,7 @@ public class SWF {
         }
     }
 
-    public List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean parallel, EventListener evl) throws IOException {
+    public List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, ExportMode exportMode, boolean parallel, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         List<ContainerItem> list2 = new ArrayList<>();
         list2.addAll(tags);
@@ -645,11 +646,11 @@ public class SWF {
         outdir += "scripts" + File.separator;
         AtomicInteger cnt = new AtomicInteger(1);
         int totalCount = TagNode.getTagCountRecursive(list);
-        ret.addAll(TagNode.exportNodeAS(tags, handler, list, outdir, isPcode, cnt, totalCount, evl));
+        ret.addAll(TagNode.exportNodeAS(tags, handler, list, outdir, exportMode, cnt, totalCount, evl));
         return ret;
     }
 
-    public List<File> exportActionScript3(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean parallel) {
+    public List<File> exportActionScript3(AbortRetryIgnoreHandler handler, String outdir, ExportMode exportMode, boolean parallel) {
         ExecutorService executor = Executors.newFixedThreadPool(parallel ? 20 : 1);
         List<Future<File>> futureResults = new ArrayList<>();
         AtomicInteger cnt = new AtomicInteger(1);
@@ -661,7 +662,7 @@ public class SWF {
         }
         List<MyEntry<ClassPath, ScriptPack>> packs = getAS3Packs();
         for (MyEntry<ClassPath, ScriptPack> item : packs) {
-            Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode, parallel));
+            Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, exportMode, parallel));
             futureResults.add(future);
         }
 
@@ -683,7 +684,7 @@ public class SWF {
         return ret;
     }
 
-    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean parallel) throws Exception {
+    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ExportMode exportMode, boolean parallel) throws Exception {
         boolean asV3Found = false;
         List<File> ret = new ArrayList<>();
         final EventListener evl = new EventListener() {
@@ -701,9 +702,9 @@ public class SWF {
         }
 
         if (asV3Found) {
-            ret.addAll(exportActionScript3(handler, outdir, isPcode, parallel));
+            ret.addAll(exportActionScript3(handler, outdir, exportMode, parallel));
         } else {
-            ret.addAll(exportActionScript2(handler, outdir, isPcode, parallel, evl));
+            ret.addAll(exportActionScript2(handler, outdir, exportMode, parallel, evl));
         }
         return ret;
     }
@@ -1586,7 +1587,7 @@ public class SWF {
             GraphSourceItem ins = code.get(ip);
 
             if (debugMode) {
-                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), code.version, false) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
+                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), code.version, ExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
             }
             if (ins.isExit()) {
                 break;

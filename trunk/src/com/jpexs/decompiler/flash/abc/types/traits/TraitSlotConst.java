@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
@@ -132,7 +133,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         if (modifier.equals(" ")) {
             modifier = "";

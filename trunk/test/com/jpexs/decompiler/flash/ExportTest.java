@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.graph.ExportMode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -79,19 +80,19 @@ public class ExportTest {
 
     @Test(dataProvider = "swfFiles")
     public void testDecompileAS(File f) {
-        testDecompile(f, false);
+        testDecompile(f, ExportMode.SOURCE);
     }
     
     @Test(dataProvider = "swfFiles")
     public void testDecompilePcode(File f) {
-        testDecompile(f, true);
+        testDecompile(f, ExportMode.PCODE);
     }
     
-    public void testDecompile(File f, boolean isPcode) {
+    public void testDecompile(File f, ExportMode exportMode) {
         try {
             SWF swf = new SWF(new FileInputStream(f), false);
             Configuration.DEBUG_COPY = true;
-            String folderName = isPcode ? "outputp" : "output";
+            String folderName = exportMode == ExportMode.SOURCE ? "output" : "outputp";
             File fdir = new File(TESTDATADIR + File.separator + folderName + File.separator + f.getName());
             fdir.mkdirs();
 
@@ -106,7 +107,7 @@ public class ExportTest {
                     return this;
                 }
                 
-            }, fdir.getAbsolutePath(), isPcode, false);
+            }, fdir.getAbsolutePath(), exportMode, false);
         } catch (Exception ex) {
             fail();
         }

@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
@@ -109,21 +110,21 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public String toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits) {
+    public String toString(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits) {
         HilightedTextWriter writer = new HilightedTextWriter(false);
-        toString(path, pcode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, fullyQualifiedNames, initTraits);
+        toString(path, exportMode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, fullyQualifiedNames, initTraits);
         String src = writer.toString();
         src = Graph.removeNonRefenrencedLoopLabels(src);
         return src;
     }
     
-    public HilightedTextWriter toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final HilightedTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits) {
+    public HilightedTextWriter toString(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final HilightedTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits) {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
-        if (pcode) {
+        if (exportMode != ExportMode.SOURCE) {
             writer.indent();
-            code.toASMSource(constants, trait, method_info[this.method_info], this, false, writer);
+            code.toASMSource(constants, trait, method_info[this.method_info], this, exportMode, writer);
             writer.unindent();
         } else {
             if (!Configuration.getConfig("decompile", true)) {

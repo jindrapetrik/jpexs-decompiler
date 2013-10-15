@@ -26,7 +26,7 @@ public class ExportDialog extends AppDialog {
         {translate("images.pngjpeg")},
         {translate("movies.flv")},
         {translate("sounds.mp3wavflv"), translate("sounds.flv")},
-        {translate("actionscript.as"), translate("actionscript.pcode")}
+        {translate("actionscript.as"), translate("actionscript.pcode"), translate("actionscript.pcodehex"), translate("actionscript.hex")}
     };
     String[] optionNames = {
         translate("shapes"),

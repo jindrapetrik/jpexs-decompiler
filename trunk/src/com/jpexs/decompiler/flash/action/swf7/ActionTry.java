@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -152,7 +153,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode) {
         String ret = "";
         ret += "Try ";
         if (catchBlockFlag) {

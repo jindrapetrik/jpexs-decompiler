@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
@@ -135,7 +136,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             return;
         }
         HilightedTextWriter writer = new HilightedTextWriter(true);
-        abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], true, writer);
+        abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], ExportMode.PCODEWITHHEX, writer);
         String textWithHexTags = writer.toString();
         textWithHex = Helper.hexToComments(textWithHexTags);
         textNoHex = Helper.stripComments(textWithHexTags);

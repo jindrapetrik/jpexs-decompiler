@@ -97,6 +97,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.process.ProcessTools;
@@ -2112,10 +2113,10 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     private SearchDialog searchDialog;
 
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
-        final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
+        final ExportMode exportMode = ExportMode.get(export.getOption(ExportDialog.OPTION_ACTIONSCRIPT));
         final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
         final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
-
+        
         List<File> ret = new ArrayList<>();
         List<Object> sel = getAllSelected(tagTree);
 
@@ -2175,7 +2176,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             for (int i = 0; i < tlsList.size(); i++) {
                 ScriptPack tls = tlsList.get(i);
                 Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
-                ret.add(tls.export(selFile, abcList, isPcode, Configuration.getConfig("parallelSpeedUp", true)));
+                ret.add(tls.export(selFile, abcList, exportMode, Configuration.getConfig("parallelSpeedUp", true)));
             }
         } else {
             List<TagNode> allNodes = new ArrayList<>();
@@ -2184,7 +2185,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 allNodes.add(asn);
                 TagNode.setExport(allNodes, false);
                 TagNode.setExport(actionNodes, true);
-                ret.addAll(TagNode.exportNodeAS(swf.tags, handler, allNodes, selFile, isPcode));
+                ret.addAll(TagNode.exportNodeAS(swf.tags, handler, allNodes, selFile, exportMode));
             }
         }
         return ret;
@@ -2718,7 +2719,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         Main.startWork(translate("work.exporting") + "...");
                         final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
                         Configuration.setConfig("lastExportDir", Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
-                        final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
+                        final ExportMode exportMode = ExportMode.get(export.getOption(ExportDialog.OPTION_ACTIONSCRIPT));
                         final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
                         final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
                         final boolean onlySel = e.getActionCommand().endsWith("SEL");
@@ -2735,7 +2736,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                         swf.exportMovies(errorHandler, selFile + File.separator + "movies");
                                         swf.exportSounds(errorHandler, selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
                                         swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData");
-                                        swf.exportActionScript(errorHandler, selFile, isPcode, Configuration.getConfig("parallelSpeedUp", true));
+                                        swf.exportActionScript(errorHandler, selFile, exportMode, Configuration.getConfig("parallelSpeedUp", true));
                                     }
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);

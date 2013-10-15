@@ -17,6 +17,7 @@
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.gui.Freed;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.awt.Component;
@@ -546,6 +547,37 @@ public class Helper {
 
         // (currently) used only in log, so no localization is required
         return timeStr;
+    }
+
+    public static HilightedTextWriter byteArrayToHex(HilightedTextWriter writer, byte[] data) {
+        writer.appendNoHilight("#hexdata").newLine();
+
+        /* // hex data from decompiled actions
+         Scanner scanner = new Scanner(srcWithHex);
+         while (scanner.hasNextLine()) {
+         String line = scanner.nextLine().trim();
+         if (line.startsWith(";")) {
+         result.append(line.substring(1).trim()).append(nl);
+         } else {
+         result.append(";").append(line).append(nl);
+         }
+         }*/
+
+        for (int i = 0; i < data.length; i++) {
+            if (i % 8 == 0) {
+                writer.newLine();
+            }
+            writer.appendNoHilight(String.format("%02x ", data[i]));
+        }
+
+        writer.newLine();
+        return writer;
+    }
+    
+    public static String byteArrayToHex(byte[] data) {
+        HilightedTextWriter writer = new HilightedTextWriter(false);
+        byteArrayToHex(writer, data);
+        return writer.toString();
     }
 
     public static <T> T timedCall(Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {

@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Cache;
 import java.util.ArrayList;
@@ -453,7 +454,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (!cache.contains(scriptLeaf)) {
             HilightedTextWriter writer = new HilightedTextWriter(true);
             for (int scriptTraitIndex : scriptLeaf.traitIndices) {
-                script.traits.traits[scriptTraitIndex].convertPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, false, scriptIndex, -1, writer, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true));
+                script.traits.traits[scriptTraitIndex].convertPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, ExportMode.SOURCE, scriptIndex, -1, writer, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true));
             }
             String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
             hilightedCode = s;

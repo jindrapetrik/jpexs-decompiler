@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunction
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -72,7 +73,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.indent();
         if (body != null) {
             try {
-                body.toString(path + "/inner", false, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null);
+                body.toString(path + "/inner", ExportMode.SOURCE, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null);
             } catch (Exception ex) {
                 Logger.getLogger(NewFunctionIns.class.getName()).log(Level.SEVERE, "error during newfunction", ex);
             }

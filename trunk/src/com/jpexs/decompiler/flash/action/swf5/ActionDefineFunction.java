@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -155,7 +156,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
-    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode) {
         String paramStr = "";
         for (int i = 0; i < paramNames.size(); i++) {
             paramStr += "\"" + Helper.escapeString(paramNames.get(i)) + "\"";
@@ -166,7 +167,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
-    public HilightedTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, HilightedTextWriter writer) {
+    public HilightedTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode, HilightedTextWriter writer) {
         List<String> oldParamNames = paramNames;
         if (replacedParamNames != null) {
             paramNames = replacedParamNames;
@@ -175,7 +176,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         if (replacedFunctionName != null) {
             functionName = replacedFunctionName;
         }
-        String ret = getASMSource(container, knownAddreses, constantPool, version, hex);
+        String ret = getASMSource(container, knownAddreses, constantPool, version, exportMode);
         paramNames = oldParamNames;
         functionName = oldFunctionName;
         writer.appendNoHilight(ret);

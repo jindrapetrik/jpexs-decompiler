@@ -11,7 +11,7 @@ import java.util.List;
 public class Main
 {
 
-   public static final String REPLACEMENTSFILE = "." + File.separator + "config" + File.separator + "replacements.ini";
+    public static final String REPLACEMENTSFILE = "." + File.separator + "config" + File.separator + "replacements.ini";
     public static boolean DEBUG_MODE = false;
 
     public static void main(String[] argv)

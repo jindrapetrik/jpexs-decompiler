@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.graph.ExportMode;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReReadableInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -75,11 +77,11 @@ public class DoActionTag extends Tag implements ASMSource {
      * @return ASM source
      */
     @Override
-    public HilightedTextWriter getASMSource(int version, boolean hex, HilightedTextWriter writer, List<Action> actions) {
+    public HilightedTextWriter getASMSource(int version, ExportMode exportMode, HilightedTextWriter writer, List<Action> actions) {
         if (actions == null) {
             actions = getActions(version);
         }
-        return Action.actionsToString(listeners, 0, actions, null, version, hex, writer, getPos(), toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, version, exportMode, writer, getPos(), toString()/*FIXME?*/);
     }
 
     /**
@@ -140,6 +142,12 @@ public class DoActionTag extends Tag implements ASMSource {
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = actionBytes;
     }
+
+    @Override
+    public HilightedTextWriter getActionBytesAsHex(HilightedTextWriter writer) {
+        return Helper.byteArrayToHex(writer, actionBytes);
+    }
+
     List<DisassemblyListener> listeners = new ArrayList<>();
 
     @Override

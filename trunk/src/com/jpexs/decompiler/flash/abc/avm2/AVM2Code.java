@@ -74,6 +74,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -718,11 +719,11 @@ public class AVM2Code implements Serializable {
         return writer;
     }
 
-    public HilightedTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, boolean hex, HilightedTextWriter writer) {
-        return toASMSource(constants, trait, info, body, new ArrayList<Integer>(), hex, writer);
+    public HilightedTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ExportMode exportMode, HilightedTextWriter writer) {
+        return toASMSource(constants, trait, info, body, new ArrayList<Integer>(), exportMode, writer);
     }
 
-    public HilightedTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, boolean hex, HilightedTextWriter writer) {
+    public HilightedTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, ExportMode exportMode, HilightedTextWriter writer) {
         invalidateCache();
         if (trait != null) {
             if (trait instanceof TraitFunction) {
@@ -899,81 +900,86 @@ public class AVM2Code implements Serializable {
         int ip = 0;
         int largeLimit = 20000;
         boolean markOffsets = code.size() <= largeLimit;
-        for (AVM2Instruction ins : code) {
-            if (hex) {
-                writer.appendNoHilight("<ffdec:hex>");
-                writer.appendNoHilight(Helper.bytesToHexString(ins.getBytes()));
-                writer.appendNoHilight("</ffdec:hex>\n");
-            }
-            if (ins.labelname != null) {
-                writer.appendNoHilight(ins.labelname + ":");
-            } else if (offsets.contains(ofs)) {
-                writer.appendNoHilight("ofs" + Helper.formatAddress(ofs) + ":");
-            }
-            /*for (int e = 0; e < body.exceptions.length; e++) {
-             if (body.exceptions[e].start == ofs) {
-             ret.append("exceptionstart " + e + ":");
-             }
-             if (body.exceptions[e].end == ofs) {
-             ret.append("exceptionend " + e + ":");
-             }
-             if (body.exceptions[e].target == ofs) {
-             ret.append("exceptiontarget " + e + ":");
-             }
-             }*/
-            if (ins.replaceWith != null) {
-                for (Object o : ins.replaceWith) {
-                    if (o instanceof Integer) {
-                        AVM2Instruction ins2 = code.get((Integer) o);
-                        if (ins2.isIgnored()) {
-                            continue;
-                        }
-                        writer.append("", ins2.mappedOffset > -1 ? ins2.mappedOffset : ofs);
-                        writer.appendNoHilight(ins2.toStringNoAddress(constants, new ArrayList<String>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)));
-                        writer.newLine();
-                        outputMap.add((Integer) o);
-                    } else if (o instanceof ControlFlowTag) {
-                        ControlFlowTag cft = (ControlFlowTag) o;
-                        if (cft.name.equals("appendjump")) {
-                            writer.appendNoHilight("jump ofs" + Helper.formatAddress(pos2adr(cft.value))).newLine();
-                            outputMap.add(-1);
-                        }
-                        if (cft.name.equals("mark")) {
-                            writer.appendNoHilight("ofs" + Helper.formatAddress(pos2adr(cft.value)) + ":");
-                        }
-                    }
+        
+        if (exportMode == ExportMode.HEX) {
+            Helper.byteArrayToHex(writer, getBytes());
+        } else {
+            for (AVM2Instruction ins : code) {
+                if (exportMode == ExportMode.PCODEWITHHEX) {
+                    writer.appendNoHilight("<ffdec:hex>");
+                    writer.appendNoHilight(Helper.bytesToHexString(ins.getBytes()));
+                    writer.appendNoHilight("</ffdec:hex>\n");
                 }
-            } else {
-                if (!ins.isIgnored()) {
-                    if (markOffsets) {
-                        writer.append("", ins.mappedOffset > -1 ? ins.mappedOffset : ofs);
-                    }
-                    int fixBranch = ins.getFixBranch();
-                    if (fixBranch > -1) {
-                        if (ins.definition instanceof IfTypeIns) {
-                            for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
-                                writer.appendNoHilight(new DeobfuscatePopIns().instructionName).newLine();
+                if (ins.labelname != null) {
+                    writer.appendNoHilight(ins.labelname + ":");
+                } else if (offsets.contains(ofs)) {
+                    writer.appendNoHilight("ofs" + Helper.formatAddress(ofs) + ":");
+                }
+                /*for (int e = 0; e < body.exceptions.length; e++) {
+                 if (body.exceptions[e].start == ofs) {
+                 ret.append("exceptionstart " + e + ":");
+                 }
+                 if (body.exceptions[e].end == ofs) {
+                 ret.append("exceptionend " + e + ":");
+                 }
+                 if (body.exceptions[e].target == ofs) {
+                 ret.append("exceptiontarget " + e + ":");
+                 }
+                 }*/
+                if (ins.replaceWith != null) {
+                    for (Object o : ins.replaceWith) {
+                        if (o instanceof Integer) {
+                            AVM2Instruction ins2 = code.get((Integer) o);
+                            if (ins2.isIgnored()) {
+                                continue;
                             }
-                            if (fixBranch == 0) { //jump
-                                writer.appendNoHilight(new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]));
-                            } else {
-                                //nojump, ignore
+                            writer.append("", ins2.mappedOffset > -1 ? ins2.mappedOffset : ofs);
+                            writer.appendNoHilight(ins2.toStringNoAddress(constants, new ArrayList<String>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)));
+                            writer.newLine();
+                            outputMap.add((Integer) o);
+                        } else if (o instanceof ControlFlowTag) {
+                            ControlFlowTag cft = (ControlFlowTag) o;
+                            if (cft.name.equals("appendjump")) {
+                                writer.appendNoHilight("jump ofs" + Helper.formatAddress(pos2adr(cft.value))).newLine();
+                                outputMap.add(-1);
+                            }
+                            if (cft.name.equals("mark")) {
+                                writer.appendNoHilight("ofs" + Helper.formatAddress(pos2adr(cft.value)) + ":");
                             }
                         }
-                        //TODO: lookupswitch ?
-                    } else {
-                        if (ins.changeJumpTo > -1) {
-                            writer.appendNoHilight(ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo)));
+                    }
+                } else {
+                    if (!ins.isIgnored()) {
+                        if (markOffsets) {
+                            writer.append("", ins.mappedOffset > -1 ? ins.mappedOffset : ofs);
+                        }
+                        int fixBranch = ins.getFixBranch();
+                        if (fixBranch > -1) {
+                            if (ins.definition instanceof IfTypeIns) {
+                                for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
+                                    writer.appendNoHilight(new DeobfuscatePopIns().instructionName).newLine();
+                                }
+                                if (fixBranch == 0) { //jump
+                                    writer.appendNoHilight(new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]));
+                                } else {
+                                    //nojump, ignore
+                                }
+                            }
+                            //TODO: lookupswitch ?
                         } else {
-                            writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<String>()));
+                            if (ins.changeJumpTo > -1) {
+                                writer.appendNoHilight(ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo)));
+                            } else {
+                                writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<String>()));
+                            }
                         }
+                        writer.newLine();
+                        outputMap.add(ip);
                     }
-                    writer.newLine();
-                    outputMap.add(ip);
                 }
+                ofs += ins.getBytes().length;
+                ip++;
             }
-            ofs += ins.getBytes().length;
-            ip++;
         }
         return writer;
     }
@@ -2101,7 +2107,7 @@ public class AVM2Code implements Serializable {
         try {
             List<Integer> outputMap = new ArrayList<>();
             HilightedTextWriter writer = new HilightedTextWriter(false);
-            toASMSource(constants, trait, info, body, outputMap, false, writer);
+            toASMSource(constants, trait, info, body, outputMap, ExportMode.PCODE, writer);
             String src = writer.toString();
 
             AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, null, body, info);
@@ -2143,7 +2149,7 @@ public class AVM2Code implements Serializable {
         try {
             List<Integer> outputMap = new ArrayList<>();
             HilightedTextWriter writer = new HilightedTextWriter(false);
-            toASMSource(constants, trait, info, body, outputMap, false, writer);
+            toASMSource(constants, trait, info, body, outputMap, ExportMode.PCODE, writer);
             String src = writer.toString();
             AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, trait, body, info);
             for (int i = 0; i < acode.code.size(); i++) {

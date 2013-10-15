@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
@@ -700,7 +701,7 @@ public class Main {
         System.out.println(" ...opens SWF file with the decompiler GUI");
         System.out.println(" 3) -proxy (-PXXX)");
         System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
-        System.out.println(" 4) -export (as|pcode|image|shape|movie|sound|binaryData|text|textplain|all) outdirectory infile [-selectas3class class1 class2 ...]");
+        System.out.println(" 4) -export (as|pcode|pcodehex|hex|image|shape|movie|sound|binaryData|text|textplain|all|all_as|all_pcode|all_pcodehex|all_hex) outdirectory infile [-selectas3class class1 class2 ...]");
         System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images, shapes, movies, binaryData, text with formatting, plain text or all.");
         System.out.println("     When \"as\" or \"pcode\" type specified, optional \"-selectas3class\" parameter can be passed to export only selected classes (ActionScript 3 only)");
         System.out.println(" 5) -dumpSWF infile");
@@ -1044,12 +1045,17 @@ public class Main {
 
                     switch (exportFormat) {
                         case "all":
+                        case "all_as":
+                        case "all_pcode":
+                        case "all_pcodehex":
+                        case "all_hex":
+                            ExportMode allExportMode = strToExportFormat(exportFormat.substring(3));
                             System.out.println("Exporting images...");
                             exfile.exportImages(handler, outDir.getAbsolutePath() + File.separator + "images");
                             System.out.println("Exporting shapes...");
                             exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes");
                             System.out.println("Exporting scripts...");
-                            exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", false, Configuration.getConfig("parallelSpeedUp", true));
+                            exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", allExportMode, Configuration.getConfig("parallelSpeedUp", true));
                             System.out.println("Exporting movies...");
                             exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies");
                             System.out.println("Exporting sounds...");
@@ -1070,13 +1076,16 @@ public class Main {
                             break;
                         case "as":
                         case "pcode":
+                        case "pcodehex":
+                        case "hex":
+                            ExportMode exportMode = strToExportFormat(exportFormat);
                             if ((pos + 5 < args.length) && (args[pos + 4].equals("-selectas3class"))) {
                                 exportOK = true;
                                 for (int i = pos + 5; i < args.length; i++) {
-                                    exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportFormat.equals("pcode"), Configuration.getConfig("parallelSpeedUp", true));
+                                    exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportMode, Configuration.getConfig("parallelSpeedUp", true));
                                 }
                             } else {
-                                exportOK = !exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportFormat.equals("pcode"), Configuration.getConfig("parallelSpeedUp", true)).isEmpty();
+                                exportOK = !exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportMode, Configuration.getConfig("parallelSpeedUp", true)).isEmpty();
                             }
                             break;
                         case "movie":
@@ -1175,6 +1184,18 @@ public class Main {
         }
     }
 
+    private static ExportMode strToExportFormat(String exportFormatStr) {
+        if (exportFormatStr.equals("pcode")) {
+            return ExportMode.PCODE;
+        } else if (exportFormatStr.equals("pcodehex")) {
+            return ExportMode.PCODEWITHHEX;
+        } else if (exportFormatStr.equals("hex")) {
+            return ExportMode.HEX;
+        } else {
+            return ExportMode.SOURCE;
+        }
+    }
+    
     private static void setConfigurations(String cfgStr) {
         String[] cfgs;
         if (cfgStr.contains(",")) {

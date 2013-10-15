@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.ExportMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,13 +56,13 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
         } else {
             if (parentTraitIndex > -1) {
                 if (isStatic){
-                    ((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+                    ((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
                 } else {
-                    ((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+                    ((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
                 }
                 writer.appendNoHilight(" ");
             }
-            ((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+            ((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
         }
         return writer.toString();
     }

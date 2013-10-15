@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -251,13 +252,13 @@ public class TagNode {
         return count;
     }
 
-    public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode) throws IOException {
+    public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, ExportMode exportMode) throws IOException {
         AtomicInteger cnt = new AtomicInteger(1);
         int totalCount = TagNode.getTagCountRecursive(nodeList);
-        return exportNodeAS(allTags, handler, nodeList, outdir, isPcode, cnt, totalCount, null);
+        return exportNodeAS(allTags, handler, nodeList, outdir, exportMode, cnt, totalCount, null);
     }
 
-    public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode, AtomicInteger index, int count, EventListener ev) throws IOException {
+    public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, ExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
         File dir = new File(outdir);
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
@@ -297,9 +298,13 @@ public class TagNode {
                             File file = new File(f);
                             String res;
                             ASMSource asm = ((ASMSource) node.tag);
-                            if (isPcode) {
+                            if (exportMode == ExportMode.HEX) {
                                 HilightedTextWriter writer = new HilightedTextWriter(false, asm.getActionSourceIndent());
-                                asm.getASMSource(SWF.DEFAULT_VERSION, false, writer, null);
+                                asm.getActionBytesAsHex(writer);
+                                res = asm.getActionSourcePrefix() + writer.toString() + asm.getActionSourceSuffix();
+                            } else if (exportMode != ExportMode.SOURCE) {
+                                HilightedTextWriter writer = new HilightedTextWriter(false, asm.getActionSourceIndent());
+                                asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, null);
                                 res = asm.getActionSourcePrefix() + writer.toString() + asm.getActionSourceSuffix();
                             } else {
                                 List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
@@ -337,7 +342,7 @@ public class TagNode {
                     } while (retry);
                 }
             } else {
-                ret.addAll(exportNodeAS(allTags, handler, node.subItems, outdir + name, isPcode, index, count, ev));
+                ret.addAll(exportNodeAS(allTags, handler, node.subItems, outdir + name, exportMode, index, count, ev));
             }
 
         }

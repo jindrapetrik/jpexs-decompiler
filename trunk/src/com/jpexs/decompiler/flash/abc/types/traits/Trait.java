@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Helper;
 import java.io.File;
@@ -115,19 +116,19 @@ public abstract class Trait implements Serializable {
         return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         writer.appendNoHilight(abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata));
         return writer;
     }
 
-    public HilightedTextWriter convertPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public HilightedTextWriter convertPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         Namespace ns = abc.constants.constant_multiname[name_index].getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
             String nsname = ns.getName(abc.constants);
             writer.appendNoHilight("package " + nsname).newLine();
             writer.appendNoHilight("{").newLine();
             writer.indent();
-            convert(parent, path, abcTags, abc, isStatic, pcod, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+            convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             writer.newLine();
             writer.unindent();
             writer.appendNoHilight("}");
@@ -135,8 +136,8 @@ public abstract class Trait implements Serializable {
         return writer;
     }
 
-    public HilightedTextWriter convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
-        convert(parent, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+    public HilightedTextWriter convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+        convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         return writer;
     }
 
@@ -158,7 +159,7 @@ public abstract class Trait implements Serializable {
         return packageName + "." + objectName;
     }
 
-    public void export(Trait parent, String directory, ABC abc, List<ABCContainerTag> abcList, boolean pcode, int scriptIndex, int classIndex, boolean isStatic, boolean parallel) throws IOException {
+    public void export(Trait parent, String directory, ABC abc, List<ABCContainerTag> abcList, ExportMode exportMode, int scriptIndex, int classIndex, boolean isStatic, boolean parallel) throws IOException {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         String packageName = ns.getName(abc.constants);
@@ -174,7 +175,7 @@ public abstract class Trait implements Serializable {
         String fileName = outDir.toString() + File.separator + objectName + ".as";
         try (FileOutputStream fos = new FileOutputStream(fileName)) {
             HilightedTextWriter writer = new HilightedTextWriter(false);
-            convertPackaged(parent, "", abcList, abc, isStatic, pcode, scriptIndex, classIndex, writer, new ArrayList<String>(), parallel);
+            convertPackaged(parent, "", abcList, abc, isStatic, exportMode, scriptIndex, classIndex, writer, new ArrayList<String>(), parallel);
             String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
             fos.write(s.getBytes());
         }

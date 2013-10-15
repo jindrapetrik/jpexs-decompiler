@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
@@ -227,7 +228,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public HilightedTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, HilightedTextWriter writer) {
+    public HilightedTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode, HilightedTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return toString(writer);
         }
@@ -238,7 +239,7 @@ public class ActionPush extends Action {
         return writer;
     }
 
-    public HilightedTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, HilightedTextWriter writer) {
+    public HilightedTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode, HilightedTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return paramsToString(writer);
         }

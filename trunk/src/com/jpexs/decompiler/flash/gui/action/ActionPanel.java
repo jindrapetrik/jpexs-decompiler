@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
@@ -278,7 +279,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         setText(hex ? srcWithHex : (hexOnly ? srcHexOnly : srcNoHex));
     }
 
-    public void setSource(ASMSource src, final boolean useCache) {
+    public void setSource(final ASMSource src, final boolean useCache) {
         this.src = src;
         Main.startWork(translate("work.decompiling") + "...");
         final ASMSource asm = (ASMSource) src;
@@ -310,12 +311,12 @@ public class ActionPanel extends JPanel implements ActionListener {
                 List<Action> actions = asm.getActions(SWF.DEFAULT_VERSION);
                 lastCode = actions;
                 HilightedTextWriter writer = new HilightedTextWriter(true);
-                asm.getASMSource(SWF.DEFAULT_VERSION, true, writer, actions);
+                asm.getASMSource(SWF.DEFAULT_VERSION, ExportMode.PCODEWITHHEX, writer, actions);
                 lastDisasm = writer.toString();
                 asm.removeDisassemblyListener(listener);
                 srcWithHex = Helper.hexToComments(lastDisasm);
                 srcNoHex = Helper.stripComments(lastDisasm);
-                srcHexOnly = getHexText(srcWithHex);
+                srcHexOnly = Helper.byteArrToString(src.getActionBytes());
                 setHex(hexButton.isSelected(), hexOnlyButton.isSelected());
                 if (Configuration.getConfig("decompile", true)) {
                     decompiledEditor.setText("//" + translate("work.decompiling") + "...");
@@ -715,33 +716,6 @@ public class ActionPanel extends JPanel implements ActionListener {
         }
         byte[] data = baos.toByteArray();
         return data;
-    }
-
-    private String getHexText(String srcWithHex) {
-        StringBuilder result = new StringBuilder();
-        String nl = System.getProperty("line.separator");
-        result.append("#hexdata").append(nl);
-
-        /* // hex data from decompiled actions
-         Scanner scanner = new Scanner(srcWithHex);
-         while (scanner.hasNextLine()) {
-         String line = scanner.nextLine().trim();
-         if (line.startsWith(";")) {
-         result.append(line.substring(1).trim()).append(nl);
-         } else {
-         result.append(";").append(line).append(nl);
-         }
-         }*/
-
-        byte[] data = src.getActionBytes();
-        for (int i = 0; i < data.length; i++) {
-            if (i % 8 == 0) {
-                result.append(nl);
-            }
-            result.append(String.format("%02x ", data[i]));
-        }
-
-        return result.toString();
     }
 
     public void updateSearchPos() {
