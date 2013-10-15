@@ -721,7 +721,7 @@ public class Action implements GraphSourceItem {
      * @return HilightedTextWriter with Source code
      */
     public static String actionsToSource(List<Action> actions, int version, String path, boolean highlight, int indent) {
-        HilightedTextWriter writer = new HilightedTextWriter(false, indent);
+        HilightedTextWriter writer = new HilightedTextWriter(highlight, indent);
         Action.actionsToSource(actions, SWF.DEFAULT_VERSION, ""/*FIXME*/, writer);
         String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
         return s;

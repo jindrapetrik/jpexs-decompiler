@@ -305,7 +305,9 @@ public class TagNode {
                             } else if (exportMode != ExportMode.SOURCE) {
                                 HilightedTextWriter writer = new HilightedTextWriter(false, asm.getActionSourceIndent());
                                 asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, null);
-                                res = asm.getActionSourcePrefix() + writer.toString() + asm.getActionSourceSuffix();
+                                String str = writer.toString();
+                                str = Helper.hexToComments(str);
+                                res = asm.getActionSourcePrefix() + str + asm.getActionSourceSuffix();
                             } else {
                                 List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                                 Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);

@@ -128,6 +128,7 @@ public class ScriptPack {
                     abc.script_info[scriptIndex].traits.traits[t].convert(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
                 }
                 String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
+                s = Helper.hexToComments(s);
                 fos.write(s.getBytes("utf-8"));
             }
         }
