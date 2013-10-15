@@ -30,6 +30,11 @@ public class ThisAVM2Item extends AVM2Item {
     }
 
     @Override
+    public String toString() {
+        return "this";
+    }
+
+    @Override
     protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
         return writer.append("this");
     }

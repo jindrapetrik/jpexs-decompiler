@@ -1416,7 +1416,12 @@ public class AVM2Code implements Serializable {
             if (ex2 instanceof OutOfMemoryError) {
                 System.gc();
             }
-            return writer.append("/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error type: " + ex2.getClass().getSimpleName() + "\r\n */\r\nthrow new IllegalOperationError(\"Not decompiled due to error\");\r\n");
+            writer.appendNoHilight("/*").newLine();
+            writer.appendNoHilight(" * Decompilation error").newLine();
+            writer.appendNoHilight(" * Code may be obfuscated").newLine();
+            writer.appendNoHilight(" * Error type: " + ex2.getClass().getSimpleName()).newLine();
+            writer.appendNoHilight(" */").newLine();
+            return writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
         }
         if (initTraits != null) {
             for (int i = 0; i < list.size(); i++) {

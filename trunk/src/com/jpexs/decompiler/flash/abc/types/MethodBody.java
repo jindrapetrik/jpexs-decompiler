@@ -151,7 +151,8 @@ public class MethodBody implements Cloneable, Serializable {
                 writer.appendNoHilight("/*").newLine();
                 writer.appendNoHilight(" * Decompilation error").newLine();
                 writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached").newLine();
-                writer.appendNoHilight(" */");
+                writer.appendNoHilight(" */").newLine();
+                writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
             }
             writer.unindent();
         }

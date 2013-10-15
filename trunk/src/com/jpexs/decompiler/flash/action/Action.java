@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
+import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
@@ -754,7 +755,8 @@ public class Action implements GraphSourceItem {
             writer.appendNoHilight("/*").newLine();
             writer.appendNoHilight(" * Decompilation error").newLine();
             writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached").newLine();
-            writer.appendNoHilight(" */");
+            writer.appendNoHilight(" */").newLine();
+            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
         } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex2);
             if (ex2 instanceof OutOfMemoryError) {
@@ -765,7 +767,8 @@ public class Action implements GraphSourceItem {
             writer.appendNoHilight(" * Decompilation error").newLine();
             writer.appendNoHilight(" * Code may be obfuscated").newLine();
             writer.appendNoHilight(" * Error type: " + ex2.getClass().getSimpleName()).newLine();
-            writer.appendNoHilight(" */");
+            writer.appendNoHilight(" */").newLine();
+            return writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
         }
         return writer;
     }
@@ -1224,7 +1227,7 @@ public class Action implements GraphSourceItem {
         List<Action> ret = actions;
         if (true) {
             //return ret;
-        }
+            }
         String s = null;
         try {
             HilightedTextWriter writer = new HilightedTextWriter(false);

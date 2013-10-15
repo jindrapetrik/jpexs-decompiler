@@ -43,7 +43,6 @@ import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReReadableInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,7 +149,7 @@ public class ActionListReader {
         updateActionLengths(actions, version);
 
         if (deobfuscate) {
-            actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, 0, path);
+            actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, ip, path);
             updateActionLengths(actions, version);
             removeZeroJumps(actions, version);
         }
@@ -172,9 +171,12 @@ public class ActionListReader {
      * @throws IOException
      */
     public static List<Action> deobfuscateActionList(List<DisassemblyListener> listeners, long containerSWFOffset, List<Action> actions, int version, int ip, String path) throws IOException {
-        byte[] data = Action.actionsToBytes(actions, true, version);
-        ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(data));
-        int endIp = data.length;
+        if (actions.isEmpty()) {
+            return actions;
+        }
+        
+        Action lastAction = actions.get(actions.size() - 1);
+        int endIp = (int) lastAction.getAddress();
 
         List<Action> retdups = new ArrayList<>();
         for (int i = 0; i < endIp; i++) {
@@ -182,14 +184,21 @@ public class ActionListReader {
             a.setAddress(i, version);
             retdups.add(a);
         }
+        List<Action> actionMap = new ArrayList<>(endIp);
+        for (int i = 0; i <= endIp; i++) {
+            actionMap.add(null);
+        }
+        for (Action a : actions) {
+            actionMap.set((int) a.getAddress(), a);
+        }
+        
         ConstantPool cpool = new ConstantPool();
 
         Stack<GraphTargetItem> stack = new Stack<>();
 
         List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
 
-        SWFInputStream sis = new SWFInputStream(rri, version);
-        deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, sis, rri, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version);
+        deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, actionMap, ip, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version);
 
         if (!retdups.isEmpty()) {
             for (int i = 0; i < ip; i++) {
@@ -442,8 +451,9 @@ public class ActionListReader {
             if (a instanceof ActionJump) {
                 ActionJump aJump = (ActionJump)a;
                 if (aJump.getJumpOffset() == 0) {
-                    removeAction(actions, i, version);
-                    i--;
+                    if (removeAction(actions, i, version, false)) {
+                        i--;
+                    }
                 }
             }
         }
@@ -454,10 +464,10 @@ public class ActionListReader {
      * @param actions
      * @param index 
      */
-    private static void removeAction(List<Action> actions, int index, int version) {
+    public static boolean removeAction(List<Action> actions, int index, int version, boolean removeWhenLast) {
         
         if (index < 0 || actions.size() <= index) {
-            return;
+            return false;
         }
         
         long startIp = actions.get(0).getAddress();
@@ -486,6 +496,9 @@ public class ActionListReader {
             List<Action> lastActions = containerLastActions.get(a);
             for (int i = 0; i < lastActions.size(); i++) {
                 if (lastActions.get(i) == actionToRemove) {
+                    if (!removeWhenLast) {
+                        return false;
+                    }
                     lastActions.set(i, prevAction);
                 }
             }
@@ -510,6 +523,8 @@ public class ActionListReader {
         updateActionStores(actions, jumps);
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
+        
+        return true;
     }
     
     @SuppressWarnings("unchecked")
@@ -629,18 +644,18 @@ public class ActionListReader {
     }
 
     @SuppressWarnings("unchecked")
-    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version) throws IOException {
+    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int pos, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version) throws IOException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
         boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
-        rri.setPos(ip);
+        pos = ip;
         Action a;
-        long filePos = rri.getPos();
         Scanner sc = new Scanner(System.in, "utf-8");
-        int prevIp = ip;
         loopip:
-        while (((endip == -1) || (endip > ip)) && (a = sis.readAction(rri, cpool)) != null) {
+        while (((endip == -1) || (endip > ip)) && (a = actions.get(pos)) != null) {
+            int actionLen = getTotalActionLength(a);
+            pos += actionLen;
             if (!visited.containsKey(ip)) {
                 visited.put(ip, 0);
             }
@@ -648,13 +663,12 @@ public class ActionListReader {
             curVisited++;
             visited.put(ip, curVisited);
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progress("Deobfuscating", rri.getCount(), rri.length());
+                listeners.get(i).progress("Deobfuscating", pos, actions.size());
             }
             if ((ip < ret.size()) && (!(ret.get(ip) instanceof ActionNop))) {
                 a = ret.get(ip);
             }
             a.containerSWFOffset = containerSWFOffset;
-            a.setAddress(prevIp, version, false);
             int info = a.actionLength + 1 + ((a.actionCode >= 0x80) ? 2 : 0);
 
             if (a instanceof ActionPush) {
@@ -685,8 +699,6 @@ public class ActionListReader {
                 }
                 System.err.println(add);
             }
-            long newFilePos = rri.getPos();
-            long actionLen = newFilePos - filePos;
 
             int newip = -1;
 
@@ -713,15 +725,15 @@ public class ActionListReader {
                         if (deobfuscate) {
                             top = stack.pop();
                         }
-                        int nip = (int) rri.getPos() + aif.getJumpOffset();
+                        int nip = pos + aif.getJumpOffset();
 
                         if (decideBranch) {
                             System.out.print("newip " + nip + ", ");
                             System.out.print("Action: jump(j),ignore(i),compute(c)?");
                             String next = sc.next();
                             if (next.equals("j")) {
-                                newip = (int) rri.getPos() + aif.getJumpOffset();
-                                rri.setPos(newip);
+                                newip = pos + aif.getJumpOffset();
+                                pos = newip;
 
                             } else if (next.equals("i")) {
                             } else if (next.equals("c")) {
@@ -733,7 +745,7 @@ public class ActionListReader {
                                 System.err.print("is compiletime -> ");
                             }
                             if (EcmaScript.toBoolean(top.getResult())) {
-                                newip = (int) rri.getPos() + aif.getJumpOffset();
+                                newip = pos + aif.getJumpOffset();
                                 aif.jumpUsed = true;
                                 if (aif.ignoreUsed) {
                                     aif.compileTime = false;
@@ -757,7 +769,7 @@ public class ActionListReader {
                             goaif = true;
                         }
                     } else if (a instanceof ActionJump) {
-                        newip = (int) rri.getPos() + ((ActionJump) a).getJumpOffset();
+                        newip = pos + ((ActionJump) a).getJumpOffset();
                     } else if (!(a instanceof GraphSourceItemContainer)) {
                         if (deobfuscate) {
                             //return in for..in,   TODO:Handle this better way
@@ -816,7 +828,7 @@ public class ActionListReader {
                         } else {
                             localData2 = localData;
                         }
-                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version);
+                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, actions, pos, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version);
                         output2s.add(output2);
                         endAddr += size;
                     }
@@ -824,9 +836,7 @@ public class ActionListReader {
                         cnt.translateContainer(output2s, stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
                     }
                     ip = (int) endAddr;
-                    prevIp = ip;
-                    rri.setPos(ip);
-                    filePos = rri.getPos();
+                    pos = ip;
                     continue;
                 }
             }
@@ -839,8 +849,7 @@ public class ActionListReader {
             } else {
                 ip = ip + info;
             }
-            rri.setPos(ip);
-            filePos = rri.getPos();
+            pos = ip;
             if (goaif) {
                 aif.ignoreUsed = true;
                 aif.jumpUsed = true;
@@ -871,8 +880,8 @@ public class ActionListReader {
 
                 if ((!stateChanged) && curVisited > 1) {
                     List<Integer> branches = new ArrayList<>();
-                    branches.add((int) rri.getPos() + aif.getJumpOffset());
-                    branches.add((int) rri.getPos());
+                    branches.add(pos + aif.getJumpOffset());
+                    branches.add(pos);
                     for (int br : branches) {
                         int visc = 0;
                         if (visited.containsKey(br)) {
@@ -880,28 +889,23 @@ public class ActionListReader {
                         }
                         if (visc == 0) {//<curVisited){
                             ip = br;
-                            prevIp = ip;
-                            rri.setPos(br);
-                            filePos = rri.getPos();
+                            pos = br;
                             continue loopip;
                         }
                     }
                     break loopip;
                 }
 
-                int oldPos = (int) rri.getPos();
                 @SuppressWarnings("unchecked")
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, (int) rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version);
-                rri.setPos(oldPos);
+                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, actions, pos, pos + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version);
             }
-            prevIp = ip;
             if (a.isExit()) {
                 break;
             }
         }
         for (DisassemblyListener listener : listeners) {
-            listener.progress("Deobfuscating", rri.getCount(), rri.length());
+            listener.progress("Deobfuscating", pos, actions.size());
         }
     }
 
