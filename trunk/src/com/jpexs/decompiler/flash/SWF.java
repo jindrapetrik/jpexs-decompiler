@@ -127,6 +127,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -650,37 +651,61 @@ public class SWF {
         return ret;
     }
 
-    public List<File> exportActionScript3(AbortRetryIgnoreHandler handler, String outdir, ExportMode exportMode, boolean parallel) {
-        ExecutorService executor = Executors.newFixedThreadPool(parallel ? 20 : 1);
-        List<Future<File>> futureResults = new ArrayList<>();
-        AtomicInteger cnt = new AtomicInteger(1);
-        List<ABCContainerTag> abcTags = new ArrayList<>();
+    public List<File> exportActionScript3(final AbortRetryIgnoreHandler handler, final String outdir, final ExportMode exportMode, final boolean parallel) {
+        final AtomicInteger cnt = new AtomicInteger(1);
+        final List<ABCContainerTag> abcTags = new ArrayList<>();
         for (Tag t : tags) {
             if (t instanceof ABCContainerTag) {
                 abcTags.add((ABCContainerTag) t);
             }
         }
-        List<MyEntry<ClassPath, ScriptPack>> packs = getAS3Packs();
-        for (MyEntry<ClassPath, ScriptPack> item : packs) {
-            Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, exportMode, parallel));
-            futureResults.add(future);
-        }
 
-        List<File> ret = new ArrayList<>();
-        for (int f = 0; f < futureResults.size(); f++) {
+        final List<File> ret = new ArrayList<>();
+        final List<MyEntry<ClassPath, ScriptPack>> packs = getAS3Packs();
+
+        if (!parallel || packs.size() < 2) {
             try {
-                ret.add(futureResults.get(f).get());
-            } catch (InterruptedException | ExecutionException ex) {
-                Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+                Helper.timedCall(new Callable<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        for (MyEntry<ClassPath, ScriptPack> item : packs) {
+                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, exportMode, parallel);
+                            try {
+                                ret.add(task.call());
+                            } catch (Exception ex) {
+                                Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+                            }
+                        }
+                        return null;
+                    }
+                }, Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
+            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT) + " ActionScript export limit reached", ex);
+            }
+        } else {
+            ExecutorService executor = Executors.newFixedThreadPool(20);
+            List<Future<File>> futureResults = new ArrayList<>();
+            for (MyEntry<ClassPath, ScriptPack> item : packs) {
+                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, exportMode, parallel));
+                futureResults.add(future);
+            }
+
+            for (int f = 0; f < futureResults.size(); f++) {
+                try {
+                    ret.add(futureResults.get(f).get());
+                } catch (InterruptedException | ExecutionException ex) {
+                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+                }
+            }
+
+            try {
+                executor.shutdown();
+                executor.awaitTermination(Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT) + " ActionScript export limit reached", ex);
             }
         }
-
-        try {
-            executor.shutdown();
-            executor.awaitTermination(Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT) + " ActionScript export limit reached", ex);
-        }
+        
         return ret;
     }
 

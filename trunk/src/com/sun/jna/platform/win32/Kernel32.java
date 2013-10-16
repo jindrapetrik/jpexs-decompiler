@@ -109,7 +109,18 @@ public interface Kernel32 extends WinNT {
     // Define the well known values for CreateNamedPipe nMaxInstances
     //
     public static final int PIPE_UNLIMITED_INSTANCES = 255;
-
+    //
+    // Define the values for process priority
+    //
+    public static final int ABOVE_NORMAL_PRIORITY_CLASS = 0x00008000;
+    public static final int BELOW_NORMAL_PRIORITY_CLASS = 0x00004000;
+    public static final int HIGH_PRIORITY_CLASS = 0x00000080;
+    public static final int IDLE_PRIORITY_CLASS = 0x00000040;
+    public static final int NORMAL_PRIORITY_CLASS = 0x00000020;
+    public static final int PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
+    public static final int PROCESS_MODE_BACKGROUND_END = 0x00200000;
+    public static final int REALTIME_PRIORITY_CLASS = 0x00000100;
+        
 //	__out
 //	HANDLE
 //	WINAPI
@@ -171,6 +182,10 @@ public interface Kernel32 extends WinNT {
      * @return The return value is a pseudohandle to the current process.
      */
     HANDLE GetCurrentProcess();
+
+    int SetProcessAffinityMask(HANDLE hProcess, int mask);
+    
+    int SetPriorityClass(HANDLE hProcess, int dwPriorityClass);
 
     /**
      * This function returns a handle to an existing process object.

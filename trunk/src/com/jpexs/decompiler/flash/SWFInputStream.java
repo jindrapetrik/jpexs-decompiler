@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -606,7 +607,7 @@ public class SWFInputStream extends InputStream {
 
     /**
      * Reads list of tags from the stream. Reading ends with End tag(=0) or end
-     * of the stream. Optinally can skip AS1/2 tags when file is AS3
+     * of the stream. Optionally can skip AS1/2 tags when file is AS3
      *
      * @param swf
      * @param level
@@ -633,10 +634,11 @@ public class SWFInputStream extends InputStream {
      */
     public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags) throws IOException {
         ExecutorService executor = null;
+        List<Future<Tag>> futureResults = new ArrayList<>();
         if (parallel) {
             executor = Executors.newFixedThreadPool(20);
+            futureResults = new ArrayList<>();
         }
-        List<Future<Tag>> futureResults = new ArrayList<>();
         List<Tag> tags = new ArrayList<>();
         Tag tag;
         Tag previousTag = null;
@@ -659,7 +661,7 @@ public class SWFInputStream extends InputStream {
             }
             tag.previousTag = previousTag;
             previousTag = tag;
-            boolean doParse = false;
+            boolean doParse;
             if (!skipUnusualTags) {
                 doParse = true;
             } else {
@@ -718,7 +720,7 @@ public class SWFInputStream extends InputStream {
             for (Future<Tag> future : futureResults) {
                 try {
                     tags.add(future.get());
-                } catch (Exception e) {
+                } catch (InterruptedException | ExecutionException e) {
                     Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", e);
                 }
             }
@@ -1003,21 +1005,6 @@ public class SWFInputStream extends InputStream {
         ret.previousTag = tag.previousTag;
         ret.forceWriteAsLong = tag.forceWriteAsLong;
         return ret;
-    }
-
-    /**
-     * Reads one Tag from the stream
-     *
-     * @param swf
-     * @param level
-     * @param pos
-     * @param parallel
-     * @param skipUnusualTags
-     * @return Tag or null when End tag
-     * @throws IOException
-     */
-    public Tag readTag(SWF swf, int level, long pos, boolean parallel, boolean skipUnusualTags) throws IOException {
-        return readTag(swf, level, pos, true, parallel, skipUnusualTags);
     }
 
     /**

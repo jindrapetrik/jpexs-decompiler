@@ -281,12 +281,16 @@ public class Main {
                 if (Main.inputStream instanceof FileInputStream) {
                     Main.inputStream.close();
                 }
+            } catch (OutOfMemoryError ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                View.showMessageDialog(null, "Cannot load SWF file. Out of memory.");
+                loadingDialog.setVisible(false);
+                swf = null;
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 View.showMessageDialog(null, "Cannot load SWF file.");
                 loadingDialog.setVisible(false);
                 swf = null;
-                //return false;
             }
 
             try {
@@ -966,6 +970,65 @@ public class Main {
                     }
 
                     pos++;
+                } else if (args[pos].equals("-affinity")) {
+                    parameterProcessed = true;
+                    pos++;
+                    if (Platform.isWindows()) {
+                        if (args.length <= pos) {
+                            System.err.println("affinity parameter expected");
+                            badArguments();
+                        }
+                        try {
+                            int affinityMask = Integer.parseInt(args[pos]);
+                            Kernel32.INSTANCE.SetProcessAffinityMask(Kernel32.INSTANCE.GetCurrentProcess(), affinityMask);
+                        } catch (NumberFormatException nex) {
+                            System.err.println("Bad affinityMask value");
+                        }
+
+                        pos++;
+                    } else {
+                        System.err.println("Process affinity setting is only available on Windows platform.");
+                    }
+                } else if (args[pos].equals("-priority")) {
+                    parameterProcessed = true;
+                    pos++;
+                    if (Platform.isWindows()) {
+                        if (args.length <= pos) {
+                            System.err.println("priority parameter expected");
+                            badArguments();
+                        }
+                        String priority = args[pos];
+                        int priorityClass = 0;
+                        switch (priority) {
+                            case "low":
+                                priorityClass = Kernel32.IDLE_PRIORITY_CLASS;
+                                break;
+                            case "belownormal":
+                                priorityClass = Kernel32.BELOW_NORMAL_PRIORITY_CLASS;
+                                break;
+                            case "normal":
+                                priorityClass = Kernel32.NORMAL_PRIORITY_CLASS;
+                                break;
+                            case "abovenormal":
+                                priorityClass = Kernel32.ABOVE_NORMAL_PRIORITY_CLASS;
+                                break;
+                            case "high":
+                                priorityClass = Kernel32.HIGH_PRIORITY_CLASS;
+                                break;
+                            case "realtime":
+                                priorityClass = Kernel32.REALTIME_PRIORITY_CLASS;
+                                break;
+                            default:
+                                System.err.println("Bad affinityMask value");
+                        }
+                        if (priorityClass != 0) {
+                            Kernel32.INSTANCE.SetPriorityClass(Kernel32.INSTANCE.GetCurrentProcess(), priorityClass);
+                        }
+
+                        pos++;
+                    } else {
+                        System.err.println("Process priority setting is only available on Windows platform.");
+                    }
                 }
             }
             if (args[pos].equals("-removefromcontextmenu")) {
@@ -1119,7 +1182,7 @@ public class Main {
                         default:
                             exportOK = false;
                     }
-                } catch (Exception ex) {
+                } catch (OutOfMemoryError | Exception ex) {
                     exportOK = false;
                     System.err.print("FAIL: Exporting Failed on Exception - ");
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);

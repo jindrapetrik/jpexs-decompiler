@@ -135,40 +135,38 @@ public class Traits implements Serializable {
     }
 
     public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
-        ExecutorService executor = null;
-        List<Future<String>> futureResults = null;
-        List<TraitConvertTask> traitConvertTasks = null;
-
-        if (parallel) {
-            executor = Executors.newFixedThreadPool(20);
-            futureResults = new ArrayList<>();
-        } else {
-            traitConvertTasks = new ArrayList<>();
-        }
-        for (int t = 0; t < traits.length; t++) {
-            HilightedTextWriter writer2 = new HilightedTextWriter(writer.getIsHighlighted(), writer.getIndent());
-            TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer2, fullyQualifiedNames, t, parallel);
-            if (parallel) {
-                Future<String> future = executor.submit(task);
-                futureResults.add(future);
-            } else {
-                traitConvertTasks.add(task);
-            }
-        }
-
-        int taskCount = parallel ? futureResults.size() : traitConvertTasks.size();
-        for (int f = 0; f < taskCount; f++) {
-            if (f > 0) {
+        if (!parallel || traits.length < 2) {
+            for (int t = 0; t < traits.length; t++) {
+                if (t > 0) {
+                    writer.newLine();
+                }
+                TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, t, parallel);
+                task.call();
                 writer.newLine();
             }
-            try {
-                String taskResult = parallel ? futureResults.get(f).get() : traitConvertTasks.get(f).call();
-                writer.appendWithoutIndent(taskResult);
-            } catch (InterruptedException | ExecutionException ex) {
-                Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during traits converting", ex);
+        } else {
+            ExecutorService executor = Executors.newFixedThreadPool(20);
+            List<Future<String>> futureResults = null;
+
+            futureResults = new ArrayList<>();
+            for (int t = 0; t < traits.length; t++) {
+                HilightedTextWriter writer2 = new HilightedTextWriter(writer.getIsHighlighted(), writer.getIndent());
+                TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer2, fullyQualifiedNames, t, parallel);
+                Future<String> future = executor.submit(task);
+                futureResults.add(future);
             }
-        }
-        if (parallel) {
+
+            for (int f = 0; f < futureResults.size(); f++) {
+                if (f > 0) {
+                    writer.newLine();
+                }
+                try {
+                    String taskResult = futureResults.get(f).get();
+                    writer.appendWithoutIndent(taskResult);
+                } catch (InterruptedException | ExecutionException ex) {
+                    Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during traits converting", ex);
+                }
+            }
             executor.shutdown();
         }
         return writer;
