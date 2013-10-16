@@ -114,7 +114,7 @@ public class MethodBody implements Cloneable, Serializable {
         HilightedTextWriter writer = new HilightedTextWriter(false);
         toString(path, exportMode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, fullyQualifiedNames, initTraits);
         String src = writer.toString();
-        src = Graph.removeNonRefenrencedLoopLabels(src);
+        src = Graph.removeNonRefenrencedLoopLabels(src, false);
         return src;
     }
     

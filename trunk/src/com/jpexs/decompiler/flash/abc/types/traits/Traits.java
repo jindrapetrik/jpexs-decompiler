@@ -73,7 +73,7 @@ public class Traits implements Serializable {
         return s;
     }
 
-    private class TraitConvertTask implements Callable<String> {
+    private class TraitConvertTask implements Callable<HilightedTextWriter> {
 
         Trait trait;
         boolean makePackages;
@@ -108,7 +108,7 @@ public class Traits implements Serializable {
         }
 
         @Override
-        public String call() {
+        public HilightedTextWriter call() {
             int h = traitIndex;
             if (classIndex != -1) {
                 if (!isStatic) {
@@ -130,7 +130,7 @@ public class Traits implements Serializable {
             } else {
                 writer.endTrait();
             }
-            return writer.toString();
+            return writer;
         }
     }
 
@@ -146,13 +146,13 @@ public class Traits implements Serializable {
             }
         } else {
             ExecutorService executor = Executors.newFixedThreadPool(20);
-            List<Future<String>> futureResults = null;
+            List<Future<HilightedTextWriter>> futureResults = null;
 
             futureResults = new ArrayList<>();
             for (int t = 0; t < traits.length; t++) {
                 HilightedTextWriter writer2 = new HilightedTextWriter(writer.getIsHighlighted(), writer.getIndent());
                 TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer2, fullyQualifiedNames, t, parallel);
-                Future<String> future = executor.submit(task);
+                Future<HilightedTextWriter> future = executor.submit(task);
                 futureResults.add(future);
             }
 
@@ -161,8 +161,8 @@ public class Traits implements Serializable {
                     writer.newLine();
                 }
                 try {
-                    String taskResult = futureResults.get(f).get();
-                    writer.appendWithoutIndent(taskResult);
+                    HilightedTextWriter taskResult = futureResults.get(f).get();
+                    writer.appendWithoutIndent(taskResult.toString());
                 } catch (InterruptedException | ExecutionException ex) {
                     Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during traits converting", ex);
                 }

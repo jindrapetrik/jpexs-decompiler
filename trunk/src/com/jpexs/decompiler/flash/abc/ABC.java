@@ -744,35 +744,6 @@ public class ABC {
         }
         return ret;
     }
-    /*public List<File> export(String directory, ExportMode exportMode, List<ABCContainerTag> abcList, String abcStr, boolean parallel) throws IOException {
-     ExecutorService executor = Executors.newFixedThreadPool(20);
-     List<Future<File>> futureResults = new ArrayList<>();
-     AtomicInteger cnt = new AtomicInteger(1);
-     for (int i = 0; i < script_info.length; i++) {
-     HashMap<ClassPath, ScriptPack> packs = script_info[i].getPacks(this, i);
-     for (Entry<ClassPath, ScriptPack> entry : packs.entrySet()) {
-     Future<File> future = executor.submit(new ExportPackTask(cnt, script_info.length, entry.getKey(), entry.getValue(), directory, abcList, pcode, abcStr, parallel));
-     futureResults.add(future);
-     }
-     }
-
-     List<File> ret = new ArrayList<>();
-     for (int f = 0; f < futureResults.size(); f++) {
-     try {
-     ret.add(futureResults.get(f).get());
-     } catch (InterruptedException | ExecutionException ex) {
-     Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
-     }
-     }
-
-     try {
-     executor.shutdown();
-     executor.awaitTermination(30, TimeUnit.MINUTES);
-     } catch (InterruptedException ex) {
-     Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "30 minutes ActionScript export limit reached", ex);
-     }
-     return ret;
-     }*/
 
     public void dump(OutputStream os) {
         PrintStream output;

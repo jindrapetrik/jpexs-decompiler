@@ -456,7 +456,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             for (int scriptTraitIndex : scriptLeaf.traitIndices) {
                 script.traits.traits[scriptTraitIndex].convertPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, ExportMode.SOURCE, scriptIndex, -1, writer, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true));
             }
-            String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
+            String s = Graph.removeNonRefenrencedLoopLabels(writer.toString(), true);
             hilightedCode = s;
             cache.put(scriptLeaf, new CachedDecompilation(hilightedCode));
         }

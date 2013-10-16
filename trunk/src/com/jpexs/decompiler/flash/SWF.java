@@ -670,16 +670,14 @@ public class SWF {
                     public Void call() throws Exception {
                         for (MyEntry<ClassPath, ScriptPack> item : packs) {
                             ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, exportMode, parallel);
-                            try {
-                                ret.add(task.call());
-                            } catch (Exception ex) {
-                                Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
-                            }
+                            ret.add(task.call());
                         }
                         return null;
                     }
                 }, Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
-            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            } catch (ExecutionException ex) {
+                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+            } catch (InterruptedException | TimeoutException ex) {
                 Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT) + " ActionScript export limit reached", ex);
             }
         } else {

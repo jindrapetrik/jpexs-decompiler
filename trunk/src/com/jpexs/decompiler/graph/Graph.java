@@ -2156,17 +2156,17 @@ public class Graph {
         return writer;
     }
 
-    public static String removeNonRefenrencedLoopLabels(String source) {
+    public static String removeNonRefenrencedLoopLabels(String source, boolean hilighted) {
         String[] parts = source.split("\r\n");
         String labelPattern = "loop(switch)?[0-9]*:";
         StringBuilder ret = new StringBuilder();
         for (int p = 0; p < parts.length; p++) {
-            String strippedP = Highlighting.stripHilights(parts[p]).trim();
+            String strippedP = (hilighted ? Highlighting.stripHilights(parts[p]) : parts[p]).trim();
             if (strippedP.matches(labelPattern)) {//endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
                 String loopname = strippedP.substring(0, strippedP.length() - 1);
                 boolean dorefer = false;
                 for (int q = p + 1; q < parts.length; q++) {
-                    String strippedQ = Highlighting.stripHilights(parts[q]).trim();
+                    String strippedQ = (hilighted ? Highlighting.stripHilights(parts[q]) : parts[q]).trim();
                     if (strippedQ.equals("break " + loopname.replace("switch", "") + ";")) {
                         dorefer = true;
                         break;

@@ -176,8 +176,8 @@ public abstract class Trait implements Serializable {
         try (FileOutputStream fos = new FileOutputStream(fileName)) {
             HilightedTextWriter writer = new HilightedTextWriter(false);
             convertPackaged(parent, "", abcList, abc, isStatic, exportMode, scriptIndex, classIndex, writer, new ArrayList<String>(), parallel);
-            String s = Graph.removeNonRefenrencedLoopLabels(writer.toString());
-            fos.write(s.getBytes());
+            String s = Graph.removeNonRefenrencedLoopLabels(writer.toString(), false);
+            fos.write(s.getBytes("utf-8"));
         }
     }
 }
