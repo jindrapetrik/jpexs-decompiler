@@ -77,7 +77,6 @@ public class NewFunctionAVM2Item extends AVM2Item {
                 Logger.getLogger(NewFunctionIns.class.getName()).log(Level.SEVERE, "error during newfunction", ex);
             }
         }
-        writer.newLine();
         writer.append("}");
         return writer;
     }
