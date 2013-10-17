@@ -70,7 +70,6 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.endMethod();
         writer.newLine();
         writer.append("{").newLine();
-        writer.indent();
         if (body != null) {
             try {
                 body.toString(path + "/inner", ExportMode.SOURCE, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null);
@@ -79,7 +78,6 @@ public class NewFunctionAVM2Item extends AVM2Item {
             }
         }
         writer.newLine();
-        writer.unindent();
         writer.append("}");
         return writer;
     }

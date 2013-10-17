@@ -54,7 +54,6 @@ public class NewObjectAVM2Item extends AVM2Item {
         }
         writer.append("}");
         if (!singleLine) {
-            writer.newLine();
             writer.unindent();
         }
         return writer;
