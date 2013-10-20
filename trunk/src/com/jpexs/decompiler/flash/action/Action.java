@@ -76,8 +76,6 @@ import java.util.logging.Logger;
  */
 public class Action implements GraphSourceItem {
 
-    public Action beforeInsert;
-    public Action afterInsert;
     public Action replaceWith;
     private boolean ignored = false;
     /**
@@ -198,15 +196,8 @@ public class Action implements GraphSourceItem {
                 a.replaceWith.setAddress(a.getAddress(), version, false);
                 ret.addAll(a.replaceWith.getAllRefs(version));
             }
-            if (a.beforeInsert != null) {
-                a.beforeInsert.setAddress(a.getAddress(), version, false);
-                ret.addAll(a.beforeInsert.getAllRefs(version));
-            }
             List<Long> part = a.getAllRefs(version);
             ret.addAll(part);
-            if (a.afterInsert != null) {
-                ret.addAll(a.afterInsert.getAllRefs(version));
-            }
         }
         return ret;
     }
@@ -515,14 +506,6 @@ public class Action implements GraphSourceItem {
                     }
                 }
             } else {
-                if (a.beforeInsert != null) {
-                    if (lastPush) {
-                        writer.newLine();
-                        lastPush = false;
-                    }
-                    writer.appendNoHilight(a.beforeInsert.getASMSource(list, importantOffsets, constantPool, version, exportMode));
-                    writer.newLine();
-                }
                 //if (!(a instanceof ActionNop)) {
                 String add = "";
                 if (a instanceof ActionIf) {
@@ -580,14 +563,6 @@ public class Action implements GraphSourceItem {
                     lastPush = false;
                 }
                 //}
-                if (a.afterInsert != null) {
-                    if (lastPush) {
-                        writer.newLine();
-                        lastPush = false;
-                    }
-                    writer.appendNoHilight(a.afterInsert.getASMSource(list, importantOffsets, constantPool, version, exportMode));
-                    writer.newLine();
-                }
             }
             offset += a.getBytes(version).length;
         }

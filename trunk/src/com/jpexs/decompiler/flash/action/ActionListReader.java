@@ -649,7 +649,6 @@ public class ActionListReader {
         boolean debugMode = false;
         boolean decideBranch = false;
 
-        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
         pos = ip;
         Action a;
         Scanner sc = new Scanner(System.in, "utf-8");
@@ -669,7 +668,6 @@ public class ActionListReader {
             if ((ip < ret.size()) && (!(ret.get(ip) instanceof ActionNop))) {
                 a = ret.get(ip);
             }
-            a.containerSWFOffset = containerSWFOffset;
             int info = a.actionLength + 1 + ((a.actionCode >= 0x80) ? 2 : 0);
 
             if (a instanceof ActionPush) {
@@ -722,10 +720,7 @@ public class ActionListReader {
                     if (a instanceof ActionIf) {
                         aif = (ActionIf) a;
 
-                        GraphTargetItem top = null;
-                        if (deobfuscate) {
-                            top = stack.pop();
-                        }
+                        GraphTargetItem top = stack.pop();
                         int nip = pos + aif.getJumpOffset();
 
                         if (decideBranch) {
@@ -740,7 +735,7 @@ public class ActionListReader {
                             } else if (next.equals("c")) {
                                 goaif = true;
                             }
-                        } else if (deobfuscate && top.isCompileTime() && (!top.hasSideEffect())) {
+                        } else if (top.isCompileTime() && (!top.hasSideEffect())) {
                             ((ActionIf) a).compileTime = true;
                             if (debugMode) {
                                 System.err.print("is compiletime -> ");
@@ -772,16 +767,14 @@ public class ActionListReader {
                     } else if (a instanceof ActionJump) {
                         newip = pos + ((ActionJump) a).getJumpOffset();
                     } else if (!(a instanceof GraphSourceItemContainer)) {
-                        if (deobfuscate) {
-                            //return in for..in,   TODO:Handle this better way
-                            if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
-                                stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
-                            }
-                            if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
-                                stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
-                            }
-                            a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
+                        //return in for..in,   TODO:Handle this better way
+                        if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
+                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
                         }
+                        if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
+                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
+                        }
+                        a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
                     }
                 } catch (RuntimeException ex) {
                     log.log(Level.SEVERE, "Disassembly exception", ex);
@@ -833,9 +826,7 @@ public class ActionListReader {
                         output2s.add(output2);
                         endAddr += size;
                     }
-                    if (deobfuscate) {
-                        cnt.translateContainer(output2s, stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
-                    }
+                    cnt.translateContainer(output2s, stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
                     ip = (int) endAddr;
                     pos = ip;
                     continue;
