@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.types;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -242,7 +242,7 @@ public class MethodInfo {
         return constants.constant_string[name_index];
     }
 
-    public HilightedTextWriter getParamStr(HilightedTextWriter writer, ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
+    public GraphTextWriter getParamStr(GraphTextWriter writer, ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
         HashMap<Integer, String> localRegNames = new HashMap<>();
         if (body != null) {
             localRegNames = body.code.getLocalRegNamesFromDebug(abc);
@@ -288,7 +288,7 @@ public class MethodInfo {
         return writer;
     }
 
-    public HilightedTextWriter getReturnTypeStr(HilightedTextWriter writer, ConstantPool constants, List<String> fullyQualifiedNames) {
+    public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, ConstantPool constants, List<String> fullyQualifiedNames) {
         return writer.hilightSpecial(ret_type == 0 ? "*" : constants.constant_multiname[ret_type].getName(constants, fullyQualifiedNames), "returns");
     }
 

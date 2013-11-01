@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
@@ -149,7 +149,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
      * @return ASM source
      */
     @Override
-    public HilightedTextWriter getASMSource(int version, ExportMode exportMode, HilightedTextWriter writer, List<Action> actions) {
+    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) {
         if (actions == null) {
             actions = getActions(version);
         }
@@ -200,7 +200,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
     }
 
     @Override
-    public HilightedTextWriter getActionBytesAsHex(HilightedTextWriter writer) {
+    public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
         return Helper.byteArrayToHex(writer, actionBytes);
     }
 

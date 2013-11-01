@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -73,9 +74,9 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
-            String actualResult = Action.actionsToSource(doa.getActions(swf.version), swf.version, "", false, 0);
+            HilightedText actualResult = Action.actionsToSource(doa.getActions(swf.version), swf.version, "", false, 0);
 
-            assertTrue(actualResult.contains("case \"c\":"));
+            assertTrue(actualResult.text.contains("case \"c\":"));
         } catch (IOException | ParseException ex) {
             fail();
         }

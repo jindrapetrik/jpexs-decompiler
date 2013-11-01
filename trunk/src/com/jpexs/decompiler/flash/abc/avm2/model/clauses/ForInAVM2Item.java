@@ -19,8 +19,9 @@ package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.LoopWithType;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -35,6 +36,7 @@ public class ForInAVM2Item extends LoopItem implements Block {
 
     public InAVM2Item expression;
     public List<GraphTargetItem> commands;
+    private boolean labelUsed;
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
@@ -70,9 +72,13 @@ public class ForInAVM2Item extends LoopItem implements Block {
     }
 
     @Override
-    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        writer.startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
-        writer.append("loop" + loop.id + ":").newLine();
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+        if (writer instanceof NulWriter) {
+            ((NulWriter)writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
+        }
+        if (labelUsed) {
+            writer.append("loop" + loop.id + ":").newLine();
+        }
         writer.append("for (");
         expression.toString(writer, localData);
         writer.append(")").newLine();
@@ -85,8 +91,10 @@ public class ForInAVM2Item extends LoopItem implements Block {
         }
         writer.unindent();
         writer.append("}").newLine();
-        writer.append(":loop" + loop.id);
-        writer.endLoop(loop.id);
+        if (writer instanceof NulWriter) {
+            LoopWithType loopOjb = ((NulWriter)writer).endLoop(loop.id);
+            labelUsed = loopOjb.used;
+        }
         return writer;
     }
 

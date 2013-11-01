@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.graph.ExportMode;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Insets;
@@ -42,6 +43,7 @@ public class MethodCodePanel extends JPanel implements ActionListener {
     private ASMSourceEditorPane sourceTextArea;
     public JPanel buttonsPanel;
     private JToggleButton hexButton;
+    private JToggleButton hexOnlyButton;
 
     public void focusEditor() {
         sourceTextArea.requestFocusInWindow();
@@ -106,9 +108,18 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         hexButton.setToolTipText(translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
+        // todo: find icon, and set visible
+        hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
+        hexOnlyButton.setActionCommand("HEXONLY");
+        hexOnlyButton.addActionListener(this);
+        hexOnlyButton.setToolTipText(translate("button.viewhex"));
+        hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
+        hexOnlyButton.setVisible(false);
+        
 
         buttonsPanel.add(graphButton);
         buttonsPanel.add(hexButton);
+        buttonsPanel.add(hexOnlyButton);
         buttonsPanel.add(new JPanel());
         // buttonsPanel.add(saveButton);
         // buttonsPan.add(execButton);
@@ -125,17 +136,24 @@ public class MethodCodePanel extends JPanel implements ActionListener {
             sourceTextArea.graph();
         }
 
-        if (e.getActionCommand().equals("HEX")) {
-            sourceTextArea.setHex(hexButton.isSelected());
+        if (e.getActionCommand().equals("HEX") || e.getActionCommand().equals("HEXONLY")) {
+            sourceTextArea.setHex(getExportMode(), false);
         }
     }
 
+    private ExportMode getExportMode() {
+        ExportMode exportMode = hexOnlyButton.isSelected() ? ExportMode.HEX :
+                (hexButton.isSelected() ? ExportMode.PCODEWITHHEX : ExportMode.PCODE);
+        return exportMode;
+    }
+    
     public void setEditMode(boolean val) {
         if (val) {
-            sourceTextArea.setHex(false);
+            sourceTextArea.setHex(ExportMode.PCODE, false);
         } else {
-            if (hexButton.isSelected()) {
-                sourceTextArea.setHex(true);
+            ExportMode exportMode = getExportMode();
+            if (exportMode != ExportMode.PCODE) {
+                sourceTextArea.setHex(exportMode, false);
             }
         }
 

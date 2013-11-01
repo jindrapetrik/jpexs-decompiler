@@ -23,11 +23,13 @@ import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -53,7 +55,9 @@ public class MethodBody implements Cloneable, Serializable {
     public AVM2Code code;
     public ABCException[] exceptions = new ABCException[0];
     public Traits traits = new Traits();
-
+    public transient List<GraphTargetItem> convertedItems;
+    public transient Exception convertException;
+    
     public List<Integer> getExceptionEntries() {
         List<Integer> ret = new ArrayList<>();
         for (ABCException e : exceptions) {
@@ -110,18 +114,41 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public String toString(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits) {
+    public HilightedTextWriter toString(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits) {
+        convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
         HilightedTextWriter writer = new HilightedTextWriter(false);
         toString(path, exportMode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, fullyQualifiedNames, initTraits);
-        String src = writer.toString();
-        src = Graph.removeNonRefenrencedLoopLabels(src, false);
-        return src;
+        return writer;
     }
     
-    public HilightedTextWriter toString(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final HilightedTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits) {
+    public void convert(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits) {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
+        if (exportMode == ExportMode.SOURCE) {
+            int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
+            try {
+                Helper.timedCall(new Callable<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+                        HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
+                        convertedItems = converted.code.toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), converted.code.visitCode(converted));
+                        Graph.graphToString(convertedItems, new NulWriter(), LocalData.create(constants, localRegNames, fullyQualifiedNames));
+                        return null;
+                    }
+                }, timeout, TimeUnit.SECONDS);
+            } catch (InterruptedException | TimeoutException | ExecutionException ex) {
+                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
+                convertException = ex;
+                if (ex instanceof ExecutionException && ex.getCause() instanceof Exception) {
+                    convertException = (Exception) ex.getCause();
+                }
+            }
+        }
+    }
+
+    public GraphTextWriter toString(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits) {
         if (exportMode != ExportMode.SOURCE) {
             writer.indent();
             code.toASMSource(constants, trait, method_info[this.method_info], this, exportMode, writer);
@@ -137,33 +164,36 @@ public class MethodBody implements Cloneable, Serializable {
             }
             writer.indent();
             int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
-            int writerPos = writer.getLength();
-            try {
-                Helper.timedCall(new Callable<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        toSource(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, fullyQualifiedNames, initTraits);
-                        return null;
-                    }
-                }, timeout, TimeUnit.SECONDS);
-            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-                Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
-                writer.setLength(writerPos); // remove already rendered code
+
+            if (convertException == null) {
+                HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
+                writer.startMethod(this.method_info);
+                Graph.graphToString(convertedItems, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+                writer.endMethod();
+            } else if (convertException instanceof TimeoutException) {
+                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
                 writer.appendNoHilight("/*").newLine();
                 writer.appendNoHilight(" * Decompilation error").newLine();
                 writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached").newLine();
                 writer.appendNoHilight(" */").newLine();
                 writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
+            } else {
+                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
+                writer.appendNoHilight("/*").newLine();
+                writer.appendNoHilight(" * Decompilation error").newLine();
+                writer.appendNoHilight(" * Code may be obfuscated").newLine();
+                writer.appendNoHilight(" * Error type: " + convertException.getClass().getSimpleName()).newLine();
+                writer.appendNoHilight(" */").newLine();
+                writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
             }
             writer.unindent();
         }
         return writer;
     }
 
-    public HilightedTextWriter toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, HilightedTextWriter writer, List<String> fullyQualifiedNames, Traits initTraits) {
-        AVM2Code deobfuscated = null;
+    public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
         MethodBody b = (MethodBody) Helper.deepCopy(this);
-        deobfuscated = b.code;
+        AVM2Code deobfuscated = b.code;
         deobfuscated.markMappedOffsets();
         if (Configuration.getConfig("autoDeobfuscate", true)) {
             try {
@@ -174,10 +204,7 @@ public class MethodBody implements Cloneable, Serializable {
         }
         //deobfuscated.restoreControlFlow(constants, b);
 
-        writer.startMethod(this.method_info);
-        deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, writer, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
-        writer.endMethod();
-        return writer;
+        return b;
     }
 
     @Override

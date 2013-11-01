@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class CodeStats {
     public boolean has_activation = false;
     public InstructionStats[] instructionStats;
 
-    public HilightedTextWriter toString(HilightedTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
+    public GraphTextWriter toString(GraphTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
         writer.appendNoHilight("Stats: maxstack=" + maxstack + ", maxscope=" + maxscope + ", maxlocal=" + maxlocal).newLine();
         int i = 0;
         int ms = 0;

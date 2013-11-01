@@ -28,5 +28,6 @@ public class LoopWithType {
     
     public long loopId;
     public int type;
+    public boolean used;
     
 }

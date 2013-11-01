@@ -1,6 +1,7 @@
 package com.jpexs.decompiler.graph.model;
 
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -13,6 +14,7 @@ import java.util.List;
 public class ContinueItem extends GraphTargetItem {
 
     public long loopId;
+    private boolean labelRequired;
 
     public ContinueItem(GraphSourceItem src, long loopId) {
         super(src, NOPRECEDENCE);
@@ -20,9 +22,16 @@ public class ContinueItem extends GraphTargetItem {
     }
 
     @Override
-    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("continue");
-        if (loopId != writer.getNonSwitchLoop()) {
+        if (writer instanceof NulWriter) {
+            NulWriter nulWriter = (NulWriter) writer;
+            labelRequired = loopId != nulWriter.getNonSwitchLoop();
+            if (labelRequired) {
+                nulWriter.setLoopUsed(loopId);
+            }
+        }
+        if (labelRequired) {
             writer.append(" loop" + loopId);            
         }
         return writer;

@@ -34,11 +34,13 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.ExportMode;
+import static com.jpexs.decompiler.graph.ExportMode.HEX;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
@@ -96,16 +98,15 @@ public class ActionPanel extends JPanel implements ActionListener {
     public JLabel decLabel = new HeaderLabel(translate("panel.decompiled"));
     public List<Highlighting> decompiledHilights = new ArrayList<>();
     public List<Highlighting> disassembledHilights = new ArrayList<>();
-    public String lastDisasm = "";
     private boolean ignoreCarret = false;
     private boolean editMode = false;
     private boolean editDecompiledMode = false;
     private List<Action> lastCode;
     private ASMSource src;
     public JPanel topButtonsPan;
-    private String srcWithHex;
-    private String srcNoHex;
-    private String srcHexOnly;
+    private HilightedText srcWithHex;
+    private HilightedText srcNoHex;
+    private HilightedText srcHexOnly;
     private String lastDecompiled = "";
     private ASMSource lastASM;
     public JPanel searchPanel;
@@ -174,9 +175,9 @@ public class ActionPanel extends JPanel implements ActionListener {
             if (actions == null) {
                 actions = src.getActions(SWF.DEFAULT_VERSION);
             }
-            String s = Action.actionsToSource(actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, true, 0);
-            List<Highlighting> hilights = Highlighting.getInstrHighlights(s);
-            String srcNoHex = Highlighting.stripHilights(s);
+            HilightedText text = Action.actionsToSource(actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, true, 0);
+            List<Highlighting> hilights = text.instructionHilights;
+            String srcNoHex = text.text;
             cache.put(src, new CachedScript(srcNoHex, hilights));
         }
     }
@@ -247,9 +248,9 @@ public class ActionPanel extends JPanel implements ActionListener {
         return false;
     }
 
-    public void setText(String text) {
+    public void setText(HilightedText text) {
         int pos = editor.getCaretPosition();
-        Highlighting lastH = new Highlighting(0, 0, 0);
+        Highlighting lastH = null;
         for (Highlighting h : disassembledHilights) {
             if (pos < h.startPos) {
                 break;
@@ -258,8 +259,8 @@ public class ActionPanel extends JPanel implements ActionListener {
         }
         String offset = lastH == null ? "0" : lastH.getPropertyString("offset");
         editor.setText("; " + translate("work.gettinghilights") + "...");
-        disassembledHilights = Highlighting.getInstrHighlights(text);
-        String stripped = Highlighting.stripHilights(text);
+        disassembledHilights = text.instructionHilights;
+        String stripped = text.text;
         /*if(stripped.length()>30000){
          editor.setContentType("text/plain");
          }else{
@@ -275,10 +276,58 @@ public class ActionPanel extends JPanel implements ActionListener {
 
     }
 
-    public void setHex(boolean hex, boolean hexOnly) {
-        setText(hex ? srcWithHex : (hexOnly ? srcHexOnly : srcNoHex));
+    private HilightedText getHilightedText(ExportMode exportMode) {
+        ASMSource asm = (ASMSource) src;
+        DisassemblyListener listener = getDisassemblyListener();
+        asm.addDisassemblyListener(listener);
+        HilightedTextWriter writer = new HilightedTextWriter(true);
+        asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, lastCode);
+        asm.removeDisassemblyListener(listener);
+        return new HilightedText(writer);
+    }
+    
+    public void setHex(ExportMode exportMode) {
+        if (exportMode != ExportMode.HEX) {
+            if (exportMode == exportMode.PCODE) {
+                if (srcNoHex == null) {
+                    srcNoHex = getHilightedText(exportMode);
+                }
+                setText(srcNoHex);
+            } else {
+                if (srcWithHex == null) {
+                    srcWithHex = getHilightedText(exportMode);
+                }
+                setText(srcWithHex);
+            }
+        } else {
+            if (srcHexOnly == null) {
+                srcHexOnly = new HilightedText(Helper.byteArrToString(src.getActionBytes()));
+            }
+            setText(srcHexOnly);
+        }
     }
 
+    private DisassemblyListener getDisassemblyListener() {
+        DisassemblyListener listener = new DisassemblyListener() {
+            int percent = 0;
+            String phase = "";
+
+            @Override
+            public void progress(String phase, long pos, long total) {
+                if (total < 1) {
+                    return;
+                }
+                int newpercent = (int) (pos * 100 / total);
+                if (((newpercent > percent) || (!this.phase.equals(phase))) && newpercent <= 100) {
+                    percent = newpercent;
+                    this.phase = phase;
+                    editor.setText("; " + translate("work.disassembling") + " - " + phase + " " + percent + "%...");
+                }
+            }
+        };
+        return listener;
+    }
+    
     public void setSource(final ASMSource src, final boolean useCache) {
         this.src = src;
         Main.startWork(translate("work.decompiling") + "...");
@@ -290,34 +339,15 @@ public class ActionPanel extends JPanel implements ActionListener {
                 if (Configuration.getConfig("decompile", true)) {
                     decompiledEditor.setText("//" + translate("work.waitingfordissasembly") + "...");
                 }
-                DisassemblyListener listener = new DisassemblyListener() {
-                    int percent = 0;
-                    String phase = "";
-
-                    @Override
-                    public void progress(String phase, long pos, long total) {
-                        if (total < 1) {
-                            return;
-                        }
-                        int newpercent = (int) (pos * 100 / total);
-                        if (((newpercent > percent) || (!this.phase.equals(phase))) && newpercent <= 100) {
-                            percent = newpercent;
-                            this.phase = phase;
-                            editor.setText("; " + translate("work.disassembling") + " - " + phase + " " + percent + "%...");
-                        }
-                    }
-                };
+                DisassemblyListener listener = getDisassemblyListener();
                 asm.addDisassemblyListener(listener);
                 List<Action> actions = asm.getActions(SWF.DEFAULT_VERSION);
                 lastCode = actions;
-                HilightedTextWriter writer = new HilightedTextWriter(true);
-                asm.getASMSource(SWF.DEFAULT_VERSION, ExportMode.PCODEWITHHEX, writer, actions);
-                lastDisasm = writer.toString();
                 asm.removeDisassemblyListener(listener);
-                srcWithHex = Helper.hexToComments(lastDisasm);
-                srcNoHex = Helper.stripComments(lastDisasm);
-                srcHexOnly = Helper.byteArrToString(src.getActionBytes());
-                setHex(hexButton.isSelected(), hexOnlyButton.isSelected());
+                srcWithHex = null;
+                srcNoHex = null;
+                srcHexOnly = null;
+                setHex(getExportMode());
                 if (Configuration.getConfig("decompile", true)) {
                     decompiledEditor.setText("//" + translate("work.decompiling") + "...");
                     String stripped = "";
@@ -530,6 +560,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 }
                 decompiledEditor.getCaret().setVisible(true);
                 int pos = decompiledEditor.getCaretPosition();
+                System.out.println("pos: " + pos);
                 Highlighting h = Highlighting.search(decompiledHilights, pos);
                 if (h != null) {
                     Highlighting h2 = Highlighting.search(disassembledHilights, "offset", h.getPropertyString("offset"));
@@ -655,10 +686,10 @@ public class ActionPanel extends JPanel implements ActionListener {
         } else if (e.getActionCommand().equals("EDITACTION")) {
             setEditMode(true);
         } else if (e.getActionCommand().equals("HEX")) {
-            setHex(hexButton.isSelected(), hexOnlyButton.isSelected());
+            setHex(getExportMode());
         } else if (e.getActionCommand().equals("CANCELACTION")) {
             setEditMode(false);
-            setHex(hexButton.isSelected(), hexOnlyButton.isSelected());
+            setHex(getExportMode());
         } else if (e.getActionCommand().equals("SAVEACTION")) {
             try {
                 String text = editor.getText();
@@ -698,6 +729,12 @@ public class ActionPanel extends JPanel implements ActionListener {
         }
     }
 
+    private ExportMode getExportMode() {
+        ExportMode exportMode = hexOnlyButton.isSelected() ? ExportMode.HEX :
+                (hexButton.isSelected() ? ExportMode.PCODEWITHHEX : ExportMode.PCODE);
+        return exportMode;
+    }
+    
     public byte[] getBytesFromHexaText(String text) {
         Scanner scanner = new Scanner(text);
         scanner.nextLine(); // ignore first line

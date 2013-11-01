@@ -16,8 +16,9 @@
  */
 package com.jpexs.decompiler.graph.model;
 
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.LoopWithType;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -30,6 +31,7 @@ public class WhileItem extends LoopItem implements Block {
 
     public List<GraphTargetItem> expression;
     public List<GraphTargetItem> commands;
+    private boolean labelUsed;
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
@@ -45,9 +47,13 @@ public class WhileItem extends LoopItem implements Block {
     }
 
     @Override
-    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        writer.startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
-        writer.append("loop" + loop.id + ":").newLine();
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+        if (writer instanceof NulWriter) {
+            ((NulWriter)writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
+        }
+        if (labelUsed) {
+            writer.append("loop" + loop.id + ":").newLine();
+        }
         writer.append("while(");
         for (int i = 0; i < expression.size(); i++) {
             if (expression.get(i).isEmpty()) {
@@ -68,8 +74,10 @@ public class WhileItem extends LoopItem implements Block {
         }
         writer.unindent();
         writer.append("}").newLine();
-        writer.append(":loop" + loop.id);
-        writer.endLoop(loop.id);
+        if (writer instanceof NulWriter) {
+            LoopWithType loopOjb = ((NulWriter)writer).endLoop(loop.id);
+            labelUsed = loopOjb.used;
+        }
         return writer;
     }
 

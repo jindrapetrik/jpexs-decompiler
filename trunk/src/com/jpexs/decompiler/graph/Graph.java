@@ -18,7 +18,7 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
@@ -2147,50 +2147,13 @@ public class Graph {
      * @param localData
      * @return String
      */
-    public static HilightedTextWriter graphToString(List<GraphTargetItem> tree, HilightedTextWriter writer, LocalData localData) {
+    public static GraphTextWriter graphToString(List<GraphTargetItem> tree, GraphTextWriter writer, LocalData localData) {
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();
             }
         }
         return writer;
-    }
-
-    public static String removeNonRefenrencedLoopLabels(String source, boolean hilighted) {
-        String[] parts = source.split("\r\n");
-        String labelPattern = "loop(switch)?[0-9]*:";
-        StringBuilder ret = new StringBuilder();
-        for (int p = 0; p < parts.length; p++) {
-            String strippedP = (hilighted ? Highlighting.stripHilights(parts[p]) : parts[p]).trim();
-            if (strippedP.matches(labelPattern)) {//endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
-                String loopname = strippedP.substring(0, strippedP.length() - 1);
-                boolean dorefer = false;
-                for (int q = p + 1; q < parts.length; q++) {
-                    String strippedQ = (hilighted ? Highlighting.stripHilights(parts[q]) : parts[q]).trim();
-                    if (strippedQ.equals("break " + loopname.replace("switch", "") + ";")) {
-                        dorefer = true;
-                        break;
-                    }
-                    if (strippedQ.equals("continue " + loopname + ";")) {
-                        dorefer = true;
-                        break;
-                    }
-                    if (strippedQ.equals(":" + loopname)) {
-                        break;
-                    }
-                }
-                if (!dorefer) {
-                    continue;
-                }
-            }
-            if (strippedP.startsWith(":")) {
-                continue;
-            }
-
-            ret.append(parts[p]);
-            ret.append("\r\n");
-        }
-        return ret.toString();
     }
 
     public List<Object> prepareBranchLocalData(List<Object> localData) {

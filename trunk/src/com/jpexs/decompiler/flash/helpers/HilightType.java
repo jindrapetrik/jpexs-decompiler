@@ -14,24 +14,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.avm2.model;
+package com.jpexs.decompiler.flash.helpers;
 
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.model.LocalData;
-
-public class DecLocalAVM2Item extends AVM2Item {
-
-    public int regIndex;
-
-    public DecLocalAVM2Item(AVM2Instruction instruction, int regIndex) {
-        super(instruction, PRECEDENCE_POSTFIX);
-        this.regIndex = regIndex;
-    }
-
-    @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        writer.append(localRegName(localData.localRegNames, regIndex));
-        return writer.append("--");
-    }
+/**
+ * Provides methods for highlighting positions of instructions in the text.
+ *
+ * @author JPEXS
+ */
+public enum HilightType {
+    
+    TRAIT, CLASS, METHOD, OFFSET, SPECIAL
+    
 }

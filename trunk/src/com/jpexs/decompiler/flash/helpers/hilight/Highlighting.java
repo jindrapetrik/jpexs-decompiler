@@ -16,17 +16,13 @@
  */
 package com.jpexs.decompiler.flash.helpers.hilight;
 
-import com.jpexs.helpers.Helper;
-import java.io.IOException;
+import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.helpers.HilightType;
 import java.io.Serializable;
-import java.io.StringReader;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.
@@ -35,7 +31,8 @@ import java.util.logging.Logger;
  */
 public class Highlighting implements Serializable {
 
-    public String data;
+    public HilightType type;
+    public String hilightedText;
     /**
      * Starting position
      */
@@ -64,10 +61,6 @@ public class Highlighting implements Serializable {
 
     public static Highlighting search(List<Highlighting> list, long pos) {
         return search(list, pos, null, null, -1, -1);
-    }
-
-    public static Highlighting search(List<Highlighting> list, long pos, String type) {
-        return search(list, pos, "type", null, -1, -1);
     }
 
     public static Highlighting search(List<Highlighting> list, String property, String value) {
@@ -112,6 +105,13 @@ public class Highlighting implements Serializable {
                 return ret;
             }
         }
+        
+        if (Configuration.debugMode) {
+            if (ret != null) {
+                System.out.println("Highlight found: " + ret.hilightedText);
+            }
+        }
+        
         return ret;
     }
 
@@ -122,7 +122,7 @@ public class Highlighting implements Serializable {
      */
     @Override
     public String toString() {
-        return "" + startPos + "-" + (startPos + len) + " data:" + data;
+        return startPos + "-" + (startPos + len) + " type:" + type;
     }
     
     /**
@@ -130,197 +130,14 @@ public class Highlighting implements Serializable {
      * @param startPos Starting position
      * @param len Length of highlighted text
      * @param data Highlighting data
+     * @param type Highlighting type
      */
-    public Highlighting(int startPos, int len, String data) {
+    public Highlighting(int startPos, Map<String, String> data, HilightType type, String text) {
         this.startPos = startPos;
-        this.len = len;
-        this.data = data;
-        parseData();
-    }
-
-    private void parseData() {
-        properties = new HashMap<>();
-        String pairs[];
-        if (data.contains(";")) {
-            pairs = data.split(";");
-        } else {
-            pairs = new String[]{data};
+        this.type = type;
+        if (Configuration.debugMode) {
+            this.hilightedText = text;
         }
-        for (String p : pairs) {
-            String keyval[];
-            if (p.contains("=")) {
-                keyval = p.split("=");
-            } else {
-                keyval = new String[]{p, p};
-            }
-            properties.put(keyval[0], keyval[1]);
-        }
-    }
-
-    public Highlighting(int startPos, int len, long offset) {
-        this(startPos, len, "");
-    }
-    public static final String HLOPEN = "<ffdec:\"";
-    public static final String HLEND = "\">";
-    public static final String HLCLOSE = "</ffdec>";
-
-    public static List<Highlighting> getHilights(String text) {
-        return getHilights(text, null);
-    }
-
-    public static List<Highlighting> getHilights(String text, String typePrefix) {
-        text = text.replace("\r\n", "\n");
-        List<HilightToken> tokens = getHilightTokens(text);
-        Stack<Integer> positions = new Stack<>();
-        Stack<String> datas = new Stack<>();
-        int pos = 0;
-        List<Highlighting> ret = new ArrayList<>();
-        for (HilightToken token : tokens) {
-            switch (token.type) {
-                case HILIGHTSTART:
-                    positions.push(pos);
-                    datas.push(token.value);
-                    break;
-                case HILIGHTEND:
-                    int start = positions.pop();
-                    String data = datas.pop();
-                    Highlighting hl = new Highlighting(start, pos - start, data);
-                    if (typePrefix == null || data.startsWith(typePrefix)) {
-                        ret.add(hl);
-                    }
-                    break;
-                case TEXT:
-                    pos += token.tokenLength;
-                    break;
-            }
-        }
-        return ret;
-    }
-
-    public static List<HilightToken> getHilightTokens(String text) {
-        HilightLexer lexer = new HilightLexer(new StringReader(text));
-        HilightToken tok;
-        List<HilightToken> ret = new ArrayList<>();
-        try {
-            while (true) {
-                tok = lexer.lex();
-                if (tok.type == TokenType.EOF) {
-                    break;
-                }
-                ret.add(tok);
-            }
-        } catch (ParseException | IOException ex) {
-            Logger.getLogger(Highlighting.class.getName()).log(Level.SEVERE, "Error during getting hilight tokens", ex);
-        }
-        return ret;
-    }
-
-    /**
-     * Strips all highlights from the text
-     *
-     * @param text Text to strip highlights in
-     * @return Text with no highlights
-     */
-    public static String stripHilights(String text) {
-        List<HilightToken> tokens = getHilightTokens(text);
-        StringBuilder ret = new StringBuilder();
-        for (HilightToken token : tokens) {
-            if (token.type == TokenType.TEXT) {
-                ret.append(token.value);
-            }
-        }
-        return ret.toString();
-    }
-
-    public static String trim(String highlighted) {
-
-        List<HilightToken> tokens = getHilightTokens(highlighted);
-        boolean first = true;
-        StringBuilder str = new StringBuilder();
-        int lastPos = 0;
-        int lastLen = 0;
-        for (HilightToken t : tokens) {
-            switch (t.type) {
-                case TEXT:
-                    String s = t.value;
-                    if (first) {
-                        while ((!s.equals("")) && "\r\n ".contains("" + s.charAt(0))) {
-                            s = s.substring(1);
-                        }
-                        first = false;
-                    }
-                    String s2 = s;
-                    lastLen = 0;
-                    while ((!s2.equals("")) && "\r\n ".contains("" + s2.charAt(s2.length() - 1))) {
-                        s2 = s2.substring(0, s2.length() - 1);
-                        lastLen++;
-                    }
-                    str.append(s);
-                    lastPos = str.length();
-                    break;
-                case HILIGHTEND:
-                    str.append(HLCLOSE);
-                    break;
-                case HILIGHTSTART:
-                    str.append(HLOPEN);
-                    str.append(Helper.escapeString(t.value));
-                    str.append(HLEND);
-                    break;
-            }
-        }
-        if (lastLen > 0) {
-            str.replace(lastPos - lastLen, lastPos, "");
-        }
-        return str.toString();
-    }
-
-    /**
-     * Gets all trait highlight objects from specified text
-     *
-     * @param text Text to get highlights from
-     * @return List of trait highlights
-     */
-    public static List<Highlighting> getTraitHighlights(String text) {
-        return getHilights(text, "type=trait;");
-    }
-
-    /**
-     * Gets all method highlight objects from specified text
-     *
-     * @param text Text to get highlights from
-     * @return List of method highlights
-     */
-    public static List<Highlighting> getMethodHighlights(String text) {
-        return getHilights(text, "type=method;");
-    }
-
-    /**
-     * Gets all special highlight objects from specified text
-     *
-     * @param text Text to get highlights from
-     * @return List of special highlights
-     */
-    public static List<Highlighting> getSpecialHighlights(String text) {
-        return getHilights(text, "type=special;");
-    }
-
-    /**
-     * Gets all instruction highlight objects from specified text
-     *
-     * @param text Text to get highlights from
-     * @return List of instruction highlights
-     */
-    public static List<Highlighting> getInstrHighlights(String text) {
-        return getHilights(text, "type=instruction;");
-    }
-
-    /**
-     * Gets all class highlight objects from specified text
-     *
-     * @param text Text to get highlights from
-     * @return List of class highlights
-     */
-    public static List<Highlighting> getClassHighlights(String text) {
-        return getHilights(text, "type=class;");
+        this.properties = data;
     }
 }

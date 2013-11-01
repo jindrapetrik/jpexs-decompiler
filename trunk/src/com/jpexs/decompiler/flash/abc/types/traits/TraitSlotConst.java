@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -60,7 +61,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return typeStr;
     }
 
-    public HilightedTextWriter getNameStr(HilightedTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
+    public GraphTextWriter getNameStr(GraphTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
         String typeStr = getType(abc.constants, fullyQualifiedNames);
         if (typeStr.equals("*")) {
             typeStr = "";
@@ -85,7 +86,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return writer;
     }
 
-    public boolean getValueStr(Trait parent, HilightedTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
+    public void getValueStr(Trait parent, GraphTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
         if (assignedValue != null) {
             if (parent instanceof TraitClass) {
                 TraitClass tc = (TraitClass) parent;
@@ -100,28 +101,13 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 writer.endMethod();
                 writer.endTrait();
             }
-            return true;
+            return;
         }
 
         if (value_kind != 0) {
             ValueKind val = new ValueKind(value_index, value_kind);
             writer.hilightSpecial(val.toString(abc.constants), "traitvalue");
-            return true;
         }
-
-        return false;
-    }
-
-    public String getNameValueStr(Trait parent, ABC abc, List<String> fullyQualifiedNames) {
-        HilightedTextWriter writer = new HilightedTextWriter(false);
-        getNameStr(writer, abc, fullyQualifiedNames);
-        writer.appendNoHilight(" = ");
-        boolean hasValue = getValueStr(parent, writer, abc, fullyQualifiedNames);
-        if (!hasValue) {
-            writer.removeFromEnd(3);
-        }
-        writer.appendNoHilight(";");
-        return writer.toString();
     }
 
     public boolean isNamespace() {
@@ -133,7 +119,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         if (modifier.equals(" ")) {
             modifier = "";
@@ -155,12 +141,15 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
         writer.appendNoHilight(modifier);
         getNameStr(writer, abc, fullyQualifiedNames);
-        writer.appendNoHilight(" = ");
-        boolean hasValue = getValueStr(parent, writer, abc, fullyQualifiedNames);
-        if (!hasValue) {
-            writer.removeFromEnd(3);
+        if (assignedValue != null || value_kind != 0) {
+            writer.appendNoHilight(" = ");
+            getValueStr(parent, writer, abc, fullyQualifiedNames);
         }
         return writer.appendNoHilight(";");
+    }
+
+    @Override
+    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
     }
 
     public boolean isConst() {

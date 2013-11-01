@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import java.io.Serializable;
 import java.util.List;
@@ -27,30 +28,38 @@ import java.util.List;
 public class CachedDecompilation implements Serializable {
 
     public String text;
-    public String hilightedText;
+    public List<Highlighting> traitHilights;
+    public List<Highlighting> classHilights;
+    public List<Highlighting> methodHilights;
+    public List<Highlighting> instructionHilights;
+    public List<Highlighting> specialHilights;
 
-    public List<Highlighting> getHighlights() {
-        return Highlighting.getInstrHighlights(hilightedText);
+    public List<Highlighting> getInstructionHighlights() {
+        return instructionHilights;
     }
 
     public List<Highlighting> getTraitHighlights() {
-        return Highlighting.getTraitHighlights(hilightedText);
+        return traitHilights;
     }
 
     public List<Highlighting> getMethodHighlights() {
-        return Highlighting.getMethodHighlights(hilightedText);
+        return methodHilights;
     }
 
     public List<Highlighting> getClassHighlights() {
-        return Highlighting.getClassHighlights(hilightedText);
+        return classHilights;
     }
 
     public List<Highlighting> getSpecialHighligths() {
-        return Highlighting.getSpecialHighlights(hilightedText);
+        return specialHilights;
     }
 
-    public CachedDecompilation(String hilightedText) {
-        this.hilightedText = hilightedText;
-        this.text = Highlighting.stripHilights(hilightedText);
+    public CachedDecompilation(HilightedText hilightedText) {
+        this.text = hilightedText.text;
+        this.traitHilights = hilightedText.traitHilights;
+        this.classHilights = hilightedText.classHilights;
+        this.methodHilights = hilightedText.methodHilights;
+        this.instructionHilights = hilightedText.instructionHilights;
+        this.specialHilights = hilightedText.specialHilights;
     }
 }

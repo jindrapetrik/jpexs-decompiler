@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionWaitForFrame2;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -45,7 +45,7 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     }
 
     @Override
-    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("ifFrameLoaded(");
         frame.toString(writer, localData);
         writer.append(")").newLine();

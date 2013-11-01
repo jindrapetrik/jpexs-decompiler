@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import static com.jpexs.decompiler.graph.GraphTargetItem.PRECEDENCE_PRIMARY;
@@ -38,7 +38,7 @@ public abstract class AVM2Item extends GraphTargetItem {
         return true;
     }
 
-    protected HilightedTextWriter formatProperty(HilightedTextWriter writer, GraphTargetItem object, GraphTargetItem propertyName, LocalData localData) {
+    protected GraphTextWriter formatProperty(GraphTextWriter writer, GraphTargetItem object, GraphTargetItem propertyName, LocalData localData) {
         boolean empty = false;
         if (object instanceof LocalRegAVM2Item) {
             if (((LocalRegAVM2Item) object).computedValue != null) {

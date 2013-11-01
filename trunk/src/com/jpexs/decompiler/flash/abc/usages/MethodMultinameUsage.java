@@ -44,6 +44,17 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
     @Override
     public String toString(List<ABCContainerTag> abcTags, ABC abc) {
+        if (!isInitializer) {
+            if (parentTraitIndex > -1) {
+                if (isStatic){
+                    ((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, new ArrayList<String>(), false);
+                } else {
+                    ((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, new ArrayList<String>(), false);
+                }
+            }
+            ((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, new ArrayList<String>(), false);
+        }
+
         HilightedTextWriter writer = new HilightedTextWriter(false);
         writer.appendNoHilight(super.toString(abcTags, abc));
         writer.appendNoHilight(" ");
@@ -56,13 +67,13 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
         } else {
             if (parentTraitIndex > -1) {
                 if (isStatic){
-                    ((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+                    ((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).toStringHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
                 } else {
-                    ((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+                    ((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).toStringHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
                 }
                 writer.appendNoHilight(" ");
             }
-            ((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+            ((TraitMethodGetterSetter) traits.traits[traitIndex]).toStringHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
         }
         return writer.toString();
     }

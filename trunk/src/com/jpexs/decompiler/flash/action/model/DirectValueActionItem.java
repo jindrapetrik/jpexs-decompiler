@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -87,7 +87,28 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    protected HilightedTextWriter appendToNoQuotes(HilightedTextWriter writer, LocalData localData) {
+    public String toStringNoQuotes(LocalData localData) {
+        if (value instanceof Double) {
+            if (Double.compare((double) (Double) value, 0) == 0) {
+                return "0";
+            }
+        }
+        if (value instanceof Float) {
+            if (Float.compare((float) (Float) value, 0) == 0) {
+                return "0";
+            }
+        }
+        if (value instanceof String) {
+            return (String) value;
+        }
+        if (value instanceof ConstantIndex) {
+            return this.constants.get(((ConstantIndex) value).index);
+        }
+        return value.toString();
+    }
+
+    @Override
+    protected GraphTextWriter appendToNoQuotes(GraphTextWriter writer, LocalData localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
                 return writer.append("0");
@@ -128,7 +149,7 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
                 return writer.append("0");

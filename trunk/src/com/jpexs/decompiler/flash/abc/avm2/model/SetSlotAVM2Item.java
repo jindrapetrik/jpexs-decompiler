@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -43,13 +43,13 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     }
 
     @Override
-    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         getName(writer, localData);
         writer.append(" = ");
         return value.toString(writer, localData);
     }
 
-    public HilightedTextWriter getName(HilightedTextWriter writer, LocalData localData) {
+    public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) {
         /*ret = scope.toString(constants, localRegNames) + ".";
          if (!(scope instanceof NewActivationAVM2Item)) {
          ret = scope.toString(constants, localRegNames) + ".";

@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -42,7 +42,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public HilightedTextWriter convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public GraphTextWriter toStringHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         MethodBody body = abc.findBody(method_info);
         if (body == null) {
@@ -62,8 +62,12 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public HilightedTextWriter convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, HilightedTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
-        convertHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+    public void convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
+    }
+
+    @Override
+    public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+        toStringHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         if (abc.instance_info[classIndex].isInterface()) {
             writer.appendNoHilight(";");
         } else {
@@ -76,6 +80,17 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             writer.appendNoHilight("}");
         }
         return writer;
+    }
+
+    @Override
+    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
+        convertHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, fullyQualifiedNames, parallel);
+        if (!abc.instance_info[classIndex].isInterface()) {
+            int bodyIndex = abc.findBodyIndex(method_info);
+            if (bodyIndex != -1) {
+                abc.bodies[bodyIndex].convert(path + "." + abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, fullyQualifiedNames, null);
+            }
+        }
     }
 
     @Override

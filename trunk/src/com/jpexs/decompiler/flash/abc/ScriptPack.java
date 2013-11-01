@@ -121,15 +121,18 @@ public class ScriptPack {
             for (int t : traitIndices) {
                 Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
                 Namespace ns = name.getNamespace(abc.constants);
+                if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                    abc.script_info[scriptIndex].traits.traits[t].convertPackaged(null, "", abcList, abc, false, exportMode, scriptIndex, -1, new ArrayList<String>(), parallel);
+                } else {
+                    abc.script_info[scriptIndex].traits.traits[t].convert(null, "", abcList, abc, false, exportMode, scriptIndex, -1, new ArrayList<String>(), parallel);
+                }
                 HilightedTextWriter writer = new HilightedTextWriter(false);
                 if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                    abc.script_info[scriptIndex].traits.traits[t].convertPackaged(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+                    abc.script_info[scriptIndex].traits.traits[t].toStringPackaged(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
                 } else {
-                    abc.script_info[scriptIndex].traits.traits[t].convert(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+                    abc.script_info[scriptIndex].traits.traits[t].toString(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
                 }
-                String s = Graph.removeNonRefenrencedLoopLabels(writer.toString(), false);
-                s = Helper.hexToComments(s);
-                fos.write(s.getBytes("utf-8"));
+                fos.write(writer.toString().getBytes("utf-8"));
             }
         }
         return file;

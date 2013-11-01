@@ -30,8 +30,9 @@ import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.LoopWithType;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -48,6 +49,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
     public GraphTargetItem variableName;
     public GraphTargetItem enumVariable;
     public List<GraphTargetItem> commands;
+    private boolean labelUsed;
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
@@ -64,9 +66,18 @@ public class ForInActionItem extends LoopActionItem implements Block {
     }
 
     @Override
-    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
-        writer.startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
-        writer.append("loop" + loop.id + ":").newLine();
+    public boolean needsSemicolon() {
+        return false;
+    }
+
+    @Override
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+        if (writer instanceof NulWriter) {
+            ((NulWriter)writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
+        }
+        if (labelUsed) {
+            writer.append("loop" + loop.id + ":").newLine();
+        }
         writer.append("for(");
         if ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber)) {
             writer.append("var ");
@@ -82,8 +93,10 @@ public class ForInActionItem extends LoopActionItem implements Block {
         }
         writer.unindent();
         writer.append("}").newLine();
-        writer.append(":loop" + loop.id);
-        writer.endLoop(loop.id);
+        if (writer instanceof NulWriter) {
+            LoopWithType loopOjb = ((NulWriter)writer).endLoop(loop.id);
+            labelUsed = loopOjb.used;
+        }
         return writer;
     }
 

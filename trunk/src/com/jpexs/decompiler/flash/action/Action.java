@@ -43,12 +43,14 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
-import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
@@ -66,6 +68,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -388,7 +391,7 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return HilightedTextWriter
      */
-    public static HilightedTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, ExportMode exportMode, HilightedTextWriter writer, long swfPos, String path) {
+    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, ExportMode exportMode, GraphTextWriter writer, long swfPos, String path) {
         return actionsToString(listeners, address, list, importantOffsets, new ArrayList<String>(), version, exportMode, writer, swfPos, path);
     }
 
@@ -406,7 +409,7 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return HilightedTextWriter
      */
-    private static HilightedTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, ExportMode exportMode, HilightedTextWriter writer, long swfPos, String path) {
+    private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, ExportMode exportMode, GraphTextWriter writer, long swfPos, String path) {
         long offset;
         if (importantOffsets == null) {
             //setActionsAddresses(list, 0, version);
@@ -435,9 +438,9 @@ public class Action implements GraphSourceItem {
                     writer.newLine();
                     lastPush = false;
                 }
-                writer.appendNoHilight("<ffdec:hex>");/* +"0x"+Helper.formatAddress(a.getFileAddress())+": "+*/;
+                writer.appendNoHilight("; ");
                 writer.appendNoHilight(Helper.bytesToHexString(a.getBytes(version)));
-                writer.appendNoHilight("</ffdec:hex>").newLine();
+                writer.newLine();
             }
             offset = a.getAddress();
 
@@ -693,60 +696,50 @@ public class Action implements GraphSourceItem {
      * @param actions List of actions
      * @param version SWF version
      * @param path
-     * @return HilightedTextWriter with Source code
+     * @return String with Source code
      */
-    public static String actionsToSource(List<Action> actions, int version, String path, boolean highlight, int indent) {
-        HilightedTextWriter writer = new HilightedTextWriter(highlight, indent);
-        Action.actionsToSource(actions, SWF.DEFAULT_VERSION, ""/*FIXME*/, writer);
-        String s = Graph.removeNonRefenrencedLoopLabels(writer.toString(), highlight);
-        return s;
-    }
-    
-    /**
-     * Converts list of actions to ActionScript source code
-     *
-     * @param actions List of actions
-     * @param version SWF version
-     * @param path
-     * @return HilightedTextWriter with Source code
-     */
-    public static HilightedTextWriter actionsToSource(final List<Action> actions, final int version, final String path, final HilightedTextWriter writer) {
+    public static HilightedText actionsToSource(final List<Action> actions, final int version, final String path, boolean highlight, int indent) {
+        List<GraphTargetItem> tree = null;
+        Throwable convertException = null;
         int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
-        int writerPos = writer.getLength();
         try {
-            Helper.timedCall(new Callable<Void>() {
+            tree = Helper.timedCall(new Callable<List<GraphTargetItem>>() {
                 @Override
-                public Void call() throws Exception {
-                    //List<ActionItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
+                public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
-
-                    List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
-                    Graph.graphToString(tree, writer, new LocalData());
-                    return null;
+                    List<GraphTargetItem> tree =  actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
+                    Graph.graphToString(tree, new NulWriter(), new LocalData());
+                    return tree;
                 }
             }, timeout, TimeUnit.SECONDS);
-        } catch (TimeoutException ex) {
+        } catch (InterruptedException | TimeoutException | ExecutionException | OutOfMemoryError | StackOverflowError ex) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
-            writer.setLength(writerPos); // remove already rendered code
+            convertException = ex;
+            if (ex instanceof ExecutionException && ex.getCause() instanceof Exception) {
+                convertException = (Exception) ex.getCause();
+            }
+        }
+
+        HilightedTextWriter writer = new HilightedTextWriter(highlight, indent);
+        if (convertException == null) {
+            Graph.graphToString(tree, writer, new LocalData());
+        } else if (convertException instanceof TimeoutException) {
+            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
             writer.appendNoHilight("/*").newLine();
             writer.appendNoHilight(" * Decompilation error").newLine();
             writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached").newLine();
             writer.appendNoHilight(" */").newLine();
             writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
-        } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
-            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex2);
-            if (ex2 instanceof OutOfMemoryError) {
-                System.gc();
-            }
-            writer.setLength(writerPos); // remove already rendered code
+        } else {
+            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
             writer.appendNoHilight("/*").newLine();
             writer.appendNoHilight(" * Decompilation error").newLine();
             writer.appendNoHilight(" * Code may be obfuscated").newLine();
-            writer.appendNoHilight(" * Error type: " + ex2.getClass().getSimpleName()).newLine();
+            writer.appendNoHilight(" * Error type: " + convertException.getClass().getSimpleName()).newLine();
             writer.appendNoHilight(" */").newLine();
-            return writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
+            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
         }
-        return writer;
+        return new HilightedText(writer);
     }
 
     /**
@@ -1236,7 +1229,7 @@ public class Action implements GraphSourceItem {
         }
     }
 
-    public HilightedTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode, HilightedTextWriter writer) {
+    public GraphTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode, GraphTextWriter writer) {
         writer.appendNoHilight(getASMSource(container, knownAddreses, constantPool, version, exportMode));
         return writer;
     }

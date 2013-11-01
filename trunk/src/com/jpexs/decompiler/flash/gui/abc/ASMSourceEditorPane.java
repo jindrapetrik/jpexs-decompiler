@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -49,29 +50,43 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     private DecompiledEditorPane decompiledEditor;
     private boolean ignoreCarret = false;
     private String name;
-    private String textWithHex = "";
-    private String textNoHex = "";
-    private boolean hex = false;
+    private HilightedText textWithHex;
+    private HilightedText textNoHex;
+    private HilightedText textHexOnly;
+    private ExportMode exportMode = ExportMode.PCODE;
     private Trait trait;
 
-    public boolean isHex() {
-        return hex;
+    public ExportMode getExportMode() {
+        return exportMode;
     }
 
-    public void switchHex() {
-        setHex(!hex);
+    private HilightedText getHilightedText(ExportMode exportMode) {
+        HilightedTextWriter writer = new HilightedTextWriter(true);
+        abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], exportMode, writer);
+        return new HilightedText(writer);
     }
-
-    public void setHex(boolean hex) {
-        if (this.hex == hex) {
+    
+    public void setHex(ExportMode exportMode, boolean force) {
+        if (this.exportMode == exportMode & !force) {
             return;
         }
-        this.hex = hex;
+        this.exportMode = exportMode;
         long oldOffset = getSelectedOffset();
-        if (hex) {
+        if (exportMode == ExportMode.PCODE) {
+            if (textNoHex == null) {
+                textNoHex = getHilightedText(exportMode);
+            }
+            setText(textNoHex);
+        } else if (exportMode == ExportMode.PCODEWITHHEX) {
+            if (textWithHex == null) {
+                textWithHex = getHilightedText(exportMode);
+            }
             setText(textWithHex);
         } else {
-            setText(textNoHex);
+            if (textHexOnly == null) {
+                textHexOnly = new HilightedText(Helper.byteArrToString(abc.bodies[bodyIndex].code.getBytes()));
+            }
+            setText(textWithHex);
         }
         hilighOffset(oldOffset);
     }
@@ -135,12 +150,9 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         if (bodyIndex == -1) {
             return;
         }
-        HilightedTextWriter writer = new HilightedTextWriter(true);
-        abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], ExportMode.PCODEWITHHEX, writer);
-        String textWithHexTags = writer.toString();
-        textWithHex = Helper.hexToComments(textWithHexTags);
-        textNoHex = Helper.stripComments(textWithHexTags);
-        setText(hex ? textWithHex : textNoHex);
+        textWithHex = null;
+        textNoHex = null;
+        setHex(exportMode, true);
     }
 
     public void graph() {
@@ -193,10 +205,16 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
     @Override
     public void setText(String t) {
-        disassembledHilights = Highlighting.getInstrHighlights(t);
-        specialHilights = Highlighting.getSpecialHighlights(t);
-        t = Highlighting.stripHilights(t);
+        disassembledHilights = new ArrayList<>();
+        specialHilights = new ArrayList<>();
         super.setText(t);
+        setCaretPosition(0);
+    }
+
+    public void setText(HilightedText hilightedText) {
+        disassembledHilights = hilightedText.instructionHilights;
+        specialHilights = hilightedText.specialHilights;
+        super.setText(hilightedText.text);
         setCaretPosition(0);
     }
 

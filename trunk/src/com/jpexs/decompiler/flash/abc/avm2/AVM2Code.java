@@ -72,6 +72,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -708,7 +709,7 @@ public class AVM2Code implements Serializable {
         return s.toString();
     }
 
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) {
         int i = 0;
         for (AVM2Instruction instruction : code) {
             writer.appendNoHilight(Helper.formatAddress(i));
@@ -719,11 +720,11 @@ public class AVM2Code implements Serializable {
         return writer;
     }
 
-    public HilightedTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ExportMode exportMode, HilightedTextWriter writer) {
+    public GraphTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ExportMode exportMode, GraphTextWriter writer) {
         return toASMSource(constants, trait, info, body, new ArrayList<Integer>(), exportMode, writer);
     }
 
-    public HilightedTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, ExportMode exportMode, HilightedTextWriter writer) {
+    public GraphTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, ExportMode exportMode, GraphTextWriter writer) {
         invalidateCache();
         if (trait != null) {
             if (trait instanceof TraitFunction) {
@@ -906,9 +907,9 @@ public class AVM2Code implements Serializable {
         } else {
             for (AVM2Instruction ins : code) {
                 if (exportMode == ExportMode.PCODEWITHHEX) {
-                    writer.appendNoHilight("<ffdec:hex>");
+                    writer.appendNoHilight("; ");
                     writer.appendNoHilight(Helper.bytesToHexString(ins.getBytes()));
-                    writer.appendNoHilight("</ffdec:hex>\n");
+                    writer.newLine();
                 }
                 if (ins.labelname != null) {
                     writer.appendNoHilight(ins.labelname + ":");
@@ -1137,7 +1138,7 @@ public class AVM2Code implements Serializable {
                 visited[ip] = true;
                 AVM2Instruction ins = code.get(ip);
                 if (debugMode) {
-                    System.err.println("translating ip " + ip + " ins " + ins.toString() + " stack:" + Highlighting.stripHilights(stack.toString()) + " scopeStack:" + Highlighting.stripHilights(scopeStack.toString()));
+                    System.err.println("translating ip " + ip + " ins " + ins.toString() + " stack:" + stack.toString() + " scopeStack:" + scopeStack.toString());
                 }
                 if (ins.definition instanceof NewFunctionIns) {
                     if (ip + 1 <= end) {
@@ -1405,30 +1406,17 @@ public class AVM2Code implements Serializable {
         ignoredIns = new ArrayList<>();
     }
 
-    public HilightedTextWriter toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, HilightedTextWriter writer, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
+    public List<GraphTargetItem> toGraphTargetItems(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
         initToSource();
         List<GraphTargetItem> list;
-        String s;
         HashMap<Integer, GraphTargetItem> localRegs = new HashMap<>();
 
         int regCount = getRegisterCount();
 
         //try {
 
-        try {
-            list = AVM2Graph.translateViaGraph(path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs);
-        } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
-            Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Decompilation error in " + path, ex2);
-            if (ex2 instanceof OutOfMemoryError) {
-                System.gc();
-            }
-            writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * Decompilation error").newLine();
-            writer.appendNoHilight(" * Code may be obfuscated").newLine();
-            writer.appendNoHilight(" * Error type: " + ex2.getClass().getSimpleName()).newLine();
-            writer.appendNoHilight(" */").newLine();
-            return writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
-        }
+        list = AVM2Graph.translateViaGraph(path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs);
+
         if (initTraits != null) {
             for (int i = 0; i < list.size(); i++) {
                 GraphTargetItem ti = list.get(i);
@@ -1475,7 +1463,7 @@ public class AVM2Code implements Serializable {
             }
             list = newList;
             if (list.isEmpty()) {
-                return writer;
+                return list;
             }
         }
         //Declarations
@@ -1525,9 +1513,7 @@ public class AVM2Code implements Serializable {
             list.remove(lastPos);
         }
 
-        Graph.graphToString(list, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
-
-        return writer;
+        return list;
     }
 
     public void removeInstruction(int pos, MethodBody body) {
@@ -2444,7 +2430,7 @@ public class AVM2Code implements Serializable {
             }
 
             if (debugMode) {
-                System.out.println((indeterminate ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
+                System.out.println((indeterminate ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + stack.toString());
                 HashMap<Integer, GraphTargetItem> registers = (HashMap<Integer, GraphTargetItem>) localData.get(2);
                 System.out.print("Registers:");
                 for (int reg : registers.keySet()) {

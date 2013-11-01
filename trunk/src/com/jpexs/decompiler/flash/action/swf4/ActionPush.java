@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -228,7 +229,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public HilightedTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode, HilightedTextWriter writer) {
+    public GraphTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode, GraphTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return toString(writer);
         }
@@ -239,7 +240,7 @@ public class ActionPush extends Action {
         return writer;
     }
 
-    public HilightedTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode, HilightedTextWriter writer) {
+    public GraphTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode, GraphTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return paramsToString(writer);
         }
@@ -280,7 +281,7 @@ public class ActionPush extends Action {
         return ret;
     }
 
-    public HilightedTextWriter paramsToString(HilightedTextWriter writer) {
+    public GraphTextWriter paramsToString(GraphTextWriter writer) {
         int pos = 0;
         for (int i = 0; i < values.size(); i++) {
             if (ignoredParts.contains(i)) {
@@ -302,7 +303,7 @@ public class ActionPush extends Action {
         return writer.toString();
     }
 
-    public HilightedTextWriter toString(HilightedTextWriter writer) {
+    public GraphTextWriter toString(GraphTextWriter writer) {
         writer.appendNoHilight("Push ");
         paramsToString(writer);
         return writer;

@@ -306,7 +306,6 @@ public class TagNode {
                                 HilightedTextWriter writer = new HilightedTextWriter(false, asm.getActionSourceIndent());
                                 asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, null);
                                 String str = writer.toString();
-                                str = Helper.hexToComments(str);
                                 res = asm.getActionSourcePrefix() + str + asm.getActionSourceSuffix();
                             } else {
                                 List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);

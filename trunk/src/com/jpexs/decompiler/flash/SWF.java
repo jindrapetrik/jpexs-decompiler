@@ -565,7 +565,7 @@ public class SWF {
         for (MyEntry<ClassPath, ScriptPack> item : packs) {
             for (MyEntry<ClassPath, ScriptPack> itemOld : ret) {
                 if (item.key.equals(itemOld.key)) {
-                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Duplicate pack path found!");
+                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Duplicate pack path found (" + itemOld.key + ")!");
                     break;
                 }
             }

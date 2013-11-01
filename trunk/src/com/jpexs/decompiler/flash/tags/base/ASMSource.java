@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.ExportMode;
 import java.util.List;
 
@@ -36,7 +36,7 @@ public interface ASMSource {
      * @param hex Add hexadecimal?
      * @return ASM source
      */
-    public HilightedTextWriter getASMSource(int version, ExportMode exportMode, HilightedTextWriter writer, List<Action> actions);
+    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions);
 
     /**
      * Whether or not this object contains ASM source
@@ -65,7 +65,7 @@ public interface ASMSource {
 
     public void setActionBytes(byte[] actionBytes);
 
-    public HilightedTextWriter getActionBytesAsHex(HilightedTextWriter writer);
+    public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer);
 
     public long getPos();
 

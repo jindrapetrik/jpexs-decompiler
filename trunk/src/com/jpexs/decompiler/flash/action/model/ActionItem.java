@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -49,7 +49,7 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         return false;
     }
 
-    protected HilightedTextWriter stripQuotes(GraphTargetItem target, LocalData localData, HilightedTextWriter writer) {
+    protected GraphTextWriter stripQuotes(GraphTargetItem target, LocalData localData, GraphTextWriter writer) {
         if (target instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) target).value instanceof String) {
                 return writer.append((String) ((DirectValueActionItem) target).value);

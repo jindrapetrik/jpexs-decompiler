@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -139,7 +139,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      * @return ASM source
      */
     @Override
-    public HilightedTextWriter getASMSource(int version, ExportMode exportMode, HilightedTextWriter writer, List<Action> actions) {
+    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) {
         if (actions == null) {
             actions = getActions(version);
         }
@@ -200,7 +200,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     }
 
     @Override
-    public HilightedTextWriter getActionBytesAsHex(HilightedTextWriter writer) {
+    public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
         return Helper.byteArrayToHex(writer, actionBytes);
     }
 

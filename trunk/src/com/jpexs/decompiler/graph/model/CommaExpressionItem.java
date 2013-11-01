@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -36,7 +36,7 @@ public class CommaExpressionItem extends GraphTargetItem {
     }
 
     @Override
-    protected HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         boolean first = true;
         for (GraphTargetItem t : commands) {
             if (!first) {

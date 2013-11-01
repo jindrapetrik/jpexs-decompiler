@@ -407,6 +407,7 @@ public class ASM3Parser {
             /*case ParsedSymbol.TYPE_KEYWORD_DECIMAL:
              value_kind = ValueKind.CONSTANT_Decimal;
              break;*/
+            case ParsedSymbol.TYPE_STRING:
             case ParsedSymbol.TYPE_KEYWORD_UTF8:
                 value_kind = ValueKind.CONSTANT_Utf8;
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);

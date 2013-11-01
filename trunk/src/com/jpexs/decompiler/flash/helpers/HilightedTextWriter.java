@@ -16,9 +16,16 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.Configuration;
+import static com.jpexs.decompiler.flash.helpers.HilightType.CLASS;
+import static com.jpexs.decompiler.flash.helpers.HilightType.SPECIAL;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.helpers.Helper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -26,7 +33,7 @@ import java.util.Stack;
  *
  * @author JPEXS
  */
-public class HilightedTextWriter {
+public class HilightedTextWriter extends GraphTextWriter {
     
     public static final String INDENT_STRING = "   ";
     private StringBuilder sb = new StringBuilder();
@@ -34,19 +41,31 @@ public class HilightedTextWriter {
     private boolean newLine = true;
     private int indent = 0;
     private Stack<GraphSourceItemPosition> offsets = new Stack<>();
-    private Stack<LoopWithType> loopStack = new Stack<>();
     private Stack<Boolean> stringAddedStack = new Stack<>();
     private boolean stringAdded = false;
+    private long startTime;
+    private boolean toStringCalled = false;
+    private int newLineCount = 0;
 
+    private Stack<Highlighting> hilightStack = new Stack<>();
+    public List<Highlighting> traitHilights = new ArrayList<>();
+    public List<Highlighting> classHilights = new ArrayList<>();
+    public List<Highlighting> methodHilights = new ArrayList<>();
+    public List<Highlighting> instructionHilights = new ArrayList<>();
+    public List<Highlighting> specialHilights = new ArrayList<>();
+    
     public HilightedTextWriter(boolean hilight) {
+        startTime = System.currentTimeMillis();
         this.hilight = hilight;
     }
 
     public HilightedTextWriter(boolean hilight, int indent) {
+        startTime = System.currentTimeMillis();
         this.hilight = hilight;
         this.indent = indent;
     }
 
+    @Override
     public boolean getIsHighlighted() {
         return hilight;
     }
@@ -57,6 +76,7 @@ public class HilightedTextWriter {
      * @param offset Offset of instruction
      * @return HilightedTextWriter
      */
+    @Override
     public HilightedTextWriter startOffset(GraphSourceItem src, int pos) {
         GraphSourceItemPosition itemPos = new GraphSourceItemPosition();
         itemPos.graphSourceItem = src;
@@ -65,6 +85,7 @@ public class HilightedTextWriter {
         return this;
     }
     
+    @Override
     public HilightedTextWriter endOffset() {
         offsets.pop();
         return this;
@@ -76,12 +97,16 @@ public class HilightedTextWriter {
      * @param index MethodInfo index
      * @return HilightedTextWriter
      */
+    @Override
     public HilightedTextWriter startMethod(long index) {
-        return start("type=method;index=" + index);
+        Map<String, String> data = new HashMap<>();
+        data.put("index", Long.toString(index));
+        return start(data, HilightType.METHOD);
     }
     
+    @Override
     public HilightedTextWriter endMethod() {
-        return end();
+        return end(HilightType.METHOD);
     }
     
     /**
@@ -90,12 +115,16 @@ public class HilightedTextWriter {
      * @param index Class index
      * @return HilightedTextWriter
      */
+    @Override
     public HilightedTextWriter startClass(long index) {
-        return start("type=class;index=" + index);
+        Map<String, String> data = new HashMap<>();
+        data.put("index", Long.toString(index));
+        return start(data, HilightType.CLASS);
     }
     
+    @Override
     public HilightedTextWriter endClass() { 
-        return end();
+        return end(HilightType.CLASS);
     }
     
     /**
@@ -104,128 +133,101 @@ public class HilightedTextWriter {
      * @param index Trait index
      * @return HilightedTextWriter
      */
+    @Override
     public HilightedTextWriter startTrait(long index) {
-        return start("type=trait;index=" + index);
+        Map<String, String> data = new HashMap<>();
+        data.put("index", Long.toString(index));
+        return start(data, HilightType.TRAIT);
     }
     
+    @Override
     public HilightedTextWriter endTrait() {
-        return end();
+        return end(HilightType.TRAIT);
     }
     
+    @Override
     public HilightedTextWriter hilightSpecial(String text, String type) {
         return hilightSpecial(text, type, 0);
     }
     
+    @Override
     public HilightedTextWriter hilightSpecial(String text, String type, int index) {
-        start("type=special;subtype=" + type + ";index=" + index);
+        Map<String, String> data = new HashMap<>();
+        data.put("subtype", type);
+        data.put("index", Long.toString(index));
+        start(data, HilightType.SPECIAL);
         appendNoHilight(text);
-        return end();
+        return end(HilightType.SPECIAL);
     }
     
-    public HilightedTextWriter startLoop(long loopId, int loopType) {
-        LoopWithType loop = new LoopWithType();
-        loop.loopId = loopId;
-        loop.type = loopType;
-        loopStack.add(loop);
-        return this;
-    }
-    
-    public HilightedTextWriter endLoop(long loopId)  {
-        LoopWithType loopIdInStack = loopStack.pop();
-        if (loopId != loopIdInStack.loopId) {
-            throw new Error("LoopId mismatch");
-        }
-        return this;
-    }
-    
-    public long getLoop() {
-        if (loopStack.isEmpty()) {
-            return -1;
-        }
-        return loopStack.peek().loopId;
-    }
-    
-    public long getNonSwitchLoop() {
-        if (loopStack.isEmpty()) {
-            return -1;
-        }
-
-        int pos = loopStack.size() - 1;
-        LoopWithType loop;
-        do {
-            loop = loopStack.get(pos);
-            pos--;
-        } while ((pos >= 0) && (loop.type == LoopWithType.LOOP_TYPE_SWITCH));
-
-        if (loop.type == LoopWithType.LOOP_TYPE_SWITCH) {
-            return -1;
-        }
-
-        return loop.loopId;
-    }
-    
-    public static String hilighOffset(String text, long offset) {
-        String data = "type=instruction;offset=" + offset;
-        return Highlighting.HLOPEN + Helper.escapeString(data) + Highlighting.HLEND + text + Highlighting.HLCLOSE;
-    }
-
+    @Override
     public HilightedTextWriter append(String str) {
         GraphSourceItemPosition itemPos = offsets.peek();
         GraphSourceItem src = itemPos.graphSourceItem;
         int pos = itemPos.position;
+        Highlighting h = null;
         if (src != null && hilight) {
-            appendToSb(hilighOffset(str, src.getOffset() + pos + 1));
-        } else {
-            appendToSb(str);
+            Map<String, String> data = new HashMap<>();
+            data.put("offset", Long.toString(src.getOffset() + pos + 1));
+            h = new Highlighting(sb.length() - newLineCount, data, HilightType.OFFSET, str);
+            instructionHilights.add(h);
+        }
+        appendToSb(str);
+        if (h != null) {
+            h.len = sb.length() - newLineCount - h.startPos;
         }
         return this;
     }
 
+    @Override
     public HilightedTextWriter append(String str, long offset) {
+        Highlighting h = null;
         if (hilight) {
-            appendToSb(hilighOffset(str, offset));
-        } else {
-            appendToSb(str);
+            Map<String, String> data = new HashMap<>();
+            data.put("offset", Long.toString(offset));
+            h = new Highlighting(sb.length() - newLineCount, data, HilightType.OFFSET, str);
+            instructionHilights.add(h);
+        }
+        appendToSb(str);
+        if (h != null) {
+            h.len = sb.length() - newLineCount - h.startPos;
         }
         return this;
     }
 
+    @Override
     public HilightedTextWriter appendNoHilight(int i) {
         appendNoHilight(Integer.toString(i));
         return this;
     }
 
+    @Override
     public HilightedTextWriter appendNoHilight(String str) {
         appendToSb(str);
         return this;
     }
 
-    public HilightedTextWriter appendWithoutIndent(String str) {
-        if (!newLine) {
-            newLine();
-        }
-        newLine = false;
-        appendToSb(str);
-        newLine();
-        return this;
-    }
-
+    @Override
     public HilightedTextWriter indent() {
         indent++;
         return this;
     }
 
+    @Override
     public HilightedTextWriter unindent() {
         indent--;
         return this;
     }
 
+    @Override
     public HilightedTextWriter newLine() {
         appendToSb("\r\n");
         newLine = true;
+        newLineCount++;
         return this;
     }
 
+    @Override
     public HilightedTextWriter stripSemicolon() {
         // hack
         if (sb.charAt(sb.length() - 1) == ';') {
@@ -234,50 +236,97 @@ public class HilightedTextWriter {
         return this;
     }
     
-    public HilightedTextWriter removeFromEnd(int count) {
-        sb.setLength(sb.length() - count);
-        return this;
-    }
-
+    @Override
     public void setLength(int length) {
+        if (length >= sb.length()) {
+            return;
+        }
+        
+        String remove = sb.substring(length);
+        int removedNewLines = 0;
+        for (int i = 0; i < remove.length(); i++) {
+            if (remove.charAt(i) == '\n') {
+                removedNewLines++;
+            }
+        }
+        newLineCount -= removedNewLines;
+        
         sb.setLength(length);
     }
     
+    @Override
     public int getLength() {
         return sb.length();
     }
     
+    @Override
     public int getIndent() {
         return indent;
     }
     
+    @Override
     public String toString() {
+        if (toStringCalled) {
+            throw new Error("HilightedTextWriter.toString() was already called.");
+        }
+        if (Configuration.debugMode) {
+            long stopTime = System.currentTimeMillis();
+            long time = stopTime - startTime;
+            if (time > 500) {
+                System.out.println("Rendering is too slow: " + Helper.formatTimeSec(time) + " length: " + sb.length());
+            }
+        }
+        toStringCalled = true;
         return sb.toString();
     }
     
+    @Override
     public void mark() {
         stringAddedStack.add(stringAdded);
         stringAdded = false;
     }
     
+    @Override
     public boolean getMark() {
         boolean result = stringAdded;
         stringAdded = stringAddedStack.pop() || result;
         return result;
     }
     
-    private HilightedTextWriter start(String data) {
+    private HilightedTextWriter start(Map<String, String> data, HilightType type) {
         if (hilight) {
-            sb.append(Highlighting.HLOPEN);
-            sb.append(Helper.escapeString(data));
-            sb.append(Highlighting.HLEND);
+            Highlighting h = new Highlighting(sb.length() - newLineCount, data, type, null);
+            hilightStack.add(h);
         }
         return this;
     }
     
-    private HilightedTextWriter end() {
+    private HilightedTextWriter end(HilightType expectedType) {
         if (hilight) {
-            sb.append(Highlighting.HLCLOSE);
+            Highlighting h = hilightStack.pop();
+            h.len = sb.length() - newLineCount - h.startPos;
+            
+            if (!expectedType.equals(h.type)) {
+                throw new Error("Hilighting mismatch.");
+            }
+            
+            switch (h.type) {
+                case CLASS:
+                    classHilights.add(h);
+                    break;
+                case METHOD:
+                    methodHilights.add(h);
+                    break;
+                case TRAIT:
+                    traitHilights.add(h);
+                    break;
+                case SPECIAL:
+                    specialHilights.add(h);
+                    break;
+                case OFFSET:
+                    instructionHilights.add(h);
+                    break;
+            }
         }
         return this;
     }

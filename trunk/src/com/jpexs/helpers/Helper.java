@@ -17,6 +17,7 @@
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.gui.Freed;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -373,13 +374,13 @@ public class Helper {
         }
     }
 
-    public static String stripComments(String str) {
-        return str.replaceAll("<ffdec:hex>[^\r\n]*</ffdec:hex>\r?\n", "");
-    }
+    //public static String stripComments(String str) {
+    //    return str.replaceAll("<ffdec:hex>[^\r\n]*</ffdec:hex>\r?\n", "");
+    //}
 
-    public static String hexToComments(String str) {
-        return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
-    }
+    //public static String hexToComments(String str) {
+    //    return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
+    //}
 
     public static String stackToString(Stack<GraphTargetItem> stack, LocalData localData) {
         String ret = "[";
@@ -549,7 +550,7 @@ public class Helper {
         return timeStr;
     }
 
-    public static HilightedTextWriter byteArrayToHex(HilightedTextWriter writer, byte[] data) {
+    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data) {
         writer.appendNoHilight("#hexdata").newLine();
 
         /* // hex data from decompiled actions

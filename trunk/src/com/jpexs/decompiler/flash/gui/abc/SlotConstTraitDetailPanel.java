@@ -102,9 +102,9 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
         writer.appendNoHilight(" value ");
         writer.hilightSpecial((new ValueKind(trait.value_index, trait.value_kind).toASMString(abc.constants)), "traitvalue");
         String s = writer.toString();
-        specialHilights = Highlighting.getSpecialHighlights(s);
+        specialHilights = writer.specialHilights;
         showWarning = trait.isConst() || isStatic;
-        slotConstEditor.setText(Highlighting.stripHilights(s));
+        slotConstEditor.setText(s);
     }
 
     @Override

@@ -28,11 +28,11 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Cache;
 import java.util.ArrayList;
 import java.util.List;
@@ -343,7 +343,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                         abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, currentTrait);
                         abcPanel.detailPanel.setEditMode(false);
                         currentMethodHighlight = null;
-                        Highlighting spec = Highlighting.search(specialHighlights, pos, "type", "special", currentTraitHighlight.startPos, currentTraitHighlight.startPos + currentTraitHighlight.len);
+                        Highlighting spec = Highlighting.search(specialHighlights, pos, null, null, currentTraitHighlight.startPos, currentTraitHighlight.startPos + currentTraitHighlight.len);
                         if (spec != null) {
                             abcPanel.detailPanel.slotConstTraitPanel.hilightSpecial(spec);
                         }
@@ -445,19 +445,21 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     public void cacheScriptPack(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) {
         int maxCacheSize = 50;
         int scriptIndex = scriptLeaf.scriptIndex;
-        String hilightedCode = "";
+        HilightedText hilightedCode = null;
         ScriptInfo script = null;
         ABC abc = scriptLeaf.abc;
         if (scriptIndex > -1) {
             script = abc.script_info[scriptIndex];
         }
         if (!cache.contains(scriptLeaf)) {
+            for (int scriptTraitIndex : scriptLeaf.traitIndices) {
+                script.traits.traits[scriptTraitIndex].convertPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, ExportMode.SOURCE, scriptIndex, -1, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true));
+            }
             HilightedTextWriter writer = new HilightedTextWriter(true);
             for (int scriptTraitIndex : scriptLeaf.traitIndices) {
-                script.traits.traits[scriptTraitIndex].convertPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, ExportMode.SOURCE, scriptIndex, -1, writer, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true));
+                script.traits.traits[scriptTraitIndex].toStringPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, ExportMode.SOURCE, scriptIndex, -1, writer, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true));
             }
-            String s = Graph.removeNonRefenrencedLoopLabels(writer.toString(), true);
-            hilightedCode = s;
+            hilightedCode = new HilightedText(writer);
             cache.put(scriptLeaf, new CachedDecompilation(hilightedCode));
         }
     }
@@ -487,7 +489,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         cacheScriptPack(scriptLeaf, abcList);
         CachedDecompilation cd = getCached(scriptLeaf);
         final String hilightedCode = cd.text;
-        highlights = cd.getHighlights();
+        highlights = cd.getInstructionHighlights();
         specialHighlights = cd.getSpecialHighligths();
         traitHighlights = cd.getTraitHighlights();
         methodHighlights = cd.getMethodHighlights();

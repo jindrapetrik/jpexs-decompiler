@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.model.BinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -83,7 +84,7 @@ public abstract class GraphTargetItem implements Serializable {
         return ret;
     }
 
-    public HilightedTextWriter toStringSemicoloned(HilightedTextWriter writer, LocalData localData) {
+    public GraphTextWriter toStringSemicoloned(GraphTextWriter writer, LocalData localData) {
         writer.startOffset(src, pos);
         appendTo(writer, localData);
         if (needsSemicolon()) { 
@@ -102,15 +103,15 @@ public abstract class GraphTargetItem implements Serializable {
         return this.getClass().getName();
     }
 
-    public HilightedTextWriter toString(HilightedTextWriter writer, LocalData localData) {
+    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) {
         writer.startOffset(src, pos);
         appendTo(writer, localData);
         writer.endOffset();
         return writer;
     }
 
-    protected abstract HilightedTextWriter appendTo(HilightedTextWriter writer, LocalData localData);
-    
+    protected abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData);
+
     public String toString(LocalData localData) {
         HilightedTextWriter writer = new HilightedTextWriter(false);
         toString(writer, localData);
@@ -145,19 +146,17 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public String toStringNoQuotes(LocalData localData) {
-        HilightedTextWriter writer = new HilightedTextWriter(false);
-        toStringNoQuotes(writer, localData);
-        return writer.toString();
+        return toString();
     }
 
-    public HilightedTextWriter toStringNoQuotes(HilightedTextWriter writer, LocalData localData) {
+    public GraphTextWriter toStringNoQuotes(GraphTextWriter writer, LocalData localData) {
         writer.startOffset(src, pos);
         appendToNoQuotes(writer, localData);
         writer.endOffset();
         return writer;
     }
 
-    protected HilightedTextWriter appendToNoQuotes(HilightedTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendToNoQuotes(GraphTextWriter writer, LocalData localData) {
         return toString(writer, localData);
     }
 
@@ -173,7 +172,7 @@ public abstract class GraphTargetItem implements Serializable {
         return false;
     }
 
-    public HilightedTextWriter toStringNL(HilightedTextWriter writer, LocalData localData) {
+    public GraphTextWriter toStringNL(GraphTextWriter writer, LocalData localData) {
         writer.startOffset(src, pos);
         appendTo(writer, localData);
         if (needsNewLine()) {
