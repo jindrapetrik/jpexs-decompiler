@@ -47,14 +47,7 @@
     <property name="INSTALLERCONFIG" value="${basedir}/installer.cfg"/>
     <property name="INSTALLERPROJECT" value="${basedir}/installer.iss"/>
     <property name="EXECONFIG" value="${basedir}/build_exe.xml"/>    
-<!--    <property name="RUNPARAMS" value=""/>   -->
-<!--
-    <property name="RUNPARAMS" value="-onerror ignore -affinity 8 -priority low -config autoDeobfuscate=1,parallelSpeedUp=0,cacheOnDisk=0 -export as c:\5\out c:\5\bomberman1.swf"/>   
-    <property name="RUNPARAMS" value="-onerror ignore -affinity 8 -priority low -config autoDeobfuscate=1,parallelSpeedUp=0,cacheOnDisk=0 -export as c:\5\out c:\5\klone.swf"/>   
-        <property name="RUNPARAMS" value="c:\5\bomberman1.swf"/>   
--->
-<property name="RUNPARAMS" value=""/>
-<!--    <property name="RUNPARAMS" value="-onerror ignore -affinity 8 -priority low -config autoDeobfuscate=0,parallelSpeedUp=0,cacheOnDisk=0 -export pcode c:\5 c:\5\effect.swf"/>   
-    -->                
+    <property name="RUNPARAMS" value=""/>
+
     <import file="build_common.xml"/>
 </project>
