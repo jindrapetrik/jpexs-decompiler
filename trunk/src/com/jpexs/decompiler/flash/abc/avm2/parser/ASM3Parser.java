@@ -477,7 +477,7 @@ public class ASM3Parser {
                 break;
             default:
                 if (Configuration.debugMode) {
-                    throw new ParseException("Not suppoerted valueType.", lexer.yyline());
+                    throw new ParseException("Not supported valueType.", lexer.yyline());
                 }
         }
         return new ValueKind(value_index, value_kind);
