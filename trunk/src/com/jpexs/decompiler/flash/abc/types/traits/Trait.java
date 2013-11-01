@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;

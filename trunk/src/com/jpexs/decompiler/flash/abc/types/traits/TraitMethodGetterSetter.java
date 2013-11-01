@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import static com.jpexs.decompiler.flash.abc.types.traits.Trait.TRAIT_GETTER;
 import static com.jpexs.decompiler.flash.abc.types.traits.Trait.TRAIT_SETTER;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;

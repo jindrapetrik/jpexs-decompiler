@@ -19,8 +19,6 @@ package com.jpexs.decompiler.flash.helpers.hilight;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightType;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
