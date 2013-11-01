@@ -144,7 +144,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             writer.appendNoHilight(" = ");
             getValueStr(parent, writer, abc, fullyQualifiedNames);
         }
-        return writer.appendNoHilight(";");
+        return writer.appendNoHilight(";").newLine();
     }
 
     @Override

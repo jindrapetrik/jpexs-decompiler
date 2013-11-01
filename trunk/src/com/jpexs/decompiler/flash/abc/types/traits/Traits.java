@@ -149,8 +149,6 @@ public class Traits implements Serializable {
             } else {
                 writer.endTrait();
             }
-            
-            writer.newLine();
         }
         return writer;
     }

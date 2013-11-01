@@ -79,6 +79,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             writer.newLine();
             writer.appendNoHilight("}");
         }
+        writer.newLine();
         return writer;
     }
 

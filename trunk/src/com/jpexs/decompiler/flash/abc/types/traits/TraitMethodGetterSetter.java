@@ -97,6 +97,7 @@ public class TraitMethodGetterSetter extends Trait {
             }
             writer.appendNoHilight("}");
         }
+        writer.newLine();
         return writer;
     }
 

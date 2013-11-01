@@ -132,9 +132,9 @@ public abstract class Trait implements Serializable {
             writer.appendNoHilight("{").newLine();
             writer.indent();
             toString(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
-            writer.newLine();
             writer.unindent();
             writer.appendNoHilight("}");
+            writer.newLine();
         }
         return writer;
     }

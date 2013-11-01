@@ -92,7 +92,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
             ti.toStringSemicoloned(writer, localData).newLine();
         }
         writer.unindent();
-        writer.append("}").newLine();
+        writer.append("}");
         if (writer instanceof NulWriter) {
             LoopWithType loopOjb = ((NulWriter)writer).endLoop(loop.id);
             labelUsed = loopOjb.used;

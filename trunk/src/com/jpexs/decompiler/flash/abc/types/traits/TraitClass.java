@@ -405,16 +405,22 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
         }
 
+        boolean hasImport = false;
         for (String imp : imports) {
             if (!imp.startsWith(".")) {
                 writer.appendNoHilight("import " + imp + ";").newLine();
+                hasImport = true;
             }
         }
-        writer.newLine();
+        if (hasImport) {
+            writer.newLine();
+        }
         for (String us : uses) {
             writer.appendNoHilight("use namespace " + us + ";").newLine();
         }
-        writer.newLine();
+        if (uses.size() > 0) {
+            writer.newLine();
+        }
 
         //class header     
         String classHeader = abc.instance_info[class_info].getClassHeaderStr(abc, fullyQualifiedNames);
@@ -488,6 +494,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.unindent();
         writer.appendNoHilight("}"); // class
         writer.endClass();
+        writer.newLine();
         return writer;
     }
 
