@@ -3,7 +3,6 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
-import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -41,12 +40,14 @@ public class ActionScript2AssemblerTest extends ActionStript2TestBase {
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
-            HilightedText actualResult = Action.actionsToSource(doa.getActions(swf.version), swf.version, "", false, 0);
             HilightedTextWriter writer = new HilightedTextWriter(false);
+            Action.actionsToSource(doa.getActions(swf.version), swf.version, "", writer);
+            String actualResult = writer.toString();
+            writer = new HilightedTextWriter(false);
             doa.getASMSource(swf.version, ExportMode.PCODE, writer, null);
             String decompiled = writer.toString();
 
-            assertEquals(actualResult.text.trim(), "ok = false;");
+            assertEquals(actualResult.trim(), "ok = false;");
             assertTrue(decompiled.contains("Push \"ok\" false"));
         } catch (IOException | ParseException ex) {
             fail();

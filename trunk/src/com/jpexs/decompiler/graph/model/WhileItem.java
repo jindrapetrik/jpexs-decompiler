@@ -73,7 +73,7 @@ public class WhileItem extends LoopItem implements Block {
             }
         }
         writer.unindent();
-        writer.append("}").newLine();
+        writer.append("}");
         if (writer instanceof NulWriter) {
             LoopWithType loopOjb = ((NulWriter)writer).endLoop(loop.id);
             labelUsed = loopOjb.used;

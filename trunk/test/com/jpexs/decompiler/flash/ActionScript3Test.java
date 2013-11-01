@@ -847,4 +847,19 @@ public class ActionScript3Test {
                 + "}\r\n"
                 + "return 4;\r\n", false);
     }
+
+    @Test
+    public void testOptionalParameters() {
+        String methodName = "testOptionalParameters";
+        int methodInfo = abc.findMethodInfoByName(clsIndex, methodName);
+        int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
+        assertTrue(methodInfo > -1);
+        assertTrue(bodyIndex > -1);
+        HilightedTextWriter writer = new HilightedTextWriter(false);
+        abc.method_info[methodInfo].getParamStr(writer, abc.constants, abc.bodies[bodyIndex], abc, new ArrayList<String>());
+        String actualResult = writer.toString().replaceAll("[ \r\n]", "");
+        String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";
+        expectedResult = expectedResult.replaceAll("[ \r\n]", "");
+        assertEquals(actualResult, expectedResult);
+    }
 }

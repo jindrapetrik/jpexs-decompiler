@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.helpers.HilightedText;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -42,8 +42,9 @@ public class ActionScript2Test extends ActionStript2TestBase {
     private void compareSrc(int frame, String expectedResult) {
         DoActionTag doa = getFrameSource(frame);
         assertNotNull(doa);
-        HilightedText hilightedText = Action.actionsToSource(doa.getActions(swf.version), swf.version, "", false, 0);
-        String actualResult = hilightedText.text.replaceAll("[ \r\n]", "");
+        HilightedTextWriter writer = new HilightedTextWriter(false);
+        Action.actionsToSource(doa.getActions(swf.version), swf.version, "", writer);
+        String actualResult = writer.toString().replaceAll("[ \r\n]", "");
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);
 

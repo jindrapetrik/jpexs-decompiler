@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser;
 
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -407,7 +408,18 @@ public class ASM3Parser {
             /*case ParsedSymbol.TYPE_KEYWORD_DECIMAL:
              value_kind = ValueKind.CONSTANT_Decimal;
              break;*/
+            case ParsedSymbol.TYPE_INTEGER:
+                value_kind = ValueKind.CONSTANT_Int;
+                value_index = constants.getIntId((Long) type.value, true);
+                break;
+            case ParsedSymbol.TYPE_FLOAT:
+                value_kind = ValueKind.CONSTANT_Double;
+                value_index = constants.getDoubleId((Double) type.value, true);
+                break;
             case ParsedSymbol.TYPE_STRING:
+                value_kind = ValueKind.CONSTANT_Utf8;
+                value_index = constants.getStringId((String) type.value, true);
+                break;
             case ParsedSymbol.TYPE_KEYWORD_UTF8:
                 value_kind = ValueKind.CONSTANT_Utf8;
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
@@ -463,6 +475,10 @@ public class ASM3Parser {
                 lexer.pushback(type);
                 value_index = parseNamespace(constants, lexer);
                 break;
+            default:
+                if (Configuration.debugMode) {
+                    throw new ParseException("Not suppoerted valueType.", lexer.yyline());
+                }
         }
         return new ValueKind(value_index, value_kind);
     }

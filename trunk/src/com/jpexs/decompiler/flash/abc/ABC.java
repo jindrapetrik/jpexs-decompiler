@@ -1065,6 +1065,19 @@ public class ABC {
         }
     }
 
+    public int findMethodInfoByName(int classId, String methodName) {
+        if (classId > -1) {
+            for (Trait t : instance_info[classId].instance_traits.traits) {
+                if (t instanceof TraitMethodGetterSetter) {
+                    if (t.getName(this).getName(constants, new ArrayList<String>()).equals(methodName)) {
+                        return ((TraitMethodGetterSetter) t).method_info;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
     public int findMethodBodyByName(int classId, String methodName) {
         if (classId > -1) {
             for (Trait t : instance_info[classId].instance_traits.traits) {
