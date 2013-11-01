@@ -161,17 +161,22 @@ public class DoActionTag extends Tag implements ASMSource {
     }
 
     @Override
-    public String getActionSourcePrefix() {
-        return "";
+    public GraphTextWriter getActionSourcePrefix(GraphTextWriter writer) {
+        return writer;
     }
 
     @Override
-    public String getActionSourceSuffix() {
-        return "";
+    public GraphTextWriter getActionSourceSuffix(GraphTextWriter writer) {
+        return writer;
     }
 
     @Override
-    public int getActionSourceIndent() {
+    public int getPrefixLineCount() {
         return 0;
+    }
+
+    @Override
+    public String removePrefixAndSuffix(String source) {
+        return source;
     }
 }

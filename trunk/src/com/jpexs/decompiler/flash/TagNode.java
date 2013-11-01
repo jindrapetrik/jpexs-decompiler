@@ -299,18 +299,25 @@ public class TagNode {
                             String res;
                             ASMSource asm = ((ASMSource) node.tag);
                             if (exportMode == ExportMode.HEX) {
-                                HilightedTextWriter writer = new HilightedTextWriter(false, asm.getActionSourceIndent());
+                                HilightedTextWriter writer = new HilightedTextWriter(false);
+                                asm.getActionSourcePrefix(writer);
                                 asm.getActionBytesAsHex(writer);
-                                res = asm.getActionSourcePrefix() + writer.toString() + asm.getActionSourceSuffix();
+                                asm.getActionSourceSuffix(writer);
+                                res = writer.toString();
                             } else if (exportMode != ExportMode.SOURCE) {
-                                HilightedTextWriter writer = new HilightedTextWriter(false, asm.getActionSourceIndent());
+                                HilightedTextWriter writer = new HilightedTextWriter(false);
+                                asm.getActionSourcePrefix(writer);
                                 asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, null);
-                                String str = writer.toString();
-                                res = asm.getActionSourcePrefix() + str + asm.getActionSourceSuffix();
+                                asm.getActionSourceSuffix(writer);
+                                res = writer.toString();
                             } else {
                                 List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                                 Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                                res = asm.getActionSourcePrefix() + Action.actionsToSource(as, SWF.DEFAULT_VERSION, ""/*FIXME*/, false, asm.getActionSourceIndent()) + asm.getActionSourceSuffix();
+                                HilightedTextWriter writer = new HilightedTextWriter(false);
+                                asm.getActionSourcePrefix(writer);
+                                Action.actionsToSource(as, SWF.DEFAULT_VERSION, ""/*FIXME*/, writer);
+                                asm.getActionSourceSuffix(writer);
+                                res = writer.toString();
                             }
                             try (FileOutputStream fos = new FileOutputStream(f)) {
                                 fos.write(res.getBytes("utf-8"));

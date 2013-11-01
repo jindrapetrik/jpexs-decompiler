@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Stack;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -217,6 +218,28 @@ public class Helper {
         return ss;
     }
 
+    public static String unindentRows(int prefixLineCount, int level, String text) {
+        StringBuilder sb = new StringBuilder();
+        Scanner scanner = new Scanner(text);
+        String indentStr = "";
+        for (int i = 0; i < level; i++) {
+            indentStr += HilightedTextWriter.INDENT_STRING;
+        }
+        int indentLength = indentStr.length();
+        for (int i = 0; i < prefixLineCount; i++) {
+            scanner.nextLine(); // ignore line
+        }
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            if (line.startsWith(indentStr)) {
+                sb.append(line.substring(indentLength)).append(HilightedTextWriter.NEW_LINE);
+            } else {
+                return sb.toString();
+            }
+        }
+        return sb.toString();
+    }
+    
     public static int getLineCount(String s) {
         if (s.endsWith("\r\n")) {
             s = s.substring(0, s.length() - 2);

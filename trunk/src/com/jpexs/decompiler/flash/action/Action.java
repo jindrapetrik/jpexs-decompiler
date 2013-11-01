@@ -48,7 +48,6 @@ import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
@@ -698,7 +697,7 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return String with Source code
      */
-    public static HilightedText actionsToSource(final List<Action> actions, final int version, final String path, boolean highlight, int indent) {
+    public static void actionsToSource(final List<Action> actions, final int version, final String path, HilightedTextWriter writer) {
         List<GraphTargetItem> tree = null;
         Throwable convertException = null;
         int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
@@ -720,7 +719,6 @@ public class Action implements GraphSourceItem {
             }
         }
 
-        HilightedTextWriter writer = new HilightedTextWriter(highlight, indent);
         if (convertException == null) {
             Graph.graphToString(tree, writer, new LocalData());
         } else if (convertException instanceof TimeoutException) {
@@ -739,7 +737,6 @@ public class Action implements GraphSourceItem {
             writer.appendNoHilight(" */").newLine();
             writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
         }
-        return new HilightedText(writer);
     }
 
     /**

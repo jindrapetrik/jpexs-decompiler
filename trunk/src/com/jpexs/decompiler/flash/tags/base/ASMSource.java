@@ -73,9 +73,11 @@ public interface ASMSource {
 
     public void removeDisassemblyListener(DisassemblyListener listener);
 
-    public String getActionSourcePrefix();
+    public GraphTextWriter getActionSourcePrefix(GraphTextWriter writer);
 
-    public String getActionSourceSuffix();
+    public GraphTextWriter getActionSourceSuffix(GraphTextWriter writer);
 
-    public int getActionSourceIndent();
+    public int getPrefixLineCount();
+
+    public String removePrefixAndSuffix(String source);
 }

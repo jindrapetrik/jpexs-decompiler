@@ -257,22 +257,30 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
     }
 
     @Override
-    public String getActionSourcePrefix() {
-        return getHeader(false) + "{\r\n";
+    public GraphTextWriter getActionSourcePrefix(GraphTextWriter writer) {
+        writer.appendNoHilight(getHeader(false));
+        writer.appendNoHilight("{").newLine();
+        return writer.indent();
     }
 
     @Override
-    public String getActionSourceSuffix() {
-        return "}\r\n";
+    public GraphTextWriter getActionSourceSuffix(GraphTextWriter writer) {
+        writer.unindent();
+        return writer.appendNoHilight("}").newLine();
+    }
+
+    @Override
+    public int getPrefixLineCount() {
+        return 1;
+    }
+
+    @Override
+    public String removePrefixAndSuffix(String source) {
+        return Helper.unindentRows(1, 1, source);
     }
 
     @Override
     public String getExportFileName(List<Tag> tags) {
         return getHeader(true);
-    }
-
-    @Override
-    public int getActionSourceIndent() {
-        return 1;
     }
 }

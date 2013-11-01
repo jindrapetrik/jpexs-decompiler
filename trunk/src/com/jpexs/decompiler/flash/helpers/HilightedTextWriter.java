@@ -36,6 +36,7 @@ import java.util.Stack;
 public class HilightedTextWriter extends GraphTextWriter {
     
     public static final String INDENT_STRING = "   ";
+    public static final String NEW_LINE = "\r\n";
     private StringBuilder sb = new StringBuilder();
     private boolean hilight;
     private boolean newLine = true;
@@ -221,7 +222,7 @@ public class HilightedTextWriter extends GraphTextWriter {
 
     @Override
     public HilightedTextWriter newLine() {
-        appendToSb("\r\n");
+        appendToSb(NEW_LINE);
         newLine = true;
         newLineCount++;
         return this;

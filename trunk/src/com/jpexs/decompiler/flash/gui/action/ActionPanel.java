@@ -174,9 +174,12 @@ public class ActionPanel extends JPanel implements ActionListener {
             if (actions == null) {
                 actions = src.getActions(SWF.DEFAULT_VERSION);
             }
-            HilightedText text = Action.actionsToSource(actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, true, 0);
-            List<Highlighting> hilights = text.instructionHilights;
-            String srcNoHex = text.text;
+            HilightedTextWriter writer = new HilightedTextWriter(true);
+            src.getActionSourcePrefix(writer);
+            Action.actionsToSource(actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, writer);
+            src.getActionSourceSuffix(writer);
+            List<Highlighting> hilights = writer.instructionHilights;
+            String srcNoHex = writer.toString();
             cache.put(src, new CachedScript(srcNoHex, hilights));
         }
     }
@@ -349,7 +352,6 @@ public class ActionPanel extends JPanel implements ActionListener {
                 setHex(getExportMode());
                 if (Configuration.getConfig("decompile", true)) {
                     decompiledEditor.setText("//" + translate("work.decompiling") + "...");
-                    String stripped = "";
                     if (!useCache) {
                         uncache(asm);
                     }
@@ -358,8 +360,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                     decompiledHilights = sc.hilights;
                     lastDecompiled = sc.text;
                     lastASM = asm;
-                    stripped = lastDecompiled;
-                    decompiledEditor.setText(asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), lastDecompiled, HilightedTextWriter.INDENT_STRING) + asm.getActionSourceSuffix());
+                    decompiledEditor.setText(lastDecompiled);
                 }
                 setEditMode(false);
                 setDecompiledEditMode(false);
@@ -559,7 +560,6 @@ public class ActionPanel extends JPanel implements ActionListener {
                 }
                 decompiledEditor.getCaret().setVisible(true);
                 int pos = decompiledEditor.getCaretPosition();
-                System.out.println("pos: " + pos);
                 Highlighting h = Highlighting.search(decompiledHilights, pos);
                 if (h != null) {
                     Highlighting h2 = Highlighting.search(disassembledHilights, "offset", h.getPropertyString("offset"));
@@ -620,15 +620,12 @@ public class ActionPanel extends JPanel implements ActionListener {
             return;
         }
 
-        String pref = lastASM.getActionSourcePrefix();
-        int lastPos = decompiledEditor.getCaretPosition();
         int lastLine = decompiledEditor.getLine();
-        int prefLines = Helper.getLineCount(pref);
+        int prefLines = lastASM.getPrefixLineCount();
         if (val) {
-            String newText = lastDecompiled;
+            String newText = lastASM.removePrefixAndSuffix(lastDecompiled);
             decompiledEditor.setText(newText);
             if (lastLine > -1) {
-                int newpos = lastPos - pref.length();
                 if (lastLine - prefLines >= 0) {
                     decompiledEditor.gotoLine(lastLine - prefLines + 1);
                 }
@@ -641,7 +638,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             decompiledEditor.getCaret().setVisible(true);
             decLabel.setIcon(View.getIcon("editing16"));
         } else {
-            String newText = pref + Helper.indentRows(lastASM.getActionSourceIndent(), lastDecompiled, HilightedTextWriter.INDENT_STRING) + lastASM.getActionSourceSuffix();
+            String newText = lastDecompiled;
             decompiledEditor.setText(newText);
             if (lastLine > -1) {
                 decompiledEditor.gotoLine(lastLine + prefLines + 1);

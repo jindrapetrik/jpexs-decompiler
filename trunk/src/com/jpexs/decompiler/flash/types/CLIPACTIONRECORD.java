@@ -215,22 +215,30 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
     }
 
     @Override
-    public String getActionSourcePrefix() {
-        return eventFlags.getHeader(keyCode, false) + "{\r\n";
+    public GraphTextWriter getActionSourcePrefix(GraphTextWriter writer) {
+        writer.appendNoHilight(eventFlags.getHeader(keyCode, false));
+        writer.appendNoHilight("{").newLine();
+        return writer.indent();
     }
 
     @Override
-    public String getActionSourceSuffix() {
-        return "}\r\n";
+    public GraphTextWriter getActionSourceSuffix(GraphTextWriter writer) {
+        writer.unindent();
+        return writer.appendNoHilight("}").newLine();
+    }
+
+    @Override
+    public int getPrefixLineCount() {
+        return 1;
+    }
+
+    @Override
+    public String removePrefixAndSuffix(String source) {
+        return Helper.unindentRows(1, 1, source);
     }
 
     @Override
     public String getExportFileName(List<Tag> tags) {
         return eventFlags.getHeader(keyCode, true);
-    }
-
-    @Override
-    public int getActionSourceIndent() {
-        return 1;
     }
 }
