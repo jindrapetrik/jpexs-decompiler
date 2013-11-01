@@ -15,4 +15,5 @@
 ^trunk/build_exe\.xml$
 ^trunk/coverage\.ec$
 ^trunk/libsrc/jsyntaxpane/jsyntaxpane/src/target$
+^trunk/hs_err_pid.*.log$
 \.~.*$ 
