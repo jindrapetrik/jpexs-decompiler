@@ -65,7 +65,7 @@ public class ScriptInfo {
         return ret;
     }
 
-    public int removeTraps(int scriptIndex, ABC abc, String path) {
+    public int removeTraps(int scriptIndex, ABC abc, String path) throws InterruptedException {
         return traits.removeTraps(scriptIndex, -1, true, abc, path);
     }
 

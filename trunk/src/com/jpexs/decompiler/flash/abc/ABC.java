@@ -99,7 +99,7 @@ public class ABC {
         }
     }
 
-    public int removeTraps() {
+    public int removeTraps() throws InterruptedException {
         int rem = 0;
         for (int s = 0; s < script_info.length; s++) {
             rem += script_info[s].removeTraps(s, this, "");

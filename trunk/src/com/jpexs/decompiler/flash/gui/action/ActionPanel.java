@@ -704,8 +704,12 @@ public class ActionPanel extends JPanel implements ActionListener {
         }
         if (e.getActionCommand().equals("GRAPH")) {
             if (lastCode != null) {
-                GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
-                gf.setVisible(true);
+                try {
+                    GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
+                    gf.setVisible(true);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         } else if (e.getActionCommand().equals("EDITACTION")) {
             setEditMode(true);

@@ -1873,7 +1873,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         return ret;
     }
 
-    public void renameIdentifier(String identifier) {
+    public void renameIdentifier(String identifier) throws InterruptedException {
         String oldName = identifier;
         String newName = View.showInputDialog(translate("rename.enternew"), oldName);
         if (newName != null) {
@@ -2602,7 +2602,11 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             @Override
                             public void run() {
                                 Main.startWork(translate("work.renaming") + "...");
-                                renameIdentifier(identifier);
+                                try {
+                                    renameIdentifier(identifier);
+                                } catch (InterruptedException ex) {
+                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                                 Main.stopWork();
                             }
                         }).start();

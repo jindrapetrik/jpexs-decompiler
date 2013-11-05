@@ -64,7 +64,7 @@ public class Graph {
 
     }
 
-    public void init(List<Object> localData) {
+    public void init(List<Object> localData) throws InterruptedException {
         if (heads != null) {
             return;
         }
@@ -89,17 +89,20 @@ public class Graph {
         }
     }
 
-    private void fixGraph(List<Object> localData, GraphPart part) {
+    private void fixGraph(List<Object> localData, GraphPart part) throws InterruptedException {
         //if(true) return;
         try {
             while (fixGraphOnce(localData, part, new ArrayList<GraphPart>(), false)) {
             }
+        } catch (InterruptedException ex) {
+            throw ex;
         } catch (Exception | Error ex) {
+            String s = ex.toString();
             //ignore
         }
     }
 
-    private boolean fixGraphOnce(List<Object> localData, GraphPart part, List<GraphPart> visited, boolean doChildren) {
+    private boolean fixGraphOnce(List<Object> localData, GraphPart part, List<GraphPart> visited, boolean doChildren) throws InterruptedException {
         if (visited.contains(part)) {
             return false;
         }
@@ -371,11 +374,11 @@ public class Graph {
     /* public GraphPart getNextCommonPart(GraphPart part, List<Loop> loops) {
      return getNextCommonPart(part, new ArrayList<GraphPart>(),loops);
      }*/
-    public GraphPart getNextCommonPart(List<Object> localData, GraphPart part, List<Loop> loops) {
+    public GraphPart getNextCommonPart(List<Object> localData, GraphPart part, List<Loop> loops) throws InterruptedException {
         return getCommonPart(localData, part.nextParts, loops);
     }
 
-    public GraphPart getCommonPart(List<Object> localData, List<GraphPart> parts, List<Loop> loops) {
+    public GraphPart getCommonPart(List<Object> localData, List<GraphPart> parts, List<Loop> loops) throws InterruptedException {
         if (parts.isEmpty()) {
             return null;
         }
@@ -435,7 +438,7 @@ public class Graph {
         return null;
     }
 
-    public GraphPart getMostCommonPart(List<Object> localData, List<GraphPart> parts, List<Loop> loops) {
+    public GraphPart getMostCommonPart(List<Object> localData, List<GraphPart> parts, List<Loop> loops) throws InterruptedException {
         if (parts.isEmpty()) {
             return null;
         }
@@ -576,13 +579,13 @@ public class Graph {
         return part;
     }
 
-    public static List<GraphTargetItem> translateViaGraph(List<Object> localData, String path, GraphSource code, List<Integer> alternateEntries, int staticOperation) {
+    public static List<GraphTargetItem> translateViaGraph(List<Object> localData, String path, GraphSource code, List<Integer> alternateEntries, int staticOperation) throws InterruptedException {
         Graph g = new Graph(code, alternateEntries);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
 
-    public List<GraphTargetItem> translate(List<Object> localData, int staticOperation, String path) {
+    public List<GraphTargetItem> translate(List<Object> localData, int staticOperation, String path) throws InterruptedException {
         List<GraphPart> allParts = new ArrayList<>();
         for (GraphPart head : heads) {
             populateParts(head, allParts);
@@ -778,7 +781,7 @@ public class Graph {
         return false;
     }
 
-    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) {
+    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         return null;
     }
 
@@ -787,13 +790,13 @@ public class Graph {
     }
 
     @SuppressWarnings("unchecked")
-    protected GraphTargetItem translatePartGetStack(List<Object> localData, GraphPart part, Stack<GraphTargetItem> stack, int staticOperation) {
+    protected GraphTargetItem translatePartGetStack(List<Object> localData, GraphPart part, Stack<GraphTargetItem> stack, int staticOperation) throws InterruptedException {
         stack = (Stack<GraphTargetItem>) stack.clone();
         translatePart(localData, part, stack, staticOperation, null);
         return stack.pop();
     }
 
-    protected List<GraphTargetItem> translatePart(List<Object> localData, GraphPart part, Stack<GraphTargetItem> stack, int staticOperation, String path) {
+    protected List<GraphTargetItem> translatePart(List<Object> localData, GraphPart part, Stack<GraphTargetItem> stack, int staticOperation, String path) throws InterruptedException {
         List<GraphPart> sub = part.getSubParts();
         List<GraphTargetItem> ret = new ArrayList<>();
         int end;
@@ -854,7 +857,7 @@ public class Graph {
         list.remove(list.size() - 1);
     }
 
-    protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, int staticOperation, String path) {
+    protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, int staticOperation, String path) throws InterruptedException {
         return printGraph(visited, localData, stack, allParts, parent, part, stopPart, loops, null, staticOperation, path);
     }
 
@@ -862,7 +865,7 @@ public class Graph {
         return loopItem;
     }
 
-    private void getPrecontinues(List<Object> localData, GraphPart parent, GraphPart part, List<Loop> loops, List<GraphPart> stopPart) {
+    private void getPrecontinues(List<Object> localData, GraphPart parent, GraphPart part, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
         markLevels(localData, part, loops);
         //Note: this also marks part as precontinue when there is if
         /*
@@ -914,13 +917,13 @@ public class Graph {
          clearLoops(loops);*/
     }
 
-    private void markLevels(List<Object> localData, GraphPart part, List<Loop> loops) {
+    private void markLevels(List<Object> localData, GraphPart part, List<Loop> loops) throws InterruptedException {
         clearLoops(loops);
         markLevels(localData, part, loops, new ArrayList<GraphPart>(), 1, new ArrayList<GraphPart>());
         clearLoops(loops);
     }
 
-    private void markLevels(List<Object> localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart, int level, List<GraphPart> visited) {
+    private void markLevels(List<Object> localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart, int level, List<GraphPart> visited) throws InterruptedException {
         boolean debugMode = false;
         if (stopPart == null) {
             stopPart = new ArrayList<>();
@@ -1062,13 +1065,13 @@ public class Graph {
         }
     }
 
-    private void getLoops(List<Object> localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart) {
+    private void getLoops(List<Object> localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
         clearLoops(loops);
         getLoops(localData, part, loops, stopPart, true, 1, new ArrayList<GraphPart>());
         clearLoops(loops);
     }
 
-    private void getLoops(List<Object> localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart, boolean first, int level, List<GraphPart> visited) {
+    private void getLoops(List<Object> localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart, boolean first, int level, List<GraphPart> visited) throws InterruptedException {
         boolean debugMode = false;
 
         if (stopPart == null) {
@@ -1349,7 +1352,7 @@ public class Graph {
         }
     }
 
-    protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path) {
+    protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path) throws InterruptedException {
         if (stopPart == null) {
             stopPart = new ArrayList<>();
         }

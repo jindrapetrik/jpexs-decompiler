@@ -529,7 +529,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {
+    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         int iInitializer = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
         int ret = 0;
         if (iInitializer != -1) {

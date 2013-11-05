@@ -1913,7 +1913,7 @@ public class SWF {
     }
     HashMap<String, Integer> typeCounts = new HashMap<>();
 
-    public int deobfuscateIdentifiers(RenameType renameType) {
+    public int deobfuscateIdentifiers(RenameType renameType) throws InterruptedException {
         findFileAttributes();
         if (fileAttributes == null) {
             int cnt = 0;
@@ -1929,17 +1929,17 @@ public class SWF {
         }
     }
 
-    public void renameAS2Identifier(String identifier, String newname) {
+    public void renameAS2Identifier(String identifier, String newname) throws InterruptedException {
         Map<String, String> selected = new HashMap<>();
         selected.put(identifier, newname);
         renameAS2Identifiers(null, selected);
     }
 
-    public int deobfuscateAS2Identifiers(RenameType renameType) {
+    public int deobfuscateAS2Identifiers(RenameType renameType) throws InterruptedException {
         return renameAS2Identifiers(renameType, null);
     }
 
-    private int renameAS2Identifiers(RenameType renameType, Map<String, String> selected) {
+    private int renameAS2Identifiers(RenameType renameType, Map<String, String> selected) throws InterruptedException {
         actionsMap = new HashMap<>();
         allFunctions = new ArrayList<>();
         allVariableNames = new ArrayList<>();

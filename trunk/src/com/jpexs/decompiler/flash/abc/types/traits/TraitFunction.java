@@ -96,7 +96,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {
+    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
             return abc.bodies[bodyIndex].removeTraps(abc.constants, abc, this, scriptIndex, classIndex, isStatic, path);
