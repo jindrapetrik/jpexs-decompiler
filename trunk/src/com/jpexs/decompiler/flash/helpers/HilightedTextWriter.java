@@ -17,8 +17,6 @@
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.Configuration;
-import static com.jpexs.decompiler.flash.helpers.HilightType.CLASS;
-import static com.jpexs.decompiler.flash.helpers.HilightType.SPECIAL;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.helpers.Helper;
@@ -35,16 +33,11 @@ import java.util.Stack;
  */
 public class HilightedTextWriter extends GraphTextWriter {
     
-    public static final String INDENT_STRING = "   ";
-    public static final String NEW_LINE = "\r\n";
     private StringBuilder sb = new StringBuilder();
     private boolean hilight;
     private boolean newLine = true;
     private int indent = 0;
     private Stack<GraphSourceItemPosition> offsets = new Stack<>();
-    private Stack<Boolean> stringAddedStack = new Stack<>();
-    private boolean stringAdded = false;
-    private long startTime;
     private boolean toStringCalled = false;
     private int newLineCount = 0;
 
@@ -56,12 +49,10 @@ public class HilightedTextWriter extends GraphTextWriter {
     public List<Highlighting> specialHilights = new ArrayList<>();
     
     public HilightedTextWriter(boolean hilight) {
-        startTime = System.currentTimeMillis();
         this.hilight = hilight;
     }
 
     public HilightedTextWriter(boolean hilight, int indent) {
-        startTime = System.currentTimeMillis();
         this.hilight = hilight;
         this.indent = indent;
     }
@@ -232,27 +223,11 @@ public class HilightedTextWriter extends GraphTextWriter {
     public HilightedTextWriter stripSemicolon() {
         // hack
         if (sb.charAt(sb.length() - 1) == ';') {
-            sb.setLength(sb.length() - 1);
+            // todo: remove later
+            // probably this code branch is not executed anymore
+            sb.append("TODO_REMOVE_SEMICOLON");
         }
         return this;
-    }
-    
-    @Override
-    public void setLength(int length) {
-        if (length >= sb.length()) {
-            return;
-        }
-        
-        String remove = sb.substring(length);
-        int removedNewLines = 0;
-        for (int i = 0; i < remove.length(); i++) {
-            if (remove.charAt(i) == '\n') {
-                removedNewLines++;
-            }
-        }
-        newLineCount -= removedNewLines;
-        
-        sb.setLength(length);
     }
     
     @Override
@@ -279,19 +254,6 @@ public class HilightedTextWriter extends GraphTextWriter {
         }
         toStringCalled = true;
         return sb.toString();
-    }
-    
-    @Override
-    public void mark() {
-        stringAddedStack.add(stringAdded);
-        stringAdded = false;
-    }
-    
-    @Override
-    public boolean getMark() {
-        boolean result = stringAdded;
-        stringAdded = stringAddedStack.pop() || result;
-        return result;
     }
     
     private HilightedTextWriter start(Map<String, String> data, HilightType type) {
@@ -338,7 +300,6 @@ public class HilightedTextWriter extends GraphTextWriter {
             appendIndent();
         }
         sb.append(str);
-        stringAdded = true;
     }
     
     private void appendIndent() {

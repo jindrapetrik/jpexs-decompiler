@@ -115,30 +115,35 @@ public class MethodBody implements Cloneable, Serializable {
     }
 
     public HilightedTextWriter toString(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits) {
-        convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+        convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, true);
         HilightedTextWriter writer = new HilightedTextWriter(false);
         toString(path, exportMode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, fullyQualifiedNames, initTraits);
         return writer;
     }
     
-    public void convert(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits) {
+    public void convert(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
         if (exportMode == ExportMode.SOURCE) {
-            int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
+            int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod");
             try {
-                Helper.timedCall(new Callable<Void>() {
+                Callable<Void> callable = new Callable<Void>() {
                     @Override
-                    public Void call() throws Exception {
+                    public Void call() {
                         MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
                         HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                         convertedItems = converted.code.toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), converted.code.visitCode(converted));
                         Graph.graphToString(convertedItems, new NulWriter(), LocalData.create(constants, localRegNames, fullyQualifiedNames));
                         return null;
                     }
-                }, timeout, TimeUnit.SECONDS);
-            } catch (InterruptedException | TimeoutException | ExecutionException ex) {
+                };
+                if (firstLevel) {
+                    Helper.timedCall(callable, timeout, TimeUnit.SECONDS);
+                } else {
+                    callable.call();
+                }
+            } catch (Exception ex) {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
                 convertException = ex;
                 if (ex instanceof ExecutionException && ex.getCause() instanceof Exception) {
@@ -163,7 +168,7 @@ public class MethodBody implements Cloneable, Serializable {
                 return writer;
             }
             writer.indent();
-            int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
+            int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod");
 
             if (convertException == null) {
                 HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
@@ -195,7 +200,7 @@ public class MethodBody implements Cloneable, Serializable {
         MethodBody b = (MethodBody) Helper.deepCopy(this);
         AVM2Code deobfuscated = b.code;
         deobfuscated.markMappedOffsets();
-        if (Configuration.getConfig("autoDeobfuscate", true)) {
+        if (Configuration.getConfig("autoDeobfuscate")) {
             try {
                 deobfuscated.removeTraps(constants, trait, method_info[this.method_info], b, abc, scriptIndex, classIndex, isStatic, path);
             } catch (Exception | StackOverflowError ex) {

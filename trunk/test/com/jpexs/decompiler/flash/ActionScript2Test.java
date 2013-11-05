@@ -43,7 +43,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
         DoActionTag doa = getFrameSource(frame);
         assertNotNull(doa);
         HilightedTextWriter writer = new HilightedTextWriter(false);
-        Action.actionsToSource(doa.getActions(swf.version), swf.version, "", writer);
+        Action.actionsToSource(doa, doa.getActions(swf.version), swf.version, "", writer);
         String actualResult = writer.toString().replaceAll("[ \r\n]", "");
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);

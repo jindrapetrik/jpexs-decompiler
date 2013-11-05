@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
@@ -54,6 +54,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -252,10 +256,21 @@ public class TagNode {
         return count;
     }
 
-    public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, ExportMode exportMode) throws IOException {
-        AtomicInteger cnt = new AtomicInteger(1);
-        int totalCount = TagNode.getTagCountRecursive(nodeList);
-        return exportNodeAS(allTags, handler, nodeList, outdir, exportMode, cnt, totalCount, null);
+    public static List<File> exportNodeAS(final List<Tag> allTags, final AbortRetryIgnoreHandler handler, final List<TagNode> nodeList, final String outdir, final ExportMode exportMode, final EventListener ev) throws IOException {
+        try {
+            List<File> result = Helper.timedCall(new Callable<List<File>>() {
+
+                @Override
+                public List<File> call() throws Exception {
+                    AtomicInteger cnt = new AtomicInteger(1);
+                    int totalCount = TagNode.getTagCountRecursive(nodeList);
+                    return exportNodeAS(allTags, handler, nodeList, outdir, exportMode, cnt, totalCount, ev);
+                }
+            }, Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
+            return result;
+        } catch (ExecutionException | InterruptedException | TimeoutException ex) {
+        }
+        return null;
     }
 
     public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, ExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
@@ -292,46 +307,41 @@ public class TagNode {
                     do {
                         retry = false;
                         try {
+                            String f = outdir + name + ".as";
+                            int currentIndex = index.getAndIncrement();
+                            if (ev != null) {
+                                ev.handleEvent("exporting", "Exporting " + currentIndex + "/" + count + " " + f);
+                            }
+
                             long startTime = System.currentTimeMillis();
 
-                            String f = outdir + name + ".as";
                             File file = new File(f);
-                            String res;
                             ASMSource asm = ((ASMSource) node.tag);
-                            if (exportMode == ExportMode.HEX) {
-                                HilightedTextWriter writer = new HilightedTextWriter(false);
-                                asm.getActionSourcePrefix(writer);
-                                asm.getActionBytesAsHex(writer);
-                                asm.getActionSourceSuffix(writer);
-                                res = writer.toString();
-                            } else if (exportMode != ExportMode.SOURCE) {
-                                HilightedTextWriter writer = new HilightedTextWriter(false);
-                                asm.getActionSourcePrefix(writer);
-                                asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, null);
-                                asm.getActionSourceSuffix(writer);
-                                res = writer.toString();
-                            } else {
-                                List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
-                                Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                                HilightedTextWriter writer = new HilightedTextWriter(false);
-                                asm.getActionSourcePrefix(writer);
-                                Action.actionsToSource(as, SWF.DEFAULT_VERSION, ""/*FIXME*/, writer);
-                                asm.getActionSourceSuffix(writer);
-                                res = writer.toString();
-                            }
-                            try (FileOutputStream fos = new FileOutputStream(f)) {
-                                fos.write(res.getBytes("utf-8"));
+                            try (FileTextWriter writer = new FileTextWriter(new FileOutputStream(f))) {
+                                if (exportMode == ExportMode.HEX) {
+                                    asm.getActionSourcePrefix(writer);
+                                    asm.getActionBytesAsHex(writer);
+                                    asm.getActionSourceSuffix(writer);
+                                } else if (exportMode != ExportMode.SOURCE) {
+                                    asm.getActionSourcePrefix(writer);
+                                    asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, null);
+                                    asm.getActionSourceSuffix(writer);
+                                } else {
+                                    List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
+                                    Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
+                                    Action.actionsToSource(asm, as, SWF.DEFAULT_VERSION, ""/*FIXME*/, writer);
+                                }
                             }
 
                             long stopTime = System.currentTimeMillis();
 
                             if (ev != null) {
                                 long time = stopTime - startTime;
-                                ev.handleEvent("export", "Exported " + index.getAndIncrement() + "/" + count + " " + f + ", " + Helper.formatTimeSec(time));
+                                ev.handleEvent("exported", "Exported " + currentIndex + "/" + count + " " + f + ", " + Helper.formatTimeSec(time));
                             }
 
                             ret.add(file);
-                        } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
+                        } catch (IOException | OutOfMemoryError | StackOverflowError ex) {
                             Logger.getLogger(TagNode.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
                             if (handler != null) {
                                 int action = handler.getNewInstance().handle(ex);

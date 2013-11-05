@@ -98,7 +98,9 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.graph.ExportMode;
+import com.jpexs.helpers.AsyncResult;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.Callback;
 import com.jpexs.helpers.Helper;
 import com.jpexs.process.ProcessTools;
 import java.awt.BorderLayout;
@@ -159,6 +161,8 @@ import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -235,6 +239,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     public LoadingPanel loadingPanel = new LoadingPanel(20, 20);
     public JLabel statusLabel = new JLabel("");
     public JPanel statusPanel = new JPanel();
+    public JButton cancelButton = new JButton();
+    public Runnable cancelButtonPressed;
     public JProgressBar progressBar = new JProgressBar(0, 100);
     private DeobfuscationDialog deobfuscationDialog;
     public JTree tagTree;
@@ -296,21 +302,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     public static final String FLASH_VIEWER_CARD = "FLASHVIEWER";
     public static final String INTERNAL_VIEWER_CARD = "INTERNALVIEWER";
     private Map<Integer, String> sourceFontsMap = new HashMap<>();
-    private AbortRetryIgnoreHandler errorHandler = new AbortRetryIgnoreHandler() {
-        @Override
-        public int handle(Throwable thrown) {
-            synchronized (MainFrame.class) {
-                String[] options = new String[]{translate("button.abort"), translate("button.retry"), translate("button.ignore")};
-                return View.showOptionDialog(null, translate("error.occured").replace("%error%", thrown.getLocalizedMessage()), translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, options, "");
-            }
-        }
-
-        @Override
-        public AbortRetryIgnoreHandler getNewInstance() {
-            // there are no non-static field in this class, so return the original instance
-            return this;
-        }
-    };
+    private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
+    private FutureTask<Void> setSourceTask;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -346,13 +339,15 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         statusLabel.setText(s);
     }
 
-    public void setWorkStatus(String s) {
+    public void setWorkStatus(String s, Runnable cancelCallback) {
         if (s.equals("")) {
             loadingPanel.setVisible(false);
         } else {
             loadingPanel.setVisible(true);
         }
         statusLabel.setText(s);
+        cancelButtonPressed = cancelCallback;
+        cancelButton.setVisible(cancelCallback != null);
     }
 
     private String fixCommandTitle(String title) {
@@ -1044,14 +1039,31 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         };
 
         tagTree.setCellRenderer(tcr);
+        JPanel statusLeftPanel = new JPanel();
+        statusLeftPanel.setLayout(new BoxLayout(statusLeftPanel, BoxLayout.X_AXIS));
         loadingPanel.setPreferredSize(new Dimension(30, 30));
+        // todo: this button is a little bit ugly in the UI. Maybe it can be changed to an icon (as in NetBeans)
+        cancelButton.setText(translate("button.cancel"));
+        cancelButton.setPreferredSize(new Dimension(100, 30));
+        cancelButton.setBorderPainted(false);
+        cancelButton.setOpaque(false);
+        cancelButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (cancelButtonPressed != null) {
+                    cancelButtonPressed.run();
+                }
+            }
+        });
+        statusLeftPanel.add(loadingPanel);
+        statusLeftPanel.add(statusLabel);
+        statusLeftPanel.add(cancelButton);
         statusPanel = new JPanel();
         statusPanel.setPreferredSize(new Dimension(1, 30));
         statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
         statusPanel.setLayout(new BorderLayout());
-        statusPanel.add(loadingPanel, BorderLayout.WEST);
-        statusPanel.add(statusLabel, BorderLayout.CENTER);
-
+        statusPanel.add(statusLeftPanel, BorderLayout.WEST);
 
         errorNotificationButton = new JButton("");
         errorNotificationButton.setIcon(View.getIcon("okay16"));
@@ -1065,8 +1077,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         errorNotificationButton.setToolTipText(translate("errors.none"));
         statusPanel.add(errorNotificationButton, BorderLayout.EAST);
 
-
         loadingPanel.setVisible(false);
+        cancelButton.setVisible(false);
         cnt.add(statusPanel, BorderLayout.SOUTH);
 
         if (swf != null) {
@@ -2185,7 +2197,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 allNodes.add(asn);
                 TagNode.setExport(allNodes, false);
                 TagNode.setExport(actionNodes, true);
-                ret.addAll(TagNode.exportNodeAS(swf.tags, handler, allNodes, selFile, exportMode));
+                ret.addAll(TagNode.exportNodeAS(swf.tags, handler, allNodes, selFile, exportMode, null));
             }
         }
         return ret;
@@ -2790,7 +2802,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
             case "RESTORECONTROLFLOW":
             case "RESTORECONTROLFLOWALL":
-                Main.startWork("Restoring control flow...");
+                Main.startWork(translate("work.restoringControlFlow"));
                 final boolean all = e.getActionCommand().endsWith("ALL");
                 if ((!all) || confirmExperimental()) {
                     new SwingWorker() {
@@ -2982,33 +2994,48 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
             if (!Main.isWorking()) {
-                Main.startWork(translate("work.decompiling") + "...");
-                (new Thread() {
+                Main.startWork(translate("work.decompiling") + "...", new Runnable() {
+
                     @Override
                     public void run() {
-                        View.execInEventDispatch(new Runnable() {
-                            @Override
-                            public void run() {
-                                int classIndex = -1;
-                                for (Trait t : scriptLeaf.abc.script_info[scriptLeaf.scriptIndex].traits.traits) {
-                                    if (t instanceof TraitClass) {
-                                        classIndex = ((TraitClass) t).class_info;
-                                        break;
-                                    }
-                                }
-                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");
-                                abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
-                                abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
-                                abcPanel.setAbc(scriptLeaf.abc);
-                                abcPanel.decompiledTextArea.setScript(scriptLeaf, abcList);
-                                abcPanel.decompiledTextArea.setClassIndex(classIndex);
-                                abcPanel.decompiledTextArea.setNoTrait();
-                                Main.stopWork();
-                            }
-                        });
+                        if (setSourceTask != null) {
+                            setSourceTask.cancel(true);
+                        }
+                        abcPanel.decompiledTextArea.setText("//" + AppStrings.translate("work.canceled"));
                     }
-                }).start();
+                });
+                
+                FutureTask<Void> task = Helper.callAsync(new Callable<Void>() {
+
+                    @Override
+                    public Void call() throws Exception {
+                        int classIndex = -1;
+                        for (Trait t : scriptLeaf.abc.script_info[scriptLeaf.scriptIndex].traits.traits) {
+                            if (t instanceof TraitClass) {
+                                classIndex = ((TraitClass) t).class_info;
+                                break;
+                            }
+                        }
+                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");
+                        abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
+                        abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
+                        abcPanel.setAbc(scriptLeaf.abc);
+                        abcPanel.decompiledTextArea.setScript(scriptLeaf, abcList);
+                        abcPanel.decompiledTextArea.setClassIndex(classIndex);
+                        abcPanel.decompiledTextArea.setNoTrait();
+                        return null;
+                    }
+                }, new Callback<AsyncResult<Void>>() {
+
+                    @Override
+                    public void call(AsyncResult<Void> arg1) {
+                        setSourceTask = null;
+                        Main.stopWork();
+                    }
+                });
+                setSourceTask = task;
             }
+            
             showDetail(DETAILCARDAS3NAVIGATOR);
             showCard(CARDACTIONSCRIPTPANEL);
             return;

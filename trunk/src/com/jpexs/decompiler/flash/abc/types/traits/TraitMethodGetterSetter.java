@@ -18,9 +18,8 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import static com.jpexs.decompiler.flash.abc.types.traits.Trait.TRAIT_GETTER;
-import static com.jpexs.decompiler.flash.abc.types.traits.Trait.TRAIT_SETTER;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -39,7 +38,7 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public void convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
+    public void convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
     }
 
     @Override
@@ -72,13 +71,13 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
+    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames);
-        convertHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, fullyQualifiedNames, parallel);
+        convertHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (!(classIndex != -1 && abc.instance_info[classIndex].isInterface() || bodyIndex == -1)) {
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, fullyQualifiedNames, null);
+                abc.bodies[bodyIndex].convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, fullyQualifiedNames, null, true);
             }
         }
     }

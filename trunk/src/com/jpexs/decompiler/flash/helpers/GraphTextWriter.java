@@ -25,7 +25,13 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
  */
 public class GraphTextWriter {
     
+    public static final String INDENT_STRING = "   ";
+    public static final String NEW_LINE = "\r\n";
+    protected long startTime;
+    protected long suspendTime;
+
     public GraphTextWriter() {
+        startTime = System.currentTimeMillis();
     }
 
     public boolean getIsHighlighted() {
@@ -132,9 +138,6 @@ public class GraphTextWriter {
         return this;
     }
     
-    public void setLength(int length) {
-    }
-    
     public int getLength() {
         return 0;
     }
@@ -143,15 +146,17 @@ public class GraphTextWriter {
         return 0;
     }
     
+    public void suspendMeasure() {
+        suspendTime = System.currentTimeMillis();
+    }
+    
+    public void continueMeasure() {
+        long time = System.currentTimeMillis();
+        startTime += time - suspendTime;
+    }
+    
     @Override
     public String toString() {
         return "";
-    }
-    
-    public void mark() {
-    }
-    
-    public boolean getMark() {
-        return false;
     }
 }

@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
@@ -452,13 +452,9 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             script = abc.script_info[scriptIndex];
         }
         if (!cache.contains(scriptLeaf)) {
-            for (int scriptTraitIndex : scriptLeaf.traitIndices) {
-                script.traits.traits[scriptTraitIndex].convertPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, ExportMode.SOURCE, scriptIndex, -1, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true));
-            }
+            boolean parallel = Configuration.getConfig("parallelSpeedUp", true);
             HilightedTextWriter writer = new HilightedTextWriter(true);
-            for (int scriptTraitIndex : scriptLeaf.traitIndices) {
-                script.traits.traits[scriptTraitIndex].toStringPackaged(null, scriptLeaf.getPath().toString(), abcList, abc, false, ExportMode.SOURCE, scriptIndex, -1, writer, new ArrayList<String>(), Configuration.getConfig("parallelSpeedUp", true));
-            }
+            scriptLeaf.toSource(writer, abcList, script.traits.traits, ExportMode.SOURCE, parallel);
             hilightedCode = new HilightedText(writer);
             cache.put(scriptLeaf, new CachedDecompilation(hilightedCode));
         }
@@ -480,7 +476,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             this.script = scriptLeaf;
             return;
         }
-        setText("//" + translate("pleasewait") + "...");
+        setText("//" + AppStrings.translate("pleasewait") + "...");
 
         this.abc = abc;
         this.abcList = abcList;
@@ -494,18 +490,12 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         traitHighlights = cd.getTraitHighlights();
         methodHighlights = cd.getMethodHighlights();
         classHighlights = cd.getClassHighlights();
-        View.execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                if (hilightedCode.length() > 1024 * 1024 * 2/*2MB*/) {
-                    setContentType("text/plain");
-                } else {
-                    setContentType("text/actionscript");
-                }
-                setText(hilightedCode);
-            }
-        });
-
+        if (hilightedCode.length() > 1024 * 1024 * 2/*2MB*/) {
+            setContentType("text/plain");
+        } else {
+            setContentType("text/actionscript");
+        }
+        setText(hilightedCode);
     }
 
     public void reloadClass() {

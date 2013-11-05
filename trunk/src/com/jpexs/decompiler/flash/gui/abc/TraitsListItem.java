@@ -6,6 +6,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
 import java.util.ArrayList;
@@ -68,12 +69,12 @@ public class TraitsListItem {
     public String toString() {
         String s = "";
         if ((type != Type.INITIALIZER) && isStatic) {
-            abc.class_info[classIndex].static_traits.traits[index].convertHeader(null, "", abcTags, abc, true, ExportMode.SOURCE, scriptIndex, classIndex, new ArrayList<String>(), false);
+            abc.class_info[classIndex].static_traits.traits[index].convertHeader(null, "", abcTags, abc, true, ExportMode.SOURCE, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
             HilightedTextWriter writer = new HilightedTextWriter(false);
             abc.class_info[classIndex].static_traits.traits[index].toStringHeader(null, "", abcTags, abc, true, ExportMode.SOURCE, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
             s = writer.toString();
         } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-            abc.instance_info[classIndex].instance_traits.traits[index].convertHeader(null, "", abcTags, abc, false, ExportMode.SOURCE, scriptIndex, classIndex, new ArrayList<String>(), false);
+            abc.instance_info[classIndex].instance_traits.traits[index].convertHeader(null, "", abcTags, abc, false, ExportMode.SOURCE, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
             HilightedTextWriter writer = new HilightedTextWriter(false);
             abc.instance_info[classIndex].instance_traits.traits[index].toStringHeader(null, "", abcTags, abc, false, ExportMode.SOURCE, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
             s = writer.toString();

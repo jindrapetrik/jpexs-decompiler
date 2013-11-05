@@ -607,7 +607,38 @@ public class Helper {
     public static <T> T timedCall(Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
         FutureTask<T> task = new FutureTask<>(c);
         THREAD_POOL.execute(task);
-        return task.get(timeout, timeUnit);
+        try {
+            return task.get(timeout, timeUnit);
+        } finally {
+            task.cancel(true);
+        }
+    }
+
+    public static <T> FutureTask<T> callAsync(final Callable<T> c) {
+        return callAsync(c, null);
+    }
+
+    public static <T> FutureTask<T> callAsync(final Callable<T> c, final Callback<AsyncResult<T>> callback) {
+        FutureTask<T> task = new FutureTask<>(new Callable<T>() {
+
+            @Override
+            public T call() throws Exception {
+                try {
+                    T t = c.call();
+                    if (callback != null) {
+                        callback.call(new AsyncResult<>(t, null));
+                    }
+                    return t;
+                } catch (Throwable ex) {
+                    if (callback != null) {
+                        callback.call(new AsyncResult<T>(null, ex));
+                    }
+                    throw ex;
+                }
+            }
+        });
+        THREAD_POOL.execute(task);
+        return task;
     }
 
     public static boolean contains(int[] array, int value) {
@@ -628,5 +659,9 @@ public class Helper {
                 fos.flush();
             }
         }
+    }
+
+    public static List<File> timedCall(Callable<List<File>> callable, int DECOMPILATION_TIMEOUT) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

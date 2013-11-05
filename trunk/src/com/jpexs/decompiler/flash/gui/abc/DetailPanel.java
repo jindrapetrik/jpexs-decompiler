@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
@@ -40,13 +40,13 @@ public class DetailPanel extends JPanel implements ActionListener {
     public MethodTraitDetailPanel methodTraitPanel;
     public JPanel unsupportedTraitPanel;
     public SlotConstTraitDetailPanel slotConstTraitPanel;
-    public static final String METHOD_TRAIT_CARD = translate("abc.detail.methodtrait");
-    public static final String UNSUPPORTED_TRAIT_CARD = translate("abc.detail.unsupported");
-    public static final String SLOT_CONST_TRAIT_CARD = translate("abc.detail.slotconsttrait");
+    public static final String METHOD_TRAIT_CARD = AppStrings.translate("abc.detail.methodtrait");
+    public static final String UNSUPPORTED_TRAIT_CARD = AppStrings.translate("abc.detail.unsupported");
+    public static final String SLOT_CONST_TRAIT_CARD = AppStrings.translate("abc.detail.slotconsttrait");
     private JPanel innerPanel;
-    public JButton saveButton = new JButton(translate("button.save"), View.getIcon("save16"));
-    public JButton editButton = new JButton(translate("button.edit"), View.getIcon("edit16"));
-    public JButton cancelButton = new JButton(translate("button.cancel"), View.getIcon("cancel16"));
+    public JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
+    public JButton editButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    public JButton cancelButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
     private HashMap<String, JComponent> cardMap = new HashMap<>();
     private String selectedCard;
     private JLabel selectedLabel;
@@ -64,7 +64,7 @@ public class DetailPanel extends JPanel implements ActionListener {
         cardMap.put(METHOD_TRAIT_CARD, methodTraitPanel);
 
         unsupportedTraitPanel = new JPanel(new BorderLayout());
-        JLabel unsup = new JLabel(translate("info.selecttrait"), SwingConstants.CENTER);
+        JLabel unsup = new JLabel(AppStrings.translate("info.selecttrait"), SwingConstants.CENTER);
         unsupportedTraitPanel.add(unsup, BorderLayout.CENTER);
 
         cardMap.put(UNSUPPORTED_TRAIT_CARD, unsupportedTraitPanel);
@@ -175,7 +175,7 @@ public class DetailPanel extends JPanel implements ActionListener {
                     int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
                     abcPanel.decompiledTextArea.reloadClass();
                     abcPanel.decompiledTextArea.gotoTrait(lasttrait);
-                    View.showMessageDialog(this, translate("message.trait.saved"));
+                    View.showMessageDialog(this, AppStrings.translate("message.trait.saved"));
                 }
             }
         }

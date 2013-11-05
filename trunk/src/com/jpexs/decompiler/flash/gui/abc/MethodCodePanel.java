@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -99,20 +99,20 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         JButton graphButton = new JButton(View.getIcon("graph16"));
         graphButton.setActionCommand("GRAPH");
         graphButton.addActionListener(this);
-        graphButton.setToolTipText(translate("button.viewgraph"));
+        graphButton.setToolTipText(AppStrings.translate("button.viewgraph"));
         graphButton.setMargin(new Insets(3, 3, 3, 3));
 
         hexButton = new JToggleButton(View.getIcon("hex16"));
         hexButton.setActionCommand("HEX");
         hexButton.addActionListener(this);
-        hexButton.setToolTipText(translate("button.viewhex"));
+        hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
         // todo: find icon, and set visible
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
         hexOnlyButton.setActionCommand("HEXONLY");
         hexOnlyButton.addActionListener(this);
-        hexOnlyButton.setToolTipText(translate("button.viewhex"));
+        hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
         hexOnlyButton.setVisible(false);
         

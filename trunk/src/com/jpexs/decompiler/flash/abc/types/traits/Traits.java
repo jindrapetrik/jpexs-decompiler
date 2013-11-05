@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
 import java.io.Serializable;
@@ -84,12 +85,13 @@ public class Traits implements Serializable {
         ExportMode exportMode;
         int scriptIndex;
         int classIndex;
+        NulWriter writer;
         List<String> fullyQualifiedNames;
         int traitIndex;
         boolean parallel;
         Trait parent;
 
-        public TraitConvertTask(Trait trait, Trait parent, boolean makePackages, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, int traitIndex, boolean parallel) {
+        public TraitConvertTask(Trait trait, Trait parent, boolean makePackages, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, int traitIndex, boolean parallel) {
             this.trait = trait;
             this.parent = parent;
             this.makePackages = makePackages;
@@ -100,6 +102,7 @@ public class Traits implements Serializable {
             this.exportMode = exportMode;
             this.scriptIndex = scriptIndex;
             this.classIndex = classIndex;
+            this.writer = writer;
             this.fullyQualifiedNames = fullyQualifiedNames;
             this.traitIndex = traitIndex;
             this.parallel = parallel;
@@ -107,16 +110,10 @@ public class Traits implements Serializable {
 
         @Override
         public Void call() {
-            int h = traitIndex;
-            if (classIndex != -1) {
-                if (!isStatic) {
-                    h = h + abc.class_info[classIndex].static_traits.traits.length;
-                }
-            }
             if (makePackages) {
-                trait.convertPackaged(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, fullyQualifiedNames, parallel);
+                trait.convertPackaged(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             } else {
-                trait.convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, fullyQualifiedNames, parallel);
+                trait.convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             }
             return null;
         }
@@ -153,10 +150,10 @@ public class Traits implements Serializable {
         return writer;
     }
 
-    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
+    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         if (!parallel || traits.length < 2) {
             for (int t = 0; t < traits.length; t++) {
-                TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, fullyQualifiedNames, t, parallel);
+                TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, t, parallel);
                 task.call();
             }
         } else {
@@ -165,7 +162,7 @@ public class Traits implements Serializable {
 
             futureResults = new ArrayList<>();
             for (int t = 0; t < traits.length; t++) {
-                TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, fullyQualifiedNames, t, parallel);
+                TraitConvertTask task = new TraitConvertTask(traits[t], parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, t, parallel);
                 Future<Void> future = executor.submit(task);
                 futureResults.add(future);
             }

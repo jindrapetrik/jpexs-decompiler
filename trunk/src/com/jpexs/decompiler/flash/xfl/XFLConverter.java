@@ -1113,9 +1113,7 @@ public class XFLConverter {
 
     private static String convertActionScript(ASMSource as) {
         HilightedTextWriter writer = new HilightedTextWriter(false);
-        as.getActionSourcePrefix(writer);
-        Action.actionsToSource(as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString(), writer);
-        as.getActionSourceSuffix(writer);
+        Action.actionsToSource(as, as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString(), writer);
         return writer.toString();
     }
 

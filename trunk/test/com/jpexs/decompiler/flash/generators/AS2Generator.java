@@ -36,7 +36,7 @@ public class AS2Generator {
                     continue;
                 }
                 HilightedTextWriter writer = new HilightedTextWriter(false);
-                Action.actionsToSource(doa.getActions(swf.version), swf.version, "", writer);
+                Action.actionsToSource(doa, doa.getActions(swf.version), swf.version, "", writer);
                 String src = writer.toString();
                 if (src.trim().equals("")) {
                     doa = null;

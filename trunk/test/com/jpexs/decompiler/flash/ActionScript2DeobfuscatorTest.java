@@ -75,7 +75,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HilightedTextWriter writer = new HilightedTextWriter(false);
-            Action.actionsToSource(doa.getActions(swf.version), swf.version, "", writer);
+            Action.actionsToSource(doa, doa.getActions(swf.version), swf.version, "", writer);
             String actualResult = writer.toString();
 
             assertTrue(actualResult.contains("case \"c\":"));

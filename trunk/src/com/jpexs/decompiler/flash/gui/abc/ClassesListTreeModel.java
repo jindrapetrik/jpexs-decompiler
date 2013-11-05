@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import java.util.List;
 import javax.swing.event.TreeModelListener;
@@ -164,6 +164,6 @@ public class ClassesListTreeModel implements TreeModel {
 
     @Override
     public String toString() {
-        return translate("node.scripts");
+        return AppStrings.translate("node.scripts");
     }
 }

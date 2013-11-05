@@ -51,6 +51,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -697,10 +698,11 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return String with Source code
      */
-    public static void actionsToSource(final List<Action> actions, final int version, final String path, HilightedTextWriter writer) {
+    public static void actionsToSource(ASMSource asm, final List<Action> actions, final int version, final String path, GraphTextWriter writer) {
+        writer.suspendMeasure();
         List<GraphTargetItem> tree = null;
         Throwable convertException = null;
-        int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
+        int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod");
         try {
             tree = Helper.timedCall(new Callable<List<GraphTargetItem>>() {
                 @Override
@@ -718,7 +720,9 @@ public class Action implements GraphSourceItem {
                 convertException = (Exception) ex.getCause();
             }
         }
+        writer.continueMeasure();
 
+        asm.getActionSourcePrefix(writer);
         if (convertException == null) {
             Graph.graphToString(tree, writer, new LocalData());
         } else if (convertException instanceof TimeoutException) {
@@ -737,6 +741,7 @@ public class Action implements GraphSourceItem {
             writer.appendNoHilight(" */").newLine();
             writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
         }
+        asm.getActionSourceSuffix(writer);
     }
 
     /**

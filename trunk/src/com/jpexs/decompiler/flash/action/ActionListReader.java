@@ -80,7 +80,7 @@ public class ActionListReader {
      * @throws IOException
      */
     public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int version, int ip, int endIp, String path) throws IOException {
-        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
+        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate");
 
         ConstantPool cpool = new ConstantPool();
 
@@ -225,7 +225,7 @@ public class ActionListReader {
             }
         }
 
-        if (Configuration.getConfig("removeNops", true)) {
+        if (Configuration.getConfig("removeNops")) {
             ret = Action.removeNops(0, ret, version, 0, path);
         }
         List<Action> reta = new ArrayList<>();

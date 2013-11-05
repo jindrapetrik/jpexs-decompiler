@@ -26,6 +26,8 @@ import java.util.Stack;
 public class NulWriter extends GraphTextWriter {
     
     private Stack<LoopWithType> loopStack = new Stack<>();
+    private Stack<Boolean> stringAddedStack = new Stack<>();
+    private boolean stringAdded = false;
 
     public NulWriter() {
     }
@@ -86,5 +88,52 @@ public class NulWriter extends GraphTextWriter {
         if (loop.loopId == loopId) {
             loop.used = true;
         }
+    }
+
+    @Override
+    public NulWriter hilightSpecial(String text, String type) {
+        stringAdded = true;
+        return this;
+    }
+    
+    @Override
+    public NulWriter hilightSpecial(String text, String type, int index) {
+        stringAdded = true;
+        return this;
+    }
+    
+    @Override
+    public NulWriter append(String str) {
+        stringAdded = true;
+        return this;
+    }
+
+    @Override
+    public NulWriter append(String str, long offset) {
+        stringAdded = true;
+        return this;
+    }
+
+    @Override
+    public NulWriter appendNoHilight(int i) {
+        stringAdded = true;
+        return this;
+    }
+
+    @Override
+    public NulWriter appendNoHilight(String str) {
+        stringAdded = true;
+        return this;
+    }
+
+    public void mark() {
+        stringAddedStack.add(stringAdded);
+        stringAdded = false;
+    }
+    
+    public boolean getMark() {
+        boolean result = stringAdded;
+        stringAdded = stringAddedStack.pop() || result;
+        return result;
     }
 }

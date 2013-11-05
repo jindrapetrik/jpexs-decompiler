@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -178,16 +177,24 @@ public class Main {
     }
 
     public static void startWork(String name) {
-        startWork(name, -1);
+        startWork(name, -1, null);
     }
 
-    public static void startWork(final String name, final int percent) {
+    public static void startWork(String name, int percent) {
+        startWork(name, percent, null);
+    }
+
+    public static void startWork(String name, Runnable cancelCallback) {
+        startWork(name, -1, cancelCallback);
+    }
+
+    public static void startWork(final String name, final int percent, final Runnable cancelCallback) {
         working = true;
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
                 if (mainFrame != null) {
-                    mainFrame.setWorkStatus(name);
+                    mainFrame.setWorkStatus(name, cancelCallback);
                     if (percent == -1) {
                         mainFrame.hidePercent();
                     } else {
@@ -213,7 +220,7 @@ public class Main {
     public static void stopWork() {
         working = false;
         if (mainFrame != null) {
-            mainFrame.setWorkStatus("");
+            mainFrame.setWorkStatus("", null);
         }
         if (loadingDialog != null) {
             loadingDialog.setDetail("");
@@ -229,23 +236,23 @@ public class Main {
         locswf = new SWF(fis, new ProgressListener() {
             @Override
             public void progress(int p) {
-                startWork(translate("work.reading.swf"), p);
+                startWork(AppStrings.translate("work.reading.swf"), p);
             }
         }, Configuration.getConfig("parallelSpeedUp", true));
         locswf.addEventListener(new EventListener() {
             @Override
             public void handleEvent(String event, Object data) {
-                if (event.equals("export")) {
+                if (event.equals("exporting")) {
                     startWork((String) data);
                 }
                 if (event.equals("getVariables")) {
-                    startWork(translate("work.gettingvariables") + "..." + (String) data);
+                    startWork(AppStrings.translate("work.gettingvariables") + "..." + (String) data);
                 }
                 if (event.equals("deobfuscate")) {
-                    startWork(translate("work.deobfuscating") + "..." + (String) data);
+                    startWork(AppStrings.translate("work.deobfuscating") + "..." + (String) data);
                 }
                 if (event.equals("rename")) {
-                    startWork(translate("work.renaming") + "..." + (String) data);
+                    startWork(AppStrings.translate("work.renaming") + "..." + (String) data);
                 }
             }
         });
@@ -276,7 +283,7 @@ public class Main {
         @Override
         protected Object doInBackground() throws Exception {
             try {
-                Main.startWork(translate("work.reading.swf") + "...");
+                Main.startWork(AppStrings.translate("work.reading.swf") + "...");
                 swf = parseSWF(Main.inputStream);
                 if (Main.inputStream instanceof FileInputStream) {
                     Main.inputStream.close();
@@ -294,11 +301,15 @@ public class Main {
             }
 
             try {
-                Main.startWork(translate("work.creatingwindow") + "...");
+                Main.startWork(AppStrings.translate("work.creatingwindow") + "...");
                 View.execInEventDispatch(new Runnable() {
                     @Override
                     public void run() {
+                        try{
                         mainFrame = new MainFrame(swf);
+                        } catch(Exception ex) {
+                            String a = ex.toString();
+                        }
                         if (errorState) {
                             mainFrame.setErrorState();
                         }
@@ -427,7 +438,7 @@ public class Main {
 
             @Override
             public String getDescription() {
-                return translate("filter.swf");
+                return AppStrings.translate("filter.swf");
             }
         };
         if (!swf.gfx) {
@@ -443,7 +454,7 @@ public class Main {
 
             @Override
             public String getDescription() {
-                return translate("filter.gfx");
+                return AppStrings.translate("filter.gfx");
             }
         };
         if (swf.gfx) {
@@ -478,7 +489,7 @@ public class Main {
                 readOnly = false;
                 return true;
             } catch (IOException ex) {
-                View.showMessageDialog(null, translate("error.file.write"));
+                View.showMessageDialog(null, AppStrings.translate("error.file.write"));
             }
         }
         return false;
@@ -498,7 +509,7 @@ public class Main {
 
             @Override
             public String getDescription() {
-                return translate("filter.supported");
+                return AppStrings.translate("filter.supported");
             }
         };
         fc.setFileFilter(allSupportedFilter);
@@ -510,7 +521,7 @@ public class Main {
 
             @Override
             public String getDescription() {
-                return translate("filter.swf");
+                return AppStrings.translate("filter.swf");
             }
         };
         fc.addChoosableFileFilter(swfFilter);
@@ -522,7 +533,7 @@ public class Main {
 
             @Override
             public String getDescription() {
-                return translate("filter.gfx");
+                return AppStrings.translate("filter.gfx");
             }
         };
         fc.addChoosableFileFilter(gfxFilter);
@@ -746,7 +757,7 @@ public class Main {
     }
 
     private static void offerAssociation() {
-        boolean offered = Configuration.getConfig("offeredAssociation", false);
+        boolean offered = Configuration.getConfig("offeredAssociation");
         if (!offered) {
             if (Platform.isWindows()) {
                 if ((!isAddedToContextMenu()) && View.showConfirmDialog(null, "Do you want to add FFDec to context menu of SWF files?\n(Can be changed later from main menu)", "Context menu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
@@ -901,6 +912,7 @@ public class Main {
 
         int errorMode = AbortRetryIgnoreHandler.UNDEFINED;
         int retryCount = 0;
+        Level traceLevel = Level.WARNING;
 
         if (args.length < pos + 1) {
             initGui();
@@ -1029,6 +1041,10 @@ public class Main {
                     } else {
                         System.err.println("Process priority setting is only available on Windows platform.");
                     }
+                } else if (args[pos].equals("-verbose")) {
+                    parameterProcessed = true;
+                    pos++;
+                    traceLevel = Level.FINE;
                 }
             }
             if (args[pos].equals("-removefromcontextmenu")) {
@@ -1097,10 +1113,14 @@ public class Main {
                 try {
                     printHeader();
                     SWF exfile = new SWF(new FileInputStream(inFile), Configuration.getConfig("parallelSpeedUp", true));
+                    final Level level = traceLevel;
                     exfile.addEventListener(new EventListener() {
                         @Override
                         public void handleEvent(String event, Object data) {
-                            if (event.equals("export")) {
+                            if (level.intValue() <= Level.FINE.intValue() && event.equals("exporting")) {
+                                System.out.println((String) data);
+                            }
+                            if (event.equals("exported")) {
                                 System.out.println((String) data);
                             }
                         }
@@ -1142,13 +1162,14 @@ public class Main {
                         case "pcodehex":
                         case "hex":
                             ExportMode exportMode = strToExportFormat(exportFormat);
+                            boolean parallel = Configuration.getConfig("parallelSpeedUp", true);
                             if ((pos + 5 < args.length) && (args[pos + 4].equals("-selectas3class"))) {
                                 exportOK = true;
                                 for (int i = pos + 5; i < args.length; i++) {
-                                    exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportMode, Configuration.getConfig("parallelSpeedUp", true));
+                                    exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportMode, parallel);
                                 }
                             } else {
-                                exportOK = !exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportMode, Configuration.getConfig("parallelSpeedUp", true)).isEmpty();
+                                exportOK = exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportMode, parallel) != null;
                             }
                             break;
                         case "movie":
@@ -1334,9 +1355,9 @@ public class Main {
         proxyFrame.switchState();
         if (stopMenuItem != null) {
             if (proxyFrame.isRunning()) {
-                stopMenuItem.setLabel(translate("proxy.stop"));
+                stopMenuItem.setLabel(AppStrings.translate("proxy.stop"));
             } else {
-                stopMenuItem.setLabel(translate("proxy.start"));
+                stopMenuItem.setLabel(AppStrings.translate("proxy.start"));
             }
         }
     }
@@ -1347,7 +1368,7 @@ public class Main {
         }
         if (SystemTray.isSupported()) {
             SystemTray tray = SystemTray.getSystemTray();
-            trayIcon = new TrayIcon(View.loadImage("proxy16"), vendor + " " + shortApplicationName + " " + translate("proxy"));
+            trayIcon = new TrayIcon(View.loadImage("proxy16"), vendor + " " + shortApplicationName + " " + AppStrings.translate("proxy"));
             trayIcon.setImageAutoSize(true);
             PopupMenu trayPopup = new PopupMenu();
 
@@ -1371,16 +1392,16 @@ public class Main {
             };
 
 
-            MenuItem showMenuItem = new MenuItem(translate("proxy.show"));
+            MenuItem showMenuItem = new MenuItem(AppStrings.translate("proxy.show"));
             showMenuItem.setActionCommand("SHOW");
             showMenuItem.addActionListener(trayListener);
             trayPopup.add(showMenuItem);
-            stopMenuItem = new MenuItem(translate("proxy.start"));
+            stopMenuItem = new MenuItem(AppStrings.translate("proxy.start"));
             stopMenuItem.setActionCommand("SWITCH");
             stopMenuItem.addActionListener(trayListener);
             trayPopup.add(stopMenuItem);
             trayPopup.addSeparator();
-            MenuItem exitMenuItem = new MenuItem(translate("exit"));
+            MenuItem exitMenuItem = new MenuItem(AppStrings.translate("exit"));
             exitMenuItem.setActionCommand("EXIT");
             exitMenuItem.addActionListener(trayListener);
             trayPopup.add(exitMenuItem);

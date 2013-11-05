@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -45,6 +46,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
     public int slot_id;
     public int class_info;
     private static final String[] builtInClasses = {"ArgumentError", "arguments", "Array", "Boolean", "Class", "Date", "DefinitionError", "Error", "EvalError", "Function", "int", "JSON", "Math", "Namespace", "Number", "Object", "QName", "RangeError", "ReferenceError", "RegExp", "SecurityError", "String", "SyntaxError", "TypeError", "uint", "URIError", "VerifyError", "XML", "XMLList"};
+    
+    private boolean classInitializerIsEmpty;
 
     @Override
     public int getSlotIndex() {
@@ -329,7 +332,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
+    public void convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
     }
 
     @Override
@@ -433,17 +436,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         int bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
         if (bodyIndex != -1) {
-            int writerPos = writer.getLength();
-            writer.startTrait(abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length + 1);
-            writer.appendNoHilight("{").newLine();
-            writer.mark();
-            abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, writer, fullyQualifiedNames, abc.class_info[class_info].static_traits);
-            boolean empty = !writer.getMark();
-            writer.appendNoHilight("}").newLine();
-            writer.endTrait();
-            writer.newLine();
-            if (empty) {
-                writer.setLength(writerPos);
+            if (!classInitializerIsEmpty) {
+                writer.startTrait(abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length + 1);
+                writer.appendNoHilight("{").newLine();
+                abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, writer, fullyQualifiedNames, abc.class_info[class_info].static_traits);
+                writer.appendNoHilight("}").newLine();
+                writer.endTrait();
+                writer.newLine();
             }
         } else {
             //"/*classInitializer*/";
@@ -499,27 +498,29 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
+    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
 
         fullyQualifiedNames = new ArrayList<>();
 
         int bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
         if (bodyIndex != -1) {
-            abc.bodies[bodyIndex].convert(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, fullyQualifiedNames, abc.class_info[class_info].static_traits);
+            writer.mark();
+            abc.bodies[bodyIndex].convert(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, fullyQualifiedNames, abc.class_info[class_info].static_traits, true);
+            classInitializerIsEmpty = !writer.getMark();
         }
 
         //constructor
         if (!abc.instance_info[class_info].isInterface()) {
             bodyIndex = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].convert(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, fullyQualifiedNames, abc.instance_info[class_info].instance_traits);
+                abc.bodies[bodyIndex].convert(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, fullyQualifiedNames, abc.instance_info[class_info].instance_traits, true);
             }
         }
 
         //static variables,constants & methods
-        abc.class_info[class_info].static_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, exportMode, false, scriptIndex, class_info, fullyQualifiedNames, parallel);
+        abc.class_info[class_info].static_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        abc.instance_info[class_info].instance_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, exportMode, false, scriptIndex, class_info, fullyQualifiedNames, parallel);
+        abc.instance_info[class_info].instance_traits.convert(this, path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
     }
 
     @Override

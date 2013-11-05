@@ -36,7 +36,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Freed;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -90,8 +90,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     //public JSplitPane splitPaneTreeNavVSDecompiledDetail;
     private JTable constantTable;
     public JComboBox constantTypeList;
-    public JLabel asmLabel = new HeaderLabel(translate("panel.disassembled"));
-    public JLabel decLabel = new HeaderLabel(translate("panel.decompiled"));
+    public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
+    public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
     public DetailPanel detailPanel;
     public JTextField filterField = new MyTextField();
     public JPanel navPanel;
@@ -124,10 +124,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
             int pos = 0;
             for (MyEntry<ClassPath, ScriptPack> item : allpacks) {
                 pos++;
-                String workText = translate("work.searching");
+                String workText = AppStrings.translate("work.searching");
                 String decAdd = "";
                 if (!decompiledTextArea.isCached(item.value)) {
-                    decAdd = ", " + translate("work.decompiling");
+                    decAdd = ", " + AppStrings.translate("work.decompiling");
                 }
                 Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.key.toString() + "... ");
                 decompiledTextArea.cacheScriptPack(item.value, list);
@@ -148,7 +148,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                 searchPanel.setVisible(true);
                 searchFor = txt;
                 updateSearchPos();
-                searchForLabel.setText(translate("search.info").replace("%text%", txt) + " ");
+                searchForLabel.setText(AppStrings.translate("search.info").replace("%text%", txt) + " ");
             }
             return true;
         }
@@ -310,7 +310,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         newTraitButton.setMargin(new Insets(5, 5, 5, 5));
         newTraitButton.addActionListener(this);
         newTraitButton.setActionCommand("ADDTRAIT");
-        newTraitButton.setToolTipText(translate("button.addtrait"));
+        newTraitButton.setToolTipText(AppStrings.translate("button.addtrait"));
         iconsPanel.add(newTraitButton);
 
 
@@ -371,7 +371,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
             }
         });
 
-        Main.startWork(translate("work.buildingscripttree") + "...");
+        Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
 
         filterField.setActionCommand("FILTERSCRIPT");
         filterField.addActionListener(this);
@@ -418,10 +418,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         cancelSearchButton.addActionListener(this);
         cancelSearchButton.setActionCommand("SEARCHCANCEL");
         searchPos = new JLabel("0/0");
-        searchForLabel = new JLabel(translate("search.info").replace("%text%", "") + " ");
+        searchForLabel = new JLabel(AppStrings.translate("search.info").replace("%text%", "") + " ");
         searchPanel.add(searchForLabel);
         searchPanel.add(prevSearchButton);
-        searchPanel.add(new JLabel(translate("search.script") + " "));
+        searchPanel.add(new JLabel(AppStrings.translate("search.script") + " "));
         searchPanel.add(searchPos);
         searchPanel.add(nextSearchButton);
         searchPanel.add(cancelSearchButton);
@@ -436,7 +436,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
          splitPaneTreeVSNavigator.setResizeWeight(0.5);
          splitPaneTreeVSNavigator.setContinuousLayout(true);*/
         tabbedPane = new JTabbedPane();
-        tabbedPane.addTab(translate("traits"), navPanel);
+        tabbedPane.addTab(AppStrings.translate("traits"), navPanel);
         //tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
 
         //pan2.add(tabbedPane, BorderLayout.CENTER);
@@ -490,7 +490,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         constantTypeList.addItemListener(this);
         panConstants.add(constantTypeList, BorderLayout.NORTH);
         panConstants.add(new JScrollPane(constantTable), BorderLayout.CENTER);
-        tabbedPane.addTab(translate("constants"), panConstants);
+        tabbedPane.addTab(AppStrings.translate("constants"), panConstants);
     }
 
     public void doFilter() {
@@ -597,7 +597,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                 loopm:
                 do {
                     if (again) {
-                        View.showMessageDialog(null, translate("error.trait.exists").replace("%name%", name), translate("error"), JOptionPane.ERROR_MESSAGE);
+                        View.showMessageDialog(null, AppStrings.translate("error.trait.exists").replace("%name%", name), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                     again = false;
                     if (!newTraitDialog.display()) {

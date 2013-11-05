@@ -734,9 +734,6 @@ public class ABC {
         }
     }
 
-    /*public void export(String directory, ExportMode exportMode, List<ABCContainerTag> abcList, boolean parallel) throws IOException {
-     export(directory, pcode, abcList, "", parallel);
-     }*/
     public List<MyEntry<ClassPath, ScriptPack>> getScriptPacks() {
         List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
         for (int i = 0; i < script_info.length; i++) {

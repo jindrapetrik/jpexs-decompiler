@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import java.awt.BorderLayout;
@@ -42,7 +41,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
     Timer timer;
     int frame = 1;
     List<BufferedImage> frameImages = new ArrayList<>();
-    JLabel buffering = new JLabel(translate("work.buffering") + "...");
+    JLabel buffering = new JLabel(AppStrings.translate("work.buffering") + "...");
 
     public SWFPreviwPanel() {
         pan = new ImagePanel();
@@ -51,7 +50,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
         add(new JScrollPane(pan), BorderLayout.CENTER);
         buffering.setHorizontalAlignment(JLabel.CENTER);
         buffering.setVisible(false);
-        JLabel prevLabel = new HeaderLabel(translate("swfpreview.internal"));
+        JLabel prevLabel = new HeaderLabel(AppStrings.translate("swfpreview.internal"));
         prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         add(prevLabel, BorderLayout.NORTH);

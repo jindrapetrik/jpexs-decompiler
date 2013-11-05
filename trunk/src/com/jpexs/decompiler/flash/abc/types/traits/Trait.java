@@ -20,13 +20,10 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +118,7 @@ public abstract class Trait implements Serializable {
         return writer;
     }
 
-    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
+    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
     }
 
     public GraphTextWriter toStringPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
@@ -139,11 +136,11 @@ public abstract class Trait implements Serializable {
         return writer;
     }
 
-    public void convertPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
+    public void convertPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
         Namespace ns = abc.constants.constant_multiname[name_index].getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
             String nsname = ns.getName(abc.constants);
-            convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, fullyQualifiedNames, parallel);
+            convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         }
     }
 
@@ -152,8 +149,8 @@ public abstract class Trait implements Serializable {
         return writer;
     }
 
-    public void convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, List<String> fullyQualifiedNames, boolean parallel) {
-        convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, fullyQualifiedNames, parallel);
+    public void convertHeader(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+        convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
     }
 
     public Multiname getName(ABC abc) {
@@ -172,27 +169,5 @@ public abstract class Trait implements Serializable {
         String packageName = ns.getName(abc.constants);
         String objectName = name.getName(abc.constants, new ArrayList<String>());
         return packageName + "." + objectName;
-    }
-
-    public void export(Trait parent, String directory, ABC abc, List<ABCContainerTag> abcList, ExportMode exportMode, int scriptIndex, int classIndex, boolean isStatic, boolean parallel) throws IOException {
-        Multiname name = getName(abc);
-        Namespace ns = name.getNamespace(abc.constants);
-        String packageName = ns.getName(abc.constants);
-        String objectName = name.getName(abc.constants, new ArrayList<String>());
-        File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
-        if (!outDir.exists()) {
-            if (!outDir.mkdirs()) {
-                if (!outDir.exists()) {
-                    throw new IOException("Cannot create directory " + outDir);
-                }
-            }
-        }
-        String fileName = outDir.toString() + File.separator + objectName + ".as";
-        try (FileOutputStream fos = new FileOutputStream(fileName)) {
-            convertPackaged(parent, "", abcList, abc, isStatic, exportMode, scriptIndex, classIndex, new ArrayList<String>(), parallel);
-            HilightedTextWriter writer = new HilightedTextWriter(false);
-            toStringPackaged(parent, "", abcList, abc, isStatic, exportMode, scriptIndex, classIndex, writer, new ArrayList<String>(), parallel);
-            fos.write(writer.toString().getBytes("utf-8"));
-        }
     }
 }

@@ -552,8 +552,10 @@ public class SWF {
                     cnt = "script " + (i + 1) + "/" + abc.script_info.length + " ";
                 }
                 String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + scr.getPath() + " ...";
-                informListeners("export", exStr);
+                informListeners("exporting", exStr);
                 scr.export(outdir, abcTags, exportMode, parallel);
+                exStr = "Exported " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + scr.getPath() + " ...";
+                informListeners("exported", exStr);
                 return true;
             }
         }
@@ -625,10 +627,15 @@ public class SWF {
                     stopTime = System.currentTimeMillis();
                 }
             };
+            int currentIndex = index.getAndIncrement();
+            synchronized (ABC.class) {
+                long time = stopTime - startTime;
+                informListeners("exporting", "Exporting script " + currentIndex + "/" + count + " " + path);
+            }
             new RetryTask(rio, handler).run();
             synchronized (ABC.class) {
                 long time = stopTime - startTime;
-                informListeners("export", "Exported script " + index.getAndIncrement() + "/" + count + " " + path + ", " + Helper.formatTimeSec(time));
+                informListeners("exported", "Exported script " + currentIndex + "/" + count + " " + path + ", " + Helper.formatTimeSec(time));
             }
             return null;
         }
@@ -645,9 +652,7 @@ public class SWF {
             outdir += File.separator;
         }
         outdir += "scripts" + File.separator;
-        AtomicInteger cnt = new AtomicInteger(1);
-        int totalCount = TagNode.getTagCountRecursive(list);
-        ret.addAll(TagNode.exportNodeAS(tags, handler, list, outdir, exportMode, cnt, totalCount, evl));
+        ret.addAll(TagNode.exportNodeAS(tags, handler, list, outdir, exportMode, evl));
         return ret;
     }
 
@@ -675,10 +680,10 @@ public class SWF {
                         return null;
                     }
                 }, Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
-            } catch (ExecutionException ex) {
-                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
-            } catch (InterruptedException | TimeoutException ex) {
+            } catch (TimeoutException ex) {
                 Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT) + " ActionScript export limit reached", ex);
+            } catch (Exception ex) {
+                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
             }
         } else {
             ExecutorService executor = Executors.newFixedThreadPool(20);
@@ -697,8 +702,8 @@ public class SWF {
             }
 
             try {
-                executor.shutdown();
                 executor.awaitTermination(Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
+                executor.shutdownNow();
             } catch (InterruptedException ex) {
                 Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT) + " ActionScript export limit reached", ex);
             }
@@ -713,7 +718,7 @@ public class SWF {
         final EventListener evl = new EventListener() {
             @Override
             public void handleEvent(String event, Object data) {
-                if (event.equals("export")) {
+                if (event.equals("exporting") || event.equals("exported")) {
                     informListeners(event, data);
                 }
             }

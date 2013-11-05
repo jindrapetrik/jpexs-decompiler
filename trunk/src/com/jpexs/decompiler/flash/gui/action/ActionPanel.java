@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -41,7 +41,9 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.helpers.AsyncResult;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.Callback;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -59,6 +61,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -84,17 +88,17 @@ public class ActionPanel extends JPanel implements ActionListener {
     public LineMarkedEditorPane decompiledEditor;
     public List<Tag> list;
     public JSplitPane splitPane;
-    public JButton saveButton = new JButton(translate("button.save"), View.getIcon("save16"));
-    public JButton editButton = new JButton(translate("button.edit"), View.getIcon("edit16"));
-    public JButton cancelButton = new JButton(translate("button.cancel"), View.getIcon("cancel16"));
-    public JLabel experimentalLabel = new JLabel(translate("action.edit.experimental"));
-    public JButton editDecompiledButton = new JButton(translate("button.edit"), View.getIcon("edit16"));
-    public JButton saveDecompiledButton = new JButton(translate("button.save"), View.getIcon("save16"));
-    public JButton cancelDecompiledButton = new JButton(translate("button.cancel"), View.getIcon("cancel16"));
+    public JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
+    public JButton editButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    public JButton cancelButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
+    public JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
+    public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    public JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
+    public JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
     public JToggleButton hexButton;
     public JToggleButton hexOnlyButton;
-    public JLabel asmLabel = new HeaderLabel(translate("panel.disassembled"));
-    public JLabel decLabel = new HeaderLabel(translate("panel.decompiled"));
+    public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
+    public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
     public List<Highlighting> decompiledHilights = new ArrayList<>();
     public List<Highlighting> disassembledHilights = new ArrayList<>();
     private boolean ignoreCarret = false;
@@ -117,7 +121,8 @@ public class ActionPanel extends JPanel implements ActionListener {
     private boolean searchIgnoreCase;
     private boolean searchRegexp;
     private Cache cache = Cache.getInstance(true);
-
+    private FutureTask<Void> setSourceTask;
+        
     public void clearCache() {
         cache.clear();
     }
@@ -175,9 +180,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 actions = src.getActions(SWF.DEFAULT_VERSION);
             }
             HilightedTextWriter writer = new HilightedTextWriter(true);
-            src.getActionSourcePrefix(writer);
-            Action.actionsToSource(actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, writer);
-            src.getActionSourceSuffix(writer);
+            Action.actionsToSource(src, actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, writer);
             List<Highlighting> hilights = writer.instructionHilights;
             String srcNoHex = writer.toString();
             cache.put(src, new CachedScript(srcNoHex, hilights));
@@ -220,10 +223,10 @@ public class ActionPanel extends JPanel implements ActionListener {
             int pos = 0;
             for (Entry<String, ASMSource> item : asms.entrySet()) {
                 pos++;
-                String workText = translate("work.searching");
+                String workText = AppStrings.translate("work.searching");
                 String decAdd = "";
                 if (!isCached(item.getValue())) {
-                    decAdd = ", " + translate("work.decompiling");
+                    decAdd = ", " + AppStrings.translate("work.decompiling");
                 }
                 Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ");
 
@@ -243,7 +246,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 searchPanel.setVisible(true);
                 searchFor = txt;
                 updateSearchPos();
-                searchForLabel.setText(translate("search.info").replace("%text%", txt) + " ");
+                searchForLabel.setText(AppStrings.translate("search.info").replace("%text%", txt) + " ");
             }
             return true;
         }
@@ -260,7 +263,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             lastH = h;
         }
         String offset = lastH == null ? "0" : lastH.getPropertyString("offset");
-        editor.setText("; " + translate("work.gettinghilights") + "...");
+        editor.setText("; " + AppStrings.translate("work.gettinghilights") + "...");
         disassembledHilights = text.instructionHilights;
         String stripped = text.text;
         /*if(stripped.length()>30000){
@@ -323,7 +326,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 if (((newpercent > percent) || (!this.phase.equals(phase))) && newpercent <= 100) {
                     percent = newpercent;
                     this.phase = phase;
-                    editor.setText("; " + translate("work.disassembling") + " - " + phase + " " + percent + "%...");
+                    editor.setText("; " + AppStrings.translate("work.disassembling") + " - " + phase + " " + percent + "%...");
                 }
             }
         };
@@ -331,15 +334,30 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
     
     public void setSource(final ASMSource src, final boolean useCache) {
+        if (setSourceTask != null) {
+            setSourceTask.cancel(true);
+        }
+
         this.src = src;
-        Main.startWork(translate("work.decompiling") + "...");
-        final ASMSource asm = (ASMSource) src;
-        (new Thread() {
+        Main.startWork(AppStrings.translate("work.decompiling") + "...", new Runnable() {
+
             @Override
             public void run() {
-                editor.setText("; " + translate("work.disassembling") + "...");
+                if (setSourceTask != null) {
+                    setSourceTask.cancel(true);
+                }
+                editor.setText("; " + AppStrings.translate("work.canceled"));
+            }
+        });
+        final ASMSource asm = (ASMSource) src;
+        
+        FutureTask<Void> task = Helper.callAsync(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                editor.setText("; " + AppStrings.translate("work.disassembling") + "...");
                 if (Configuration.getConfig("decompile", true)) {
-                    decompiledEditor.setText("//" + translate("work.waitingfordissasembly") + "...");
+                    decompiledEditor.setText("//" + AppStrings.translate("work.waitingfordissasembly") + "...");
                 }
                 DisassemblyListener listener = getDisassemblyListener();
                 asm.addDisassemblyListener(listener);
@@ -351,7 +369,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 srcHexOnly = null;
                 setHex(getExportMode());
                 if (Configuration.getConfig("decompile", true)) {
-                    decompiledEditor.setText("//" + translate("work.decompiling") + "...");
+                    decompiledEditor.setText("//" + AppStrings.translate("work.decompiling") + "...");
                     if (!useCache) {
                         uncache(asm);
                     }
@@ -364,9 +382,19 @@ public class ActionPanel extends JPanel implements ActionListener {
                 }
                 setEditMode(false);
                 setDecompiledEditMode(false);
+                return null;
+            }
+        }, new Callback<AsyncResult<Void>>() {
+
+            @Override
+            public void call(AsyncResult<Void> arg1) {
+                setSourceTask = null;
                 Main.stopWork();
             }
-        }).start();
+            
+        });
+        
+        setSourceTask = task;
     }
 
     public void hilightOffset(long offset) {
@@ -394,7 +422,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         cancelSearchButton.addActionListener(this);
         cancelSearchButton.setActionCommand("SEARCHCANCEL");
         searchPos = new JLabel("0/0");
-        searchForLabel = new JLabel(translate("search.info").replace("%text%", ""));
+        searchForLabel = new JLabel(AppStrings.translate("search.info").replace("%text%", ""));
         searchPanel.add(searchForLabel);
         searchPanel.add(prevSearchButton);
         searchPanel.add(new JLabel("Script "));
@@ -406,22 +434,22 @@ public class ActionPanel extends JPanel implements ActionListener {
         JButton graphButton = new JButton(View.getIcon("graph16"));
         graphButton.setActionCommand("GRAPH");
         graphButton.addActionListener(this);
-        graphButton.setToolTipText(translate("button.viewgraph"));
+        graphButton.setToolTipText(AppStrings.translate("button.viewgraph"));
         graphButton.setMargin(new Insets(3, 3, 3, 3));
 
         hexButton = new JToggleButton(View.getIcon("hex16"));
         hexButton.setActionCommand("HEX");
         hexButton.addActionListener(this);
-        hexButton.setToolTipText(translate("button.viewhex"));
+        hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
         // todo: find icon, and set visible
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
         hexOnlyButton.setActionCommand("HEXONLY");
         hexOnlyButton.addActionListener(this);
-        hexOnlyButton.setToolTipText(translate("button.viewhex"));
+        hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
-        hexOnlyButton.setVisible(false);
+        //hexOnlyButton.setVisible(false);
 
         topButtonsPan = new JPanel();
         topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
@@ -681,7 +709,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             }
         } else if (e.getActionCommand().equals("EDITACTION")) {
             setEditMode(true);
-        } else if (e.getActionCommand().equals("HEX")) {
+        } else if (e.getActionCommand().equals("HEX") || e.getActionCommand().equals("HEXONLY")) {
             setHex(getExportMode());
         } else if (e.getActionCommand().equals("CANCELACTION")) {
             setEditMode(false);
@@ -695,7 +723,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                     src.setActions(ASMParser.parse(0, src.getPos(), true, text, SWF.DEFAULT_VERSION, false), SWF.DEFAULT_VERSION);
                 }
                 setSource(this.src, false);
-                View.showMessageDialog(this, translate("message.action.saved"));
+                View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
                 saveButton.setVisible(false);
                 cancelButton.setVisible(false);
                 editButton.setVisible(true);
@@ -703,7 +731,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 editMode = false;
             } catch (IOException ex) {
             } catch (ParseException ex) {
-                View.showMessageDialog(this, translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
+                View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             }
         } else if (e.getActionCommand().equals("EDITDECOMPILED")) {
             setDecompiledEditMode(true);
@@ -714,12 +742,12 @@ public class ActionPanel extends JPanel implements ActionListener {
                 ActionScriptParser par = new ActionScriptParser();
                 src.setActions(par.actionsFromString(decompiledEditor.getText()), SWF.DEFAULT_VERSION);
                 setSource(this.src, false);
-                View.showMessageDialog(this, translate("message.action.saved"));
+                View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
                 setDecompiledEditMode(false);
             } catch (IOException ex) {
                 Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, "IOException during action compiling", ex);
             } catch (ParseException ex) {
-                View.showMessageDialog(this, translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
+                View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             }
 
         }

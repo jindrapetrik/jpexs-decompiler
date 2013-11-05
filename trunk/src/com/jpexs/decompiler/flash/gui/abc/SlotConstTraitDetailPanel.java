@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -114,7 +114,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
                 return false;
             }
         } catch (ParseException ex) {
-            View.showMessageDialog(slotConstEditor, ex.text, translate("error.slotconst.typevalue"), JOptionPane.ERROR_MESSAGE);
+            View.showMessageDialog(slotConstEditor, ex.text, AppStrings.translate("error.slotconst.typevalue"), JOptionPane.ERROR_MESSAGE);
             return false;
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(SlotConstTraitDetailPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -129,7 +129,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     @Override
     public void setEditMode(boolean val) {
         if (val && active) {
-            JOptionPane.showMessageDialog(null, translate("warning.initializers"), translate("message.warning"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, AppStrings.translate("warning.initializers"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE);
         }
         slotConstEditor.setEditable(val);
     }

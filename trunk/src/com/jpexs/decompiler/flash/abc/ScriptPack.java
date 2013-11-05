@@ -16,9 +16,14 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.helpers.FileTextWriter;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
@@ -27,6 +32,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -103,6 +114,67 @@ public class ScriptPack {
         return Helper.joinStrings(pathParts, File.separator);
     }
 
+    public void convert(final NulWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ExportMode exportMode, final boolean parallel) {
+        for (int t : traitIndices) {
+            Trait trait = traits[t];
+            Multiname name = trait.getName(abc);
+            Namespace ns = name.getNamespace(abc.constants);
+            if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                trait.convertPackaged(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+            } else {
+                trait.convert(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+            }
+        }
+    }
+    
+    public void appendTo(GraphTextWriter writer, List<ABCContainerTag> abcList, Trait[] traits, ExportMode exportMode, boolean parallel) {
+        for (int t : traitIndices) {
+            Trait trait = traits[t];
+            Multiname name = trait.getName(abc);
+            Namespace ns = name.getNamespace(abc.constants);
+            if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                trait.toStringPackaged(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+            } else {
+                trait.toString(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+            }
+        }
+    }
+
+    public void toSource(GraphTextWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ExportMode exportMode, final boolean parallel) {
+        writer.suspendMeasure();
+        try {
+            Helper.timedCall(new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    convert(new NulWriter(), abcList, traits, exportMode, parallel);
+                    return null;
+                }
+            }, Configuration.DECOMPILATION_TIMEOUT_FILE, TimeUnit.SECONDS);
+        } catch (TimeoutException ex) {
+            writer.continueMeasure();
+            Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
+            writer.appendNoHilight("/*").newLine();
+            writer.appendNoHilight(" * Decompilation error").newLine();
+            writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT_FILE) + ") was reached").newLine();
+            writer.appendNoHilight(" */").newLine();
+            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
+            return;
+        } catch (InterruptedException | ExecutionException ex) {
+            writer.continueMeasure();
+            Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
+            writer.appendNoHilight("/*").newLine();
+            writer.appendNoHilight(" * Decompilation error").newLine();
+            writer.appendNoHilight(" * Code may be obfuscated").newLine();
+            writer.appendNoHilight(" * Error type: " + ex.getClass().getSimpleName()).newLine();
+            writer.appendNoHilight(" */").newLine();
+            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
+            return;
+        }
+        writer.continueMeasure();
+
+        appendTo(writer, abcList, traits, exportMode, parallel);
+    }
+    
     public File export(String directory, List<ABCContainerTag> abcList, ExportMode exportMode, boolean parallel) throws IOException {
         String scriptName = getPathScriptName();
         String packageName = getPathPackage();
@@ -115,24 +187,10 @@ public class ScriptPack {
             }
         }
         String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + ".as";
+
         File file = new File(fileName);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            for (int t : traitIndices) {
-                Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
-                Namespace ns = name.getNamespace(abc.constants);
-                if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                    abc.script_info[scriptIndex].traits.traits[t].convertPackaged(null, "", abcList, abc, false, exportMode, scriptIndex, -1, new ArrayList<String>(), parallel);
-                } else {
-                    abc.script_info[scriptIndex].traits.traits[t].convert(null, "", abcList, abc, false, exportMode, scriptIndex, -1, new ArrayList<String>(), parallel);
-                }
-                HilightedTextWriter writer = new HilightedTextWriter(false);
-                if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                    abc.script_info[scriptIndex].traits.traits[t].toStringPackaged(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
-                } else {
-                    abc.script_info[scriptIndex].traits.traits[t].toString(null, "", abcList, abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
-                }
-                fos.write(writer.toString().getBytes("utf-8"));
-            }
+        try (FileTextWriter writer = new FileTextWriter(new FileOutputStream(file))) {
+            toSource(writer, abcList, abc.script_info[scriptIndex].traits.traits, exportMode, parallel);
         }
         return file;
     }

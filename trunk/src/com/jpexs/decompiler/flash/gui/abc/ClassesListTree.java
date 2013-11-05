@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
@@ -125,7 +126,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
         if (item instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) item;
             if (!Main.isWorking()) {
-                Main.startWork("Decompiling...");
+                Main.startWork(AppStrings.translate("work.decompiling") + "...");
                 (new Thread() {
                     @Override
                     public void run() {
