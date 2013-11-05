@@ -386,7 +386,7 @@ public class Action implements GraphSourceItem {
      * @param list List of actions
      * @param importantOffsets List of important offsets to mark as labels
      * @param version SWF version
-     * @param hex Add hexadecimal?
+     * @param exportMode PCode or hex?
      * @param swfPos
      * @param path
      * @return HilightedTextWriter
@@ -599,7 +599,7 @@ public class Action implements GraphSourceItem {
      * @param knownAddreses List of important offsets to mark as labels
      * @param constantPool Constant pool
      * @param version SWF version
-     * @param hex Add hexadecimal
+     * @param exportMode PCode or hex?
      * @return String of P-code source
      */
     public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode) {
@@ -696,7 +696,6 @@ public class Action implements GraphSourceItem {
      * @param actions List of actions
      * @param version SWF version
      * @param path
-     * @return String with Source code
      */
     public static void actionsToSource(ASMSource asm, final List<Action> actions, final int version, final String path, GraphTextWriter writer) {
         writer.suspendMeasure();

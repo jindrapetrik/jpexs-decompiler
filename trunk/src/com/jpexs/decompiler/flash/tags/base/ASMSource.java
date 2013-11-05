@@ -33,7 +33,7 @@ public interface ASMSource {
      * Converts actions to ASM source
      *
      * @param version SWF version
-     * @param hex Add hexadecimal?
+     * @param exportMode PCode or hex?
      * @return ASM source
      */
     public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions);

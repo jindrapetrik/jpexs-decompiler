@@ -126,7 +126,6 @@ public class Highlighting implements Serializable {
     /**
      *
      * @param startPos Starting position
-     * @param len Length of highlighted text
      * @param data Highlighting data
      * @param type Highlighting type
      */
