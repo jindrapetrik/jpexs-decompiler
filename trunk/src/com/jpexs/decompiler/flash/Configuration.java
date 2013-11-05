@@ -60,7 +60,7 @@ public class Configuration {
     /**
      * Decompilation timeout in seconds for a single file
      */
-    public static final int DECOMPILATION_TIMEOUT_FILE = 5;
+    public static final int DECOMPILATION_TIMEOUT_FILE = 5 * 60;
     //using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices
     public static final boolean PARAM_NAMES_ENABLE = false;
     private static HashMap<String, Object> config = new HashMap<>();
