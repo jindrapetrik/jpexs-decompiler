@@ -274,10 +274,10 @@ public class ABC {
                                     String pkg = "";
                                     String name = fullname;
                                     if (fullname.contains(".")) {
-                                        pkg = fullname.substring(0, fullname.lastIndexOf("."));
-                                        name = fullname.substring(fullname.lastIndexOf(".") + 1);
+                                        pkg = fullname.substring(0, fullname.lastIndexOf('.'));
+                                        name = fullname.substring(fullname.lastIndexOf('.') + 1);
                                     }
-                                    if (!pkg.equals("")) {
+                                    if (!pkg.isEmpty()) {
                                         int pkgStrIndex = constants.getStringId(pkg, true);
                                         pkgStrIndex = deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, pkgStrIndex, renameType);
                                         pkg = constants.constant_string[pkgStrIndex];
@@ -286,7 +286,7 @@ public class ABC {
                                     nameStrIndex = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, nameStrIndex, true, renameType);
                                     name = constants.constant_string[nameStrIndex];
                                     String fullChanged = "";
-                                    if (!pkg.equals("")) {
+                                    if (!pkg.isEmpty()) {
                                         fullChanged = pkg + ".";
                                     }
                                     fullChanged += name;
@@ -823,18 +823,18 @@ public class ABC {
             for (int i = 1; i < constants.constant_string.length; i++) {
                 if (constants.constant_string[i].equals(ret)) {
                     exists = true;
-                    rndSize = rndSize + 1;
+                    rndSize += 1;
                     continue loopfoo;
                 }
             }
             if (isReserved(ret)) {
                 exists = true;
-                rndSize = rndSize + 1;
+                rndSize += 1;
                 continue;
             }
             if (deobfuscated.containsValue(ret)) {
                 exists = true;
-                rndSize = rndSize + 1;
+                rndSize += 1;
                 continue;
             }
         } while (exists);

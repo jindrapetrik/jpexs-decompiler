@@ -66,11 +66,11 @@ public abstract class CharacterIdTag extends Tag {
 
     @Override
     public String getExportFileName(List<Tag> tags) {
-        return super.getName(tags) + "_" + getCharacterId() + (((exportName != null) && (!exportName.equals(""))) ? "_" + exportName : "");
+        return super.getName(tags) + "_" + getCharacterId() + (((exportName != null) && (!exportName.isEmpty())) ? "_" + exportName : "");
     }
 
     public String getCharacterExportFileName() {
-        return getCharacterId() + (((exportName != null) && (!exportName.equals(""))) ? "_" + exportName : "");
+        return getCharacterId() + (((exportName != null) && (!exportName.isEmpty())) ? "_" + exportName : "");
     }
 
     public String getExportName() {

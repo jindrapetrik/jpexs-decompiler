@@ -116,31 +116,39 @@ public class CommandLineArgumentParser {
         AbortRetryIgnoreHandler handler = null;
 
         String nextParam;
+        OUTER:
         while (true) {
             nextParam = args.remove();
-            if (nextParam.equals("-config")) {
-                parseConfig(args);
-                if (args.isEmpty()) {
-                    Main.saveConfig();
-                    System.out.println("Configuration saved");
-                    return null;
-                }
-            } else if (nextParam.equals("-onerror")) {
-                handler = parseOnError(args);
-            } else if (nextParam.equals("-timeout")) {
-                parseTimeout(args);
-            } else if (nextParam.equals("-affinity")) {
-                parseAffinity(args);
-            } else if (nextParam.equals("-priority")) {
-                parsePriority(args);
-            } else if (nextParam.equals("-verbose")) {
-                traceLevel = Level.FINE;
-            } else if (nextParam.equals("-debug")) {
-                Configuration.debugMode = true;
-            } else {
-                break;
+            switch (nextParam) {
+                case "-config":
+                    parseConfig(args);
+                    if (args.isEmpty()) {
+                        Main.saveConfig();
+                        System.out.println("Configuration saved");
+                        return null;
+                    }
+                    break;
+                case "-onerror":
+                    handler = parseOnError(args);
+                    break;
+                case "-timeout":
+                    parseTimeout(args);
+                    break;
+                case "-affinity":
+                    parseAffinity(args);
+                    break;
+                case "-priority":
+                    parsePriority(args);
+                    break;
+                case "-verbose":
+                    traceLevel = Level.FINE;
+                    break;
+                case "-debug":
+                    Configuration.debugMode = true;
+                    break;
+                default:
+                    break OUTER;
             }
-            
             if (args.isEmpty()) {
                 return null;
             }
@@ -237,14 +245,15 @@ public class CommandLineArgumentParser {
     }
 
     private static ExportMode strToExportFormat(String exportFormatStr) {
-        if (exportFormatStr.equals("pcode")) {
-            return ExportMode.PCODE;
-        } else if (exportFormatStr.equals("pcodehex")) {
-            return ExportMode.PCODEWITHHEX;
-        } else if (exportFormatStr.equals("hex")) {
-            return ExportMode.HEX;
-        } else {
-            return ExportMode.SOURCE;
+        switch (exportFormatStr) {
+            case "pcode":
+                return ExportMode.PCODE;
+            case "pcodehex":
+                return ExportMode.PCODEWITHHEX;
+            case "hex":
+                return ExportMode.HEX;
+            default:
+                return ExportMode.SOURCE;
         }
     }
     

@@ -72,7 +72,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
                 cns = ns.getName(constants);
             }
         }
-        return cname.equals("XML") && cns.equals("");
+        return cname.equals("XML") && cns.isEmpty();
     }
 
     @Override

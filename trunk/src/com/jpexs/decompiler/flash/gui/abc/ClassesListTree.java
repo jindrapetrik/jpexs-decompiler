@@ -35,7 +35,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-public class ClassesListTree extends JTree implements TreeSelectionListener {
+public final class ClassesListTree extends JTree implements TreeSelectionListener {
 
     private List<ABCContainerTag> abcList;
     public List<MyEntry<ClassPath, ScriptPack>> treeList;

@@ -88,18 +88,18 @@ public class GFxInputStream extends InputStream {
                 return v;
 
             case 1:
-                t = t >> 2;
+                t >>= 2;
                 v = t | (readUI8() << 6);
                 return v;
             case 2:
-                t = t >> 2;
-                t = t | (readUI8() << 6);
+                t >>= 2;
+                t |= (readUI8() << 6);
                 v = t | (readUI8() << 14);
                 return v;
         }
-        t = t >> 2;
-        t = t | (readUI8() << 6);
-        t = t | (readUI8() << 14);
+        t >>= 2;
+        t |= (readUI8() << 6);
+        t |= (readUI8() << 14);
         v = t | (readUI8() << 22);
         return v;
     }

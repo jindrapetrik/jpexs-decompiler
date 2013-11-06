@@ -253,7 +253,7 @@ public abstract class Advapi32Util {
                 offset += Native.WCHAR_SIZE;
                 result.add(s);
             }
-            return result.toArray(new String[0]);
+            return result.toArray(new String[result.size()]);
         } finally {
             rc = Advapi32.INSTANCE.RegCloseKey(phkKey.getValue());
             if (rc != W32Errors.ERROR_SUCCESS) {
@@ -700,7 +700,7 @@ public abstract class Advapi32Util {
             }
             keys.add(Native.toString(name));
         }
-        return keys.toArray(new String[0]);
+        return keys.toArray(new String[keys.size()]);
     }
 
     /**
@@ -784,7 +784,7 @@ public abstract class Advapi32Util {
                         offset += Native.WCHAR_SIZE;
                         result.add(s);
                     }
-                    keyValues.put(nameString, result.toArray(new String[0]));
+                    keyValues.put(nameString, result.toArray(new String[result.size()]));
                     break;
                 }
                 default:
@@ -830,7 +830,7 @@ public abstract class Advapi32Util {
         StringBuilder out = new StringBuilder();
         for (Entry<String, String> entry : environment.entrySet()) {
             if (entry.getValue() != null) {
-                out.append(entry.getKey() + "=" + entry.getValue() + "\0");
+                out.append(entry.getKey()).append("=").append(entry.getValue()).append("\0");
             }
         }
         return out.toString() + "\0";
@@ -975,7 +975,7 @@ public abstract class Advapi32Util {
                     offset += Native.WCHAR_SIZE;
                     count--;
                 }
-                _strings = strings.toArray(new String[0]);
+                _strings = strings.toArray(new String[strings.size()]);
             }
         }
     }

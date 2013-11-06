@@ -32,8 +32,9 @@ public enum ExportMode {
     private static final Map<Integer, ExportMode> lookup = new HashMap<>();
 
     static {
-         for(ExportMode s : EnumSet.allOf(ExportMode.class))
-              lookup.put(s.getCode(), s);
+         for(ExportMode s : EnumSet.allOf(ExportMode.class)) {
+             lookup.put(s.getCode(), s);
+         }
     }
 
     private int code;

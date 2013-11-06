@@ -70,7 +70,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
     private boolean parseUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
         Namespace ns = abc.constants.constant_namespace[namespace_index];
-        if (name.equals("")) {
+        if (name.isEmpty()) {
             name = "*";
         }
         String newimport = ns.getName(abc.constants);
@@ -87,7 +87,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 if (newname.equals("-")) {
                     return true;
                 }
-                if (!newname.equals("")) {
+                if (!newname.isEmpty()) {
                     newimport = newname;
                     break;
                 }
@@ -96,7 +96,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 newimport = oldimport;
                 newimport += "." + name;
             }
-            if (newimport.equals("")) {
+            if (newimport.isEmpty()) {
                 newimport = null;
             }
             if (newimport != null) {
@@ -110,11 +110,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     }
                     String pkg = "";
                     if (newimport.contains(".")) {
-                        pkg = newimport.substring(0, newimport.lastIndexOf("."));
+                        pkg = newimport.substring(0, newimport.lastIndexOf('.'));
                     }
                     String usname = newimport;
                     if (usname.contains(".")) {
-                        usname = usname.substring(usname.lastIndexOf(".") + 1);
+                        usname = usname.substring(usname.lastIndexOf('.') + 1);
                     }
                     if (ns.kind == Namespace.KIND_PACKAGE) {
                         if (!pkg.equals(ignorePackage)) {
@@ -140,7 +140,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
     private void parseImportsUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
         Namespace ns = abc.constants.constant_namespace[namespace_index];
-        if (name.equals("")) {
+        if (name.isEmpty()) {
             name = "*";
         }
         String newimport = ns.getName(abc.constants);
@@ -158,7 +158,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             return;
         }
         if (!imports.contains(newimport)) {
-            String pkg = newimport.substring(0, newimport.lastIndexOf("."));
+            String pkg = newimport.substring(0, newimport.lastIndexOf('.'));
             if (!pkg.equals(ignorePackage)) {
                 imports.add(newimport);
             }
@@ -348,8 +348,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     String pkg = "";
                     String name = spath;
                     if (spath.contains(".")) {
-                        pkg = spath.substring(0, spath.lastIndexOf("."));
-                        name = spath.substring(spath.lastIndexOf(".") + 1);
+                        pkg = spath.substring(0, spath.lastIndexOf('.'));
+                        name = spath.substring(spath.lastIndexOf('.') + 1);
                     }
                     if (pkg.equals(packageName)) {
                         namesInThisPackage.add(name);
@@ -371,10 +371,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
             String name = ipath;
             String pkg = "";
             if (name.contains(".")) {
-                pkg = name.substring(0, name.lastIndexOf("."));
-                name = name.substring(name.lastIndexOf(".") + 1);
+                pkg = name.substring(0, name.lastIndexOf('.'));
+                name = name.substring(name.lastIndexOf('.') + 1);
             }
-            if (importnames.contains(name) || ((!pkg.equals("")) && isBuiltInClass(name))) {
+            if (importnames.contains(name) || ((!pkg.isEmpty()) && isBuiltInClass(name))) {
                 fullyQualifiedNames.add(name);
             } else {
                 importnames.add(name);
@@ -397,8 +397,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         for (int i = 0; i < imports.size(); i++) {
             String imp = imports.get(i);
-            String pkg = imp.substring(0, imp.lastIndexOf("."));
-            String name = imp.substring(imp.lastIndexOf(".") + 1);
+            String pkg = imp.substring(0, imp.lastIndexOf('.'));
+            String name = imp.substring(imp.lastIndexOf('.') + 1);
             if (name.equals("*")) {
                 continue;
             }

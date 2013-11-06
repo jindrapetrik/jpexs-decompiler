@@ -231,7 +231,7 @@ import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationM
  *
  * @author Jindra
  */
-public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSelectionListener, Freed {
+public final class MainFrame extends AppRibbonFrame implements ActionListener, TreeSelectionListener, Freed {
 
     private SWF swf;
     public ABCPanel abcPanel;
@@ -340,7 +340,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     }
 
     public void setWorkStatus(String s, Runnable cancelCallback) {
-        if (s.equals("")) {
+        if (s.isEmpty()) {
             loadingPanel.setVisible(false);
         } else {
             loadingPanel.setVisible(true);
@@ -573,10 +573,10 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
         int state = 0;
         if (maximizedHorizontal) {
-            state = state | JFrame.MAXIMIZED_HORIZ;
+            state |= JFrame.MAXIMIZED_HORIZ;
         }
         if (maximizedVertical) {
-            state = state | JFrame.MAXIMIZED_VERT;
+            state |= JFrame.MAXIMIZED_VERT;
         }
         setExtendedState(state);
 
@@ -914,9 +914,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 files.clear();
 
                                 File[] fs = ftemp.listFiles();
-                                for (File f : fs) {
-                                    files.add(f);
-                                }
+                                files.addAll(Arrays.asList(fs));
 
                                 Main.stopWork();
                             } catch (IOException ex) {
@@ -2188,7 +2186,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         ret.addAll(swf.exportTexts(handler, selFile + File.separator + "texts", texts, isFormatted));
         ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies));
         ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav));
-        ret.addAll(swf.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData));
+        ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData));
         if (abcPanel != null) {
             for (int i = 0; i < tlsList.size(); i++) {
                 ScriptPack tls = tlsList.get(i);
@@ -2406,7 +2404,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 searchDialog.setVisible(true);
                 if (searchDialog.result) {
                     final String txt = searchDialog.searchField.getText();
-                    if (!txt.equals("")) {
+                    if (!txt.isEmpty()) {
                         if (abcPanel != null) {
                             (new Thread() {
                                 @Override
@@ -3241,8 +3239,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                         mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
                                         mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
                                     } else {
-                                        mat.translateX = mat.translateX + width / 2;
-                                        mat.translateY = mat.translateY + height / 2;
+                                        mat.translateX += width / 2;
+                                        mat.translateY += height / 2;
                                     }
                                     sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
 

@@ -99,7 +99,7 @@ public class ScriptPack {
      return packageName.equals("") ? scriptName : packageName + "." + scriptName;
      }*/
     private static String makeDirPath(String packageName) {
-        if (packageName.equals("")) {
+        if (packageName.isEmpty()) {
             return "";
         }
         String[] pathParts;

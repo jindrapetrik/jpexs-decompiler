@@ -109,8 +109,8 @@ public class ABCInputStream extends InputStream {
         do {
             i = read();
             nextByte = (i >> 7) == 1;
-            i = i & 0x7f;
-            ret = ret + (i << bytePos);
+            i &= 0x7f;
+            ret += (i << bytePos);
             byteCount++;
             bytePos += 7;
         } while (nextByte);
@@ -125,7 +125,7 @@ public class ABCInputStream extends InputStream {
         int ret = (read()) + (read() << 8) + (read() << 16);
 
         if ((ret >> 23) == 1) {
-            ret = ret | 0xff000000;
+            ret |= 0xff000000;
         }
 
         return ret;
@@ -144,8 +144,8 @@ public class ABCInputStream extends InputStream {
         do {
             i = read();
             nextByte = (i >> 7) == 1;
-            i = i & 0x7f;
-            ret = ret + (i << bytePos);
+            i &= 0x7f;
+            ret += (i << bytePos);
             byteCount++;
             bytePos += 7;
             if (bytePos == 35) {

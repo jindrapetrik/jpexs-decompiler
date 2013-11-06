@@ -74,12 +74,12 @@ public class ContourType {
         moveToY = sis.readSI15();
         long numEdgesRef = sis.readUI30();
         isReference = (numEdgesRef & 1) == 1;
-        numEdgesRef = numEdgesRef >> 1;
+        numEdgesRef >>= 1;
         long oldPos = sis.getPos();
         if (isReference) {
             sis.setPos(numEdgesRef);
             numEdgesRef = sis.readUI30();
-            numEdgesRef = numEdgesRef >> 1;
+            numEdgesRef >>= 1;
         }
 
         edges = new EdgeType[(int) numEdgesRef];

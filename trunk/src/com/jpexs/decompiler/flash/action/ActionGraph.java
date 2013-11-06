@@ -120,7 +120,7 @@ public class ActionGraph extends Graph {
                 GraphTargetItem it = list.get(t);
                 if (it instanceof SetTargetActionItem) {
                     SetTargetActionItem st = (SetTargetActionItem) it;
-                    if (st.target.equals("")) {
+                    if (st.target.isEmpty()) {
                         if (targetStart > -1) {
                             targetEnd = t;
                             break;

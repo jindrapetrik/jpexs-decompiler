@@ -45,7 +45,7 @@ public class ConvertBIns extends InstructionDefinition implements CoerceOrConver
         } else if (value instanceof Long) {
             bval = ((Long) value).longValue() != 0;
         } else if (value instanceof String) {
-            bval = !((String) value).equals("");
+            bval = !((String) value).isEmpty();
         } else {
             bval = true;
         }

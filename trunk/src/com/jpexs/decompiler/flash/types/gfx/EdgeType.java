@@ -455,7 +455,6 @@ public class EdgeType {
                 sos.writeUI8((((ax >> 14) & m5) | (ay << 5)));
                 sos.writeUI8(((ay >> 3)));
                 sos.writeUI8(((ay >> 11)));
-                return;
         }
     }
 }

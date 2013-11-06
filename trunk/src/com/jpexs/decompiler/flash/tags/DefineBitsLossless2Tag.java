@@ -66,7 +66,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
                 int a = (argb >> 24) & 0xff;
                 int r = (argb >> 16) & 0xff;
                 int g = (argb >> 8) & 0xff;
-                int b = (argb >> 0) & 0xff;
+                int b = (argb) & 0xff;
 
                 r = r * a / 255;
                 g = g * a / 255;

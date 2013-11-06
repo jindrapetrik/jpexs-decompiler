@@ -34,7 +34,7 @@ public class ClassPath {
 
     @Override
     public String toString() {
-        return (packageStr == null || packageStr.equals("")) ? className : packageStr + "." + className;
+        return (packageStr == null || packageStr.isEmpty()) ? className : packageStr + "." + className;
     }
 
     @Override

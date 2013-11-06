@@ -65,7 +65,7 @@ import javax.swing.JPanel;
  *
  * @author JPEXS
  */
-public class DefineCompactedFont extends FontTag implements DrawableTag {
+public final class DefineCompactedFont extends FontTag implements DrawableTag {
 
     public static final int ID = 1005;
     public int fontId;

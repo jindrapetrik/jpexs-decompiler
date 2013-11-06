@@ -82,7 +82,7 @@ public class ActionGetURL extends Action {
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         String fsCommandPrefix = "FSCommand:";
-        if (urlString.startsWith(fsCommandPrefix) && targetString.equals("")) {
+        if (urlString.startsWith(fsCommandPrefix) && targetString.isEmpty()) {
             String command = urlString.substring(fsCommandPrefix.length());
             output.add(new FSCommandActionItem(this, command));
             return;
@@ -91,7 +91,7 @@ public class ActionGetURL extends Action {
         if (targetString.startsWith(levelPrefix)) {
             try {
                 int num = Integer.valueOf(targetString.substring(levelPrefix.length()));
-                if (urlString.equals("")) {
+                if (urlString.isEmpty()) {
                     output.add(new UnLoadMovieNumActionItem(this, new DirectValueActionItem((Long) (long) (int) num)));
                 } else {
                     DirectValueActionItem urlStringDi = new DirectValueActionItem(null, 0, urlString, new ArrayList<String>());
@@ -103,7 +103,7 @@ public class ActionGetURL extends Action {
 
         }
 
-        if (urlString.equals("")) {
+        if (urlString.isEmpty()) {
             DirectValueActionItem targetStringDi = new DirectValueActionItem(null, 0, targetString, new ArrayList<String>());
             output.add(new UnLoadMovieActionItem(this, targetStringDi));
         } else {

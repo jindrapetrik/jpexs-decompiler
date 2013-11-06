@@ -330,7 +330,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     public void catched(String contentType, String url, InputStream data) {
         boolean swfOnly = false;
         if (contentType.contains(";")) {
-            contentType = contentType.substring(0, contentType.indexOf(";"));
+            contentType = contentType.substring(0, contentType.indexOf(';'));
         }
         if ((!sniffSWFCheckBox.isSelected()) && (contentType.equals("application/x-shockwave-flash"))) {
             return;

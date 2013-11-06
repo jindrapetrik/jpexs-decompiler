@@ -53,14 +53,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
@@ -208,10 +206,10 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
 
     public boolean search(String txt, boolean ignoreCase, boolean regexp) {
-        if ((txt != null) && (!txt.equals(""))) {
+        if ((txt != null) && (!txt.isEmpty())) {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
-            List<TagNode> list = Main.swf.createASTagList(Main.swf.tags, null);
+            List<TagNode> list = SWF.createASTagList(Main.swf.tags, null);
             Map<String, ASMSource> asms = getASMs("", list);
             found = new ArrayList<>();
             Pattern pat = null;
@@ -293,7 +291,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     
     public void setHex(ExportMode exportMode) {
         if (exportMode != ExportMode.HEX) {
-            if (exportMode == exportMode.PCODE) {
+            if (exportMode == ExportMode.PCODE) {
                 if (srcNoHex == null) {
                     srcNoHex = getHilightedText(exportMode);
                 }
@@ -702,63 +700,73 @@ public class ActionPanel extends JPanel implements ActionListener {
             foundPos = (foundPos + 1) % found.size();
             updateSearchPos();
         }
-        if (e.getActionCommand().equals("GRAPH")) {
-            if (lastCode != null) {
-                try {
-                    GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
-                    gf.setVisible(true);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+        switch (e.getActionCommand()) {
+            case "GRAPH":
+                if (lastCode != null) {
+                    try {
+                        GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
+                        gf.setVisible(true);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
-            }
-        } else if (e.getActionCommand().equals("EDITACTION")) {
-            setEditMode(true);
-        } else if (e.getActionCommand().equals("HEX") || e.getActionCommand().equals("HEXONLY")) {
-            if (e.getActionCommand().equals("HEX")) {
-                hexOnlyButton.setSelected(false);
-            } else {
-                hexButton.setSelected(false);
-            }
-            setHex(getExportMode());
-        } else if (e.getActionCommand().equals("CANCELACTION")) {
-            setEditMode(false);
-            setHex(getExportMode());
-        } else if (e.getActionCommand().equals("SAVEACTION")) {
-            try {
-                String text = editor.getText();
-                if (text.trim().startsWith("#hexdata")) {
-                    src.setActionBytes(Helper.getBytesFromHexaText(text));
+                break;
+            case "EDITACTION":
+                setEditMode(true);
+                break;
+            case "HEX":
+            case "HEXONLY":
+                if (e.getActionCommand().equals("HEX")) {
+                    hexOnlyButton.setSelected(false);
                 } else {
-                    src.setActions(ASMParser.parse(0, src.getPos(), true, text, SWF.DEFAULT_VERSION, false), SWF.DEFAULT_VERSION);
+                    hexButton.setSelected(false);
                 }
-                setSource(this.src, false);
-                View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
-                saveButton.setVisible(false);
-                cancelButton.setVisible(false);
-                editButton.setVisible(true);
-                editor.setEditable(false);
-                editMode = false;
-            } catch (IOException ex) {
-            } catch (ParseException ex) {
-                View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            }
-        } else if (e.getActionCommand().equals("EDITDECOMPILED")) {
-            setDecompiledEditMode(true);
-        } else if (e.getActionCommand().equals("CANCELDECOMPILED")) {
-            setDecompiledEditMode(false);
-        } else if (e.getActionCommand().equals("SAVEDECOMPILED")) {
-            try {
-                ActionScriptParser par = new ActionScriptParser();
-                src.setActions(par.actionsFromString(decompiledEditor.getText()), SWF.DEFAULT_VERSION);
-                setSource(this.src, false);
-                View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
+                setHex(getExportMode());
+                break;
+            case "CANCELACTION":
+                setEditMode(false);
+                setHex(getExportMode());
+                break;
+            case "SAVEACTION":
+                try {
+                    String text = editor.getText();
+                    if (text.trim().startsWith("#hexdata")) {
+                        src.setActionBytes(Helper.getBytesFromHexaText(text));
+                    } else {
+                        src.setActions(ASMParser.parse(0, src.getPos(), true, text, SWF.DEFAULT_VERSION, false), SWF.DEFAULT_VERSION);
+                    }
+                    setSource(this.src, false);
+                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
+                    saveButton.setVisible(false);
+                    cancelButton.setVisible(false);
+                    editButton.setVisible(true);
+                    editor.setEditable(false);
+                    editMode = false;
+                } catch (IOException ex) {
+                } catch (ParseException ex) {
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "EDITDECOMPILED":
+                setDecompiledEditMode(true);
+                break;
+            case "CANCELDECOMPILED":
                 setDecompiledEditMode(false);
-            } catch (IOException ex) {
-                Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, "IOException during action compiling", ex);
-            } catch (ParseException ex) {
-                View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            }
+                break;
+            case "SAVEDECOMPILED":
+                try {
+                    ActionScriptParser par = new ActionScriptParser();
+                    src.setActions(par.actionsFromString(decompiledEditor.getText()), SWF.DEFAULT_VERSION);
+                    setSource(this.src, false);
 
+                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
+                    setDecompiledEditMode(false);
+                } catch (IOException ex) {
+                    Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, "IOException during action compiling", ex);
+                } catch (ParseException ex) {
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+                break;
         }
     }
 

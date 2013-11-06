@@ -711,7 +711,7 @@ public class XFLConverter {
         edges.clear();
         fillsStr += "</fills>";
         strokesStr += "</strokes>";
-        if (!currentLayer.equals("")) {
+        if (!currentLayer.isEmpty()) {
             currentLayer += "</edges>";
             currentLayer += "</DOMShape>";
             currentLayer += "</elements>";
@@ -1301,10 +1301,14 @@ public class XFLConverter {
                 String symbolFile = "bitmap" + symbol.getCharacterId() + "." + imageTag.getImageFormat();
                 files.put(symbolFile, baos.toByteArray());
                 String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + baos.toByteArray().length + "\"";
-                if (format.equals("png") || format.equals("gif")) {
-                    mediaLinkStr += " useImportedJPEGData=\"false\" compressionType=\"lossless\" originalCompressionType=\"lossless\"";
-                } else if (format.equals("jpg")) {
-                    mediaLinkStr += " isJPEG=\"true\"";
+                switch (format) {
+                    case "png":
+                    case "gif":
+                        mediaLinkStr += " useImportedJPEGData=\"false\" compressionType=\"lossless\" originalCompressionType=\"lossless\"";
+                        break;
+                    case "jpg":
+                        mediaLinkStr += " isJPEG=\"true\"";
+                        break;
                 }
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
                     mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
@@ -1670,7 +1674,7 @@ public class XFLConverter {
         ret += ">";
 
         ret += soundEnvelopeStr;
-        if (!actionScript.equals("")) {
+        if (!actionScript.isEmpty()) {
             ret += "<Actionscript><script><![CDATA[";
             ret += actionScript;
             ret += "]]></script></Actionscript>";
@@ -1850,12 +1854,12 @@ public class XFLConverter {
                 lastElements = elements;
             }
         }
-        if (!lastElements.equals("")) {
+        if (!lastElements.isEmpty()) {
             frame++;
             ret += convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements);
         }
         afterStr = "</frames>" + afterStr;
-        if (!ret.equals("")) {
+        if (!ret.isEmpty()) {
             ret = prevStr + ret + afterStr;
         }
         return ret;
@@ -1875,7 +1879,7 @@ public class XFLConverter {
                 }
             }
         }
-        if (!script.equals("")) {
+        if (!script.isEmpty()) {
             script = "#initclip\r\n" + script + "#endinitclip\r\n";
         }
         for (Tag t : timeLineTags) {
@@ -1885,7 +1889,7 @@ public class XFLConverter {
             }
             if (t instanceof ShowFrameTag) {
 
-                if (script.equals("")) {
+                if (script.isEmpty()) {
                     duration++;
                 } else {
                     if (duration > 0) {
@@ -1912,7 +1916,7 @@ public class XFLConverter {
                 frame++;
             }
         }
-        if (!ret.equals("")) {
+        if (!ret.isEmpty()) {
             ret = "<DOMLayer name=\"Script Layer\" color=\"" + randomOutlineColor() + "\">"
                     + "<frames>"
                     + ret
@@ -1936,7 +1940,7 @@ public class XFLConverter {
             }
             if (t instanceof ShowFrameTag) {
 
-                if (frameLabel.equals("")) {
+                if (frameLabel.isEmpty()) {
                     duration++;
                 } else {
                     if (duration > 0) {
@@ -1967,7 +1971,7 @@ public class XFLConverter {
                 frame++;
             }
         }
-        if (!ret.equals("")) {
+        if (!ret.isEmpty()) {
             ret = "<DOMLayer name=\"Labels Layer\" color=\"" + randomOutlineColor() + "\">"
                     + "<frames>"
                     + ret
@@ -2015,7 +2019,7 @@ public class XFLConverter {
             }
             ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "");
         }
-        if (!ret.equals("")) {
+        if (!ret.isEmpty()) {
             ret = "<DOMLayer name=\"Layer " + layerIndex + "\" color=\"" + randomOutlineColor() + "\">"
                     + "<frames>" + ret + "</frames>"
                     + "</DOMLayer>";
@@ -2100,7 +2104,7 @@ public class XFLConverter {
             layerPrev += ">";
             String layerAfter = "</DOMLayer>";
             String cf = convertFrames(layerPrev, layerAfter, oneInstanceShapes, tags, timelineTags, characters, d);
-            if (cf.equals("")) {
+            if (cf.isEmpty()) {
                 index--;
             }
             ret += cf;
@@ -2395,7 +2399,7 @@ public class XFLConverter {
             if (det.hasMaxLength) {
                 ret += " maxCharacters=\"" + det.maxLength + "\"";
             }
-            if (!det.variableName.equals("")) {
+            if (!det.variableName.isEmpty()) {
                 ret += " variableName=\"" + det.variableName + "\"";
             }
             ret += ">";
@@ -2520,7 +2524,7 @@ public class XFLConverter {
         File f = new File(baseName);
         baseName = f.getName();
         if (baseName.contains(".")) {
-            baseName = baseName.substring(0, baseName.lastIndexOf("."));
+            baseName = baseName.substring(0, baseName.lastIndexOf('.'));
         }
         final HashMap<String, byte[]> files = new HashMap<>();
         final HashMap<String, byte[]> datfiles = new HashMap<>();
@@ -2586,7 +2590,7 @@ public class XFLConverter {
                             }
                             String expDir = "";
                             if (expPath.contains(".")) {
-                                expDir = expPath.substring(0, expPath.lastIndexOf("."));
+                                expDir = expPath.substring(0, expPath.lastIndexOf('.'));
                                 expDir = expDir.replace(".", File.separator);
                             }
                             expPath = expPath.replace(".", File.separator);
@@ -3121,75 +3125,82 @@ public class XFLConverter {
         @Override
         public void startElement(String uri, String localName,
                 String qName, Attributes attributes) throws SAXException {
-            if (qName.equals("a")) {
-                String href = attributes.getValue("href");
-                if (href != null) {
-                    url = href;
-                }
-                String t = attributes.getValue("target");
-                if (t != null) {
-                    target = t;
-                }
-            } else if (qName.equals("b")) {
-                bold = true;
-            } else if (qName.equals("i")) {
-                italic = true;
-            } else if (qName.equals("u")) {
-                underline = true;
-            } else if (qName.equals("li")) {
-                li = true;
-            } else if (qName.equals("p")) {
-                String a = attributes.getValue("align");
-                if (a != null) {
-                    alignment = a;
-                }
-                if (!result.equals("")) {
-                    putText("\r\n");
-                }
-            } else if (qName.equals("font")) {
-                //kerning  ?
-                String ls = attributes.getValue("letterSpacing");
-                if (ls != null) {
-                    letterSpacing = Double.parseDouble(ls);
-                }
-                String s = attributes.getValue("size");
-                if (s != null) {
-                    size = Integer.parseInt(s);
-                }
-                String c = attributes.getValue("color");
-                if (c != null) {
-                    color = c;
-                }
-                String f = attributes.getValue("face");
-                if (f != null) {
-                    for (Tag t : tags) {
-                        if (t instanceof FontTag) {
-                            FontTag ft = (FontTag) t;
-                            String fontName = null;
-                            if (f.equals(ft.getFontName(tags))) {
-                                for (Tag u : tags) {
-                                    if (u instanceof DefineFontNameTag) {
-                                        if (((DefineFontNameTag) u).fontId == ft.getFontId()) {
-                                            fontName = ((DefineFontNameTag) u).fontName;
+            switch (qName) {
+                case "a":
+                    String href = attributes.getValue("href");
+                    if (href != null) {
+                        url = href;
+                    }
+                    String t = attributes.getValue("target");
+                    if (t != null) {
+                        target = t;
+                    }
+                    break;
+                case "b":
+                    bold = true;
+                    break;
+                case "i":
+                    italic = true;
+                    break;
+                case "u":
+                    underline = true;
+                    break;
+                case "li":
+                    li = true;
+                    break;
+                case "p":
+                    String a = attributes.getValue("align");
+                    if (a != null) {
+                        alignment = a;
+                    }
+                    if (!result.isEmpty()) {
+                        putText("\r\n");
+                    }
+                    break;
+                case "font":
+                    //kerning  ?
+                    String ls = attributes.getValue("letterSpacing");
+                    if (ls != null) {
+                        letterSpacing = Double.parseDouble(ls);
+                    }
+                    String s = attributes.getValue("size");
+                    if (s != null) {
+                        size = Integer.parseInt(s);
+                    }
+                    String c = attributes.getValue("color");
+                    if (c != null) {
+                        color = c;
+                    }
+                    String f = attributes.getValue("face");
+                    if (f != null) {
+                        for (Tag tag : tags) {
+                            if (tag instanceof FontTag) {
+                                FontTag ft = (FontTag) tag;
+                                String fontName = null;
+                                if (f.equals(ft.getFontName(tags))) {
+                                    for (Tag u : tags) {
+                                        if (u instanceof DefineFontNameTag) {
+                                            if (((DefineFontNameTag) u).fontId == ft.getFontId()) {
+                                                fontName = ((DefineFontNameTag) u).fontName;
+                                            }
                                         }
                                     }
+                                    if (fontName == null) {
+                                        fontName = ft.getFontName(tags);
+                                    }
+                                    String installedFont;
+                                    if ((installedFont = FontTag.isFontInstalled(fontName)) != null) {
+                                        fontFace = new Font(installedFont, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
+                                    } else {
+                                        fontFace = fontName;
+                                    }
+                                    break;
                                 }
-                                if (fontName == null) {
-                                    fontName = ft.getFontName(tags);
-                                }
-                                String installedFont;
-                                if ((installedFont = FontTag.isFontInstalled(fontName)) != null) {
-                                    fontFace = new Font(installedFont, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
-                                } else {
-                                    fontFace = fontName;
-                                }
-                                break;
                             }
                         }
                     }
-                }
+                    break;
             }
-            //textformat,tab,br
         }
 
         @Override
@@ -3268,7 +3279,7 @@ public class XFLConverter {
 
         @Override
         public void endDocument() {
-            if (this.result.equals("")) {
+            if (this.result.isEmpty()) {
                 putText("");
             }
         }

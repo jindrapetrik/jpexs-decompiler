@@ -627,7 +627,7 @@ public class ActionListReader {
                     }
                 }
 
-                ip = ip + actionLengthWithHeader;
+                ip += actionLengthWithHeader;
 
                 if (a.isExit()) {
                     break;
@@ -731,13 +731,16 @@ public class ActionListReader {
                             System.out.print("newip " + nip + ", ");
                             System.out.print("Action: jump(j),ignore(i),compute(c)?");
                             String next = sc.next();
-                            if (next.equals("j")) {
-                                newip = pos + aif.getJumpOffset();
-                                pos = newip;
-
-                            } else if (next.equals("i")) {
-                            } else if (next.equals("c")) {
-                                goaif = true;
+                            switch (next) {
+                                case "j":
+                                    newip = pos + aif.getJumpOffset();
+                                    pos = newip;
+                                    break;
+                                case "i":
+                                    break;
+                                case "c":
+                                    goaif = true;
+                                    break;
                             }
                         } else if (top.isCompileTime() && (!top.hasSideEffect())) {
                             ((ActionIf) a).compileTime = true;
@@ -843,7 +846,7 @@ public class ActionListReader {
             if (newip > -1) {
                 ip = newip;
             } else {
-                ip = ip + info;
+                ip += info;
             }
             pos = ip;
             if (goaif) {

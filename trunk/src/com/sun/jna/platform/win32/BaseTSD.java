@@ -79,7 +79,7 @@ public interface BaseTSD extends StdCallLibrary {
     /**
      * PULONG_PTR
      */
-    public static class ULONG_PTRByReference extends ByReference {
+    public static final class ULONG_PTRByReference extends ByReference {
 
         public ULONG_PTRByReference() {
             this(new ULONG_PTR(0));

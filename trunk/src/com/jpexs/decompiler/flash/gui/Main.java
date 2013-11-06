@@ -993,8 +993,8 @@ public class Main {
                         }
                     } else {
                         if (s.contains("=")) {
-                            String key = s.substring(0, s.indexOf("="));
-                            String val = s.substring(s.indexOf("=") + 1);
+                            String key = s.substring(0, s.indexOf('='));
+                            String val = s.substring(s.indexOf('=') + 1);
                             if ("updateSystem".equals(header)) {
                                 if (key.equals("majorVersion")) {
                                     updateMajor = Integer.parseInt(val);
@@ -1029,8 +1029,8 @@ public class Main {
                                     ver.updateLink = val;
                                 }
                                 if (key.equals("change[]")) {
-                                    String changeType = val.substring(0, val.indexOf("|"));
-                                    String change = val.substring(val.indexOf("|") + 1);
+                                    String changeType = val.substring(0, val.indexOf('|'));
+                                    String change = val.substring(val.indexOf('|') + 1);
                                     if (!ver.changes.containsKey(changeType)) {
                                         ver.changes.put(changeType, new ArrayList<String>());
                                     }
@@ -1041,7 +1041,7 @@ public class Main {
                         }
                     }
                 }
-                if (s.equals("")) {
+                if (s.isEmpty()) {
                     start = true;
                 }
             }

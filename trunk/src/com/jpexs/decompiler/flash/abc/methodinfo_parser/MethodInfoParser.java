@@ -56,7 +56,7 @@ public class MethodInfoParser {
                         nstype = nstype + symbValue.type + ":";
                     }
                 } while (symbValue.type >= 8 && symbValue.type <= 13);
-                if ((!nstype.equals("")) && (symbValue.type != ParsedSymbol.TYPE_NAMESPACE)) {
+                if ((!nstype.isEmpty()) && (symbValue.type != ParsedSymbol.TYPE_NAMESPACE)) {
                     throw new ParseException("Namespace expected", lexer.yyline());
                 }
                 int id = 0;
@@ -95,7 +95,7 @@ public class MethodInfoParser {
                             value = new ValueKind((int) (long) (Long) symbValue.value, ValueKind.CONSTANT_StaticProtectedNs);
                         } else if (nstype.equals("8:")) {
                             value = new ValueKind((int) (long) (Long) symbValue.value, ValueKind.CONSTANT_PrivateNs);
-                        } else if (nstype.equals("")) {
+                        } else if (nstype.isEmpty()) {
                             value = new ValueKind((int) (long) (Long) symbValue.value, ValueKind.CONSTANT_Namespace);
                         } else {
                             throw new ParseException("Invalid type of namespace", lexer.yyline());
@@ -194,7 +194,7 @@ public class MethodInfoParser {
                                 nstype = nstype + symbValue.type + ":";
                             }
                         } while (symbValue.type >= 8 && symbValue.type <= 13);
-                        if ((!nstype.equals("")) && (symbValue.type != ParsedSymbol.TYPE_NAMESPACE)) {
+                        if ((!nstype.isEmpty()) && (symbValue.type != ParsedSymbol.TYPE_NAMESPACE)) {
                             throw new ParseException("Namespace expected", lexer.yyline());
                         }
                         int id = 0;
@@ -233,7 +233,7 @@ public class MethodInfoParser {
                                     optionalValues.add(new ValueKind((int) (long) (Long) symbValue.value, ValueKind.CONSTANT_StaticProtectedNs));
                                 } else if (nstype.equals("8:")) {
                                     optionalValues.add(new ValueKind((int) (long) (Long) symbValue.value, ValueKind.CONSTANT_PrivateNs));
-                                } else if (nstype.equals("")) {
+                                } else if (nstype.isEmpty()) {
                                     optionalValues.add(new ValueKind((int) (long) (Long) symbValue.value, ValueKind.CONSTANT_Namespace));
                                 } else {
                                     throw new ParseException("Invalid type of namespace", lexer.yyline());

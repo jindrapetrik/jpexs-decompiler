@@ -62,7 +62,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
     @Override
     protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         MethodBody body = abc.findBody(methodIndex);
-        writer.append("function" + (!functionName.equals("") ? " " + functionName : ""));
+        writer.append("function" + (!functionName.isEmpty() ? " " + functionName : ""));
         writer.startMethod(methodIndex);
         writer.appendNoHilight("(");
         methodInfo[methodIndex].getParamStr(writer, constants, body, abc, fullyQualifiedNames);

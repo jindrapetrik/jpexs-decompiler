@@ -471,7 +471,7 @@ public class SWFInputStream extends InputStream {
         }
         for (int bit = 0; bit < nBits; bit++) {
             int nb = (tempByte >> (7 - bitPos)) & 1;
-            ret = ret + (nb << (nBits - 1 - bit));
+            ret += (nb << (nBits - 1 - bit));
             bitPos++;
             if (bitPos == 8) {
                 bitPos = 0;

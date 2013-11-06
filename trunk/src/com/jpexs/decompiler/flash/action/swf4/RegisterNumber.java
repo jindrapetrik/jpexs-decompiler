@@ -51,7 +51,7 @@ public class RegisterNumber implements Serializable {
 
     @Override
     public String toString() {
-        if (name == null || name.trim().equals("")) {
+        if (name == null || name.trim().isEmpty()) {
             return toStringNoName();
         }
         return name;
@@ -62,7 +62,7 @@ public class RegisterNumber implements Serializable {
     }
 
     public String translate() {
-        if (name == null || name.trim().equals("")) {
+        if (name == null || name.trim().isEmpty()) {
             return "_loc" + number + "_";
         }
         return name;

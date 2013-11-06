@@ -56,7 +56,7 @@ public class ChromeCache implements CacheImplementation {
             for (EntryStore en : entries) {
                 if (en.state == EntryStore.ENTRY_NORMAL) {
                     String key = en.getKey();
-                    if (key != null && !key.trim().equals("")) {
+                    if (key != null && !key.trim().isEmpty()) {
                         ret.add(en);
                     }
                 }

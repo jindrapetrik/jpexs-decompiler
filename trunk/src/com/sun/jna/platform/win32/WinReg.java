@@ -40,7 +40,7 @@ public interface WinReg extends StdCallLibrary {
         }
     }
 
-    public static class HKEYByReference extends ByReference {
+    public static final class HKEYByReference extends ByReference {
 
         public HKEYByReference() {
             this(null);

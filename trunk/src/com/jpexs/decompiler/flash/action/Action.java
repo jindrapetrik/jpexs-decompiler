@@ -123,7 +123,7 @@ public class Action implements GraphSourceItem {
         "_ymouse"
     };
     public static final List<String> propertyNamesList = Arrays.asList(propertyNames);
-    private static Logger logger = Logger.getLogger(Action.class.getName());
+    private static final Logger logger = Logger.getLogger(Action.class.getName());
 
     /**
      * Constructor

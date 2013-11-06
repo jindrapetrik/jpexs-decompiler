@@ -163,7 +163,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
             return fontName;
         }
         if (fontName.contains("_")) {
-            String beforeUnderscore = fontName.substring(0, fontName.indexOf("_"));
+            String beforeUnderscore = fontName.substring(0, fontName.indexOf('_'));
             if (fontNames.contains(beforeUnderscore)) {
                 return beforeUnderscore;
             }
@@ -176,7 +176,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
             return fontName;
         }
         if (fontName.contains("_")) {
-            String beforeUnderscore = fontName.substring(0, fontName.indexOf("_"));
+            String beforeUnderscore = fontName.substring(0, fontName.indexOf('_'));
             if (fontNames.contains(beforeUnderscore)) {
                 return beforeUnderscore;
             }
