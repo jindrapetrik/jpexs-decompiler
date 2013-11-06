@@ -604,6 +604,26 @@ public class Helper {
         return writer.toString();
     }
 
+    public static byte[] getBytesFromHexaText(String text) {
+        Scanner scanner = new Scanner(text);
+        scanner.nextLine(); // ignore first line
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine().trim();
+            if (line.startsWith(";")) {
+                continue;
+            }
+            line = line.replace(" ", "");
+            for (int i = 0; i < line.length() / 2; i++) {
+                String hexStr = line.substring(i * 2, (i + 1) * 2);
+                byte b = (byte) Integer.parseInt(hexStr, 16);
+                baos.write(b);
+            }
+        }
+        byte[] data = baos.toByteArray();
+        return data;
+    }
+
     public static <T> T timedCall(Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
         FutureTask<T> task = new FutureTask<>(c);
         THREAD_POOL.execute(task);

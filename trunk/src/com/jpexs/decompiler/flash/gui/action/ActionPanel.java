@@ -306,7 +306,9 @@ public class ActionPanel extends JPanel implements ActionListener {
             }
         } else {
             if (srcHexOnly == null) {
-                srcHexOnly = new HilightedText(Helper.byteArrToString(src.getActionBytes()));
+                HilightedTextWriter writer = new HilightedTextWriter(true);
+                Helper.byteArrayToHex(writer, src.getActionBytes());
+                srcHexOnly = new HilightedText(writer);
             }
             setText(srcHexOnly);
         }
@@ -443,13 +445,12 @@ public class ActionPanel extends JPanel implements ActionListener {
         hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
-        // todo: find icon, and set visible
+        // todo: find icon
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
         hexOnlyButton.setActionCommand("HEXONLY");
         hexOnlyButton.addActionListener(this);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
-        //hexOnlyButton.setVisible(false);
 
         topButtonsPan = new JPanel();
         topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
@@ -618,8 +619,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
 
     public void setEditMode(boolean val) {
-        // todo: create UI for editing raw data
-        final boolean rawEdit = false;
+        boolean rawEdit = hexOnlyButton.isSelected();
 
         if (val) {
             setText(rawEdit ? srcHexOnly : srcNoHex);
@@ -630,7 +630,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             editor.getCaret().setVisible(true);
             asmLabel.setIcon(View.getIcon("editing16"));
         } else {
-            setText(hexButton.isSelected() ? srcWithHex : srcNoHex);
+            setHex(getExportMode());
             editor.setEditable(false);
             saveButton.setVisible(false);
             editButton.setVisible(true);
@@ -714,6 +714,11 @@ public class ActionPanel extends JPanel implements ActionListener {
         } else if (e.getActionCommand().equals("EDITACTION")) {
             setEditMode(true);
         } else if (e.getActionCommand().equals("HEX") || e.getActionCommand().equals("HEXONLY")) {
+            if (e.getActionCommand().equals("HEX")) {
+                hexOnlyButton.setSelected(false);
+            } else {
+                hexButton.setSelected(false);
+            }
             setHex(getExportMode());
         } else if (e.getActionCommand().equals("CANCELACTION")) {
             setEditMode(false);
@@ -722,7 +727,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             try {
                 String text = editor.getText();
                 if (text.trim().startsWith("#hexdata")) {
-                    src.setActionBytes(getBytesFromHexaText(text));
+                    src.setActionBytes(Helper.getBytesFromHexaText(text));
                 } else {
                     src.setActions(ASMParser.parse(0, src.getPos(), true, text, SWF.DEFAULT_VERSION, false), SWF.DEFAULT_VERSION);
                 }
@@ -763,26 +768,6 @@ public class ActionPanel extends JPanel implements ActionListener {
         return exportMode;
     }
     
-    public byte[] getBytesFromHexaText(String text) {
-        Scanner scanner = new Scanner(text);
-        scanner.nextLine(); // ignore first line
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine().trim();
-            if (line.startsWith(";")) {
-                continue;
-            }
-            line = line.replace(" ", "");
-            for (int i = 0; i < line.length() / 2; i++) {
-                String hexStr = line.substring(i * 2, (i + 1) * 2);
-                byte b = (byte) Integer.parseInt(hexStr, 16);
-                baos.write(b);
-            }
-        }
-        byte[] data = baos.toByteArray();
-        return data;
-    }
-
     public void updateSearchPos() {
         searchPos.setText((foundPos + 1) + "/" + found.size());
         setSource(found.get(foundPos), true);

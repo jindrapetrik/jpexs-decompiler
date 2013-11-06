@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,5 +62,10 @@ public class HilightedText implements Serializable {
     
     public HilightedText(String text) {
         this.text = text;
+        this.traitHilights = new ArrayList<>();
+        this.classHilights = new ArrayList<>();
+        this.methodHilights = new ArrayList<>();
+        this.instructionHilights = new ArrayList<>();
+        this.specialHilights = new ArrayList<>();
     }
 }
