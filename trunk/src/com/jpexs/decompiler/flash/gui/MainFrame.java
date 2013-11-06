@@ -391,7 +391,6 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         JCommandButton reloadCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.reload")), View.getResizableIcon("reload16"));
         assignListener(reloadCommandButton, "RELOAD");
 
-
         editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveasCommandButton, RibbonElementPriority.MEDIUM);
@@ -477,7 +476,6 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
         //assignListener(miGotoMainClassOnStartup,"GOTODOCUMENTCLASSONSTARTUP");
 
-
         settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
         settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
         settingsBand.addRibbonComponent(new JRibbonComponent(miParallelSpeedUp));
@@ -500,8 +498,15 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         JCommandButton setLanguageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.settings.language")), View.getResizableIcon("setlanguage32"));
         assignListener(setLanguageCommandButton, "SETLANGUAGE");
         languageBand.addCommandButton(setLanguageCommandButton, RibbonElementPriority.TOP);
-        RibbonTask settingsTask = new RibbonTask(translate("menu.settings"), settingsBand, languageBand);
 
+        JRibbonBand advancedSettingsBand = new JRibbonBand(translate("menu.advancedsettings.advancedsettings"), null);
+        advancedSettingsBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(advancedSettingsBand.getControlPanel()), new IconRibbonBandResizePolicy(advancedSettingsBand.getControlPanel())));
+        JCommandButton advancedSettingsCommandButton = new JCommandButton(fixCommandTitle(translate("menu.advancedsettings.advancedsettings")), View.getResizableIcon("settings16"));
+        assignListener(advancedSettingsCommandButton, "ADVANCEDSETTINGS");
+
+        advancedSettingsBand.addCommandButton(advancedSettingsCommandButton, RibbonElementPriority.MEDIUM);
+        
+        RibbonTask settingsTask = new RibbonTask(translate("menu.settings"), settingsBand, languageBand, advancedSettingsBand);
 
         //----------------------------------------- HELP -----------------------------------
 
@@ -2312,6 +2317,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 if (View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                     Main.reloadSWF();
                 }
+                break;
+            case "ADVANCEDSETTINGS":
+                Main.advancedSettings();
                 break;
             case "LOADMEMORY":
                 Main.loadFromMemory();
