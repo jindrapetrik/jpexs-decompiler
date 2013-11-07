@@ -4,6 +4,7 @@
 	import flash.utils.Dictionary;
 	import classes.myInternal;
 	import flash.errors.EOFError;
+	import flash.events.Event;
 
 	public class Test
 	{
