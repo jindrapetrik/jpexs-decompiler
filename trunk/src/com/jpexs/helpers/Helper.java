@@ -34,6 +34,7 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
@@ -72,7 +73,7 @@ public class Helper {
             if (i > 0) {
                 s += ",";
             }
-            s = s + array[i];
+            s += array[i];
         }
         s += "]";
         return s;
@@ -90,7 +91,7 @@ public class Helper {
             if (i > 0) {
                 s += " ";
             }
-            s = s + padZeros(Integer.toHexString(array[i] & 0xff), 2);
+            s += padZeros(Integer.toHexString(array[i] & 0xff), 2);
         }
         s += "]";
         return s;
@@ -353,9 +354,7 @@ public class Helper {
 
     public static List<Object> toList(Object... rest) {
         List<Object> ret = new ArrayList<>();
-        for (Object o : rest) {
-            ret.add(o);
-        }
+        ret.addAll(Arrays.asList(rest));
         return ret;
     }
 
@@ -483,7 +482,7 @@ public class Helper {
             str = Pattern.compile("\\." + Pattern.quote(inv) + "\\.", Pattern.CASE_INSENSITIVE).matcher(str).replaceAll("._" + inv + ".");
         }
         str = str.substring(1, str.length() - 1); //remove dots
-        if (str.equals("")) {
+        if (str.isEmpty()) {
             str = "unnamed";
         }
         return str;
@@ -527,11 +526,11 @@ public class Helper {
 
     public static String formatTimeSec(long timeMs) {
         long timeS = timeMs / 1000;
-        timeMs = timeMs % 1000;
+        timeMs %= 1000;
         long timeM = timeS / 60;
-        timeS = timeS % 60;
+        timeS %= 60;
         long timeH = timeM / 60;
-        timeM = timeM % 60;
+        timeM %= 60;
         String timeStr = "";
         if (timeH > 0) {
             timeStr += Helper.padZeros(timeH, 2) + ":";
@@ -548,9 +547,9 @@ public class Helper {
 
     public static String formatTimeToText(int timeS) {
         long timeM = timeS / 60;
-        timeS = timeS % 60;
+        timeS %= 60;
         long timeH = timeM / 60;
-        timeM = timeM % 60;
+        timeM %= 60;
 
         String timeStr = "";
         if (timeH > 0) {
@@ -602,6 +601,26 @@ public class Helper {
         HilightedTextWriter writer = new HilightedTextWriter(false);
         byteArrayToHex(writer, data);
         return writer.toString();
+    }
+
+    public static byte[] getBytesFromHexaText(String text) {
+        Scanner scanner = new Scanner(text);
+        scanner.nextLine(); // ignore first line
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine().trim();
+            if (line.startsWith(";")) {
+                continue;
+            }
+            line = line.replace(" ", "");
+            for (int i = 0; i < line.length() / 2; i++) {
+                String hexStr = line.substring(i * 2, (i + 1) * 2);
+                byte b = (byte) Integer.parseInt(hexStr, 16);
+                baos.write(b);
+            }
+        }
+        byte[] data = baos.toByteArray();
+        return data;
     }
 
     public static <T> T timedCall(Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {

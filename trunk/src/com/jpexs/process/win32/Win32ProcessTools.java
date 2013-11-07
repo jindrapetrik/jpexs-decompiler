@@ -200,7 +200,7 @@ public class Win32ProcessTools extends ProcessTools {
                 int rgb = Gdi32.INSTANCE.GetPixel(hdcMem, x, y).intValue();
                 int r = (rgb >> 16) & 0xff;
                 int g = (rgb >> 8) & 0xff;
-                int b = (rgb >> 0) & 0xff;
+                int b = (rgb) & 0xff;
                 rgb = (b << 16) + (g << 8) + r;
                 ret.setRGB(x, y, rgb);
             }
@@ -226,7 +226,7 @@ public class Win32ProcessTools extends ProcessTools {
                 int rgb = image.getRGB(x, y);
                 int r = (rgb >> 16) & 0xff;
                 int g = (rgb >> 8) & 0xff;
-                int b = (rgb >> 0) & 0xff;
+                int b = (rgb) & 0xff;
                 r = r * alpha / 255;
                 g = g * alpha / 255;
                 b = b * alpha / 255;

@@ -108,14 +108,12 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
-        // todo: find icon, and set visible
+        // todo: find icon
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
         hexOnlyButton.setActionCommand("HEXONLY");
         hexOnlyButton.addActionListener(this);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
-        hexOnlyButton.setVisible(false);
-        
 
         buttonsPanel.add(graphButton);
         buttonsPanel.add(hexButton);
@@ -137,6 +135,11 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         }
 
         if (e.getActionCommand().equals("HEX") || e.getActionCommand().equals("HEXONLY")) {
+            if (e.getActionCommand().equals("HEX")) {
+                hexOnlyButton.setSelected(false);
+            } else {
+                hexButton.setSelected(false);
+            }
             sourceTextArea.setHex(getExportMode(), false);
         }
     }
@@ -148,10 +151,10 @@ public class MethodCodePanel extends JPanel implements ActionListener {
     }
     
     public void setEditMode(boolean val) {
+        ExportMode exportMode = getExportMode();
         if (val) {
-            sourceTextArea.setHex(ExportMode.PCODE, false);
+            sourceTextArea.setHex(exportMode == ExportMode.HEX ? ExportMode.HEX : ExportMode.PCODE, false);
         } else {
-            ExportMode exportMode = getExportMode();
             if (exportMode != ExportMode.PCODE) {
                 sourceTextArea.setHex(exportMode, false);
             }

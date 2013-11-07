@@ -81,7 +81,7 @@ public class Namespace {
     public String getNameWithKind(ConstantPool constants) {
         String kindStr = getKindStr();
         String nameStr = constants.constant_string[name_index];
-        return kindStr + (nameStr.equals("") ? "" : " " + nameStr);
+        return kindStr + (nameStr.isEmpty() ? "" : " " + nameStr);
     }
 
     public String getPrefix(ABC abc) {

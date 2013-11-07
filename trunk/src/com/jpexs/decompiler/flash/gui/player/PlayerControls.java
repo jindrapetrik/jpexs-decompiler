@@ -102,11 +102,11 @@ public class PlayerControls extends JPanel implements ActionListener {
 
     private String formatMs(long ms) {
         long s = ms / 1000;
-        ms = ms % 1000;
+        ms %= 1000;
         long m = s / 60;
-        s = s % 60;
+        s %= 60;
         long h = m / 60;
-        m = m % 60;
+        m %= 60;
         return "" + (h > 0 ? h + ":" : "") + pad(m) + ":" + pad(s) + "." + pad(ms / 10);
     }
 

@@ -61,7 +61,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public class WORDbyReference extends ByReference {
+    public static final class WORDbyReference extends ByReference {
 
         public WORDbyReference() {
             this(new WORD(0));
@@ -123,7 +123,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public class DWORDbyReference extends ByReference {
+    public static final class DWORDbyReference extends ByReference {
 
         public DWORDbyReference() {
             this(new DWORD(0));
@@ -156,7 +156,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public class LONGbyReference extends ByReference {
+    public static final class LONGbyReference extends ByReference {
 
         public LONGbyReference() {
             this(new LONG(0));
@@ -189,7 +189,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public class LONGLONGbyReference extends ByReference {
+    public static final class LONGLONGbyReference extends ByReference {
 
         public LONGLONGbyReference() {
             this(new LONGLONG(0));
@@ -658,7 +658,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public class ULONGbyReference extends ByReference {
+    public static final class ULONGbyReference extends ByReference {
 
         public ULONGbyReference() {
             this(new ULONG(0));
@@ -691,7 +691,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public class ULONGLONGbyReference extends ByReference {
+    public static final class ULONGLONGbyReference extends ByReference {
 
         public ULONGLONGbyReference() {
             this(new ULONGLONG(0));
@@ -899,7 +899,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public class USHORTbyReference extends ByReference {
+    public static final class USHORTbyReference extends ByReference {
 
         public USHORTbyReference() {
             this(new USHORT(0));
@@ -967,7 +967,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public class UINTbyReference extends ByReference {
+    public static final class UINTbyReference extends ByReference {
 
         public UINTbyReference() {
             this(new UINT(0));
@@ -1009,7 +1009,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public static class SCODEbyReference extends ByReference {
+    public static final class SCODEbyReference extends ByReference {
 
         public SCODEbyReference() {
             this(new SCODE(0));
@@ -1053,7 +1053,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public static class BOOLbyReference extends ByReference {
+    public static final class BOOLbyReference extends ByReference {
 
         public BOOLbyReference() {
             this(new BOOL(0));
@@ -1110,7 +1110,7 @@ public interface WinDef extends StdCallLibrary {
         }
     }
 
-    public static class CHARbyReference extends ByReference {
+    public static final class CHARbyReference extends ByReference {
 
         public CHARbyReference() {
             this(new CHAR(0));

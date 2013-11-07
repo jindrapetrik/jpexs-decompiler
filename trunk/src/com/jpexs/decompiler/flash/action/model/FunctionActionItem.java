@@ -81,7 +81,7 @@ public class FunctionActionItem extends ActionItem {
         if (calculatedFunctionName != null) {
             writer.append(" ");
             calculatedFunctionName.toStringNoQuotes(writer, localData);
-        } else if (!functionName.equals("")) {
+        } else if (!functionName.isEmpty()) {
             writer.append(" ");
             writer.append(functionName);
         }
@@ -91,7 +91,7 @@ public class FunctionActionItem extends ActionItem {
                 writer.append(", ");
             }
             String pname = paramNames.get(p);
-            if (pname == null || pname.equals("")) {
+            if (pname == null || pname.isEmpty()) {
                 pname = new RegisterNumber(regStart + p).translate();
             }
             writer.append(pname);

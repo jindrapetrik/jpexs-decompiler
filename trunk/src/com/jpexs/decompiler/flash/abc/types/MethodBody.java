@@ -84,7 +84,7 @@ public class MethodBody implements Cloneable, Serializable {
         code.restoreControlFlow(constants, trait, info, this);
     }
 
-    public int removeTraps(ConstantPool constants, ABC abc, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) {
+    public int removeTraps(ConstantPool constants, ABC abc, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
         return code.removeTraps(constants, trait, abc.method_info[method_info], this, abc, scriptIndex, classIndex, isStatic, path);
     }
 
@@ -130,7 +130,7 @@ public class MethodBody implements Cloneable, Serializable {
             try {
                 Callable<Void> callable = new Callable<Void>() {
                     @Override
-                    public Void call() {
+                    public Void call() throws InterruptedException {
                         MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
                         HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                         convertedItems = converted.code.toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), converted.code.visitCode(converted));

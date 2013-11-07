@@ -36,7 +36,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
+public final class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
 
     public JLabel label = new JLabel();
     public DrawableTag drawable;

@@ -277,7 +277,7 @@ public class TagNode {
         File dir = new File(outdir);
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
-            outdir = outdir + File.separator;
+            outdir += File.separator;
         }
         List<String> existingNames = new ArrayList<>();
         for (TagNode node : nodeList) {

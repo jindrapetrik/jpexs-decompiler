@@ -26,7 +26,7 @@ import java.util.Stack;
  */
 public interface GraphSourceItem extends Serializable {
 
-    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path);
+    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException;
 
     public boolean isJump();
 

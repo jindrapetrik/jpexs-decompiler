@@ -60,7 +60,7 @@ public class ABCOutputStream extends OutputStream {
 
     public void writeU32(long value) throws IOException {
         boolean loop = true;
-        value = value & 0xFFFFFFFF;
+        value &= 0xFFFFFFFF;
         do {
             int ret = (int) (value & 0x7F);
             if (value < 0x80) {
@@ -70,17 +70,17 @@ public class ABCOutputStream extends OutputStream {
                 ret += 0x80;
             }
             write(ret);
-            value = value >> 7;
+            value >>= 7;
         } while (loop);
     }
 
     public void writeS24(long value) throws IOException {
         int ret = (int) (value & 0xff);
         write(ret);
-        value = value >> 8;
+        value >>= 8;
         ret = (int) (value & 0xff);
         write(ret);
-        value = value >> 8;
+        value >>= 8;
         ret = (int) (value & 0xff);
         write(ret);
     }
@@ -107,13 +107,13 @@ public class ABCOutputStream extends OutputStream {
             }
 
             if (bitcount == 35) {
-                ret = ret & 0xf;
+                ret &= 0xf;
             }
             write(ret);
             if (bitcount == 35) {
                 break;
             }
-            value = value >> 7;
+            value >>= 7;
         } while (loop);
     }
 

@@ -109,7 +109,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     public JLabel scriptNameLabel;
 
     public boolean search(String txt, boolean ignoreCase, boolean regexp) {
-        if ((txt != null) && (!txt.equals(""))) {
+        if ((txt != null) && (!txt.isEmpty())) {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
             ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();

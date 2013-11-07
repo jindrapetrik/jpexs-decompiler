@@ -197,7 +197,7 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         String search = searchField.getText();
         List<CacheEntry> filtered = new ArrayList<>();
         for (CacheEntry en : entries) {
-            if (search.equals("") || en.getRequestURL().contains(search)) {
+            if (search.isEmpty() || en.getRequestURL().contains(search)) {
                 filtered.add(en);
             }
         }
@@ -208,11 +208,11 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         String ret = en.getRequestURL();
         //Strip parameters
         if (ret.contains("?")) {
-            ret = ret.substring(0, ret.indexOf("?"));
+            ret = ret.substring(0, ret.indexOf('?'));
         }
         //Strip path
         if (ret.contains("/")) {
-            ret = ret.substring(ret.lastIndexOf("/") + 1);
+            ret = ret.substring(ret.lastIndexOf('/') + 1);
         }
         return ret;
     }

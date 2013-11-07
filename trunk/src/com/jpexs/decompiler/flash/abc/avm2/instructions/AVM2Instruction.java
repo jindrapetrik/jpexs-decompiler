@@ -254,7 +254,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         if (ignored) {
             return " ;ignored";
         }
-        if ((comment == null) || comment.equals("")) {
+        if ((comment == null) || comment.isEmpty()) {
             return "";
         }
         return " ;" + comment;

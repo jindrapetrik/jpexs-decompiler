@@ -63,9 +63,9 @@ public abstract class Trait implements Serializable {
                         break;
                     }
                     if (nsname.contains(".")) {
-                        nsname = nsname.substring(nsname.lastIndexOf(".") + 1);
+                        nsname = nsname.substring(nsname.lastIndexOf('.') + 1);
                     }
-                    if (!nsname.equals("")) {
+                    if (!nsname.isEmpty()) {
                         break;
                     }
                 }
@@ -77,7 +77,7 @@ public abstract class Trait implements Serializable {
             }
 
 
-            if ((!nsname.equals("")) && (!nsname.equals("-"))) {
+            if ((!nsname.isEmpty()) && (!nsname.equals("-"))) {
             } else {
                 if (ns != null) {
                     if (ns.kind == Namespace.KIND_NAMESPACE) {
@@ -86,7 +86,7 @@ public abstract class Trait implements Serializable {
                 }
             }
 
-            if ((!nsname.contains(":")) && (!nsname.equals(""))) {
+            if ((!nsname.contains(":")) && (!nsname.isEmpty())) {
                 ret += " " + nsname;
             }
             if (ns != null) {
@@ -161,7 +161,7 @@ public abstract class Trait implements Serializable {
         }
     }
 
-    public abstract int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path);
+    public abstract int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException;
 
     public String getPath(ABC abc) {
         Multiname name = getName(abc);

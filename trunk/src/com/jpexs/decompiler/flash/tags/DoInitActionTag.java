@@ -176,7 +176,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     @Override
     public String getExportFileName(List<Tag> tags) {
         String expName = getExportName();
-        if ((expName == null) || expName.equals("")) {
+        if ((expName == null) || expName.isEmpty()) {
             return super.toString();
         }
         String[] pathParts;
@@ -191,7 +191,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     @Override
     public String toString() {
         String expName = getExportName();
-        if ((expName == null) || expName.equals("")) {
+        if ((expName == null) || expName.isEmpty()) {
             return super.toString();
         }
         String[] pathParts;

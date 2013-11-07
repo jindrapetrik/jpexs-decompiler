@@ -123,7 +123,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         int multinameIndex = ins.operands[0];
         String multiname = resolveMultinameNoPop(0, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
         GraphTargetItem obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)); //pod vrcholem
-        if ((!obj.toString().equals(""))) {
+        if ((!obj.toString().isEmpty())) {
             multiname = "." + multiname;
         }
         return obj + multiname;

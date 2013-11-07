@@ -101,7 +101,7 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
         for (int i = 0; i < accessStrings.length; i++) {
             String pref = Namespace.kindToPrefix(modifiers[i]);
             String name = Namespace.kindToStr(modifiers[i]);
-            accessStrings[i] = (pref.equals("") ? "" : pref + " ") + "(" + name + ")";
+            accessStrings[i] = (pref.isEmpty() ? "" : pref + " ") + "(" + name + ")";
         }
 
 
@@ -162,7 +162,7 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "OK":
-                if (nameField.getText().trim().equals("")) {
+                if (nameField.getText().trim().isEmpty()) {
                     View.showMessageDialog(null, translate("error.name"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }

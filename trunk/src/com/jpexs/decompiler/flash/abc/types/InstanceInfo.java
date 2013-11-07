@@ -72,7 +72,7 @@ public class InstanceInfo {
         String modifiers;
         Namespace ns = abc.constants.constant_multiname[name_index].getNamespace(abc.constants);
         modifiers = ns.getPrefix(abc);
-        if (!modifiers.equals("")) {
+        if (!modifiers.isEmpty()) {
             modifiers += " ";
         }
 
@@ -80,7 +80,7 @@ public class InstanceInfo {
             modifiers += "final ";
         }
         if (isDynamic()) {
-            modifiers = modifiers + "dynamic ";
+            modifiers += "dynamic ";
         }
         String objType = "class ";
         if (isInterface()) {

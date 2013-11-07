@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.PackageNode;
@@ -231,7 +232,7 @@ import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationM
  *
  * @author Jindra
  */
-public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSelectionListener, Freed {
+public final class MainFrame extends AppRibbonFrame implements ActionListener, TreeSelectionListener, Freed {
 
     private SWF swf;
     public ABCPanel abcPanel;
@@ -340,7 +341,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     }
 
     public void setWorkStatus(String s, Runnable cancelCallback) {
-        if (s.equals("")) {
+        if (s.isEmpty()) {
             loadingPanel.setVisible(false);
         } else {
             loadingPanel.setVisible(true);
@@ -390,7 +391,6 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
         JCommandButton reloadCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.reload")), View.getResizableIcon("reload16"));
         assignListener(reloadCommandButton, "RELOAD");
-
 
         editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
@@ -477,7 +477,6 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
         //assignListener(miGotoMainClassOnStartup,"GOTODOCUMENTCLASSONSTARTUP");
 
-
         settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
         settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
         settingsBand.addRibbonComponent(new JRibbonComponent(miParallelSpeedUp));
@@ -500,8 +499,15 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         JCommandButton setLanguageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.settings.language")), View.getResizableIcon("setlanguage32"));
         assignListener(setLanguageCommandButton, "SETLANGUAGE");
         languageBand.addCommandButton(setLanguageCommandButton, RibbonElementPriority.TOP);
-        RibbonTask settingsTask = new RibbonTask(translate("menu.settings"), settingsBand, languageBand);
 
+        JRibbonBand advancedSettingsBand = new JRibbonBand(translate("menu.advancedsettings.advancedsettings"), null);
+        advancedSettingsBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(advancedSettingsBand.getControlPanel()), new IconRibbonBandResizePolicy(advancedSettingsBand.getControlPanel())));
+        JCommandButton advancedSettingsCommandButton = new JCommandButton(fixCommandTitle(translate("menu.advancedsettings.advancedsettings")), View.getResizableIcon("settings16"));
+        assignListener(advancedSettingsCommandButton, "ADVANCEDSETTINGS");
+
+        advancedSettingsBand.addCommandButton(advancedSettingsCommandButton, RibbonElementPriority.MEDIUM);
+        
+        RibbonTask settingsTask = new RibbonTask(translate("menu.settings"), settingsBand, languageBand, advancedSettingsBand);
 
         //----------------------------------------- HELP -----------------------------------
 
@@ -568,10 +574,10 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
         int state = 0;
         if (maximizedHorizontal) {
-            state = state | JFrame.MAXIMIZED_HORIZ;
+            state |= JFrame.MAXIMIZED_HORIZ;
         }
         if (maximizedVertical) {
-            state = state | JFrame.MAXIMIZED_VERT;
+            state |= JFrame.MAXIMIZED_VERT;
         }
         setExtendedState(state);
 
@@ -617,7 +623,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 Main.exit();
             }
         });
-        setTitle(Main.applicationVerName + ((swf != null && Configuration.DISPLAY_FILENAME) ? " - " + Main.getFileTitle() : ""));
+        setTitle(ApplicationInfo.applicationVerName + ((swf != null && Configuration.DISPLAY_FILENAME) ? " - " + Main.getFileTitle() : ""));
         JMenuBar menuBar = new JMenuBar();
 
 
@@ -909,9 +915,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 files.clear();
 
                                 File[] fs = ftemp.listFiles();
-                                for (File f : fs) {
-                                    files.add(f);
-                                }
+                                files.addAll(Arrays.asList(fs));
 
                                 Main.stopWork();
                             } catch (IOException ex) {
@@ -1873,7 +1877,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         return ret;
     }
 
-    public void renameIdentifier(String identifier) {
+    public void renameIdentifier(String identifier) throws InterruptedException {
         String oldName = identifier;
         String newName = View.showInputDialog(translate("rename.enternew"), oldName);
         if (newName != null) {
@@ -2183,7 +2187,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         ret.addAll(swf.exportTexts(handler, selFile + File.separator + "texts", texts, isFormatted));
         ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies));
         ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav));
-        ret.addAll(swf.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData));
+        ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData));
         if (abcPanel != null) {
             for (int i = 0; i < tlsList.size(); i++) {
                 ScriptPack tls = tlsList.get(i);
@@ -2313,6 +2317,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     Main.reloadSWF();
                 }
                 break;
+            case "ADVANCEDSETTINGS":
+                Main.advancedSettings();
+                break;
             case "LOADMEMORY":
                 Main.loadFromMemory();
                 break;
@@ -2398,7 +2405,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 searchDialog.setVisible(true);
                 if (searchDialog.result) {
                     final String txt = searchDialog.searchField.getText();
-                    if (!txt.equals("")) {
+                    if (!txt.isEmpty()) {
                         if (abcPanel != null) {
                             (new Thread() {
                                 @Override
@@ -2602,7 +2609,11 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             @Override
                             public void run() {
                                 Main.startWork(translate("work.renaming") + "...");
-                                renameIdentifier(identifier);
+                                try {
+                                    renameIdentifier(identifier);
+                                } catch (InterruptedException ex) {
+                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                                 Main.stopWork();
                             }
                         }).start();
@@ -2636,7 +2647,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 break;
             case "SAVEAS":
                 if (Main.saveFileDialog()) {
-                    setTitle(Main.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
+                    setTitle(ApplicationInfo.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
                     saveCommandButton.setEnabled(!Main.readOnly);
                 }
                 break;
@@ -2699,9 +2710,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             Helper.freeMem();
                             try {
                                 if (compressed) {
-                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", true));
+                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.getConfig("parallelSpeedUp", true));
                                 } else {
-                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", true));
+                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.getConfig("parallelSpeedUp", true));
                                 }
                             } catch (IOException ex) {
                                 View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2718,11 +2729,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 export.setVisible(true);
                 if (!export.cancelled) {
                     JFileChooser chooser = new JFileChooser();
-                    if (Configuration.containsConfig("lastExportDir")) {
-                        chooser.setCurrentDirectory(new java.io.File(Configuration.getConfig("lastExportDir", ".")));
-                    } else {
-                        chooser.setCurrentDirectory(new File("."));
-                    }
+                    chooser.setCurrentDirectory(new File(Configuration.getConfig("lastExportDir", ".")));
                     chooser.setDialogTitle(translate("export.select.directory"));
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     chooser.setAcceptAllFileFilterUsed(false);
@@ -2773,7 +2780,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 break;
 
             case "HELPUS":
-                String helpUsURL = Main.projectPage + "/help_us.html";
+                String helpUsURL = ApplicationInfo.projectPage + "/help_us.html";
                 if (java.awt.Desktop.isDesktopSupported()) {
                     java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                     try {
@@ -2787,7 +2794,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 break;
 
             case "HOMEPAGE":
-                String homePageURL = Main.projectPage;
+                String homePageURL = ApplicationInfo.projectPage;
                 if (java.awt.Desktop.isDesktopSupported()) {
                     java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                     try {
@@ -3229,8 +3236,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                         mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
                                         mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
                                     } else {
-                                        mat.translateX = mat.translateX + width / 2;
-                                        mat.translateY = mat.translateY + height / 2;
+                                        mat.translateX += width / 2;
+                                        mat.translateY += height / 2;
                                     }
                                     sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
 

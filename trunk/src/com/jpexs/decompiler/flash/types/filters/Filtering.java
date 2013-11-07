@@ -96,10 +96,7 @@ public class Filtering {
                     }
                 }
             }
-
-            for (int x = 0; x < w; x++) {
-                pixels[index + x] = newColors[x];
-            }
+            System.arraycopy(newColors, 0, pixels, index, w);
 
             index += w;
         }

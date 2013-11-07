@@ -857,8 +857,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 maxh = r.getHeight();
             }
         }
-        maxw = maxw / 20;
-        maxh = maxh / 20;
+        maxw /= 20;
+        maxh /= 20;
 
 
         int cols = (int) Math.ceil(Math.sqrt(shapes.size()));

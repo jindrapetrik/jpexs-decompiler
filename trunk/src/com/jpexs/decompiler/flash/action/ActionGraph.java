@@ -69,7 +69,7 @@ public class ActionGraph extends Graph {
          }*/
     }
 
-    public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) {
+    public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
 
         ActionGraph g = new ActionGraph(code, registerNames, variables, functions, version);
         List<Object> localData = new ArrayList<>();
@@ -120,7 +120,7 @@ public class ActionGraph extends Graph {
                 GraphTargetItem it = list.get(t);
                 if (it instanceof SetTargetActionItem) {
                     SetTargetActionItem st = (SetTargetActionItem) it;
-                    if (st.target.equals("")) {
+                    if (st.target.isEmpty()) {
                         if (targetStart > -1) {
                             targetEnd = t;
                             break;
@@ -253,7 +253,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) {
+    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         if (!output.isEmpty()) {
             if (output.get(output.size() - 1) instanceof StoreRegisterActionItem) {
                 StoreRegisterActionItem str = (StoreRegisterActionItem) output.get(output.size() - 1);

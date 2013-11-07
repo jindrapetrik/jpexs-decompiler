@@ -39,10 +39,10 @@ public class GraphTextWriter {
     }
 
     /**
-     * Highlights specified text as instruction by adding special tags
+     * Highlights specified text as instruction
      *
-     * @param offset Offset of instruction
-     * @return HilightedTextWriter
+     * @param pos Offset of instruction
+     * @return GraphTextWriter
      */
     public GraphTextWriter startOffset(GraphSourceItem src, int pos) {
         return this;
@@ -53,10 +53,10 @@ public class GraphTextWriter {
     }
     
     /**
-     * Highlights specified text as method by adding special tags
+     * Highlights specified text as method
      *
      * @param index MethodInfo index
-     * @return HilightedTextWriter
+     * @return GraphTextWriter
      */
     public GraphTextWriter startMethod(long index) {
         return this;
@@ -67,10 +67,10 @@ public class GraphTextWriter {
     }
     
     /**
-     * Highlights specified text as class by adding special tags
+     * Highlights specified text as class
      *
      * @param index Class index
-     * @return HilightedTextWriter
+     * @return GraphTextWriter
      */
     public GraphTextWriter startClass(long index) {
         return this;
@@ -81,10 +81,10 @@ public class GraphTextWriter {
     }
     
     /**
-     * Highlights specified text as trait by adding special tags
+     * Highlights specified text as trait
      *
      * @param index Trait index
-     * @return HilightedTextWriter
+     * @return GraphTextWriter
      */
     public GraphTextWriter startTrait(long index) {
         return this;

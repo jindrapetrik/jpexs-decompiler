@@ -257,7 +257,7 @@ public class Multiname {
         Namespace ns = getNamespace(constants);
         if (ns != null) {
             String nsname = ns.getName(constants);
-            if (!nsname.equals("")) {
+            if (!nsname.isEmpty()) {
                 ret += nsname + ".";
             }
         }

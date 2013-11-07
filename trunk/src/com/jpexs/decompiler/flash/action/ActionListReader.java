@@ -150,7 +150,11 @@ public class ActionListReader {
         updateActionLengths(actions, version);
 
         if (deobfuscate) {
-            actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, ip, path);
+            try {
+                actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, ip, path);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
+            }
             updateActionLengths(actions, version);
             removeZeroJumps(actions, version);
         }
@@ -171,7 +175,7 @@ public class ActionListReader {
      * @return List of actions
      * @throws IOException
      */
-    public static List<Action> deobfuscateActionList(List<DisassemblyListener> listeners, long containerSWFOffset, List<Action> actions, int version, int ip, String path) throws IOException {
+    public static List<Action> deobfuscateActionList(List<DisassemblyListener> listeners, long containerSWFOffset, List<Action> actions, int version, int ip, String path) throws IOException, InterruptedException {
         if (actions.isEmpty()) {
             return actions;
         }
@@ -623,7 +627,7 @@ public class ActionListReader {
                     }
                 }
 
-                ip = ip + actionLengthWithHeader;
+                ip += actionLengthWithHeader;
 
                 if (a.isExit()) {
                     break;
@@ -645,7 +649,7 @@ public class ActionListReader {
     }
 
     @SuppressWarnings("unchecked")
-    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int pos, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version) throws IOException {
+    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int pos, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version) throws IOException, InterruptedException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
@@ -727,13 +731,16 @@ public class ActionListReader {
                             System.out.print("newip " + nip + ", ");
                             System.out.print("Action: jump(j),ignore(i),compute(c)?");
                             String next = sc.next();
-                            if (next.equals("j")) {
-                                newip = pos + aif.getJumpOffset();
-                                pos = newip;
-
-                            } else if (next.equals("i")) {
-                            } else if (next.equals("c")) {
-                                goaif = true;
+                            switch (next) {
+                                case "j":
+                                    newip = pos + aif.getJumpOffset();
+                                    pos = newip;
+                                    break;
+                                case "i":
+                                    break;
+                                case "c":
+                                    goaif = true;
+                                    break;
                             }
                         } else if (top.isCompileTime() && (!top.hasSideEffect())) {
                             ((ActionIf) a).compileTime = true;
@@ -839,7 +846,7 @@ public class ActionListReader {
             if (newip > -1) {
                 ip = newip;
             } else {
-                ip = ip + info;
+                ip += info;
             }
             pos = ip;
             if (goaif) {

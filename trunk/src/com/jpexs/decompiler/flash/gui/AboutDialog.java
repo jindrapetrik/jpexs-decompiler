@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -77,7 +78,7 @@ public class AboutDialog extends AppDialog {
         appNamePanel.setAlignmentX(0.5f);
         cp.add(appNamePanel);
 
-        JLabel verLabel = new JLabel(translate("version") + " " + Main.version);
+        JLabel verLabel = new JLabel(translate("version") + " " + ApplicationInfo.version);
         verLabel.setAlignmentX(0.5f);
         //verLabel.setPreferredSize(new Dimension(300, 15));
         verLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
@@ -137,7 +138,7 @@ public class AboutDialog extends AppDialog {
 
         cp.add(Box.createVerticalStrut(10));
 
-        LinkLabel wwwLabel = new LinkLabel(Main.projectPage);
+        LinkLabel wwwLabel = new LinkLabel(ApplicationInfo.projectPage);
         wwwLabel.setAlignmentX(0.5f);
         wwwLabel.setForeground(Color.blue);
         //wwwLabel.setPreferredSize(new Dimension(300, 25));

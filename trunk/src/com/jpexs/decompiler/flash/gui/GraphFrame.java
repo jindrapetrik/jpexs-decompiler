@@ -47,7 +47,7 @@ public class GraphFrame extends AppFrame {
         private int backLinksRight = 0;
         private GraphPart head;
 
-        public GraphPanel(Graph graph) {
+        public GraphPanel(Graph graph) throws InterruptedException {
             graph.init(new ArrayList<>());
             size = getPartPositions(head = graph.heads.get(0), SPACE_VERTICAL + SPACE_VERTICAL + BLOCK_HEIGHT / 2, getPartWidth(graph.heads.get(0), new HashSet<GraphPart>()) * (BLOCK_WIDTH + SPACE_HORIZONTAL) / 2 - SPACE_HORIZONTAL, partPos, true);
             backLinksLeft = 1;
@@ -240,7 +240,7 @@ public class GraphFrame extends AppFrame {
     int frameWidthDiff;
     int frameHeightDiff;
 
-    public GraphFrame(Graph graph, String name) {
+    public GraphFrame(Graph graph, String name) throws InterruptedException {
         setSize(500, 500);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());

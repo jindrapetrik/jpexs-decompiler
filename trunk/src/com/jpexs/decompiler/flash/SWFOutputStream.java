@@ -236,7 +236,7 @@ public class SWFOutputStream extends OutputStream {
         int sign = bits >> 31;
         int exponent = (bits >> 22) & 0xff;
         int mantisa = bits & 0x3FFFFF;
-        mantisa = mantisa >> 13;
+        mantisa >>= 13;
         writeUI16((sign << 15) + (exponent << 10) + mantisa);
     }
 
@@ -248,7 +248,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeEncodedU32(long value) throws IOException {
         boolean loop = true;
-        value = value & 0xFFFFFFFF;
+        value &= 0xFFFFFFFF;
         do {
             int ret = (int) (value & 0x7F);
             if (value < 0x80) {
@@ -258,7 +258,7 @@ public class SWFOutputStream extends OutputStream {
                 ret += 0x80;
             }
             write(ret);
-            value = value >> 7;
+            value >>= 7;
         } while (loop);
     }
 

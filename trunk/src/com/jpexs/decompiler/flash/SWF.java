@@ -141,7 +141,7 @@ import javax.imageio.ImageIO;
  *
  * @author JPEXS
  */
-public class SWF {
+public final class SWF {
 
     /**
      * Default version of SWF file format
@@ -479,52 +479,56 @@ public class SWF {
             byte[] hdr = new byte[3];
             fis.read(hdr);
             String shdr = new String(hdr, "utf-8");
-            if (shdr.equals("CWS")) {
-                int version = fis.read();
-                SWFInputStream sis = new SWFInputStream(fis, version, 4);
-                long fileSize = sis.readUI32();
-                SWFOutputStream sos = new SWFOutputStream(fos, version);
-                sos.write("FWS".getBytes("utf-8"));
-                sos.writeUI8(version);
-                sos.writeUI32(fileSize);
-                InflaterInputStream iis = new InflaterInputStream(fis);
-                int i;
-                while ((i = iis.read()) != -1) {
-                    fos.write(i);
-                }
-
-                fis.close();
-                fos.close();
-            } else if (shdr.equals("ZWS")) {
-                int version = fis.read();
-                SWFInputStream sis = new SWFInputStream(fis, version, 4);
-                long fileSize = sis.readUI32();
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                sis.readUI32(); //outSize
-                int propertiesSize = 5;
-                byte[] lzmaProperties = new byte[propertiesSize];
-                if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
-                    throw new IOException("LZMA:input .lzma file is too short");
-                }
-                SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
-                if (!decoder.SetDecoderProperties(lzmaProperties)) {
-                    throw new IOException("LZMA:Incorrect stream properties");
-                }
-
-                if (!decoder.Code(sis, baos, fileSize - 8)) {
-                    throw new IOException("LZMA:Error in data stream");
-                }
-                try (SWFOutputStream sos = new SWFOutputStream(fos, version)) {
-                    sos.write("FWS".getBytes("utf-8"));
-                    sos.write(version);
-                    sos.writeUI32(fileSize);
-                    sos.write(baos.toByteArray());
-                }
-                fis.close();
-                fos.close();
-            } else {
-                return false;
+            switch (shdr) {
+                case "CWS":
+                    {
+                        int version = fis.read();
+                        SWFInputStream sis = new SWFInputStream(fis, version, 4);
+                        long fileSize = sis.readUI32();
+                        SWFOutputStream sos = new SWFOutputStream(fos, version);
+                        sos.write("FWS".getBytes("utf-8"));
+                        sos.writeUI8(version);
+                        sos.writeUI32(fileSize);
+                        InflaterInputStream iis = new InflaterInputStream(fis);
+                        int i;
+                        while ((i = iis.read()) != -1) {
+                            fos.write(i);
+                        }
+                        fis.close();
+                        fos.close();
+                        break;
+                    }
+                case "ZWS":
+                    {
+                        int version = fis.read();
+                        SWFInputStream sis = new SWFInputStream(fis, version, 4);
+                        long fileSize = sis.readUI32();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        sis.readUI32();
+                        int propertiesSize = 5;
+                        byte[] lzmaProperties = new byte[propertiesSize];
+                        if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
+                            throw new IOException("LZMA:input .lzma file is too short");
+                        }
+                        SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
+                        if (!decoder.SetDecoderProperties(lzmaProperties)) {
+                            throw new IOException("LZMA:Incorrect stream properties");
+                        }
+                        if (!decoder.Code(sis, baos, fileSize - 8)) {
+                            throw new IOException("LZMA:Error in data stream");
+                        }
+                        try (SWFOutputStream sos = new SWFOutputStream(fos, version)) {
+                            sos.write("FWS".getBytes("utf-8"));
+                            sos.write(version);
+                            sos.writeUI32(fileSize);
+                            sos.write(baos.toByteArray());
+                        }
+                        fis.close();
+                        fos.close();
+                        break;
+                    }
+                default:
+                    return false;
             }
         } catch (FileNotFoundException ex) {
             return false;
@@ -842,7 +846,7 @@ public class SWF {
                                 expName = "";
                             }
                             if (expName.contains(".")) {
-                                expName = expName.substring(expName.lastIndexOf(".") + 1);
+                                expName = expName.substring(expName.lastIndexOf('.') + 1);
                             }
                             if ((ct.getClass().getName() + "_" + expName).compareTo(addNode.tag.getClass().getName() + "_" + pathParts[pos]) > 0) {
                                 break;
@@ -1023,7 +1027,7 @@ public class SWF {
     private static void writeLE(OutputStream os, long val, int size) throws IOException {
         for (int i = 0; i < size; i++) {
             os.write((int) (val & 0xff));
-            val = val >> 8;
+            val >>= 8;
         }
     }
 
@@ -1528,17 +1532,17 @@ public class SWF {
             }
             if (allVariableNamesStr.contains(ret)) {
                 exists = true;
-                rndSize = rndSize + 1;
+                rndSize += 1;
                 continue loopfoo;
             }
             if (isReserved(ret)) {
                 exists = true;
-                rndSize = rndSize + 1;
+                rndSize += 1;
                 continue;
             }
             if (deobfuscated.containsValue(ret)) {
                 exists = true;
-                rndSize = rndSize + 1;
+                rndSize += 1;
                 continue;
             }
         } while (exists);
@@ -1856,13 +1860,13 @@ public class SWF {
         String pkg = null;
         String name = "";
         if (n.contains(".")) {
-            pkg = n.substring(0, n.lastIndexOf("."));
-            name = n.substring(n.lastIndexOf(".") + 1);
+            pkg = n.substring(0, n.lastIndexOf('.'));
+            name = n.substring(n.lastIndexOf('.') + 1);
         } else {
             name = n;
         }
         boolean changed = false;
-        if ((pkg != null) && (!pkg.equals(""))) {
+        if ((pkg != null) && (!pkg.isEmpty())) {
             String changedPkg = deobfuscatePackage(pkg, renameType, selected);
             if (changedPkg != null) {
                 changed = true;
@@ -1913,7 +1917,7 @@ public class SWF {
     }
     HashMap<String, Integer> typeCounts = new HashMap<>();
 
-    public int deobfuscateIdentifiers(RenameType renameType) {
+    public int deobfuscateIdentifiers(RenameType renameType) throws InterruptedException {
         findFileAttributes();
         if (fileAttributes == null) {
             int cnt = 0;
@@ -1929,17 +1933,17 @@ public class SWF {
         }
     }
 
-    public void renameAS2Identifier(String identifier, String newname) {
+    public void renameAS2Identifier(String identifier, String newname) throws InterruptedException {
         Map<String, String> selected = new HashMap<>();
         selected.put(identifier, newname);
         renameAS2Identifiers(null, selected);
     }
 
-    public int deobfuscateAS2Identifiers(RenameType renameType) {
+    public int deobfuscateAS2Identifiers(RenameType renameType) throws InterruptedException {
         return renameAS2Identifiers(renameType, null);
     }
 
-    private int renameAS2Identifiers(RenameType renameType, Map<String, String> selected) {
+    private int renameAS2Identifiers(RenameType renameType, Map<String, String> selected) throws InterruptedException {
         actionsMap = new HashMap<>();
         allFunctions = new ArrayList<>();
         allVariableNames = new ArrayList<>();
@@ -2092,7 +2096,7 @@ public class SWF {
             informListeners("rename", "function " + fc + "/" + allFunctions.size());
             if (fun instanceof ActionDefineFunction) {
                 ActionDefineFunction f = (ActionDefineFunction) fun;
-                if (f.functionName.equals("")) { //anonymous function, leave as is
+                if (f.functionName.isEmpty()) { //anonymous function, leave as is
                     continue;
                 }
                 String changed = deobfuscateName(f.functionName, false, "function", renameType, selected);
@@ -2103,7 +2107,7 @@ public class SWF {
             }
             if (fun instanceof ActionDefineFunction2) {
                 ActionDefineFunction2 f = (ActionDefineFunction2) fun;
-                if (f.functionName.equals("")) { //anonymous function, leave as is
+                if (f.functionName.isEmpty()) { //anonymous function, leave as is
                     continue;
                 }
                 String changed = deobfuscateName(f.functionName, false, "function", renameType, selected);
@@ -2524,7 +2528,6 @@ public class SWF {
                 f++;
             }
         }
-        return;
     }
 
     public void removeTagFromTimeline(Tag toRemove, List<Tag> timeline) {

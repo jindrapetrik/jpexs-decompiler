@@ -269,7 +269,7 @@ public class EcmaScript {
         }
         if (o instanceof String) {
             String s = (String) o;
-            return !s.equals("");
+            return !s.isEmpty();
         }
         return true; //other Object
     }
@@ -289,7 +289,7 @@ public class EcmaScript {
             return 0L;
         }
         Long posInt = (long) (double) (Math.signum(n) * Math.floor(Math.abs(n)));
-        posInt = posInt % (1 << 32);
+        posInt %= (1 << 32);
         return posInt;
     }
 }

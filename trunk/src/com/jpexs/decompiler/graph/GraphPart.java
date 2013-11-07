@@ -60,7 +60,11 @@ public class GraphPart implements Serializable {
         return time;
     }
 
-    private boolean leadsTo(List<Object> localData, Graph gr, GraphSource code, GraphPart part, List<GraphPart> visited, List<Loop> loops) {
+    private boolean leadsTo(List<Object> localData, Graph gr, GraphSource code, GraphPart part, List<GraphPart> visited, List<Loop> loops) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
+        
         GraphPart tpart = gr.checkPart(null, localData, this, null);
         if (tpart == null) {
             return false;
@@ -121,7 +125,7 @@ public class GraphPart implements Serializable {
         return false;
     }
 
-    public boolean leadsTo(List<Object> localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops) {
+    public boolean leadsTo(List<Object> localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops) throws InterruptedException {
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }

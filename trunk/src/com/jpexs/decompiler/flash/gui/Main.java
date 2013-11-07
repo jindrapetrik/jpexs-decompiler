@@ -16,16 +16,15 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.Configuration;
-import com.jpexs.decompiler.flash.ConsoleAbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
@@ -48,10 +47,7 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
 import java.net.URLDecoder;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Properties;
@@ -83,21 +79,11 @@ public class Main {
     public static InputStream inputStream;
     public static String fileTitle;
     public static SWF swf;
-    public static String version = "";
-    public static final String applicationName = "JPEXS Free Flash Decompiler";
-    public static String applicationVerName;
-    public static final String shortApplicationName = "FFDec";
-    public static String shortApplicationVerName;
-    public static final String projectPage = "http://www.free-decompiler.com/flash";
-    public static String updatePageStub = "http://www.free-decompiler.com/flash/update.html?currentVersion=";
-    public static String updatePage;
-    public static final String vendor = "JPEXS";
     public static LoadingDialog loadingDialog;
     public static ModeFrame modeFrame;
     private static boolean working = false;
     private static TrayIcon trayIcon;
     private static MenuItem stopMenuItem;
-    private static boolean commandLineMode = false;
     public static MainFrame mainFrame;
     private static final int UPDATE_SYSTEM_MAJOR = 1;
     private static final int UPDATE_SYSTEM_MINOR = 0;
@@ -118,30 +104,6 @@ public class Main {
             loadFromMemoryFrame = new LoadFromMemoryFrame();
         }
         loadFromMemoryFrame.setVisible(true);
-    }
-    private static String[] commandlineConfigBoolean = new String[]{
-        "decompile",
-        "parallelSpeedUp",
-        "internalFlashViewer",
-        "autoDeobfuscate",
-        "cacheOnDisk"};
-
-    private static void loadProperties() {
-        Properties prop = new Properties();
-        try {
-            prop.load(Main.class.getResourceAsStream("/project.properties"));
-            version = prop.getProperty("version");
-            applicationVerName = applicationName + " v." + version;
-            updatePage = updatePageStub + version;
-            shortApplicationVerName = shortApplicationName + " v." + version;
-        } catch (IOException ex) {
-            //ignore
-            version = "unknown";
-        }
-    }
-
-    public static boolean isCommandLineMode() {
-        return commandLineMode;
     }
 
     /**
@@ -209,7 +171,7 @@ public class Main {
                         loadingDialog.setPercent(percent);
                     }
                 }
-                if (Main.isCommandLineMode()) {
+                if (CommandLineArgumentParser.isCommandLineMode()) {
                     System.out.println(name);
                 }
             }
@@ -694,68 +656,6 @@ public class Main {
 
     }
 
-    public static void badArguments() {
-        System.err.println("Error: Bad Commandline Arguments!");
-        printCmdLineUsage();
-        System.exit(1);
-    }
-
-    public static void printHeader() {
-        System.out.println(applicationVerName);
-        for (int i = 0; i < applicationVerName.length(); i++) {
-            System.out.print("-");
-        }
-        System.out.println();
-    }
-
-    public static void printCmdLineUsage() {
-        System.out.println("Commandline arguments:");
-        System.out.println(" 1) -help | --help | /?");
-        System.out.println(" ...shows commandline arguments (this help)");
-        System.out.println(" 2) infile");
-        System.out.println(" ...opens SWF file with the decompiler GUI");
-        System.out.println(" 3) -proxy (-PXXX)");
-        System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
-        System.out.println(" 4) -export (as|pcode|pcodehex|hex|image|shape|movie|sound|binaryData|text|textplain|all|all_as|all_pcode|all_pcodehex|all_hex) outdirectory infile [-selectas3class class1 class2 ...]");
-        System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images, shapes, movies, binaryData, text with formatting, plain text or all.");
-        System.out.println("     When \"as\" or \"pcode\" type specified, optional \"-selectas3class\" parameter can be passed to export only selected classes (ActionScript 3 only)");
-        System.out.println(" 5) -dumpSWF infile");
-        System.out.println("  ...dumps list of SWF tags to console");
-        System.out.println(" 6) -compress infile outfile");
-        System.out.println("  ...Compress SWF infile and save it to outfile");
-        System.out.println(" 7) -decompress infile outfile");
-        System.out.println("  ...Decompress infile and save it to outfile");
-        System.out.println(" 8) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
-        System.out.print("  ...Sets configuration values. Available keys[current setting]:");
-        for (String key : commandlineConfigBoolean) {
-            System.out.print(" " + key + "[" + Configuration.getConfig(key) + "]");
-        }
-        System.out.println("");
-        System.out.println("    Values are boolean, you can use 0/1, true/false, on/off or yes/no.");
-        System.out.println("    If no other parameters passed, configuration is saved. Otherwise it is used only once.");
-        System.out.println("    DO NOT PUT space between comma (,) and next value.");
-        System.out.println(" 9) -onerror (abort|retryN|ignore)");
-        System.out.println("  ...error handling mode. \"abort\" stops the exporting, \"retry\" tries the exporting N times, \"ignore\" ignores the current file");
-        System.out.println(" 10) -timeout N");
-        System.out.println("  ...decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds");
-        System.out.println();
-        System.out.println("Examples:");
-        System.out.println("java -jar ffdec.jar myfile.swf");
-        System.out.println("java -jar ffdec.jar -proxy");
-        System.out.println("java -jar ffdec.jar -proxy -P1234");
-        System.out.println("java -jar ffdec.jar -export as \"C:\\decompiled\\\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -export as \"C:\\decompiled\\\" myfile.swf -selectas3class com.example.MyClass com.example.SecondClass");
-        System.out.println("java -jar ffdec.jar -export pcode \"C:\\decompiled\\\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
-        System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
-        System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
-        System.out.println("java -jar ffdec.jar -onerror ignore -export as \"C:\\decompiled\\\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -onerror retry 5 -export as \"C:\\decompiled\\\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export as \"C:\\decompiled\\\" myfile.swf");
-        System.out.println("");
-        System.out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
-    }
-
     private static void offerAssociation() {
         boolean offered = Configuration.getConfig("offeredAssociation");
         if (!offered) {
@@ -769,9 +669,7 @@ public class Main {
     }
 
     public static void initLang() {
-        if (Configuration.containsConfig("locale")) {
-            Locale.setDefault(Locale.forLanguageTag(Configuration.getConfig("locale", "en")));
-        }
+        Locale.setDefault(Locale.forLanguageTag(Configuration.getConfig("locale", "en")));
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
         UIManager.put("OptionPane.noButtonText", AppStrings.translate("button.no"));
@@ -889,15 +787,7 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         startFreeMemThread();
-        loadProperties();
-        Configuration.loadFromFile(getConfigFile(), getReplacementsFile());
-        int pos = 0;
-        if (args.length > 0) {
-            if (args[0].equals("-debug")) {
-                Configuration.debugMode = true;
-                pos++;
-            }
-        }
+        Configuration.loadConfig();
         initLogging(Configuration.debugMode);
 
         initLang();
@@ -910,426 +800,20 @@ public class Main {
             Cache.setStorageType(Cache.STORAGE_MEMORY);
         }
 
-        int errorMode = AbortRetryIgnoreHandler.UNDEFINED;
-        int retryCount = 0;
-        Level traceLevel = Level.WARNING;
-
-        if (args.length < pos + 1) {
+        if (args.length == 0) {
             initGui();
             showModeFrame();
         } else {
-            boolean parameterProcessed = true;
-            while (parameterProcessed) {
-                parameterProcessed = false;
-                if (args[pos].equals("-config")) {
-                    parameterProcessed = true;
-                    pos++;
-                    if (args.length <= pos) {
-                        System.err.println("Config values expected");
-                        badArguments();
-                    }
-                    setConfigurations(args[pos]);
-                    pos++;
-                    if (args.length <= pos) {
-                        saveConfig();
-                        System.out.println("Configuration saved");
-                        return;
-                    }
-                } else if (args[pos].equals("-onerror")) {
-                    parameterProcessed = true;
-                    pos++;
-                    if (args.length <= pos) {
-                        System.err.println("onerror parameter expected");
-                        badArguments();
-                    }
-                    String errorModeParameter = args[pos];
-                    switch (errorModeParameter) {
-                        case "abort":
-                            errorMode = AbortRetryIgnoreHandler.ABORT;
-                            break;
-                        case "retry":
-                            errorMode = AbortRetryIgnoreHandler.RETRY;
-                            pos++;
-                            if (args.length <= pos) {
-                                System.err.println("onerror retry count parameter expected");
-                                badArguments();
-                            }
-
-                            try {
-                                retryCount = Integer.parseInt(args[pos]);
-                            } catch (NumberFormatException nex) {
-                                System.err.println("Bad retry count number");
-                            }
-                            break;
-                        case "ignore":
-                            errorMode = AbortRetryIgnoreHandler.IGNORE;
-                            break;
-                    }
-
-                    pos++;
-                } else if (args[pos].equals("-timeout")) {
-                    parameterProcessed = true;
-                    pos++;
-                    if (args.length <= pos) {
-                        System.err.println("timeout parameter expected");
-                        badArguments();
-                    }
-                    try {
-                        int timeout = Integer.parseInt(args[pos]);
-                        Configuration.setConfig("decompilationTimeoutSingleMethod", timeout);
-                    } catch (NumberFormatException nex) {
-                        System.err.println("Bad timeout value");
-                    }
-
-                    pos++;
-                } else if (args[pos].equals("-affinity")) {
-                    parameterProcessed = true;
-                    pos++;
-                    if (Platform.isWindows()) {
-                        if (args.length <= pos) {
-                            System.err.println("affinity parameter expected");
-                            badArguments();
-                        }
-                        try {
-                            int affinityMask = Integer.parseInt(args[pos]);
-                            Kernel32.INSTANCE.SetProcessAffinityMask(Kernel32.INSTANCE.GetCurrentProcess(), affinityMask);
-                        } catch (NumberFormatException nex) {
-                            System.err.println("Bad affinityMask value");
-                        }
-
-                        pos++;
-                    } else {
-                        System.err.println("Process affinity setting is only available on Windows platform.");
-                    }
-                } else if (args[pos].equals("-priority")) {
-                    parameterProcessed = true;
-                    pos++;
-                    if (Platform.isWindows()) {
-                        if (args.length <= pos) {
-                            System.err.println("priority parameter expected");
-                            badArguments();
-                        }
-                        String priority = args[pos];
-                        int priorityClass = 0;
-                        switch (priority) {
-                            case "low":
-                                priorityClass = Kernel32.IDLE_PRIORITY_CLASS;
-                                break;
-                            case "belownormal":
-                                priorityClass = Kernel32.BELOW_NORMAL_PRIORITY_CLASS;
-                                break;
-                            case "normal":
-                                priorityClass = Kernel32.NORMAL_PRIORITY_CLASS;
-                                break;
-                            case "abovenormal":
-                                priorityClass = Kernel32.ABOVE_NORMAL_PRIORITY_CLASS;
-                                break;
-                            case "high":
-                                priorityClass = Kernel32.HIGH_PRIORITY_CLASS;
-                                break;
-                            case "realtime":
-                                priorityClass = Kernel32.REALTIME_PRIORITY_CLASS;
-                                break;
-                            default:
-                                System.err.println("Bad affinityMask value");
-                        }
-                        if (priorityClass != 0) {
-                            Kernel32.INSTANCE.SetPriorityClass(Kernel32.INSTANCE.GetCurrentProcess(), priorityClass);
-                        }
-
-                        pos++;
-                    } else {
-                        System.err.println("Process priority setting is only available on Windows platform.");
-                    }
-                } else if (args[pos].equals("-verbose")) {
-                    parameterProcessed = true;
-                    pos++;
-                    traceLevel = Level.FINE;
-                }
-            }
-            if (args[pos].equals("-removefromcontextmenu")) {
-                addToContextMenu(false);
-                System.exit(0);
-            } else if (args[pos].equals("-addtocontextmenu")) {
-                addToContextMenu(true);
-                System.exit(0);
-            } else if (args[pos].equals("-proxy")) {
-                int port = 55555;
-                for (int i = pos; i < args.length; i++) {
-                    if (args[i].startsWith("-P")) {
-                        try {
-                            port = Integer.parseInt(args[pos].substring(2));
-                        } catch (NumberFormatException nex) {
-                            System.err.println("Bad port number");
-                        }
-                    }
-                }
-                View.execInEventDispatch(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (proxyFrame == null) {
-                            proxyFrame = new ProxyFrame();
-                        }
-                    }
-                });
-                proxyFrame.setPort(port);
-                addTrayIcon();
-                switchProxy();
-
-            } else if (args[pos].equals("-export")) {
-                if (args.length < pos + 4) {
-                    badArguments();
-                }
-                String[] validExportFormats = new String[]{
-                    "as",
-                    "pcode",
-                    "image",
-                    "shape",
-                    "movie",
-                    "sound",
-                    "binarydata",
-                    "text",
-                    "textplain",
-                    "all",
-                    "fla",
-                    "xfl"
-                };
-
-                AbortRetryIgnoreHandler handler = new ConsoleAbortRetryIgnoreHandler(errorMode, retryCount);
-                String exportFormat = args[pos + 1].toLowerCase();
-                if (!Arrays.asList(validExportFormats).contains(exportFormat)) {
-                    System.err.println("Invalid export format:" + exportFormat);
-                    badArguments();
-                }
-                File outDir = new File(args[pos + 2]);
-                File inFile = new File(args[pos + 3]);
-                if (!inFile.exists()) {
-                    System.err.println("Input SWF file does not exist!");
-                    badArguments();
-                }
-                commandLineMode = true;
-                long startTime = System.currentTimeMillis();
-                boolean exportOK;
-                try {
-                    printHeader();
-                    SWF exfile = new SWF(new FileInputStream(inFile), Configuration.getConfig("parallelSpeedUp", true));
-                    final Level level = traceLevel;
-                    exfile.addEventListener(new EventListener() {
-                        @Override
-                        public void handleEvent(String event, Object data) {
-                            if (level.intValue() <= Level.FINE.intValue() && event.equals("exporting")) {
-                                System.out.println((String) data);
-                            }
-                            if (event.equals("exported")) {
-                                System.out.println((String) data);
-                            }
-                        }
-                    });
-
-                    switch (exportFormat) {
-                        case "all":
-                        case "all_as":
-                        case "all_pcode":
-                        case "all_pcodehex":
-                        case "all_hex":
-                            ExportMode allExportMode = strToExportFormat(exportFormat.substring(3));
-                            System.out.println("Exporting images...");
-                            exfile.exportImages(handler, outDir.getAbsolutePath() + File.separator + "images");
-                            System.out.println("Exporting shapes...");
-                            exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes");
-                            System.out.println("Exporting scripts...");
-                            exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", allExportMode, Configuration.getConfig("parallelSpeedUp", true));
-                            System.out.println("Exporting movies...");
-                            exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies");
-                            System.out.println("Exporting sounds...");
-                            exfile.exportSounds(handler, outDir.getAbsolutePath() + File.separator + "sounds", true, true);
-                            System.out.println("Exporting binaryData...");
-                            exfile.exportBinaryData(handler, outDir.getAbsolutePath() + File.separator + "binaryData");
-                            System.out.println("Exporting texts...");
-                            exfile.exportTexts(handler, outDir.getAbsolutePath() + File.separator + "texts", true);
-                            exportOK = true;
-                            break;
-                        case "image":
-                            exfile.exportImages(handler, outDir.getAbsolutePath());
-                            exportOK = true;
-                            break;
-                        case "shape":
-                            exfile.exportShapes(handler, outDir.getAbsolutePath());
-                            exportOK = true;
-                            break;
-                        case "as":
-                        case "pcode":
-                        case "pcodehex":
-                        case "hex":
-                            ExportMode exportMode = strToExportFormat(exportFormat);
-                            boolean parallel = Configuration.getConfig("parallelSpeedUp", true);
-                            if ((pos + 5 < args.length) && (args[pos + 4].equals("-selectas3class"))) {
-                                exportOK = true;
-                                for (int i = pos + 5; i < args.length; i++) {
-                                    exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportMode, parallel);
-                                }
-                            } else {
-                                exportOK = exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportMode, parallel) != null;
-                            }
-                            break;
-                        case "movie":
-                            exfile.exportMovies(handler, outDir.getAbsolutePath());
-                            exportOK = true;
-                            break;
-                        case "sound":
-                            exfile.exportSounds(handler, outDir.getAbsolutePath(), true, true);
-                            exportOK = true;
-                            break;
-                        case "binarydata":
-                            exfile.exportBinaryData(handler, outDir.getAbsolutePath());
-                            exportOK = true;
-                            break;
-                        case "text":
-                            exfile.exportTexts(handler, outDir.getAbsolutePath(), true);
-                            exportOK = true;
-                            break;
-                        case "textplain":
-                            exfile.exportTexts(handler, outDir.getAbsolutePath(), false);
-                            exportOK = true;
-                            break;
-                        case "fla":
-                            exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, Configuration.getConfig("parallelSpeedUp", true));
-                            exportOK = true;
-                            break;
-                        case "xfl":
-                            exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, Configuration.getConfig("parallelSpeedUp", true));
-                            exportOK = true;
-                            break;
-                        default:
-                            exportOK = false;
-                    }
-                } catch (OutOfMemoryError | Exception ex) {
-                    exportOK = false;
-                    System.err.print("FAIL: Exporting Failed on Exception - ");
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    System.exit(1);
-                }
-                long stopTime = System.currentTimeMillis();
-                long time = stopTime - startTime;
-                System.out.println("Export finished. Total export time: " + Helper.formatTimeSec(time));
-                if (exportOK) {
-                    System.out.println("OK");
-                    System.exit(0);
-                } else {
-                    System.err.println("FAIL");
-                    System.exit(1);
-                }
-            } else if (args[pos].equals("-compress")) {
-                if (args.length < pos + 3) {
-                    badArguments();
-                }
-
-                if (SWF.fws2cws(new FileInputStream(args[pos + 1]), new FileOutputStream(args[pos + 2]))) {
-                    System.out.println("OK");
-                } else {
-                    System.err.println("FAIL");
-                }
-            } else if (args[pos].equals("-decompress")) {
-                if (args.length < pos + 3) {
-                    badArguments();
-                }
-
-                if (SWF.decompress(new FileInputStream(args[pos + 1]), new FileOutputStream(args[pos + 2]))) {
-                    System.out.println("OK");
-                    System.exit(0);
-                } else {
-                    System.err.println("FAIL");
-                    System.exit(1);
-                }
-            } else if (args[pos].equals("-dumpSWF")) {
-                if (args.length < pos + 2) {
-                    badArguments();
-                }
-                try {
-                    Configuration.dump_tags = true;
-                    Configuration.setConfig("parallelSpeedUp", false);
-                    SWF swf = parseSWF(args[pos + 1]);
-                } catch (Exception ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    System.exit(1);
-                }
-                System.exit(0);
-            } else if (args[pos].equals("-help") || args[pos].equals("--help") || args[pos].equals("/?")) {
-                printHeader();
-                printCmdLineUsage();
-                System.exit(0);
-            } else if (args.length == pos + 1) {
-
+            String fileToOpen = CommandLineArgumentParser.parseArguments(args);
+            if (fileToOpen != null) {
                 initGui();
-                openFile(args[pos]);
-            } else {
-                badArguments();
+                openFile(fileToOpen);
             }
         }
-    }
-
-    private static ExportMode strToExportFormat(String exportFormatStr) {
-        if (exportFormatStr.equals("pcode")) {
-            return ExportMode.PCODE;
-        } else if (exportFormatStr.equals("pcodehex")) {
-            return ExportMode.PCODEWITHHEX;
-        } else if (exportFormatStr.equals("hex")) {
-            return ExportMode.HEX;
-        } else {
-            return ExportMode.SOURCE;
-        }
-    }
-    
-    private static void setConfigurations(String cfgStr) {
-        String[] cfgs;
-        if (cfgStr.contains(",")) {
-            cfgs = cfgStr.split(",");
-        } else {
-            cfgs = new String[]{cfgStr};
-        }
-
-        for (String c : cfgs) {
-            String[] cp;
-            if (c.contains("=")) {
-                cp = c.split("=");
-            } else {
-                cp = new String[]{c, "1"};
-            }
-            String key = cp[0];
-            String value = cp[1];
-            if (key.toLowerCase().equals("paralelSpeedUp".toLowerCase())) {
-                key = "parallelSpeedUp";
-            }
-            for (String bk : commandlineConfigBoolean) {
-                if (key.toLowerCase().equals(bk.toLowerCase())) {
-                    Boolean bValue = parseBooleanConfigValue(value);
-                    if (bValue != null) {
-                        System.out.println("Config " + bk + " set to " + bValue);
-                        Configuration.setConfig(bk, bValue);
-                    }
-                }
-            }
-        }
-    }
-
-    private static Boolean parseBooleanConfigValue(String value) {
-        if (value == null) {
-            return null;
-        }
-
-        Boolean bValue = null;
-        value = value.toLowerCase();
-        if (value.equals("0") || value.equals("false") || value.equals("no") || value.equals("off")) {
-            bValue = false;
-        }
-        if (value.equals("1") || value.equals("true") || value.equals("yes") || value.equals("on")) {
-            bValue = true;
-        }
-        return bValue;
     }
 
     public static String tempFile(String url) throws IOException {
-        File f = new File(getFFDecHome() + "saved" + File.separator);
+        File f = new File(Configuration.getFFDecHome() + "saved" + File.separator);
         if (!f.exists()) {
             if (!f.mkdirs()) {
                 if (!f.exists()) {
@@ -1337,7 +821,7 @@ public class Main {
                 }
             }
         }
-        return getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
+        return Configuration.getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
 
     }
 
@@ -1368,7 +852,7 @@ public class Main {
         }
         if (SystemTray.isSupported()) {
             SystemTray tray = SystemTray.getSystemTray();
-            trayIcon = new TrayIcon(View.loadImage("proxy16"), vendor + " " + shortApplicationName + " " + AppStrings.translate("proxy"));
+            trayIcon = new TrayIcon(View.loadImage("proxy16"), ApplicationInfo.vendor + " " + ApplicationInfo.shortApplicationName + " " + AppStrings.translate("proxy"));
             trayIcon.setImageAutoSize(true);
             PopupMenu trayPopup = new PopupMenu();
 
@@ -1425,22 +909,18 @@ public class Main {
         }
     }
 
-    public static void saveConfig() {
-        try {
-            Configuration.saveToFile(getConfigFile(), getReplacementsFile());
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     public static void exit() {
-        saveConfig();
+        Configuration.saveConfig();
         FlashPlayerPanel.unload();
         System.exit(0);
     }
 
     public static void about() {
         (new AboutDialog()).setVisible(true);
+    }
+
+    public static void advancedSettings() {
+        (new AdvancedSettingsDialog()).setVisible(true);
     }
 
     public static void autoCheckForUpdates() {
@@ -1454,7 +934,7 @@ public class Main {
         try {
             Socket sock = new Socket("www.free-decompiler.com", 80);
             OutputStream os = sock.getOutputStream();
-            os.write(("GET /flash/update.html?action=check&currentVersion=" + version + " HTTP/1.1\r\nHost: www.free-decompiler.com\r\nUser-Agent: " + shortApplicationVerName + "\r\nConnection: close\r\n\r\n").getBytes());
+            os.write(("GET /flash/update.html?action=check&currentVersion=" + ApplicationInfo.version + " HTTP/1.1\r\nHost: www.free-decompiler.com\r\nUser-Agent: " + ApplicationInfo.shortApplicationVerName + "\r\nConnection: close\r\n\r\n").getBytes());
             BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             String s;
             boolean start = false;
@@ -1478,8 +958,8 @@ public class Main {
                         }
                     } else {
                         if (s.contains("=")) {
-                            String key = s.substring(0, s.indexOf("="));
-                            String val = s.substring(s.indexOf("=") + 1);
+                            String key = s.substring(0, s.indexOf('='));
+                            String val = s.substring(s.indexOf('=') + 1);
                             if ("updateSystem".equals(header)) {
                                 if (key.equals("majorVersion")) {
                                     updateMajor = Integer.parseInt(val);
@@ -1514,8 +994,8 @@ public class Main {
                                     ver.updateLink = val;
                                 }
                                 if (key.equals("change[]")) {
-                                    String changeType = val.substring(0, val.indexOf("|"));
-                                    String change = val.substring(val.indexOf("|") + 1);
+                                    String changeType = val.substring(0, val.indexOf('|'));
+                                    String change = val.substring(val.indexOf('|') + 1);
                                     if (!ver.changes.containsKey(changeType)) {
                                         ver.changes.put(changeType, new ArrayList<String>());
                                     }
@@ -1526,7 +1006,7 @@ public class Main {
                         }
                     }
                 }
-                if (s.equals("")) {
+                if (s.isEmpty()) {
                     start = true;
                 }
             }
@@ -1553,13 +1033,13 @@ public class Main {
             logger.removeHandler(fileTxt);
         }
         try {
-            File f = new File(getFFDecHome() + File.separator + "log.txt");
+            File f = new File(Configuration.getFFDecHome() + File.separator + "log.txt");
             FileOutputStream fos = new FileOutputStream(f);
             fos.close();
         } catch (IOException ex) {
         }
         try {
-            fileTxt = new FileHandler(getFFDecHome() + File.separator + "log.txt");
+            fileTxt = new FileHandler(Configuration.getFFDecHome() + File.separator + "log.txt");
         } catch (IOException | SecurityException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1589,97 +1069,6 @@ public class Main {
         } catch (Exception ex) {
             throw new RuntimeException("Problems with creating the log files");
         }
-    }
-    private static final String CONFIG_NAME = "config.bin";
-    private static final String REPLACEMENTS_NAME = "replacements.cfg";
-    private static final File unspecifiedFile = new File("unspecified");
-    private static File directory = unspecifiedFile;
-
-    private enum OSId {
-
-        WINDOWS, OSX, UNIX
-    }
-
-    private static OSId getOSId() {
-        PrivilegedAction<String> doGetOSName = new PrivilegedAction<String>() {
-            @Override
-            public String run() {
-                return System.getProperty("os.name");
-            }
-        };
-        OSId id = OSId.UNIX;
-        String osName = AccessController.doPrivileged(doGetOSName);
-        if (osName != null) {
-            if (osName.toLowerCase().startsWith("mac os x")) {
-                id = OSId.OSX;
-            } else if (osName.contains("Windows")) {
-                id = OSId.WINDOWS;
-            }
-        }
-        return id;
-    }
-
-    public static String getFFDecHome() throws IOException {
-        if (directory == unspecifiedFile) {
-            directory = null;
-            String userHome = null;
-            try {
-                userHome = System.getProperty("user.home");
-            } catch (SecurityException ignore) {
-            }
-            if (userHome != null) {
-                String applicationId = Main.shortApplicationName;
-                OSId osId = getOSId();
-                if (osId == OSId.WINDOWS) {
-                    File appDataDir = null;
-                    try {
-                        String appDataEV = System.getenv("APPDATA");
-                        if ((appDataEV != null) && (appDataEV.length() > 0)) {
-                            appDataDir = new File(appDataEV);
-                        }
-                    } catch (SecurityException ignore) {
-                    }
-                    String vendorId = Main.vendor;
-                    if ((appDataDir != null) && appDataDir.isDirectory()) {
-                        // ${APPDATA}\{vendorId}\${applicationId}
-                        String path = vendorId + "\\" + applicationId + "\\";
-                        directory = new File(appDataDir, path);
-                    } else {
-                        // ${userHome}\Application Data\${vendorId}\${applicationId}
-                        String path = "Application Data\\" + vendorId + "\\" + applicationId + "\\";
-                        directory = new File(userHome, path);
-                    }
-                } else if (osId == OSId.OSX) {
-                    // ${userHome}/Library/Application Support/${applicationId}
-                    String path = "Library/Application Support/" + applicationId + "/";
-                    directory = new File(userHome, path);
-                } else {
-                    // ${userHome}/.${applicationId}/
-                    String path = "." + applicationId + "/";
-                    directory = new File(userHome, path);
-                }
-            }
-        }
-        if (!directory.exists()) {
-            if (!directory.mkdirs()) {
-                if (!directory.exists()) {
-                    throw new IOException("cannot create directory " + directory);
-                }
-            }
-        }
-        String ret = directory.getAbsolutePath();
-        if (!ret.endsWith(File.separator)) {
-            ret += File.separator;
-        }
-        return ret;
-    }
-
-    private static String getReplacementsFile() throws IOException {
-        return getFFDecHome() + REPLACEMENTS_NAME;
-    }
-
-    private static String getConfigFile() throws IOException {
-        return getFFDecHome() + CONFIG_NAME;
     }
 
     public static boolean isAddedToContextMenu() {

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -65,7 +66,7 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
      */
     public LoadingDialog() {
         setResizable(false);
-        setTitle(Main.shortApplicationVerName);
+        setTitle(ApplicationInfo.shortApplicationVerName);
         Container cntp = getContentPane();
         JPanel cnt = new JPanel();
         cntp.setLayout(new BorderLayout());

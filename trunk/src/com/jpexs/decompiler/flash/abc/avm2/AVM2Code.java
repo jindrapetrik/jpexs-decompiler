@@ -1405,7 +1405,7 @@ public class AVM2Code implements Serializable {
         ignoredIns = new ArrayList<>();
     }
 
-    public List<GraphTargetItem> toGraphTargetItems(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
+    public List<GraphTargetItem> toGraphTargetItems(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo[] method_info, MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         initToSource();
         List<GraphTargetItem> list;
         HashMap<Integer, GraphTargetItem> localRegs = new HashMap<>();
@@ -1654,7 +1654,7 @@ public class AVM2Code implements Serializable {
         return ret;
     }
 
-    public int removeTraps(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) {
+    public int removeTraps(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
         removeDeadCode(constants, trait, info, body);
         List<Object> localData = new ArrayList<>();
         localData.add((Boolean) isStatic); //isStatic
@@ -2360,7 +2360,7 @@ public class AVM2Code implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions, String path) {
+    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions, String path) throws InterruptedException {
         boolean debugMode = false;
         int ret = 0;
         iploop:
@@ -2615,7 +2615,7 @@ public class AVM2Code implements Serializable {
         return ret;
     }
 
-    public static int removeTraps(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Object> localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) {
+    public static int removeTraps(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Object> localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<>();
         removeTraps(refs, false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
         int cnt = 0;

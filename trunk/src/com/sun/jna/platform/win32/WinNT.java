@@ -808,7 +808,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
     /**
      * LPHANDLE
      */
-    public static class HANDLEByReference extends ByReference {
+    public static final class HANDLEByReference extends ByReference {
 
         public HANDLEByReference() {
             this(null);

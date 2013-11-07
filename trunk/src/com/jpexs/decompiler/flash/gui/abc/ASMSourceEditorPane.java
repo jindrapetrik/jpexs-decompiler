@@ -19,10 +19,12 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.View;
@@ -38,6 +40,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
@@ -84,9 +88,11 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             setText(textWithHex);
         } else {
             if (textHexOnly == null) {
-                textHexOnly = new HilightedText(Helper.byteArrToString(abc.bodies[bodyIndex].code.getBytes()));
+                HilightedTextWriter writer = new HilightedTextWriter(true);
+                Helper.byteArrayToHex(writer, abc.bodies[bodyIndex].code.getBytes());
+                textHexOnly = new HilightedText(writer);
             }
-            setText(textWithHex);
+            setText(textHexOnly);
         }
         hilighOffset(oldOffset);
     }
@@ -156,8 +162,12 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     }
 
     public void graph() {
-        AVM2Graph gr = new AVM2Graph(abc.bodies[bodyIndex].code, abc, abc.bodies[bodyIndex], false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), abc.bodies[bodyIndex].code.visitCode(abc.bodies[bodyIndex]));
-        (new GraphFrame(gr, name)).setVisible(true);
+        try {
+            AVM2Graph gr = new AVM2Graph(abc.bodies[bodyIndex].code, abc, abc.bodies[bodyIndex], false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), abc.bodies[bodyIndex].code.visitCode(abc.bodies[bodyIndex]));
+            (new GraphFrame(gr, name)).setVisible(true);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ASMSourceEditorPane.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void exec() {
@@ -170,30 +180,44 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
     public boolean save(ConstantPool constants) {
         try {
-            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes("UTF-8")), constants, trait, new MissingSymbolHandler() {
-                //no longer ask for adding new constants
-                @Override
-                public boolean missingString(String value) {
-                    return true;
+            String text = getText();
+            if (text.trim().startsWith("#hexdata")) {
+                byte[] data = Helper.getBytesFromHexaText(text);
+                MethodBody mb = abc.bodies[bodyIndex];
+                mb.codeBytes = data;
+                try {
+                    mb.code = new AVM2Code(new ByteArrayInputStream(mb.codeBytes));
+                } catch (UnknownInstructionCode re) {
+                    mb.code = new AVM2Code();
+                    Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, re);
                 }
+                mb.code.compact();
+            } else {
+                AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(text.getBytes("UTF-8")), constants, trait, new MissingSymbolHandler() {
+                    //no longer ask for adding new constants
+                    @Override
+                    public boolean missingString(String value) {
+                        return true;
+                    }
 
-                @Override
-                public boolean missingInt(long value) {
-                    return true;
-                }
+                    @Override
+                    public boolean missingInt(long value) {
+                        return true;
+                    }
 
-                @Override
-                public boolean missingUInt(long value) {
-                    return true;
-                }
+                    @Override
+                    public boolean missingUInt(long value) {
+                        return true;
+                    }
 
-                @Override
-                public boolean missingDouble(double value) {
-                    return true;
-                }
-            }, abc.bodies[bodyIndex], abc.method_info[abc.bodies[bodyIndex].method_info]);
-            acode.getBytes(abc.bodies[bodyIndex].codeBytes);
-            abc.bodies[bodyIndex].code = acode;
+                    @Override
+                    public boolean missingDouble(double value) {
+                        return true;
+                    }
+                }, abc.bodies[bodyIndex], abc.method_info[abc.bodies[bodyIndex].method_info]);
+                acode.getBytes(abc.bodies[bodyIndex].codeBytes);
+                abc.bodies[bodyIndex].code = acode;
+            }
         } catch (IOException ex) {
         } catch (ParseException ex) {
             View.showMessageDialog(this, (ex.text + " on line " + ex.line));

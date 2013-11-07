@@ -43,7 +43,7 @@ public class Traits implements Serializable {
         return traits.length - 1;
     }
 
-    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {
+    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         int ret = 0;
         for (Trait t : traits) {
             ret += t.removeTraps(scriptIndex, classIndex, isStatic, abc, path);
@@ -128,7 +128,7 @@ public class Traits implements Serializable {
             int h = t;
             if (classIndex != -1) {
                 if (!isStatic) {
-                    h = h + abc.class_info[classIndex].static_traits.traits.length;
+                    h += abc.class_info[classIndex].static_traits.traits.length;
                 }
             }
             if (trait instanceof TraitClass) {

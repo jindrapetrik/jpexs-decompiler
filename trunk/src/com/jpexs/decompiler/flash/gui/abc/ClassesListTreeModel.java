@@ -91,7 +91,7 @@ public class ClassesListTreeModel implements TreeModel {
     public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list, String filter) {
         for (MyEntry<ClassPath, ScriptPack> item : list) {
             if (filter != null) {
-                if (!filter.equals("")) {
+                if (!filter.isEmpty()) {
                     if (!item.key.toString().contains(filter)) {
                         continue;
                     }
