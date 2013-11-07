@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -86,7 +87,7 @@ public abstract class AVM2Item extends GraphTargetItem {
             if (reg == 0) {
                 return "this";
             }
-            return "_loc" + reg + "_";
+            return String.format(Configuration.registerNameFormat.get(), reg);
         }
     }
 

@@ -40,6 +40,8 @@ public class ActionScript3Test {
         assertTrue(clsIndex > -1);
         this.abc = tag.getABC();
         Configuration.autoDeobfuscate.set(false);
+        Configuration.decompile.set(true);
+        Configuration.registerNameFormat.set("_loc%d_");
     }
 
     private void decompileMethod(String methodName, String expectedResult, boolean isStatic) {

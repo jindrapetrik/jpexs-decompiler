@@ -93,6 +93,7 @@ public class Configuration {
             put("lastOpenDir", ".");
             put("offeredAssociation", false);
             put("locale", "en");
+            put("registerNameFormat", "_loc%d_");
             put("lastUpdatesCheckDate", null);
             put("gui.window.width", 1000);
             put("gui.window.height", 700);
@@ -114,13 +115,13 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> removeNops = null;
 
     public static final ConfigurationItem<Integer> decompilationTimeoutSingleMethod = null;
-    public static final ConfigurationItem<Integer> xxx = null;
     public static final ConfigurationItem<Integer> lastRenameType = null;
 
     public static final ConfigurationItem<String> lastSaveDir = null;
     public static final ConfigurationItem<String> lastOpenDir = null;
     public static final ConfigurationItem<String> lastExportDir = null;
     public static final ConfigurationItem<String> locale = null;
+    public static final ConfigurationItem<String> registerNameFormat = null;
     
     public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
 

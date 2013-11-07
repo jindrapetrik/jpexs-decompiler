@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf4;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.io.Serializable;
 
 public class RegisterNumber implements Serializable {
@@ -63,7 +64,7 @@ public class RegisterNumber implements Serializable {
 
     public String translate() {
         if (name == null || name.trim().isEmpty()) {
-            return "_loc" + number + "_";
+            return String.format(Configuration.registerNameFormat.get(), number);
         }
         return name;
     }

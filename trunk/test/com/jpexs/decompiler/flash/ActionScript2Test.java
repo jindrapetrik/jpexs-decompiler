@@ -24,8 +24,6 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.testng.Assert.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -39,6 +37,8 @@ public class ActionScript2Test extends ActionStript2TestBase {
     @BeforeClass
     public void init() throws IOException {
         Configuration.autoDeobfuscate.set(false);
+        Configuration.decompile.set(true);
+        Configuration.registerNameFormat.set("_loc%d_");
         swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
     }
 
