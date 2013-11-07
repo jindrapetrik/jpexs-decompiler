@@ -49,7 +49,7 @@ public class GotoFrame2ActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         String prefix = "gotoAndStop";
         if (playFlag) {
             prefix = "gotoAndPlay";

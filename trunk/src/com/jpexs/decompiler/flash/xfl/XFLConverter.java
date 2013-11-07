@@ -120,7 +120,9 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import org.xml.sax.Attributes;
@@ -1113,7 +1115,11 @@ public class XFLConverter {
 
     private static String convertActionScript(ASMSource as) {
         HilightedTextWriter writer = new HilightedTextWriter(false);
-        Action.actionsToSource(as, as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString(), writer);
+        try {
+            Action.actionsToSource(as, as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString(), writer);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return writer.toString();
     }
 
@@ -1570,7 +1576,7 @@ public class XFLConverter {
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.transform(xmlInput, xmlOutput);
             return xmlOutput.getWriter().toString();
-        } catch (Exception e) {
+        } catch (TransformerFactoryConfigurationError | IllegalArgumentException | TransformerException e) {
             System.err.println(input);
             Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Pretty print error", e);
             return input;
@@ -3032,7 +3038,7 @@ public class XFLConverter {
              html = "<html>" + html + "</html>";
              reader.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(html.getBytes("UTF-8")), "UTF-8")));*/
 
-        } catch (Exception e) {
+        } catch (SAXException | IOException e) {
             Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error while converting HTML", e);
         }
         return tparser.result;

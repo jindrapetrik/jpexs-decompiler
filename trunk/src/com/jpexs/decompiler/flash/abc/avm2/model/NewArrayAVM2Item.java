@@ -32,7 +32,7 @@ public class NewArrayAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("[");
         for (int a = 0; a < values.size(); a++) {
             if (a > 0) {

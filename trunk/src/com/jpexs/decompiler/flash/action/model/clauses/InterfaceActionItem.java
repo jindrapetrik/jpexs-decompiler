@@ -43,7 +43,7 @@ public class InterfaceActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("interface ");
         name.toStringNoQuotes(writer, localData);
         boolean first = true;

@@ -269,7 +269,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
             } else {
                 lexer.yypushback(lexer.yylength());
             }
-        } catch (Exception ex) {
+        } catch (IOException | ParseException ex) {
         }
 
         if (finallyBlockFlag) {

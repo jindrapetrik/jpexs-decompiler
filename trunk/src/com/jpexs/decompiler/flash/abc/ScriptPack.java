@@ -16,11 +16,11 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -114,7 +114,7 @@ public class ScriptPack {
         return Helper.joinStrings(pathParts, File.separator);
     }
 
-    public void convert(final NulWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ExportMode exportMode, final boolean parallel) {
+    public void convert(final NulWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ExportMode exportMode, final boolean parallel) throws InterruptedException {
         for (int t : traitIndices) {
             Trait trait = traits[t];
             Multiname name = trait.getName(abc);
@@ -127,7 +127,7 @@ public class ScriptPack {
         }
     }
     
-    public void appendTo(GraphTextWriter writer, List<ABCContainerTag> abcList, Trait[] traits, ExportMode exportMode, boolean parallel) {
+    public void appendTo(GraphTextWriter writer, List<ABCContainerTag> abcList, Trait[] traits, ExportMode exportMode, boolean parallel) throws InterruptedException {
         for (int t : traitIndices) {
             Trait trait = traits[t];
             Multiname name = trait.getName(abc);
@@ -140,7 +140,7 @@ public class ScriptPack {
         }
     }
 
-    public void toSource(GraphTextWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ExportMode exportMode, final boolean parallel) {
+    public void toSource(GraphTextWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ExportMode exportMode, final boolean parallel) throws InterruptedException {
         writer.suspendMeasure();
         try {
             Helper.timedCall(new Callable<Void>() {
@@ -190,7 +190,11 @@ public class ScriptPack {
 
         File file = new File(fileName);
         try (FileTextWriter writer = new FileTextWriter(new FileOutputStream(file))) {
-            toSource(writer, abcList, abc.script_info[scriptIndex].traits.traits, exportMode, parallel);
+            try {
+                toSource(writer, abcList, abc.script_info[scriptIndex].traits.traits, exportMode, parallel);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return file;
     }

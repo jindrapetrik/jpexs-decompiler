@@ -45,7 +45,7 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("ifFrameLoaded(");
         frame.toString(writer, localData);
         writer.append(")").newLine();

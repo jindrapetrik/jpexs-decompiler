@@ -41,12 +41,14 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -346,7 +348,7 @@ public class Helper {
                 copy = ois.readObject();
             }
             return copy;
-        } catch (Exception ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, "Copy error", ex);
             return null;
         }
@@ -404,7 +406,7 @@ public class Helper {
     //    return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
     //}
 
-    public static String stackToString(Stack<GraphTargetItem> stack, LocalData localData) {
+    public static String stackToString(Stack<GraphTargetItem> stack, LocalData localData) throws InterruptedException {
         String ret = "[";
         for (int i = stack.size() - 1; i >= 0; i--) {
             if (i < stack.size() - 1) {
@@ -513,13 +515,15 @@ public class Helper {
                     ((Collection) v).clear();
                 }
                 if (v instanceof Component) {
-                    ((Component) v).getParent().remove((Component) v);
+                    if (((Component) v).getParent() != null) {
+                        ((Component) v).getParent().remove((Component) v);
+                    }
                 }
                 if (v instanceof Freed) {
                     ((Freed) v).free();
                 }
                 f.set(obj, null);
-            } catch (Exception ex) {
+            } catch (SecurityException | IllegalArgumentException | IllegalAccessException ex) {
             }
         }
     }
@@ -660,6 +664,24 @@ public class Helper {
         return task;
     }
 
+    public static <T> T cancellableCall(final Callable<T> c, final AtomicReference<FutureTask<T>> cancellation) throws InterruptedException, ExecutionException {
+        FutureTask<T> task = new FutureTask<>(new Callable<T>() {
+
+            @Override
+            public T call() throws Exception {
+                T t = c.call();
+                return t;
+            }
+        });
+        cancellation.set(task);
+        THREAD_POOL.execute(task);
+        try {
+            return task.get();
+        } catch (CancellationException ex) {
+            throw new InterruptedException();
+        }
+    }
+
     public static boolean contains(int[] array, int value) {
         for (int i : array) {
             if (i == value) {
@@ -678,9 +700,5 @@ public class Helper {
                 fos.flush();
             }
         }
-    }
-
-    public static List<File> timedCall(Callable<List<File>> callable, int DECOMPILATION_TIMEOUT) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

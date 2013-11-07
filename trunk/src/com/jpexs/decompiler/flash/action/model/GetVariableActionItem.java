@@ -48,7 +48,7 @@ public class GetVariableActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return stripQuotes(name, localData, writer);
     }
 

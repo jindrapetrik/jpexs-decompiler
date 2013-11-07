@@ -14,15 +14,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.configuration;
 
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.proxy.Replacement;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -69,11 +75,10 @@ public class Configuration {
     public static final int DECOMPILATION_TIMEOUT_FILE = 5 * 60;
     //using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices
     public static final boolean PARAM_NAMES_ENABLE = false;
-    private static HashMap<String, Object> config = new HashMap<>();
     /**
      * List of replacements
      */
-    public static java.util.List<Replacement> replacements = new ArrayList<>();
+    private static java.util.List<Replacement> replacements = new ArrayList<>();
     private static HashMap<String, Object> configDefaults = new HashMap<String, Object>() {
         {
             put("decompile", true);
@@ -98,6 +103,44 @@ public class Configuration {
         }
     };
 
+    public static final ConfigurationItem<Boolean> decompile = null;
+    public static final ConfigurationItem<Boolean> parallelSpeedUp = null;
+    public static final ConfigurationItem<Boolean> autoDeobfuscate = null;
+    public static final ConfigurationItem<Boolean> cacheOnDisk = null;
+    public static final ConfigurationItem<Boolean> internalFlashViewer = null;
+    public static final ConfigurationItem<Boolean> gotoMainClassOnStartup = null;
+    public static final ConfigurationItem<Boolean> deobfuscateUsePrevTagOnly = null;
+    public static final ConfigurationItem<Boolean> offeredAssociation = null;
+    public static final ConfigurationItem<Boolean> removeNops = null;
+
+    public static final ConfigurationItem<Integer> decompilationTimeoutSingleMethod = null;
+    public static final ConfigurationItem<Integer> xxx = null;
+    public static final ConfigurationItem<Integer> lastRenameType = null;
+
+    public static final ConfigurationItem<String> lastSaveDir = null;
+    public static final ConfigurationItem<String> lastOpenDir = null;
+    public static final ConfigurationItem<String> lastExportDir = null;
+    public static final ConfigurationItem<String> locale = null;
+    
+    public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
+
+    @ConfigurationName(name = "gui.window.width")
+    public static final ConfigurationItem<Integer> guiWindowWidth = null;
+    @ConfigurationName(name = "gui.window.height")
+    public static final ConfigurationItem<Integer> guiWindowHeight = null;
+    @ConfigurationName(name = "gui.window.maximized.horizontal")
+    public static final ConfigurationItem<Boolean> guiWindowMaximizedHorizontal = null;
+    @ConfigurationName(name = "gui.window.maximized.vertical")
+    public static final ConfigurationItem<Boolean> guiWindowMaximizedVertical = null;
+    @ConfigurationName(name = "gui.avm2.splitPane.dividerLocation")
+    public static final ConfigurationItem<Integer> guiAvm2SplitPaneDividerLocation = null;
+    @ConfigurationName(name = "guiActionSplitPaneDividerLocation")
+    public static final ConfigurationItem<Integer> guiActionSplitPaneDividerLocation = null;
+    @ConfigurationName(name = "gui.splitPane1.dividerLocation")
+    public static final ConfigurationItem<Integer> guiSplitPane1DividerLocation = null;
+    @ConfigurationName(name = "gui.splitPane2.dividerLocation")
+    public static final ConfigurationItem<Integer> guiSplitPane2DividerLocation = null;
+    
     private enum OSId {
 
         WINDOWS, OSX, UNIX
@@ -219,38 +262,6 @@ public class Configuration {
         }
     }
 
-    public static boolean containsConfig(String cfg) {
-        return config.containsKey(cfg);
-    }
-
-    public static <T> T getConfig(String cfg) {
-        T defaultValue = null;
-        if (configDefaults.containsKey(cfg)) {
-            @SuppressWarnings("unchecked")
-            T def = (T) configDefaults.get(cfg);
-            defaultValue = def;
-        }
-        return getConfig(cfg, defaultValue);
-    }
-
-    public static <T> T getConfig(String cfg, T defaultValue) {
-        if (!config.containsKey(cfg)) {
-            return defaultValue;
-        }
-        @SuppressWarnings("unchecked")
-        T result = (T) config.get(cfg);
-        return result;
-    }
-
-    public static <T> T setConfig(String cfg, T value) {
-        if (cfg.equals("paralelSpeedUp")) {
-            cfg = "parallelSpeedUp";
-        }
-        @SuppressWarnings("unchecked")
-        T result = (T) config.put(cfg, value);
-        return result;
-    }
-
     private static String getReplacementsFile() throws IOException {
         return getFFDecHome() + REPLACEMENTS_NAME;
     }
@@ -259,11 +270,13 @@ public class Configuration {
         return getFFDecHome() + CONFIG_NAME;
     }
 
-    @SuppressWarnings("unchecked")
-    public static void loadFromFile(String file, String replacementsFile) {
+    private static HashMap<String, Object> loadFromFile(String file, String replacementsFile) {
+        HashMap<String, Object> config = new HashMap<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
 
-            config = (HashMap<String, Object>) ois.readObject();
+            @SuppressWarnings("unchecked")
+            HashMap<String, Object> cfg = (HashMap<String, Object>) ois.readObject();
+            config = cfg;
         } catch (FileNotFoundException ex) {
         } catch (ClassNotFoundException cnf) {
         } catch (IOException ex) {
@@ -271,13 +284,27 @@ public class Configuration {
         if (replacementsFile != null) {
             loadReplacements(replacementsFile);
         }
-        if (containsConfig("paralelSpeedUp")) {
-            setConfig("parallelSpeedUp", getConfig("paralelSpeedUp"));
+        if (config.containsKey("paralelSpeedUp")) {
+            config.put("parallelSpeedUp", config.get("paralelSpeedUp"));
             config.remove("paralelSpeedUp");
         }
+        return config;
     }
 
-    private static void saveToFile(String file, String replacementsFile) {
+     private static void saveToFile(String file, String replacementsFile) {
+        HashMap<String, Object> config = new HashMap<>();
+        for (Entry<String, Field> entry : getConfigurationFields().entrySet()) {
+            try {
+                String name = entry.getKey();
+                Field field = entry.getValue();
+                ConfigurationItem item = (ConfigurationItem) field.get(null);
+                if (item.hasValue) {
+                    config.put(name, item.get());
+                }
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(config);
         } catch (IOException ex) {
@@ -293,15 +320,53 @@ public class Configuration {
         return replacements;
     }
 
-    public static void loadConfig() throws IOException {
-        loadFromFile(getConfigFile(), getReplacementsFile());
-    }
-
     public static void saveConfig() {
         try {
             saveToFile(getConfigFile(), getReplacementsFile());
         } catch (IOException ex) {
             Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    static {
+        setConfigurationFields();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static void setConfigurationFields() {
+        try {
+            HashMap<String, Object> config = loadFromFile(getConfigFile(), getReplacementsFile());
+            for (Entry<String, Field> entry : getConfigurationFields().entrySet()) {
+                String name = entry.getKey();
+                Field field = entry.getValue();
+                // remove final modifier from field
+                Field modifiersField = field.getClass().getDeclaredField("modifiers");
+                modifiersField.setAccessible(true);
+                modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+                Object defaultValue = configDefaults.get(name);
+
+                if (config.containsKey(name)) {
+                    field.set(null, new ConfigurationItem(field.getName(), defaultValue, config.get(name)));
+                } else {
+                    field.set(null, new ConfigurationItem(field.getName(), defaultValue));
+                }
+            }
+        } catch (IOException | IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ex) {
+            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static Map<String, Field> getConfigurationFields() {
+        Field[] fields = Configuration.class.getFields();
+        Map<String, Field> result = new HashMap<>();
+        for (Field field : fields) {
+            if (ConfigurationItem.class.isAssignableFrom(field.getType())) {
+                ConfigurationName annotation = (ConfigurationName) field.getAnnotation(ConfigurationName.class);
+                String name = annotation == null ? field.getName() : annotation.name();
+                result.put(name, field);
+            }
+        }
+        return result;
     }
 }

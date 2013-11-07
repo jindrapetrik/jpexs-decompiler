@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.*;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
@@ -88,7 +89,7 @@ public class SWFInputStream extends InputStream {
     private long percentMax;
     private List<byte[]> buffered = new ArrayList<>();
     private ByteArrayOutputStream buffer;
-    private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = Configuration.getConfig("deobfuscateUsePrevTagOnly");
+    private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = Configuration.deobfuscateUsePrevTagOnly.get();
 
     public int getVersion() {
         return version;
@@ -583,11 +584,7 @@ public class SWFInputStream extends InputStream {
 
         @Override
         public Tag call() throws Exception {
-            try {
-                return SWFInputStream.resolveTag(swf, tag, version, level, parallel, skipUnusualTags);
-            } catch (Exception ex) {
-                return null;
-            }
+            return SWFInputStream.resolveTag(swf, tag, version, level, parallel, skipUnusualTags);
         }
     }
 
@@ -998,7 +995,7 @@ public class SWFInputStream extends InputStream {
                 default:
                     ret = new Tag(swf, tag.getId(), "Unknown", data, pos);
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", ex);
             ret = new Tag(swf, tag.getId(), "ErrorTag", data, pos);
         }

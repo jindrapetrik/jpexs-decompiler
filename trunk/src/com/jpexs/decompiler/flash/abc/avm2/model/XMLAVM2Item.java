@@ -36,7 +36,7 @@ public class XMLAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         for (GraphTargetItem part : parts) {
             if (part instanceof StringAVM2Item) {
                 writer.append(((StringAVM2Item) part).value);

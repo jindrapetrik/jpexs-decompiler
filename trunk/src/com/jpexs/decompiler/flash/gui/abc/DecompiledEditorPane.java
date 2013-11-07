@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -26,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedText;
@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -380,14 +382,14 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return cache.contains(pack);
     }
 
-    private CachedDecompilation getCached(ScriptPack pack) {
+    private CachedDecompilation getCached(ScriptPack pack) throws InterruptedException {
         if (!cache.contains(pack)) {
             cacheScriptPack(pack, abcList);
         }
         return (CachedDecompilation) cache.get(pack);
     }
 
-    public String getCachedText(ScriptPack pack) {
+    public String getCachedText(ScriptPack pack) throws InterruptedException {
         return getCached(pack).text;
     }
 
@@ -442,7 +444,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         cache.clear();
     }
 
-    public void cacheScriptPack(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) {
+    public void cacheScriptPack(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) throws InterruptedException {
         int maxCacheSize = 50;
         int scriptIndex = scriptLeaf.scriptIndex;
         HilightedText hilightedCode = null;
@@ -452,7 +454,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             script = abc.script_info[scriptIndex];
         }
         if (!cache.contains(scriptLeaf)) {
-            boolean parallel = Configuration.getConfig("parallelSpeedUp", true);
+            boolean parallel = Configuration.parallelSpeedUp.get();
             HilightedTextWriter writer = new HilightedTextWriter(true);
             scriptLeaf.toSource(writer, abcList, script.traits.traits, ExportMode.SOURCE, parallel);
             hilightedCode = new HilightedText(writer);
@@ -481,21 +483,27 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         this.abc = abc;
         this.abcList = abcList;
         this.script = scriptLeaf;
-
-        cacheScriptPack(scriptLeaf, abcList);
-        CachedDecompilation cd = getCached(scriptLeaf);
-        final String hilightedCode = cd.text;
-        highlights = cd.getInstructionHighlights();
-        specialHighlights = cd.getSpecialHighligths();
-        traitHighlights = cd.getTraitHighlights();
-        methodHighlights = cd.getMethodHighlights();
-        classHighlights = cd.getClassHighlights();
-        if (hilightedCode.length() > 1024 * 1024 * 2/*2MB*/) {
-            setContentType("text/plain");
-        } else {
-            setContentType("text/actionscript");
+        CachedDecompilation cd = null;
+        try {
+            cacheScriptPack(scriptLeaf, abcList);
+            cd = getCached(scriptLeaf);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(DecompiledEditorPane.class.getName()).log(Level.SEVERE, null, ex);
         }
-        setText(hilightedCode);
+        if (cd != null) {
+            final String hilightedCode = cd.text;
+            highlights = cd.getInstructionHighlights();
+            specialHighlights = cd.getSpecialHighligths();
+            traitHighlights = cd.getTraitHighlights();
+            methodHighlights = cd.getMethodHighlights();
+            classHighlights = cd.getClassHighlights();
+            if (hilightedCode.length() > 1024 * 1024 * 2/*2MB*/) {
+                setContentType("text/plain");
+            } else {
+                setContentType("text/actionscript");
+            }
+            setText(hilightedCode);
+        }
     }
 
     public void reloadClass() {

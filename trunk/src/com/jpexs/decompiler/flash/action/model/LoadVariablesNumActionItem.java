@@ -53,7 +53,7 @@ public class LoadVariablesNumActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         String methodStr = "";
         if (method == 1) {
             methodStr = ",\"GET\"";

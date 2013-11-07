@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.action;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.TagNode;
@@ -27,6 +26,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
@@ -172,7 +172,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         return cache.contains(src);
     }
 
-    private void cacheScript(ASMSource src, List<Action> actions) {
+    private void cacheScript(ASMSource src, List<Action> actions) throws InterruptedException {
         if (!cache.contains(src)) {
             if (actions == null) {
                 actions = src.getActions(SWF.DEFAULT_VERSION);
@@ -227,8 +227,11 @@ public class ActionPanel extends JPanel implements ActionListener {
                     decAdd = ", " + AppStrings.translate("work.decompiling");
                 }
                 Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ");
-
-                cacheScript(item.getValue(), null);
+                try {
+                    cacheScript(item.getValue(), null);
+                } catch (InterruptedException ex) {
+                    break;
+                }
                 if (pat.matcher(getCached(item.getValue()).text).find()) {
                     found.add(item.getValue());
                 }
@@ -356,7 +359,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             @Override
             public Void call() throws Exception {
                 editor.setText("; " + AppStrings.translate("work.disassembling") + "...");
-                if (Configuration.getConfig("decompile", true)) {
+                if (Configuration.decompile.get()) {
                     decompiledEditor.setText("//" + AppStrings.translate("work.waitingfordissasembly") + "...");
                 }
                 DisassemblyListener listener = getDisassemblyListener();
@@ -368,7 +371,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 srcNoHex = null;
                 srcHexOnly = null;
                 setHex(getExportMode());
-                if (Configuration.getConfig("decompile", true)) {
+                if (Configuration.decompile.get()) {
                     decompiledEditor.setText("//" + AppStrings.translate("work.decompiling") + "...");
                     if (!useCache) {
                         uncache(asm);
@@ -538,7 +541,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
-                Configuration.setConfig("gui.action.splitPane.dividerLocation", pce.getNewValue());
+                Configuration.guiActionSplitPaneDividerLocation.set((int) pce.getNewValue());
             }
         });
         editor.setContentType("text/flasm");
@@ -604,7 +607,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
 
     public void initSplits() {
-        int split = Configuration.getConfig("gui.action.splitPane.dividerLocation", getWidth() / 2);
+        int split = Configuration.guiActionSplitPaneDividerLocation.get(getWidth() / 2);
         if (split == 0) {
             split = getWidth() / 2;
         }

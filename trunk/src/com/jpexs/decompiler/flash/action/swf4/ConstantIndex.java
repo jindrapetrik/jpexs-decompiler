@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf4;
 
-import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.ArrayList;

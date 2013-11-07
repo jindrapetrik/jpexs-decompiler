@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -29,8 +28,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class NewFunctionAVM2Item extends AVM2Item {
 
@@ -60,7 +57,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         MethodBody body = abc.findBody(methodIndex);
         writer.append("function" + (!functionName.isEmpty() ? " " + functionName : ""));
         writer.startMethod(methodIndex);
@@ -72,14 +69,10 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.newLine();
         writer.append("{").newLine();
         if (body != null) {
-            try {
-                if (writer instanceof NulWriter) {
-                    body.convert(path + "/inner", ExportMode.SOURCE, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, fullyQualifiedNames, null, false);
-                } else {
-                    body.toString(path + "/inner", ExportMode.SOURCE, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null);
-                }
-            } catch (Exception ex) {
-                Logger.getLogger(NewFunctionIns.class.getName()).log(Level.SEVERE, "error during newfunction", ex);
+            if (writer instanceof NulWriter) {
+                body.convert(path + "/inner", ExportMode.SOURCE, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, fullyQualifiedNames, null, false);
+            } else {
+                body.toString(path + "/inner", ExportMode.SOURCE, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null);
             }
         }
         writer.append("}");

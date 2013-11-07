@@ -47,7 +47,7 @@ public class GetPropertyActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (isEmptyString(target)) {
             return writer.append(Action.propertyNames[propertyIndex]);
         }

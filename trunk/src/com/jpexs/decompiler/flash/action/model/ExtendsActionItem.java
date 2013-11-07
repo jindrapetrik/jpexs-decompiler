@@ -35,7 +35,7 @@ public class ExtendsActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         subclass.toString(writer, localData);
         writer.append(" extends ");
         return stripQuotes(superclass, localData, writer);

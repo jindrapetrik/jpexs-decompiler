@@ -38,7 +38,7 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
     }
 
     @Override
-    public String toString(List<ABCContainerTag> abcTags, ABC abc) {
+    public String toString(List<ABCContainerTag> abcTags, ABC abc) throws InterruptedException {
         NulWriter nulWriter = new NulWriter();
         if (parentTraitIndex > -1) {
             if (isStatic) {

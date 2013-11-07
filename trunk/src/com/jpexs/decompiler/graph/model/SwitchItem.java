@@ -59,7 +59,7 @@ public class SwitchItem extends LoopItem implements Block {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (writer instanceof NulWriter) {
             ((NulWriter)writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_SWITCH);
         }

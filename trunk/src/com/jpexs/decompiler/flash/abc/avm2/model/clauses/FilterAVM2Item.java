@@ -38,7 +38,7 @@ public class FilterAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         collection.toString(writer, localData);
         writer.append(".(");
         expression.toString(writer, localData);

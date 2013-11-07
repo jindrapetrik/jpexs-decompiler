@@ -47,7 +47,7 @@ public class ApplicationInfo {
             applicationVerName = applicationName + " v." + version;
             updatePage = updatePageStub + version;
             shortApplicationVerName = shortApplicationName + " v." + version;
-        } catch (IOException ex) {
+        } catch (IOException | NullPointerException ex) {
             //ignore
             version = "unknown";
         }

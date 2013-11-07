@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.PackageNode;
 import com.jpexs.decompiler.flash.SWF;
@@ -31,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -149,6 +149,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -556,10 +557,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         mainMenu.addMenuSeparator();
         rib.setApplicationMenu(mainMenu);
 
-
-        int w = Configuration.getConfig("gui.window.width", 1000);
-
-        int h = Configuration.getConfig("gui.window.height", 700);
+        int w = Configuration.guiWindowWidth.get();
+        int h = Configuration.guiWindowHeight.get();
         Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         if (w > dim.width) {
             w = dim.width;
@@ -569,8 +568,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
         setSize(w, h);
 
-        boolean maximizedHorizontal = Configuration.getConfig("gui.window.maximized.horizontal", false);
-        boolean maximizedVertical = Configuration.getConfig("gui.window.maximized.vertical", false);
+        boolean maximizedHorizontal = Configuration.guiWindowMaximizedHorizontal.get();
+        boolean maximizedVertical = Configuration.guiWindowMaximizedVertical.get();
 
         int state = 0;
         if (maximizedHorizontal) {
@@ -586,8 +585,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             @Override
             public void windowStateChanged(WindowEvent e) {
                 int state = e.getNewState();
-                Configuration.setConfig("gui.window.maximized.horizontal", (state & JFrame.MAXIMIZED_HORIZ) == JFrame.MAXIMIZED_HORIZ);
-                Configuration.setConfig("gui.window.maximized.vertical", (state & JFrame.MAXIMIZED_VERT) == JFrame.MAXIMIZED_VERT);
+                Configuration.guiWindowMaximizedHorizontal.set((state & JFrame.MAXIMIZED_HORIZ) == JFrame.MAXIMIZED_HORIZ);
+                Configuration.guiWindowMaximizedVertical.set((state & JFrame.MAXIMIZED_VERT) == JFrame.MAXIMIZED_VERT);
             }
         });
         addComponentListener(new ComponentAdapter() {
@@ -595,10 +594,10 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             public void componentResized(ComponentEvent e) {
                 int state = getExtendedState();
                 if ((state & JFrame.MAXIMIZED_HORIZ) == 0) {
-                    Configuration.setConfig("gui.window.width", getWidth());
+                    Configuration.guiWindowWidth.set(getWidth());
                 }
                 if ((state & JFrame.MAXIMIZED_VERT) == 0) {
-                    Configuration.setConfig("gui.window.height", getHeight());
+                    Configuration.guiWindowHeight.set(getHeight());
                 }
             }
         });
@@ -683,7 +682,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         miDeobfuscation.addActionListener(this);
 
         //autoDeobfuscateMenuItem = new JCheckBoxMenuItem(translate("menu.settings.autodeobfuscation"));
-        miAutoDeobfuscation.setSelected(Configuration.getConfig("autoDeobfuscate", true));
+        miAutoDeobfuscation.setSelected(Configuration.autoDeobfuscate.get());
         miAutoDeobfuscation.addActionListener(this);
         miAutoDeobfuscation.setActionCommand("AUTODEOBFUSCATE");
 
@@ -714,7 +713,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
         //miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
         boolean externalFlashPlayerUnavailable = flashPanel == null;
-        miInternalViewer.setSelected(Configuration.getConfig("internalFlashViewer", false) || externalFlashPlayerUnavailable);
+        miInternalViewer.setSelected(Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
         if (externalFlashPlayerUnavailable) {
             miInternalViewer.setEnabled(false);
         }
@@ -722,7 +721,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         miInternalViewer.addActionListener(this);
 
         //miParallelSpeedUp = new JCheckBox(translate("menu.settings.parallelspeedup"));
-        miParallelSpeedUp.setSelected(Configuration.getConfig("parallelSpeedUp", true));
+        miParallelSpeedUp.setSelected(Configuration.parallelSpeedUp.get());
         miParallelSpeedUp.setActionCommand("PARALLELSPEEDUP");
         miParallelSpeedUp.addActionListener(this);
 
@@ -738,18 +737,18 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         menuBar.add(menuTools);
 
         //miDecompile = new JCheckBox(translate("menu.settings.disabledecompilation"));
-        miDecompile.setSelected(!Configuration.getConfig("decompile", true));
+        miDecompile.setSelected(!Configuration.decompile.get());
         miDecompile.setActionCommand("DISABLEDECOMPILATION");
         miDecompile.addActionListener(this);
 
 
         //miCacheDisk = new JCheckBox(translate("menu.settings.cacheOnDisk"));
-        miCacheDisk.setSelected(Configuration.getConfig("cacheOnDisk", true));
+        miCacheDisk.setSelected(Configuration.cacheOnDisk.get());
         miCacheDisk.setActionCommand("CACHEONDISK");
         miCacheDisk.addActionListener(this);
 
         // miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
-        miGotoMainClassOnStartup.setSelected(Configuration.getConfig("gotoMainClassOnStartup", false));
+        miGotoMainClassOnStartup.setSelected(Configuration.gotoMainClassOnStartup.get());
         miGotoMainClassOnStartup.setActionCommand("GOTODOCUMENTCLASSONSTARTUP");
         miGotoMainClassOnStartup.addActionListener(this);
 
@@ -1476,7 +1475,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
                 if (splitsInited) {
-                    Configuration.setConfig("gui.splitPane1.dividerLocation", pce.getNewValue());
+                    Configuration.guiSplitPane1DividerLocation.set((int) pce.getNewValue());
                 }
             }
         });
@@ -1485,7 +1484,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
                 if (detailPanel.isVisible()) {
-                    Configuration.setConfig("gui.splitPane2.dividerLocation", pce.getNewValue());
+                    Configuration.guiSplitPane2DividerLocation.set((int) pce.getNewValue());
                 }
             }
         });
@@ -1518,7 +1517,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         if (!droppedFiles.isEmpty()) {
                             Main.openFile(droppedFiles.get(0).getAbsolutePath());
                         }
-                    } catch (Exception ex) {
+                    } catch (UnsupportedFlavorException | IOException ex) {
                     }
                 }
             });
@@ -1632,8 +1631,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         mui.setNormalIcon(View.getResizableIcon("buttonicon_256"));
                         mui.setClickIcon(View.getResizableIcon("buttonicon_down_256"));
                     }
-                    splitPane1.setDividerLocation(Configuration.getConfig("gui.splitPane1.dividerLocation", getWidth() / 3));
-                    int confDivLoc = Configuration.getConfig("gui.splitPane2.dividerLocation", splitPane2.getHeight() * 3 / 5);
+                    splitPane1.setDividerLocation(Configuration.guiSplitPane1DividerLocation.get(getWidth() / 3));
+                    int confDivLoc = Configuration.guiSplitPane2DividerLocation.get(splitPane2.getHeight() * 3 / 5);
                     if (confDivLoc > splitPane2.getHeight() - 10) { //In older releases, divider location was saved when detailPanel was invisible too
                         confDivLoc = splitPane2.getHeight() * 3 / 5;
                     }
@@ -2192,7 +2191,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             for (int i = 0; i < tlsList.size(); i++) {
                 ScriptPack tls = tlsList.get(i);
                 Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
-                ret.add(tls.export(selFile, abcList, exportMode, Configuration.getConfig("parallelSpeedUp", true)));
+                ret.add(tls.export(selFile, abcList, exportMode, Configuration.parallelSpeedUp.get()));
             }
         } else {
             List<TagNode> allNodes = new ArrayList<>();
@@ -2342,10 +2341,10 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 }
                 break;
             case "GOTODOCUMENTCLASSONSTARTUP":
-                Configuration.setConfig("gotoMainClassOnStartup", miGotoMainClassOnStartup.isSelected());
+                Configuration.gotoMainClassOnStartup.set(miGotoMainClassOnStartup.isSelected());
                 break;
             case "CACHEONDISK":
-                Configuration.setConfig("cacheOnDisk", miCacheDisk.isSelected());
+                Configuration.cacheOnDisk.set(miCacheDisk.isSelected());
                 if (miCacheDisk.isSelected()) {
                     Cache.setStorageType(Cache.STORAGE_FILES);
                 } else {
@@ -2356,7 +2355,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 new SelectLanguageDialog().display();
                 break;
             case "DISABLEDECOMPILATION":
-                Configuration.setConfig("decompile", !miDecompile.isSelected());
+                Configuration.decompile.set(!miDecompile.isSelected());
                 clearCache();
                 if (abcPanel != null) {
                     abcPanel.reload();
@@ -2389,13 +2388,13 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     confStr += " " + translate("message.confirm.off");
                 }
                 if (View.showConfirmDialog(null, confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.setConfig("parallelSpeedUp", (Boolean) miParallelSpeedUp.isSelected());
+                    Configuration.parallelSpeedUp.set((Boolean) miParallelSpeedUp.isSelected());
                 } else {
                     miParallelSpeedUp.setSelected(!miParallelSpeedUp.isSelected());
                 }
                 break;
             case "INTERNALVIEWERSWITCH":
-                Configuration.setConfig("internalFlashViewer", miInternalViewer.isSelected());
+                Configuration.internalFlashViewer.set(miInternalViewer.isSelected());
                 reload(true);
                 break;
             case "SEARCHAS":
@@ -2456,7 +2455,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     ImageTag it = (ImageTag) tagObj;
                     if (it.importSupported()) {
                         JFileChooser fc = new JFileChooser();
-                        fc.setCurrentDirectory(new File(Configuration.getConfig("lastOpenDir", ".")));
+                        fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
                         fc.setFileFilter(new FileFilter() {
                             @Override
                             public boolean accept(File f) {
@@ -2476,7 +2475,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         View.setWindowIcon(f);
                         int returnVal = fc.showOpenDialog(f);
                         if (returnVal == JFileChooser.APPROVE_OPTION) {
-                            Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                            Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
                             File selfile = Helper.fixDialogFile(fc.getSelectedFile());
                             byte[] data = Helper.readFile(selfile.getAbsolutePath());
                             try {
@@ -2559,7 +2558,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
             case "AUTODEOBFUSCATE":
                 if (View.showConfirmDialog(this, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.setConfig("autoDeobfuscate", miAutoDeobfuscation.isSelected());
+                    Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
                     clearCache();
                     if (abcPanel != null) {
                         abcPanel.reload();
@@ -2656,7 +2655,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 break;
             case "EXPORTFLA":
                 JFileChooser fc = new JFileChooser();
-                String selDir = Configuration.getConfig("lastOpenDir", ".");
+                String selDir = Configuration.lastOpenDir.get();
                 fc.setCurrentDirectory(new File(selDir));
                 if (!selDir.endsWith(File.separator)) {
                     selDir += File.separator;
@@ -2693,7 +2692,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 View.setWindowIcon(f);
                 int returnVal = fc.showSaveDialog(f);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                    Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
                     File sf = Helper.fixDialogFile(fc.getSelectedFile());
 
                     Main.startWork(translate("work.exporting.fla") + "...");
@@ -2710,9 +2709,9 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                             Helper.freeMem();
                             try {
                                 if (compressed) {
-                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.getConfig("parallelSpeedUp", true));
+                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
                                 } else {
-                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.getConfig("parallelSpeedUp", true));
+                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
                                 }
                             } catch (IOException ex) {
                                 View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2729,7 +2728,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 export.setVisible(true);
                 if (!export.cancelled) {
                     JFileChooser chooser = new JFileChooser();
-                    chooser.setCurrentDirectory(new File(Configuration.getConfig("lastExportDir", ".")));
+                    chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
                     chooser.setDialogTitle(translate("export.select.directory"));
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     chooser.setAcceptAllFileFilterUsed(false);
@@ -2737,7 +2736,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         final long timeBefore = System.currentTimeMillis();
                         Main.startWork(translate("work.exporting") + "...");
                         final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
-                        Configuration.setConfig("lastExportDir", Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
+                        Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
                         final ExportMode exportMode = ExportMode.get(export.getOption(ExportDialog.OPTION_ACTIONSCRIPT));
                         final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
                         final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
@@ -2755,7 +2754,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                         swf.exportMovies(errorHandler, selFile + File.separator + "movies");
                                         swf.exportSounds(errorHandler, selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
                                         swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData");
-                                        swf.exportActionScript(errorHandler, selFile, exportMode, Configuration.getConfig("parallelSpeedUp", true));
+                                        swf.exportActionScript(errorHandler, selFile, exportMode, Configuration.parallelSpeedUp.get());
                                     }
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
@@ -2786,7 +2785,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     try {
                         java.net.URI uri = new java.net.URI(helpUsURL);
                         desktop.browse(uri);
-                    } catch (Exception ex) {
+                    } catch (URISyntaxException | IOException ex) {
                     }
                 } else {
                     View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
@@ -2800,7 +2799,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     try {
                         java.net.URI uri = new java.net.URI(homePageURL);
                         desktop.browse(uri);
-                    } catch (Exception ex) {
+                    } catch (URISyntaxException | IOException ex) {
                     }
                 } else {
                     View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
@@ -3485,7 +3484,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     }
                 }
 
-            } catch (Exception ex) {
+            } catch (IOException | com.jpexs.decompiler.flash.action.parser.ParseException ex) {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
 

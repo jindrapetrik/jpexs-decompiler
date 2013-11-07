@@ -51,7 +51,7 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         object.toString(writer, localData);
         return writer.append("--");
     }

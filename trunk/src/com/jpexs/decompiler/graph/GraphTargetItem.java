@@ -84,7 +84,7 @@ public abstract class GraphTargetItem implements Serializable {
         return ret;
     }
 
-    public GraphTextWriter toStringSemicoloned(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter toStringSemicoloned(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.startOffset(src, pos);
         appendTo(writer, localData);
         if (needsSemicolon()) { 
@@ -103,16 +103,16 @@ public abstract class GraphTargetItem implements Serializable {
         return this.getClass().getName();
     }
 
-    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.startOffset(src, pos);
         appendTo(writer, localData);
         writer.endOffset();
         return writer;
     }
 
-    protected abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData);
+    protected abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
 
-    public String toString(LocalData localData) {
+    public String toString(LocalData localData) throws InterruptedException {
         HilightedTextWriter writer = new HilightedTextWriter(false);
         toString(writer, localData);
         return writer.toString();
@@ -149,14 +149,14 @@ public abstract class GraphTargetItem implements Serializable {
         return toString();
     }
 
-    public GraphTextWriter toStringNoQuotes(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter toStringNoQuotes(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.startOffset(src, pos);
         appendToNoQuotes(writer, localData);
         writer.endOffset();
         return writer;
     }
 
-    protected GraphTextWriter appendToNoQuotes(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendToNoQuotes(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData);
     }
 
@@ -172,7 +172,7 @@ public abstract class GraphTargetItem implements Serializable {
         return false;
     }
 
-    public GraphTextWriter toStringNL(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter toStringNL(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.startOffset(src, pos);
         appendTo(writer, localData);
         if (needsNewLine()) {

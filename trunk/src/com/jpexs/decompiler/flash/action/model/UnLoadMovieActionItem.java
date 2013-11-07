@@ -47,7 +47,7 @@ public class UnLoadMovieActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("unloadMovie(");
         targetString.toString(writer, localData);
         return writer.append(")");

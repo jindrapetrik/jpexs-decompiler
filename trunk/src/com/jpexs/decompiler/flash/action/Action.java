@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -46,6 +45,7 @@ import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
@@ -697,11 +697,11 @@ public class Action implements GraphSourceItem {
      * @param version SWF version
      * @param path
      */
-    public static void actionsToSource(ASMSource asm, final List<Action> actions, final int version, final String path, GraphTextWriter writer) {
+    public static void actionsToSource(ASMSource asm, final List<Action> actions, final int version, final String path, GraphTextWriter writer) throws InterruptedException {
         writer.suspendMeasure();
         List<GraphTargetItem> tree = null;
         Throwable convertException = null;
-        int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod");
+        int timeout = Configuration.decompilationTimeoutSingleMethod.get();
         try {
             tree = Helper.timedCall(new Callable<List<GraphTargetItem>>() {
                 @Override
@@ -877,7 +877,7 @@ public class Action implements GraphSourceItem {
                     List<GraphTargetItem> out;
                     try {
                         out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables2, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
-                    } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
+                    } catch (OutOfMemoryError | StackOverflowError ex2) {
                         Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex2);
                         if (ex2 instanceof OutOfMemoryError) {
                             System.gc();
@@ -1204,7 +1204,7 @@ public class Action implements GraphSourceItem {
             Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, ExportMode.PCODE, writer, swfPos, path);
             s = writer.toString();
             ret = ASMParser.parse(address, swfPos, true, s, SWF.DEFAULT_VERSION, false);
-        } catch (Exception ex) {
+        } catch (IOException | ParseException ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error. path: " + path, ex);
         }
         return ret;

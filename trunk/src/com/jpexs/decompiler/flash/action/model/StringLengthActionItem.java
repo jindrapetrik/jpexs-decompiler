@@ -33,7 +33,7 @@ public class StringLengthActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("length(");
         value.toString(writer, localData);
         return writer.append(")");

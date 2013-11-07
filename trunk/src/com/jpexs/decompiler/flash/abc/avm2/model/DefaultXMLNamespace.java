@@ -35,7 +35,7 @@ public class DefaultXMLNamespace extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("default xml namespace = ");
         return ns.toString(writer, localData);
     }

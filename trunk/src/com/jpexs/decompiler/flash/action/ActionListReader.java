@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
@@ -33,6 +32,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -80,7 +80,7 @@ public class ActionListReader {
      * @throws IOException
      */
     public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int version, int ip, int endIp, String path) throws IOException {
-        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate");
+        boolean deobfuscate = Configuration.autoDeobfuscate.get();
 
         ConstantPool cpool = new ConstantPool();
 
@@ -229,7 +229,7 @@ public class ActionListReader {
             }
         }
 
-        if (Configuration.getConfig("removeNops")) {
+        if (Configuration.removeNops.get()) {
             ret = Action.removeNops(0, ret, version, 0, path);
         }
         List<Action> reta = new ArrayList<>();

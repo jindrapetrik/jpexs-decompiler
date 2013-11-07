@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -50,7 +50,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         cnt1.add(cnt, BorderLayout.CENTER);
 
 
-        String currentLanguage = Configuration.getConfig("locale", Locale.getDefault().getLanguage());
+        String currentLanguage = Configuration.locale.get(Locale.getDefault().getLanguage());
         boolean found = false;
         int enIndex = 0;
         for (String code : languages) {
@@ -111,7 +111,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
                     if (newLanguage.equals("en")) {
                         newLanguage = "";
                     }
-                    Configuration.setConfig("locale", newLanguage);
+                    Configuration.locale.set(newLanguage);
                     Locale.setDefault(Locale.forLanguageTag(newLanguage));
                     updateLanguage();
                     setVisible(false);

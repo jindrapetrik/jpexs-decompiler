@@ -33,7 +33,7 @@ public class NameValuePair extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         name.toString(writer, localData);
         writer.append(":");
         if (value instanceof TernarOpItem) { //Ternar operator contains ":"

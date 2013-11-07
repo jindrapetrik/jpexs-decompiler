@@ -96,7 +96,7 @@ public class Graph {
             }
         } catch (InterruptedException ex) {
             throw ex;
-        } catch (Exception | Error ex) {
+        } catch (Error ex) {
             String s = ex.toString();
             //ignore
         }
@@ -1353,6 +1353,9 @@ public class Graph {
     }
 
     protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path) throws InterruptedException {
+        if (Thread.interrupted()) {
+            throw new InterruptedException();
+        }
         if (stopPart == null) {
             stopPart = new ArrayList<>();
         }
@@ -2149,7 +2152,7 @@ public class Graph {
      * @param localData
      * @return String
      */
-    public static GraphTextWriter graphToString(List<GraphTargetItem> tree, GraphTextWriter writer, LocalData localData) {
+    public static GraphTextWriter graphToString(List<GraphTargetItem> tree, GraphTextWriter writer, LocalData localData) throws InterruptedException {
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();

@@ -35,7 +35,7 @@ public class CoerceAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         //return hilight("("+type+")", highlight)+
         return value.toString(writer, localData);
     }

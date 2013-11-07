@@ -68,7 +68,7 @@ public class AVM2GraphSource extends GraphSource {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) {
+    public List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = new ArrayList<>();
         Object o = localData.get(AVM2Graph.DATA_SCOPESTACK);
         Stack<GraphTargetItem> newstack = (Stack<GraphTargetItem>) o;

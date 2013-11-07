@@ -39,7 +39,7 @@ public class StringExtractActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         value.toString(writer, localData);
         writer.append(".substr(");
         index.toString(writer, localData);

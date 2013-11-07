@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.RenameType;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -55,7 +55,7 @@ public class RenameDialog extends AppDialog implements ActionListener {
     public RenameDialog() {
         setSize(300, 150);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-        int renameType = Configuration.getConfig("lastRenameType", 1);
+        int renameType = Configuration.lastRenameType.get();
         ButtonGroup group = new ButtonGroup();
         group.add(typeNumberRadioButton);
         group.add(randomWordRadioButton);
@@ -97,7 +97,7 @@ public class RenameDialog extends AppDialog implements ActionListener {
         switch (e.getActionCommand()) {
             case "OK":
                 confirmed = true;
-                Configuration.setConfig("lastRenameType", (Integer) (getRenameType() == RenameType.TYPENUMBER ? 1 : 2));
+                Configuration.lastRenameType.set((Integer) (getRenameType() == RenameType.TYPENUMBER ? 1 : 2));
                 setVisible(false);
                 break;
             case "CANCEL":

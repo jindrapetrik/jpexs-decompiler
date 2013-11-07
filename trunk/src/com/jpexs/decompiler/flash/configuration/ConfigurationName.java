@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2011-2013 JPEXS
+ *  Copyright (C) 2010-2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,24 +14,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.usages;
+package com.jpexs.decompiler.flash.configuration;
 
-import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
  * @author JPEXS
  */
-public class ImplementsMultinameUsage extends InsideClassMultinameUsage {
-
-    public ImplementsMultinameUsage(int multinameIndex, int classIndex) {
-        super(multinameIndex, classIndex);
-    }
-
-    @Override
-    public String toString(List<ABCContainerTag> abcTags, ABC abc) throws InterruptedException {
-        return super.toString(abcTags, abc) + " implements";
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface ConfigurationName {
+    
+    String name(); 
+    
 }

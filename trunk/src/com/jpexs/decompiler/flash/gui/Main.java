@@ -17,11 +17,11 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
@@ -50,7 +50,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -200,7 +199,7 @@ public class Main {
             public void progress(int p) {
                 startWork(AppStrings.translate("work.reading.swf"), p);
             }
-        }, Configuration.getConfig("parallelSpeedUp", true));
+        }, Configuration.parallelSpeedUp.get());
         locswf.addEventListener(new EventListener() {
             @Override
             public void handleEvent(String event, Object data) {
@@ -391,7 +390,7 @@ public class Main {
 
     public static boolean saveFileDialog() {
         JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(Configuration.getConfig("lastSaveDir", ".")));
+        fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -446,7 +445,7 @@ public class Main {
                     swf.gfx = true;
                 }
                 Main.saveFile(fileName);
-                Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());
+                Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
                 fileTitle = null;
                 readOnly = false;
                 return true;
@@ -460,7 +459,7 @@ public class Main {
     public static boolean openFileDialog() {
         fileTitle = null;
         JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(Configuration.getConfig("lastOpenDir", ".")));
+        fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -504,7 +503,7 @@ public class Main {
         View.setWindowIcon(f);
         int returnVal = fc.showOpenDialog(f);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+            Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
             File selfile = Helper.fixDialogFile(fc.getSelectedFile());
             Main.openFile(selfile.getAbsolutePath());
             return true;
@@ -657,7 +656,7 @@ public class Main {
     }
 
     private static void offerAssociation() {
-        boolean offered = Configuration.getConfig("offeredAssociation");
+        boolean offered = Configuration.offeredAssociation.get();
         if (!offered) {
             if (Platform.isWindows()) {
                 if ((!isAddedToContextMenu()) && View.showConfirmDialog(null, "Do you want to add FFDec to context menu of SWF files?\n(Can be changed later from main menu)", "Context menu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
@@ -665,11 +664,11 @@ public class Main {
                 }
             }
         }
-        Configuration.setConfig("offeredAssociation", true);
+        Configuration.offeredAssociation.set(true);
     }
 
     public static void initLang() {
-        Locale.setDefault(Locale.forLanguageTag(Configuration.getConfig("locale", "en")));
+        Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
         UIManager.put("OptionPane.noButtonText", AppStrings.translate("button.no"));
@@ -787,14 +786,13 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         startFreeMemThread();
-        Configuration.loadConfig();
         initLogging(Configuration.debugMode);
 
         initLang();
 
         View.setLookAndFeel();
 
-        if (Configuration.getConfig("cacheOnDisk", true)) {
+        if (Configuration.cacheOnDisk.get()) {
             Cache.setStorageType(Cache.STORAGE_FILES);
         } else {
             Cache.setStorageType(Cache.STORAGE_MEMORY);
@@ -924,7 +922,7 @@ public class Main {
     }
 
     public static void autoCheckForUpdates() {
-        Calendar lastUpdatesCheckDate = Configuration.getConfig("lastUpdatesCheckDate", null);
+        Calendar lastUpdatesCheckDate = Configuration.lastUpdatesCheckDate.get();
         if ((lastUpdatesCheckDate == null) || (lastUpdatesCheckDate.getTime().getTime() < Calendar.getInstance().getTime().getTime() - 1000 * 60 * 60 * 24)) {
             checkForUpdates();
         }
@@ -1014,13 +1012,13 @@ public class Main {
             if (!versions.isEmpty()) {
                 NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
                 newVersionDialog.setVisible(true);
-                Configuration.setConfig("lastUpdatesCheckDate", Calendar.getInstance());
+                Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
                 return true;
             }
-        } catch (Exception ex) {
+        } catch (IOException | NumberFormatException ex) {
             return false;
         }
-        Configuration.setConfig("lastUpdatesCheckDate", Calendar.getInstance());
+        Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
         return false;
     }
     private static FileHandler fileTxt;

@@ -280,7 +280,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) {
+    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
         definition.translate((Boolean) localData.get(0),
                 (Integer) localData.get(13),
                 (Integer) localData.get(1),

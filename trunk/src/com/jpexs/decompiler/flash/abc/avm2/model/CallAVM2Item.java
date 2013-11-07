@@ -36,7 +36,7 @@ public class CallAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         /*String recPart = ""; receiver.toString(constants, localRegNames) + writer.append(".");
          if (receiver instanceof NewActivationAVM2Item) {
          recPart = "";

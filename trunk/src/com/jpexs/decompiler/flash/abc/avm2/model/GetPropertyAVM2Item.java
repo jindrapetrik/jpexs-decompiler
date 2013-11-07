@@ -33,7 +33,7 @@ public class GetPropertyAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return formatProperty(writer, object, propertyName, localData);
     }
 }

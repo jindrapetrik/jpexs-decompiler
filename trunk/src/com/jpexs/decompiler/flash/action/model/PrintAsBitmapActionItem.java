@@ -51,7 +51,7 @@ public class PrintAsBitmapActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("printAsBitmap(");
         target.toString(writer, localData);
         writer.append(",");

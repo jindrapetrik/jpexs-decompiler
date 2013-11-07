@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
-import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.helpers.Helper;

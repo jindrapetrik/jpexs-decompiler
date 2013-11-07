@@ -86,7 +86,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return writer;
     }
 
-    public void getValueStr(Trait parent, GraphTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
+    public void getValueStr(Trait parent, GraphTextWriter writer, ABC abc, List<String> fullyQualifiedNames) throws InterruptedException {
         if (assignedValue != null) {
             if (parent instanceof TraitClass) {
                 TraitClass tc = (TraitClass) parent;
@@ -119,7 +119,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         if (modifier.equals(" ")) {
             modifier = "";

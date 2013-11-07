@@ -38,7 +38,7 @@ public class CallPropertyAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         formatProperty(writer, receiver, propertyName, localData);
         writer.append("(");
         for (int a = 0; a < arguments.size(); a++) {

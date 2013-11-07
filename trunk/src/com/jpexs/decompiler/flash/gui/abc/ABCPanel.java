@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -36,6 +35,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Freed;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
@@ -64,6 +64,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -115,25 +119,45 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
             ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
             List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
             found = new ArrayList<>();
-            Pattern pat = null;
-            if (regexp) {
-                pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
-            } else {
-                pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
-            }
+            final Pattern pat = regexp ?
+                Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0) :
+                Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
             int pos = 0;
-            for (MyEntry<ClassPath, ScriptPack> item : allpacks) {
+            for (final MyEntry<ClassPath, ScriptPack> item : allpacks) {
                 pos++;
                 String workText = AppStrings.translate("work.searching");
                 String decAdd = "";
                 if (!decompiledTextArea.isCached(item.value)) {
                     decAdd = ", " + AppStrings.translate("work.decompiling");
                 }
-                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.key.toString() + "... ");
-                decompiledTextArea.cacheScriptPack(item.value, list);
-                if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
-                    found.add(item.value);
-                    foundPath.add(item.key);
+                
+                final AtomicReference<FutureTask<Void>> taskRef = new AtomicReference<>();
+                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.key.toString() + "... ", new Runnable() {
+
+                    @Override
+                    public void run() {
+                        FutureTask task = taskRef.get();
+                        if (task != null) {
+                            task.cancel(true);
+                        }
+                    }
+                });
+                try {
+                    Helper.cancellableCall(new Callable<Void>() {
+                        @Override
+                        public Void call() throws Exception {
+                            decompiledTextArea.cacheScriptPack(item.value, list);
+                            if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
+                                found.add(item.value);
+                                foundPath.add(item.key);
+                            }
+                            return null;
+                        }
+                    }, taskRef);
+                } catch (InterruptedException ex) {
+                    break;
+                } catch (ExecutionException ex) {
+                    Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -269,7 +293,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         }
 
 
-        splitPane.setDividerLocation(Configuration.getConfig("gui.avm2.splitPane.dividerLocation", splitPane.getWidth() * 1 / 2));
+        splitPane.setDividerLocation(Configuration.guiAvm2SplitPaneDividerLocation.get(splitPane.getWidth() * 1 / 2));
 
     }
 
@@ -340,7 +364,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
-                Configuration.setConfig("gui.avm2.splitPane.dividerLocation", pce.getNewValue());
+                Configuration.guiAvm2SplitPaneDividerLocation.set((int) pce.getNewValue());
             }
         });
         decompiledTextArea.setContentType("text/actionscript");

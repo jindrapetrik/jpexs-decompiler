@@ -56,7 +56,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
         return (name != null) || (namespace != null);
     }
 
-    public boolean isXML(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public boolean isXML(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) throws InterruptedException {
         String cname;
         if (name != null) {
             cname = name.toString(LocalData.create(constants, localRegNames, fullyQualifiedNames));
@@ -76,7 +76,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (namespace != null) {
             namespace.toString(writer, localData);
             writer.append("::");

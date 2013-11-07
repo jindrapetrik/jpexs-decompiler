@@ -41,7 +41,7 @@ public class WithAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("with(");
         scope.toString(writer, localData);
         writer.append(")").newLine();

@@ -45,7 +45,7 @@ public class ReturnActionItem extends ActionItem implements ExitItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("return ");
         return value.toString(writer, localData);
     }

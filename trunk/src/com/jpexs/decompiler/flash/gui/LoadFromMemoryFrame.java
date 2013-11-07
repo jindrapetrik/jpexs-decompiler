@@ -1,7 +1,7 @@
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LimitedInputStream;
 import com.jpexs.helpers.PosMarkedInputStream;
@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
@@ -180,7 +181,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                             if (((StateValue) evt.getNewValue()) == StateValue.DONE) {
                                 try {
                                     foundIs = wrk.get();
-                                } catch (Exception ex) {
+                                } catch (InterruptedException | ExecutionException ex) {
                                     Logger.getLogger(LoadFromMemoryFrame.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                                 if (foundIs == null) {
@@ -335,11 +336,11 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 int[] selected = listRes.getSelectedIndices();
                 if (selected.length > 0) {
                     JFileChooser fc = new JFileChooser();
-                    fc.setCurrentDirectory(new File(Configuration.getConfig("lastSaveDir", ".")));
+                    fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
                     if (selected.length > 1) {
                         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     } else {
-                        fc.setSelectedFile(new File(Configuration.getConfig("lastSaveDir", "."), "movie.swf"));
+                        fc.setSelectedFile(new File(Configuration.lastSaveDir.get(), "movie.swf"));
                         fc.setFileFilter(new FileFilter() {
                             @Override
                             public boolean accept(File f) {
@@ -370,7 +371,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                                     Helper.saveStream(bis, new File(file, "movie" + sel + ".swf"));
                                 }
                             }
-                            Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());
+                            Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
                         } catch (IOException ex) {
                             View.showMessageDialog(null, translate("error.file.write"));
                         }

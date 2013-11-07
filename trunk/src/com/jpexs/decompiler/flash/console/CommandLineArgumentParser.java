@@ -18,10 +18,11 @@ package com.jpexs.decompiler.flash.console;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.ConsoleAbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
@@ -48,12 +49,14 @@ public class CommandLineArgumentParser {
 
     private static boolean commandLineMode = false;
 
-    private static String[] commandlineConfigBoolean = new String[]{
-        "decompile",
-        "parallelSpeedUp",
-        "internalFlashViewer",
-        "autoDeobfuscate",
-        "cacheOnDisk"};
+    @SuppressWarnings("unchecked")
+    private static ConfigurationItem<Boolean>[] commandlineConfigBoolean = new ConfigurationItem[]{
+        Configuration.decompile,
+        Configuration.parallelSpeedUp,
+        Configuration.internalFlashViewer,
+        Configuration.autoDeobfuscate,
+        Configuration.cacheOnDisk
+    };
 
     public static boolean isCommandLineMode() {
         return commandLineMode;
@@ -78,8 +81,8 @@ public class CommandLineArgumentParser {
         System.out.println("  ...Decompress infile and save it to outfile");
         System.out.println(" 8) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
         System.out.print("  ...Sets configuration values. Available keys[current setting]:");
-        for (String key : commandlineConfigBoolean) {
-            System.out.print(" " + key + "[" + Configuration.getConfig(key) + "]");
+        for (ConfigurationItem item : commandlineConfigBoolean) {
+            System.out.print(" " + item + "[" + item.get() + "]");
         }
         System.out.println("");
         System.out.println("    Values are boolean, you can use 0/1, true/false, on/off or yes/no.");
@@ -174,8 +177,8 @@ public class CommandLineArgumentParser {
             printHeader();
             printCmdLineUsage();
             System.exit(0);
-        } else if (args.size() == 1) {
-            return args.remove();
+        } else if (args.isEmpty()) {
+            return nextParam;
         } else {
             badArguments();
         }
@@ -217,12 +220,12 @@ public class CommandLineArgumentParser {
             if (key.toLowerCase().equals("paralelSpeedUp".toLowerCase())) {
                 key = "parallelSpeedUp";
             }
-            for (String bk : commandlineConfigBoolean) {
-                if (key.toLowerCase().equals(bk.toLowerCase())) {
+            for (ConfigurationItem<Boolean> item : commandlineConfigBoolean) {
+                if (key.toLowerCase().equals(item.getName().toLowerCase())) {
                     Boolean bValue = parseBooleanConfigValue(value);
                     if (bValue != null) {
-                        System.out.println("Config " + bk + " set to " + bValue);
-                        Configuration.setConfig(bk, bValue);
+                        System.out.println("Config " + item + " set to " + bValue);
+                        item.set(bValue);
                     }
                 }
             }
@@ -307,7 +310,7 @@ public class CommandLineArgumentParser {
         }
         try {
             int timeout = Integer.parseInt(args.remove());
-            Configuration.setConfig("decompilationTimeoutSingleMethod", timeout);
+            Configuration.decompilationTimeoutSingleMethod.set(timeout);
         } catch (NumberFormatException nex) {
             System.err.println("Bad timeout value");
         }
@@ -430,7 +433,7 @@ public class CommandLineArgumentParser {
         boolean exportOK;
         try {
             printHeader();
-            SWF exfile = new SWF(new FileInputStream(inFile), Configuration.getConfig("parallelSpeedUp", true));
+            SWF exfile = new SWF(new FileInputStream(inFile), Configuration.parallelSpeedUp.get());
             final Level level = traceLevel;
             exfile.addEventListener(new EventListener() {
                 @Override
@@ -456,7 +459,7 @@ public class CommandLineArgumentParser {
                     System.out.println("Exporting shapes...");
                     exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes");
                     System.out.println("Exporting scripts...");
-                    exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", allExportMode, Configuration.getConfig("parallelSpeedUp", true));
+                    exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", allExportMode, Configuration.parallelSpeedUp.get());
                     System.out.println("Exporting movies...");
                     exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies");
                     System.out.println("Exporting sounds...");
@@ -480,7 +483,7 @@ public class CommandLineArgumentParser {
                 case "pcodehex":
                 case "hex":
                     ExportMode exportMode = strToExportFormat(exportFormat);
-                    boolean parallel = Configuration.getConfig("parallelSpeedUp", true);
+                    boolean parallel = Configuration.parallelSpeedUp.get();
                     if (!args.isEmpty() && args.peek().equals("-selectas3class")) {
                         args.remove();
                         exportOK = true;
@@ -512,11 +515,11 @@ public class CommandLineArgumentParser {
                     exportOK = true;
                     break;
                 case "fla":
-                    exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.getConfig("parallelSpeedUp", true));
+                    exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
                     exportOK = true;
                     break;
                 case "xfl":
-                    exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.getConfig("parallelSpeedUp", true));
+                    exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
                     exportOK = true;
                     break;
                 default:
@@ -572,7 +575,7 @@ public class CommandLineArgumentParser {
         }
         try {
             Configuration.dump_tags = true;
-            Configuration.setConfig("parallelSpeedUp", false);
+            Configuration.parallelSpeedUp.set(false);
             SWF swf = Main.parseSWF(args.remove());
         } catch (Exception ex) {
             Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);

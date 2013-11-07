@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 
 /**
@@ -39,13 +41,23 @@ public class UsageListModel extends DefaultListModel<Object> {
     @Override
     @SuppressWarnings("unchecked")
     public Object get(int index) {
-        return ((MultinameUsage) super.get(index)).toString(abcTags, abc);
+        try {
+            return ((MultinameUsage) super.get(index)).toString(abcTags, abc);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(UsageListModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Object getElementAt(int index) {
-        return ((MultinameUsage) super.getElementAt(index)).toString(abcTags, abc);
+        try {
+            return ((MultinameUsage) super.getElementAt(index)).toString(abcTags, abc);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(UsageListModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")

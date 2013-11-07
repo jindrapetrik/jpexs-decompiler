@@ -32,7 +32,7 @@ public class MethodReturnTypeMultinameUsage extends MethodMultinameUsage {
     }
 
     @Override
-    public String toString(List<ABCContainerTag> abcTags, ABC abc) {
+    public String toString(List<ABCContainerTag> abcTags, ABC abc) throws InterruptedException {
         return super.toString(abcTags, abc) + " return type";
     }
 }

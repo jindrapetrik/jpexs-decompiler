@@ -16,11 +16,11 @@
  */
 package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;

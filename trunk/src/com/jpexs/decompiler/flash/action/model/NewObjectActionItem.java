@@ -46,7 +46,7 @@ public class NewObjectActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("new ");
         stripQuotes(objectName, localData, writer);
         writer.append("(");

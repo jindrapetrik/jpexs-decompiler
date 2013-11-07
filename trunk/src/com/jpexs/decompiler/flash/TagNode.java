@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -341,6 +342,7 @@ public class TagNode {
                             }
 
                             ret.add(file);
+                        } catch (InterruptedException ex) {
                         } catch (IOException | OutOfMemoryError | StackOverflowError ex) {
                             Logger.getLogger(TagNode.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
                             if (handler != null) {

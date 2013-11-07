@@ -73,7 +73,7 @@ public class FunctionActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (true) {
             //return writer.appendNoHilight("<func>")
         }

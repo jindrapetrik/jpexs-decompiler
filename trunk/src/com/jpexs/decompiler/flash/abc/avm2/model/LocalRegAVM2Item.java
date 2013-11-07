@@ -47,7 +47,7 @@ public class LocalRegAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (computedValue instanceof FilterAVM2Item) {
             return computedValue.toString(writer, localData);
         }

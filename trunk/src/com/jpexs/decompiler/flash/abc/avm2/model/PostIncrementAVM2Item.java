@@ -32,7 +32,7 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         object.toString(writer, localData);
         return writer.append("++");
     }

@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.browsers.cache.CacheEntry;
 import com.jpexs.browsers.cache.CacheImplementation;
 import com.jpexs.browsers.cache.CacheReader;
-import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReReadableInputStream;
 import java.awt.BorderLayout;
@@ -238,11 +238,11 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
                 List<CacheEntry> selected = list.getSelectedValuesList();
                 if (!selected.isEmpty()) {
                     JFileChooser fc = new JFileChooser();
-                    fc.setCurrentDirectory(new File(Configuration.getConfig("lastSaveDir", ".")));
+                    fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
                     if (selected.size() > 1) {
                         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     } else {
-                        fc.setSelectedFile(new File(Configuration.getConfig("lastSaveDir", "."), entryToFileName(selected.get(0))));
+                        fc.setSelectedFile(new File(Configuration.lastSaveDir.get(), entryToFileName(selected.get(0))));
                         fc.setFileFilter(new FileFilter() {
                             @Override
                             public boolean accept(File f) {
@@ -269,7 +269,7 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
                                     Helper.saveStream(sel.getResponseDataStream(), new File(file, entryToFileName(sel)));
                                 }
                             }
-                            Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());
+                            Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
                         } catch (IOException ex) {
                             View.showMessageDialog(null, translate("error.file.write"));
                         }
