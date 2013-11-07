@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.ExportMode;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +40,7 @@ public class ExportTest {
 
     @BeforeClass
     public void addLogger() {
-        Configuration.setConfig("autoDeobfuscate", true);
+        Configuration.autoDeobfuscate.set(true);
         Logger logger = Logger.getLogger("");
         logger.addHandler(new Handler() {
             @Override

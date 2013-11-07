@@ -19,11 +19,14 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.testng.Assert.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -36,7 +39,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
 
     @BeforeClass
     public void init() throws IOException {
-        Configuration.setConfig("autoDeobfuscate", true);
+        Configuration.autoDeobfuscate.set(true);
         swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
     }
 
@@ -79,7 +82,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
             String actualResult = writer.toString();
 
             assertTrue(actualResult.contains("case \"c\":"));
-        } catch (IOException | ParseException ex) {
+        } catch (IOException | ParseException | InterruptedException ex) {
             fail();
         }
     }

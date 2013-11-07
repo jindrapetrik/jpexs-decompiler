@@ -1,6 +1,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.NotSameException;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.io.*;
 import static org.testng.Assert.*;
 import org.testng.annotations.Test;

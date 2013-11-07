@@ -1,6 +1,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -38,13 +39,18 @@ public class ActionScript3Test {
         clsIndex = tag.getABC().findClassByName("classes.Test");
         assertTrue(clsIndex > -1);
         this.abc = tag.getABC();
-        Configuration.setConfig("autoDeobfuscate", false);
+        Configuration.autoDeobfuscate.set(false);
     }
 
     private void decompileMethod(String methodName, String expectedResult, boolean isStatic) {
         int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
         assertTrue(bodyIndex > -1);
-        HilightedTextWriter writer = abc.bodies[bodyIndex].toString(methodName, ExportMode.SOURCE, isStatic, -1/*FIX?*/, clsIndex, abc,null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false,  new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
+        HilightedTextWriter writer = null;
+        try {
+            writer = abc.bodies[bodyIndex].toString(methodName, ExportMode.SOURCE, isStatic, -1/*FIX?*/, clsIndex, abc,null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false,  new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
+        } catch (InterruptedException ex) {
+            fail();
+        }
         String actualResult = writer.toString().replaceAll("[ \r\n]", "");
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);

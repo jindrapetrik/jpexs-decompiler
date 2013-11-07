@@ -17,12 +17,15 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.testng.Assert.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -35,7 +38,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @BeforeClass
     public void init() throws IOException {
-        Configuration.setConfig("autoDeobfuscate", false);
+        Configuration.autoDeobfuscate.set(false);
         swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
     }
 
@@ -43,7 +46,11 @@ public class ActionScript2Test extends ActionStript2TestBase {
         DoActionTag doa = getFrameSource(frame);
         assertNotNull(doa);
         HilightedTextWriter writer = new HilightedTextWriter(false);
-        Action.actionsToSource(doa, doa.getActions(swf.version), swf.version, "", writer);
+        try {
+            Action.actionsToSource(doa, doa.getActions(swf.version), swf.version, "", writer);
+        } catch (InterruptedException ex) {
+            fail();
+        }
         String actualResult = writer.toString().replaceAll("[ \r\n]", "");
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);

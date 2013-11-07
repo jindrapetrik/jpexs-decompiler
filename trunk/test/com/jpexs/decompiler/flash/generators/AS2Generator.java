@@ -1,8 +1,8 @@
 package com.jpexs.decompiler.flash.generators;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -20,7 +20,7 @@ import java.io.FileOutputStream;
 public class AS2Generator {
 
     public static void main(String[] args) throws Exception {
-        Configuration.setConfig("autoDeobfuscate", false);
+        Configuration.autoDeobfuscate.set(false);
         SWF swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
         DoABCDefineTag tag = null;
         DoActionTag doa = null;

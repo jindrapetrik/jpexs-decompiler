@@ -1,10 +1,10 @@
 package com.jpexs.decompiler.flash.generators;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -24,7 +24,7 @@ import java.util.Stack;
 public class AS3Generator {
 
     public static void main(String[] args) throws Exception {
-        Configuration.setConfig("autoDeobfuscate", false);
+        Configuration.autoDeobfuscate.set(false);
         SWF swf = new SWF(new FileInputStream("testdata/as3/as3.swf"),false);
         DoABCDefineTag tag = null;
         for (Tag t : swf.tags) {

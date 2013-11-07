@@ -96,7 +96,7 @@ public class Graph {
             }
         } catch (InterruptedException ex) {
             throw ex;
-        } catch (Error ex) {
+        } catch (Exception | Error ex) {
             String s = ex.toString();
             //ignore
         }
