@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
@@ -46,8 +47,6 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
 import java.net.URLDecoder;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -80,15 +79,6 @@ public class Main {
     public static InputStream inputStream;
     public static String fileTitle;
     public static SWF swf;
-    public static String version = "";
-    public static final String applicationName = "JPEXS Free Flash Decompiler";
-    public static String applicationVerName;
-    public static final String shortApplicationName = "FFDec";
-    public static String shortApplicationVerName;
-    public static final String projectPage = "http://www.free-decompiler.com/flash";
-    public static String updatePageStub = "http://www.free-decompiler.com/flash/update.html?currentVersion=";
-    public static String updatePage;
-    public static final String vendor = "JPEXS";
     public static LoadingDialog loadingDialog;
     public static ModeFrame modeFrame;
     private static boolean working = false;
@@ -114,20 +104,6 @@ public class Main {
             loadFromMemoryFrame = new LoadFromMemoryFrame();
         }
         loadFromMemoryFrame.setVisible(true);
-    }
-
-    private static void loadProperties() {
-        Properties prop = new Properties();
-        try {
-            prop.load(Main.class.getResourceAsStream("/project.properties"));
-            version = prop.getProperty("version");
-            applicationVerName = applicationName + " v." + version;
-            updatePage = updatePageStub + version;
-            shortApplicationVerName = shortApplicationName + " v." + version;
-        } catch (IOException ex) {
-            //ignore
-            version = "unknown";
-        }
     }
 
     /**
@@ -693,9 +669,7 @@ public class Main {
     }
 
     public static void initLang() {
-        if (Configuration.containsConfig("locale")) {
-            Locale.setDefault(Locale.forLanguageTag(Configuration.getConfig("locale", "en")));
-        }
+        Locale.setDefault(Locale.forLanguageTag(Configuration.getConfig("locale", "en")));
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
         UIManager.put("OptionPane.noButtonText", AppStrings.translate("button.no"));
@@ -813,8 +787,7 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         startFreeMemThread();
-        loadProperties();
-        Configuration.loadFromFile(getConfigFile(), getReplacementsFile());
+        Configuration.loadConfig();
         initLogging(Configuration.debugMode);
 
         initLang();
@@ -840,7 +813,7 @@ public class Main {
     }
 
     public static String tempFile(String url) throws IOException {
-        File f = new File(getFFDecHome() + "saved" + File.separator);
+        File f = new File(Configuration.getFFDecHome() + "saved" + File.separator);
         if (!f.exists()) {
             if (!f.mkdirs()) {
                 if (!f.exists()) {
@@ -848,7 +821,7 @@ public class Main {
                 }
             }
         }
-        return getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
+        return Configuration.getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
 
     }
 
@@ -879,7 +852,7 @@ public class Main {
         }
         if (SystemTray.isSupported()) {
             SystemTray tray = SystemTray.getSystemTray();
-            trayIcon = new TrayIcon(View.loadImage("proxy16"), vendor + " " + shortApplicationName + " " + AppStrings.translate("proxy"));
+            trayIcon = new TrayIcon(View.loadImage("proxy16"), ApplicationInfo.vendor + " " + ApplicationInfo.shortApplicationName + " " + AppStrings.translate("proxy"));
             trayIcon.setImageAutoSize(true);
             PopupMenu trayPopup = new PopupMenu();
 
@@ -936,16 +909,8 @@ public class Main {
         }
     }
 
-    public static void saveConfig() {
-        try {
-            Configuration.saveToFile(getConfigFile(), getReplacementsFile());
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     public static void exit() {
-        saveConfig();
+        Configuration.saveConfig();
         FlashPlayerPanel.unload();
         System.exit(0);
     }
@@ -969,7 +934,7 @@ public class Main {
         try {
             Socket sock = new Socket("www.free-decompiler.com", 80);
             OutputStream os = sock.getOutputStream();
-            os.write(("GET /flash/update.html?action=check&currentVersion=" + version + " HTTP/1.1\r\nHost: www.free-decompiler.com\r\nUser-Agent: " + shortApplicationVerName + "\r\nConnection: close\r\n\r\n").getBytes());
+            os.write(("GET /flash/update.html?action=check&currentVersion=" + ApplicationInfo.version + " HTTP/1.1\r\nHost: www.free-decompiler.com\r\nUser-Agent: " + ApplicationInfo.shortApplicationVerName + "\r\nConnection: close\r\n\r\n").getBytes());
             BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             String s;
             boolean start = false;
@@ -1068,13 +1033,13 @@ public class Main {
             logger.removeHandler(fileTxt);
         }
         try {
-            File f = new File(getFFDecHome() + File.separator + "log.txt");
+            File f = new File(Configuration.getFFDecHome() + File.separator + "log.txt");
             FileOutputStream fos = new FileOutputStream(f);
             fos.close();
         } catch (IOException ex) {
         }
         try {
-            fileTxt = new FileHandler(getFFDecHome() + File.separator + "log.txt");
+            fileTxt = new FileHandler(Configuration.getFFDecHome() + File.separator + "log.txt");
         } catch (IOException | SecurityException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1104,97 +1069,6 @@ public class Main {
         } catch (Exception ex) {
             throw new RuntimeException("Problems with creating the log files");
         }
-    }
-    private static final String CONFIG_NAME = "config.bin";
-    private static final String REPLACEMENTS_NAME = "replacements.cfg";
-    private static final File unspecifiedFile = new File("unspecified");
-    private static File directory = unspecifiedFile;
-
-    private enum OSId {
-
-        WINDOWS, OSX, UNIX
-    }
-
-    private static OSId getOSId() {
-        PrivilegedAction<String> doGetOSName = new PrivilegedAction<String>() {
-            @Override
-            public String run() {
-                return System.getProperty("os.name");
-            }
-        };
-        OSId id = OSId.UNIX;
-        String osName = AccessController.doPrivileged(doGetOSName);
-        if (osName != null) {
-            if (osName.toLowerCase().startsWith("mac os x")) {
-                id = OSId.OSX;
-            } else if (osName.contains("Windows")) {
-                id = OSId.WINDOWS;
-            }
-        }
-        return id;
-    }
-
-    public static String getFFDecHome() throws IOException {
-        if (directory == unspecifiedFile) {
-            directory = null;
-            String userHome = null;
-            try {
-                userHome = System.getProperty("user.home");
-            } catch (SecurityException ignore) {
-            }
-            if (userHome != null) {
-                String applicationId = Main.shortApplicationName;
-                OSId osId = getOSId();
-                if (osId == OSId.WINDOWS) {
-                    File appDataDir = null;
-                    try {
-                        String appDataEV = System.getenv("APPDATA");
-                        if ((appDataEV != null) && (appDataEV.length() > 0)) {
-                            appDataDir = new File(appDataEV);
-                        }
-                    } catch (SecurityException ignore) {
-                    }
-                    String vendorId = Main.vendor;
-                    if ((appDataDir != null) && appDataDir.isDirectory()) {
-                        // ${APPDATA}\{vendorId}\${applicationId}
-                        String path = vendorId + "\\" + applicationId + "\\";
-                        directory = new File(appDataDir, path);
-                    } else {
-                        // ${userHome}\Application Data\${vendorId}\${applicationId}
-                        String path = "Application Data\\" + vendorId + "\\" + applicationId + "\\";
-                        directory = new File(userHome, path);
-                    }
-                } else if (osId == OSId.OSX) {
-                    // ${userHome}/Library/Application Support/${applicationId}
-                    String path = "Library/Application Support/" + applicationId + "/";
-                    directory = new File(userHome, path);
-                } else {
-                    // ${userHome}/.${applicationId}/
-                    String path = "." + applicationId + "/";
-                    directory = new File(userHome, path);
-                }
-            }
-        }
-        if (!directory.exists()) {
-            if (!directory.mkdirs()) {
-                if (!directory.exists()) {
-                    throw new IOException("cannot create directory " + directory);
-                }
-            }
-        }
-        String ret = directory.getAbsolutePath();
-        if (!ret.endsWith(File.separator)) {
-            ret += File.separator;
-        }
-        return ret;
-    }
-
-    private static String getReplacementsFile() throws IOException {
-        return getFFDecHome() + REPLACEMENTS_NAME;
-    }
-
-    private static String getConfigFile() throws IOException {
-        return getFFDecHome() + CONFIG_NAME;
     }
 
     public static boolean isAddedToContextMenu() {

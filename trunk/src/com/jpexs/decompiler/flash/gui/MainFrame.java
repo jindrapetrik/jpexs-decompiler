@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.PackageNode;
@@ -622,7 +623,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 Main.exit();
             }
         });
-        setTitle(Main.applicationVerName + ((swf != null && Configuration.DISPLAY_FILENAME) ? " - " + Main.getFileTitle() : ""));
+        setTitle(ApplicationInfo.applicationVerName + ((swf != null && Configuration.DISPLAY_FILENAME) ? " - " + Main.getFileTitle() : ""));
         JMenuBar menuBar = new JMenuBar();
 
 
@@ -2646,7 +2647,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 break;
             case "SAVEAS":
                 if (Main.saveFileDialog()) {
-                    setTitle(Main.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
+                    setTitle(ApplicationInfo.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
                     saveCommandButton.setEnabled(!Main.readOnly);
                 }
                 break;
@@ -2709,9 +2710,9 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                             Helper.freeMem();
                             try {
                                 if (compressed) {
-                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", true));
+                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.getConfig("parallelSpeedUp", true));
                                 } else {
-                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", true));
+                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.getConfig("parallelSpeedUp", true));
                                 }
                             } catch (IOException ex) {
                                 View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2728,11 +2729,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 export.setVisible(true);
                 if (!export.cancelled) {
                     JFileChooser chooser = new JFileChooser();
-                    if (Configuration.containsConfig("lastExportDir")) {
-                        chooser.setCurrentDirectory(new java.io.File(Configuration.getConfig("lastExportDir", ".")));
-                    } else {
-                        chooser.setCurrentDirectory(new File("."));
-                    }
+                    chooser.setCurrentDirectory(new File(Configuration.getConfig("lastExportDir", ".")));
                     chooser.setDialogTitle(translate("export.select.directory"));
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     chooser.setAcceptAllFileFilterUsed(false);
@@ -2783,7 +2780,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 break;
 
             case "HELPUS":
-                String helpUsURL = Main.projectPage + "/help_us.html";
+                String helpUsURL = ApplicationInfo.projectPage + "/help_us.html";
                 if (java.awt.Desktop.isDesktopSupported()) {
                     java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                     try {
@@ -2797,7 +2794,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 break;
 
             case "HOMEPAGE":
-                String homePageURL = Main.projectPage;
+                String homePageURL = ApplicationInfo.projectPage;
                 if (java.awt.Desktop.isDesktopSupported()) {
                     java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                     try {

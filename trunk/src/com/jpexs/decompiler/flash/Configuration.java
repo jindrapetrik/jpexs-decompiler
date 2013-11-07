@@ -18,15 +18,21 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.proxy.Replacement;
 import java.io.*;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 public class Configuration {
+
+    private static final String CONFIG_NAME = "config.bin";
+    private static final String REPLACEMENTS_NAME = "replacements.cfg";
+    private static final File unspecifiedFile = new File("unspecified");
+    private static File directory = unspecifiedFile;
 
     public static final boolean DISPLAY_FILENAME = true;
     public static boolean DEBUG_COPY = false;
@@ -91,6 +97,85 @@ public class Configuration {
             put("removeNops", true);
         }
     };
+
+    private enum OSId {
+
+        WINDOWS, OSX, UNIX
+    }
+
+    private static OSId getOSId() {
+        PrivilegedAction<String> doGetOSName = new PrivilegedAction<String>() {
+            @Override
+            public String run() {
+                return System.getProperty("os.name");
+            }
+        };
+        OSId id = OSId.UNIX;
+        String osName = AccessController.doPrivileged(doGetOSName);
+        if (osName != null) {
+            if (osName.toLowerCase().startsWith("mac os x")) {
+                id = OSId.OSX;
+            } else if (osName.contains("Windows")) {
+                id = OSId.WINDOWS;
+            }
+        }
+        return id;
+    }
+
+    public static String getFFDecHome() throws IOException {
+        if (directory == unspecifiedFile) {
+            directory = null;
+            String userHome = null;
+            try {
+                userHome = System.getProperty("user.home");
+            } catch (SecurityException ignore) {
+            }
+            if (userHome != null) {
+                String applicationId = ApplicationInfo.shortApplicationName;
+                OSId osId = getOSId();
+                if (osId == OSId.WINDOWS) {
+                    File appDataDir = null;
+                    try {
+                        String appDataEV = System.getenv("APPDATA");
+                        if ((appDataEV != null) && (appDataEV.length() > 0)) {
+                            appDataDir = new File(appDataEV);
+                        }
+                    } catch (SecurityException ignore) {
+                    }
+                    String vendorId = ApplicationInfo.vendor;
+                    if ((appDataDir != null) && appDataDir.isDirectory()) {
+                        // ${APPDATA}\{vendorId}\${applicationId}
+                        String path = vendorId + "\\" + applicationId + "\\";
+                        directory = new File(appDataDir, path);
+                    } else {
+                        // ${userHome}\Application Data\${vendorId}\${applicationId}
+                        String path = "Application Data\\" + vendorId + "\\" + applicationId + "\\";
+                        directory = new File(userHome, path);
+                    }
+                } else if (osId == OSId.OSX) {
+                    // ${userHome}/Library/Application Support/${applicationId}
+                    String path = "Library/Application Support/" + applicationId + "/";
+                    directory = new File(userHome, path);
+                } else {
+                    // ${userHome}/.${applicationId}/
+                    String path = "." + applicationId + "/";
+                    directory = new File(userHome, path);
+                }
+            }
+        }
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                if (!directory.exists()) {
+                    throw new IOException("cannot create directory " + directory);
+                }
+            }
+        }
+        String ret = directory.getAbsolutePath();
+        if (!ret.endsWith(File.separator)) {
+            ret += File.separator;
+        }
+        return ret;
+    }
 
     /**
      * Saves replacements to file for future use
@@ -166,13 +251,12 @@ public class Configuration {
         return result;
     }
 
-    public static void unsetConfig(String cfg) {
-        config.remove(cfg);
+    private static String getReplacementsFile() throws IOException {
+        return getFFDecHome() + REPLACEMENTS_NAME;
     }
 
-    public static void loadFromMap(Map<String, Object> map) {
-        config.clear();
-        config.putAll(map);
+    private static String getConfigFile() throws IOException {
+        return getFFDecHome() + CONFIG_NAME;
     }
 
     @SuppressWarnings("unchecked")
@@ -189,16 +273,16 @@ public class Configuration {
         }
         if (containsConfig("paralelSpeedUp")) {
             setConfig("parallelSpeedUp", getConfig("paralelSpeedUp"));
-            unsetConfig("paralelSpeedUp");
+            config.remove("paralelSpeedUp");
         }
     }
 
-    public static void saveToFile(String file, String replacementsFile) {
+    private static void saveToFile(String file, String replacementsFile) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(config);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Cannot save configuration.", "Error", JOptionPane.ERROR_MESSAGE);
-            Logger.getLogger(SWFInputStream.class.getName()).severe("Configuration directory is read only.");
+            Logger.getLogger(Configuration.class.getName()).severe("Configuration directory is read only.");
         }
         if (replacementsFile != null) {
             saveReplacements(replacementsFile);
@@ -207,5 +291,17 @@ public class Configuration {
 
     public static List<Replacement> getReplacements() {
         return replacements;
+    }
+
+    public static void loadConfig() throws IOException {
+        loadFromFile(getConfigFile(), getReplacementsFile());
+    }
+
+    public static void saveConfig() {
+        try {
+            saveToFile(getConfigFile(), getReplacementsFile());
+        } catch (IOException ex) {
+            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

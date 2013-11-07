@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.console;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.ConsoleAbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
@@ -123,7 +124,7 @@ public class CommandLineArgumentParser {
                 case "-config":
                     parseConfig(args);
                     if (args.isEmpty()) {
-                        Main.saveConfig();
+                        Configuration.saveConfig();
                         System.out.println("Configuration saved");
                         return null;
                     }
@@ -183,8 +184,8 @@ public class CommandLineArgumentParser {
     }
 
     public static void printHeader() {
-        System.out.println(Main.applicationVerName);
-        for (int i = 0; i < Main.applicationVerName.length(); i++) {
+        System.out.println(ApplicationInfo.applicationVerName);
+        for (int i = 0; i < ApplicationInfo.applicationVerName.length(); i++) {
             System.out.print("-");
         }
         System.out.println();
@@ -511,11 +512,11 @@ public class CommandLineArgumentParser {
                     exportOK = true;
                     break;
                 case "fla":
-                    exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", true));
+                    exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.getConfig("parallelSpeedUp", true));
                     exportOK = true;
                     break;
                 case "xfl":
-                    exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", true));
+                    exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.getConfig("parallelSpeedUp", true));
                     exportOK = true;
                     break;
                 default:
@@ -524,7 +525,7 @@ public class CommandLineArgumentParser {
         } catch (OutOfMemoryError | Exception ex) {
             exportOK = false;
             System.err.print("FAIL: Exporting Failed on Exception - ");
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
         long stopTime = System.currentTimeMillis();
@@ -574,7 +575,7 @@ public class CommandLineArgumentParser {
             Configuration.setConfig("parallelSpeedUp", false);
             SWF swf = Main.parseSWF(args.remove());
         } catch (Exception ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
         System.exit(0);

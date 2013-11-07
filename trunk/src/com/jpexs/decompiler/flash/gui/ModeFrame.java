@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -61,7 +62,7 @@ public class ModeFrame extends AppFrame implements ActionListener {
         cont.add(exitButton);
         View.centerScreen(this);
         View.setWindowIcon(this);
-        setTitle(Main.shortApplicationVerName);
+        setTitle(ApplicationInfo.shortApplicationVerName);
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

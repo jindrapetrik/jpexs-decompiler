@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.Version;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -115,7 +116,7 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
                             java.net.URI uri = new java.net.URI(latestVersion.updateLink);
                             desktop.browse(uri);
                         } else {
-                            java.net.URI uri = new java.net.URI(Main.updatePage);
+                            java.net.URI uri = new java.net.URI(ApplicationInfo.updatePage);
                             desktop.browse(uri);
                         }
                         Main.exit();
@@ -126,7 +127,7 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
                 }
             }
             if (desktop == null) {
-                View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", Main.shortApplicationName).replace("%newAppName%", latestVersion.appName).replace("%projectPage%", Main.projectPage), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
+                View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", ApplicationInfo.shortApplicationName).replace("%newAppName%", latestVersion.appName).replace("%projectPage%", ApplicationInfo.projectPage), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
             }
         }
         setVisible(false);
