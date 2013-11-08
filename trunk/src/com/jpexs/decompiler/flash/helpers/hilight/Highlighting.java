@@ -104,7 +104,7 @@ public class Highlighting implements Serializable {
             }
         }
         
-        if (Configuration.debugMode) {
+        if (Configuration.debugMode.get()) {
             if (ret != null) {
                 System.out.println("Highlight found: " + ret.hilightedText);
             }
@@ -132,7 +132,7 @@ public class Highlighting implements Serializable {
     public Highlighting(int startPos, Map<String, String> data, HilightType type, String text) {
         this.startPos = startPos;
         this.type = type;
-        if (Configuration.debugMode) {
+        if (Configuration.debugMode.get()) {
             this.hilightedText = text;
         }
         this.properties = data;

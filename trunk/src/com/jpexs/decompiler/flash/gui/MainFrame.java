@@ -622,7 +622,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 Main.exit();
             }
         });
-        setTitle(ApplicationInfo.applicationVerName + ((swf != null && Configuration.DISPLAY_FILENAME) ? " - " + Main.getFileTitle() : ""));
+        setTitle(ApplicationInfo.applicationVerName + ((swf != null && Configuration.displayFileName.get()) ? " - " + Main.getFileTitle() : ""));
         JMenuBar menuBar = new JMenuBar();
 
 
@@ -2646,7 +2646,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 break;
             case "SAVEAS":
                 if (Main.saveFileDialog()) {
-                    setTitle(ApplicationInfo.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
+                    setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + Main.getFileTitle() : ""));
                     saveCommandButton.setEnabled(!Main.readOnly);
                 }
                 break;

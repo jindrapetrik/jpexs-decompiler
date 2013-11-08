@@ -27,8 +27,8 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface ConfigurationName {
+public @interface ConfigurationDefaultBoolean {
     
-    String value();
+    boolean value();
     
 }

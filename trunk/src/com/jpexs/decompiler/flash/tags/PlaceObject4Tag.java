@@ -199,12 +199,12 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
      */
     @Override
     public byte[] getData(int version) {
-        if (Configuration.DISABLE_DANGEROUS) {
+        if (Configuration.disableDangerous.get()) {
             return super.getData(version);
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        if (Configuration.DEBUG_COPY) {
+        if (Configuration.debugCopy.get()) {
             os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
         }
         SWFOutputStream sos = new SWFOutputStream(os, version);

@@ -684,9 +684,9 @@ public final class SWF {
                         }
                         return null;
                     }
-                }, Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
+                }, Configuration.exportTimeout.get(), TimeUnit.SECONDS);
             } catch (TimeoutException ex) {
-                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT) + " ActionScript export limit reached", ex);
+                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached", ex);
             } catch (Exception ex) {
                 Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
             }
@@ -707,10 +707,10 @@ public final class SWF {
             }
 
             try {
-                executor.awaitTermination(Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
+                executor.awaitTermination(Configuration.exportTimeout.get(), TimeUnit.SECONDS);
                 executor.shutdownNow();
             } catch (InterruptedException ex) {
-                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT) + " ActionScript export limit reached", ex);
+                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached", ex);
             }
         }
         

@@ -253,7 +253,7 @@ public class MethodInfo {
             }
             if (!localRegNames.isEmpty()) {
                 writer.appendNoHilight(localRegNames.get(i + 1));
-            } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.PARAM_NAMES_ENABLE) {
+            } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
                 writer.appendNoHilight(constants.constant_string[paramNames[i]]);
             } else {
                 writer.appendNoHilight("param" + (i + 1));

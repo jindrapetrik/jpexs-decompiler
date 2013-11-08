@@ -163,7 +163,7 @@ public class DefineFont3Tag extends FontTag {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
-        if (Configuration.DEBUG_COPY) {
+        if (Configuration.debugCopy.get()) {
             sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(data)), 10);
         }
         try {

@@ -119,7 +119,7 @@ public class Main {
 
     public static void setSubLimiter(boolean value) {
         if (value) {
-            AVM2Code.toSourceLimit = Configuration.SUBLIMITER;
+            AVM2Code.toSourceLimit = Configuration.sublimiter.get();
         } else {
             AVM2Code.toSourceLimit = -1;
         }
@@ -786,7 +786,7 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         startFreeMemThread();
-        initLogging(Configuration.debugMode);
+        initLogging(Configuration.debugMode.get());
 
         initLang();
 

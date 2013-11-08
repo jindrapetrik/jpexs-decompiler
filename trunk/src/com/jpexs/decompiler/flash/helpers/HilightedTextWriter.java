@@ -245,7 +245,7 @@ public class HilightedTextWriter extends GraphTextWriter {
         if (toStringCalled) {
             throw new Error("HilightedTextWriter.toString() was already called.");
         }
-        if (Configuration.debugMode) {
+        if (Configuration.debugMode.get()) {
             long stopTime = System.currentTimeMillis();
             long time = stopTime - startTime;
             if (time > 500) {

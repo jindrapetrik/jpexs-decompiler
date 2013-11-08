@@ -297,7 +297,7 @@ public class MethodInfoParser {
                 useParamNames = true;
             }
         }
-        if (!Configuration.PARAM_NAMES_ENABLE) {
+        if (!Configuration.paramNamesEnable.get()) {
             useParamNames = false;
         }
         if (useParamNames) {

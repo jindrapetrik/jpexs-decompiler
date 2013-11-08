@@ -149,13 +149,13 @@ public class ScriptPack {
                     convert(new NulWriter(), abcList, traits, exportMode, parallel);
                     return null;
                 }
-            }, Configuration.DECOMPILATION_TIMEOUT_FILE, TimeUnit.SECONDS);
+            }, Configuration.decompilationTimeoutFile.get(), TimeUnit.SECONDS);
         } catch (TimeoutException ex) {
             writer.continueMeasure();
             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
             writer.appendNoHilight("/*").newLine();
             writer.appendNoHilight(" * Decompilation error").newLine();
-            writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT_FILE) + ") was reached").newLine();
+            writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(Configuration.decompilationTimeoutFile.get()) + ") was reached").newLine();
             writer.appendNoHilight(" */").newLine();
             writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
             return;

@@ -40,106 +40,118 @@ public class Configuration {
     private static final File unspecifiedFile = new File("unspecified");
     private static File directory = unspecifiedFile;
 
-    public static final boolean DISPLAY_FILENAME = true;
-    public static boolean DEBUG_COPY = false;
-    public static boolean dump_tags = false;
+    /**
+     * List of replacements
+     */
+    private static List<Replacement> replacements = new ArrayList<>();
+
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> decompile = null;
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> parallelSpeedUp = null;
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> autoDeobfuscate = null;
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> cacheOnDisk = null;
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> internalFlashViewer = null;
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> gotoMainClassOnStartup = null;
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> deobfuscateUsePrevTagOnly = null;
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> offeredAssociation = null;
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> removeNops = null;
+
     /**
      * Debug mode = throwing an error when comparing original file and
      * recompiled
      */
-    public static boolean debugMode = false;
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationDescription("Debug mode = throwing an error when comparing original file and recompiled")
+    public static final ConfigurationItem<Boolean> debugMode = null;
     /**
      * Turn off reading unsafe tags (tags which can cause problems with
      * recompiling)
      */
-    public static boolean DISABLE_DANGEROUS = false;
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationDescription("Turn off reading unsafe tags (tags which can cause problems with recompiling)")
+    public static final ConfigurationItem<Boolean> disableDangerous = null;
     /**
      * Turn off resolving constants in ActionScript 2
      */
-    public static final boolean RESOLVE_CONSTANTS = true;
-    /**
-     * Find latest constant pool in the code
-     */
-    public static final boolean LATEST_CONSTANTPOOL_HACK = false;
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationDescription("Turn off resolving constants in ActionScript 2")
+    public static final ConfigurationItem<Boolean> resolveConstants = null;
     /**
      * Limit of code subs (for obfuscated code)
      */
-    public static final int SUBLIMITER = 500;
+    @ConfigurationDefaultInt(500)
+    @ConfigurationDescription("Limit of code subs (for obfuscated code)")
+    public static final ConfigurationItem<Integer> sublimiter = null;
     /**
-     * Decompilation timeout in seconds
+     * Total export timeout in seconds
      */
-    public static final int DECOMPILATION_TIMEOUT = 30 * 60;
+    @ConfigurationDefaultInt(30 * 60)
+    @ConfigurationDescription("Total export timeout in seconds")
+    public static final ConfigurationItem<Integer> exportTimeout = null;
     /**
      * Decompilation timeout in seconds for a single file
      */
-    public static final int DECOMPILATION_TIMEOUT_FILE = 5 * 60;
-    //using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices
-    public static final boolean PARAM_NAMES_ENABLE = false;
+    @ConfigurationDefaultInt(5 * 60)
+    @ConfigurationDescription("Decompilation timeout in seconds for a single file")
+    public static final ConfigurationItem<Integer> decompilationTimeoutFile = null;
     /**
-     * List of replacements
+     * Using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices
      */
-    private static java.util.List<Replacement> replacements = new ArrayList<>();
-    private static HashMap<String, Object> configDefaults = new HashMap<String, Object>() {
-        {
-            put("decompile", true);
-            put("parallelSpeedUp", true);
-            put("autoDeobfuscate", true);
-            put("cacheOnDisk", true);
-            put("internalFlashViewer", false);
-            put("gotoMainClassOnStartup", false);
-            put("deobfuscateUsePrevTagOnly", true);
-            put("decompilationTimeoutSingleMethod", 60);
-            put("lastSaveDir", ".");
-            put("lastOpenDir", ".");
-            put("offeredAssociation", false);
-            put("locale", "en");
-            put("registerNameFormat", "_loc%d_");
-            put("lastUpdatesCheckDate", null);
-            put("gui.window.width", 1000);
-            put("gui.window.height", 700);
-            put("gui.window.maximized.horizontal", false);
-            put("gui.window.maximized.vertical", false);
-            put("lastRenameType", 1);
-            put("removeNops", true);
-        }
-    };
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationDescription("Using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices")
+    public static final ConfigurationItem<Boolean> paramNamesEnable = null;
 
-    public static final ConfigurationItem<Boolean> decompile = null;
-    public static final ConfigurationItem<Boolean> parallelSpeedUp = null;
-    public static final ConfigurationItem<Boolean> autoDeobfuscate = null;
-    public static final ConfigurationItem<Boolean> cacheOnDisk = null;
-    public static final ConfigurationItem<Boolean> internalFlashViewer = null;
-    public static final ConfigurationItem<Boolean> gotoMainClassOnStartup = null;
-    public static final ConfigurationItem<Boolean> deobfuscateUsePrevTagOnly = null;
-    public static final ConfigurationItem<Boolean> offeredAssociation = null;
-    public static final ConfigurationItem<Boolean> removeNops = null;
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> displayFileName = null;
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> debugCopy = null;
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> dumpTags = null;
 
+    @ConfigurationDefaultInt(60)
     public static final ConfigurationItem<Integer> decompilationTimeoutSingleMethod = null;
+    @ConfigurationDefaultInt(1)
     public static final ConfigurationItem<Integer> lastRenameType = null;
 
+    @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastSaveDir = null;
+    @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastOpenDir = null;
     public static final ConfigurationItem<String> lastExportDir = null;
+    @ConfigurationDefaultString("en")
     public static final ConfigurationItem<String> locale = null;
+    @ConfigurationDefaultString("_loc%d_")
     public static final ConfigurationItem<String> registerNameFormat = null;
     
     public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
 
-    @ConfigurationName(name = "gui.window.width")
+    @ConfigurationDefaultInt(1000)
+    @ConfigurationName("gui.window.width")
     public static final ConfigurationItem<Integer> guiWindowWidth = null;
-    @ConfigurationName(name = "gui.window.height")
+    @ConfigurationDefaultInt(700)
+    @ConfigurationName("gui.window.height")
     public static final ConfigurationItem<Integer> guiWindowHeight = null;
-    @ConfigurationName(name = "gui.window.maximized.horizontal")
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationName("gui.window.maximized.horizontal")
     public static final ConfigurationItem<Boolean> guiWindowMaximizedHorizontal = null;
-    @ConfigurationName(name = "gui.window.maximized.vertical")
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationName("gui.window.maximized.vertical")
     public static final ConfigurationItem<Boolean> guiWindowMaximizedVertical = null;
-    @ConfigurationName(name = "gui.avm2.splitPane.dividerLocation")
+    @ConfigurationName("gui.avm2.splitPane.dividerLocation")
     public static final ConfigurationItem<Integer> guiAvm2SplitPaneDividerLocation = null;
-    @ConfigurationName(name = "guiActionSplitPaneDividerLocation")
+    @ConfigurationName("guiActionSplitPaneDividerLocation")
     public static final ConfigurationItem<Integer> guiActionSplitPaneDividerLocation = null;
-    @ConfigurationName(name = "gui.splitPane1.dividerLocation")
+    @ConfigurationName("gui.splitPane1.dividerLocation")
     public static final ConfigurationItem<Integer> guiSplitPane1DividerLocation = null;
-    @ConfigurationName(name = "gui.splitPane2.dividerLocation")
+    @ConfigurationName("gui.splitPane2.dividerLocation")
     public static final ConfigurationItem<Integer> guiSplitPane2DividerLocation = null;
     
     private enum OSId {
@@ -345,17 +357,44 @@ public class Configuration {
                 modifiersField.setAccessible(true);
                 modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
-                Object defaultValue = configDefaults.get(name);
-
+                Object defaultValue = getDefaultValue(field);
                 if (config.containsKey(name)) {
                     field.set(null, new ConfigurationItem(field.getName(), defaultValue, config.get(name)));
                 } else {
                     field.set(null, new ConfigurationItem(field.getName(), defaultValue));
                 }
             }
-        } catch (IOException | IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ex) {
+        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ex) {
+            // Reflection exceptions. This should never happen
+            throw new Error(ex.getMessage());
+        } catch (IOException ex) {
             Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static Object getDefaultValue(Field field) {
+        Object defaultValue = null;
+        ConfigurationDefaultBoolean aBool = (ConfigurationDefaultBoolean) field.getAnnotation(ConfigurationDefaultBoolean.class);
+        if (aBool != null) {
+            defaultValue = aBool.value();
+        }
+        ConfigurationDefaultInt aInt = (ConfigurationDefaultInt) field.getAnnotation(ConfigurationDefaultInt.class);
+        if (aInt != null) {
+            defaultValue = aInt.value();
+        }
+        ConfigurationDefaultString aString = (ConfigurationDefaultString) field.getAnnotation(ConfigurationDefaultString.class);
+        if (aString != null) {
+            defaultValue = aString.value();
+        }
+        return defaultValue;
+    }
+    
+    public static String getDescription(Field field) {
+        ConfigurationDescription a = (ConfigurationDescription) field.getAnnotation(ConfigurationDescription.class);
+        if (a != null) {
+            return a.value();
+        }
+        return null;
     }
     
     public static Map<String, Field> getConfigurationFields() {
@@ -364,7 +403,7 @@ public class Configuration {
         for (Field field : fields) {
             if (ConfigurationItem.class.isAssignableFrom(field.getType())) {
                 ConfigurationName annotation = (ConfigurationName) field.getAnnotation(ConfigurationName.class);
-                String name = annotation == null ? field.getName() : annotation.name();
+                String name = annotation == null ? field.getName() : annotation.value();
                 result.put(name, field);
             }
         }

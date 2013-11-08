@@ -19,10 +19,9 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -44,15 +43,26 @@ public class AdvancedSettingsDialog extends AppDialog {
         configurationTable.setCellEditor(configurationTable.getDefaultEditor(null));
         
         Map<String, Field> fields = Configuration.getConfigurationFields();
-        for (Entry<String, Field> entry : fields.entrySet()) {
-            String name = entry.getKey();
-            Field field = entry.getValue();
+        String[] keys = new String[fields.size()];
+        keys = fields.keySet().toArray(keys);
+        Arrays.sort(keys);
+        for (String name : keys) {
+            Field field = fields.get(name);
             DefaultTableModel model = (DefaultTableModel) configurationTable.getModel();
             try {
                 ConfigurationItem item = (ConfigurationItem) field.get(null);
-                model.addRow(new Object[]{name, item.get()});
+                String description = Configuration.getDescription(field);
+                if (description == null) {
+                    description = "";
+                }
+                Object defaultValue = Configuration.getDefaultValue(field);
+                if (defaultValue != null) {
+                    description += " (default: " + defaultValue + ")";
+                }
+                model.addRow(new Object[]{name, item.get(), description});
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                // Reflection exceptions. This should never happen
+                throw new Error(ex.getMessage());
             }
         }
     }
@@ -70,23 +80,25 @@ public class AdvancedSettingsDialog extends AppDialog {
         configurationTable = new com.jpexs.decompiler.flash.gui.EachRowRendererEditor();
         btnOk = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        btnReset = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setResizable(false);
+        setModal(true);
+        setPreferredSize(new java.awt.Dimension(600, 400));
 
         configurationTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Name", "Value"
+                "Name", "Value", "Description"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Object.class
+                java.lang.String.class, java.lang.Object.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, true
+                false, true, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -114,6 +126,13 @@ public class AdvancedSettingsDialog extends AppDialog {
             }
         });
 
+        btnReset.setText("Reset");
+        btnReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -123,7 +142,8 @@ public class AdvancedSettingsDialog extends AppDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnReset)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnOk)))
@@ -133,11 +153,12 @@ public class AdvancedSettingsDialog extends AppDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnOk)
-                    .addComponent(btnCancel))
+                    .addComponent(btnCancel)
+                    .addComponent(btnReset))
                 .addContainerGap())
         );
 
@@ -157,7 +178,8 @@ public class AdvancedSettingsDialog extends AppDialog {
             try {
                 item = (ConfigurationItem) field.get(null);
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                // Reflection exceptions. This should never happen
+                throw new Error(ex.getMessage());
             }
             if (item.get() != null && !item.get().equals(value)) {
                 item.set(value);
@@ -171,9 +193,28 @@ public class AdvancedSettingsDialog extends AppDialog {
         setVisible(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+        Map<String, Field> fields = Configuration.getConfigurationFields();
+        for (Entry<String, Field> entry : fields.entrySet()) {
+            String name = entry.getKey();
+            Field field = entry.getValue();
+            try {
+                ConfigurationItem item = (ConfigurationItem) field.get(null);
+                item.unset();
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                // Reflection exceptions. This should never happen
+                throw new Error(ex.getMessage());
+            }
+        }
+        Configuration.saveConfig();
+        setVisible(false);
+        SelectLanguageDialog.reloadUi();
+    }//GEN-LAST:event_btnResetActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnOk;
+    private javax.swing.JButton btnReset;
     private com.jpexs.decompiler.flash.gui.EachRowRendererEditor configurationTable;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables

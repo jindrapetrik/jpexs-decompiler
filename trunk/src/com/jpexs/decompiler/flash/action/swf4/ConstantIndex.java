@@ -38,7 +38,7 @@ public class ConstantIndex implements Serializable {
     }
 
     public String toStringNoQ() {
-        if (Configuration.RESOLVE_CONSTANTS) {
+        if (Configuration.resolveConstants.get()) {
             if (constantPool != null) {
                 if (index < constantPool.size()) {
                     return constantPool.get(index);
@@ -50,7 +50,7 @@ public class ConstantIndex implements Serializable {
 
     @Override
     public String toString() {
-        if (Configuration.RESOLVE_CONSTANTS) {
+        if (Configuration.resolveConstants.get()) {
             if (constantPool != null) {
                 if (index < constantPool.size()) {
                     return "\"" + Helper.escapeString(constantPool.get(index)) + "\"";

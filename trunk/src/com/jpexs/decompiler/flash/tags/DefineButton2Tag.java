@@ -113,7 +113,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
      */
     @Override
     public byte[] getData(int version) {
-        if (Configuration.DISABLE_DANGEROUS) {
+        if (Configuration.disableDangerous.get()) {
             return super.getData(version);
         }
 
@@ -121,7 +121,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        if (Configuration.DEBUG_COPY) {
+        if (Configuration.debugCopy.get()) {
             os = new CopyOutputStream(os, bais);
         }
         SWFOutputStream sos = new SWFOutputStream(os, version);
@@ -133,7 +133,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
             OutputStream os2 = baos2;
             byte[] origbrdata = null;
-            if (Configuration.DEBUG_COPY) {
+            if (Configuration.debugCopy.get()) {
                 SWFInputStream sis = new SWFInputStream(bais, version);
                 int len = sis.readUI16();
                 if (len != 0) {
@@ -145,14 +145,14 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
                 sos2.writeBUTTONRECORDList(characters, true);
             }
             byte[] brdata = baos2.toByteArray();
-            if (Configuration.DEBUG_COPY) {
+            if (Configuration.debugCopy.get()) {
                 if (origbrdata != null) {
                     if (origbrdata.length != brdata.length) {
                         /*throw nso*/
                     }
                 }
             }
-            if (Configuration.DEBUG_COPY) {
+            if (Configuration.debugCopy.get()) {
                 sos = new SWFOutputStream(baos, version);
             }
             if ((actions == null) || (actions.isEmpty())) {
@@ -161,7 +161,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
                 sos.writeUI16(2 + brdata.length);
             }
             sos.write(brdata);
-            if (Configuration.DEBUG_COPY) {
+            if (Configuration.debugCopy.get()) {
                 sos = new SWFOutputStream(new CopyOutputStream(baos, bais), version);
             }
             sos.writeBUTTONCONDACTIONList(actions);

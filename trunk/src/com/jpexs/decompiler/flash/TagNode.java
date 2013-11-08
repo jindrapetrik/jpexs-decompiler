@@ -267,7 +267,7 @@ public class TagNode {
                     int totalCount = TagNode.getTagCountRecursive(nodeList);
                     return exportNodeAS(allTags, handler, nodeList, outdir, exportMode, cnt, totalCount, ev);
                 }
-            }, Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
+            }, Configuration.exportTimeout.get(), TimeUnit.SECONDS);
             return result;
         } catch (ExecutionException | InterruptedException | TimeoutException ex) {
         }

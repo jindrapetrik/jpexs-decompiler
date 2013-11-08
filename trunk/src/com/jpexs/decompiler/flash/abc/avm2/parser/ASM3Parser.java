@@ -476,7 +476,7 @@ public class ASM3Parser {
                 value_index = parseNamespace(constants, lexer);
                 break;
             default:
-                if (Configuration.debugMode) {
+                if (Configuration.debugMode.get()) {
                     throw new ParseException("Not supported valueType.", lexer.yyline());
                 }
         }

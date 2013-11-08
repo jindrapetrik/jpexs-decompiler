@@ -112,12 +112,8 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
                         newLanguage = "";
                     }
                     Configuration.locale.set(newLanguage);
-                    Locale.setDefault(Locale.forLanguageTag(newLanguage));
-                    updateLanguage();
                     setVisible(false);
-                    AppStrings.updateLanguage();
-                    DefaultSyntaxKit.reloadConfigs();
-                    Main.reloadApp();
+                    reloadUi();
                 }
                 break;
             case "CANCEL":
@@ -126,6 +122,14 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         }
     }
 
+    public static void reloadUi() {
+        Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
+        AppStrings.updateLanguage();
+        DefaultSyntaxKit.reloadConfigs();
+        Main.initLang();
+        Main.reloadApp();
+    }
+    
     public String display() {
         setVisible(true);
         return languageCode;

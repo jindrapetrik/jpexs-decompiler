@@ -148,7 +148,7 @@ public class CommandLineArgumentParser {
                     traceLevel = Level.FINE;
                     break;
                 case "-debug":
-                    Configuration.debugMode = true;
+                    Configuration.debugMode.set(true);
                     break;
                 default:
                     break OUTER;
@@ -574,7 +574,7 @@ public class CommandLineArgumentParser {
             badArguments();
         }
         try {
-            Configuration.dump_tags = true;
+            Configuration.dumpTags.set(true);
             Configuration.parallelSpeedUp.set(false);
             SWF swf = Main.parseSWF(args.remove());
         } catch (Exception ex) {
