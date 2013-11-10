@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -169,6 +170,7 @@ public class AdvancedSettingsDialog extends AppDialog {
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
         TableModel model = configurationTable.getModel();
         int count = model.getRowCount();
+        boolean modified = false;
         for (int i = 0; i < count; i++) {
             String name = (String) model.getValueAt(i, 0);
             Object value = model.getValueAt(i, 1);
@@ -183,10 +185,14 @@ public class AdvancedSettingsDialog extends AppDialog {
             }
             if (item.get() != null && !item.get().equals(value)) {
                 item.set(value);
+                modified = true;
             }
         }
         Configuration.saveConfig();
         setVisible(false);
+        if (modified) {
+            showRestartConfirmDialod();
+        }
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
@@ -208,9 +214,15 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
         Configuration.saveConfig();
         setVisible(false);
-        SelectLanguageDialog.reloadUi();
+        showRestartConfirmDialod();       
     }//GEN-LAST:event_btnResetActionPerformed
 
+    private void showRestartConfirmDialod() {
+        if (View.showConfirmDialog(this, translate("advancedSettings.restartConfirmation"), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            SelectLanguageDialog.reloadUi();
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnOk;
