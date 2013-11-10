@@ -349,6 +349,7 @@ public class Main {
 
     public static boolean openFile(String swfFile) {
         try {
+            Configuration.addRecentFile(swfFile);
             boolean ok = openFile(swfFile, new FileInputStream(swfFile));
             if (ok) {
                 readOnly = false;

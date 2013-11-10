@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.helpers.Helper;
 import com.jpexs.proxy.Replacement;
 import java.io.*;
 import java.lang.reflect.Field;
@@ -24,6 +25,7 @@ import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -130,6 +132,9 @@ public class Configuration {
     public static final ConfigurationItem<String> locale = null;
     @ConfigurationDefaultString("_loc%d_")
     public static final ConfigurationItem<String> registerNameFormat = null;
+    @ConfigurationDefaultInt(8)
+    public static final ConfigurationItem<Integer> maxRecentFileCount = null;
+    public static final ConfigurationItem<String> recentFiles = null;
     
     public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
 
@@ -233,6 +238,27 @@ public class Configuration {
         return ret;
     }
 
+    public static List<String> getRecentFiles() {
+        String files = recentFiles.get();
+        if (files == null) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(recentFiles.get().split("::"));
+    }
+    
+    public static void addRecentFile(String path) {
+        List<String> recentFilesArray = new ArrayList<>(getRecentFiles());
+        int idx = recentFilesArray.indexOf(path);
+        if (idx != -1) {
+            recentFilesArray.remove(idx);
+        }        
+        recentFilesArray.add(path);
+        while (recentFilesArray.size() >= maxRecentFileCount.get()) {
+            recentFilesArray.remove(0);
+        }
+        recentFiles.set(Helper.joinStrings(recentFilesArray, "::"));
+    }
+    
     /**
      * Saves replacements to file for future use
      */

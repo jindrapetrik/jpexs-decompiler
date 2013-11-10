@@ -214,6 +214,7 @@ import org.pushingpixels.flamingo.api.common.CommandButtonDisplayState;
 import org.pushingpixels.flamingo.api.common.CommandButtonLayoutManager;
 import org.pushingpixels.flamingo.api.common.JCommandButton;
 import org.pushingpixels.flamingo.api.common.JCommandButton.CommandButtonKind;
+import org.pushingpixels.flamingo.api.common.JCommandButtonPanel;
 import org.pushingpixels.flamingo.api.common.icon.ResizableIcon;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.api.ribbon.JRibbonBand;
@@ -221,6 +222,7 @@ import org.pushingpixels.flamingo.api.ribbon.JRibbonComponent;
 import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenu;
 import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryFooter;
 import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryPrimary;
+import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntrySecondary;
 import org.pushingpixels.flamingo.api.ribbon.RibbonElementPriority;
 import org.pushingpixels.flamingo.api.ribbon.RibbonTask;
 import org.pushingpixels.flamingo.api.ribbon.resize.BaseRibbonBandResizePolicy;
@@ -543,10 +545,42 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         RibbonApplicationMenuEntryPrimary exportSelMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportsel32"), translate("menu.file.export.selection"), new ActionRedirector(this, "EXPORTSEL"), CommandButtonKind.ACTION_ONLY);
         RibbonApplicationMenuEntryPrimary checkUpdatesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("update32"), translate("menu.help.checkupdates"), new ActionRedirector(this, "CHECKUPDATES"), CommandButtonKind.ACTION_ONLY);
         RibbonApplicationMenuEntryPrimary aboutMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("about32"), translate("menu.help.about"), new ActionRedirector(this, "ABOUT"), CommandButtonKind.ACTION_ONLY);
-        //
+        RibbonApplicationMenuEntryPrimary openFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("open32"), translate("menu.file.open"), new ActionRedirector(this, "OPEN"), CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
+        openFileMenu.setRolloverCallback(new RibbonApplicationMenuEntryPrimary.PrimaryRolloverCallback() {
+            @Override
+            public void menuEntryActivated(JPanel targetPanel) {
+               targetPanel.removeAll();
+               JCommandButtonPanel openHistoryPanel = new JCommandButtonPanel(CommandButtonDisplayState.MEDIUM);
+               String groupName = translate("menu.recentFiles");
+               openHistoryPanel.addButtonGroup(groupName);
+               List<String> recentFiles = Configuration.getRecentFiles();
+               int j = 0;
+               for (int i = recentFiles.size() - 1; i >= 0; i--) {
+                  String path = recentFiles.get(i); 
+                  RecentFilesButton historyButton = new RecentFilesButton(j + "    " + path, null);
+                  historyButton.fileName = path;
+                  historyButton.addActionListener(new ActionListener() {
 
+                      @Override
+                      public void actionPerformed(ActionEvent ae) {
+                          RecentFilesButton source = (RecentFilesButton) ae.getSource();
+                          Main.openFile(source.fileName);
+                      }
+                  });
+                  j++;
+                  historyButton.setHorizontalAlignment(SwingUtilities.LEFT);
+                  openHistoryPanel.addButtonToLastGroup(historyButton);
+               }
+               openHistoryPanel.setMaxButtonColumns(1);
+               targetPanel.setLayout(new BorderLayout());
+               targetPanel.add(openHistoryPanel, BorderLayout.CENTER);
+            }
+        });
+        
         RibbonApplicationMenuEntryFooter exitMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon("exit32"), translate("menu.file.exit"), new ActionRedirector(this, "EXIT"));
 
+        mainMenu.addMenuEntry(openFileMenu);
+        mainMenu.addMenuSeparator();
         mainMenu.addMenuEntry(exportFlaMenu);
         mainMenu.addMenuEntry(exportAllMenu);
         mainMenu.addMenuEntry(exportSelMenu);
