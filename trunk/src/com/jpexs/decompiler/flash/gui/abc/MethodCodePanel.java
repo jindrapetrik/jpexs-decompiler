@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
@@ -114,6 +115,9 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         hexOnlyButton.addActionListener(this);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
+        if (!Configuration.showHexOnlyButton.get()) {
+            hexOnlyButton.setVisible(false);
+        }
 
         buttonsPanel.add(graphButton);
         buttonsPanel.add(hexButton);

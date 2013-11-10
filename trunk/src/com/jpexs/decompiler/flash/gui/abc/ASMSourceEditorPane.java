@@ -77,16 +77,19 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         this.exportMode = exportMode;
         long oldOffset = getSelectedOffset();
         if (exportMode == ExportMode.PCODE) {
+            setContentType("text/flasm");
             if (textNoHex == null) {
                 textNoHex = getHilightedText(exportMode);
             }
             setText(textNoHex);
         } else if (exportMode == ExportMode.PCODEWITHHEX) {
+            setContentType("text/flasm");
             if (textWithHex == null) {
                 textWithHex = getHilightedText(exportMode);
             }
             setText(textWithHex);
         } else {
+            setContentType("text/plain");
             if (textHexOnly == null) {
                 HilightedTextWriter writer = new HilightedTextWriter(true);
                 Helper.byteArrayToHex(writer, abc.bodies[bodyIndex].code.getBytes());

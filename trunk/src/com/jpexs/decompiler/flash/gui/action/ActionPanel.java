@@ -294,6 +294,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     
     public void setHex(ExportMode exportMode) {
         if (exportMode != ExportMode.HEX) {
+            editor.setContentType("text/flasm");
             if (exportMode == ExportMode.PCODE) {
                 if (srcNoHex == null) {
                     srcNoHex = getHilightedText(exportMode);
@@ -306,6 +307,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 setText(srcWithHex);
             }
         } else {
+            editor.setContentType("text/plain");
             if (srcHexOnly == null) {
                 HilightedTextWriter writer = new HilightedTextWriter(true);
                 Helper.byteArrayToHex(writer, src.getActionBytes());
@@ -452,6 +454,9 @@ public class ActionPanel extends JPanel implements ActionListener {
         hexOnlyButton.addActionListener(this);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
+        if (!Configuration.showHexOnlyButton.get()) {
+            hexOnlyButton.setVisible(false);
+        }
 
         topButtonsPan = new JPanel();
         topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
@@ -623,7 +628,13 @@ public class ActionPanel extends JPanel implements ActionListener {
         boolean rawEdit = hexOnlyButton.isSelected();
 
         if (val) {
-            setText(rawEdit ? srcHexOnly : srcNoHex);
+            if (rawEdit) {
+                editor.setContentType("text/flasm");
+                setText(srcHexOnly);
+            } else {
+                editor.setContentType("text/plain");
+                setText(srcNoHex);
+            }
             editor.setEditable(true);
             saveButton.setVisible(true);
             editButton.setVisible(false);

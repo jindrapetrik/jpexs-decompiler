@@ -65,6 +65,8 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> offeredAssociation = null;
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> removeNops = null;
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> showHexOnlyButton = null;
 
     /**
      * Debug mode = throwing an error when comparing original file and
