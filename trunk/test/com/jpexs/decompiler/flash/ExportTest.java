@@ -92,7 +92,7 @@ public class ExportTest {
     public void testDecompile(File f, ExportMode exportMode) {
         try {
             SWF swf = new SWF(new FileInputStream(f), false);
-            Configuration.DEBUG_COPY = true;
+            Configuration.debugCopy.set(true);
             String folderName = exportMode == ExportMode.SOURCE ? "output" : "outputp";
             File fdir = new File(TESTDATADIR + File.separator + folderName + File.separator + f.getName());
             fdir.mkdirs();
