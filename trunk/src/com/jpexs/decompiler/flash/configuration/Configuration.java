@@ -129,6 +129,7 @@ public class Configuration {
     public static final ConfigurationItem<String> lastSaveDir = null;
     @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastOpenDir = null;
+    @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastExportDir = null;
     @ConfigurationDefaultString("en")
     public static final ConfigurationItem<String> locale = null;
