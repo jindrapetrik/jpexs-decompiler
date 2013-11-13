@@ -392,8 +392,11 @@ public class ActionPanel extends JPanel implements ActionListener {
         }, new Callback<AsyncResult<Void>>() {
 
             @Override
-            public void call(AsyncResult<Void> arg1) {
+            public void call(AsyncResult<Void> result) {
                 setSourceTask = null;
+                if (result.error != null) {
+                    decompiledEditor.setText("//Decompilation error: " + result.error);
+                }
                 Main.stopWork();
             }
             

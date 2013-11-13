@@ -224,7 +224,7 @@ public class CommandLineArgumentParser {
                 if (key.toLowerCase().equals(item.getName().toLowerCase())) {
                     Boolean bValue = parseBooleanConfigValue(value);
                     if (bValue != null) {
-                        System.out.println("Config " + item + " set to " + bValue);
+                        System.out.println("Config " + item.getName() + " set to " + bValue);
                         item.set(bValue);
                     }
                 }

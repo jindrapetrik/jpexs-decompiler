@@ -34,10 +34,12 @@ public class ConfigurationItem<T> {
     }
 
     public ConfigurationItem(String name, T defaultValue) {
+        this.name = name;
         this.defaultValue = defaultValue;
     }
 
     public ConfigurationItem(String name, T defaultValue, T value) {
+        this.name = name;
         hasValue = true;
         this.defaultValue = defaultValue;
         this.value = value;

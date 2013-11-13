@@ -387,9 +387,9 @@ public class Configuration {
 
                 Object defaultValue = getDefaultValue(field);
                 if (config.containsKey(name)) {
-                    field.set(null, new ConfigurationItem(field.getName(), defaultValue, config.get(name)));
+                    field.set(null, new ConfigurationItem(name, defaultValue, config.get(name)));
                 } else {
-                    field.set(null, new ConfigurationItem(field.getName(), defaultValue));
+                    field.set(null, new ConfigurationItem(name, defaultValue));
                 }
             }
         } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ex) {

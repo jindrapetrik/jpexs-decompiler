@@ -349,6 +349,8 @@ public class Main {
 
     public static boolean openFile(String swfFile) {
         try {
+            File file = new File(swfFile);
+            swfFile = file.getCanonicalPath();
             Configuration.addRecentFile(swfFile);
             boolean ok = openFile(swfFile, new FileInputStream(swfFile));
             if (ok) {

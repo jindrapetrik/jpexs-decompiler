@@ -58,6 +58,9 @@ public abstract class Trait implements Serializable {
             //if (abc.constants.constant_namespace[m.namespace_index].kind == Namespace.KIND_NAMESPACE) {
             {
                 for (ABCContainerTag abcTag : abcTags) {
+                    if (m.namespace_index == -1) {
+                        break;
+                    }
                     nsname = abcTag.getABC().nsValueToName(abc.constants.constant_namespace[m.namespace_index].getName(abc.constants));
                     if (nsname.equals("-")) {
                         break;

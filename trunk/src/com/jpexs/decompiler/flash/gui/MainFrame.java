@@ -3067,8 +3067,11 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 }, new Callback<AsyncResult<Void>>() {
 
                     @Override
-                    public void call(AsyncResult<Void> arg1) {
+                    public void call(AsyncResult<Void> result) {
                         setSourceTask = null;
+                        if (result.error != null) {
+                            abcPanel.decompiledTextArea.setText("//Decompilation error: " + result.error);
+                        }
                         Main.stopWork();
                     }
                 });
