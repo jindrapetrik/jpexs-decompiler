@@ -149,7 +149,11 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+        getNameStr(writer, abc, fullyQualifiedNames);
+        if (assignedValue != null || value_kind != 0) {
+            getValueStr(parent, writer, abc, fullyQualifiedNames);
+        }
     }
 
     public boolean isConst() {
