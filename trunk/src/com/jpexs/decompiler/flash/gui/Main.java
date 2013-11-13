@@ -287,10 +287,9 @@ public class Main {
                     if (mainFrame != null) {
                         mainFrame.setVisible(true);
                     }
+                    Main.stopWork();
                 }
             });
-
-            Main.stopWork();
 
             return true;
         }

@@ -218,11 +218,7 @@ public class View {
         if (SwingUtilities.isEventDispatchThread()) {
             r.run();
         } else {
-            try {
-                SwingUtilities.invokeAndWait(r);
-            } catch (InterruptedException | InvocationTargetException ex) {
-                Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            SwingUtilities.invokeLater(r);
         }
     }
 
