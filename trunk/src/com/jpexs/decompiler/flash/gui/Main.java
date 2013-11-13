@@ -151,7 +151,7 @@ public class Main {
 
     public static void startWork(final String name, final int percent, final Runnable cancelCallback) {
         working = true;
-        View.execInEventDispatch(new Runnable() {
+        View.execInEventDispatchLater(new Runnable() {
             @Override
             public void run() {
                 if (mainFrame != null) {

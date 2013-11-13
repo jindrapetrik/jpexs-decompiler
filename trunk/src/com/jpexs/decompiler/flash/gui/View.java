@@ -218,6 +218,18 @@ public class View {
         if (SwingUtilities.isEventDispatchThread()) {
             r.run();
         } else {
+            try {
+                SwingUtilities.invokeAndWait(r);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public static void execInEventDispatchLater(Runnable r) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            r.run();
+        } else {
             SwingUtilities.invokeLater(r);
         }
     }
