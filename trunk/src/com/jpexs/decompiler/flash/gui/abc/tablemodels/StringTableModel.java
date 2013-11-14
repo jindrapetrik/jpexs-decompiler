@@ -44,7 +44,7 @@ public class StringTableModel implements TableModel {
         if (abc == null) {
             return 0;
         }
-        return abc.constants.constant_string.length;
+        return abc.constants.getStringCount();
     }
 
     /**
@@ -119,7 +119,7 @@ public class StringTableModel implements TableModel {
         if (columnIndex == 0) {
             return rowIndex;
         } else {
-            return abc.constants.constant_string[rowIndex];
+            return abc.constants.getString(rowIndex);
         }
     }
 

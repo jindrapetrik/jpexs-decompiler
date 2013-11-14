@@ -35,6 +35,6 @@ public class TypeNameMultinameUsage extends MultinameUsage {
 
     @Override
     public String toString(List<ABCContainerTag> abcTags, ABC abc) {
-        return "TypeName " + abc.constants.constant_multiname[typename_index].toString(abc.constants, new ArrayList<String>());
+        return "TypeName " + abc.constants.getMultiname(typename_index).toString(abc.constants, new ArrayList<String>());
     }
 }

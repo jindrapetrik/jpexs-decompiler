@@ -140,18 +140,18 @@ public class Multiname {
         if (index == 0) {
             return "null";
         }
-        int type = constants.constant_namespace[index].kind;
-        String name = constants.constant_namespace[index].getName(constants);
+        int type = constants.getNamespace(index).kind;
+        String name = constants.getNamespace(index).getName(constants);
         int sub = -1;
-        for (int n = 1; n < constants.constant_namespace.length; n++) {
-            if (constants.constant_namespace[n].kind == type && constants.constant_namespace[n].getName(constants).equals(name)) {
+        for (int n = 1; n < constants.getNamespaceCount(); n++) {
+            if (constants.getNamespace(n).kind == type && constants.getNamespace(n).getName(constants).equals(name)) {
                 sub++;
             }
             if (n == index) {
                 break;
             }
         }
-        return constants.constant_namespace[index].getKindStr() + "(" + "\"" + Helper.escapeString(name) + "\"" + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
+        return constants.getNamespace(index).getKindStr() + "(" + "\"" + Helper.escapeString(name) + "\"" + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
     }
 
     private static String namespaceSetToString(ConstantPool constants, int index) {
@@ -159,11 +159,11 @@ public class Multiname {
             return "null";
         }
         String ret = "[";
-        for (int n = 0; n < constants.constant_namespace_set[index].namespaces.length; n++) {
+        for (int n = 0; n < constants.getNamespaceSet(index).namespaces.length; n++) {
             if (n > 0) {
                 ret += ",";
             }
-            int ns = constants.constant_namespace_set[index].namespaces[n];
+            int ns = constants.getNamespaceSet(index).namespaces[n];
             ret += namespaceToString(constants, ns);
         }
         ret += "]";
@@ -174,7 +174,7 @@ public class Multiname {
         if (index == 0) {
             return "null";
         }
-        return constants.constant_multiname[index].toString(constants, fullyQualifiedNames);
+        return constants.getMultiname(index).toString(constants, fullyQualifiedNames);
     }
 
     public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
@@ -182,16 +182,16 @@ public class Multiname {
         switch (kind) {
             case QNAME:
             case QNAMEA:
-                return getKindStr() + "(" + namespaceToString(constants, namespace_index) + "," + "\"" + Helper.escapeString(constants.constant_string[name_index]) + "\"" + ")";
+                return getKindStr() + "(" + namespaceToString(constants, namespace_index) + "," + "\"" + Helper.escapeString(constants.getString(name_index)) + "\"" + ")";
             case RTQNAME:
             case RTQNAMEA:
-                return getKindStr() + "(" + "\"" + Helper.escapeString(constants.constant_string[name_index]) + "\"" + ")";
+                return getKindStr() + "(" + "\"" + Helper.escapeString(constants.getString(name_index)) + "\"" + ")";
             case RTQNAMEL:
             case RTQNAMELA:
                 return getKindStr() + "()";
             case MULTINAME:
             case MULTINAMEA:
-                return getKindStr() + "(" + "\"" + Helper.escapeString(constants.constant_string[name_index]) + "\"" + "," + namespaceSetToString(constants, namespace_set_index) + ")";
+                return getKindStr() + "(" + "\"" + Helper.escapeString(constants.getString(name_index)) + "\"" + "," + namespaceSetToString(constants, namespace_set_index) + ")";
             case MULTINAMEL:
             case MULTINAMELA:
                 return getKindStr() + "(" + namespaceSetToString(constants, namespace_set_index) + ")";
@@ -213,10 +213,10 @@ public class Multiname {
     }
 
     private String typeNameToStr(ConstantPool constants, List<String> fullyQualifiedNames) {
-        if (constants.constant_multiname[qname_index].name_index == name_index) {
+        if (constants.getMultiname(qname_index).name_index == name_index) {
             return "ambiguousTypeName";
         }
-        String typeNameStr = constants.constant_multiname[qname_index].getName(constants, fullyQualifiedNames);
+        String typeNameStr = constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames);
         if (!params.isEmpty()) {
             typeNameStr += ".<";
             for (int i = 0; i < params.size(); i++) {
@@ -226,7 +226,7 @@ public class Multiname {
                 if (params.get(i) == 0) {
                     typeNameStr += "*";
                 } else {
-                    typeNameStr += constants.constant_multiname[params.get(i)].getName(constants, fullyQualifiedNames);
+                    typeNameStr += constants.getMultiname(params.get(i)).getName(constants, fullyQualifiedNames);
                 }
             }
             typeNameStr += ">";
@@ -244,7 +244,7 @@ public class Multiname {
         if (name_index == 0) {
             return (isAttribute() ? "@*" : "*");
         } else {
-            String name = constants.constant_string[name_index];
+            String name = constants.getString(name_index);
             if ((fullyQualifiedNames != null) && fullyQualifiedNames.contains(name)) {
                 return getNameWithNamespace(constants);
             }
@@ -269,7 +269,7 @@ public class Multiname {
         if ((namespace_index == 0) || (namespace_index == -1)) {
             return null;
         } else {
-            return constants.constant_namespace[namespace_index];
+            return constants.getNamespace(namespace_index);
         }
     }
 
@@ -279,7 +279,7 @@ public class Multiname {
         } else if (namespace_set_index == -1) {
             return null;
         } else {
-            return constants.constant_namespace_set[namespace_set_index];
+            return constants.getNamespaceSet(namespace_set_index);
         }
     }
 }

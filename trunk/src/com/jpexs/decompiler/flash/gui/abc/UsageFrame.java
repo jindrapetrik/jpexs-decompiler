@@ -74,7 +74,7 @@ public class UsageFrame extends AppFrame implements ActionListener, MouseListene
         cont.add(new JScrollPane(usageList), BorderLayout.CENTER);
         cont.add(buttonsPanel, BorderLayout.SOUTH);
         setSize(400, 300);
-        setTitle(translate("dialog.title") + abc.constants.constant_multiname[multinameIndex].getNameWithNamespace(abc.constants));
+        setTitle(translate("dialog.title") + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(abc.constants));
         View.centerScreen(this);
         View.setWindowIcon(this);
     }

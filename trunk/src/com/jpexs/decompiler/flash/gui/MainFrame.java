@@ -1924,8 +1924,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
     public void renameMultiname(int multiNameIndex) {
         String oldName = "";
-        if (abcPanel.abc.constants.constant_multiname[multiNameIndex].name_index > 0) {
-            oldName = abcPanel.abc.constants.constant_string[abcPanel.abc.constants.constant_multiname[multiNameIndex].name_index];
+        if (abcPanel.abc.constants.getMultiname(multiNameIndex).name_index > 0) {
+            oldName = abcPanel.abc.constants.getString(abcPanel.abc.constants.getMultiname(multiNameIndex).name_index);
         }
         String newName = View.showInputDialog(translate("rename.enternew"), oldName);
         if (newName != null) {
@@ -1933,11 +1933,11 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 int mulCount = 0;
                 for (ABCContainerTag cnt : abcList) {
                     ABC abc = cnt.getABC();
-                    for (int m = 1; m < abc.constants.constant_multiname.length; m++) {
-                        int ni = abc.constants.constant_multiname[m].name_index;
+                    for (int m = 1; m < abc.constants.getMultinameCount(); m++) {
+                        int ni = abc.constants.getMultiname(m).name_index;
                         String n = "";
                         if (ni > 0) {
-                            n = abc.constants.constant_string[ni];
+                            n = abc.constants.getString(ni);
                         }
                         if (n.equals(oldName)) {
                             abc.renameMultiname(m, newName);
@@ -2747,7 +2747,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                     swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
                                 }
                             } catch (IOException ex) {
-                                View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
+                                View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
                             }
                             Helper.freeMem();
                             Main.stopWork();
@@ -2791,7 +2791,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                     }
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
-                                    View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage());
+                                    View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
                                 }
                                 Main.stopWork();
                                 long timeAfter = System.currentTimeMillis();

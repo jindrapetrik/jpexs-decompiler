@@ -213,7 +213,7 @@ public class MethodInfo {
             if (param_types[i] == 0) {
                 param_typesStr += "*";
             } else {
-                param_typesStr += constants.constant_multiname[param_types[i]].toString(constants, fullyQualifiedNames);
+                param_typesStr += constants.getMultiname(param_types[i]).toString(constants, fullyQualifiedNames);
             }
         }
 
@@ -222,24 +222,24 @@ public class MethodInfo {
             if (i > 0) {
                 paramNamesStr += ",";
             }
-            paramNamesStr += constants.constant_string[paramNames[i]];
+            paramNamesStr += constants.getString(paramNames[i]);
         }
 
         String ret_typeStr = "";
         if (ret_type == 0) {
             ret_typeStr += "*";
         } else {
-            ret_typeStr += constants.constant_multiname[ret_type].toString(constants, fullyQualifiedNames);
+            ret_typeStr += constants.getMultiname(ret_type).toString(constants, fullyQualifiedNames);
         }
 
-        return "param_types=" + param_typesStr + " ret_type=" + ret_typeStr + " name=\"" + constants.constant_string[name_index] + "\" flags=" + flags + " optional=" + optionalStr + " paramNames=" + paramNamesStr;
+        return "param_types=" + param_typesStr + " ret_type=" + ret_typeStr + " name=\"" + constants.getString(name_index) + "\" flags=" + flags + " optional=" + optionalStr + " paramNames=" + paramNamesStr;
     }
 
     public String getName(ConstantPool constants) {
         if (name_index == 0) {
             return "UNKNOWN";
         }
-        return constants.constant_string[name_index];
+        return constants.getString(name_index);
     }
 
     public GraphTextWriter getParamStr(GraphTextWriter writer, ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
@@ -254,7 +254,7 @@ public class MethodInfo {
             if (!localRegNames.isEmpty()) {
                 writer.appendNoHilight(localRegNames.get(i + 1));
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
-                writer.appendNoHilight(constants.constant_string[paramNames[i]]);
+                writer.appendNoHilight(constants.getString(paramNames[i]));
             } else {
                 writer.appendNoHilight("param" + (i + 1));
             }
@@ -262,7 +262,7 @@ public class MethodInfo {
             if (param_types[i] == 0) {
                 writer.hilightSpecial("*", "param", i);
             } else {
-                writer.hilightSpecial(constants.constant_multiname[param_types[i]].getName(constants, fullyQualifiedNames), "param", i);
+                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames), "param", i);
             }
             if (optional != null) {
                 if (i >= param_types.length - optional.length) {
@@ -289,7 +289,7 @@ public class MethodInfo {
     }
 
     public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, ConstantPool constants, List<String> fullyQualifiedNames) {
-        return writer.hilightSpecial(ret_type == 0 ? "*" : constants.constant_multiname[ret_type].getName(constants, fullyQualifiedNames), "returns");
+        return writer.hilightSpecial(ret_type == 0 ? "*" : constants.getMultiname(ret_type).getName(constants, fullyQualifiedNames), "returns");
     }
 
     public void setBody(MethodBody body) {

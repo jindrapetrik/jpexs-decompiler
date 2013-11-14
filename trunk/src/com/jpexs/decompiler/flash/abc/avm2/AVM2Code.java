@@ -813,7 +813,7 @@ public class AVM2Code implements Serializable {
                         writer.appendNoHilight("null");
                     } else {
                         writer.appendNoHilight("\"");
-                        writer.appendNoHilight(constants.constant_string[n]);
+                        writer.appendNoHilight(constants.getString(n));
                         writer.appendNoHilight("\"");
                     }
                     writer.newLine();
@@ -871,10 +871,10 @@ public class AVM2Code implements Serializable {
             offsets.add((long) body.exceptions[e].target);
 
             writer.appendNoHilight(" type ");
-            writer.hilightSpecial(body.exceptions[e].type_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].type_index].toString(constants, new ArrayList<String>()), "try.type", e);
+            writer.hilightSpecial(body.exceptions[e].type_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].type_index).toString(constants, new ArrayList<String>()), "try.type", e);
 
             writer.appendNoHilight(" name ");
-            writer.hilightSpecial(body.exceptions[e].name_index == 0 ? "null" : constants.constant_multiname[body.exceptions[e].name_index].toString(constants, new ArrayList<String>()), "try.name", e);
+            writer.hilightSpecial(body.exceptions[e].name_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].name_index).toString(constants, new ArrayList<String>()), "try.name", e);
             writer.newLine();
         }
 
@@ -1039,7 +1039,7 @@ public class AVM2Code implements Serializable {
         for (AVM2Instruction ins : code) {
             if (ins.definition instanceof DebugIns) {
                 if (ins.operands[0] == 1) {
-                    localRegNames.put(ins.operands[2] + 1, abc.constants.constant_string[ins.operands[1]]);
+                    localRegNames.put(ins.operands[2] + 1, abc.constants.getString(ins.operands[1]));
                 }
             }
         }
@@ -1300,7 +1300,7 @@ public class AVM2Code implements Serializable {
                                             if (code.get(ip + plus + 2).definition instanceof SwapIns) {
                                                 if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
                                                     if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
-                                                        functionName = abc.constants.constant_multiname[code.get(ip + plus + 3).operands[0]].getName(constants, fullyQualifiedNames);
+                                                        functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(constants, fullyQualifiedNames);
                                                         scopeStack.pop();//with
                                                         output.remove(output.size() - 1); //with
                                                         ip = ip + plus + 4; //+1 below

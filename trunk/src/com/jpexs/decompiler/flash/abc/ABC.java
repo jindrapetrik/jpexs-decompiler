@@ -123,8 +123,8 @@ public class ABC {
 
     public Set<Integer> getNsStringUsages() {
         Set<Integer> ret = new HashSet<>();
-        for (int n = 1; n < constants.constant_namespace.length; n++) {
-            ret.add(constants.constant_namespace[n].name_index);
+        for (int n = 1; n < constants.getNamespaceCount(); n++) {
+            ret.add(constants.getNamespace(n).name_index);
         }
         return ret;
     }
@@ -157,7 +157,7 @@ public class ABC {
 
     private void getStringUsageTypes(Map<Integer, String> ret, Traits traits, boolean classesOnly) {
         for (Trait t : traits.traits) {
-            int strIndex = constants.constant_multiname[t.name_index].name_index;
+            int strIndex = constants.getMultiname(t.name_index).name_index;
             String usageType = "";
             if (t instanceof TraitClass) {
                 TraitClass tc = (TraitClass) t;
@@ -165,10 +165,10 @@ public class ABC {
                 getStringUsageTypes(ret, instance_info[tc.class_info].instance_traits, classesOnly);
 
                 if (instance_info[tc.class_info].name_index != 0) {
-                    setStringUsageType(ret, constants.constant_multiname[instance_info[tc.class_info].name_index].name_index, "class");
+                    setStringUsageType(ret, constants.getMultiname(instance_info[tc.class_info].name_index).name_index, "class");
                 }
                 if (instance_info[tc.class_info].super_index != 0) {
-                    setStringUsageType(ret, constants.constant_multiname[instance_info[tc.class_info].super_index].name_index, "class");
+                    setStringUsageType(ret, constants.getMultiname(instance_info[tc.class_info].super_index).name_index, "class");
                 }
 
                 usageType = "class";
@@ -211,17 +211,17 @@ public class ABC {
     }
 
     public void renameMultiname(int multinameIndex, String newname) {
-        if (multinameIndex <= 0 || multinameIndex >= constants.constant_multiname.length) {
+        if (multinameIndex <= 0 || multinameIndex >= constants.getMultinameCount()) {
             throw new IllegalArgumentException("Multiname with index " + multinameIndex + " does not exist");
         }
         Set<Integer> stringUsages = getStringUsages();
         Set<Integer> namespaceUsages = getNsStringUsages();
-        int strIndex = constants.constant_multiname[multinameIndex].name_index;
+        int strIndex = constants.getMultiname(multinameIndex).name_index;
         if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { //name is used elsewhere as string literal            
             strIndex = constants.getStringId(newname, true);
-            constants.constant_multiname[multinameIndex].name_index = strIndex;
+            constants.getMultiname(multinameIndex).name_index = strIndex;
         } else {
-            constants.constant_string[strIndex] = newname;
+            constants.setString(strIndex, newname);
         }
     }
 
@@ -234,29 +234,29 @@ public class ABC {
         for (int i = 0; i < instance_info.length; i++) {
             informListeners("deobfuscate", "class " + i + "/" + instance_info.length);
             if (instance_info[i].name_index != 0) {
-                constants.constant_multiname[instance_info[i].name_index].name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.constant_multiname[instance_info[i].name_index].name_index, true, renameType);
-                if (constants.constant_multiname[instance_info[i].name_index].namespace_index != 0) {
-                    constants.constant_namespace[constants.constant_multiname[instance_info[i].name_index].namespace_index].name_index =
-                            deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.constant_namespace[constants.constant_multiname[instance_info[i].name_index].namespace_index].name_index, renameType);
+                constants.getMultiname(instance_info[i].name_index).name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(instance_info[i].name_index).name_index, true, renameType);
+                if (constants.getMultiname(instance_info[i].name_index).namespace_index != 0) {
+                    constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index =
+                            deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index, renameType);
                 }
             }
             if (instance_info[i].super_index != 0) {
-                constants.constant_multiname[instance_info[i].super_index].name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.constant_multiname[instance_info[i].super_index].name_index, true, renameType);
+                constants.getMultiname(instance_info[i].super_index).name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(instance_info[i].super_index).name_index, true, renameType);
             }
         }
         if (classesOnly) {
             return;
         }
-        for (int i = 1; i < constants.constant_multiname.length; i++) {
-            informListeners("deobfuscate", "name " + i + "/" + constants.constant_multiname.length);
-            constants.constant_multiname[i].name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.constant_multiname[i].name_index, false, renameType);
+        for (int i = 1; i < constants.getMultinameCount(); i++) {
+            informListeners("deobfuscate", "name " + i + "/" + constants.getMultinameCount());
+            constants.getMultiname(i).name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(i).name_index, false, renameType);
         }
-        for (int i = 1; i < constants.constant_namespace.length; i++) {
-            informListeners("deobfuscate", "namespace " + i + "/" + constants.constant_namespace.length);
-            if (constants.constant_namespace[i].kind != Namespace.KIND_PACKAGE) { //only packages
+        for (int i = 1; i < constants.getNamespaceCount(); i++) {
+            informListeners("deobfuscate", "namespace " + i + "/" + constants.getNamespaceCount());
+            if (constants.getNamespace(i).kind != Namespace.KIND_PACKAGE) { //only packages
                 continue;
             }
-            constants.constant_namespace[i].name_index = deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.constant_namespace[i].name_index, renameType);
+            constants.getNamespace(i).name_index = deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(i).name_index, renameType);
         }
 
         //process reflection using getDefinitionByName too
@@ -265,12 +265,12 @@ public class ABC {
                 if (body.code.code.get(ip).definition instanceof CallPropertyIns) {
                     int mIndex = body.code.code.get(ip).operands[0];
                     if (mIndex > 0) {
-                        Multiname m = constants.constant_multiname[mIndex];
+                        Multiname m = constants.getMultiname(mIndex);
                         if (m.getNameWithNamespace(constants).equals("flash.utils.getDefinitionByName")) {
                             if (ip > 0) {
                                 if (body.code.code.get(ip - 1).definition instanceof PushStringIns) {
                                     int strIndex = body.code.code.get(ip - 1).operands[0];
-                                    String fullname = constants.constant_string[strIndex];
+                                    String fullname = constants.getString(strIndex);
                                     String pkg = "";
                                     String name = fullname;
                                     if (fullname.contains(".")) {
@@ -280,11 +280,11 @@ public class ABC {
                                     if (!pkg.isEmpty()) {
                                         int pkgStrIndex = constants.getStringId(pkg, true);
                                         pkgStrIndex = deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, pkgStrIndex, renameType);
-                                        pkg = constants.constant_string[pkgStrIndex];
+                                        pkg = constants.getString(pkgStrIndex);
                                     }
                                     int nameStrIndex = constants.getStringId(name, true);
                                     nameStrIndex = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, nameStrIndex, true, renameType);
-                                    name = constants.constant_string[nameStrIndex];
+                                    name = constants.getString(nameStrIndex);
                                     String fullChanged = "";
                                     if (!pkg.isEmpty()) {
                                         fullChanged = pkg + ".";
@@ -309,64 +309,70 @@ public class ABC {
         constants = new ConstantPool();
         //constant integers
         int constant_int_pool_count = ais.readU30();
-        constants.constant_int = new long[constant_int_pool_count];
+        constants.constant_int = new ArrayList<>(constant_int_pool_count);
+        constants.addInt(0);
         for (int i = 1; i < constant_int_pool_count; i++) { //index 0 not used. Values 1..n-1         
-            constants.constant_int[i] = ais.readS32();
+            constants.addInt(ais.readS32());
         }
 
         //constant unsigned integers
         int constant_uint_pool_count = ais.readU30();
-        constants.constant_uint = new long[constant_uint_pool_count];
+        constants.constant_uint = new ArrayList<>(constant_uint_pool_count);
+        constants.addUInt(0);
         for (int i = 1; i < constant_uint_pool_count; i++) { //index 0 not used. Values 1..n-1
-            constants.constant_uint[i] = ais.readU32();
+            constants.addUInt(ais.readU32());
         }
 
         //constant double
         int constant_double_pool_count = ais.readU30();
-        constants.constant_double = new double[constant_double_pool_count];
+        constants.constant_double = new ArrayList<>(constant_double_pool_count);
+        constants.addDouble(0);
         for (int i = 1; i < constant_double_pool_count; i++) { //index 0 not used. Values 1..n-1
-            constants.constant_double[i] = ais.readDouble();
+            constants.addDouble(ais.readDouble());
         }
 
 
         //constant decimal
         if (minor_version >= MINORwithDECIMAL) {
             int constant_decimal_pool_count = ais.readU30();
-            constants.constant_decimal = new Decimal[constant_decimal_pool_count];
+            constants.constant_decimal = new ArrayList<>(constant_decimal_pool_count);
+            constants.addDecimal(null);
             for (int i = 1; i < constant_decimal_pool_count; i++) { //index 0 not used. Values 1..n-1
-                constants.constant_decimal[i] = ais.readDecimal();
+                constants.addDecimal(ais.readDecimal());
             }
         } else {
-            constants.constant_decimal = new Decimal[0];
+            constants.constant_decimal = new ArrayList<>(0);
         }
 
         //constant string
         int constant_string_pool_count = ais.readU30();
-        constants.constant_string = new String[constant_string_pool_count];
+        constants.constant_string = new ArrayList<>(constant_string_pool_count);
         stringOffsets = new long[constant_string_pool_count];
-        constants.constant_string[0] = "";
+        constants.addString("");
         for (int i = 1; i < constant_string_pool_count; i++) { //index 0 not used. Values 1..n-1
             long pos = ais.getPosition();
-            constants.constant_string[i] = ais.readString();
+            constants.addString(ais.readString());
             stringOffsets[i] = pos;
         }
 
         //constant namespace
         int constant_namespace_pool_count = ais.readU30();
-        constants.constant_namespace = new Namespace[constant_namespace_pool_count];
+        constants.constant_namespace = new ArrayList<>(constant_namespace_pool_count);
+        constants.addNamespace(null);
         for (int i = 1; i < constant_namespace_pool_count; i++) { //index 0 not used. Values 1..n-1
-            constants.constant_namespace[i] = ais.readNamespace();
+            constants.addNamespace(ais.readNamespace());
         }
 
         //constant namespace set
         int constant_namespace_set_pool_count = ais.readU30();
-        constants.constant_namespace_set = new NamespaceSet[constant_namespace_set_pool_count];
+        constants.constant_namespace_set = new ArrayList<>(constant_namespace_set_pool_count);
+        constants.addNamespaceSet(null);
         for (int i = 1; i < constant_namespace_set_pool_count; i++) { //index 0 not used. Values 1..n-1
-            constants.constant_namespace_set[i] = new NamespaceSet();
+            constants.addNamespaceSet(new NamespaceSet());
             int namespace_count = ais.readU30();
-            constants.constant_namespace_set[i].namespaces = new int[namespace_count];
+            constants.getNamespaceSet(i).namespaces = new int[namespace_count];
             for (int j = 0; j < namespace_count; j++) {
-                constants.constant_namespace_set[i].namespaces[j] = ais.readU30();
+                constants.getNamespaceSet(i).namespaces[j] = ais.readU30();
             }
         }
 
@@ -376,9 +382,10 @@ public class ABC {
 
         //constant multiname
         int constant_multiname_pool_count = ais.readU30();
-        constants.constant_multiname = new Multiname[constant_multiname_pool_count];
+        constants.constant_multiname = new ArrayList<>(constant_multiname_pool_count);
+        constants.addMultiname(null);
         for (int i = 1; i < constant_multiname_pool_count; i++) { //index 0 not used. Values 1..n-1
-            constants.constant_multiname[i] = ais.readMultiname();
+            constants.addMultiname(ais.readMultiname());
         }
 
 
@@ -471,48 +478,48 @@ public class ABC {
         aos.writeU16(minor_version);
         aos.writeU16(major_version);
 
-        aos.writeU30(constants.constant_int.length);
-        for (int i = 1; i < constants.constant_int.length; i++) {
-            aos.writeS32(constants.constant_int[i]);
+        aos.writeU30(constants.getIntCount());
+        for (int i = 1; i < constants.getIntCount(); i++) {
+            aos.writeS32(constants.getInt(i));
         }
-        aos.writeU30(constants.constant_uint.length);
-        for (int i = 1; i < constants.constant_uint.length; i++) {
-            aos.writeU32(constants.constant_uint[i]);
+        aos.writeU30(constants.getUIntCount());
+        for (int i = 1; i < constants.getUIntCount(); i++) {
+            aos.writeU32(constants.getUInt(i));
         }
 
-        aos.writeU30(constants.constant_double.length);
-        for (int i = 1; i < constants.constant_double.length; i++) {
-            aos.writeDouble(constants.constant_double[i]);
+        aos.writeU30(constants.getDoubleCount());
+        for (int i = 1; i < constants.getDoubleCount(); i++) {
+            aos.writeDouble(constants.getDouble(i));
         }
 
         if (minor_version >= MINORwithDECIMAL) {
-            aos.writeU30(constants.constant_decimal.length);
-            for (int i = 1; i < constants.constant_decimal.length; i++) {
-                aos.writeDecimal(constants.constant_decimal[i]);
+            aos.writeU30(constants.getDecimalCount());
+            for (int i = 1; i < constants.getDecimalCount(); i++) {
+                aos.writeDecimal(constants.getDecimal(i));
             }
         }
 
-        aos.writeU30(constants.constant_string.length);
-        for (int i = 1; i < constants.constant_string.length; i++) {
-            aos.writeString(constants.constant_string[i]);
+        aos.writeU30(constants.getStringCount());
+        for (int i = 1; i < constants.getStringCount(); i++) {
+            aos.writeString(constants.getString(i));
         }
 
-        aos.writeU30(constants.constant_namespace.length);
-        for (int i = 1; i < constants.constant_namespace.length; i++) {
-            aos.writeNamespace(constants.constant_namespace[i]);
+        aos.writeU30(constants.getNamespaceCount());
+        for (int i = 1; i < constants.getNamespaceCount(); i++) {
+            aos.writeNamespace(constants.getNamespace(i));
         }
 
-        aos.writeU30(constants.constant_namespace_set.length);
-        for (int i = 1; i < constants.constant_namespace_set.length; i++) {
-            aos.writeU30(constants.constant_namespace_set[i].namespaces.length);
-            for (int j = 0; j < constants.constant_namespace_set[i].namespaces.length; j++) {
-                aos.writeU30(constants.constant_namespace_set[i].namespaces[j]);
+        aos.writeU30(constants.getNamespaceSetCount());
+        for (int i = 1; i < constants.getNamespaceSetCount(); i++) {
+            aos.writeU30(constants.getNamespaceSet(i).namespaces.length);
+            for (int j = 0; j < constants.getNamespaceSet(i).namespaces.length; j++) {
+                aos.writeU30(constants.getNamespaceSet(i).namespaces[j]);
             }
         }
 
-        aos.writeU30(constants.constant_multiname.length);
-        for (int i = 1; i < constants.constant_multiname.length; i++) {
-            aos.writeMultiname(constants.constant_multiname[i]);
+        aos.writeU30(constants.getMultinameCount());
+        for (int i = 1; i < constants.getMultinameCount(); i++) {
+            aos.writeMultiname(constants.getMultiname(i));
         }
 
         aos.writeU30(method_info.length);
@@ -584,7 +591,7 @@ public class ABC {
 
     public MethodBody findBodyByClassAndName(String className, String methodName) {
         for (int i = 0; i < instance_info.length; i++) {
-            if (className.equals(constants.constant_multiname[instance_info[i].name_index].getName(constants, new ArrayList<String>()))) {
+            if (className.equals(constants.getMultiname(instance_info[i].name_index).getName(constants, new ArrayList<String>()))) {
                 for (Trait t : instance_info[i].instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
@@ -601,7 +608,7 @@ public class ABC {
             }
         }
         for (int i = 0; i < class_info.length; i++) {
-            if (className.equals(constants.constant_multiname[instance_info[i].name_index].getName(constants, new ArrayList<String>()))) {
+            if (className.equals(constants.getMultiname(instance_info[i].name_index).getName(constants, new ArrayList<String>()))) {
                 for (Trait t : class_info[i].static_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
@@ -702,8 +709,8 @@ public class ABC {
                 if (t instanceof TraitSlotConst) {
                     TraitSlotConst s = ((TraitSlotConst) t);
                     if (s.isNamespace()) {
-                        String key = constants.constant_namespace[s.value_index].getName(constants);
-                        String val = constants.constant_multiname[s.name_index].getNameWithNamespace(constants);
+                        String key = constants.getNamespace(s.value_index).getName(constants);
+                        String val = constants.getMultiname(s.name_index).getNameWithNamespace(constants);
                         namespaceMap.put(key, val);
                     }
                 }
@@ -820,8 +827,8 @@ public class ABC {
                     ret += c;
                 }
             }
-            for (int i = 1; i < constants.constant_string.length; i++) {
-                if (constants.constant_string[i].equals(ret)) {
+            for (int i = 1; i < constants.getStringCount(); i++) {
+                if (constants.getString(i).equals(ret)) {
                     exists = true;
                     rndSize += 1;
                     continue loopfoo;
@@ -879,7 +886,7 @@ public class ABC {
         if (strIndex <= 0) {
             return strIndex;
         }
-        String s = constants.constant_string[strIndex];
+        String s = constants.getString(strIndex);
         if (builtInNs(s) != null) {
             return strIndex;
         }
@@ -887,7 +894,7 @@ public class ABC {
         if (!isValid) {
             String newName;
             if (namesMap.containsKey(s)) {
-                newName = constants.constant_string[strIndex] = namesMap.get(s);
+                newName = constants.setString(strIndex, namesMap.get(s));
             } else {
                 String[] parts = null;
                 if (s.contains(".")) {
@@ -912,7 +919,7 @@ public class ABC {
             if (stringUsages.contains(strIndex)) {
                 strIndex = constants.addString(newName);
             } else {
-                constants.constant_string[strIndex] = newName;
+                constants.setString(strIndex, newName);
             }
 
         }
@@ -923,7 +930,7 @@ public class ABC {
         if (strIndex <= 0) {
             return strIndex;
         }
-        String s = constants.constant_string[strIndex];
+        String s = constants.getString(strIndex);
         boolean isValid = true;
         if (isReserved(s)) {
             isValid = false;
@@ -950,14 +957,14 @@ public class ABC {
             if (namesMap.containsKey(s)) {
                 newname = namesMap.get(s);
             } else {
-                newname = fooString(namesMap, constants.constant_string[strIndex], firstUppercase, DEFAULT_FOO_SIZE, stringUsageTypes.get(strIndex), renameType);
+                newname = fooString(namesMap, constants.getString(strIndex), firstUppercase, DEFAULT_FOO_SIZE, stringUsageTypes.get(strIndex), renameType);
             }
             if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { //this name is already referenced as String
                 strIndex = constants.addString(s); //add new index
             }
-            constants.constant_string[strIndex] = newname;
+            constants.setString(strIndex, newname);
             if (!namesMap.containsKey(s)) {
-                namesMap.put(s, constants.constant_string[strIndex]);
+                namesMap.put(s, constants.getString(strIndex));
             }
         }
         return strIndex;
@@ -1039,13 +1046,13 @@ public class ABC {
             findMultinameUsageInTraits(class_info[c].static_traits, multinameIndex, true, c, ret, -1);
         }
         loopm:
-        for (int m = 1; m < constants.constant_multiname.length; m++) {
-            if (constants.constant_multiname[m].kind == Multiname.TYPENAME) {
-                if (constants.constant_multiname[m].qname_index == multinameIndex) {
+        for (int m = 1; m < constants.getMultinameCount(); m++) {
+            if (constants.getMultiname(m).kind == Multiname.TYPENAME) {
+                if (constants.getMultiname(m).qname_index == multinameIndex) {
                     ret.add(new TypeNameMultinameUsage(m));
                     continue;
                 }
-                for (int mp : constants.constant_multiname[m].params) {
+                for (int mp : constants.getMultiname(m).params) {
                     if (mp == multinameIndex) {
                         ret.add(new TypeNameMultinameUsage(m));
                         continue loopm;
@@ -1095,7 +1102,7 @@ public class ABC {
 
     public int findClassByName(String name) {
         for (int c = 0; c < instance_info.length; c++) {
-            String s = constants.constant_multiname[instance_info[c].name_index].getNameWithNamespace(constants);
+            String s = constants.getMultiname(instance_info[c].name_index).getNameWithNamespace(constants);
             if (name.equals(s)) {
                 return c;
             }

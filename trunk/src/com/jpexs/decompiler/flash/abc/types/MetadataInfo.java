@@ -37,15 +37,15 @@ public class MetadataInfo {
     }
 
     public String toString(ConstantPool constants) {
-        String s = "name=" + constants.constant_string[name_index];
+        String s = "name=" + constants.getString(name_index);
         if (keys.length > 0) {
             s += "\r\n";
         }
         for (int i = 0; i < keys.length; i++) {
             if (keys[i] == 0) {
-                s += "\"" + constants.constant_string[values[i]] + "\"\r\n";
+                s += "\"" + constants.getString(values[i]) + "\"\r\n";
             } else {
-                s += "\"" + constants.constant_string[keys[i]] + "\"=\"" + constants.constant_string[values[i]] + "\"\r\n";
+                s += "\"" + constants.getString(keys[i]) + "\"=\"" + constants.getString(values[i]) + "\"\r\n";
             }
         }
         return s;

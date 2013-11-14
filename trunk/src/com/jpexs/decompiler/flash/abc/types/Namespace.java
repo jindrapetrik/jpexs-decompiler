@@ -80,7 +80,7 @@ public class Namespace {
 
     public String getNameWithKind(ConstantPool constants) {
         String kindStr = getKindStr();
-        String nameStr = constants.constant_string[name_index];
+        String nameStr = constants.getString(name_index);
         return kindStr + (nameStr.isEmpty() ? "" : " " + nameStr);
     }
 
@@ -99,6 +99,6 @@ public class Namespace {
         if (name_index == 0) {
             return "-";
         }
-        return constants.constant_string[name_index];
+        return constants.getString(name_index);
     }
 }

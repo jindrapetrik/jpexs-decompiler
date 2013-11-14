@@ -36,7 +36,7 @@ public abstract class InsideClassMultinameUsage extends MultinameUsage {
 
     @Override
     public String toString(List<ABCContainerTag> abcTags, ABC abc) throws InterruptedException {
-        return "class " + abc.constants.constant_multiname[abc.instance_info[classIndex].name_index].getNameWithNamespace(abc.constants);
+        return "class " + abc.constants.getMultiname(abc.instance_info[classIndex].name_index).getNameWithNamespace(abc.constants);
     }
 
     public int getMultinameIndex() {

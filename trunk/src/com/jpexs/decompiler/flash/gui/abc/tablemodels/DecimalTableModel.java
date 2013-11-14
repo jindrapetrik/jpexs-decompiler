@@ -44,7 +44,7 @@ public class DecimalTableModel implements TableModel {
         if (abc == null) {
             return 0;
         }
-        return abc.constants.constant_decimal.length;
+        return abc.constants.getDecimalCount();
     }
 
     /**
@@ -119,7 +119,7 @@ public class DecimalTableModel implements TableModel {
         if (columnIndex == 0) {
             return rowIndex;
         } else {
-            return abc.constants.constant_decimal[rowIndex];
+            return abc.constants.getDecimal(rowIndex);
         }
     }
 

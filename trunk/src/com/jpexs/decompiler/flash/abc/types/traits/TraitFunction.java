@@ -39,7 +39,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     @Override
     public String toString(ABC abc, List<String> fullyQualifiedNames) {
-        return "Function " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_index + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
+        return "Function " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_index + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         }
         writer.appendNoHilight(modifier);
         writer.hilightSpecial("function ", "traittype");
-        writer.hilightSpecial(abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames), "traitname");
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames), "traitname");
         writer.appendNoHilight("(");
         abc.method_info[method_info].getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");
@@ -75,7 +75,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             writer.appendNoHilight(" {").newLine();
             int bodyIndex = abc.findBodyIndex(method_info);
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].toString(path + "." + abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null);
+                abc.bodies[bodyIndex].toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null);
             }
             writer.newLine();
             writer.appendNoHilight("}");
@@ -90,7 +90,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         if (!abc.instance_info[classIndex].isInterface()) {
             int bodyIndex = abc.findBodyIndex(method_info);
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].convert(path + "." + abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, fullyQualifiedNames, null, true);
+                abc.bodies[bodyIndex].convert(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, fullyQualifiedNames, null, true);
             }
         }
     }

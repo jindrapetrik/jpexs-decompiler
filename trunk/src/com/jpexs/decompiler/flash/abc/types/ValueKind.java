@@ -83,19 +83,19 @@ public class ValueKind {
         String ret = "?";
         switch (value_kind) {
             case CONSTANT_Int:
-                ret = "" + constants.constant_int[value_index];
+                ret = "" + constants.getInt(value_index);
                 break;
             case CONSTANT_UInt:
-                ret = "" + constants.constant_uint[value_index];
+                ret = "" + constants.getUInt(value_index);
                 break;
             case CONSTANT_Double:
-                ret = "" + constants.constant_double[value_index];
+                ret = "" + constants.getDouble(value_index);
                 break;
             case CONSTANT_Decimal:
-                ret = "" + constants.constant_decimal[value_index];
+                ret = "" + constants.getDecimal(value_index);
                 break;
             case CONSTANT_Utf8:
-                ret = "\"" + Helper.escapeString(constants.constant_string[value_index]) + "\"";
+                ret = "\"" + Helper.escapeString(constants.getString(value_index)) + "\"";
                 break;
             case CONSTANT_True:
                 ret = "true";
@@ -115,7 +115,7 @@ public class ValueKind {
             case CONSTANT_ExplicitNamespace:
             case CONSTANT_StaticProtectedNs:
             case CONSTANT_PrivateNs:
-                ret = "\"" + constants.constant_namespace[value_index].getName(constants) + "\"";
+                ret = "\"" + constants.getNamespace(value_index).getName(constants) + "\"";
                 break;
         }
         return ret;
@@ -125,19 +125,19 @@ public class ValueKind {
         String ret = "?";
         switch (value_kind) {
             case CONSTANT_Int:
-                ret = "Integer(" + constants.constant_int[value_index] + ")";
+                ret = "Integer(" + constants.getInt(value_index) + ")";
                 break;
             case CONSTANT_UInt:
-                ret = "UInteger(" + constants.constant_uint[value_index] + ")";
+                ret = "UInteger(" + constants.getUInt(value_index) + ")";
                 break;
             case CONSTANT_Double:
-                ret = "Double(" + constants.constant_double[value_index] + ")";
+                ret = "Double(" + constants.getDouble(value_index) + ")";
                 break;
             case CONSTANT_Decimal:
-                ret = "Decimal(" + constants.constant_decimal[value_index] + ")";
+                ret = "Decimal(" + constants.getDecimal(value_index) + ")";
                 break;
             case CONSTANT_Utf8:
-                ret = "Utf8(\"" + Helper.escapeString(constants.constant_string[value_index]) + "\")";
+                ret = "Utf8(\"" + Helper.escapeString(constants.getString(value_index)) + "\")";
                 break;
             case CONSTANT_True:
                 ret = "True";
@@ -157,7 +157,7 @@ public class ValueKind {
             case CONSTANT_ExplicitNamespace:
             case CONSTANT_StaticProtectedNs:
             case CONSTANT_PrivateNs:
-                ret = constants.constant_namespace[value_index].getKindStr() + "(\"" + constants.constant_namespace[value_index].getName(constants) + "\")";
+                ret = constants.getNamespace(value_index).getKindStr() + "(\"" + constants.getNamespace(value_index).getName(constants) + "\")";
                 break;
         }
         return ret;

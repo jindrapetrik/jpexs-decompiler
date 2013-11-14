@@ -24,67 +24,169 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ConstantPool {
 
-    public long[] constant_int;
-    public long[] constant_uint;
-    public double[] constant_double;
+    public List<Long> constant_int;
+    public List<Long> constant_uint;
+    public List<Double> constant_double;
     /* Only for some minor versions */
-    public Decimal[] constant_decimal;
-    public String[] constant_string;
-    public Namespace[] constant_namespace;
-    public NamespaceSet[] constant_namespace_set;
-    public Multiname[] constant_multiname;
+    public List<Decimal> constant_decimal;
+    public List<String> constant_string;
+    public List<Namespace> constant_namespace;
+    public List<NamespaceSet> constant_namespace_set;
+    public List<Multiname> constant_multiname;
 
-    public int addInt(long value) {
-        constant_int = Arrays.copyOf(constant_int, constant_int.length + 1);
-        constant_int[constant_int.length - 1] = value;
-        return constant_int.length - 1;
+    public synchronized int addInt(long value) {
+        constant_int.add(value);
+        return constant_int.size() - 1;
     }
 
-    public int addNamespace(Namespace ns) {
-        constant_namespace = Arrays.copyOf(constant_namespace, constant_namespace.length + 1);
-        constant_namespace[constant_namespace.length - 1] = ns;
-        return constant_namespace.length - 1;
+    public synchronized int addNamespace(Namespace ns) {
+        constant_namespace.add(ns);
+        return constant_namespace.size() - 1;
     }
 
-    public int addNamespaceSet(NamespaceSet nss) {
-        constant_namespace_set = Arrays.copyOf(constant_namespace_set, constant_namespace_set.length + 1);
-        constant_namespace_set[constant_namespace_set.length - 1] = nss;
-        return constant_namespace_set.length - 1;
+    public synchronized int addNamespaceSet(NamespaceSet nss) {
+        constant_namespace_set.add(nss);
+        return constant_namespace_set.size() - 1;
     }
 
-    public int addMultiname(Multiname m) {
-        constant_multiname = Arrays.copyOf(constant_multiname, constant_multiname.length + 1);
-        constant_multiname[constant_multiname.length - 1] = m;
-        return constant_multiname.length - 1;
+    public synchronized int addMultiname(Multiname m) {
+        constant_multiname.add(m);
+        return constant_multiname.size() - 1;
     }
 
-    public int addUInt(long value) {
-        constant_uint = Arrays.copyOf(constant_uint, constant_uint.length + 1);
-        constant_uint[constant_uint.length - 1] = value;
-        return constant_uint.length - 1;
+    public synchronized int addUInt(long value) {
+        constant_uint.add(value);
+        return constant_uint.size() - 1;
     }
 
-    public int addDouble(double value) {
-        constant_double = Arrays.copyOf(constant_double, constant_double.length + 1);
-        constant_double[constant_double.length - 1] = value;
-        return constant_double.length - 1;
+    public synchronized int addDouble(double value) {
+        constant_double.add(value);
+        return constant_double.size() - 1;
     }
 
-    public int addString(String value) {
-        constant_string = Arrays.copyOf(constant_string, constant_string.length + 1);
-        constant_string[constant_string.length - 1] = value;
-        return constant_string.length - 1;
+    public synchronized int addDecimal(Decimal value) {
+        constant_decimal.add(value);
+        return constant_decimal.size() - 1;
+    }
+
+    public synchronized int addString(String value) {
+        constant_string.add(value);
+        return constant_string.size() - 1;
+    }
+
+    public long setInt(int index, long value) {
+        constant_int.set(index, value);
+        return value;
+    }
+
+    public Namespace setNamespace(int index, Namespace ns) {
+        constant_namespace.set(index, ns);
+        return ns;
+    }
+
+    public NamespaceSet setNamespaceSet(int index, NamespaceSet nss) {
+        constant_namespace_set.set(index, nss);
+        return nss;
+    }
+
+    public Multiname setMultiname(int index, Multiname m) {
+        constant_multiname.set(index, m);
+        return m;
+    }
+
+    public long setUInt(int index, long value) {
+        constant_uint.set(index, value);
+        return value;
+    }
+
+    public double setDouble(int index, double value) {
+        constant_double.set(index, value);
+        return value;
+    }
+
+    public Decimal setDecimal(int index, Decimal value) {
+        constant_decimal.set(index, value);
+        return value;
+    }
+
+    public String setString(int index, String value) {
+        constant_string.set(index, value);
+        return value;
+    }
+
+    public long getInt(int index) {
+        return constant_int.get(index);
+    }
+
+    public Namespace getNamespace(int index) {
+        return constant_namespace.get(index);
+    }
+
+    public NamespaceSet getNamespaceSet(int index) {
+        return constant_namespace_set.get(index);
+    }
+
+    public Multiname getMultiname(int index) {
+        return constant_multiname.get(index);
+    }
+
+    public long getUInt(int index) {
+        return constant_uint.get(index);
+    }
+
+    public double getDouble(int index) {
+        return constant_double.get(index);
+    }
+
+    public Decimal getDecimal(int index) {
+        return constant_decimal.get(index);
+    }
+
+    public String getString(int index) {
+        return constant_string.get(index);
+    }
+
+    public int getIntCount() {
+        return constant_int.size();
+    }
+
+    public int getNamespaceCount() {
+        return constant_namespace.size();
+    }
+
+    public int getNamespaceSetCount() {
+        return constant_namespace_set.size();
+    }
+
+    public int getMultinameCount() {
+        return constant_multiname.size();
+    }
+
+    public int getUIntCount() {
+        return constant_uint.size();
+    }
+
+    public int getDoubleCount() {
+        return constant_double.size();
+    }
+
+    public int getDecimalCount() {
+        return constant_decimal.size();
+    }
+
+    public int getStringCount() {
+        return constant_string.size();
     }
 
     public int getNamespaceId(Namespace val, int index) {
-        for (int n = 1; n < constant_namespace.length; n++) {
-            Namespace ns = constant_namespace[n];
+        for (int n = 1; n < constant_namespace.size(); n++) {
+            Namespace ns = constant_namespace.get(n);
             if (ns.name_index == val.name_index && (ns.kind == val.kind)) {
                 if (index == 0) {
                     return n;
@@ -96,8 +198,8 @@ public class ConstantPool {
     }
 
     public int getIntId(long value) {
-        for (int i = 1; i < constant_int.length; i++) {
-            if (constant_int[i] == value) {
+        for (int i = 1; i < constant_int.size(); i++) {
+            if (constant_int.get(i) == value) {
                 return i;
             }
         }
@@ -105,8 +207,8 @@ public class ConstantPool {
     }
 
     public int getUIntId(long value) {
-        for (int i = 1; i < constant_uint.length; i++) {
-            if (constant_uint[i] == value) {
+        for (int i = 1; i < constant_uint.size(); i++) {
+            if (constant_uint.get(i) == value) {
                 return i;
             }
         }
@@ -114,8 +216,8 @@ public class ConstantPool {
     }
 
     public int getDoubleId(double value) {
-        for (int i = 1; i < constant_double.length; i++) {
-            if (Double.compare(constant_double[i], value) == 0) {
+        for (int i = 1; i < constant_double.size(); i++) {
+            if (Double.compare(constant_double.get(i), value) == 0) {
                 return i;
             }
         }
@@ -123,8 +225,8 @@ public class ConstantPool {
     }
 
     public int getStringId(String val) {
-        for (int i = 1; i < constant_string.length; i++) {
-            if (constant_string[i].equals(val)) {
+        for (int i = 1; i < constant_string.size(); i++) {
+            if (constant_string.get(i).equals(val)) {
                 return i;
             }
         }
@@ -133,8 +235,8 @@ public class ConstantPool {
 
     public int getMultinameId(Multiname val) {
         loopm:
-        for (int m = 1; m < constant_multiname.length; m++) {
-            Multiname mul = constant_multiname[m];
+        for (int m = 1; m < constant_multiname.size(); m++) {
+            Multiname mul = constant_multiname.get(m);
             if (mul.kind == val.kind && mul.name_index == val.name_index && mul.namespace_index == val.namespace_index && mul.namespace_set_index == val.namespace_set_index && mul.qname_index == val.qname_index && mul.params.size() == val.params.size()) {
                 for (int p = 0; p < mul.params.size(); p++) {
                     if (mul.params.get(p) != val.params.get(p)) {
@@ -212,27 +314,27 @@ public class ConstantPool {
             return;
         }
         String s = "";
-        for (int i = 1; i < constant_int.length; i++) {
-            output.println("INT[" + i + "]=" + constant_int[i]);
+        for (int i = 1; i < constant_int.size(); i++) {
+            output.println("INT[" + i + "]=" + constant_int.get(i));
         }
-        for (int i = 1; i < constant_uint.length; i++) {
-            output.println("UINT[" + i + "]=" + constant_uint[i]);
+        for (int i = 1; i < constant_uint.size(); i++) {
+            output.println("UINT[" + i + "]=" + constant_uint.get(i));
         }
-        for (int i = 1; i < constant_double.length; i++) {
-            output.println("Double[" + i + "]=" + constant_double[i]);
+        for (int i = 1; i < constant_double.size(); i++) {
+            output.println("Double[" + i + "]=" + constant_double.get(i));
         }
-        for (int i = 1; i < constant_string.length; i++) {
-            output.println("String[" + i + "]=" + constant_string[i]);
+        for (int i = 1; i < constant_string.size(); i++) {
+            output.println("String[" + i + "]=" + constant_string.get(i));
         }
-        for (int i = 1; i < constant_namespace.length; i++) {
-            output.println("Namespace[" + i + "]=" + constant_namespace[i].toString(this));
+        for (int i = 1; i < constant_namespace.size(); i++) {
+            output.println("Namespace[" + i + "]=" + constant_namespace.get(i).toString(this));
         }
-        for (int i = 1; i < constant_namespace_set.length; i++) {
-            output.println("NamespaceSet[" + i + "]=" + constant_namespace_set[i].toString(this));
+        for (int i = 1; i < constant_namespace_set.size(); i++) {
+            output.println("NamespaceSet[" + i + "]=" + constant_namespace_set.get(i).toString(this));
         }
 
-        for (int i = 1; i < constant_multiname.length; i++) {
-            output.println("Multiname[" + i + "]=" + constant_multiname[i].toString(this, new ArrayList<String>()));
+        for (int i = 1; i < constant_multiname.size(); i++) {
+            output.println("Multiname[" + i + "]=" + constant_multiname.get(i).toString(this, new ArrayList<String>()));
         }
     }
 
@@ -240,20 +342,20 @@ public class ConstantPool {
         if (index == 0) {
             return "null";
         }
-        return constant_multiname[index].toString(this, new ArrayList<String>());
+        return constant_multiname.get(index).toString(this, new ArrayList<String>());
     }
 
     public String namespaceToString(int index) {
         if (index == 0) {
             return "null";
         }
-        return constant_namespace[index].toString(this);
+        return constant_namespace.get(index).toString(this);
     }
 
     public String namespaceSetToString(int index) {
         if (index == 0) {
             return "null";
         }
-        return constant_namespace_set[index].toString(this);
+        return constant_namespace_set.get(index).toString(this);
     }
 }

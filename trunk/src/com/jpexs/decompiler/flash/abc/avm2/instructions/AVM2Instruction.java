@@ -134,19 +134,19 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
                 case AVM2Code.DAT_MULTINAME_INDEX:
-                    s.add(constants.constant_multiname[operands[i]]);
+                    s.add(constants.getMultiname(operands[i]));
                     break;
                 case AVM2Code.DAT_STRING_INDEX:
-                    s.add(constants.constant_string[operands[i]]);
+                    s.add(constants.getString(operands[i]));
                     break;
                 case AVM2Code.DAT_INT_INDEX:
-                    s.add(Long.valueOf(constants.constant_int[operands[i]]));
+                    s.add(Long.valueOf(constants.getInt(operands[i])));
                     break;
                 case AVM2Code.DAT_UINT_INDEX:
-                    s.add(new Long(constants.constant_uint[operands[i]]));
+                    s.add(new Long(constants.getUInt(operands[i])));
                     break;
                 case AVM2Code.DAT_DOUBLE_INDEX:
-                    s.add(Double.valueOf(constants.constant_double[operands[i]]));
+                    s.add(Double.valueOf(constants.getDouble(operands[i])));
                     break;
                 case AVM2Code.DAT_OFFSET:
                     s.add(new Long(offset + operands[i] + getBytes().length));
@@ -177,7 +177,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(constants.constant_multiname[operands[i]].toString(constants, fullyQualifiedNames));
+                        s.append(constants.getMultiname(operands[i]).toString(constants, fullyQualifiedNames));
                     }
                     /*s.append(" m[");
                      s.append(operands[i]);
@@ -194,7 +194,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" \"");
-                        s.append(Helper.escapeString(constants.constant_string[operands[i]]));
+                        s.append(Helper.escapeString(constants.getString(operands[i])));
                         s.append("\"");
                     }
                     break;
@@ -203,7 +203,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(constants.constant_int[operands[i]]);
+                        s.append(constants.getInt(operands[i]));
                     }
                     break;
                 case AVM2Code.DAT_UINT_INDEX:
@@ -211,7 +211,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(constants.constant_uint[operands[i]]);
+                        s.append(constants.getUInt(operands[i]));
                     }
                     break;
                 case AVM2Code.DAT_DOUBLE_INDEX:
@@ -219,7 +219,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(constants.constant_double[operands[i]]);
+                        s.append(constants.getDouble(operands[i]));
                     }
                     break;
                 case AVM2Code.DAT_OFFSET:

@@ -44,7 +44,7 @@ public class IntTableModel implements TableModel {
         if (abc == null) {
             return 0;
         }
-        return abc.constants.constant_int.length;
+        return abc.constants.getIntCount();
     }
 
     /**
@@ -119,7 +119,7 @@ public class IntTableModel implements TableModel {
         if (columnIndex == 0) {
             return rowIndex;
         } else {
-            return abc.constants.constant_int[rowIndex];
+            return abc.constants.getInt(rowIndex);
         }
     }
 

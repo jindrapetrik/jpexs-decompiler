@@ -44,7 +44,7 @@ public class UIntTableModel implements TableModel {
         if (abc == null) {
             return 0;
         }
-        return abc.constants.constant_uint.length;
+        return abc.constants.getUIntCount();
     }
 
     /**
@@ -119,7 +119,7 @@ public class UIntTableModel implements TableModel {
         if (columnIndex == 0) {
             return rowIndex;
         } else {
-            return abc.constants.constant_uint[rowIndex];
+            return abc.constants.getUInt(rowIndex);
         }
     }
 

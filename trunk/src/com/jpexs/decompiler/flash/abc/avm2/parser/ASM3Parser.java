@@ -82,7 +82,7 @@ public class ASM3Parser {
     }
 
     private static int checkMultinameIndex(ConstantPool constants, int index, int line) throws ParseException {
-        if ((index < 0) || (index >= constants.constant_multiname.length)) {
+        if ((index < 0) || (index >= constants.getMultinameCount())) {
             throw new ParseException("Invalid multiname index", line);
         }
         return index;
@@ -183,8 +183,8 @@ public class ASM3Parser {
             expected(s, ParsedSymbol.TYPE_BRACKET_CLOSE, "]");
         }
         loopn:
-        for (int n = 1; n < constants.constant_namespace_set.length; n++) {
-            int nss[] = constants.constant_namespace_set[n].namespaces;
+        for (int n = 1; n < constants.getNamespaceSetCount(); n++) {
+            int nss[] = constants.getNamespaceSet(n).namespaces;
             if (nss.length != namespaceList.size()) {
                 continue;
             }

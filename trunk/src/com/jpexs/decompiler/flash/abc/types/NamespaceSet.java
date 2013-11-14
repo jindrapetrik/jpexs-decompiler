@@ -35,7 +35,7 @@ public class NamespaceSet {
             if (i > 0) {
                 s += ", ";
             }
-            s += constants.constant_namespace[namespaces[i]].getNameWithKind(constants);
+            s += constants.getNamespace(namespaces[i]).getNameWithKind(constants);
         }
         return s;
     }

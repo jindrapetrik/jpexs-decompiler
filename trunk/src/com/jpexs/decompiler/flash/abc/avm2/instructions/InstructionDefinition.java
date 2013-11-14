@@ -86,10 +86,10 @@ public class InstructionDefinition implements Serializable {
     protected FullMultinameAVM2Item resolveMultiname(Stack<GraphTargetItem> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
-        if (constants.constant_multiname[multinameIndex].needsName()) {
+        if (constants.getMultiname(multinameIndex).needsName()) {
             name = (GraphTargetItem) stack.pop();
         }
-        if (constants.constant_multiname[multinameIndex].needsNs()) {
+        if (constants.getMultiname(multinameIndex).needsNs()) {
             ns = (GraphTargetItem) stack.pop();
         }
         return new FullMultinameAVM2Item(ins, multinameIndex, name, ns);
@@ -97,10 +97,10 @@ public class InstructionDefinition implements Serializable {
 
     protected int resolvedCount(ConstantPool constants, int multinameIndex) {
         int pos = 0;
-        if (constants.constant_multiname[multinameIndex].needsNs()) {
+        if (constants.getMultiname(multinameIndex).needsNs()) {
             pos++;
         }
-        if (constants.constant_multiname[multinameIndex].needsName()) {
+        if (constants.getMultiname(multinameIndex).needsName()) {
             pos++;
         }
         return pos;
@@ -110,14 +110,14 @@ public class InstructionDefinition implements Serializable {
     protected String resolveMultinameNoPop(int pos, Stack<AVM2Item> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins, List<String> fullyQualifiedNames) {
         String ns = "";
         String name;
-        if (constants.constant_multiname[multinameIndex].needsNs()) {
+        if (constants.getMultiname(multinameIndex).needsNs()) {
             ns = "[" + stack.get(pos) + "]";
             pos++;
         }
-        if (constants.constant_multiname[multinameIndex].needsName()) {
+        if (constants.getMultiname(multinameIndex).needsName()) {
             name = stack.get(pos).toString();
         } else {
-            name = GraphTextWriter.hilighOffset(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), ins.offset);
+            name = GraphTextWriter.hilighOffset(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames), ins.offset);
         }
         return name + ns;
     }

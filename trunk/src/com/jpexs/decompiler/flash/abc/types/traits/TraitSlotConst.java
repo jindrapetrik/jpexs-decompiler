@@ -48,15 +48,15 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     public String toString(ABC abc, List<String> fullyQualifiedNames) {
         String typeStr = "*";
         if (type_index > 0) {
-            typeStr = abc.constants.constant_multiname[type_index].toString(abc.constants, fullyQualifiedNames);
+            typeStr = abc.constants.getMultiname(type_index).toString(abc.constants, fullyQualifiedNames);
         }
-        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
+        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
     }
 
     public String getType(ConstantPool constants, List<String> fullyQualifiedNames) {
         String typeStr = "*";
         if (type_index > 0) {
-            typeStr = constants.constant_multiname[type_index].getName(constants, fullyQualifiedNames);
+            typeStr = constants.getMultiname(type_index).getName(constants, fullyQualifiedNames);
         }
         return typeStr;
     }

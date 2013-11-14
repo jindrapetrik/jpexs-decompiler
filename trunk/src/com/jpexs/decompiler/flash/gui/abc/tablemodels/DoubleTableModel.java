@@ -44,7 +44,7 @@ public class DoubleTableModel implements TableModel {
         if (abc == null) {
             return 0;
         }
-        return abc.constants.constant_double.length;
+        return abc.constants.getDoubleCount();
     }
 
     /**
@@ -118,10 +118,10 @@ public class DoubleTableModel implements TableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
             return rowIndex;
-        } else if (Double.isNaN(abc.constants.constant_double[rowIndex])) {
+        } else if (Double.isNaN(abc.constants.getDouble(rowIndex))) {
             return "NaN";
         } else {
-            return "" + abc.constants.constant_double[rowIndex];
+            return "" + abc.constants.getDouble(rowIndex);
         }
     }
 

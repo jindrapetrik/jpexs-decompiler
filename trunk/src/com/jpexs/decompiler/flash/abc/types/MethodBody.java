@@ -93,7 +93,7 @@ public class MethodBody implements Cloneable, Serializable {
         for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
             String paramName = "param" + i;
             if (abc.method_info[this.method_info].flagHas_paramnames() && Configuration.paramNamesEnable.get()) {
-                paramName = abc.constants.constant_string[abc.method_info[this.method_info].paramNames[i - 1]];
+                paramName = abc.constants.getString(abc.method_info[this.method_info].paramNames[i - 1]);
             }
             ret.put(i, paramName);
         }

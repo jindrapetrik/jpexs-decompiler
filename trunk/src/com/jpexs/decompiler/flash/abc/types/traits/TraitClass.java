@@ -65,11 +65,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
     @Override
     public String toString(ABC abc, List<String> fullyQualifiedNames) {
-        return "Class " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
+        return "Class " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
     private boolean parseUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
-        Namespace ns = abc.constants.constant_namespace[namespace_index];
+        Namespace ns = abc.constants.getNamespace(namespace_index);
         if (name.isEmpty()) {
             name = "*";
         }
@@ -139,7 +139,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     private void parseImportsUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
-        Namespace ns = abc.constants.constant_namespace[namespace_index];
+        Namespace ns = abc.constants.getNamespace(namespace_index);
         if (name.isEmpty()) {
             name = "*";
         }
@@ -170,11 +170,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
-                    parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[m.qname_index], ignorePackage, fullyQualifiedNames);
+                    parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames);
                 }
                 for (Integer i : m.params) {
                     if (i != 0) {
-                        parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[i], ignorePackage, fullyQualifiedNames);
+                        parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames);
                     }
                 }
                 return;
@@ -201,11 +201,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
-                    parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[m.qname_index], ignorePackage, fullyQualifiedNames);
+                    parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames);
                 }
                 for (Integer i : m.params) {
                     if (i != 0) {
-                        parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[i], ignorePackage, fullyQualifiedNames);
+                        parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames);
                     }
                 }
                 return;
@@ -230,18 +230,18 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
         visitedMethods.add(method_index);
         if (abc.method_info[method_index].ret_type != 0) {
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[abc.method_info[method_index].ret_type], ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(abc.method_info[method_index].ret_type), ignorePackage, fullyQualifiedNames);
         }
         for (int t : abc.method_info[method_index].param_types) {
             if (t != 0) {
-                parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[t], ignorePackage, fullyQualifiedNames);
+                parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(t), ignorePackage, fullyQualifiedNames);
             }
         }
         MethodBody body = abc.findBody(method_index);
         if (body != null) {
             parseImportsUsagesFromTraits(abcTags, abc, body.traits, imports, uses, ignorePackage, fullyQualifiedNames);
             for (ABCException ex : body.exceptions) {
-                parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[ex.type_index], ignorePackage, fullyQualifiedNames);
+                parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames);
             }
             for (AVM2Instruction ins : body.code.code) {
                 if (ins.definition instanceof NewFunctionIns) {
@@ -258,14 +258,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
                         || (ins.definition instanceof AsTypeIns)) {
                     int m = ins.operands[0];
                     if (m != 0) {
-                        parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[m], ignorePackage, fullyQualifiedNames);
+                        parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames);
                     }
                 } else {
                     for (int k = 0; k < ins.definition.operands.length; k++) {
 
                         if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
                             int multinameIndex = ins.operands[k];
-                            parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[multinameIndex], ignorePackage, fullyQualifiedNames);
+                            parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(multinameIndex), ignorePackage, fullyQualifiedNames);
                         }
                     }
                 }
@@ -282,7 +282,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     private void parseImportsUsagesFromTrait(List<ABCContainerTag> abcTags, ABC abc, Trait t, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
         if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[tm.name_index], ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(tm.name_index), ignorePackage, fullyQualifiedNames);
             if (tm.method_info != 0) {
                 parseImportsUsagesFromMethodInfo(abcTags, abc, tm.method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<Integer>());
             }
@@ -290,8 +290,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
         parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, t.getName(abc), ignorePackage, fullyQualifiedNames);
         if (t instanceof TraitSlotConst) {
             TraitSlotConst ts = (TraitSlotConst) t;
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[ts.name_index], ignorePackage, fullyQualifiedNames);
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[ts.type_index], ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(ts.name_index), ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(ts.type_index), ignorePackage, fullyQualifiedNames);
         }
     }
 
@@ -301,13 +301,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         String packageName = abc.instance_info[class_info].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
 
-        parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[abc.instance_info[class_info].name_index], packageName, fullyQualifiedNames);
+        parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(abc.instance_info[class_info].name_index), packageName, fullyQualifiedNames);
 
         if (abc.instance_info[class_info].super_index > 0) {
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[abc.instance_info[class_info].super_index], packageName, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(abc.instance_info[class_info].super_index), packageName, fullyQualifiedNames);
         }
         for (int i : abc.instance_info[class_info].interfaces) {
-            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[i], packageName, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(i), packageName, fullyQualifiedNames);
         }
 
         //static
@@ -451,7 +451,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //constructor
         if (!abc.instance_info[class_info].isInterface()) {
             String modifier = "";
-            Multiname m = abc.constants.constant_multiname[abc.instance_info[class_info].name_index];
+            Multiname m = abc.constants.getMultiname(abc.instance_info[class_info].name_index);
             if (m != null) {
                 Namespace ns = m.getNamespace(abc.constants);
                 if (ns != null) {
@@ -468,7 +468,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.startTrait(abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length);
             writer.appendNoHilight(modifier);
             writer.appendNoHilight("function ");
-            writer.appendNoHilight(abc.constants.constant_multiname[abc.instance_info[class_info].name_index].getName(abc.constants, new ArrayList<String>()/*do not want full names here*/));
+            writer.appendNoHilight(abc.constants.getMultiname(abc.instance_info[class_info].name_index).getName(abc.constants, new ArrayList<String>()/*do not want full names here*/));
             writer.appendNoHilight("(");
             bodyIndex = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
             if (bodyIndex != -1) {
@@ -525,7 +525,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
     @Override
     public Multiname getName(ABC abc) {
-        return abc.constants.constant_multiname[abc.instance_info[class_info].name_index];
+        return abc.constants.getMultiname(abc.instance_info[class_info].name_index);
     }
 
     @Override

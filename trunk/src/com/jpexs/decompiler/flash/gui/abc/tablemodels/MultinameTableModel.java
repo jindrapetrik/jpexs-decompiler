@@ -45,7 +45,7 @@ public class MultinameTableModel implements TableModel {
         if (abc == null) {
             return 0;
         }
-        return abc.constants.constant_multiname.length;
+        return abc.constants.getMultinameCount();
     }
 
     /**
@@ -124,31 +124,31 @@ public class MultinameTableModel implements TableModel {
                 if (rowIndex == 0) {
                     return "";
                 }
-                return abc.constants.constant_multiname[rowIndex].getKindStr();
+                return abc.constants.getMultiname(rowIndex).getKindStr();
             case 2:
                 if (rowIndex == 0) {
                     return "";
                 }
-                if (abc.constants.constant_multiname[rowIndex].name_index == -1) {
+                if (abc.constants.getMultiname(rowIndex).name_index == -1) {
                     return "";
                 }
-                return abc.constants.constant_multiname[rowIndex].getName(abc.constants, new ArrayList<String>());
+                return abc.constants.getMultiname(rowIndex).getName(abc.constants, new ArrayList<String>());
             case 3:
                 if (rowIndex == 0) {
                     return "";
                 }
-                if (abc.constants.constant_multiname[rowIndex].namespace_index == -1) {
+                if (abc.constants.getMultiname(rowIndex).namespace_index == -1) {
                     return "";
                 }
-                return abc.constants.constant_multiname[rowIndex].getNamespace(abc.constants).getNameWithKind(abc.constants);
+                return abc.constants.getMultiname(rowIndex).getNamespace(abc.constants).getNameWithKind(abc.constants);
             case 4:
                 if (rowIndex == 0) {
                     return "";
                 }
-                if (abc.constants.constant_multiname[rowIndex].namespace_set_index == -1) {
+                if (abc.constants.getMultiname(rowIndex).namespace_set_index == -1) {
                     return "";
                 }
-                return abc.constants.constant_multiname[rowIndex].getNamespaceSet(abc.constants).toString(abc.constants);
+                return abc.constants.getMultiname(rowIndex).getNamespaceSet(abc.constants).toString(abc.constants);
             default:
                 return null;
         }

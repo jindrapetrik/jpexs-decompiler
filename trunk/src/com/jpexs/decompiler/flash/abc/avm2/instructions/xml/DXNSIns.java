@@ -40,13 +40,13 @@ public class DXNSIns extends InstructionDefinition {
     @Override
     public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         int strIndex = (int) ((Long) arguments.get(0)).longValue();
-        String s = constants.constant_string[strIndex];
+        String s = constants.getString(strIndex);
         System.out.println("Set default XML space " + s);
 
     }
 
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
-        output.add(new DefaultXMLNamespace(ins, new StringAVM2Item(ins, constants.constant_string[ins.operands[0]])));
+        output.add(new DefaultXMLNamespace(ins, new StringAVM2Item(ins, constants.getString(ins.operands[0]))));
     }
 }

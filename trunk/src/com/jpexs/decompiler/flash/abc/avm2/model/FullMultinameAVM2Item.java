@@ -61,13 +61,13 @@ public class FullMultinameAVM2Item extends AVM2Item {
         if (name != null) {
             cname = name.toString(LocalData.create(constants, localRegNames, fullyQualifiedNames));
         } else {
-            cname = (constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
+            cname = (constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames));
         }
         String cns = "";
         if (namespace != null) {
             cns = namespace.toString(LocalData.create(constants, localRegNames, fullyQualifiedNames));
         } else {
-            Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
+            Namespace ns = constants.getMultiname(multinameIndex).getNamespace(constants);
             if ((ns != null) && (ns.name_index != 0)) {
                 cns = ns.getName(constants);
             }
@@ -81,7 +81,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
             namespace.toString(writer, localData);
             writer.append("::");
         } else {
-            /*Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
+            /*Namespace ns = constants.getMultiname(multinameIndex).getNamespace(constants);
              if ((ns != null)&&(ns.name_index!=0)) {
              ret =  hilight(ns.getName(constants) + "::")+ret;
              }*/
@@ -93,7 +93,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
         } else {
             ConstantPool constants = localData.constantsAvm2;
             List<String> fullyQualifiedNames = localData.fullyQualifiedNames;
-            writer.append(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
+            writer.append(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames));
         }
         return writer;
     }

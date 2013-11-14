@@ -44,7 +44,7 @@ public class NamespaceTableModel implements TableModel {
         if (abc == null) {
             return 0;
         }
-        return abc.constants.constant_namespace.length;
+        return abc.constants.getNamespaceCount();
     }
 
     /**
@@ -123,12 +123,12 @@ public class NamespaceTableModel implements TableModel {
                 if (rowIndex == 0) {
                     return "-";
                 }
-                return abc.constants.constant_namespace[rowIndex].getKindStr();
+                return abc.constants.getNamespace(rowIndex).getKindStr();
             case 2:
                 if (rowIndex == 0) {
                     return "-";
                 }
-                return abc.constants.constant_namespace[rowIndex].getName(abc.constants);
+                return abc.constants.getNamespace(rowIndex).getName(abc.constants);
             default:
                 return null;
         }

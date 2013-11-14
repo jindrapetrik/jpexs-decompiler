@@ -55,13 +55,13 @@ public abstract class Trait implements Serializable {
         Multiname m = getName(abc);
         if (m != null) {
             String nsname = "";
-            //if (abc.constants.constant_namespace[m.namespace_index].kind == Namespace.KIND_NAMESPACE) {
+            //if (abc.constants.getNamespace(m.namespace_index).kind == Namespace.KIND_NAMESPACE) {
             {
                 for (ABCContainerTag abcTag : abcTags) {
                     if (m.namespace_index == -1) {
                         break;
                     }
-                    nsname = abcTag.getABC().nsValueToName(abc.constants.constant_namespace[m.namespace_index].getName(abc.constants));
+                    nsname = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants));
                     if (nsname.equals("-")) {
                         break;
                     }
@@ -113,11 +113,11 @@ public abstract class Trait implements Serializable {
     }
 
     public String toString(ABC abc, List<String> fullyQualifiedNames) {
-        return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
+        return abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
     public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        writer.appendNoHilight(abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata));
+        writer.appendNoHilight(abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata));
         return writer;
     }
 
@@ -125,7 +125,7 @@ public abstract class Trait implements Serializable {
     }
 
     public GraphTextWriter toStringPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        Namespace ns = abc.constants.constant_multiname[name_index].getNamespace(abc.constants);
+        Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
             String nsname = ns.getName(abc.constants);
             writer.appendNoHilight("package " + nsname).newLine();
@@ -140,7 +140,7 @@ public abstract class Trait implements Serializable {
     }
 
     public void convertPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        Namespace ns = abc.constants.constant_multiname[name_index].getNamespace(abc.constants);
+        Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
             String nsname = ns.getName(abc.constants);
             convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
@@ -160,7 +160,7 @@ public abstract class Trait implements Serializable {
         if (name_index == 0) {
             return null;
         } else {
-            return abc.constants.constant_multiname[name_index];
+            return abc.constants.getMultiname(name_index);
         }
     }
 

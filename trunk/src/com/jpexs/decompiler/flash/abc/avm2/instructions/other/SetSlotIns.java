@@ -67,7 +67,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         }
 
         if (obj instanceof ExceptionAVM2Item) {
-            slotname = constants.constant_multiname[((ExceptionAVM2Item) obj).exception.name_index];
+            slotname = constants.getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
         } else if (obj instanceof ClassAVM2Item) {
             slotname = ((ClassAVM2Item) obj).className;
         } else if (obj instanceof ThisAVM2Item) {
