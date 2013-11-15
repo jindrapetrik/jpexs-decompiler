@@ -632,10 +632,10 @@ public class ActionPanel extends JPanel implements ActionListener {
 
         if (val) {
             if (rawEdit) {
-                editor.setContentType("text/flasm");
+                editor.setContentType("text/plain");
                 setText(srcHexOnly);
             } else {
-                editor.setContentType("text/plain");
+                editor.setContentType("text/flasm");
                 setText(srcNoHex);
             }
             editor.setEditable(true);

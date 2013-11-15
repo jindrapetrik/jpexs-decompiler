@@ -531,11 +531,31 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         helpBand.addCommandButton(helpUsUpdatesCommandButton, RibbonElementPriority.TOP);
         RibbonTask helpTask = new RibbonTask(translate("menu.help"), helpBand);
 
+        RibbonTask debugTask = null;
+        if (Configuration.debugMode.get()) {
+            //----------------------------------------- DEBUG -----------------------------------
+
+            JRibbonBand debugBand = new JRibbonBand("Debug", null);
+            debugBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(debugBand.getControlPanel()), new IconRibbonBandResizePolicy(debugBand.getControlPanel())));
+
+            JCommandButton removeNonScriptsCommandButton = new JCommandButton(fixCommandTitle("Remove non scripts"), View.getResizableIcon("update16"));
+            assignListener(removeNonScriptsCommandButton, "REMOVENONSCRIPTS");
+
+            JCommandButton refreshDecompiledCommandButton = new JCommandButton(fixCommandTitle("Refresh decompiled script"), View.getResizableIcon("update16"));
+            assignListener(refreshDecompiledCommandButton, "REFRESHDECOMPILED");
+
+            debugBand.addCommandButton(removeNonScriptsCommandButton, RibbonElementPriority.MEDIUM);
+            debugBand.addCommandButton(refreshDecompiledCommandButton, RibbonElementPriority.MEDIUM);
+            debugTask = new RibbonTask("Debug", debugBand);
+        }
 
         rib.addTask(fileTask);
         rib.addTask(toolsTask);
         rib.addTask(settingsTask);
         rib.addTask(helpTask);
+        if (debugTask != null) {
+            rib.addTask(debugTask);
+        }
 
 
         RibbonApplicationMenu mainMenu = new RibbonApplicationMenu();
@@ -2948,6 +2968,25 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         }
                     }.execute();
                 }
+                break;
+            case "REMOVENONSCRIPTS":
+                List<Tag> tags = new ArrayList<>(swf.tags);
+                for (Tag tag : tags) {
+                    System.out.println(tag.getClass());
+                    if (!(tag instanceof ABCContainerTag || tag instanceof ASMSource)) {
+                        swf.removeTag(tag);
+                    }
+                }
+                showCard(CARDEMPTYPANEL);
+                refreshTree();
+                break;
+            case "REFRESHDECOMPILED":
+                clearCache();
+                if (abcPanel != null) {
+                    abcPanel.reload();
+                }
+                reload(true);
+                doFilter();
                 break;
         }
 
