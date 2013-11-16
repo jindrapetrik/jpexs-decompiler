@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -817,7 +818,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         // miAssociate = new JCheckBox(translate("menu.settings.addtocontextmenu"));
         miAssociate.setActionCommand("ASSOCIATE");
         miAssociate.addActionListener(this);
-        miAssociate.setSelected(Main.isAddedToContextMenu());
+        miAssociate.setSelected(ContextMenuTools.isAddedToContextMenu());
 
 
         JMenuItem miLanguage = new JMenuItem(translate("menu.settings.language"));
@@ -2418,16 +2419,16 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 doFilter();
                 break;
             case "ASSOCIATE":
-                if (miAssociate.isSelected() == Main.isAddedToContextMenu()) {
+                if (miAssociate.isSelected() == ContextMenuTools.isAddedToContextMenu()) {
                     return;
                 }
-                Main.addToContextMenu(miAssociate.isSelected());
+                ContextMenuTools.addToContextMenu(miAssociate.isSelected());
 
                 //Update checkbox menuitem accordingly (User can cancel rights elevation)
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        miAssociate.setSelected(Main.isAddedToContextMenu());
+                        miAssociate.setSelected(ContextMenuTools.isAddedToContextMenu());
                     }
                 }, 1000); //It takes some time registry change to apply
                 break;

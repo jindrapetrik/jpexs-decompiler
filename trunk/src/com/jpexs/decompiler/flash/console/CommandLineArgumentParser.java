@@ -24,8 +24,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.sun.jna.Platform;
@@ -158,10 +156,10 @@ public class CommandLineArgumentParser {
             }
         }
         if (nextParam.equals("-removefromcontextmenu")) {
-            Main.addToContextMenu(false);
+            ContextMenuTools.addToContextMenu(false);
             System.exit(0);
         } else if (nextParam.equals("-addtocontextmenu")) {
-            Main.addToContextMenu(true);
+            ContextMenuTools.addToContextMenu(true);
             System.exit(0);
         } else if (nextParam.equals("-proxy")) {
             parseProxy(args);
@@ -382,17 +380,7 @@ public class CommandLineArgumentParser {
                 System.err.println("Bad port number");
             }
         }
-        View.execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                if (Main.proxyFrame == null) {
-                    Main.proxyFrame = new ProxyFrame();
-                }
-            }
-        });
-        Main.proxyFrame.setPort(port);
-        Main.addTrayIcon();
-        Main.switchProxy();
+        Main.startProxy(port);
     }
 
     private static void parseExport(Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel) {
