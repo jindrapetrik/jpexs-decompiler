@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.console;
 
+import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import java.util.Scanner;
 
 /**
