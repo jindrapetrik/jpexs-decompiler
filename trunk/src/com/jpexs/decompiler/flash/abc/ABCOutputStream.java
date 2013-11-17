@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.abc.types.*;
 import com.jpexs.decompiler.flash.abc.types.traits.*;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -144,7 +145,7 @@ public class ABCOutputStream extends OutputStream {
     }
 
     public void writeString(String s) throws IOException {
-        byte[] sbytes = s.getBytes("UTF-8");
+        byte[] sbytes = Utf8Helper.getBytes(s);
         writeU30(sbytes.length);
         write(sbytes);
     }

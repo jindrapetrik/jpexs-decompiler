@@ -34,15 +34,11 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ASM3Parser {
 
@@ -77,8 +73,8 @@ public class ASM3Parser {
         }
     }
 
-    public static AVM2Code parse(InputStream is, ConstantPool constants, Trait trait, MethodBody body, MethodInfo info) throws IOException, ParseException {
-        return parse(is, constants, trait, null, body, info);
+    public static AVM2Code parse(Reader reader, ConstantPool constants, Trait trait, MethodBody body, MethodInfo info) throws IOException, ParseException {
+        return parse(reader, constants, trait, null, body, info);
     }
 
     private static int checkMultinameIndex(ConstantPool constants, int index, int line) throws ParseException {
@@ -101,14 +97,8 @@ public class ASM3Parser {
         }
     }
 
-    public static boolean parseSlotConst(InputStream is, ConstantPool constants, TraitSlotConst tsc) throws IOException, ParseException {
-        Flasm3Lexer lexer = null;
-        try {
-            lexer = new Flasm3Lexer(new InputStreamReader(is, "UTF-8"));
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(ASM3Parser.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
+    public static boolean parseSlotConst(Reader reader, ConstantPool constants, TraitSlotConst tsc) throws IOException, ParseException {
+        Flasm3Lexer lexer = new Flasm3Lexer(reader);
         expected(ParsedSymbol.TYPE_KEYWORD_TRAIT, "trait", lexer);
         int name_index = parseMultiName(constants, lexer);
 
@@ -483,7 +473,7 @@ public class ASM3Parser {
         return new ValueKind(value_index, value_kind);
     }
 
-    public static AVM2Code parse(InputStream is, ConstantPool constants, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, ParseException {
+    public static AVM2Code parse(Reader reader, ConstantPool constants, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, ParseException {
         AVM2Code code = new AVM2Code();
 
         List<OffsetItem> offsetItems = new ArrayList<>();
@@ -493,7 +483,7 @@ public class ASM3Parser {
         int offset = 0;
 
 
-        Flasm3Lexer lexer = new Flasm3Lexer(new InputStreamReader(is, "UTF-8"));
+        Flasm3Lexer lexer = new Flasm3Lexer(reader);
 
         ParsedSymbol symb;
         AVM2Instruction lastIns = null;

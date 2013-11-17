@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8InputStreamReader;
+import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
 import com.jpexs.proxy.Replacement;
 import java.io.*;
 import java.lang.reflect.Field;
@@ -274,7 +276,7 @@ public class Configuration {
                 }
             }
         } else {
-            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(replacementsFile), "utf-8"))) {
+            try (PrintWriter pw = new PrintWriter(new Utf8OutputStreamWriter(new FileOutputStream(replacementsFile)))) {
                 for (Replacement r : replacements) {
                     pw.println(r.urlPattern);
                     pw.println(r.targetFile);
@@ -293,7 +295,7 @@ public class Configuration {
             return;
         }
         replacements = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(replacementsFile), "utf-8"))) {
+        try (BufferedReader br = new BufferedReader(new Utf8InputStreamReader(new FileInputStream(replacementsFile)))) {
             String s;
             while ((s = br.readLine()) != null) {
                 Replacement r = new Replacement(s, br.readLine());

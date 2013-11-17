@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -102,8 +103,9 @@ public class DefineFont2Tag extends FontTag {
             sos.writeUB(1, fontFlagsItalic ? 1 : 0);
             sos.writeUB(1, fontFlagsBold ? 1 : 0);
             sos.writeLANGCODE(languageCode);
-            sos.writeUI8(fontName.getBytes("utf-8").length);
-            sos.write(fontName.getBytes("utf-8"));
+            byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
+            sos.writeUI8(fontNameBytes.length);
+            sos.write(fontNameBytes);
             sos.writeUI16(numGlyphs);
 
             List<Long> offsetTable = new ArrayList<>();

@@ -83,8 +83,22 @@ import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -2095,7 +2109,7 @@ public class AVM2Code implements Serializable {
             toASMSource(constants, trait, info, body, outputMap, ExportMode.PCODE, writer);
             String src = writer.toString();
 
-            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, null, body, info);
+            AVM2Code acode = ASM3Parser.parse(new StringReader(src), constants, null, body, info);
             for (int i = 0; i < acode.code.size(); i++) {
                 if (outputMap.size() > i) {
                     int tpos = outputMap.get(i);
@@ -2136,7 +2150,7 @@ public class AVM2Code implements Serializable {
             HilightedTextWriter writer = new HilightedTextWriter(false);
             toASMSource(constants, trait, info, body, outputMap, ExportMode.PCODE, writer);
             String src = writer.toString();
-            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, trait, body, info);
+            AVM2Code acode = ASM3Parser.parse(new StringReader(src), constants, trait, body, info);
             for (int i = 0; i < acode.code.size(); i++) {
                 if (outputMap.size() > i) {
                     int tpos = outputMap.get(i);

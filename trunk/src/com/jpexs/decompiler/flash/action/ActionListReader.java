@@ -655,7 +655,7 @@ public class ActionListReader {
 
         pos = ip;
         Action a;
-        Scanner sc = new Scanner(System.in, "utf-8");
+        Scanner sc = new Scanner(System.in);
         loopip:
         while (((endip == -1) || (endip > ip)) && (a = actions.get(pos)) != null) {
             int actionLen = getTotalActionLength(a);

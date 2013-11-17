@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Component;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -491,13 +491,7 @@ public class Helper {
     }
 
     public static String strToHex(String s) {
-        byte[] bs;
-        try {
-            bs = s.getBytes("utf-8");
-        } catch (UnsupportedEncodingException ex) {
-            bs = new byte[0];
-            Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        byte[] bs = Utf8Helper.getBytes(s);
         String sn = "";
         for (int i = 0; i < bs.length; i++) {
             sn += "0x" + Integer.toHexString(bs[i] & 0xff) + " ";

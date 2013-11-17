@@ -36,6 +36,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -196,7 +197,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                 }
                 mb.code.compact();
             } else {
-                AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(text.getBytes("UTF-8")), constants, trait, new MissingSymbolHandler() {
+                AVM2Code acode = ASM3Parser.parse(new StringReader(text), constants, trait, new MissingSymbolHandler() {
                     //no longer ask for adding new constants
                     @Override
                     public boolean missingString(String value) {

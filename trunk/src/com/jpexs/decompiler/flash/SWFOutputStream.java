@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -106,7 +107,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeString(String value) throws IOException {
-        write(value.getBytes("utf8"));
+        write(Utf8Helper.getBytes(value));
         write(0);
     }
 

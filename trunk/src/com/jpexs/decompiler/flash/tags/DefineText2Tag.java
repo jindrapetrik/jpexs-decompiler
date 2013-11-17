@@ -38,17 +38,14 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -159,7 +156,7 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
     public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text, String fontName) throws ParseException {
         List<TEXTRECORD> oldTextRecords = textRecords;
         try {
-            TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
+            TextLexer lexer = new TextLexer(new StringReader(text));
             ParsedSymbol s = null;
             textRecords = new ArrayList<>();
             RGBA colorA = null;
@@ -386,8 +383,6 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
             this.textBounds = textBounds;
             //this.textBounds.Xmin = minX;
             //this.textBounds.Xmax = maxX;
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(DefineText2Tag.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             textRecords = oldTextRecords;
             return false;

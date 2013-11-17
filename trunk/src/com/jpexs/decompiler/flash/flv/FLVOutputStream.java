@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.flash.flv;
 
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -137,15 +138,15 @@ public class FLVOutputStream extends OutputStream {
     }
 
     public void writeSCRIPTDATASTRING(String s) throws IOException {
-        int len = s.getBytes("UTF-8").length;
-        writeUI16(len);
-        write(s.getBytes("UTF-8"));
+        byte[] bytes = Utf8Helper.getBytes(s);
+        writeUI16(bytes.length);
+        write(bytes);
     }
 
     public void writeSCRIPTDATALONGSTRING(String s) throws IOException {
-        int len = s.getBytes("UTF-8").length;
-        writeUI32(len);
-        write(s.getBytes("UTF-8"));
+        byte[] bytes = Utf8Helper.getBytes(s);
+        writeUI32(bytes.length);
+        write(bytes);
     }
 
     private void writeLong(long value) throws IOException {

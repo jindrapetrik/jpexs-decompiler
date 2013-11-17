@@ -30,6 +30,7 @@ import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.ReReadableInputStream;
+import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import com.sun.jna.Platform;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -608,11 +609,7 @@ public class Main {
             } else {
                 if (f.getName().endsWith(".java")) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    PrintWriter pw = null;
-                    try {
-                        pw = new PrintWriter(new OutputStreamWriter(baos, "utf8"));
-                    } catch (UnsupportedEncodingException ex) {
-                    }
+                    PrintWriter pw = new Utf8PrintWriter(baos);
                     try {
                         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
                             String s;

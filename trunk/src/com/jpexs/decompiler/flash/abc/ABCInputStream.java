@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.abc.types.*;
 import com.jpexs.decompiler.flash.abc.types.traits.*;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -368,7 +369,7 @@ public class ABCInputStream extends InputStream {
     public String readString() throws IOException {
         int length = readU30();
         byte[] b = safeRead(length);
-        String r = new String(b, "UTF-8");
+        String r = new String(b, Utf8Helper.charset);
         return r;
     }
 

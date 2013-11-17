@@ -8,6 +8,7 @@ import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -77,7 +78,7 @@ public class AS2Generator {
              pw.println(s.toString());
              }*/
             try (FileOutputStream fos = new FileOutputStream("as2_teststub.java")) {
-                fos.write(s.toString().getBytes("UTF-8"));
+                fos.write(Utf8Helper.getBytes(s.toString()));
             }
         }
     }

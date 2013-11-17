@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -57,8 +58,9 @@ public class DefineFontInfoTag extends Tag {
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
             sos.writeUI16(fontId);
-            sos.writeUI8(fontName.getBytes("utf-8").length);
-            sos.write(fontName.getBytes("utf-8"));
+            byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
+            sos.writeUI8(fontNameBytes.length);
+            sos.write(fontNameBytes);
             sos.writeUB(2, 0); //reserved
             sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
             sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);

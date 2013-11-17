@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.console;
 
+import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.Advapi32Util;
@@ -26,10 +27,6 @@ import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinReg;
 import com.sun.jna.platform.win32.WinUser;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -38,12 +35,8 @@ import java.util.logging.Logger;
 public class ContextMenuTools {
     
     public static String getAppDir() {
-        String appDir = "";
-        try {
-            appDir = new File(URLDecoder.decode(ContextMenuTools.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8")).getParentFile().getAbsolutePath();
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(ContextMenuTools.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        String path = Utf8Helper.urlDecode(ContextMenuTools.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        String appDir = new File(path).getParentFile().getAbsolutePath();
         if (!appDir.endsWith("\\")) {
             appDir += "\\";
         }

@@ -26,9 +26,8 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import java.awt.BorderLayout;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.StringReader;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -110,14 +109,11 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     @Override
     public boolean save() {
         try {//(slotConstEditor.getText(), trait, abc)
-            if (!ASM3Parser.parseSlotConst(new ByteArrayInputStream(slotConstEditor.getText().getBytes("UTF-8")), abc.constants, trait)) {
+            if (!ASM3Parser.parseSlotConst(new StringReader(slotConstEditor.getText()), abc.constants, trait)) {
                 return false;
             }
         } catch (ParseException ex) {
             View.showMessageDialog(slotConstEditor, ex.text, AppStrings.translate("error.slotconst.typevalue"), JOptionPane.ERROR_MESSAGE);
-            return false;
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(SlotConstTraitDetailPanel.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         } catch (IOException ex) {
             Logger.getLogger(SlotConstTraitDetailPanel.class.getName()).log(Level.SEVERE, null, ex);

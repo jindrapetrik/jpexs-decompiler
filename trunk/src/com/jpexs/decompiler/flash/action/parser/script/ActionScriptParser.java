@@ -128,15 +128,11 @@ import com.jpexs.decompiler.graph.model.ParenthesisItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -1822,12 +1818,7 @@ public class ActionScriptParser {
     public List<GraphTargetItem> treeFromString(String str, List<String> constantPool) throws ParseException, IOException {
         List<GraphTargetItem> retTree = new ArrayList<>();
         this.constantPool = constantPool;
-        try {
-            lexer = new ActionScriptLexer(new InputStreamReader(new ByteArrayInputStream(str.getBytes("UTF8")), "UTF8"));
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(ActionScriptParser.class.getName()).log(Level.SEVERE, null, ex);
-            return retTree;
-        }
+        lexer = new ActionScriptLexer(new StringReader(str));
         retTree.addAll(commands(new HashMap<String, Integer>(), false, false, 0));
         if (lexer.lex().type != SymbolType.EOF) {
             throw new ParseException("Parsing finisned before end of the file", lexer.yyline());

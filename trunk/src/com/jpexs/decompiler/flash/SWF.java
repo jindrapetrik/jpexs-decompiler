@@ -103,6 +103,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -111,7 +112,15 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -316,7 +325,7 @@ public final class SWF {
     public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException {
         byte[] hdr = new byte[3];
         is.read(hdr);
-        String shdr = new String(hdr, "utf-8");
+        String shdr = new String(hdr, Utf8Helper.charset);
         if (!Arrays.asList(
                 "FWS",  //Uncompressed Flash
                 "CWS",  //ZLib compressed Flash
@@ -479,7 +488,7 @@ public final class SWF {
         try {
             byte[] hdr = new byte[3];
             fis.read(hdr);
-            String shdr = new String(hdr, "utf-8");
+            String shdr = new String(hdr, Utf8Helper.charset);
             switch (shdr) {
                 case "CWS":
                     {
@@ -487,7 +496,7 @@ public final class SWF {
                         SWFInputStream sis = new SWFInputStream(fis, version, 4);
                         long fileSize = sis.readUI32();
                         SWFOutputStream sos = new SWFOutputStream(fos, version);
-                        sos.write("FWS".getBytes("utf-8"));
+                        sos.write(Utf8Helper.getBytes("FWS"));
                         sos.writeUI8(version);
                         sos.writeUI32(fileSize);
                         InflaterInputStream iis = new InflaterInputStream(fis);
@@ -519,7 +528,7 @@ public final class SWF {
                             throw new IOException("LZMA:Error in data stream");
                         }
                         try (SWFOutputStream sos = new SWFOutputStream(fos, version)) {
-                            sos.write("FWS".getBytes("utf-8"));
+                            sos.write(Utf8Helper.getBytes("FWS"));
                             sos.write(version);
                             sos.writeUI32(fileSize);
                             sos.write(baos.toByteArray());
@@ -1052,20 +1061,20 @@ public final class SWF {
             writeLE(subChunk1Data, bitsPerSample, 2);
 
             ByteArrayOutputStream chunks = new ByteArrayOutputStream();
-            chunks.write("fmt ".getBytes("utf-8"));
+            chunks.write(Utf8Helper.getBytes("fmt "));
             byte[] subChunk1DataBytes = subChunk1Data.toByteArray();
             writeLE(chunks, subChunk1DataBytes.length, 4);
             chunks.write(subChunk1DataBytes);
 
 
-            chunks.write("data".getBytes("utf-8"));
+            chunks.write(Utf8Helper.getBytes("data"));
             writeLE(chunks, pcmData.length, 4);
             chunks.write(pcmData);
 
-            fos.write("RIFF".getBytes("utf-8"));
+            fos.write(Utf8Helper.getBytes("RIFF"));
             byte[] chunkBytes = chunks.toByteArray();
             writeLE(fos, 4 + chunkBytes.length, 4);
-            fos.write("WAVE".getBytes("utf-8"));
+            fos.write(Utf8Helper.getBytes("WAVE"));
             fos.write(chunkBytes);
             //size1=>16bit*/
         } finally {
@@ -1359,9 +1368,9 @@ public final class SWF {
                     public void run() throws IOException {
                         try (FileOutputStream fos = new FileOutputStream(file)) {
                             if (formatted) {
-                                fos.write(((TextTag) t).getFormattedText(ttags).getBytes("UTF-8"));
+                                fos.write(Utf8Helper.getBytes(((TextTag) t).getFormattedText(ttags)));
                             } else {
-                                fos.write(((TextTag) t).getText(ttags).getBytes("UTF-8"));
+                                fos.write(Utf8Helper.getBytes(((TextTag) t).getText(ttags)));
                             }
                         }
                     }
@@ -1401,7 +1410,7 @@ public final class SWF {
                     @Override
                     public void run() throws IOException {
                         try (FileOutputStream fos = new FileOutputStream(file)) {
-                            fos.write(((ShapeTag) t).toSVG().getBytes("utf-8"));
+                            fos.write(Utf8Helper.getBytes(((ShapeTag) t).toSVG()));
                         }
                     }
                 }, handler).run();

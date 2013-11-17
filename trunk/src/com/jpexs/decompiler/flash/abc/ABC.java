@@ -33,7 +33,11 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.*;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
-import java.io.*;
+import com.jpexs.helpers.utf8.Utf8PrintWriter;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -750,13 +754,8 @@ public class ABC {
     }
 
     public void dump(OutputStream os) {
-        PrintStream output;
-        try {
-            output = new PrintStream(os, false, "utf-8");
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
-            return;
-        }
+        Utf8PrintWriter output;
+        output = new Utf8PrintWriter(os);
         constants.dump(output);
         for (int i = 0; i < method_info.length; i++) {
             output.println("MethodInfo[" + i + "]:" + method_info[i].toString(constants, new ArrayList<String>()));

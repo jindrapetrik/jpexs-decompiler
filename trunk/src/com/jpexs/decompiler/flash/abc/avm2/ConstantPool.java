@@ -20,13 +20,9 @@ import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ConstantPool {
 
@@ -305,36 +301,29 @@ public class ConstantPool {
         return id;
     }
 
-    public void dump(OutputStream os) {
-        PrintStream output;
-        try {
-            output = new PrintStream(os, false, "utf-8");
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(ConstantPool.class.getName()).log(Level.SEVERE, null, ex);
-            return;
-        }
+    public void dump(Utf8PrintWriter writer) {
         String s = "";
         for (int i = 1; i < constant_int.size(); i++) {
-            output.println("INT[" + i + "]=" + constant_int.get(i));
+            writer.println("INT[" + i + "]=" + constant_int.get(i));
         }
         for (int i = 1; i < constant_uint.size(); i++) {
-            output.println("UINT[" + i + "]=" + constant_uint.get(i));
+            writer.println("UINT[" + i + "]=" + constant_uint.get(i));
         }
         for (int i = 1; i < constant_double.size(); i++) {
-            output.println("Double[" + i + "]=" + constant_double.get(i));
+            writer.println("Double[" + i + "]=" + constant_double.get(i));
         }
         for (int i = 1; i < constant_string.size(); i++) {
-            output.println("String[" + i + "]=" + constant_string.get(i));
+            writer.println("String[" + i + "]=" + constant_string.get(i));
         }
         for (int i = 1; i < constant_namespace.size(); i++) {
-            output.println("Namespace[" + i + "]=" + constant_namespace.get(i).toString(this));
+            writer.println("Namespace[" + i + "]=" + constant_namespace.get(i).toString(this));
         }
         for (int i = 1; i < constant_namespace_set.size(); i++) {
-            output.println("NamespaceSet[" + i + "]=" + constant_namespace_set.get(i).toString(this));
+            writer.println("NamespaceSet[" + i + "]=" + constant_namespace_set.get(i).toString(this));
         }
 
         for (int i = 1; i < constant_multiname.size(); i++) {
-            output.println("Multiname[" + i + "]=" + constant_multiname.get(i).toString(this, new ArrayList<String>()));
+            writer.println("Multiname[" + i + "]=" + constant_multiname.get(i).toString(this, new ArrayList<String>()));
         }
     }
 

@@ -16,11 +16,10 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,8 +36,8 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
     private int indent;
     private int writtenBytes;
 
-    public FileTextWriter(FileOutputStream fos) throws UnsupportedEncodingException {
-        this.writer = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
+    public FileTextWriter(FileOutputStream fos) {
+        this.writer = new BufferedWriter(new Utf8OutputStreamWriter(fos));
     }
 
     @Override

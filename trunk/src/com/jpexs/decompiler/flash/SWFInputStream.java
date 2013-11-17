@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.ReReadableInputStream;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -240,7 +241,7 @@ public class SWFInputStream extends InputStream {
         while (true) {
             r = readEx();
             if (r == 0) {
-                return new String(baos.toByteArray(), "utf8");
+                return new String(baos.toByteArray(), Utf8Helper.charset);
             }
             baos.write(r);
         }

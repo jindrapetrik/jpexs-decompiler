@@ -32,8 +32,8 @@ import java.awt.geom.GeneralPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -165,7 +165,7 @@ public class DefineEditTextTag extends TextTag {
     @Override
     public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text, String fontName) throws ParseException {
         try {
-            TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
+            TextLexer lexer = new TextLexer(new StringReader(text));
             ParsedSymbol s = null;
             text = "";
             RECT bounds = new RECT(this.bounds);

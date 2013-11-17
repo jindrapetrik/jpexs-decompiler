@@ -91,6 +91,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.graph.ExportMode;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -100,10 +101,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -1282,11 +1281,7 @@ public class XFLConverter {
                 symbolStr += "</DOMSymbolItem>";
                 symbolStr = prettyFormatXML(symbolStr);
                 String symbolFile = "Symbol " + symbol.getCharacterId() + ".xml";
-                try {
-                    files.put(symbolFile, symbolStr.getBytes("UTF-8"));
-                } catch (UnsupportedEncodingException ex) {
-                    Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                files.put(symbolFile, Utf8Helper.getBytes(symbolStr));
                 String symbLinkStr = "";
                 symbLinkStr += "<Include href=\"" + symbolFile + "\"";
                 if (itemIcon != null) {
@@ -2608,11 +2603,7 @@ public class XFLConverter {
                                     }
                                 }
                             }
-                            try {
-                                writeFile(handler, data.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + expPath + ".as");
-                            } catch (UnsupportedEncodingException ex) {
-                                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
-                            }
+                            writeFile(handler, Utf8Helper.getBytes(data), outDir.getAbsolutePath() + File.separator + expPath + ".as");
                         }
                     }
                 }
@@ -2835,9 +2826,9 @@ public class XFLConverter {
                 public void run() throws IOException {
                     try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outfileF))) {
                         out.putNextEntry(new ZipEntry("DOMDocument.xml"));
-                        out.write(domDocumentF.getBytes("UTF-8"));
+                        out.write(Utf8Helper.getBytes(domDocumentF));
                         out.putNextEntry(new ZipEntry("PublishSettings.xml"));
-                        out.write(publishSettingsF.getBytes("UTF-8"));
+                        out.write(Utf8Helper.getBytes(publishSettingsF));
                         for (String fileName : files.keySet()) {
                             out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
                             out.write(files.get(fileName));
@@ -2860,16 +2851,8 @@ public class XFLConverter {
                     }
                 }
             }
-            try {
-                writeFile(handler, domDocument.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            try {
-                writeFile(handler, publishSettings.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            writeFile(handler, Utf8Helper.getBytes(domDocument), outDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
+            writeFile(handler, Utf8Helper.getBytes(publishSettings), outDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
             File libraryDir = new File(outDir.getAbsolutePath() + File.separator + "LIBRARY");
             libraryDir.mkdir();
             File binDir = new File(outDir.getAbsolutePath() + File.separator + "bin");
@@ -2880,11 +2863,7 @@ public class XFLConverter {
             for (String fileName : datfiles.keySet()) {
                 writeFile(handler, datfiles.get(fileName), binDir.getAbsolutePath() + File.separator + fileName);
             }
-            try {
-                writeFile(handler, "PROXY-CS5".getBytes("utf-8"), outfile);
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            writeFile(handler, Utf8Helper.getBytes("PROXY-CS5"), outfile);
         }
         if (useAS3) {
             try {
@@ -3024,7 +3003,7 @@ public class XFLConverter {
                     + "<!ENTITY nbsp \"&#160;\"> \n"
                     + "]><html>" + html + "</html>";
             try {
-                parser.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(html.getBytes("UTF-8")), "UTF-8")));
+                parser.parse(new InputSource(new StringReader(html)));
             } catch (SAXParseException spe) {
                 System.out.println(html);
                 System.err.println(tparser.result);
@@ -3036,7 +3015,7 @@ public class XFLConverter {
              reader.setErrorHandler(tparser);
              reader.setEntityResolver(tparser);
              html = "<html>" + html + "</html>";
-             reader.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(html.getBytes("UTF-8")), "UTF-8")));*/
+             reader.parse(new InputSource(new StringReader(html)));*/
 
         } catch (SAXException | IOException e) {
             Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error while converting HTML", e);
