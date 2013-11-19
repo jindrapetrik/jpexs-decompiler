@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -76,7 +77,9 @@ public class CommandLineArgumentParser {
         System.out.println("  ...Compress SWF infile and save it to outfile");
         System.out.println(" 7) -decompress infile outfile");
         System.out.println("  ...Decompress infile and save it to outfile");
-        System.out.println(" 8) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
+        System.out.println(" 8) -renameInvalidIdentifiers (typeNumber|randomWord) infile outfile");
+        System.out.println("  ...Renames the invalid identifiers in infile and save it to outfile");
+        System.out.println(" 9) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
         System.out.print("  ...Sets configuration values. Available keys[current setting]:");
         for (ConfigurationItem item : commandlineConfigBoolean) {
             System.out.print(" " + item + "[" + item.get() + "]");
@@ -85,9 +88,9 @@ public class CommandLineArgumentParser {
         System.out.println("    Values are boolean, you can use 0/1, true/false, on/off or yes/no.");
         System.out.println("    If no other parameters passed, configuration is saved. Otherwise it is used only once.");
         System.out.println("    DO NOT PUT space between comma (,) and next value.");
-        System.out.println(" 9) -onerror (abort|retryN|ignore)");
+        System.out.println(" 10) -onerror (abort|retryN|ignore)");
         System.out.println("  ...error handling mode. \"abort\" stops the exporting, \"retry\" tries the exporting N times, \"ignore\" ignores the current file");
-        System.out.println(" 10) -timeout N");
+        System.out.println(" 11) -timeout N");
         System.out.println("  ...decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds");
         System.out.println();
         System.out.println("Examples:");
@@ -168,6 +171,8 @@ public class CommandLineArgumentParser {
             parseCompress(args);
         } else if (nextParam.equals("-decompress")) {
             parseDecompress(args);
+        } else if (nextParam.equals("-renameInvalidIdentifiers")) {
+            parseRenameInvalidIdentifiers(args);
         } else if (nextParam.equals("-dumpSWF")) {
             parseDumpSwf(args);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?")) {
@@ -548,6 +553,34 @@ public class CommandLineArgumentParser {
         }
 
         if (SWF.decompress(new FileInputStream(args.remove()), new FileOutputStream(args.remove()))) {
+            System.out.println("OK");
+            System.exit(0);
+        } else {
+            System.err.println("FAIL");
+            System.exit(1);
+        }
+    }
+
+    private static void parseRenameInvalidIdentifiers(Queue<String> args) throws FileNotFoundException {
+        if (args.size() < 3) {
+            badArguments();
+        }
+
+        String renameTypeStr = args.remove();
+        RenameType renameType;
+        switch (renameTypeStr.toLowerCase()) {
+            case "typenumber":
+                renameType = RenameType.TYPENUMBER;
+                break;
+            case "randomword":
+                renameType = RenameType.RANDOMWORD;
+                break;
+            default:
+                System.err.println("Invalid rename type:" + renameTypeStr);
+                badArguments();
+                return;
+        }
+        if (SWF.renameInvalidIdentifiers(renameType, new FileInputStream(args.remove()), new FileOutputStream(args.remove()))) {
             System.out.println("OK");
             System.exit(0);
         } else {

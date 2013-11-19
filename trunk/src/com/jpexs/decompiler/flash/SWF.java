@@ -548,6 +548,23 @@ public final class SWF {
         return true;
     }
 
+    public static boolean renameInvalidIdentifiers(RenameType renameType, InputStream fis, OutputStream fos) {
+        try {
+            SWF swf = new SWF(fis, Configuration.parallelSpeedUp.get());
+            int cnt = swf.deobfuscateIdentifiers(renameType);
+            swf.assignClassesToSymbols();
+            System.out.println(cnt + " identifiers renamed.");
+            swf.saveTo(fos);
+        } catch (InterruptedException ex) {
+            return false;
+        } catch (FileNotFoundException ex) {
+            return false;
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
+    }
+    
     public boolean exportAS3Class(String className, String outdir, ExportMode exportMode, boolean parallel) throws Exception {
         List<ABCContainerTag> abcTags = new ArrayList<>();
 
@@ -1945,7 +1962,7 @@ public final class SWF {
         renameAS2Identifiers(null, selected);
     }
 
-    public int deobfuscateAS2Identifiers(RenameType renameType) throws InterruptedException {
+    private int deobfuscateAS2Identifiers(RenameType renameType) throws InterruptedException {
         return renameAS2Identifiers(renameType, null);
     }
 

@@ -2899,8 +2899,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                             @Override
                             protected Object doInBackground() throws Exception {
                                 try {
-                                    int cnt = 0;
-                                    cnt = swf.deobfuscateIdentifiers(renameType);
+                                    int cnt = swf.deobfuscateIdentifiers(renameType);
                                     Main.stopWork();
                                     View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", "" + cnt));
                                     swf.assignClassesToSymbols();

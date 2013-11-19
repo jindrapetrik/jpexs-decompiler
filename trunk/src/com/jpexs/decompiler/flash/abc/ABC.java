@@ -314,7 +314,9 @@ public class ABC {
         //constant integers
         int constant_int_pool_count = ais.readU30();
         constants.constant_int = new ArrayList<>(constant_int_pool_count);
-        constants.addInt(0);
+        if (constant_int_pool_count > 0) {
+            constants.addInt(0);
+        }
         for (int i = 1; i < constant_int_pool_count; i++) { //index 0 not used. Values 1..n-1         
             constants.addInt(ais.readS32());
         }
@@ -322,7 +324,9 @@ public class ABC {
         //constant unsigned integers
         int constant_uint_pool_count = ais.readU30();
         constants.constant_uint = new ArrayList<>(constant_uint_pool_count);
-        constants.addUInt(0);
+        if (constant_uint_pool_count > 0) {
+            constants.addUInt(0);
+        }
         for (int i = 1; i < constant_uint_pool_count; i++) { //index 0 not used. Values 1..n-1
             constants.addUInt(ais.readU32());
         }
@@ -330,7 +334,9 @@ public class ABC {
         //constant double
         int constant_double_pool_count = ais.readU30();
         constants.constant_double = new ArrayList<>(constant_double_pool_count);
-        constants.addDouble(0);
+        if (constant_double_pool_count > 0) {
+            constants.addDouble(0);
+        }
         for (int i = 1; i < constant_double_pool_count; i++) { //index 0 not used. Values 1..n-1
             constants.addDouble(ais.readDouble());
         }
@@ -340,7 +346,9 @@ public class ABC {
         if (minor_version >= MINORwithDECIMAL) {
             int constant_decimal_pool_count = ais.readU30();
             constants.constant_decimal = new ArrayList<>(constant_decimal_pool_count);
-            constants.addDecimal(null);
+            if (constant_decimal_pool_count > 0) {
+                constants.addDecimal(null);
+            }
             for (int i = 1; i < constant_decimal_pool_count; i++) { //index 0 not used. Values 1..n-1
                 constants.addDecimal(ais.readDecimal());
             }
@@ -352,7 +360,9 @@ public class ABC {
         int constant_string_pool_count = ais.readU30();
         constants.constant_string = new ArrayList<>(constant_string_pool_count);
         stringOffsets = new long[constant_string_pool_count];
-        constants.addString("");
+        if (constant_string_pool_count > 0) {
+            constants.addString("");
+        }
         for (int i = 1; i < constant_string_pool_count; i++) { //index 0 not used. Values 1..n-1
             long pos = ais.getPosition();
             constants.addString(ais.readString());
@@ -362,7 +372,9 @@ public class ABC {
         //constant namespace
         int constant_namespace_pool_count = ais.readU30();
         constants.constant_namespace = new ArrayList<>(constant_namespace_pool_count);
-        constants.addNamespace(null);
+        if (constant_namespace_pool_count > 0) {
+            constants.addNamespace(null);
+        }
         for (int i = 1; i < constant_namespace_pool_count; i++) { //index 0 not used. Values 1..n-1
             constants.addNamespace(ais.readNamespace());
         }
@@ -370,7 +382,9 @@ public class ABC {
         //constant namespace set
         int constant_namespace_set_pool_count = ais.readU30();
         constants.constant_namespace_set = new ArrayList<>(constant_namespace_set_pool_count);
-        constants.addNamespaceSet(null);
+        if (constant_namespace_set_pool_count > 0) {
+            constants.addNamespaceSet(null);
+        }
         for (int i = 1; i < constant_namespace_set_pool_count; i++) { //index 0 not used. Values 1..n-1
             constants.addNamespaceSet(new NamespaceSet());
             int namespace_count = ais.readU30();
@@ -387,7 +401,9 @@ public class ABC {
         //constant multiname
         int constant_multiname_pool_count = ais.readU30();
         constants.constant_multiname = new ArrayList<>(constant_multiname_pool_count);
-        constants.addMultiname(null);
+        if (constant_multiname_pool_count > 0) {
+            constants.addMultiname(null);
+        }
         for (int i = 1; i < constant_multiname_pool_count; i++) { //index 0 not used. Values 1..n-1
             constants.addMultiname(ais.readMultiname());
         }
