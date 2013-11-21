@@ -342,14 +342,13 @@ public class DefineFont3Tag extends FontTag {
         }
         if (fontFlagsHasLayout) {
 
-            Font fnt = new Font(fontName, fontStyle, getDivider() * 1024);
+            Font fnt = new Font(fontName, fontStyle, 1024); //Not multiplied with divider as it causes problems to create font with height around 20k
             if (!exists) {
                 fontBoundsTable.add(pos, shp.getBounds());
-                fontAdvanceTable.add(pos, (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
+                fontAdvanceTable.add(pos, (int) getDivider() * Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
             } else {
                 fontBoundsTable.set(pos, shp.getBounds());
-                fontAdvanceTable.set(pos, (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
-
+                fontAdvanceTable.set(pos, (int) getDivider() * Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
             }
         }
         if (!exists) {

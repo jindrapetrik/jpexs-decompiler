@@ -346,13 +346,13 @@ public class DefineFont2Tag extends FontTag {
 
 
         if (fontFlagsHasLayout) {
-            Font fnt = new Font(fontName, fontStyle, getDivider() * 1024);
+            Font fnt = new Font(fontName, fontStyle, 1024);
             if (!exists) {
                 fontBoundsTable.add(pos, shp.getBounds());
-                fontAdvanceTable.add(pos, (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
+                fontAdvanceTable.add(pos, (int) getDivider() * Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
             } else {
                 fontBoundsTable.set(pos, shp.getBounds());
-                fontAdvanceTable.set(pos, (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
+                fontAdvanceTable.set(pos, (int) getDivider() * Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
             }
         }
         if (!exists) {
