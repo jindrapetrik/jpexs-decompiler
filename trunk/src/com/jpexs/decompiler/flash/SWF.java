@@ -115,7 +115,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -476,8 +475,6 @@ public final class SWF {
 
             fis.close();
             fos.close();
-        } catch (FileNotFoundException ex) {
-            return false;
         } catch (IOException ex) {
             return false;
         }
@@ -540,8 +537,6 @@ public final class SWF {
                 default:
                     return false;
             }
-        } catch (FileNotFoundException ex) {
-            return false;
         } catch (IOException ex) {
             return false;
         }
@@ -556,8 +551,6 @@ public final class SWF {
             System.out.println(cnt + " identifiers renamed.");
             swf.saveTo(fos);
         } catch (InterruptedException ex) {
-            return false;
-        } catch (FileNotFoundException ex) {
             return false;
         } catch (IOException ex) {
             return false;

@@ -33,6 +33,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -535,33 +537,46 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseCompress(Queue<String> args) throws FileNotFoundException {
+    private static void parseCompress(Queue<String> args) {
+        if (args.size() < 2) {
+            badArguments();
+        }
+        try {
+            InputStream fis = new FileInputStream(args.remove());
+            OutputStream fos = new FileOutputStream(args.remove());
+            if (SWF.fws2cws(fis, fos)) {
+                System.out.println("OK");
+            } else {
+                System.err.println("FAIL");
+            }
+        } catch (FileNotFoundException ex) {
+            System.err.println("File not found.");
+        }
+        System.exit(0);
+    }
+
+    private static void parseDecompress(Queue<String> args) {
         if (args.size() < 2) {
             badArguments();
         }
 
-        if (SWF.fws2cws(new FileInputStream(args.remove()), new FileOutputStream(args.remove()))) {
-            System.out.println("OK");
-        } else {
-            System.err.println("FAIL");
+        try {
+            InputStream fis = new FileInputStream(args.remove());
+            OutputStream fos = new FileOutputStream(args.remove());
+            if (SWF.decompress(fis, fos)) {
+                System.out.println("OK");
+                System.exit(0);
+            } else {
+                System.err.println("FAIL");
+                System.exit(1);
+            }
+        } catch (FileNotFoundException ex) {
+            System.err.println("File not found.");
         }
+        System.exit(0);
     }
 
-    private static void parseDecompress(Queue<String> args) throws FileNotFoundException {
-        if (args.size() < 2) {
-            badArguments();
-        }
-
-        if (SWF.decompress(new FileInputStream(args.remove()), new FileOutputStream(args.remove()))) {
-            System.out.println("OK");
-            System.exit(0);
-        } else {
-            System.err.println("FAIL");
-            System.exit(1);
-        }
-    }
-
-    private static void parseRenameInvalidIdentifiers(Queue<String> args) throws FileNotFoundException {
+    private static void parseRenameInvalidIdentifiers(Queue<String> args) {
         if (args.size() < 3) {
             badArguments();
         }
@@ -580,13 +595,20 @@ public class CommandLineArgumentParser {
                 badArguments();
                 return;
         }
-        if (SWF.renameInvalidIdentifiers(renameType, new FileInputStream(args.remove()), new FileOutputStream(args.remove()))) {
-            System.out.println("OK");
-            System.exit(0);
-        } else {
-            System.err.println("FAIL");
-            System.exit(1);
+        try {
+            InputStream fis = new FileInputStream(args.remove());
+            OutputStream fos = new FileOutputStream(args.remove());
+            if (SWF.renameInvalidIdentifiers(renameType, fis, fos)) {
+                System.out.println("OK");
+                System.exit(0);
+            } else {
+                System.err.println("FAIL");
+                System.exit(1);
+            }
+        } catch (FileNotFoundException ex) {
+            System.err.println("File not found.");
         }
+        System.exit(0);
     }
 
     private static void parseDumpSwf(Queue<String> args) {
