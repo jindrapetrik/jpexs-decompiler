@@ -205,25 +205,28 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     private WinDef.HWND hwndFrame;
 
     private void execute() {
+        String path = Utf8Helper.urlDecode(FlashPlayerPanel.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        String appDir = new File(path).getParentFile().getAbsolutePath();
+        if (!appDir.endsWith("\\")) {
+            appDir += "\\";
+        }
+        String exePath = appDir + "lib\\FlashPlayer.exe";
+        File f = new File(exePath);
+        if(!f.exists()) {
+            return;
+        }
+
         WinDef.HWND hwnd = new WinDef.HWND();
         hwnd.setPointer(Native.getComponentPointer(this));
 
         hwndFrame = new WinDef.HWND();
         hwndFrame.setPointer(Native.getComponentPointer(frame));
 
-
         pipe = Kernel32.INSTANCE.CreateNamedPipe("\\\\.\\pipe\\ffdec_flashplayer_" + hwnd.getPointer().hashCode(), Kernel32.PIPE_ACCESS_DUPLEX, Kernel32.PIPE_TYPE_BYTE, 1, 0, 0, 0, null);
-
-
 
         SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
         sei.fMask = 0x00000040;
-        String path = Utf8Helper.urlDecode(FlashPlayerPanel.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-        String appDir = new File(path).getParentFile().getAbsolutePath();
-        if (!appDir.endsWith("\\")) {
-            appDir += "\\";
-        }
-        sei.lpFile = new WString(appDir + "lib\\FlashPlayer.exe");
+        sei.lpFile = new WString(exePath);
         sei.lpParameters = new WString(hwnd.getPointer().hashCode() + " " + hwndFrame.getPointer().hashCode());
         sei.nShow = WinUser.SW_NORMAL;
         Shell32.INSTANCE.ShellExecuteEx(sei);
