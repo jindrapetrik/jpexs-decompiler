@@ -3144,6 +3144,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                             break;
                         }
                     }
+                    ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
                     if (flashPanel instanceof FlashPlayerPanel) {
                         if (tempFile != null) {
                             tempFile.delete();
@@ -3197,7 +3198,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         } else if (((tagObj instanceof FrameNode) && ((FrameNode) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             try {
-
                 if (tempFile != null) {
                     tempFile.delete();
                 }
