@@ -122,6 +122,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1735,6 +1736,9 @@ public final class SWF {
 
             try {
                 ins.translate(localData, stack, output, staticOperation, path);
+            } catch (EmptyStackException ex) {
+                // probably obfucated code, never executed branch
+                break;
             } catch (InterruptedException ex) {
                 Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during getting variables", ex);
             }

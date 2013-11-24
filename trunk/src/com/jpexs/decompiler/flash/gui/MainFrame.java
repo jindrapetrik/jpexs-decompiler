@@ -2911,6 +2911,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                     reload(true);
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during renaming identifiers", ex);
+                                    Main.stopWork();
+                                    View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
                                 }
                                 return true;
                             }
