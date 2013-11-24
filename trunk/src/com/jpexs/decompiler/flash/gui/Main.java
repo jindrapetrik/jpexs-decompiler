@@ -528,6 +528,7 @@ public class Main {
     private static boolean errorState = false;
 
     private static void initGui() {
+        View.setLookAndFeel();
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
@@ -793,8 +794,6 @@ public class Main {
         initLogging(Configuration.debugMode.get());
 
         initLang();
-
-        View.setLookAndFeel();
 
         if (Configuration.cacheOnDisk.get()) {
             Cache.setStorageType(Cache.STORAGE_FILES);
