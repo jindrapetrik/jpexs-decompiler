@@ -3145,18 +3145,16 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         }
                     }
                     ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
-                    if (flashPanel instanceof FlashPlayerPanel) {
-                        if (tempFile != null) {
-                            tempFile.delete();
-                        }
-                        try {
-                            tempFile = File.createTempFile("temp", ".swf");
-                            tempFile.deleteOnExit();
-                            swf.saveTo(new FileOutputStream(tempFile));
-                            flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
-                        } catch (IOException iex) {
-                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);
-                        }
+                    if (tempFile != null) {
+                        tempFile.delete();
+                    }
+                    try {
+                        tempFile = File.createTempFile("temp", ".swf");
+                        tempFile.deleteOnExit();
+                        swf.saveTo(new FileOutputStream(tempFile));
+                        flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
+                    } catch (IOException iex) {
+                        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);
                     }
                 }
             }
@@ -3557,9 +3555,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 }
                 showCard(CARDFLASHPANEL);
                 if (flashPanel != null) {
-                    if (flashPanel instanceof FlashPlayerPanel) {
-                        flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
-                    }
+                    flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
                 }
 
             } catch (IOException | com.jpexs.decompiler.flash.action.parser.ParseException ex) {
