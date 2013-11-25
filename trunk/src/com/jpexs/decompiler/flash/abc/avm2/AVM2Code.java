@@ -226,7 +226,7 @@ public class AVM2Code implements Serializable {
         new EqualsIns(),
         new EscXAttrIns(),
         new EscXElemIns(),
-        new InstructionDefinition(0x5f, "finddef", new int[]{AVM2Code.DAT_MULTINAME_INDEX}),
+        new FindDefIns(),
         /* //Duplicate OPCODE with deldescendants. Prefering deldescendants (found in FLEX compiler)
          new InstructionDefinition(0x5b,"findpropglobalstrict",new int[]{AVM2Code.DAT_MULTINAME_INDEX}){
 

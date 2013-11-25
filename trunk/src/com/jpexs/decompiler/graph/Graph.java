@@ -1769,13 +1769,24 @@ public class Graph {
                     if (!isEmpty) {
                         onFalse = printGraph(visited, prepareBranchLocalData(localData), falseStack, allParts, part, nps.get(0), stopPart2, loops, staticOperation, path);
                     }
-                    if (isEmpty(onTrue) && isEmpty(onFalse) && (trueStack.size() > trueStackSizeBefore) && (falseStack.size() > falseStackSizeBefore)) {
+                    if (isEmpty(onTrue) && isEmpty(onFalse) && (trueStack.size() == trueStackSizeBefore + 1) && (falseStack.size() == falseStackSizeBefore + 1)) {
                         stack.push(new TernarOpItem(null, expr, trueStack.pop(), falseStack.pop()));
                     } else {
                         currentRet.add(new IfItem(null, expr, onTrue, onFalse));
                     }
                     if (next != null) {
-                        printGraph(visited, localData, stack, allParts, part, next, stopPart, loops, currentRet, staticOperation, path);
+                        if (trueStack.size() != trueStackSizeBefore || falseStack.size() != falseStackSizeBefore) {
+                            // it's a hack, because duplicates all instructions in the next part, but better than EmptyStackException
+                            onTrue = printGraph(visited, localData, trueStack, allParts, part, next, stopPart, loops, null, staticOperation, path);
+                            onFalse = printGraph(visited, localData, falseStack, allParts, part, next, stopPart, loops, null, staticOperation, path);
+                            if (isEmpty(onTrue) && isEmpty(onFalse) && (trueStack.size() == trueStackSizeBefore + 1) && (falseStack.size() == falseStackSizeBefore + 1)) {
+                                stack.push(new TernarOpItem(null, expr, trueStack.pop(), falseStack.pop()));
+                            } else {
+                                currentRet.add(new IfItem(null, expr, onTrue, onFalse));
+                            }
+                        } else {
+                            printGraph(visited, localData, stack, allParts, part, next, stopPart, loops, currentRet, staticOperation, path);
+                        }
                         //currentRet.addAll();
                     }
                 }
