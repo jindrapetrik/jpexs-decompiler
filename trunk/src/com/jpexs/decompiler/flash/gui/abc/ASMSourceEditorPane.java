@@ -246,6 +246,12 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         setCaretPosition(0);
     }
 
+    public void clear() {
+        setText("");
+        bodyIndex = -1;
+        setCaretPosition(0);
+    }
+    
     public void selectInstruction(int pos) {
         String text = getText();
         int lineCnt = 1;

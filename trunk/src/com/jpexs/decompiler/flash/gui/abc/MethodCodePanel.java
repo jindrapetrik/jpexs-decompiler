@@ -78,8 +78,8 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         return sourceTextArea.bodyIndex;
     }
 
-    public void setCode(String text) {
-        sourceTextArea.setText(text);
+    public void clear() {
+        sourceTextArea.clear();
     }
 
     public boolean save(ConstantPool constants) {

@@ -143,7 +143,7 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
                         abcPanel.decompiledTextArea.setScript(scriptLeaf, abcList);
                         abcPanel.decompiledTextArea.setClassIndex(classIndex);
                         abcPanel.decompiledTextArea.setNoTrait();
-                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");
+                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
                         Main.stopWork();
                     }
                 }).start();

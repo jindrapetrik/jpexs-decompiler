@@ -3097,7 +3097,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                 break;
                             }
                         }
-                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");
+                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
                         abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
                         abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
                         abcPanel.setAbc(scriptLeaf.abc);
