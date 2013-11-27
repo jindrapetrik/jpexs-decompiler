@@ -112,6 +112,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -992,57 +993,52 @@ public final class SWF {
     public byte[] exportSound(Tag t) throws IOException {
         boolean mp3 = true;
         boolean wave = true;
-        ByteArrayOutputStream fos = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream fos = new ByteArrayOutputStream()) {
 
-        if (t instanceof DefineSoundTag) {
-            DefineSoundTag st = (DefineSoundTag) t;
-            if ((st.soundFormat == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                fos = new ByteArrayOutputStream();
-                createWavFromAdpcm(fos, st.soundRate, st.soundSize, st.soundType, st.soundData);
-            } else if ((st.soundFormat == DefineSoundTag.FORMAT_MP3) && mp3) {
-                fos = new ByteArrayOutputStream();
-                fos.write(st.soundData, 2, st.soundData.length - 2);
-            } else {
-                fos = new ByteArrayOutputStream();
-                FLVOutputStream flv = new FLVOutputStream(fos);
-                flv.writeHeader(true, false);
-                flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
+            if (t instanceof DefineSoundTag) {
+                DefineSoundTag st = (DefineSoundTag) t;
+                if ((st.soundFormat == DefineSoundTag.FORMAT_ADPCM) && wave) {
+                    createWavFromAdpcm(fos, st.soundRate, st.soundSize, st.soundType, st.soundData);
+                } else if ((st.soundFormat == DefineSoundTag.FORMAT_MP3) && mp3) {
+                    fos.write(st.soundData, 2, st.soundData.length - 2);
+                } else {
+                    FLVOutputStream flv = new FLVOutputStream(fos);
+                    flv.writeHeader(true, false);
+                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
+                }
             }
-        }
-        if (t instanceof SoundStreamHeadTypeTag) {
-            SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
-            List<SoundStreamBlockTag> blocks = new ArrayList<>();
-            populateSoundStreamBlocks(this.tags, t, blocks);
-            if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                for (int b = 0; b < blocks.size(); b++) {
-                    byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
-                    baos.write(data);
-                }
-                fos = new ByteArrayOutputStream();
-                createWavFromAdpcm(fos, shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), baos.toByteArray());
-            } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
-                fos = new ByteArrayOutputStream();
-                for (int b = 0; b < blocks.size(); b++) {
-                    byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
-                    fos.write(data, 4, data.length - 4);
-                }
-            } else {
-                fos = new ByteArrayOutputStream();
-                FLVOutputStream flv = new FLVOutputStream(fos);
-                flv.writeHeader(true, false);
-
-                int ms = (int) (1000.0f / ((float) frameRate));
-                for (int b = 0; b < blocks.size(); b++) {
-                    byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
-                    if (shead.getSoundFormat() == 2) { //MP3
-                        data = Arrays.copyOfRange(data, 4, data.length);
+            if (t instanceof SoundStreamHeadTypeTag) {
+                SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
+                List<SoundStreamBlockTag> blocks = new ArrayList<>();
+                populateSoundStreamBlocks(this.tags, t, blocks);
+                if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    for (int b = 0; b < blocks.size(); b++) {
+                        byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                        baos.write(data);
                     }
-                    flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(shead.getSoundFormat(), shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), data)));
+                    createWavFromAdpcm(fos, shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), baos.toByteArray());
+                } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
+                    for (int b = 0; b < blocks.size(); b++) {
+                        byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                        fos.write(data, 4, data.length - 4);
+                    }
+                } else {
+                    FLVOutputStream flv = new FLVOutputStream(fos);
+                    flv.writeHeader(true, false);
+
+                    int ms = (int) (1000.0f / ((float) frameRate));
+                    for (int b = 0; b < blocks.size(); b++) {
+                        byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                        if (shead.getSoundFormat() == 2) { //MP3
+                            data = Arrays.copyOfRange(data, 4, data.length);
+                        }
+                        flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(shead.getSoundFormat(), shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), data)));
+                    }
                 }
             }
+            return fos.toByteArray();
         }
-        return fos.toByteArray();
     }
 
     private static void writeLE(OutputStream os, long val, int size) throws IOException {
@@ -1053,50 +1049,40 @@ public final class SWF {
     }
 
     private static void createWavFromAdpcm(OutputStream fos, int soundRate, int soundSize, int soundType, byte[] data) throws IOException {
-        try {
-            byte[] pcmData = AdpcmDecoder.decode(data, soundType == 1 ? true : false);
+        byte[] pcmData = AdpcmDecoder.decode(data, soundType == 1 ? true : false);
 
-            ByteArrayOutputStream subChunk1Data = new ByteArrayOutputStream();
-            int audioFormat = 1; //PCM
-            writeLE(subChunk1Data, audioFormat, 2);
-            int numChannels = soundType == 1 ? 2 : 1;
-            writeLE(subChunk1Data, numChannels, 2);
-            int[] rateMap = {5512, 11025, 22050, 44100};
-            int sampleRate = rateMap[soundRate];
-            writeLE(subChunk1Data, sampleRate, 4);
-            int bitsPerSample = soundSize == 1 ? 16 : 8;
-            int byteRate = sampleRate * numChannels * bitsPerSample / 8;
-            writeLE(subChunk1Data, byteRate, 4);
-            int blockAlign = numChannels * bitsPerSample / 8;
-            writeLE(subChunk1Data, blockAlign, 2);
-            writeLE(subChunk1Data, bitsPerSample, 2);
+        ByteArrayOutputStream subChunk1Data = new ByteArrayOutputStream();
+        int audioFormat = 1; //PCM
+        writeLE(subChunk1Data, audioFormat, 2);
+        int numChannels = soundType == 1 ? 2 : 1;
+        writeLE(subChunk1Data, numChannels, 2);
+        int[] rateMap = {5512, 11025, 22050, 44100};
+        int sampleRate = rateMap[soundRate];
+        writeLE(subChunk1Data, sampleRate, 4);
+        int bitsPerSample = soundSize == 1 ? 16 : 8;
+        int byteRate = sampleRate * numChannels * bitsPerSample / 8;
+        writeLE(subChunk1Data, byteRate, 4);
+        int blockAlign = numChannels * bitsPerSample / 8;
+        writeLE(subChunk1Data, blockAlign, 2);
+        writeLE(subChunk1Data, bitsPerSample, 2);
 
-            ByteArrayOutputStream chunks = new ByteArrayOutputStream();
-            chunks.write(Utf8Helper.getBytes("fmt "));
-            byte[] subChunk1DataBytes = subChunk1Data.toByteArray();
-            writeLE(chunks, subChunk1DataBytes.length, 4);
-            chunks.write(subChunk1DataBytes);
+        ByteArrayOutputStream chunks = new ByteArrayOutputStream();
+        chunks.write(Utf8Helper.getBytes("fmt "));
+        byte[] subChunk1DataBytes = subChunk1Data.toByteArray();
+        writeLE(chunks, subChunk1DataBytes.length, 4);
+        chunks.write(subChunk1DataBytes);
 
 
-            chunks.write(Utf8Helper.getBytes("data"));
-            writeLE(chunks, pcmData.length, 4);
-            chunks.write(pcmData);
+        chunks.write(Utf8Helper.getBytes("data"));
+        writeLE(chunks, pcmData.length, 4);
+        chunks.write(pcmData);
 
-            fos.write(Utf8Helper.getBytes("RIFF"));
-            byte[] chunkBytes = chunks.toByteArray();
-            writeLE(fos, 4 + chunkBytes.length, 4);
-            fos.write(Utf8Helper.getBytes("WAVE"));
-            fos.write(chunkBytes);
-            //size1=>16bit*/
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
-            }
-        }
+        fos.write(Utf8Helper.getBytes("RIFF"));
+        byte[] chunkBytes = chunks.toByteArray();
+        writeLE(fos, 4 + chunkBytes.length, 4);
+        fos.write(Utf8Helper.getBytes("WAVE"));
+        fos.write(chunkBytes);
+        //size1=>16bit*/
     }
 
     public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, boolean mp3, boolean wave) throws IOException {
@@ -1114,95 +1100,96 @@ public final class SWF {
         }
         for (Tag t : tags) {
             File newfile = null;
-            FileOutputStream fos = null;
-            //File file = null;
-            try {
-                int id = 0;
-                if (t instanceof DefineSoundTag) {
-                    id = ((DefineSoundTag) t).soundId;
-                }
+            int id = 0;
+            if (t instanceof DefineSoundTag) {
+                id = ((DefineSoundTag) t).soundId;
+            }
 
 
-                if (t instanceof DefineSoundTag) {
-                    final DefineSoundTag st = (DefineSoundTag) t;
+            if (t instanceof DefineSoundTag) {
+                final DefineSoundTag st = (DefineSoundTag) t;
 
-                    if ((st.soundFormat == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                        final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".wav");
-                        newfile = file;
-                        new RetryTask(new RunnableIOEx() {
-                            @Override
-                            public void run() throws IOException {
-                                FileOutputStream fos = new FileOutputStream(file);
-                                createWavFromAdpcm(fos, st.soundRate, st.soundSize, st.soundType, st.soundData);
+                if ((st.soundFormat == DefineSoundTag.FORMAT_ADPCM) && wave) {
+                    final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".wav");
+                    newfile = file;
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+                                createWavFromAdpcm(os, st.soundRate, st.soundSize, st.soundType, st.soundData);
                             }
-                        }, handler).run();
-                    } else if ((st.soundFormat == DefineSoundTag.FORMAT_MP3) && mp3) {
-                        final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".mp3");
-                        newfile = file;
-                        new RetryTask(new RunnableIOEx() {
-                            @Override
-                            public void run() throws IOException {
-                                FileOutputStream fos = new FileOutputStream(file);
+                        }
+                    }, handler).run();
+                } else if ((st.soundFormat == DefineSoundTag.FORMAT_MP3) && mp3) {
+                    final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".mp3");
+                    newfile = file;
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            try (FileOutputStream fos = new FileOutputStream(file)) {
                                 fos.write(st.soundData, 2, st.soundData.length - 2);
                             }
-                        }, handler).run();
-                    } else {
-                        final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".flv");
-                        newfile = file;
-                        new RetryTask(new RunnableIOEx() {
-                            @Override
-                            public void run() throws IOException {
-                                FileOutputStream fos = new FileOutputStream(file);
-                                try (FLVOutputStream flv = new FLVOutputStream(fos)) {
-                                    flv.writeHeader(true, false);
-                                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
-                                }
-                            }
-                        }, handler).run();
-                    }
-                }
-                if (t instanceof SoundStreamHeadTypeTag) {
-                    final SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
-                    final List<SoundStreamBlockTag> blocks = new ArrayList<>();
-                    List<ContainerItem> objs = new ArrayList<>();
-                    objs.addAll(this.tags);
-                    populateSoundStreamBlocks(objs, t, blocks);
-                    if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        for (int b = 0; b < blocks.size(); b++) {
-                            byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
-                            baos.write(data);
                         }
-                        final File file = new File(outdir + File.separator + id + ".wav");
-                        newfile = file;
-                        new RetryTask(new RunnableIOEx() {
-                            @Override
-                            public void run() throws IOException {
-                                FileOutputStream fos = new FileOutputStream(file);
+                    }, handler).run();
+                } else {
+                    final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".flv");
+                    newfile = file;
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            FileOutputStream fos = new FileOutputStream(file);
+                            try (FLVOutputStream flv = new FLVOutputStream(fos)) {
+                                flv.writeHeader(true, false);
+                                flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
+                            }
+                        }
+                    }, handler).run();
+                }
+            }
+            if (t instanceof SoundStreamHeadTypeTag) {
+                final SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
+                final List<SoundStreamBlockTag> blocks = new ArrayList<>();
+                List<ContainerItem> objs = new ArrayList<>();
+                objs.addAll(this.tags);
+                populateSoundStreamBlocks(objs, t, blocks);
+                if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
+                    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    for (int b = 0; b < blocks.size(); b++) {
+                        byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                        baos.write(data);
+                    }
+                    final File file = new File(outdir + File.separator + id + ".wav");
+                    newfile = file;
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                 createWavFromAdpcm(fos, shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), baos.toByteArray());
                             }
-                        }, handler).run();
-                    } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
-                        final File file = new File(outdir + File.separator + id + ".mp3");
-                        newfile = file;
-                        new RetryTask(new RunnableIOEx() {
-                            @Override
-                            public void run() throws IOException {
-                                FileOutputStream fos = new FileOutputStream(file);
+                        }
+                    }, handler).run();
+                } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
+                    final File file = new File(outdir + File.separator + id + ".mp3");
+                    newfile = file;
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
                                 for (int b = 0; b < blocks.size(); b++) {
                                     byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
-                                    fos.write(data, 2, data.length - 2);
+                                    os.write(data, 2, data.length - 2);
                                 }
                             }
-                        }, handler).run();
-                    } else {
-                        final File file = new File(outdir + File.separator + id + ".flv");
-                        newfile = file;
-                        new RetryTask(new RunnableIOEx() {
-                            @Override
-                            public void run() throws IOException {
-                                FileOutputStream fos = new FileOutputStream(file);
-                                FLVOutputStream flv = new FLVOutputStream(fos);
+                        }
+                    }, handler).run();
+                } else {
+                    final File file = new File(outdir + File.separator + id + ".flv");
+                    newfile = file;
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+                                FLVOutputStream flv = new FLVOutputStream(os);
                                 flv.writeHeader(true, false);
 
                                 int ms = (int) (1000.0f / ((float) frameRate));
@@ -1214,16 +1201,8 @@ public final class SWF {
                                     flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(shead.getSoundFormat(), shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), data)));
                                 }
                             }
-                        }, handler).run();
-                    }
-                }
-            } finally {
-                if (fos != null) {
-                    try {
-                        fos.close();
-                    } catch (Exception ignore) {
-                        //ignore
-                    }
+                        }
+                    }, handler).run();
                 }
             }
             if (newfile != null) {

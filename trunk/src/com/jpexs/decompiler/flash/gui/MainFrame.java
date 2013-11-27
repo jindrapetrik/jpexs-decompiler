@@ -105,6 +105,7 @@ import com.jpexs.helpers.AsyncResult;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Callback;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Stopwatch;
 import com.jpexs.process.ProcessTools;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -147,10 +148,12 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -3230,13 +3233,9 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 if (tagObj instanceof DefineSoundTag) {
                     frameCount = 1;
                 }
-                try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                    SWFOutputStream sos = new SWFOutputStream(fos, 10);
-                    sos.write("FWS".getBytes());
-                    sos.write(swf.version);
-
-
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                
+                byte[] data;
+                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                     SWFOutputStream sos2 = new SWFOutputStream(baos, 10);
                     int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
                     int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
@@ -3547,8 +3546,13 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     }//not showframe
 
                     sos2.writeTag(new EndTag(null));
-                    byte[] data = baos.toByteArray();
+                    data = baos.toByteArray();
+                }
 
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                    SWFOutputStream sos = new SWFOutputStream(fos, 10);
+                    sos.write("FWS".getBytes());
+                    sos.write(swf.version);
                     sos.writeUI32(sos.getPos() + data.length + 4);
                     sos.write(data);
                     fos.flush();

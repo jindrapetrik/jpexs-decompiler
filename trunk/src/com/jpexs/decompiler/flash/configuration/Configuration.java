@@ -276,7 +276,7 @@ public class Configuration {
                 }
             }
         } else {
-            try (PrintWriter pw = new PrintWriter(new Utf8OutputStreamWriter(new FileOutputStream(replacementsFile)))) {
+            try (PrintWriter pw = new PrintWriter(new Utf8OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(replacementsFile))))) {
                 for (Replacement r : replacements) {
                     pw.println(r.urlPattern);
                     pw.println(r.targetFile);
@@ -349,7 +349,7 @@ public class Configuration {
                 Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
             oos.writeObject(config);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Cannot save configuration.", "Error", JOptionPane.ERROR_MESSAGE);
