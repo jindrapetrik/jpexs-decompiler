@@ -26,7 +26,6 @@ import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.helpers.ReReadableInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         return false;
     }
 
-    public ActionWith(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
+    public ActionWith(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x94, actionLength);
         codeSize = sis.readUI16();
         this.version = version;

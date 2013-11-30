@@ -31,7 +31,6 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ReReadableInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         this.version = version;
     }
 
-    public ActionTry(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
+    public ActionTry(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x8F, actionLength);
         long startPos = sis.getPos();
         sis.readUB(5);

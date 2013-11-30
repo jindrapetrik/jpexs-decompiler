@@ -27,8 +27,7 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ReReadableInputStream;
-import java.io.ByteArrayInputStream;
+import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -175,7 +174,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
     @Override
     public List<Action> getActions(int version) {
         try {
-            List<Action> list = ActionListReader.readActionList(listeners, getPos() + 4, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionList(listeners, getPos() + 4, new MemoryInputStream(actionBytes), version, 0, -1, toString()/*FIXME?*/);
             return list;
 
         } catch (Exception ex) {

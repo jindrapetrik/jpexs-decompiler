@@ -29,7 +29,7 @@ import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
-import com.jpexs.helpers.ReReadableInputStream;
+import com.jpexs.helpers.streams.SeekableInputStream;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import com.sun.jna.Platform;
 import java.awt.*;
@@ -313,9 +313,9 @@ public class Main {
         } else {
             if (inputStream instanceof FileInputStream) {
                 openFile(file);
-            } else if (inputStream instanceof ReReadableInputStream) {
+            } else if (inputStream instanceof SeekableInputStream) {
                 try {
-                    ((ReReadableInputStream) inputStream).setPos(0);
+                    ((SeekableInputStream) inputStream).seek(0);
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }

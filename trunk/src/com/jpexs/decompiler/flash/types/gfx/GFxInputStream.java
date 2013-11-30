@@ -39,7 +39,7 @@ public class GFxInputStream extends InputStream {
     }
 
     public void setPos(long pos) throws IOException {
-        is.setPos(pos);
+        is.seek(pos);
     }
 
     public long getPos() {

@@ -28,7 +28,6 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ReReadableInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,7 +77,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         this.paramRegisters = paramRegisters;
     }
 
-    public ActionDefineFunction2(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
+    public ActionDefineFunction2(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x8E, actionLength);
         long posBef = sis.getPos();
         this.version = version;
@@ -103,7 +102,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         long posAfter = sis.getPos();
         hdrSize = posAfter - posBef;
         //code = new ArrayList<Action>();
-        int posBef2 = (int) rri.getPos();
+        //int posBef2 = (int) rri.getPos();
         //code = sis.readActionList(rri.getPos(), getFileAddress() + hdrSize, rri, codeSize);
         //rri.setPos(posBef2 + codeSize);
     }

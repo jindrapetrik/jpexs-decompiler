@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
@@ -55,7 +54,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
-import com.jpexs.helpers.ReReadableInputStream;
+import com.jpexs.helpers.streams.SeekableInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -164,6 +163,21 @@ public class SWFInputStream extends InputStream {
      */
     public long getPos() {
         return pos;
+    }
+
+    /**
+     * Sets position in bytes in the stream
+     *
+     * @param pos Number of bytes
+     */
+    public void seek(int pos) throws IOException {
+        if (is instanceof SeekableInputStream) {
+            SeekableInputStream sis = (SeekableInputStream) is;
+            sis.seek(pos);
+        }
+        else {
+            throw new IOException("Underlying stream is not a SeekableInputStream");
+        }
     }
 
     /**
@@ -533,15 +547,6 @@ public class SWFInputStream extends InputStream {
         ret.nbits = NBits;
         alignByte();
         return ret;
-    }
-
-    public List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, String path) throws IOException {
-        ReReadableInputStream rri = new ReReadableInputStream(this);
-        return ActionListReader.readActionList(listeners, containerSWFOffset, rri, version, 0, -1, path);
-    }
-
-    public List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int maxlen, String path) throws IOException {
-        return ActionListReader.readActionList(listeners, containerSWFOffset, rri, version, (int) rri.getPos(), (int) rri.getPos() + maxlen, path);
     }
 
     private static void dumpTag(PrintStream out, int version, Tag tag, int level) {
@@ -1072,251 +1077,244 @@ public class SWFInputStream extends InputStream {
         return ret;
     }
 
-    public Action readAction(ConstantPool cpool) throws IOException {
-        return readAction(new ReReadableInputStream(this), cpool);
-    }
-
     /**
      * Reads one Action from the stream
      *
-     * @param rri
      * @return Action or null when ActionEndFlag or end of the stream
      * @throws IOException
      */
-    public Action readAction(ReReadableInputStream rri, ConstantPool cpool) throws IOException {
-        {
-            int actionCode = -1;
+    public Action readAction(ConstantPool cpool) throws IOException {
+        int actionCode = -1;
 
-            try {
-                actionCode = readUI8();
-                if (actionCode == 0) {
-                    return new ActionEnd();
-                }
-                if (actionCode == -1) {
-                    return null;
-                }
-                int actionLength = 0;
-                if (actionCode >= 0x80) {
-                    actionLength = readUI16();
-                }
-                switch (actionCode) {
-                    //SWF3 Actions
-                    case 0x81:
-                        return new ActionGotoFrame(actionLength, this);
-                    case 0x83:
-                        return new ActionGetURL(actionLength, this, version);
-                    case 0x04:
-                        return new ActionNextFrame();
-                    case 0x05:
-                        return new ActionPrevFrame();
-                    case 0x06:
-                        return new ActionPlay();
-                    case 0x07:
-                        return new ActionStop();
-                    case 0x08:
-                        return new ActionToggleQuality();
-                    case 0x09:
-                        return new ActionStopSounds();
-                    case 0x8A:
-                        return new ActionWaitForFrame(actionLength, this, cpool);
-                    case 0x8B:
-                        return new ActionSetTarget(actionLength, this, version);
-                    case 0x8C:
-                        return new ActionGoToLabel(actionLength, this, version);
-                    //SWF4 Actions
-                    case 0x96:
-                        return new ActionPush(actionLength, this, version);
-                    case 0x17:
-                        return new ActionPop();
-                    case 0x0A:
-                        return new ActionAdd();
-                    case 0x0B:
-                        return new ActionSubtract();
-                    case 0x0C:
-                        return new ActionMultiply();
-                    case 0x0D:
-                        return new ActionDivide();
-                    case 0x0E:
-                        return new ActionEquals();
-                    case 0x0F:
-                        return new ActionLess();
-                    case 0x10:
-                        return new ActionAnd();
-                    case 0x11:
-                        return new ActionOr();
-                    case 0x12:
-                        return new ActionNot();
-                    case 0x13:
-                        return new ActionStringEquals();
-                    case 0x14:
-                        return new ActionStringLength();
-                    case 0x21:
-                        return new ActionStringAdd();
-                    case 0x15:
-                        return new ActionStringExtract();
-                    case 0x29:
-                        return new ActionStringLess();
-                    case 0x31:
-                        return new ActionMBStringLength();
-                    case 0x35:
-                        return new ActionMBStringExtract();
-                    case 0x18:
-                        return new ActionToInteger();
-                    case 0x32:
-                        return new ActionCharToAscii();
-                    case 0x33:
-                        return new ActionAsciiToChar();
-                    case 0x36:
-                        return new ActionMBCharToAscii();
-                    case 0x37:
-                        return new ActionMBAsciiToChar();
-                    case 0x99:
-                        return new ActionJump(actionLength, this);
-                    case 0x9D:
-                        return new ActionIf(actionLength, this);
-                    case 0x9E:
-                        return new ActionCall(actionLength);
-                    case 0x1C:
-                        return new ActionGetVariable();
-                    case 0x1D:
-                        return new ActionSetVariable();
-                    case 0x9A:
-                        return new ActionGetURL2(actionLength, this);
-                    case 0x9F:
-                        return new ActionGotoFrame2(actionLength, this);
-                    case 0x20:
-                        return new ActionSetTarget2();
-                    case 0x22:
-                        return new ActionGetProperty();
-                    case 0x23:
-                        return new ActionSetProperty();
-                    case 0x24:
-                        return new ActionCloneSprite();
-                    case 0x25:
-                        return new ActionRemoveSprite();
-                    case 0x27:
-                        return new ActionStartDrag();
-                    case 0x28:
-                        return new ActionEndDrag();
-                    case 0x8D:
-                        return new ActionWaitForFrame2(actionLength, this, cpool);
-                    case 0x26:
-                        return new ActionTrace();
-                    case 0x34:
-                        return new ActionGetTime();
-                    case 0x30:
-                        return new ActionRandomNumber();
-                    //SWF5 Actions
-                    case 0x3D:
-                        return new ActionCallFunction();
-                    case 0x52:
-                        return new ActionCallMethod();
-                    case 0x88:
-                        return new ActionConstantPool(actionLength, this, version);
-                    case 0x9B:
-                        return new ActionDefineFunction(actionLength, this, rri, version);
-                    case 0x3C:
-                        return new ActionDefineLocal();
-                    case 0x41:
-                        return new ActionDefineLocal2();
-                    case 0x3A:
-                        return new ActionDelete();
-                    case 0x3B:
-                        return new ActionDelete2();
-                    case 0x46:
-                        return new ActionEnumerate();
-                    case 0x49:
-                        return new ActionEquals2();
-                    case 0x4E:
-                        return new ActionGetMember();
-                    case 0x42:
-                        return new ActionInitArray();
-                    case 0x43:
-                        return new ActionInitObject();
-                    case 0x53:
-                        return new ActionNewMethod();
-                    case 0x40:
-                        return new ActionNewObject();
-                    case 0x4F:
-                        return new ActionSetMember();
-                    case 0x45:
-                        return new ActionTargetPath();
-                    case 0x94:
-                        return new ActionWith(actionLength, this, rri, version);
-                    case 0x4A:
-                        return new ActionToNumber();
-                    case 0x4B:
-                        return new ActionToString();
-                    case 0x44:
-                        return new ActionTypeOf();
-                    case 0x47:
-                        return new ActionAdd2();
-                    case 0x48:
-                        return new ActionLess2();
-                    case 0x3F:
-                        return new ActionModulo();
-                    case 0x60:
-                        return new ActionBitAnd();
-                    case 0x63:
-                        return new ActionBitLShift();
-                    case 0x61:
-                        return new ActionBitOr();
-                    case 0x64:
-                        return new ActionBitRShift();
-                    case 0x65:
-                        return new ActionBitURShift();
-                    case 0x62:
-                        return new ActionBitXor();
-                    case 0x51:
-                        return new ActionDecrement();
-                    case 0x50:
-                        return new ActionIncrement();
-                    case 0x4C:
-                        return new ActionPushDuplicate();
-                    case 0x3E:
-                        return new ActionReturn();
-                    case 0x4D:
-                        return new ActionStackSwap();
-                    case 0x87:
-                        return new ActionStoreRegister(actionLength, this);
-                    //SWF6 Actions
-                    case 0x54:
-                        return new ActionInstanceOf();
-                    case 0x55:
-                        return new ActionEnumerate2();
-                    case 0x66:
-                        return new ActionStrictEquals();
-                    case 0x67:
-                        return new ActionGreater();
-                    case 0x68:
-                        return new ActionStringGreater();
-                    //SWF7 Actions
-                    case 0x8E:
-                        return new ActionDefineFunction2(actionLength, this, rri, version);
-                    case 0x69:
-                        return new ActionExtends();
-                    case 0x2B:
-                        return new ActionCastOp();
-                    case 0x2C:
-                        return new ActionImplementsOp();
-                    case 0x8F:
-                        return new ActionTry(actionLength, this, rri, version);
-                    case 0x2A:
-                        return new ActionThrow();
-                    default:
-                        /*if (actionLength > 0) {
-                         //skip(actionLength);
-                         }*/
-                        //throw new UnknownActionException(actionCode);
-                        Action r = new ActionNop();
-                        r.actionCode = actionCode;
-                        r.actionLength = actionLength;
-                        return r;
-                    //return new Action(actionCode, actionLength);
-                }
-            } catch (EndOfStreamException | ArrayIndexOutOfBoundsException eos) {
+        try {
+            actionCode = readUI8();
+            if (actionCode == 0) {
+                return new ActionEnd();
+            }
+            if (actionCode == -1) {
                 return null;
             }
+            int actionLength = 0;
+            if (actionCode >= 0x80) {
+                actionLength = readUI16();
+            }
+            switch (actionCode) {
+                //SWF3 Actions
+                case 0x81:
+                    return new ActionGotoFrame(actionLength, this);
+                case 0x83:
+                    return new ActionGetURL(actionLength, this, version);
+                case 0x04:
+                    return new ActionNextFrame();
+                case 0x05:
+                    return new ActionPrevFrame();
+                case 0x06:
+                    return new ActionPlay();
+                case 0x07:
+                    return new ActionStop();
+                case 0x08:
+                    return new ActionToggleQuality();
+                case 0x09:
+                    return new ActionStopSounds();
+                case 0x8A:
+                    return new ActionWaitForFrame(actionLength, this, cpool);
+                case 0x8B:
+                    return new ActionSetTarget(actionLength, this, version);
+                case 0x8C:
+                    return new ActionGoToLabel(actionLength, this, version);
+                //SWF4 Actions
+                case 0x96:
+                    return new ActionPush(actionLength, this, version);
+                case 0x17:
+                    return new ActionPop();
+                case 0x0A:
+                    return new ActionAdd();
+                case 0x0B:
+                    return new ActionSubtract();
+                case 0x0C:
+                    return new ActionMultiply();
+                case 0x0D:
+                    return new ActionDivide();
+                case 0x0E:
+                    return new ActionEquals();
+                case 0x0F:
+                    return new ActionLess();
+                case 0x10:
+                    return new ActionAnd();
+                case 0x11:
+                    return new ActionOr();
+                case 0x12:
+                    return new ActionNot();
+                case 0x13:
+                    return new ActionStringEquals();
+                case 0x14:
+                    return new ActionStringLength();
+                case 0x21:
+                    return new ActionStringAdd();
+                case 0x15:
+                    return new ActionStringExtract();
+                case 0x29:
+                    return new ActionStringLess();
+                case 0x31:
+                    return new ActionMBStringLength();
+                case 0x35:
+                    return new ActionMBStringExtract();
+                case 0x18:
+                    return new ActionToInteger();
+                case 0x32:
+                    return new ActionCharToAscii();
+                case 0x33:
+                    return new ActionAsciiToChar();
+                case 0x36:
+                    return new ActionMBCharToAscii();
+                case 0x37:
+                    return new ActionMBAsciiToChar();
+                case 0x99:
+                    return new ActionJump(actionLength, this);
+                case 0x9D:
+                    return new ActionIf(actionLength, this);
+                case 0x9E:
+                    return new ActionCall(actionLength);
+                case 0x1C:
+                    return new ActionGetVariable();
+                case 0x1D:
+                    return new ActionSetVariable();
+                case 0x9A:
+                    return new ActionGetURL2(actionLength, this);
+                case 0x9F:
+                    return new ActionGotoFrame2(actionLength, this);
+                case 0x20:
+                    return new ActionSetTarget2();
+                case 0x22:
+                    return new ActionGetProperty();
+                case 0x23:
+                    return new ActionSetProperty();
+                case 0x24:
+                    return new ActionCloneSprite();
+                case 0x25:
+                    return new ActionRemoveSprite();
+                case 0x27:
+                    return new ActionStartDrag();
+                case 0x28:
+                    return new ActionEndDrag();
+                case 0x8D:
+                    return new ActionWaitForFrame2(actionLength, this, cpool);
+                case 0x26:
+                    return new ActionTrace();
+                case 0x34:
+                    return new ActionGetTime();
+                case 0x30:
+                    return new ActionRandomNumber();
+                //SWF5 Actions
+                case 0x3D:
+                    return new ActionCallFunction();
+                case 0x52:
+                    return new ActionCallMethod();
+                case 0x88:
+                    return new ActionConstantPool(actionLength, this, version);
+                case 0x9B:
+                    return new ActionDefineFunction(actionLength, this, version);
+                case 0x3C:
+                    return new ActionDefineLocal();
+                case 0x41:
+                    return new ActionDefineLocal2();
+                case 0x3A:
+                    return new ActionDelete();
+                case 0x3B:
+                    return new ActionDelete2();
+                case 0x46:
+                    return new ActionEnumerate();
+                case 0x49:
+                    return new ActionEquals2();
+                case 0x4E:
+                    return new ActionGetMember();
+                case 0x42:
+                    return new ActionInitArray();
+                case 0x43:
+                    return new ActionInitObject();
+                case 0x53:
+                    return new ActionNewMethod();
+                case 0x40:
+                    return new ActionNewObject();
+                case 0x4F:
+                    return new ActionSetMember();
+                case 0x45:
+                    return new ActionTargetPath();
+                case 0x94:
+                    return new ActionWith(actionLength, this, version);
+                case 0x4A:
+                    return new ActionToNumber();
+                case 0x4B:
+                    return new ActionToString();
+                case 0x44:
+                    return new ActionTypeOf();
+                case 0x47:
+                    return new ActionAdd2();
+                case 0x48:
+                    return new ActionLess2();
+                case 0x3F:
+                    return new ActionModulo();
+                case 0x60:
+                    return new ActionBitAnd();
+                case 0x63:
+                    return new ActionBitLShift();
+                case 0x61:
+                    return new ActionBitOr();
+                case 0x64:
+                    return new ActionBitRShift();
+                case 0x65:
+                    return new ActionBitURShift();
+                case 0x62:
+                    return new ActionBitXor();
+                case 0x51:
+                    return new ActionDecrement();
+                case 0x50:
+                    return new ActionIncrement();
+                case 0x4C:
+                    return new ActionPushDuplicate();
+                case 0x3E:
+                    return new ActionReturn();
+                case 0x4D:
+                    return new ActionStackSwap();
+                case 0x87:
+                    return new ActionStoreRegister(actionLength, this);
+                //SWF6 Actions
+                case 0x54:
+                    return new ActionInstanceOf();
+                case 0x55:
+                    return new ActionEnumerate2();
+                case 0x66:
+                    return new ActionStrictEquals();
+                case 0x67:
+                    return new ActionGreater();
+                case 0x68:
+                    return new ActionStringGreater();
+                //SWF7 Actions
+                case 0x8E:
+                    return new ActionDefineFunction2(actionLength, this, version);
+                case 0x69:
+                    return new ActionExtends();
+                case 0x2B:
+                    return new ActionCastOp();
+                case 0x2C:
+                    return new ActionImplementsOp();
+                case 0x8F:
+                    return new ActionTry(actionLength, this, version);
+                case 0x2A:
+                    return new ActionThrow();
+                default:
+                    /*if (actionLength > 0) {
+                     //skip(actionLength);
+                     }*/
+                    //throw new UnknownActionException(actionCode);
+                    Action r = new ActionNop();
+                    r.actionCode = actionCode;
+                    r.actionLength = actionLength;
+                    return r;
+                //return new Action(actionCode, actionLength);
+            }
+        } catch (EndOfStreamException | ArrayIndexOutOfBoundsException eos) {
+            return null;
         }
     }
 

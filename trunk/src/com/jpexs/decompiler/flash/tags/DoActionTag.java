@@ -25,8 +25,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ReReadableInputStream;
-import java.io.ByteArrayInputStream;
+import com.jpexs.helpers.MemoryInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,8 +117,8 @@ public class DoActionTag extends Tag implements ASMSource {
                 prevLength += header.length;
             }
             baos.write(actionBytes);
-            ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
-            rri.setPos(prevLength);
+            MemoryInputStream rri = new MemoryInputStream(baos.toByteArray());
+            rri.seek(prevLength);
             List<Action> list = ActionListReader.readActionList(listeners, getPos() - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
             return list;
         } catch (Exception ex) {

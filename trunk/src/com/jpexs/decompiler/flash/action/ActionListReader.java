@@ -43,7 +43,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ReReadableInputStream;
+import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +71,7 @@ public class ActionListReader {
      * ActionEndFlag(=0) or end of the stream.
      * @param listeners
      * @param containerSWFOffset
-     * @param rri
+     * @param mis
      * @param version
      * @param ip
      * @param endIp
@@ -79,19 +79,18 @@ public class ActionListReader {
      * @return List of actions
      * @throws IOException
      */
-    public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int version, int ip, int endIp, String path) throws IOException {
+    public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, MemoryInputStream mis, int version, int ip, int endIp, String path) throws IOException {
         boolean deobfuscate = Configuration.autoDeobfuscate.get();
 
         ConstantPool cpool = new ConstantPool();
 
-        SWFInputStream sis = new SWFInputStream(rri, version);
+        SWFInputStream sis = new SWFInputStream(mis, version);
 
         // List of the actions. N. item contains the action which starts in offset N.
         List<Action> actionMap = new ArrayList<>();
         List<Long> nextOffsets = new ArrayList<>();
-        Action entryAction = readActionListAtPos(listeners, containerSWFOffset, cpool,
-                sis, rri,
-                actionMap, nextOffsets,
+        Action entryAction = readActionListAtPos(listeners, containerSWFOffset, cpool, 
+                sis, actionMap, nextOffsets,
                 ip, ip, endIp, version, path, false, new ArrayList<Long>());
 
         Map<Action, List<Action>> containerLastActions = new HashMap<>();
@@ -534,8 +533,7 @@ public class ActionListReader {
     
     @SuppressWarnings("unchecked")
     private static Action readActionListAtPos(List<DisassemblyListener> listeners, long containerSWFOffset, ConstantPool cpool,
-            SWFInputStream sis, ReReadableInputStream rri,
-            List<Action> actions, List<Long> nextOffsets,
+            SWFInputStream sis, List<Action> actions, List<Long> nextOffsets,
             long ip, long startIp, long endIp, int version, String path, boolean indeterminate, List<Long> visitedContainers) throws IOException {
 
         Action entryAction = null;
@@ -550,10 +548,10 @@ public class ActionListReader {
         while (!jumpQueue.isEmpty()) {
             ip = jumpQueue.remove();
             while ((endIp == -1) || (endIp > ip)) {
-                rri.setPos((int) ip);
+                sis.seek((int) ip);
 
                 Action a;
-                if ((a = sis.readAction(rri, cpool)) == null) {
+                if ((a = sis.readAction(cpool)) == null) {
                     break;
                 }
 
@@ -583,8 +581,10 @@ public class ActionListReader {
                 actions.set((int) ip, a);
                 nextOffsets.set((int) ip, ip + actionLengthWithHeader);
 
+                long pos = sis.getPos();
+                long length = pos + sis.available();
                 for (int i = 0; i < listeners.size(); i++) {
-                    listeners.get(i).progress("Reading", rri.getCount(), rri.length());
+                    listeners.get(i).progress("Reading", pos, length);
                 }
 
                 a.containerSWFOffset = containerSWFOffset;
@@ -619,8 +619,7 @@ public class ActionListReader {
                             long ip2 = ip + actionLengthWithHeader;
                             //long endIp2 = ip + actionLengthWithHeader + size;
                             readActionListAtPos(listeners, containerSWFOffset, cpool,
-                                    sis, rri,
-                                    actions, nextOffsets,
+                                    sis, actions, nextOffsets,
                                     ip2, startIp, endIp, version, newPath, indeterminate, visitedContainers);
                             actionLengthWithHeader += size;
                         }

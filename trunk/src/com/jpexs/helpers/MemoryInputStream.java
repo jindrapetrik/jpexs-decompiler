@@ -17,74 +17,60 @@
 package com.jpexs.helpers;
 
 import com.jpexs.helpers.streams.SeekableInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  *
  * @author JPEXS
  */
-public class ReReadableInputStream extends SeekableInputStream {
+public class MemoryInputStream extends SeekableInputStream {
 
-    InputStream is;
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    byte[] converted;
+    byte[] buffer;
     long pos = 0;
     int count = 0;
+
+    public MemoryInputStream(byte[] buffer) {
+        this.buffer = buffer;
+    }
 
     public int getCount() {
         return count;
     }
 
     public byte[] getAllRead() {
-        return baos.toByteArray();
+        return buffer;
     }
 
     public long getPos() {
         return pos;
     }
 
-    public ReReadableInputStream(InputStream is) {
-        this.is = is;
-    }
-
     @Override
     public void seek(long pos) throws IOException {
-        if (pos > count) {
-            this.pos = count;
-            skip(pos - count);
-        }
         this.pos = pos;
     }
 
     @Override
     public int read() throws IOException {
-        if (pos < count) {
-            if (converted == null) {
-                converted = baos.toByteArray();
-            }
-            int ret = converted[(int) pos] & 0xff;
+        if (pos > count) {
+            count = (int) pos;
+        }
+        
+        if (pos < buffer.length) {
+            int ret = buffer[(int) pos] & 0xff;
             pos++;
             return ret;
         }
-        int i = is.read();
-        if (i > -1) {
-            baos.write(i);
-            count++;
-        }
-        pos++;
-        converted = null;
 
-        return i;
+        return -1;
     }
 
     @Override
     public int available() throws IOException {
-        return (count + is.available()) - (int) pos;
+        return buffer.length - (int) pos;
     }
 
     public long length() throws IOException {
-        return count + is.available();
+        return buffer.length;
     }
 }

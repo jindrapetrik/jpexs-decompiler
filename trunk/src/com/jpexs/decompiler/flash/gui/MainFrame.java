@@ -105,7 +105,6 @@ import com.jpexs.helpers.AsyncResult;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Callback;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.Stopwatch;
 import com.jpexs.process.ProcessTools;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -3154,7 +3153,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     try {
                         tempFile = File.createTempFile("temp", ".swf");
                         tempFile.deleteOnExit();
-                        swf.saveTo(new FileOutputStream(tempFile));
+                        swf.saveTo(new BufferedOutputStream(new FileOutputStream(tempFile)));
                         flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
                     } catch (IOException iex) {
                         Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);

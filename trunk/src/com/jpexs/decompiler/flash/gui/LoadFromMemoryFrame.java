@@ -104,7 +104,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                     ReReadableInputStream is = new ReReadableInputStream(pmi);
                     SWF swf = new SWF(is, null, false, true);
                     long limit = pmi.getPos();
-                    is.setPos(0);
+                    is.seek(0);
                     is = new ReReadableInputStream(new LimitedInputStream(is, limit));
                     if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
                         String p = translate("swfitem").replace("%version%", "" + swf.version).replace("%size%", "" + swf.fileSize);
@@ -143,7 +143,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         if (index > -1) {
             ReReadableInputStream str = foundIs.get(index);
             try {
-                str.setPos(0);
+                str.seek(0);
             } catch (IOException ex) {
                 Logger.getLogger(LoadFromMemoryFrame.class.getName()).log(Level.SEVERE, null, ex);
                 return;
@@ -362,12 +362,12 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                         try {
                             if (selected.length == 1) {
                                 ReReadableInputStream bis = foundIs.get(selected[0]);
-                                bis.setPos(0);
+                                bis.seek(0);
                                 Helper.saveStream(bis, file);
                             } else {
                                 for (int sel : selected) {
                                     ReReadableInputStream bis = foundIs.get(sel);
-                                    bis.setPos(0);
+                                    bis.seek(0);
                                     Helper.saveStream(bis, new File(file, "movie" + sel + ".swf"));
                                 }
                             }

@@ -36,7 +36,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ReReadableInputStream;
+import com.jpexs.helpers.MemoryInputStream;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -173,8 +173,8 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
                 prevLength = prevData.length;
             }
             baos.write(actionBytes);
-            ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
-            rri.setPos(prevLength);
+            MemoryInputStream rri = new MemoryInputStream(baos.toByteArray());
+            rri.seek(prevLength);
 
             List<Action> list = ActionListReader.readActionList(listeners, getPos() + hdrSize - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
             return list;
