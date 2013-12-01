@@ -19,6 +19,7 @@ package com.jpexs.decompiler.graph.model;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.Set;
 
 /**
  *
@@ -39,7 +40,7 @@ public class IntegerValueItem extends GraphTargetItem {
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return true;
     }
 

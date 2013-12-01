@@ -318,7 +318,7 @@ public class ActionGraph extends Graph {
                 List<GraphTargetItem> defaultCommands = new ArrayList<>();
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 stopPart2.add(defaultPart2);
-                defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2, loops, staticOperation, path);
+                defaultCommands = printGraph(localData, stack, allParts, null, defaultPart, stopPart2, loops, staticOperation, path);
 
 
                 List<GraphPart> loopContinues = new ArrayList<>();
@@ -399,7 +399,7 @@ public class ActionGraph extends Graph {
                 if ((defaultPart != null) && (defaultCommands.isEmpty())) {
                     List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
                     stopPart2x.add(next);
-                    defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2x, loops, staticOperation, path);
+                    defaultCommands = printGraph(localData, stack, allParts, null, defaultPart, stopPart2x, loops, staticOperation, path);
                 }
 
                 if (!defaultCommands.isEmpty()) {
@@ -448,7 +448,7 @@ public class ActionGraph extends Graph {
                     if (breakPart != null) {
                         stopPart2x.add(breakPart);
                     }
-                    cc.addAll(0, printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
+                    cc.addAll(0, printGraph(localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
                     if (cc.size() >= 2) {
                         if (cc.get(cc.size() - 1) instanceof BreakItem) {
                             if ((cc.get(cc.size() - 2) instanceof ContinueItem) || (cc.get(cc.size() - 2) instanceof BreakItem)) {
@@ -467,7 +467,7 @@ public class ActionGraph extends Graph {
                     if (ti != null) {
                         ret.add(ti);
                     } else {
-                        ret.addAll(printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
+                        ret.addAll(printGraph(localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
                     }
                 }
             }

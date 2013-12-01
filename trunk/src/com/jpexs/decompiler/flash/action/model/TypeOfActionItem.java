@@ -26,6 +26,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
+import java.util.Set;
 
 public class TypeOfActionItem extends ActionItem {
 
@@ -71,8 +72,12 @@ public class TypeOfActionItem extends ActionItem {
     }
 
     @Override
-    public boolean isCompileTime() {
-        return value.isCompileTime();
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        if (dependencies.contains(value)) {
+            return false;
+        }
+        dependencies.add(value);
+        return value.isCompileTime(dependencies);
     }
 
     @Override

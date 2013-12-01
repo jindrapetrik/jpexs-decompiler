@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
+import java.util.Set;
 
 public class CharToAsciiActionItem extends ActionItem {
 
@@ -47,7 +48,7 @@ public class CharToAsciiActionItem extends ActionItem {
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         if (value instanceof DirectValueActionItem) {
             DirectValueActionItem dv = (DirectValueActionItem) value;
             if (dv.value instanceof String) {

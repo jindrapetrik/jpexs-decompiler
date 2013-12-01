@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.graph.ExportMode;
+import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -343,8 +344,8 @@ public class TagNode {
 
                             ret.add(file);
                         } catch (InterruptedException ex) {
-                        } catch (IOException | OutOfMemoryError | StackOverflowError ex) {
-                            Logger.getLogger(TagNode.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
+                        } catch (IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
+                            Logger.getLogger(TagNode.class.getName()).log(Level.SEVERE, "Decompilation error in file: " + name + ".as", ex);
                             if (handler != null) {
                                 int action = handler.getNewInstance().handle(ex);
                                 switch (action) {

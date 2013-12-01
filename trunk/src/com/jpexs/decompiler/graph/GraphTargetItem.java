@@ -22,7 +22,9 @@ import com.jpexs.decompiler.graph.model.BinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -123,6 +125,12 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public boolean isCompileTime() {
+        Set<GraphTargetItem> dependencies = new HashSet<>();
+        dependencies.add(this);
+        return isCompileTime(dependencies);
+    }
+
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return false;
     }
 

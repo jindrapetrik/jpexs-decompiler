@@ -30,6 +30,7 @@ import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class DirectValueActionItem extends ActionItem {
 
@@ -173,8 +174,12 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    public boolean isCompileTime() {
-        return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value instanceof Null) || (computedRegValue != null && computedRegValue.isCompileTime()) || (value instanceof String) || (value instanceof ConstantIndex);
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        if (dependencies.contains(computedRegValue)) {
+            return false;
+        }
+        dependencies.add(computedRegValue);
+        return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value instanceof Null) || (computedRegValue != null && computedRegValue.isCompileTime(dependencies)) || (value instanceof String) || (value instanceof ConstantIndex);
     }
 
     @Override

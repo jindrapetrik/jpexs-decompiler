@@ -18,7 +18,9 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.Set;
 
 public class FloatValueAVM2Item extends NumberValueAVM2Item {
 
@@ -40,7 +42,7 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return true;
     }
 }

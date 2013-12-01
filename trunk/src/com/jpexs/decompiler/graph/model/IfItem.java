@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class IfItem extends GraphTargetItem implements Block {
 
@@ -31,8 +32,12 @@ public class IfItem extends GraphTargetItem implements Block {
     public List<GraphTargetItem> onFalse;
 
     @Override
-    public boolean isCompileTime() {
-        return expression.isCompileTime();
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        if (dependencies.contains(expression)) {
+            return false;
+        }
+        dependencies.add(expression);
+        return expression.isCompileTime(dependencies);
     }
 
     @Override

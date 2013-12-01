@@ -41,6 +41,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
+import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -150,12 +151,17 @@ public class ActionListReader {
 
         if (deobfuscate) {
             try {
-                actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, ip, path);
-            } catch (InterruptedException ex) {
+                try {
+                    actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, ip, path);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                updateActionLengths(actions, version);
+                removeZeroJumps(actions, version);
+            } catch (TranslateException ex) {
+                // keep orignal (not deobfuscated) actions
                 Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
             }
-            updateActionLengths(actions, version);
-            removeZeroJumps(actions, version);
         }
 
         return actions;
@@ -202,7 +208,14 @@ public class ActionListReader {
 
         List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
 
-        deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, actionMap, ip, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version);
+        int maxRecursionLevel = 0;
+        for (int i = 0; i < actions.size(); i++) {
+            Action a = actions.get(i);
+            if (a instanceof ActionIf || a instanceof GraphSourceItemContainer) {
+                maxRecursionLevel++;
+            }
+        }
+        deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, actionMap, ip, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version, 0, maxRecursionLevel);
 
         if (!retdups.isEmpty()) {
             for (int i = 0; i < ip; i++) {
@@ -648,10 +661,14 @@ public class ActionListReader {
     }
 
     @SuppressWarnings("unchecked")
-    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int pos, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version) throws IOException, InterruptedException {
+    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int pos, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
+        if (recursionLevel > maxRecursionLevel + 1) {
+            throw new TranslateException("deobfustaceActionListAtPosRecursive max recursion level reached.");
+        }
+        
         pos = ip;
         Action a;
         Scanner sc = new Scanner(System.in);
@@ -828,7 +845,7 @@ public class ActionListReader {
                         } else {
                             localData2 = localData;
                         }
-                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, actions, pos, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version);
+                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, actions, pos, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
                         output2s.add(output2);
                         endAddr += size;
                     }
@@ -896,7 +913,7 @@ public class ActionListReader {
 
                 @SuppressWarnings("unchecked")
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, actions, pos, pos + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version);
+                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, actions, pos, pos + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
             }
             if (a.isExit()) {
                 break;

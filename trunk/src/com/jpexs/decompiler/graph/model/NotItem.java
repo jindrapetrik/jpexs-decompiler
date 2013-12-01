@@ -6,6 +6,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -30,8 +31,12 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
     }
 
     @Override
-    public boolean isCompileTime() {
-        return value.isCompileTime();
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        if (dependencies.contains(value)) {
+            return false;
+        }
+        dependencies.add(value);
+        return value.isCompileTime(dependencies);
     }
 
     @Override

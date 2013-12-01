@@ -26,6 +26,7 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class DecrementActionItem extends ActionItem {
 
@@ -50,8 +51,12 @@ public class DecrementActionItem extends ActionItem {
     }
 
     @Override
-    public boolean isCompileTime() {
-        return object.isCompileTime();
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        if (dependencies.contains(object)) {
+            return false;
+        }
+        dependencies.add(object);
+        return object.isCompileTime(dependencies);
     }
 
     @Override

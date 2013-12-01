@@ -35,6 +35,7 @@ import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ReturnActionItem extends ActionItem implements ExitItem {
 
@@ -58,7 +59,7 @@ public class ReturnActionItem extends ActionItem implements ExitItem {
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return true;
     }
 

@@ -26,6 +26,7 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class GetVariableActionItem extends ActionItem {
 
@@ -65,7 +66,7 @@ public class GetVariableActionItem extends ActionItem {
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         if (computedValue == null) {
             return false;
         }

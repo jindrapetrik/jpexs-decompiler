@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
+import java.util.Set;
 
 public class CallFunctionActionItem extends ActionItem {
 
@@ -67,11 +68,15 @@ public class CallFunctionActionItem extends ActionItem {
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         if (calculatedFunction == null) {
             return false;
         }
-        return calculatedFunction.isCompileTime();
+        if (dependencies.contains(calculatedFunction)) {
+            return false;
+        }
+        dependencies.add(calculatedFunction);
+        return calculatedFunction.isCompileTime(dependencies);
     }
 
     @Override

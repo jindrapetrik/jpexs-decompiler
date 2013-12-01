@@ -35,6 +35,7 @@ import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class FunctionActionItem extends ActionItem {
@@ -119,9 +120,13 @@ public class FunctionActionItem extends ActionItem {
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         for (GraphTargetItem a : actions) {
-            if (!a.isCompileTime()) {
+            if (dependencies.contains(a)) {
+                return false;
+            }
+            dependencies.add(a);
+            if (!a.isCompileTime(dependencies)) {
                 return false;
             }
         }

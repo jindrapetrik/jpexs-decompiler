@@ -58,6 +58,7 @@ import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -717,7 +718,7 @@ public class Action implements GraphSourceItem {
                     return tree;
                 }
             }, timeout, TimeUnit.SECONDS);
-        } catch (InterruptedException | TimeoutException | ExecutionException | OutOfMemoryError | StackOverflowError ex) {
+        } catch (InterruptedException | TimeoutException | ExecutionException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
             convertException = ex;
             if (ex instanceof ExecutionException && ex.getCause() instanceof Exception) {
@@ -882,13 +883,18 @@ public class Action implements GraphSourceItem {
                     List<GraphTargetItem> out;
                     try {
                         out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables2, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
-                    } catch (OutOfMemoryError | StackOverflowError ex2) {
-                        Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex2);
+                    } catch (OutOfMemoryError | TranslateException | StackOverflowError ex2) {
+                        Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ex2);
                         if (ex2 instanceof OutOfMemoryError) {
                             System.gc();
                         }
                         out = new ArrayList<>();
-                        out.add(new CommentItem("\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error type: " + ex2.getClass().getSimpleName() + "\r\n"));
+                        out.add(new CommentItem(new String[] {
+                            "", 
+                            " * Decompilation error",
+                            " * Code may be obfuscated",
+                            " * Error type: " + ex2.getClass().getSimpleName(), 
+                            ""}));
                     }
                     outs.add(out);
                     endAddr += size;
@@ -1002,7 +1008,7 @@ public class Action implements GraphSourceItem {
                 try {
                     action.translate(localData, stack, output, staticOperation, path);
                 } catch (EmptyStackException ese) {
-                    Logger.getLogger(Action.class.getName()).log(Level.SEVERE, null, ese);
+                    Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ese);
                     output.add(new UnsupportedActionItem(action, "Empty stack"));
                 }
 

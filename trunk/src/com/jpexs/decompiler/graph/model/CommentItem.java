@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import static com.jpexs.decompiler.graph.GraphTargetItem.NOPRECEDENCE;
 
 /**
  *
@@ -25,20 +26,32 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
  */
 public class CommentItem extends GraphTargetItem {
 
-    private String comment;
+    private String[] commentLines;
 
     public CommentItem(String comment) {
         super(null, NOPRECEDENCE);
-        this.comment = comment;
+        this.commentLines = new String[] { comment };
+    }
+
+    public CommentItem(String[] commentLines) {
+        super(null, NOPRECEDENCE);
+        this.commentLines = commentLines;
     }
 
     @Override
     protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("/* " + comment + " */");
+        writer.append("/* ");
+        for (int i = 0; i < commentLines.length; i++) {
+            writer.append(commentLines[i]);
+            if (i != commentLines.length - 1) {
+                writer.newLine();
+            }
+        }
+        return writer.append(" */");
     }
 
-    public String getComment() {
-        return comment;
+    public String[] getCommentLines() {
+        return commentLines;
     }
 
     @Override

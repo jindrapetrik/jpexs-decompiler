@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.Set;
 
 public class LocalRegAVM2Item extends AVM2Item {
 
@@ -72,7 +73,7 @@ public class LocalRegAVM2Item extends AVM2Item {
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return isCT;
     }
 }

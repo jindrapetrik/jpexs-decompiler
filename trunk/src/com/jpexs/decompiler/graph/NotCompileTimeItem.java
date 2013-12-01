@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.Set;
 
 /**
  *
@@ -33,7 +34,7 @@ public class NotCompileTimeItem extends GraphTargetItem {
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return false;
     }
 

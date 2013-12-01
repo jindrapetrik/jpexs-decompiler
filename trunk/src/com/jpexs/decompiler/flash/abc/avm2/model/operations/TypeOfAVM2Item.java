@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
+import java.util.Set;
 
 public class TypeOfAVM2Item extends UnaryOpItem {
 
@@ -29,8 +30,12 @@ public class TypeOfAVM2Item extends UnaryOpItem {
     }
 
     @Override
-    public boolean isCompileTime() {
-        return value.isCompileTime();
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        if (dependencies.contains(value)) {
+            return false;
+        }
+        dependencies.add(value);
+        return value.isCompileTime(dependencies);
     }
 
     @Override

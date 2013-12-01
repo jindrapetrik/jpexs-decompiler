@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
 
@@ -79,8 +80,16 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     }
 
     @Override
-    public boolean isCompileTime() {
-        return leftSide.isCompileTime() && rightSide.isCompileTime();
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        if (dependencies.contains(leftSide)) {
+            return false;
+        }
+        dependencies.add(leftSide);
+        if (dependencies.contains(rightSide)) {
+            return false;
+        }
+        dependencies.add(rightSide);
+        return leftSide.isCompileTime(dependencies) && rightSide.isCompileTime(dependencies);
     }
 
     @Override

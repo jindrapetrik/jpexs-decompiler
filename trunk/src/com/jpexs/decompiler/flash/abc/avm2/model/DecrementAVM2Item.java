@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.Set;
 
 public class DecrementAVM2Item extends AVM2Item {
 
@@ -36,8 +37,12 @@ public class DecrementAVM2Item extends AVM2Item {
     }
 
     @Override
-    public boolean isCompileTime() {
-        return value.isCompileTime();
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        if (dependencies.contains(value)) {
+            return false;
+        }
+        dependencies.add(value);
+        return value.isCompileTime(dependencies);
     }
 
     @Override

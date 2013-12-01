@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
+import java.util.Set;
 
 public class InstanceOfActionItem extends BinaryOpItem {
 
@@ -30,7 +31,7 @@ public class InstanceOfActionItem extends BinaryOpItem {
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return false;
     }
 

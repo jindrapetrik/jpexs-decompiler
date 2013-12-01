@@ -80,6 +80,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
+import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
@@ -2374,9 +2375,12 @@ public class AVM2Code implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions, String path) throws InterruptedException {
+    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions, String path, int recursionLevel) throws InterruptedException {
         if (Thread.interrupted()) {
             throw new InterruptedException();
+        }
+        if (recursionLevel > code.size() + 1) {
+            throw new TranslateException("removeTraps max recursion level reached.");
         }
         boolean debugMode = false;
         int ret = 0;
@@ -2614,7 +2618,7 @@ public class AVM2Code implements Serializable {
                     for (int b : branches) {
                         Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                         if (b >= 0) { //useVisited || (!ins.isJump())
-                            ret += removeTraps(refs, secondPass, indeterminate, prepareBranchLocalData(localData), brStack, output, code, b, visited, visitedStates, decisions, path);
+                            ret += removeTraps(refs, secondPass, indeterminate, prepareBranchLocalData(localData), brStack, output, code, b, visited, visitedStates, decisions, path, recursionLevel + 1);
                         } else {
                             if (debugMode) {
                                 System.out.println("Negative branch:" + b);
@@ -2634,7 +2638,7 @@ public class AVM2Code implements Serializable {
 
     public static int removeTraps(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Object> localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<>();
-        removeTraps(refs, false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
+        removeTraps(refs, false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path, 0);
         int cnt = 0;
         for (GraphSourceItem src : decisions.keySet()) {
             Decision dec = decisions.get(src);

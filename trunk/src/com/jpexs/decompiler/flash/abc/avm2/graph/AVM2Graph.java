@@ -286,7 +286,7 @@ public class AVM2Graph extends Graph {
                                     List<Integer> oldFinallyJumps = new ArrayList<>(finallyJumps);
                                     finallyJumps.clear();
                                     ignoredSwitches.add(swPos);
-                                    finallyCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, fpart, null, loops, staticOperation, path);
+                                    finallyCommands = printGraph(localData, stack, allParts, parent, fpart, null, loops, staticOperation, path);
                                     //ignoredSwitches.remove(igs_size-1);
                                     finallyJumps.addAll(oldFinallyJumps);
                                     finallyJumps.add(finStart);
@@ -339,7 +339,7 @@ public class AVM2Graph extends Graph {
                     if (retPart != null) {
                         stopPart2.add(retPart);
                     }
-                    catchedCommands.add(printGraph(new ArrayList<GraphPart>(), localData2, stack, allParts, parent, npart, stopPart2, loops, staticOperation, path));
+                    catchedCommands.add(printGraph(localData2, stack, allParts, parent, npart, stopPart2, loops, staticOperation, path));
                 }
 
                 GraphPart nepart = null;
@@ -357,7 +357,7 @@ public class AVM2Graph extends Graph {
                 if (retPart != null) {
                     stopPart2.add(retPart);
                 }
-                List<GraphTargetItem> tryCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, part, stopPart2, loops, staticOperation, path);
+                List<GraphTargetItem> tryCommands = printGraph(localData, stack, allParts, parent, part, stopPart2, loops, staticOperation, path);
 
                 output.clear();
                 output.add(new TryAVM2Item(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
@@ -381,7 +381,7 @@ public class AVM2Graph extends Graph {
             ret.addAll(output);
             GraphTargetItem lop = checkLoop(part, stopPart, loops);
             if (lop == null) {
-                ret.addAll(printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, part, stopPart, loops, staticOperation, path));
+                ret.addAll(printGraph(localData, stack, allParts, null, part, stopPart, loops, staticOperation, path));
             } else {
                 ret.add(lop);
             }
@@ -572,7 +572,7 @@ public class AVM2Graph extends Graph {
                 defaultPart = switchLoc.nextParts.get(switchLoc.nextParts.size() - 1);
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 stopPart2.add(next);
-                defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, switchLoc, defaultPart, stopPart2, loops, staticOperation, path);
+                defaultCommands = printGraph(localData, stack, allParts, switchLoc, defaultPart, stopPart2, loops, staticOperation, path);
                 if (!defaultCommands.isEmpty()) {
                     if (defaultCommands.get(defaultCommands.size() - 1) instanceof BreakItem) {
                         if (((BreakItem) defaultCommands.get(defaultCommands.size() - 1)).loopId == currentLoop.id) {
@@ -599,7 +599,7 @@ public class AVM2Graph extends Graph {
                     stopPart2.add(defaultPart);
                 }
 
-                cc.addAll(0, printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, switchLoc, caseBodies.get(i), stopPart2, loops, staticOperation, path));
+                cc.addAll(0, printGraph(localData, stack, allParts, switchLoc, caseBodies.get(i), stopPart2, loops, staticOperation, path));
                 caseCommands.add(cc);
             }
 
@@ -611,7 +611,7 @@ public class AVM2Graph extends Graph {
                  ret.add(ti);
                  } else {*/
                 currentLoop.phase = 2;
-                ret.addAll(printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
+                ret.addAll(printGraph(localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
                 //}
             }
         }

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
+import java.util.Set;
 
 public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
 
@@ -51,8 +52,12 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
     }
 
     @Override
-    public boolean isCompileTime() {
-        return value.isCompileTime();
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        if (dependencies.contains(value)) {
+            return false;
+        }
+        dependencies.add(value);
+        return value.isCompileTime(dependencies);
     }
 
     @Override
