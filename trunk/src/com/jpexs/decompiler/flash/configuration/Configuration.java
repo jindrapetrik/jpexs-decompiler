@@ -69,6 +69,10 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> removeNops = null;
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> showHexOnlyButton = null;
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> decimalAddress = null;
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> showAllAddresses = null;
 
     /**
      * Debug mode = throwing an error when comparing original file and

@@ -478,7 +478,7 @@ public class Action implements GraphSourceItem {
                 }
             }
 
-            if (importantOffsets.contains(offset)) {
+            if (Configuration.showAllAddresses.get() || importantOffsets.contains(offset)) {
                 if (lastPush) {
                     writer.newLine();
                     lastPush = false;
@@ -487,8 +487,6 @@ public class Action implements GraphSourceItem {
                 writer.appendNoHilight(Helper.formatAddress(offset));
                 writer.appendNoHilight(":");
             }
-
-
 
             if (a.replaceWith != null) {
                 if (lastPush) {
@@ -536,26 +534,24 @@ public class Action implements GraphSourceItem {
 
                     writer.append("", offset);
 
+                    int fixBranch = -1;
                     if (a instanceof ActionIf) {
                         ActionIf aif = (ActionIf) a;
                         if (aif.jumpUsed && !aif.ignoreUsed) {
-                            aif.setFixBranch(0);
+                            fixBranch = 0;
                         }
                         if (!aif.jumpUsed && aif.ignoreUsed) {
-                            aif.setFixBranch(1);
+                            fixBranch = 1;
                         }
                     }
-
-                    int fixBranch = a.getFixBranch();
+                    
                     if (fixBranch > -1) {
-                        if (a instanceof ActionIf) {
-                            writer.appendNoHilight("ffdec_deobfuscatepop").newLine();
-                            if (fixBranch == 0) { //jump                               
-                                writer.appendNoHilight("jump loc");
-                                writer.appendNoHilight(Helper.formatAddress(a.getAddress() + a.getBytes(version).length + ((ActionIf) a).getJumpOffset()));
-                            } else {
-                                //nojump, ignore
-                            }
+                        writer.appendNoHilight("FFDec_DeobfuscatePop").newLine();
+                        if (fixBranch == 0) { //jump                               
+                            writer.appendNoHilight("Jump loc");
+                            writer.appendNoHilight(Helper.formatAddress(a.getAddress() + a.getBytes(version).length + ((ActionIf) a).getJumpOffset()));
+                        } else {
+                            //nojump, ignore
                         }
                     } else {
                         a.getASMSourceReplaced(list, importantOffsets, constantPool, version, exportMode, writer);
@@ -564,7 +560,7 @@ public class Action implements GraphSourceItem {
                     writer.appendNoHilight(add);
                     if (!(a instanceof ActionPush)) {
                         writer.newLine();
-                    };
+                    }
                 }
                 if (a instanceof ActionPush) {
                     lastPush = true;
@@ -1264,17 +1260,6 @@ public class Action implements GraphSourceItem {
             }
         }
         return 0;
-    }
-
-    @Override
-    public void setFixBranch(int pos) {
-        this.fixedBranch = pos;
-    }
-    private int fixedBranch = -1;
-
-    @Override
-    public int getFixBranch() {
-        return fixedBranch;
     }
 
     public static GraphTargetItem gettoset(GraphTargetItem get, GraphTargetItem value) {

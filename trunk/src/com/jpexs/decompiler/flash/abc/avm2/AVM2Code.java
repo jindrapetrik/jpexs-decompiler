@@ -71,6 +71,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
@@ -927,7 +928,7 @@ public class AVM2Code implements Serializable {
                 }
                 if (ins.labelname != null) {
                     writer.appendNoHilight(ins.labelname + ":");
-                } else if (offsets.contains(ofs)) {
+                } else if (Configuration.showAllAddresses.get() || offsets.contains(ofs)) {
                     writer.appendNoHilight("ofs" + Helper.formatAddress(ofs) + ":");
                 }
                 /*for (int e = 0; e < body.exceptions.length; e++) {
@@ -2375,7 +2376,7 @@ public class AVM2Code implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions, String path, int recursionLevel) throws InterruptedException {
+    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<AVM2Instruction, Decision> decisions, String path, int recursionLevel) throws InterruptedException {
         if (Thread.interrupted()) {
             throw new InterruptedException();
         }
@@ -2427,20 +2428,16 @@ public class AVM2Code implements Serializable {
              }
              }*/
 
-            GraphSourceItem ins = code.get(ip);
-
-            if (ins instanceof AVM2Instruction) {
-                AVM2Instruction ains = (AVM2Instruction) ins;
-                //Errorneous code inserted by some obfuscators
-                if (ains.definition instanceof NewObjectIns) {
-                    if (ains.operands[0] > stack.size()) {
-                        ains.setIgnored(true, 0);
-                    }
+            AVM2Instruction ins = code.get(ip);
+            //Errorneous code inserted by some obfuscators
+            if (ins.definition instanceof NewObjectIns) {
+                if (ins.operands[0] > stack.size()) {
+                    ins.setIgnored(true, 0);
                 }
-                if (ains.definition instanceof NewArrayIns) {
-                    if (ains.operands[0] > stack.size()) {
-                        ains.setIgnored(true, 0);
-                    }
+            }
+            if (ins.definition instanceof NewArrayIns) {
+                if (ins.operands[0] > stack.size()) {
+                    ins.setIgnored(true, 0);
                 }
             }
 
@@ -2482,7 +2479,7 @@ public class AVM2Code implements Serializable {
 
 
 
-            if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof NewFunctionIns)) {
+            if (((AVM2Instruction) ins).definition instanceof NewFunctionIns) {
                 stack.push(new BooleanAVM2Item(null, true));
             } else {
                 localData.set(15, ip);
@@ -2490,17 +2487,14 @@ public class AVM2Code implements Serializable {
             }
 
 
-            if (ins instanceof AVM2Instruction) {
-                AVM2Instruction ains = (AVM2Instruction) ins;
-                if (ains.definition instanceof SetLocalTypeIns) {
-                    SetLocalTypeIns slt = (SetLocalTypeIns) ains.definition;
-                    int regId = slt.getRegisterId(ains);
-                    if (indeterminate) {
-                        HashMap<Integer, GraphTargetItem> registers = (HashMap<Integer, GraphTargetItem>) localData.get(2);
-                        GraphTargetItem regVal = registers.get(regId);
-                        if (regVal.isCompileTime()) {
-                            registers.put(regId, new NotCompileTimeItem(null, regVal));
-                        }
+            if (ins.definition instanceof SetLocalTypeIns) {
+                SetLocalTypeIns slt = (SetLocalTypeIns) ins.definition;
+                int regId = slt.getRegisterId(ins);
+                if (indeterminate) {
+                    HashMap<Integer, GraphTargetItem> registers = (HashMap<Integer, GraphTargetItem>) localData.get(2);
+                    GraphTargetItem regVal = registers.get(regId);
+                    if (regVal.isCompileTime()) {
+                        registers.put(regId, new NotCompileTimeItem(null, regVal));
                     }
                 }
             }
@@ -2512,8 +2506,11 @@ public class AVM2Code implements Serializable {
 
             if (ins.isBranch() || ins.isJump()) {
                 List<Integer> branches = ins.getBranches(code);
-                if ((ins instanceof AVM2Instruction) && ((AVM2Instruction) ins).definition instanceof IfTypeIns
-                        && (!(((AVM2Instruction) ins).definition instanceof JumpIns)) && (!stack.isEmpty()) && (stack.peek().isCompileTime()) && (!stack.peek().hasSideEffect())) {
+                if (((AVM2Instruction) ins).definition instanceof IfTypeIns
+                        && (!(((AVM2Instruction) ins).definition instanceof JumpIns)) 
+                        && (!stack.isEmpty()) 
+                        && (stack.peek().isCompileTime()) 
+                        && (!stack.peek().hasSideEffect())) {
                     boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
                     if (debugMode) {
                         if (condition) {
@@ -2629,7 +2626,7 @@ public class AVM2Code implements Serializable {
                 break;
             }
             ip++;
-        };
+        }
         if (ip < 0) {
             System.out.println("Visited Negative: " + ip);
         }
@@ -2637,16 +2634,17 @@ public class AVM2Code implements Serializable {
     }
 
     public static int removeTraps(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Object> localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
-        HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<>();
+        HashMap<AVM2Instruction, AVM2Code.Decision> decisions = new HashMap<>();
         removeTraps(refs, false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path, 0);
         int cnt = 0;
-        for (GraphSourceItem src : decisions.keySet()) {
+        for (AVM2Instruction src : decisions.keySet()) {
             Decision dec = decisions.get(src);
             if (dec != null) {
-                if ((src instanceof AVM2Instruction) && (((AVM2Instruction) src).definition instanceof LookupSwitchIns)) {
+                if (((AVM2Instruction) src).definition instanceof LookupSwitchIns) {
+                    AVM2Instruction asrc = (AVM2Instruction) src;
                     if (dec.casesUsed.size() == 1) {
                         for (int c : dec.casesUsed) {
-                            src.setFixBranch(c);
+                            asrc.setFixBranch(c);
                             cnt++;
                         }
                     }

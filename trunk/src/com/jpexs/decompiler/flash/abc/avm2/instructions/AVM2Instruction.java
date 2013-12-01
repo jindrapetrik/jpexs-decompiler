@@ -350,13 +350,11 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         this.ignored = ignored;
     }
 
-    @Override
     public void setFixBranch(int pos) {
         this.fixedBranch = pos;
     }
     private int fixedBranch = -1;
 
-    @Override
     public int getFixBranch() {
         return fixedBranch;
     }

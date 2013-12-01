@@ -37,9 +37,8 @@ public class ActionIf extends Action {
 
     private int offset;
     public String identifier;
-    public boolean compileTime;
-    public boolean jumpUsed = false;
-    public boolean ignoreUsed = false;
+    public boolean jumpUsed = true;
+    public boolean ignoreUsed = true;
 
     public int getJumpOffset() {
         return offset;
@@ -85,7 +84,7 @@ public class ActionIf extends Action {
     @Override
     public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode) {
         String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
-        return "If loc" + ofsStr + (compileTime ? " ;compileTime" : "");
+        return "If loc" + ofsStr + (!jumpUsed ? " ;compileTimeIgnore" : (!ignoreUsed ? " ;compileTimeJump" : ""));
     }
 
     public ActionIf(FlasmLexer lexer) throws IOException, ParseException {

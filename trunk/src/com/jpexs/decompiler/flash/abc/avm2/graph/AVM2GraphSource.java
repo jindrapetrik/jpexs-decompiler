@@ -3,6 +3,7 @@ package com.jpexs.decompiler.flash.abc.avm2.graph;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertOutput;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -57,7 +58,7 @@ public class AVM2GraphSource extends GraphSource {
     }
 
     @Override
-    public GraphSourceItem get(int pos) {
+    public AVM2Instruction get(int pos) {
         return code.code.get(pos);
     }
 

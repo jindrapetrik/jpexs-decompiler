@@ -16,6 +16,7 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
@@ -122,6 +123,9 @@ public class Helper {
      * @return String representation of the address
      */
     public static String formatAddress(long number) {
+        if (Configuration.decimalAddress.get()) {
+            return padZeros(Long.toString(number), 4);
+        }
         return padZeros(Long.toHexString(number), 4);
     }
 

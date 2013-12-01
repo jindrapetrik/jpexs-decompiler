@@ -60,10 +60,15 @@ public class ASMParser {
             } else if (symb.type == ASMParsedSymbol.TYPE_COMMENT) {
                 if (!list.isEmpty()) {
                     String cmt = (String) symb.value;
-                    if (cmt.equals("compileTime")) {
+                    if (cmt.equals("compileTimeJump")) {
                         Action a = list.get(list.size() - 1);
                         if (a instanceof ActionIf) {
-                            ((ActionIf) a).compileTime = true;
+                            ((ActionIf) a).ignoreUsed = false;
+                        }
+                    } else if (cmt.equals("compileTimeIgnore")) {
+                        Action a = list.get(list.size() - 1);
+                        if (a instanceof ActionIf) {
+                            ((ActionIf) a).jumpUsed = false;
                         }
                     }
                 }

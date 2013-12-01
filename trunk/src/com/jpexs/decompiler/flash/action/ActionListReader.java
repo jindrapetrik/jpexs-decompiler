@@ -214,7 +214,13 @@ public class ActionListReader {
             if (a instanceof ActionIf || a instanceof GraphSourceItemContainer) {
                 maxRecursionLevel++;
             }
+            if (a instanceof ActionIf) {
+                ActionIf aif = (ActionIf) a;
+                aif.ignoreUsed = false;
+                aif.jumpUsed = false;
+            }
         }
+        
         deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, actionMap, ip, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version, 0, maxRecursionLevel);
 
         if (!retdups.isEmpty()) {
@@ -759,24 +765,17 @@ public class ActionListReader {
                                     break;
                             }
                         } else if (top.isCompileTime() && (!top.hasSideEffect())) {
-                            ((ActionIf) a).compileTime = true;
                             if (debugMode) {
                                 System.err.print("is compiletime -> ");
                             }
                             if (EcmaScript.toBoolean(top.getResult())) {
                                 newip = pos + aif.getJumpOffset();
                                 aif.jumpUsed = true;
-                                if (aif.ignoreUsed) {
-                                    aif.compileTime = false;
-                                }
                                 if (debugMode) {
                                     System.err.println("jump");
                                 }
                             } else {
                                 aif.ignoreUsed = true;
-                                if (aif.jumpUsed) {
-                                    aif.compileTime = false;
-                                }
                                 if (debugMode) {
                                     System.err.println("ignore");
                                 }
