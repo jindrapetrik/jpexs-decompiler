@@ -393,8 +393,13 @@ public class Configuration {
                 modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
                 Object defaultValue = getDefaultValue(field);
+                Object value = null;
                 if (config.containsKey(name)) {
-                    field.set(null, new ConfigurationItem(name, defaultValue, config.get(name)));
+                    value = config.get(name);
+                }
+                
+                if (value != null) {
+                    field.set(null, new ConfigurationItem(name, defaultValue, value));
                 } else {
                     field.set(null, new ConfigurationItem(name, defaultValue));
                 }
