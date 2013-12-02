@@ -3,6 +3,8 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.abc.NotSameException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
@@ -19,7 +21,7 @@ public class RecompileTest {
             SWF swf = new SWF(new FileInputStream(TESTDATADIR + File.separator + filename), false);
             Configuration.debugCopy.set(true);
             swf.saveTo(new ByteArrayOutputStream());
-        } catch (IOException ex) {
+        } catch (IOException | InterruptedException ex) {
             fail();
         } catch (NotSameException ex) {
             fail("File is different after recompiling: " + filename);

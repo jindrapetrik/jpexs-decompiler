@@ -36,7 +36,7 @@ import org.testng.annotations.Test;
 public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
 
     @BeforeClass
-    public void init() throws IOException {
+    public void init() throws IOException, InterruptedException {
         Configuration.autoDeobfuscate.set(true);
         swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
     }

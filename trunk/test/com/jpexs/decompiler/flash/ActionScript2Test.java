@@ -35,7 +35,7 @@ import org.testng.annotations.Test;
 public class ActionScript2Test extends ActionStript2TestBase {
 
     @BeforeClass
-    public void init() throws IOException {
+    public void init() throws IOException, InterruptedException {
         Configuration.autoDeobfuscate.set(false);
         Configuration.decompile.set(true);
         Configuration.registerNameFormat.set("_loc%d_");

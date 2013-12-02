@@ -26,7 +26,7 @@ public class ActionScript3Test {
     private ABC abc;
 
     @BeforeClass
-    public void init() throws IOException {
+    public void init() throws IOException, InterruptedException {
         swf = new SWF(new FileInputStream("testdata/as3/as3.swf"), false);
         DoABCDefineTag tag = null;
         for (Tag t : swf.tags) {
