@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -43,13 +44,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 public class ABC {
 
@@ -67,6 +65,7 @@ public class ABC {
     public static final int MINORwithDECIMAL = 17;
     protected HashSet<EventListener> listeners = new HashSet<>();
     private static final Logger logger = Logger.getLogger(ABC.class.getName());
+    private AVM2Deobfuscation deobfuscation;
 
     public int addMethodBody(MethodBody body) {
         bodies = Arrays.copyOf(bodies, bodies.length + 1);
@@ -111,7 +110,7 @@ public class ABC {
         return rem;
     }
 
-    public int removeDeadCode() {
+    public int removeDeadCode() throws InterruptedException {
         int rem = 0;
         for (MethodBody body : bodies) {
             rem += body.removeDeadCode(constants, null/*FIXME*/, method_info[body.method_info]);
@@ -119,7 +118,7 @@ public class ABC {
         return rem;
     }
 
-    public void restoreControlFlow() {
+    public void restoreControlFlow() throws InterruptedException {
         for (MethodBody body : bodies) {
             body.restoreControlFlow(constants, null/*FIXME*/, method_info[body.method_info]);
         }
@@ -238,14 +237,14 @@ public class ABC {
         for (int i = 0; i < instance_info.length; i++) {
             informListeners("deobfuscate", "class " + i + "/" + instance_info.length);
             if (instance_info[i].name_index != 0) {
-                constants.getMultiname(instance_info[i].name_index).name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(instance_info[i].name_index).name_index, true, renameType);
+                constants.getMultiname(instance_info[i].name_index).name_index = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(instance_info[i].name_index).name_index, true, renameType);
                 if (constants.getMultiname(instance_info[i].name_index).namespace_index != 0) {
                     constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index =
-                            deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index, renameType);
+                            deobfuscation.deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index, renameType);
                 }
             }
             if (instance_info[i].super_index != 0) {
-                constants.getMultiname(instance_info[i].super_index).name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(instance_info[i].super_index).name_index, true, renameType);
+                constants.getMultiname(instance_info[i].super_index).name_index = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(instance_info[i].super_index).name_index, true, renameType);
             }
         }
         if (classesOnly) {
@@ -253,14 +252,14 @@ public class ABC {
         }
         for (int i = 1; i < constants.getMultinameCount(); i++) {
             informListeners("deobfuscate", "name " + i + "/" + constants.getMultinameCount());
-            constants.getMultiname(i).name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(i).name_index, false, renameType);
+            constants.getMultiname(i).name_index = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(i).name_index, false, renameType);
         }
         for (int i = 1; i < constants.getNamespaceCount(); i++) {
             informListeners("deobfuscate", "namespace " + i + "/" + constants.getNamespaceCount());
             if (constants.getNamespace(i).kind != Namespace.KIND_PACKAGE) { //only packages
                 continue;
             }
-            constants.getNamespace(i).name_index = deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(i).name_index, renameType);
+            constants.getNamespace(i).name_index = deobfuscation.deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(i).name_index, renameType);
         }
 
         //process reflection using getDefinitionByName too
@@ -283,11 +282,11 @@ public class ABC {
                                     }
                                     if (!pkg.isEmpty()) {
                                         int pkgStrIndex = constants.getStringId(pkg, true);
-                                        pkgStrIndex = deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, pkgStrIndex, renameType);
+                                        pkgStrIndex = deobfuscation.deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, pkgStrIndex, renameType);
                                         pkg = constants.getString(pkgStrIndex);
                                     }
                                     int nameStrIndex = constants.getStringId(name, true);
-                                    nameStrIndex = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, nameStrIndex, true, renameType);
+                                    nameStrIndex = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, nameStrIndex, true, renameType);
                                     name = constants.getString(nameStrIndex);
                                     String fullChanged = "";
                                     if (!pkg.isEmpty()) {
@@ -311,6 +310,7 @@ public class ABC {
         major_version = ais.readU16();
         logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
         constants = new ConstantPool();
+        deobfuscation = new AVM2Deobfuscation(constants);
         //constant integers
         int constant_int_pool_count = ais.readU30();
         constants.constant_int = new ArrayList<>(constant_int_pool_count);
@@ -738,21 +738,11 @@ public class ABC {
         }
     }
 
-    public String builtInNs(String ns) {
-        if (ns.equals("http://www.adobe.com/2006/actionscript/flash/proxy")) {
-            return "flash.utils.flash_proxy";
-        }
-        if (ns.equals("http://adobe.com/AS3/2006/builtin")) {
-            return "-";
-        }
-        return null;
-    }
-
     public String nsValueToName(String value) {
         if (namespaceMap.containsKey(value)) {
             return namespaceMap.get(value);
         } else {
-            String ns = builtInNs(value);
+            String ns = deobfuscation.builtInNs(value);
             if (ns == null) {
                 return "";
             } else {
@@ -791,198 +781,6 @@ public class ABC {
         for (int i = 0; i < bodies.length; i++) {
             output.println("MethodBody[" + i + "]:"); //+ bodies[i].toString(this, constants, method_info));
         }
-    }
-    public static final String[] reservedWords = {
-        "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",
-        "extends", "false", "finally", "for", "function", "get", "if", "implements", "import", "in", "instanceof",
-        "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
-        "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
-        "with", "dynamic", "default", "final", "in", "static"};
-    public static final String validFirstCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-    public static final String validNextCharacters = validFirstCharacters + "0123456789";
-    public static final String validNsCharacters = ".:$";
-    public static final String fooCharacters = "bcdfghjklmnpqrstvwz";
-    public static final String fooJoinCharacters = "aeiouy";
-    private Random rnd = new Random();
-    private final int DEFAULT_FOO_SIZE = 10;
-    private Map<String, Integer> usageTypesCount = new HashMap<>();
-
-    private String fooString(HashMap<String, String> deobfuscated, String orig, boolean firstUppercase, int rndSize, String usageType, RenameType renameType) {
-        boolean exists;
-        String ret;
-        int pos = 0;
-
-        if (usageType == null) {
-            usageType = "name";
-        }
-        if (usageTypesCount.containsKey(usageType)) {
-            pos = usageTypesCount.get(usageType);
-        }
-
-        loopfoo:
-        do {
-            exists = false;
-            ret = "";
-            if (renameType == RenameType.TYPENUMBER) {
-                pos++;
-                ret = usageType + "_" + pos;
-            } else if (renameType == RenameType.RANDOMWORD) {
-                int len = 3 + rnd.nextInt(rndSize - 3);
-
-                for (int i = 0; i < len; i++) {
-                    String c = "";
-                    if ((i % 2) == 0) {
-                        c = "" + fooCharacters.charAt(rnd.nextInt(fooCharacters.length()));
-                    } else {
-                        c = "" + fooJoinCharacters.charAt(rnd.nextInt(fooJoinCharacters.length()));
-                    }
-                    if (i == 0 && firstUppercase) {
-                        c = c.toUpperCase(Locale.ENGLISH);
-                    }
-                    ret += c;
-                }
-            }
-            for (int i = 1; i < constants.getStringCount(); i++) {
-                if (constants.getString(i).equals(ret)) {
-                    exists = true;
-                    rndSize += 1;
-                    continue loopfoo;
-                }
-            }
-            if (isReserved(ret)) {
-                exists = true;
-                rndSize += 1;
-                continue;
-            }
-            if (deobfuscated.containsValue(ret)) {
-                exists = true;
-                rndSize += 1;
-                continue;
-            }
-        } while (exists);
-        usageTypesCount.put(usageType, pos);
-        deobfuscated.put(orig, ret);
-        return ret;
-    }
-
-    private boolean isReserved(String s) {
-        for (String rw : reservedWords) {
-            if (rw.equals(s.trim())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isValidNSPart(String s) {
-        boolean isValid = true;
-        if (isReserved(s)) {
-            isValid = false;
-        }
-
-        if (isValid) {
-            for (int i = 0; i < s.length(); i++) {
-                if (s.charAt(i) > 127) {
-                    isValid = false;
-                    break;
-                }
-            }
-        }
-        if (isValid) {
-            Pattern pat = Pattern.compile("^([" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters + validNsCharacters) + "]*)*$");
-            if (!pat.matcher(s).matches()) {
-                isValid = false;
-            }
-        }
-        return isValid;
-    }
-
-    public int deobfuscatePackageName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex, RenameType renameType) {
-        if (strIndex <= 0) {
-            return strIndex;
-        }
-        String s = constants.getString(strIndex);
-        if (builtInNs(s) != null) {
-            return strIndex;
-        }
-        boolean isValid = isValidNSPart(s);
-        if (!isValid) {
-            String newName;
-            if (namesMap.containsKey(s)) {
-                newName = constants.setString(strIndex, namesMap.get(s));
-            } else {
-                String[] parts = null;
-                if (s.contains(".")) {
-                    parts = s.split("\\.");
-                } else {
-                    parts = new String[]{s};
-                }
-                String ret = "";
-                for (int p = 0; p < parts.length; p++) {
-                    if (p > 0) {
-                        ret += ".";
-                    }
-                    if (!isValidNSPart(parts[p])) {
-                        ret += fooString(namesMap, parts[p], false, DEFAULT_FOO_SIZE, "package", renameType);
-                    } else {
-                        ret += parts[p];
-                    }
-                }
-                newName = ret;
-                namesMap.put(s, newName);
-            }
-            if (stringUsages.contains(strIndex)) {
-                strIndex = constants.addString(newName);
-            } else {
-                constants.setString(strIndex, newName);
-            }
-
-        }
-        return strIndex;
-    }
-
-    public int deobfuscateName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, Set<Integer> namespaceUsages, HashMap<String, String> namesMap, int strIndex, boolean firstUppercase, RenameType renameType) {
-        if (strIndex <= 0) {
-            return strIndex;
-        }
-        String s = constants.getString(strIndex);
-        boolean isValid = true;
-        if (isReserved(s)) {
-            isValid = false;
-        }
-
-        if (isValid) {
-            for (int i = 0; i < s.length(); i++) {
-                if (s.charAt(i) > 127) {
-                    isValid = false;
-                    break;
-                }
-            }
-        }
-
-        if (isValid) {
-            Pattern pat = Pattern.compile("^[" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters) + "]*$");
-            if (!pat.matcher(s).matches()) {
-                isValid = false;
-            }
-        }
-
-        if (!isValid) {
-            String newname;
-            if (namesMap.containsKey(s)) {
-                newname = namesMap.get(s);
-            } else {
-                newname = fooString(namesMap, constants.getString(strIndex), firstUppercase, DEFAULT_FOO_SIZE, stringUsageTypes.get(strIndex), renameType);
-            }
-            if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { //this name is already referenced as String
-                strIndex = constants.addString(s); //add new index
-            }
-            constants.setString(strIndex, newname);
-            if (!namesMap.containsKey(s)) {
-                namesMap.put(s, constants.getString(strIndex));
-            }
-        }
-        return strIndex;
     }
 
     private void checkMultinameUsedInMethod(int multinameIndex, int methodInfo, List<MultinameUsage> ret, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {

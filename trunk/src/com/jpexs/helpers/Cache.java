@@ -162,8 +162,7 @@ public class Cache {
 
                 cacheFiles.put(key, temp);
 
-
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 //ignore
             }
         } else if (storageType == STORAGE_MEMORY) {

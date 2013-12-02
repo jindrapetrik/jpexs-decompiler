@@ -36,7 +36,7 @@ public interface ASMSource {
      * @param exportMode PCode or hex?
      * @return ASM source
      */
-    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions);
+    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException;
 
     /**
      * Whether or not this object contains ASM source
@@ -51,7 +51,7 @@ public interface ASMSource {
      * @param version Version
      * @return List of actions
      */
-    public List<Action> getActions(int version);
+    public List<Action> getActions(int version) throws InterruptedException;
 
     /**
      * Sets actions associated with this object

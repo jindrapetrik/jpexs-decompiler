@@ -220,7 +220,8 @@ public class View {
         } else {
             try {
                 SwingUtilities.invokeAndWait(r);
-            } catch (InterruptedException | InvocationTargetException ex) {
+            } catch (InterruptedException ex) {
+            } catch (InvocationTargetException ex) {
                 Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

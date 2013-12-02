@@ -73,7 +73,7 @@ public class ASM3Parser {
         }
     }
 
-    public static AVM2Code parse(Reader reader, ConstantPool constants, Trait trait, MethodBody body, MethodInfo info) throws IOException, ParseException {
+    public static AVM2Code parse(Reader reader, ConstantPool constants, Trait trait, MethodBody body, MethodInfo info) throws IOException, ParseException, InterruptedException {
         return parse(reader, constants, trait, null, body, info);
     }
 
@@ -473,7 +473,7 @@ public class ASM3Parser {
         return new ValueKind(value_index, value_kind);
     }
 
-    public static AVM2Code parse(Reader reader, ConstantPool constants, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, ParseException {
+    public static AVM2Code parse(Reader reader, ConstantPool constants, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, ParseException, InterruptedException {
         AVM2Code code = new AVM2Code();
 
         List<OffsetItem> offsetItems = new ArrayList<>();
@@ -909,6 +909,9 @@ public class ASM3Parser {
 
         for (OffsetItem oi : offsetItems) {
             for (LabelItem li : labelItems) {
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException();
+                }
                 if (oi.label.equals(li.label)) {
                     AVM2Instruction ins = code.code.get((int) oi.insPosition);
                     int relOffset;

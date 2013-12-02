@@ -61,7 +61,7 @@ public class GraphPart implements Serializable {
     }
 
     private boolean leadsTo(List<Object> localData, Graph gr, GraphSource code, GraphPart part, List<GraphPart> visited, List<Loop> loops) throws InterruptedException {
-        if (Thread.interrupted()) {
+        if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
         

@@ -53,6 +53,8 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> decompile = null;
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> parallelSpeedUp = null;
+    @ConfigurationDefaultInt(20)
+    public static final ConfigurationItem<Integer> parallelThreadCount = null;
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> autoDeobfuscate = null;
     @ConfigurationDefaultBoolean(true)

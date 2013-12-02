@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -64,10 +65,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -131,21 +129,11 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                     decAdd = ", " + AppStrings.translate("work.decompiling");
                 }
                 
-                final AtomicReference<FutureTask<Void>> taskRef = new AtomicReference<>();
-                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.key.toString() + "... ", new Runnable() {
-
-                    @Override
-                    public void run() {
-                        FutureTask task = taskRef.get();
-                        if (task != null) {
-                            task.cancel(true);
-                        }
-                    }
-                });
                 try {
-                    Helper.cancellableCall(new Callable<Void>() {
+                    CancellableWorker worker = new CancellableWorker() {
+
                         @Override
-                        public Void call() throws Exception {
+                        public Void doInBackground() throws Exception {
                             decompiledTextArea.cacheScriptPack(item.value, list);
                             if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
                                 found.add(item.value);
@@ -153,7 +141,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                             }
                             return null;
                         }
-                    }, taskRef);
+                    };
+                    worker.execute();
+                    Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.key.toString() + "... ", worker);
+                    worker.get();
                 } catch (InterruptedException ex) {
                     break;
                 } catch (ExecutionException ex) {

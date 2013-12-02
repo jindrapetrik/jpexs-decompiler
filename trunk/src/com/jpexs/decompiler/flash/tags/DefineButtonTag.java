@@ -139,7 +139,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      * @return ASM source
      */
     @Override
-    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) {
+    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
         if (actions == null) {
             actions = getActions(version);
         }
@@ -163,7 +163,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      * @return List of actions
      */
     @Override
-    public List<Action> getActions(int version) {
+    public List<Action> getActions(int version) throws InterruptedException {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int prevLength = 0;
@@ -176,8 +176,10 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             MemoryInputStream rri = new MemoryInputStream(baos.toByteArray());
             rri.seek(prevLength);
 
-            List<Action> list = ActionListReader.readActionList(listeners, getPos() + hdrSize - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + hdrSize - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
             return list;
+        } catch (InterruptedException ex) {
+            throw ex;
         } catch (Exception ex) {
             Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<>();

@@ -41,15 +41,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -61,8 +52,6 @@ import java.util.regex.Pattern;
  * @author JPEXS, Paolo Cancedda
  */
 public class Helper {
-
-    private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
 
     /**
      * Converts array of int values to string
@@ -623,61 +612,6 @@ public class Helper {
         }
         byte[] data = baos.toByteArray();
         return data;
-    }
-
-    public static <T> T timedCall(Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
-        FutureTask<T> task = new FutureTask<>(c);
-        THREAD_POOL.execute(task);
-        try {
-            return task.get(timeout, timeUnit);
-        } finally {
-            task.cancel(true);
-        }
-    }
-
-    public static <T> FutureTask<T> callAsync(final Callable<T> c) {
-        return callAsync(c, null);
-    }
-
-    public static <T> FutureTask<T> callAsync(final Callable<T> c, final Callback<AsyncResult<T>> callback) {
-        FutureTask<T> task = new FutureTask<>(new Callable<T>() {
-
-            @Override
-            public T call() throws Exception {
-                try {
-                    T t = c.call();
-                    if (callback != null) {
-                        callback.call(new AsyncResult<>(t, null));
-                    }
-                    return t;
-                } catch (Throwable ex) {
-                    if (callback != null) {
-                        callback.call(new AsyncResult<T>(null, ex));
-                    }
-                    throw ex;
-                }
-            }
-        });
-        THREAD_POOL.execute(task);
-        return task;
-    }
-
-    public static <T> T cancellableCall(final Callable<T> c, final AtomicReference<FutureTask<T>> cancellation) throws InterruptedException, ExecutionException {
-        FutureTask<T> task = new FutureTask<>(new Callable<T>() {
-
-            @Override
-            public T call() throws Exception {
-                T t = c.call();
-                return t;
-            }
-        });
-        cancellation.set(task);
-        THREAD_POOL.execute(task);
-        try {
-            return task.get();
-        } catch (CancellationException ex) {
-            throw new InterruptedException();
-        }
     }
 
     public static boolean contains(int[] array, int value) {

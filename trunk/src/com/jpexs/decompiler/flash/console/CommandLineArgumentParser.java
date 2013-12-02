@@ -94,6 +94,10 @@ public class CommandLineArgumentParser {
         System.out.println("  ...error handling mode. \"abort\" stops the exporting, \"retry\" tries the exporting N times, \"ignore\" ignores the current file");
         System.out.println(" 11) -timeout N");
         System.out.println("  ...decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds");
+        System.out.println(" 12) -exportTimeout N");
+        System.out.println("  ...total export timeout in seconds");
+        System.out.println(" 13) -exportFileTimeout N");
+        System.out.println("  ...export timeout for a single AS3 class in seconds");
         System.out.println();
         System.out.println("Examples:");
         System.out.println("java -jar ffdec.jar myfile.swf");
@@ -125,6 +129,9 @@ public class CommandLineArgumentParser {
         OUTER:
         while (true) {
             nextParam = args.remove();
+            if (nextParam != null) {
+                nextParam = nextParam.toLowerCase();
+            }
             switch (nextParam) {
                 case "-config":
                     parseConfig(args);
@@ -139,6 +146,12 @@ public class CommandLineArgumentParser {
                     break;
                 case "-timeout":
                     parseTimeout(args);
+                    break;
+                case "-exporttimeout":
+                    parseExportTimeout(args);
+                    break;
+                case "-exportfiletimeout":
+                    parseExportFileTimeout(args);
                     break;
                 case "-affinity":
                     parseAffinity(args);
@@ -315,6 +328,32 @@ public class CommandLineArgumentParser {
         try {
             int timeout = Integer.parseInt(args.remove());
             Configuration.decompilationTimeoutSingleMethod.set(timeout);
+        } catch (NumberFormatException nex) {
+            System.err.println("Bad timeout value");
+        }
+    }
+
+    private static void parseExportTimeout(Queue<String> args) {
+        if (args.isEmpty()) {
+            System.err.println("timeout parameter expected");
+            badArguments();
+        }
+        try {
+            int timeout = Integer.parseInt(args.remove());
+            Configuration.exportTimeout.set(timeout);
+        } catch (NumberFormatException nex) {
+            System.err.println("Bad timeout value");
+        }
+    }
+
+    private static void parseExportFileTimeout(Queue<String> args) {
+        if (args.isEmpty()) {
+            System.err.println("timeout parameter expected");
+            badArguments();
+        }
+        try {
+            int timeout = Integer.parseInt(args.remove());
+            Configuration.decompilationTimeoutFile.set(timeout);
         } catch (NumberFormatException nex) {
             System.err.println("Bad timeout value");
         }

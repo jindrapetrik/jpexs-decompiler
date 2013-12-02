@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -121,9 +122,7 @@ public class Traits implements Serializable {
 
     public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         for (int t = 0; t < traits.length; t++) {
-            if (t > 0) {
-                writer.newLine();
-            }
+            writer.newLine();
             Trait trait = traits[t];
             int h = t;
             if (classIndex != -1) {
@@ -157,7 +156,7 @@ public class Traits implements Serializable {
                 task.call();
             }
         } else {
-            ExecutorService executor = Executors.newFixedThreadPool(20);
+            ExecutorService executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
             List<Future<Void>> futureResults = null;
 
             futureResults = new ArrayList<>();
@@ -170,7 +169,10 @@ public class Traits implements Serializable {
             for (int f = 0; f < futureResults.size(); f++) {
                 try {
                     futureResults.get(f).get();
-                } catch (InterruptedException | ExecutionException ex) {
+                } catch (InterruptedException ex) {
+                    executor.shutdownNow();
+                    throw ex;
+                } catch (ExecutionException ex) {
                     Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during traits converting", ex);
                 }
             }

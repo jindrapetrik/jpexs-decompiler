@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionDeobfuscation;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -101,6 +102,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -129,7 +131,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.Callable;
@@ -142,7 +143,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 import javax.imageio.ImageIO;
@@ -298,7 +298,7 @@ public final class SWF {
         }
     }
 
-    public SWF(InputStream is, boolean parallelRead) throws IOException {
+    public SWF(InputStream is, boolean parallelRead) throws IOException, InterruptedException {
         this(is, null, parallelRead);
     }
 
@@ -310,7 +310,7 @@ public final class SWF {
      * @param parallelRead Use parallel threads?
      * @throws IOException
      */
-    public SWF(InputStream is, ProgressListener listener, boolean parallelRead) throws IOException {
+    public SWF(InputStream is, ProgressListener listener, boolean parallelRead) throws IOException, InterruptedException {
         this(is, listener, parallelRead, false);
     }
 
@@ -323,7 +323,7 @@ public final class SWF {
      * @param checkOnly Check only file validity
      * @throws IOException
      */
-    public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException {
+    public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException, InterruptedException {
         byte[] hdr = new byte[3];
         is.read(hdr);
         String shdr = new String(hdr, Utf8Helper.charset);
@@ -663,7 +663,7 @@ public final class SWF {
                 long time = stopTime - startTime;
                 informListeners("exported", "Exported script " + currentIndex + "/" + count + " " + path + ", " + Helper.formatTimeSec(time));
             }
-            return null;
+            return rio.result;
         }
     }
 
@@ -696,7 +696,7 @@ public final class SWF {
 
         if (!parallel || packs.size() < 2) {
             try {
-                Helper.timedCall(new Callable<Void>() {
+                CancellableWorker.call(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
                         for (MyEntry<ClassPath, ScriptPack> item : packs) {
@@ -712,26 +712,32 @@ public final class SWF {
                 Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
             }
         } else {
-            ExecutorService executor = Executors.newFixedThreadPool(20);
+            ExecutorService executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
             List<Future<File>> futureResults = new ArrayList<>();
             for (MyEntry<ClassPath, ScriptPack> item : packs) {
                 Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, exportMode, parallel));
                 futureResults.add(future);
             }
 
-            for (int f = 0; f < futureResults.size(); f++) {
-                try {
-                    ret.add(futureResults.get(f).get());
-                } catch (InterruptedException | ExecutionException ex) {
-                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+            try {
+                executor.shutdown();
+                if (!executor.awaitTermination(Configuration.exportTimeout.get(), TimeUnit.SECONDS)) {
+                    Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached");
                 }
+            } catch (InterruptedException ex) {
+            } finally {
+                executor.shutdownNow();
             }
 
-            try {
-                executor.awaitTermination(Configuration.exportTimeout.get(), TimeUnit.SECONDS);
-                executor.shutdownNow();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached", ex);
+            for (int f = 0; f < futureResults.size(); f++) {
+                try {
+                    if (futureResults.get(f).isDone()) {
+                        ret.add(futureResults.get(f).get());
+                    }
+                } catch (InterruptedException ex) {
+                } catch (ExecutionException ex) {
+                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+                }
             }
         }
         
@@ -1482,133 +1488,12 @@ public final class SWF {
     public void exportBinaryData(AbortRetryIgnoreHandler handler, String outdir) throws IOException {
         exportBinaryData(handler, outdir, tags);
     }
-    public static final String[] reservedWords = {
-        "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",
-        "extends", "false", "finally", "for", "function", "get", "if", "implements", "import", "in", "instanceof",
-        "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
-        "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
-        "with", "dynamic", "default", "final", "in"};
-
-    private boolean isReserved(String s) {
-        for (String rw : reservedWords) {
-            if (rw.equals(s.trim())) {
-                return true;
-            }
-        }
-        return false;
-    }
     private HashMap<String, String> deobfuscated = new HashMap<>();
-    private Random rnd = new Random();
-    private final int DEFAULT_FOO_SIZE = 10;
-    public static final String validFirstCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-    public static final String validNextCharacters = validFirstCharacters + "0123456789";
-    public static final String fooCharacters = "bcdfghjklmnpqrstvwz";
-    public static final String fooJoinCharacters = "aeiouy";
     private List<MyEntry<DirectValueActionItem, ConstantPool>> allVariableNames = new ArrayList<>();
-    private HashSet<String> allVariableNamesStr = new HashSet<>();
     private List<GraphSourceItem> allFunctions = new ArrayList<>();
     private HashMap<DirectValueActionItem, ConstantPool> allStrings = new HashMap<>();
     private HashMap<DirectValueActionItem, String> usageTypes = new HashMap<>();
-
-    private String fooString(String orig, boolean firstUppercase, int rndSize) {
-        boolean exists;
-        String ret;
-        loopfoo:
-        do {
-            exists = false;
-            int len = 3 + rnd.nextInt(rndSize - 3);
-            ret = "";
-            for (int i = 0; i < len; i++) {
-                String c = "";
-                if ((i % 2) == 0) {
-                    c = "" + fooCharacters.charAt(rnd.nextInt(fooCharacters.length()));
-                } else {
-                    c = "" + fooJoinCharacters.charAt(rnd.nextInt(fooJoinCharacters.length()));
-                }
-                if (i == 0 && firstUppercase) {
-                    c = c.toUpperCase(Locale.ENGLISH);
-                }
-                ret += c;
-            }
-            if (allVariableNamesStr.contains(ret)) {
-                exists = true;
-                rndSize += 1;
-                continue loopfoo;
-            }
-            if (isReserved(ret)) {
-                exists = true;
-                rndSize += 1;
-                continue;
-            }
-            if (deobfuscated.containsValue(ret)) {
-                exists = true;
-                rndSize += 1;
-                continue;
-            }
-        } while (exists);
-        return ret;
-    }
-
-    public String deobfuscateName(String s, boolean firstUppercase, String usageType, RenameType renameType, Map<String, String> selected) {
-        boolean isValid = true;
-        if (usageType == null) {
-            usageType = "name";
-        }
-
-        if (selected != null) {
-            if (selected.containsKey(s)) {
-                return selected.get(s);
-            }
-        }
-
-        if (isReserved(s)) {
-            isValid = false;
-        }
-
-        if (isValid) {
-            for (int i = 0; i < s.length(); i++) {
-                if (s.charAt(i) > 127) {
-                    isValid = false;
-                    break;
-                }
-            }
-        }
-
-        if (isValid) {
-            Pattern pat = Pattern.compile("^[" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters) + "]*$");
-            if (!pat.matcher(s).matches()) {
-                isValid = false;
-            }
-        }
-        if (!isValid) {
-            if (deobfuscated.containsKey(s)) {
-                return deobfuscated.get(s);
-            } else {
-                Integer cnt = typeCounts.get(usageType);
-                if (cnt == null) {
-                    cnt = 0;
-                }
-
-                String ret = null;
-                if (renameType == RenameType.TYPENUMBER) {
-
-                    boolean found;
-                    do {
-                        found = false;
-                        cnt++;
-                        ret = usageType + "_" + cnt;
-                        found = allVariableNamesStr.contains(ret);
-                    } while (found);
-                    typeCounts.put(usageType, cnt);
-                } else if (renameType == RenameType.RANDOMWORD) {
-                    ret = fooString(s, firstUppercase, DEFAULT_FOO_SIZE);
-                }
-                deobfuscated.put(s, ret);
-                return ret;
-            }
-        }
-        return null;
-    }
+    private ActionDeobfuscation deobfuscation = new ActionDeobfuscation();
 
     private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
         boolean debugMode = false;
@@ -1638,6 +1523,9 @@ public final class SWF {
                     || (ins instanceof ActionNewObject)
                     || (ins instanceof ActionCallMethod)
                     || (ins instanceof ActionCallFunction)) {
+                if (stack.isEmpty()) {
+                    break;
+                }
                 name = stack.peek();
             }
 
@@ -1681,12 +1569,18 @@ public final class SWF {
                 r.add(new ArrayList<GraphTargetItem>());
                 r.add(new ArrayList<GraphTargetItem>());
                 r.add(new ArrayList<GraphTargetItem>());
-                ((GraphSourceItemContainer) ins).translateContainer(r, stack, output, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+                try {
+                    ((GraphSourceItemContainer) ins).translateContainer(r, stack, output, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+                } catch (EmptyStackException ex) {
+                }
                 //ip++;
                 continue;
             }
 
             if ((ins instanceof ActionSetVariable) || (ins instanceof ActionSetMember) || (ins instanceof ActionDefineLocal)) {
+                if (stack.size() < 2) {
+                    break;
+                }
                 name = stack.get(stack.size() - 2);
             }
 
@@ -1718,8 +1612,6 @@ public final class SWF {
             } catch (EmptyStackException ex) {
                 // probably obfucated code, never executed branch
                 break;
-            } catch (InterruptedException ex) {
-                Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during getting variables", ex);
             }
             if (ins.isExit()) {
                 break;
@@ -1742,6 +1634,9 @@ public final class SWF {
 
             if (ins.isBranch() || ins.isJump()) {
                 if (ins instanceof ActionIf) {
+                    if (stack.isEmpty()) {
+                        break;
+                    }
                     stack.pop();
                 }
                 visited.add(ip);
@@ -1799,96 +1694,6 @@ public final class SWF {
         }
     }
 
-    public void deobfuscateInstanceNames(RenameType renameType, List<Tag> tags, Map<String, String> selected) {
-        for (Tag t : tags) {
-            if (t instanceof DefineSpriteTag) {
-                deobfuscateInstanceNames(renameType, ((DefineSpriteTag) t).subTags, selected);
-            }
-            if (t instanceof PlaceObjectTypeTag) {
-                PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
-                String name = po.getInstanceName();
-                if (name != null) {
-                    String changedName = deobfuscateName(name, false, "instance", renameType, selected);
-                    if (changedName != null) {
-                        po.setInstanceName(changedName);
-                    }
-                }
-                String className = po.getClassName();
-                if (className != null) {
-                    String changedClassName = deobfuscateNameWithPackage(className, renameType, selected);
-                    if (changedClassName != null) {
-                        po.setClassName(changedClassName);
-                    }
-                }
-            }
-        }
-    }
-
-    public String deobfuscatePackage(String pkg, RenameType renameType, Map<String, String> selected) {
-        if (deobfuscated.containsKey(pkg)) {
-            return deobfuscated.get(pkg);
-        }
-        String[] parts = null;
-        if (pkg.contains(".")) {
-            parts = pkg.split("\\.");
-        } else {
-            parts = new String[]{pkg};
-        }
-        String ret = "";
-        boolean isChanged = false;
-        for (int p = 0; p < parts.length; p++) {
-            if (p > 0) {
-                ret += ".";
-            }
-            String partChanged = deobfuscateName(parts[p], false, "package", renameType, selected);
-            if (partChanged != null) {
-                ret += partChanged;
-                isChanged = true;
-            } else {
-                ret += parts[p];
-            }
-        }
-        if (isChanged) {
-            deobfuscated.put(pkg, ret);
-            return ret;
-        }
-        return null;
-    }
-
-    public String deobfuscateNameWithPackage(String n, RenameType renameType, Map<String, String> selected) {
-        String pkg = null;
-        String name = "";
-        if (n.contains(".")) {
-            pkg = n.substring(0, n.lastIndexOf('.'));
-            name = n.substring(n.lastIndexOf('.') + 1);
-        } else {
-            name = n;
-        }
-        boolean changed = false;
-        if ((pkg != null) && (!pkg.isEmpty())) {
-            String changedPkg = deobfuscatePackage(pkg, renameType, selected);
-            if (changedPkg != null) {
-                changed = true;
-                pkg = changedPkg;
-            }
-        }
-        String changedName = deobfuscateName(name, true, "class", renameType, selected);
-        if (changedName != null) {
-            changed = true;
-            name = changedName;
-        }
-        if (changed) {
-            String newClassName = "";
-            if (pkg == null) {
-                newClassName = name;
-            } else {
-                newClassName = pkg + "." + name;
-            }
-            return newClassName;
-        }
-        return null;
-    }
-
     public int deobfuscateAS3Identifiers(RenameType renameType) {
         for (Tag tag : tags) {
             if (tag instanceof ABCContainerTag) {
@@ -1904,17 +1709,16 @@ public final class SWF {
             if (tag instanceof SymbolClassTag) {
                 SymbolClassTag sc = (SymbolClassTag) tag;
                 for (int i = 0; i < sc.classNames.length; i++) {
-                    String newname = deobfuscateNameWithPackage(sc.classNames[i], renameType, deobfuscated);
+                    String newname = deobfuscation.deobfuscateNameWithPackage(sc.classNames[i], deobfuscated, renameType, deobfuscated);
                     if (newname != null) {
                         sc.classNames[i] = newname;
                     }
                 }
             }
         }
-        deobfuscateInstanceNames(renameType, tags, new HashMap<String, String>());
+        deobfuscation.deobfuscateInstanceNames(deobfuscated, renameType, tags, new HashMap<String, String>());
         return deobfuscated.size();
     }
-    HashMap<String, Integer> typeCounts = new HashMap<>();
 
     public int deobfuscateIdentifiers(RenameType renameType) throws InterruptedException {
         findFileAttributes();
@@ -1956,7 +1760,7 @@ public final class SWF {
         int fc = 0;
         for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
             String name = it.key.toStringNoH(it.value);
-            allVariableNamesStr.add(name);
+            deobfuscation.allVariableNamesStr.add(name);
         }
 
         informListeners("rename", "classes");
@@ -1984,7 +1788,12 @@ public final class SWF {
                     }
                 }
                 int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
-                List<GraphTargetItem> dec = Action.actionsToTree(dia.getActions(version), version, staticOperation, ""/*FIXME*/);
+                List<GraphTargetItem> dec;
+                try {
+                    dec = Action.actionsToTree(dia.getActions(version), version, staticOperation, ""/*FIXME*/);
+                } catch (EmptyStackException ex) {
+                    continue;
+                }
                 GraphTargetItem name = null;
                 for (GraphTargetItem it : dec) {
                     if (it instanceof ClassActionItem) {
@@ -1999,7 +1808,7 @@ public final class SWF {
                                 if (fun.calculatedFunctionName instanceof DirectValueActionItem) {
                                     DirectValueActionItem dvf = (DirectValueActionItem) fun.calculatedFunctionName;
                                     String fname = dvf.toStringNoH(null);
-                                    String changed = deobfuscateName(fname, false, "method", renameType, selected);
+                                    String changed = deobfuscation.deobfuscateName(fname, false, "method", deobfuscated, renameType, selected);
                                     if (changed != null) {
                                         deobfuscated.put(fname, changed);
                                     }
@@ -2019,7 +1828,7 @@ public final class SWF {
                             if (gti instanceof DirectValueActionItem) {
                                 DirectValueActionItem dvf = (DirectValueActionItem) gti;
                                 String vname = dvf.toStringNoH(null);
-                                String changed = deobfuscateName(vname, false, "attribute", renameType, selected);
+                                String changed = deobfuscation.deobfuscateName(vname, false, "attribute", deobfuscated, renameType, selected);
                                 if (changed != null) {
                                     deobfuscated.put(vname, changed);
                                 }
@@ -2053,7 +1862,7 @@ public final class SWF {
                             if (classNameParts != null) {
                                 changedNameStr = classNameParts[classNameParts.length - 1 - pos];
                             }
-                            String changedNameStr2 = deobfuscateName(changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType, selected);
+                            String changedNameStr2 = deobfuscation.deobfuscateName(changedNameStr, pos == 0, pos == 0 ? "class" : "package", deobfuscated, renameType, selected);
                             if (changedNameStr2 != null) {
                                 changedNameStr = changedNameStr2;
                             }
@@ -2077,7 +1886,7 @@ public final class SWF {
                             if (classNameParts != null) {
                                 changedNameStr = classNameParts[classNameParts.length - 1 - pos];
                             }
-                            String changedNameStr2 = deobfuscateName(changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType, selected);
+                            String changedNameStr2 = deobfuscation.deobfuscateName(changedNameStr, pos == 0, pos == 0 ? "class" : "package", deobfuscated, renameType, selected);
                             if (changedNameStr2 != null) {
                                 changedNameStr = changedNameStr2;
                             }
@@ -2098,7 +1907,7 @@ public final class SWF {
                 if (f.functionName.isEmpty()) { //anonymous function, leave as is
                     continue;
                 }
-                String changed = deobfuscateName(f.functionName, false, "function", renameType, selected);
+                String changed = deobfuscation.deobfuscateName(f.functionName, false, "function", deobfuscated, renameType, selected);
                 if (changed != null) {
                     f.replacedFunctionName = changed;
                     ret++;
@@ -2109,7 +1918,7 @@ public final class SWF {
                 if (f.functionName.isEmpty()) { //anonymous function, leave as is
                     continue;
                 }
-                String changed = deobfuscateName(f.functionName, false, "function", renameType, selected);
+                String changed = deobfuscation.deobfuscateName(f.functionName, false, "function", deobfuscated, renameType, selected);
                 if (changed != null) {
                     f.replacedFunctionName = changed;
                     ret++;
@@ -2132,7 +1941,7 @@ public final class SWF {
         for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
             vc++;
             String name = it.key.toStringNoH(it.value);
-            String changed = deobfuscateName(name, false, usageTypes.get(it.key), renameType, selected);
+            String changed = deobfuscation.deobfuscateName(name, false, usageTypes.get(it.key), deobfuscated, renameType, selected);
             if (changed != null) {
                 boolean addNew = false;
                 String h = System.identityHashCode(it.key) + "_" + name;
@@ -2169,7 +1978,7 @@ public final class SWF {
             actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, 0, ""/*FIXME path*/));
             src.setActions(actionsMap.get(src), version);
         }
-        deobfuscateInstanceNames(renameType, tags, selected);
+        deobfuscation.deobfuscateInstanceNames(deobfuscated, renameType, tags, selected);
         return ret;
     }
 

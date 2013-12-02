@@ -37,7 +37,10 @@ public abstract class GraphSource implements Serializable {
 
     public abstract List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) throws InterruptedException;
 
-    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) {
+    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
         boolean debugMode = false;
         while (((endIp == -1) || (ip < endIp)) && (ip < size())) {
             refs.get(ip).add(lastIp);
@@ -87,7 +90,7 @@ public abstract class GraphSource implements Serializable {
         };
     }
 
-    public HashMap<Integer, List<Integer>> visitCode(List<Integer> alternateEntries) {
+    public HashMap<Integer, List<Integer>> visitCode(List<Integer> alternateEntries) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
         int siz = size();
         for (int i = 0; i < siz; i++) {

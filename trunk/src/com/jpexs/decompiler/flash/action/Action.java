@@ -64,6 +64,7 @@ import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -705,7 +706,7 @@ public class Action implements GraphSourceItem {
         Throwable convertException = null;
         int timeout = Configuration.decompilationTimeoutSingleMethod.get();
         try {
-            tree = Helper.timedCall(new Callable<List<GraphTargetItem>>() {
+            tree = CancellableWorker.call(new Callable<List<GraphTargetItem>>() {
                 @Override
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
@@ -714,7 +715,7 @@ public class Action implements GraphSourceItem {
                     return tree;
                 }
             }, timeout, TimeUnit.SECONDS);
-        } catch (InterruptedException | TimeoutException | ExecutionException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
+        } catch (TimeoutException | ExecutionException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
             convertException = ex;
             if (ex instanceof ExecutionException && ex.getCause() instanceof Exception) {

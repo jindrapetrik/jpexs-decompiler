@@ -103,6 +103,10 @@ public class Graph {
     }
 
     private boolean fixGraphOnce(List<Object> localData, GraphPart part, List<GraphPart> visited, boolean doChildren) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
+
         if (visited.contains(part)) {
             return false;
         }
@@ -1358,7 +1362,7 @@ public class Graph {
     }
 
     protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
-        if (Thread.interrupted()) {
+        if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
         if (stopPart == null) {
@@ -2034,7 +2038,7 @@ public class Graph {
     protected void checkGraph(List<GraphPart> allBlocks) {
     }
 
-    private List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<Integer> alternateEntries) {
+    private List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<Integer> alternateEntries) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = code.visitCode(alternateEntries);
         List<GraphPart> ret = new ArrayList<>();
         boolean[] visited = new boolean[code.size()];
@@ -2052,7 +2056,10 @@ public class Graph {
         return ip;
     }
 
-    private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startip, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean[] visited2) {
+    private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startip, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean[] visited2) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
 
         int ip = startip;
         for (GraphPart p : allBlocks) {

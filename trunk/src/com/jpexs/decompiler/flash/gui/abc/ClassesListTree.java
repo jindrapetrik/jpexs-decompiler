@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.helpers.CancellableWorker;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTree;
@@ -127,9 +128,9 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
             final ScriptPack scriptLeaf = (ScriptPack) item;
             if (!Main.isWorking()) {
                 Main.startWork(AppStrings.translate("work.decompiling") + "...");
-                (new Thread() {
+                new CancellableWorker() {
                     @Override
-                    public void run() {
+                    public Void doInBackground() throws Exception {
                         int classIndex = -1;
                         for (Trait t : scriptLeaf.abc.script_info[scriptLeaf.scriptIndex].traits.traits) {
                             if (t instanceof TraitClass) {
@@ -144,9 +145,14 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
                         abcPanel.decompiledTextArea.setClassIndex(classIndex);
                         abcPanel.decompiledTextArea.setNoTrait();
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
                         Main.stopWork();
                     }
-                }).start();
+                }.execute();
             }
 
         }

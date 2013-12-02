@@ -43,6 +43,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
@@ -54,6 +55,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,7 +85,41 @@ public class ActionListReader {
      * @return List of actions
      * @throws IOException
      */
-    public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, MemoryInputStream mis, int version, int ip, int endIp, String path) throws IOException {
+    public static List<Action> readActionListTimeout(final List<DisassemblyListener> listeners, final long containerSWFOffset, final MemoryInputStream mis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
+        try {
+            return CancellableWorker.call(new Callable<List<Action>>() {
+
+                @Override
+                public List<Action> call() throws IOException, InterruptedException {
+                    return readActionList(listeners, containerSWFOffset, mis, version, ip, endIp, path);
+                }
+            }, Configuration.decompilationTimeoutSingleMethod.get(), TimeUnit.SECONDS);
+        } catch (ExecutionException ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof InterruptedException) {
+                throw (InterruptedException) cause;
+            } else if (cause instanceof InterruptedException) {
+                throw (IOException) cause;
+            } else {
+                Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
+    }
+    /**
+     * Reads list of actions from the stream. Reading ends with
+     * ActionEndFlag(=0) or end of the stream.
+     * @param listeners
+     * @param containerSWFOffset
+     * @param mis
+     * @param version
+     * @param ip
+     * @param endIp
+     * @param path
+     * @return List of actions
+     * @throws IOException
+     */
+    public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, MemoryInputStream mis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
         boolean deobfuscate = Configuration.autoDeobfuscate.get();
 
         ConstantPool cpool = new ConstantPool();
@@ -151,11 +190,7 @@ public class ActionListReader {
 
         if (deobfuscate) {
             try {
-                try {
-                    actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, ip, path);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, ip, path);
                 updateActionLengths(actions, version);
                 removeZeroJumps(actions, version);
             } catch (TranslateException ex) {
@@ -680,6 +715,10 @@ public class ActionListReader {
         Scanner sc = new Scanner(System.in);
         loopip:
         while (((endip == -1) || (endip > ip)) && (a = actions.get(pos)) != null) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
+            
             int actionLen = getTotalActionLength(a);
             pos += actionLen;
             if (!visited.containsKey(ip)) {

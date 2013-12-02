@@ -604,7 +604,7 @@ public class SWFInputStream extends InputStream {
      * @return List of tags
      * @throws IOException
      */
-    public List<Tag> readTagList(SWF swf, int level, boolean parallel) throws IOException {
+    public List<Tag> readTagList(SWF swf, int level, boolean parallel) throws IOException, InterruptedException {
         return readTagList(swf, level, parallel, false);
     }
 
@@ -619,7 +619,7 @@ public class SWFInputStream extends InputStream {
      * @return List of tags
      * @throws IOException
      */
-    public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags) throws IOException {
+    public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
         return readTagList(swf, level, parallel, skipUnusualTags, true);
     }
 
@@ -635,11 +635,11 @@ public class SWFInputStream extends InputStream {
      * @return List of tags
      * @throws IOException
      */
-    public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags) throws IOException {
+    public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags) throws IOException, InterruptedException {
         ExecutorService executor = null;
         List<Future<Tag>> futureResults = new ArrayList<>();
         if (parallel) {
-            executor = Executors.newFixedThreadPool(20);
+            executor = Executors.newFixedThreadPool(Configuration.parallelThreadCount.get());
             futureResults = new ArrayList<>();
         }
         List<Tag> tags = new ArrayList<>();
@@ -723,7 +723,9 @@ public class SWFInputStream extends InputStream {
             for (Future<Tag> future : futureResults) {
                 try {
                     tags.add(future.get());
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (InterruptedException ex) {
+                    future.cancel(true);
+                } catch (ExecutionException e) {
                     Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", e);
                 }
             }
@@ -733,7 +735,7 @@ public class SWFInputStream extends InputStream {
         return tags;
     }
 
-    public static Tag resolveTag(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags) {
+    public static Tag resolveTag(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags) throws InterruptedException {
         Tag ret;
 
         byte[] data = tag.getData(version);
@@ -1023,7 +1025,7 @@ public class SWFInputStream extends InputStream {
      * @return Tag or null when End tag
      * @throws IOException
      */
-    public Tag readTag(SWF swf, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags) throws IOException {
+    public Tag readTag(SWF swf, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
         int tagIDTagLength = readUI16();
         int tagID = (tagIDTagLength) >> 6;
         if (tagID == 0) {

@@ -41,9 +41,8 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.helpers.AsyncResult;
 import com.jpexs.helpers.Cache;
-import com.jpexs.helpers.Callback;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -59,8 +58,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -119,7 +117,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     private boolean searchIgnoreCase;
     private boolean searchRegexp;
     private Cache cache = Cache.getInstance(true);
-    private FutureTask<Void> setSourceTask;
+    private CancellableWorker setSourceWorker;
         
     public void clearCache() {
         cache.clear();
@@ -287,7 +285,11 @@ public class ActionPanel extends JPanel implements ActionListener {
         DisassemblyListener listener = getDisassemblyListener();
         asm.addDisassemblyListener(listener);
         HilightedTextWriter writer = new HilightedTextWriter(true);
-        asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, lastCode);
+        try {
+            asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, lastCode);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         asm.removeDisassemblyListener(listener);
         return new HilightedText(writer);
     }
@@ -339,27 +341,17 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
     
     public void setSource(final ASMSource src, final boolean useCache) {
-        if (setSourceTask != null) {
-            setSourceTask.cancel(true);
+        if (setSourceWorker != null) {
+            setSourceWorker.cancel(true);
         }
 
         this.src = src;
-        Main.startWork(AppStrings.translate("work.decompiling") + "...", new Runnable() {
-
-            @Override
-            public void run() {
-                if (setSourceTask != null) {
-                    setSourceTask.cancel(true);
-                }
-                editor.setText("; " + AppStrings.translate("work.canceled"));
-            }
-        });
         final ASMSource asm = (ASMSource) src;
         
-        FutureTask<Void> task = Helper.callAsync(new Callable<Void>() {
+        CancellableWorker worker = new CancellableWorker() {
 
             @Override
-            public Void call() throws Exception {
+            protected Void doInBackground() throws Exception {
                 editor.setText("; " + AppStrings.translate("work.disassembling") + "...");
                 if (Configuration.decompile.get()) {
                     decompiledEditor.setText("//" + AppStrings.translate("work.waitingfordissasembly") + "...");
@@ -389,20 +381,30 @@ public class ActionPanel extends JPanel implements ActionListener {
                 setDecompiledEditMode(false);
                 return null;
             }
-        }, new Callback<AsyncResult<Void>>() {
 
             @Override
-            public void call(AsyncResult<Void> result) {
-                setSourceTask = null;
-                if (result.error != null) {
-                    decompiledEditor.setText("//Decompilation error: " + result.error);
-                }
+            protected void done() {
+                setSourceWorker = null;
                 Main.stopWork();
+
+                View.execInEventDispatch(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            get();
+                        } catch (CancellationException ex) {
+                            editor.setText("; " + AppStrings.translate("work.canceled"));
+                        } catch (Exception ex) {
+                            decompiledEditor.setText("//Decompilation error: " + ex);
+                        }
+                    }
+                });
             }
-            
-        });
-        
-        setSourceTask = task;
+        };
+        worker.execute();
+        setSourceWorker = worker;
+        Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
     }
 
     public void hilightOffset(long offset) {

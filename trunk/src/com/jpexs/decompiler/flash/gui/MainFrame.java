@@ -101,9 +101,8 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.graph.ExportMode;
-import com.jpexs.helpers.AsyncResult;
 import com.jpexs.helpers.Cache;
-import com.jpexs.helpers.Callback;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.process.ProcessTools;
 import java.awt.BorderLayout;
@@ -167,8 +166,7 @@ import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -198,7 +196,6 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
@@ -247,7 +244,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     public JLabel statusLabel = new JLabel("");
     public JPanel statusPanel = new JPanel();
     public JButton cancelButton = new JButton();
-    public Runnable cancelButtonPressed;
+    public CancellableWorker currentWorker;
     public JProgressBar progressBar = new JProgressBar(0, 100);
     private DeobfuscationDialog deobfuscationDialog;
     public JTree tagTree;
@@ -310,7 +307,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     public static final String INTERNAL_VIEWER_CARD = "INTERNALVIEWER";
     private Map<Integer, String> sourceFontsMap = new HashMap<>();
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
-    private FutureTask<Void> setSourceTask;
+    private CancellableWorker setSourceWorker;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -346,15 +343,15 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         statusLabel.setText(s);
     }
 
-    public void setWorkStatus(String s, Runnable cancelCallback) {
+    public void setWorkStatus(String s, CancellableWorker worker) {
         if (s.isEmpty()) {
             loadingPanel.setVisible(false);
         } else {
             loadingPanel.setVisible(true);
         }
         statusLabel.setText(s);
-        cancelButtonPressed = cancelCallback;
-        cancelButton.setVisible(cancelCallback != null);
+        currentWorker = worker;
+        cancelButton.setVisible(worker != null);
     }
 
     private String fixCommandTitle(String title) {
@@ -564,7 +561,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
         RibbonApplicationMenu mainMenu = new RibbonApplicationMenu();
         RibbonApplicationMenuEntryPrimary exportFlaMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportfla32"), translate("menu.file.export.fla"), new ActionRedirector(this, "EXPORTFLA"), CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary exportAllMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("export32"), translate("menu.file.export.all"), new ActionRedirector(this, "EXPORTSEL"), CommandButtonKind.ACTION_ONLY);
+        RibbonApplicationMenuEntryPrimary exportAllMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("export32"), translate("menu.file.export.all"), new ActionRedirector(this, "EXPORT"), CommandButtonKind.ACTION_ONLY);
         RibbonApplicationMenuEntryPrimary exportSelMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportsel32"), translate("menu.file.export.selection"), new ActionRedirector(this, "EXPORTSEL"), CommandButtonKind.ACTION_ONLY);
         RibbonApplicationMenuEntryPrimary checkUpdatesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("update32"), translate("menu.help.checkupdates"), new ActionRedirector(this, "CHECKUPDATES"), CommandButtonKind.ACTION_ONLY);
         RibbonApplicationMenuEntryPrimary aboutMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("about32"), translate("menu.help.about"), new ActionRedirector(this, "ABOUT"), CommandButtonKind.ACTION_ONLY);
@@ -1111,8 +1108,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (cancelButtonPressed != null) {
-                    cancelButtonPressed.run();
+                if (currentWorker != null) {
+                    currentWorker.cancel(true);
                 }
             }
         });
@@ -2463,9 +2460,9 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     final String txt = searchDialog.searchField.getText();
                     if (!txt.isEmpty()) {
                         if (abcPanel != null) {
-                            (new Thread() {
+                            new CancellableWorker() {
                                 @Override
-                                public void run() {
+                                protected Void doInBackground() throws Exception {
                                     if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                         View.execInEventDispatch(new Runnable() {
                                             @Override
@@ -2477,12 +2474,13 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                     } else {
                                         View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                     }
+                                    return null;
                                 }
-                            }).start();
+                            }.execute();
                         } else {
-                            (new Thread() {
+                            new CancellableWorker() {
                                 @Override
-                                public void run() {
+                                protected Void doInBackground() {
                                     if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                         View.execInEventDispatch(new Runnable() {
                                             @Override
@@ -2493,8 +2491,9 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                     } else {
                                         View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                     }
+                                    return null;
                                 }
-                            }).start();
+                            }.execute();
                         }
                     }
                 }
@@ -2646,14 +2645,19 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 if (swf.fileAttributes.actionScript3) {
                     final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
                     if (multiName > 0) {
-                        (new Thread() {
+                        new CancellableWorker() {
                             @Override
-                            public void run() {
+                            public Void doInBackground() throws Exception {
                                 Main.startWork(translate("work.renaming") + "...");
                                 renameMultiname(multiName);
+                                return null;
+                            }
+                            
+                            @Override
+                            protected void done() {
                                 Main.stopWork();
                             }
-                        }).start();
+                        }.execute();
 
                     } else {
                         View.showMessageDialog(null, translate("message.rename.notfound.multiname"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
@@ -2661,18 +2665,23 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 } else {
                     final String identifier = actionPanel.getStringUnderCursor();
                     if (identifier != null) {
-                        (new Thread() {
+                        new CancellableWorker() {
                             @Override
-                            public void run() {
+                            public Void doInBackground() throws Exception {
                                 Main.startWork(translate("work.renaming") + "...");
                                 try {
                                     renameIdentifier(identifier);
                                 } catch (InterruptedException ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                                 }
+                                return null;
+                            }
+
+                            @Override
+                            protected void done() {
                                 Main.stopWork();
                             }
-                        }).start();
+                        }.execute();
                     } else {
                         View.showMessageDialog(null, translate("message.rename.notfound.identifier"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                     }
@@ -2760,9 +2769,9 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         }
                     }
                     final File selfile = sf;
-                    (new Thread() {
+                    new CancellableWorker() {
                         @Override
-                        public void run() {
+                        protected Void doInBackground() throws Exception {
                             Helper.freeMem();
                             try {
                                 if (compressed) {
@@ -2774,9 +2783,14 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                 View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
                             }
                             Helper.freeMem();
+                            return null;
+                        }
+
+                        @Override
+                        protected void done() {
                             Main.stopWork();
                         }
-                    }).start();
+                    }.execute();
                 }
                 break;
             case "EXPORTSEL":
@@ -2798,9 +2812,9 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
                         final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
                         final boolean onlySel = e.getActionCommand().endsWith("SEL");
-                        (new Thread() {
+                        new CancellableWorker() {
                             @Override
-                            public void run() {
+                            public Void doInBackground() throws Exception {
                                 try {
                                     if (onlySel) {
                                         exportSelection(errorHandler, selFile, export);
@@ -2817,13 +2831,24 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
                                     View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
                                 }
+                                return null;
+                            }
+
+                            @Override
+                            protected void done() {
                                 Main.stopWork();
                                 long timeAfter = System.currentTimeMillis();
-                                long timeMs = timeAfter - timeBefore;
+                                final long timeMs = timeAfter - timeBefore;
 
-                                setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                                View.execInEventDispatchLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                                    }
+                                });
                             }
-                        }).start();
+                        }.execute();
 
                     }
                 }
@@ -2868,7 +2893,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 Main.startWork(translate("work.restoringControlFlow"));
                 final boolean all = e.getActionCommand().endsWith("ALL");
                 if ((!all) || confirmExperimental()) {
-                    new SwingWorker() {
+                    new CancellableWorker() {
                         @Override
                         protected Object doInBackground() throws Exception {
                             int cnt = 0;
@@ -2883,11 +2908,22 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                 }
                                 abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, abcPanel.decompiledTextArea.getCurrentTrait());
                             }
-                            Main.stopWork();
-                            View.showMessageDialog(null, "Control flow restored");
-                            abcPanel.reload();
-                            doFilter();
                             return true;
+                        }
+
+                        @Override
+                        protected void done() {
+                            Main.stopWork();
+                            View.showMessageDialog(null, translate("work.restoringControlFlow.complete"));
+
+                            View.execInEventDispatch(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    abcPanel.reload();
+                                    doFilter();
+                                }
+                            });
                         }
                     }.execute();
                 }
@@ -2897,29 +2933,39 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     final RenameType renameType = new RenameDialog().display();
                     if (renameType != null) {
                         Main.startWork(translate("work.renaming.identifiers") + "...");
-                        new SwingWorker() {
+                        new CancellableWorker<Integer>() {
                             @Override
-                            protected Object doInBackground() throws Exception {
-                                try {
-                                    int cnt = swf.deobfuscateIdentifiers(renameType);
-                                    Main.stopWork();
-                                    View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", "" + cnt));
-                                    swf.assignClassesToSymbols();
-                                    clearCache();
-                                    if (abcPanel != null) {
-                                        abcPanel.reload();
+                            protected Integer doInBackground() throws Exception {
+                                int cnt = swf.deobfuscateIdentifiers(renameType);
+                                return cnt;
+                            }
+
+                            @Override
+                            protected void done() {
+                                View.execInEventDispatch(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            int cnt = get();
+                                            Main.stopWork();
+                                            View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", "" + cnt));
+                                            swf.assignClassesToSymbols();
+                                            clearCache();
+                                            if (abcPanel != null) {
+                                                abcPanel.reload();
+                                            }
+                                            doFilter();
+                                            reload(true);
+                                        } catch (Exception ex) {
+                                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during renaming identifiers", ex);
+                                            Main.stopWork();
+                                            View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
+                                        }
                                     }
-                                    doFilter();
-                                    reload(true);
-                                } catch (Exception ex) {
-                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during renaming identifiers", ex);
-                                    Main.stopWork();
-                                    View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
-                                }
-                                return true;
+                                });
                             }
                         }.execute();
-
                     }
                 }
                 break;
@@ -2931,7 +2977,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 deobfuscationDialog.setVisible(true);
                 if (deobfuscationDialog.ok) {
                     Main.startWork(translate("work.deobfuscating") + "...");
-                    new SwingWorker() {
+                    new CancellableWorker() {
                         @Override
                         protected Object doInBackground() throws Exception {
                             try {
@@ -2964,12 +3010,23 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                             } catch (Exception ex) {
                                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);
                             }
+                            return true;
+                        }
+
+                        @Override
+                        protected void done() {
                             Main.stopWork();
                             View.showMessageDialog(null, translate("work.deobfuscating.complete"));
-                            clearCache();
-                            abcPanel.reload();
-                            doFilter();
-                            return true;
+
+                            View.execInEventDispatch(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    clearCache();
+                                    abcPanel.reload();
+                                    doFilter();
+                                }
+                            });
                         }
                     }.execute();
                 }
@@ -3076,22 +3133,14 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         oldValue = tagObj;
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
+            if (setSourceWorker != null) {
+                setSourceWorker.cancel(true);
+            }
             if (!Main.isWorking()) {
-                Main.startWork(translate("work.decompiling") + "...", new Runnable() {
+                CancellableWorker worker = new CancellableWorker() {
 
                     @Override
-                    public void run() {
-                        if (setSourceTask != null) {
-                            setSourceTask.cancel(true);
-                        }
-                        abcPanel.decompiledTextArea.setText("//" + AppStrings.translate("work.canceled"));
-                    }
-                });
-                
-                FutureTask<Void> task = Helper.callAsync(new Callable<Void>() {
-
-                    @Override
-                    public Void call() throws Exception {
+                    protected Void doInBackground() throws Exception {
                         int classIndex = -1;
                         for (Trait t : scriptLeaf.abc.script_info[scriptLeaf.scriptIndex].traits.traits) {
                             if (t instanceof TraitClass) {
@@ -3108,18 +3157,29 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         abcPanel.decompiledTextArea.setNoTrait();
                         return null;
                     }
-                }, new Callback<AsyncResult<Void>>() {
 
                     @Override
-                    public void call(AsyncResult<Void> result) {
-                        setSourceTask = null;
-                        if (result.error != null) {
-                            abcPanel.decompiledTextArea.setText("//Decompilation error: " + result.error);
-                        }
+                    protected void done() {
                         Main.stopWork();
+
+                        View.execInEventDispatch(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                try {
+                                    get();
+                                } catch (CancellationException ex) {
+                                    abcPanel.decompiledTextArea.setText("//" + AppStrings.translate("work.canceled"));
+                                } catch (Exception ex) {
+                                    abcPanel.decompiledTextArea.setText("//Decompilation error: " + ex);
+                                }
+                            }
+                        });
                     }
-                });
-                setSourceTask = task;
+                };
+                worker.execute();
+                setSourceWorker = worker;
+                Main.startWork(translate("work.decompiling") + "...", worker);
             }
             
             showDetail(DETAILCARDAS3NAVIGATOR);

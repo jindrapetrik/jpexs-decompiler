@@ -153,7 +153,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
      * @return ASM source
      */
     @Override
-    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) {
+    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
         if (actions == null) {
             actions = getActions(version);
         }
@@ -171,10 +171,12 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
     }
 
     @Override
-    public List<Action> getActions(int version) {
+    public List<Action> getActions(int version) throws InterruptedException {
         try {
-            List<Action> list = ActionListReader.readActionList(listeners, getPos() + hdrPos, new MemoryInputStream(actionBytes), version, 0, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + hdrPos, new MemoryInputStream(actionBytes), version, 0, -1, toString()/*FIXME?*/);
             return list;
+        } catch (InterruptedException ex) {
+            throw ex;
         } catch (Exception ex) {
             Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<>();

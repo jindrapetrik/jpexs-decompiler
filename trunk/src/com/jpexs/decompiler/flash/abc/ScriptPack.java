@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.ExportMode;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -143,7 +144,7 @@ public class ScriptPack {
     public void toSource(GraphTextWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ExportMode exportMode, final boolean parallel) throws InterruptedException {
         writer.suspendMeasure();
         try {
-            Helper.timedCall(new Callable<Void>() {
+            CancellableWorker.call(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
                     convert(new NulWriter(), abcList, traits, exportMode, parallel);
@@ -159,7 +160,7 @@ public class ScriptPack {
             writer.appendNoHilight(" */").newLine();
             writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
             return;
-        } catch (InterruptedException | ExecutionException ex) {
+        } catch (ExecutionException ex) {
             writer.continueMeasure();
             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
             writer.appendNoHilight("/*").newLine();

@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -260,7 +261,7 @@ public class TagNode {
 
     public static List<File> exportNodeAS(final List<Tag> allTags, final AbortRetryIgnoreHandler handler, final List<TagNode> nodeList, final String outdir, final ExportMode exportMode, final EventListener ev) throws IOException {
         try {
-            List<File> result = Helper.timedCall(new Callable<List<File>>() {
+            List<File> result = CancellableWorker.call(new Callable<List<File>>() {
 
                 @Override
                 public List<File> call() throws Exception {

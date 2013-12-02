@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -151,17 +152,17 @@ public class Main {
         startWork(name, percent, null);
     }
 
-    public static void startWork(String name, Runnable cancelCallback) {
-        startWork(name, -1, cancelCallback);
+    public static void startWork(String name, CancellableWorker worker) {
+        startWork(name, -1, worker);
     }
 
-    public static void startWork(final String name, final int percent, final Runnable cancelCallback) {
+    public static void startWork(final String name, final int percent, final CancellableWorker worker) {
         working = true;
         View.execInEventDispatchLater(new Runnable() {
             @Override
             public void run() {
                 if (mainFrame != null) {
-                    mainFrame.setWorkStatus(name, cancelCallback);
+                    mainFrame.setWorkStatus(name, worker);
                     if (percent == -1) {
                         mainFrame.hidePercent();
                     } else {
@@ -186,12 +187,17 @@ public class Main {
 
     public static void stopWork() {
         working = false;
-        if (mainFrame != null) {
-            mainFrame.setWorkStatus("", null);
-        }
-        if (loadingDialog != null) {
-            loadingDialog.setDetail("");
-        }
+        View.execInEventDispatchLater(new Runnable() {
+            @Override
+            public void run() {
+                if (mainFrame != null) {
+                    mainFrame.setWorkStatus("", null);
+                }
+                if (loadingDialog != null) {
+                    loadingDialog.setDetail("");
+                }
+            }
+        });
     }
 
     public static SWF parseSWF(String file) throws Exception {
@@ -302,6 +308,7 @@ public class Main {
     }
 
     public static boolean reloadSWF() {
+        CancellableWorker.cancelBackgroundThreads();
         if (Main.inputStream == null) {
             mainFrame.setVisible(false);
             Helper.emptyObject(mainFrame);

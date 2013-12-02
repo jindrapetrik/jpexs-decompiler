@@ -223,6 +223,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                 abc.bodies[bodyIndex].code = acode;
             }
         } catch (IOException ex) {
+        } catch (InterruptedException ex) {
         } catch (ParseException ex) {
             View.showMessageDialog(this, (ex.text + " on line " + ex.line));
             selectLine((int) ex.line);

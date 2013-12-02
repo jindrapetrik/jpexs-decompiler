@@ -1796,7 +1796,10 @@ public class AVM2Code implements Serializable {
         return stats;
     }
 
-    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) {
+    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
         while (ip < code.size()) {
             if (!refs.containsKey(ip)) {
                 refs.put(ip, new ArrayList<Integer>());
@@ -1844,7 +1847,7 @@ public class AVM2Code implements Serializable {
         };
     }
 
-    public HashMap<Integer, List<Integer>> visitCode(MethodBody body) {
+    public HashMap<Integer, List<Integer>> visitCode(MethodBody body) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
         for (int i = 0; i < code.size(); i++) {
             refs.put(i, new ArrayList<Integer>());
@@ -2078,7 +2081,7 @@ public class AVM2Code implements Serializable {
 
     }
 
-    private void restoreControlFlowPass(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, boolean secondpass) {
+    private void restoreControlFlowPass(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, boolean secondpass) throws InterruptedException {
         try {
             HashMap<Integer, List<Integer>> refs;
             int[] visited2 = new int[code.size()];
@@ -2134,7 +2137,7 @@ public class AVM2Code implements Serializable {
         removeDeadCode(constants, trait, info, body);
     }
 
-    public void restoreControlFlow(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) {
+    public void restoreControlFlow(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
         restoreControlFlowPass(constants, trait, info, body, false);
         //restoreControlFlowPass(constants, body, true);
     }
@@ -2146,7 +2149,7 @@ public class AVM2Code implements Serializable {
      }
      }
      }*/
-    public void removeIgnored(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) {
+    public void removeIgnored(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
         try {
             List<Integer> outputMap = new ArrayList<>();
             HilightedTextWriter writer = new HilightedTextWriter(false);
@@ -2170,7 +2173,7 @@ public class AVM2Code implements Serializable {
         invalidateCache();
     }
 
-    public int removeDeadCode(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) {
+    public int removeDeadCode(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = visitCode(body);
 
         int cnt = 0;
@@ -2377,7 +2380,7 @@ public class AVM2Code implements Serializable {
 
     @SuppressWarnings("unchecked")
     private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<AVM2Instruction, Decision> decisions, String path, int recursionLevel) throws InterruptedException {
-        if (Thread.interrupted()) {
+        if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
         if (recursionLevel > code.size() + 1) {

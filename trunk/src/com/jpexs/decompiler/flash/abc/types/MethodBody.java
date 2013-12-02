@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -76,11 +77,11 @@ public class MethodBody implements Cloneable, Serializable {
         return s;
     }
 
-    public int removeDeadCode(ConstantPool constants, Trait trait, MethodInfo info) {
+    public int removeDeadCode(ConstantPool constants, Trait trait, MethodInfo info) throws InterruptedException {
         return code.removeDeadCode(constants, trait, info, this);
     }
 
-    public void restoreControlFlow(ConstantPool constants, Trait trait, MethodInfo info) {
+    public void restoreControlFlow(ConstantPool constants, Trait trait, MethodInfo info) throws InterruptedException {
         code.restoreControlFlow(constants, trait, info, this);
     }
 
@@ -139,7 +140,7 @@ public class MethodBody implements Cloneable, Serializable {
                     }
                 };
                 if (firstLevel) {
-                    Helper.timedCall(callable, timeout, TimeUnit.SECONDS);
+                    CancellableWorker.call(callable, timeout, TimeUnit.SECONDS);
                 } else {
                     callable.call();
                 }

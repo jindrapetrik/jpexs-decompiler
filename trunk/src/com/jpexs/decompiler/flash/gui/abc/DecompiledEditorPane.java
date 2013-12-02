@@ -38,8 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -488,7 +486,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             cacheScriptPack(scriptLeaf, abcList);
             cd = getCached(scriptLeaf);
         } catch (InterruptedException ex) {
-            Logger.getLogger(DecompiledEditorPane.class.getName()).log(Level.SEVERE, null, ex);
         }
         if (cd != null) {
             final String hilightedCode = cd.text;
