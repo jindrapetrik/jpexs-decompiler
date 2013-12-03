@@ -104,7 +104,7 @@ public class ActionListReader {
                 Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return null;
+        return new ArrayList<>();
     }
     /**
      * Reads list of actions from the stream. Reading ends with

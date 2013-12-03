@@ -273,7 +273,7 @@ public class TagNode {
             return result;
         } catch (ExecutionException | InterruptedException | TimeoutException ex) {
         }
-        return null;
+        return new ArrayList<>();
     }
 
     public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, ExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
