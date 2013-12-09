@@ -505,7 +505,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         int bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
         if (bodyIndex != -1) {
             writer.mark();
-            abc.bodies[bodyIndex].convert(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, fullyQualifiedNames, abc.class_info[class_info].static_traits, true);
+            abc.bodies[bodyIndex].convert(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, writer, fullyQualifiedNames, abc.class_info[class_info].static_traits, true);
             classInitializerIsEmpty = !writer.getMark();
         }
 
@@ -513,7 +513,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (!abc.instance_info[class_info].isInterface()) {
             bodyIndex = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].convert(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, fullyQualifiedNames, abc.instance_info[class_info].instance_traits, true);
+                abc.bodies[bodyIndex].convert(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, abc.instance_info[class_info].instance_traits, true);
             }
         }
 

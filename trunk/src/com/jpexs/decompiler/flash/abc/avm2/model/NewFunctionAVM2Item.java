@@ -70,7 +70,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.append("{").newLine();
         if (body != null) {
             if (writer instanceof NulWriter) {
-                body.convert(path + "/inner", ExportMode.SOURCE, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, fullyQualifiedNames, null, false);
+                body.convert(path + "/inner", ExportMode.SOURCE, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null, false);
             } else {
                 body.toString(path + "/inner", ExportMode.SOURCE, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new Stack<GraphTargetItem>()/*scopeStack*/, false, writer, fullyQualifiedNames, null);
             }

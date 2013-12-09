@@ -90,7 +90,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         if (!abc.instance_info[classIndex].isInterface()) {
             int bodyIndex = abc.findBodyIndex(method_info);
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].convert(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, fullyQualifiedNames, null, true);
+                abc.bodies[bodyIndex].convert(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null, true);
             }
         }
     }

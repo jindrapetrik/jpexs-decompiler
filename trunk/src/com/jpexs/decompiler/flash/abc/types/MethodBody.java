@@ -115,18 +115,17 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public HilightedTextWriter toString(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits) throws InterruptedException {
-        convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, true);
-        HilightedTextWriter writer = new HilightedTextWriter(false);
-        toString(path, exportMode, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, writer, fullyQualifiedNames, initTraits);
-        return writer;
-    }
-    
-    public void convert(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final List<String> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
+    public void convert(final String path, ExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
-        if (exportMode == ExportMode.SOURCE) {
+        if (exportMode != ExportMode.SOURCE) {
+            code.toASMSource(constants, trait, method_info[this.method_info], this, exportMode, writer);
+        } else {
+            if (!Configuration.decompile.get()) {
+                writer.appendNoHilight("//Decompilation skipped").newLine();
+                return;
+            }
             int timeout = Configuration.decompilationTimeoutSingleMethod.get();
             try {
                 Callable<Void> callable = new Callable<Void>() {
@@ -135,7 +134,7 @@ public class MethodBody implements Cloneable, Serializable {
                         MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
                         HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                         convertedItems = converted.code.toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), converted.code.visitCode(converted));
-                        Graph.graphToString(convertedItems, new NulWriter(), LocalData.create(constants, localRegNames, fullyQualifiedNames));
+                        Graph.graphToString(convertedItems, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
                         return null;
                     }
                 };
@@ -165,7 +164,7 @@ public class MethodBody implements Cloneable, Serializable {
             if (!Configuration.decompile.get()) {
                 writer.indent();
                 writer.startMethod(this.method_info);
-                writer.appendNoHilight("//Decompilation skipped");
+                writer.appendNoHilight("//Decompilation skipped").newLine();
                 writer.endMethod();
                 writer.unindent();
                 return writer;

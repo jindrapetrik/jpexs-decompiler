@@ -77,7 +77,7 @@ public class TraitMethodGetterSetter extends Trait {
         int bodyIndex = abc.findBodyIndex(method_info);
         if (!(classIndex != -1 && abc.instance_info[classIndex].isInterface() || bodyIndex == -1)) {
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, fullyQualifiedNames, null, true);
+                abc.bodies[bodyIndex].convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null, true);
             }
         }
     }
