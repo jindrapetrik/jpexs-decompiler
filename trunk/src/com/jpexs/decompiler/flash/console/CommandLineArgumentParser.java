@@ -186,9 +186,9 @@ public class CommandLineArgumentParser {
             parseCompress(args);
         } else if (nextParam.equals("-decompress")) {
             parseDecompress(args);
-        } else if (nextParam.equals("-renameInvalidIdentifiers")) {
+        } else if (nextParam.equals("-renameinvalididentifiers")) {
             parseRenameInvalidIdentifiers(args);
-        } else if (nextParam.equals("-dumpSWF")) {
+        } else if (nextParam.equals("-dumpswf")) {
             parseDumpSwf(args);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?")) {
             printHeader();
