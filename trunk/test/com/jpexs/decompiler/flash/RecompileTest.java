@@ -3,8 +3,6 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.abc.NotSameException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
