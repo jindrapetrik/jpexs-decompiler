@@ -3,6 +3,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -49,7 +50,9 @@ public class ActionScript3Test {
         assertTrue(bodyIndex > -1);
         HilightedTextWriter writer = null;
         try {
-            writer = abc.bodies[bodyIndex].toString(methodName, ExportMode.SOURCE, isStatic, -1/*FIX?*/, clsIndex, abc,null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false,  new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
+            abc.bodies[bodyIndex].convert(methodName, ExportMode.SOURCE, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits, true);
+            writer = new HilightedTextWriter(false);
+            abc.bodies[bodyIndex].toString(methodName, ExportMode.SOURCE, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
         } catch (InterruptedException ex) {
             fail();
         }
