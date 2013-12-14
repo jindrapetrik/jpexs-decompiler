@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.helpers.CancellableWorker;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.FlowLayout;
@@ -28,6 +30,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
@@ -172,10 +177,22 @@ public class DetailPanel extends JPanel implements ActionListener {
         if (e.getActionCommand().equals("SAVEDETAIL")) {
             if (cardMap.get(selectedCard) instanceof TraitDetail) {
                 if (((TraitDetail) cardMap.get(selectedCard)).save()) {
-                    int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
-                    abcPanel.decompiledTextArea.reloadClass();
-                    abcPanel.decompiledTextArea.gotoTrait(lasttrait);
-                    View.showMessageDialog(this, AppStrings.translate("message.trait.saved"));
+                    CancellableWorker worker = new CancellableWorker() {
+
+                        @Override
+                        public Void doInBackground() throws Exception {
+                            int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
+                            abcPanel.decompiledTextArea.reloadClass();
+                            abcPanel.decompiledTextArea.gotoTrait(lasttrait);
+                            return null;
+                        }
+
+                        @Override
+                        protected void done() {
+                            View.showMessageDialog(null, AppStrings.translate("message.trait.saved"));
+                        }
+                    };
+                    worker.execute();
                 }
             }
         }
