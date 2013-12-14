@@ -174,6 +174,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "RTQNameL"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_RTQNAMEL,yytext());}
   "RTQNameLA"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_RTQNAMELA,yytext());}
   "Multiname"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MULTINAME,yytext());}
+  "MultinameA"                 {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MULTINAMEA,yytext());}
   "MultinameL"                 {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MULTINAMEL,yytext());}
   "MultinameLA"                {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MULTINAMELA,yytext());}
   "TypeName"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TYPENAME,yytext());}
