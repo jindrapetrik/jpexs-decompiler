@@ -203,7 +203,7 @@ public class Configuration {
             } catch (SecurityException ignore) {
             }
             if (userHome != null) {
-                String applicationId = ApplicationInfo.shortApplicationName;
+                String applicationId = ApplicationInfo.SHORT_APPLICATION_NAME;
                 OSId osId = getOSId();
                 if (osId == OSId.WINDOWS) {
                     File appDataDir = null;
@@ -214,7 +214,7 @@ public class Configuration {
                         }
                     } catch (SecurityException ignore) {
                     }
-                    String vendorId = ApplicationInfo.vendor;
+                    String vendorId = ApplicationInfo.VENDOR;
                     if ((appDataDir != null) && appDataDir.isDirectory()) {
                         // ${APPDATA}\{vendorId}\${applicationId}
                         String path = vendorId + "\\" + applicationId + "\\";

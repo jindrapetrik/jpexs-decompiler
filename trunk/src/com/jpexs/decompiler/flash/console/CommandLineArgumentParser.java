@@ -548,11 +548,11 @@ public class CommandLineArgumentParser {
                     exportOK = true;
                     break;
                 case "fla":
-                    exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
+                    exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
                     exportOK = true;
                     break;
                 case "xfl":
-                    exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.applicationName, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
+                    exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
                     exportOK = true;
                     break;
                 default:

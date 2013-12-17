@@ -39,11 +39,11 @@ public class AVM2Deobfuscation {
         "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
         "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
         "with", "dynamic", "default", "final", "in", "static"};
-    public static final String validFirstCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-    public static final String validNextCharacters = validFirstCharacters + "0123456789";
-    public static final String validNsCharacters = ".:$";
-    public static final String fooCharacters = "bcdfghjklmnpqrstvwz";
-    public static final String fooJoinCharacters = "aeiouy";
+    public static final String VALID_FIRST_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+    public static final String VALID_NEXT_CHARACTERS = VALID_FIRST_CHARACTERS + "0123456789";
+    public static final String VALID_NS_CHARACTERS = ".:$";
+    public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
+    public static final String FOO_JOIN_CHARACTERS = "aeiouy";
 
     private ConstantPool constants;
     private Map<String, Integer> usageTypesCount = new HashMap<>();
@@ -76,7 +76,7 @@ public class AVM2Deobfuscation {
             }
         }
         if (isValid) {
-            Pattern pat = Pattern.compile("^([" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters + validNsCharacters) + "]*)*$");
+            Pattern pat = Pattern.compile("^([" + Pattern.quote(VALID_FIRST_CHARACTERS) + "]" + "[" + Pattern.quote(VALID_FIRST_CHARACTERS + VALID_NEXT_CHARACTERS + VALID_NS_CHARACTERS) + "]*)*$");
             if (!pat.matcher(s).matches()) {
                 isValid = false;
             }
@@ -119,9 +119,9 @@ public class AVM2Deobfuscation {
                 for (int i = 0; i < len; i++) {
                     String c = "";
                     if ((i % 2) == 0) {
-                        c = "" + fooCharacters.charAt(rnd.nextInt(fooCharacters.length()));
+                        c = "" + FOO_CHARACTERS.charAt(rnd.nextInt(FOO_CHARACTERS.length()));
                     } else {
-                        c = "" + fooJoinCharacters.charAt(rnd.nextInt(fooJoinCharacters.length()));
+                        c = "" + FOO_JOIN_CHARACTERS.charAt(rnd.nextInt(FOO_JOIN_CHARACTERS.length()));
                     }
                     if (i == 0 && firstUppercase) {
                         c = c.toUpperCase(Locale.ENGLISH);
@@ -216,7 +216,7 @@ public class AVM2Deobfuscation {
         }
 
         if (isValid) {
-            Pattern pat = Pattern.compile("^[" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters) + "]*$");
+            Pattern pat = Pattern.compile("^[" + Pattern.quote(VALID_FIRST_CHARACTERS) + "]" + "[" + Pattern.quote(VALID_FIRST_CHARACTERS + VALID_NEXT_CHARACTERS) + "]*$");
             if (!pat.matcher(s).matches()) {
                 isValid = false;
             }

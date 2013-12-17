@@ -25,13 +25,13 @@ import java.util.Properties;
  */
 public class ApplicationInfo {
     
-    public static final String applicationName = "JPEXS Free Flash Decompiler";
-    public static final String shortApplicationName = "FFDec";
-    public static final String vendor = "JPEXS";
+    public static final String APPLICATION_NAME = "JPEXS Free Flash Decompiler";
+    public static final String SHORT_APPLICATION_NAME = "FFDec";
+    public static final String VENDOR = "JPEXS";
     public static String version = "";
     public static String applicationVerName;
     public static String shortApplicationVerName;
-    public static final String projectPage = "http://www.free-decompiler.com/flash";
+    public static final String PROJECT_PAGE = "http://www.free-decompiler.com/flash";
     public static String updatePageStub = "http://www.free-decompiler.com/flash/update.html?currentVersion=";
     public static String updatePage;
 
@@ -44,9 +44,9 @@ public class ApplicationInfo {
         try {
             prop.load(ApplicationInfo.class.getResourceAsStream("/project.properties"));
             version = prop.getProperty("version");
-            applicationVerName = applicationName + " v." + version;
+            applicationVerName = APPLICATION_NAME + " v." + version;
             updatePage = updatePageStub + version;
-            shortApplicationVerName = shortApplicationName + " v." + version;
+            shortApplicationVerName = SHORT_APPLICATION_NAME + " v." + version;
         } catch (IOException | NullPointerException ex) {
             //ignore
             version = "unknown";

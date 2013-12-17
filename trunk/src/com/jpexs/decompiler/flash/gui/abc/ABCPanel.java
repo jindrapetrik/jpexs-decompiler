@@ -110,6 +110,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     private NewTraitDialog newTraitDialog;
     public JLabel scriptNameLabel;
 
+    static final String ACTION_ADD_TRAIT = "ADDTRAIT";
+    public static final String ACTION_FILTER_SCRIPT = "FILTERSCRIPT";
+    static final String ACTION_SEARCH_CANCEL = "SEARCHCANCEL";
+    static final String ACTION_SEARCH_PREV = "SEARCHPREV";
+    static final String ACTION_SEARCH_NEXT = "SEARCHNEXT";
+    
     public boolean search(String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
             searchIgnoreCase = ignoreCase;
@@ -590,7 +596,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "ADDTRAIT":
+            case ACTION_ADD_TRAIT:
                 int class_index = decompiledTextArea.getClassIndex();
                 if (class_index < 0) {
                     return;
@@ -691,23 +697,23 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                 }
 
                 break;
-            case "FILTERSCRIPT":
+            case ACTION_FILTER_SCRIPT:
                 doFilter();
                 break;
-            case "SEARCHCANCEL":
+            case ACTION_SEARCH_CANCEL:
                 foundPos = 0;
                 searchPanel.setVisible(false);
                 found = new ArrayList<>();
                 searchFor = null;
                 break;
-            case "SEARCHPREV":
+            case ACTION_SEARCH_PREV:
                 foundPos--;
                 if (foundPos < 0) {
                     foundPos += found.size();
                 }
                 updateSearchPos();
                 break;
-            case "SEARCHNEXT":
+            case ACTION_SEARCH_NEXT:
                 foundPos = (foundPos + 1) % found.size();
                 updateSearchPos();
                 break;

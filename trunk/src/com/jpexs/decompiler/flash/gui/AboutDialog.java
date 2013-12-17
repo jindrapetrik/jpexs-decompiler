@@ -138,7 +138,7 @@ public class AboutDialog extends AppDialog {
 
         cp.add(Box.createVerticalStrut(10));
 
-        LinkLabel wwwLabel = new LinkLabel(ApplicationInfo.projectPage);
+        LinkLabel wwwLabel = new LinkLabel(ApplicationInfo.PROJECT_PAGE);
         wwwLabel.setAlignmentX(0.5f);
         wwwLabel.setForeground(Color.blue);
         //wwwLabel.setPreferredSize(new Dimension(300, 25));
