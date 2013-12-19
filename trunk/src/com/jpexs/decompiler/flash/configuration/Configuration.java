@@ -269,6 +269,15 @@ public class Configuration {
         }
         recentFiles.set(Helper.joinStrings(recentFilesArray, "::"));
     }
+
+    public static void removeRecentFile(String path) {
+        List<String> recentFilesArray = new ArrayList<>(getRecentFiles());
+        int idx = recentFilesArray.indexOf(path);
+        if (idx != -1) {
+            recentFilesArray.remove(idx);
+        }        
+        recentFiles.set(Helper.joinStrings(recentFilesArray, "::"));
+    }
     
     /**
      * Saves replacements to file for future use

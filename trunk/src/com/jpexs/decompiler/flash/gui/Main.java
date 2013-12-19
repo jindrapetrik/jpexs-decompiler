@@ -31,7 +31,6 @@ import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.streams.SeekableInputStream;
-import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import com.sun.jna.Platform;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -326,14 +325,14 @@ public class Main {
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                return openFile(fileTitle, inputStream);
+                return openFile(fileTitle, inputStream) == OpenFileResult.OK;
             } else if (inputStream instanceof BufferedInputStream) {
                 try {
                     ((BufferedInputStream) inputStream).reset();
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                return openFile(fileTitle, inputStream);
+                return openFile(fileTitle, inputStream) == OpenFileResult.OK;
             }
             return false;
         }
@@ -359,23 +358,26 @@ public class Main {
         reloadSWF();
     }
 
-    public static boolean openFile(String swfFile) {
+    public static OpenFileResult openFile(String swfFile) {
         try {
             File file = new File(swfFile);
             swfFile = file.getCanonicalPath();
             Configuration.addRecentFile(swfFile);
-            boolean ok = openFile(swfFile, new FileInputStream(swfFile));
-            if (ok) {
+            OpenFileResult openResult = openFile(swfFile, new FileInputStream(swfFile));
+            if (openResult == OpenFileResult.OK) {
                 readOnly = false;
             }
-            return ok;
+            return openResult;
+        } catch (FileNotFoundException ex) {
+            View.showMessageDialog(null, "File not found", "Error", JOptionPane.ERROR_MESSAGE);
+            return OpenFileResult.NOT_FOUND;
         } catch (IOException ex) {
             View.showMessageDialog(null, "Cannot open file", "Error", JOptionPane.ERROR_MESSAGE);
+            return OpenFileResult.ERROR;
         }
-        return false;
     }
 
-    public static boolean openFile(String fileTitle, InputStream is) {
+    public static OpenFileResult openFile(String fileTitle, InputStream is) {
         Main.file = fileTitle;
         Main.inputStream = is;
         Main.fileTitle = fileTitle;
@@ -400,7 +402,7 @@ public class Main {
         Main.loadingDialog.setVisible(true);
         OpenFileWorker wrk = new OpenFileWorker();
         wrk.execute();
-        return true;
+        return OpenFileResult.OK;
     }
 
     public static boolean saveFileDialog() {
