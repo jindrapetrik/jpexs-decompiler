@@ -107,7 +107,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
         }
     }
     
-    public String translate(String key) {
+    private String translate(String key) {
         return mainFrame.translate(key);
     }
 

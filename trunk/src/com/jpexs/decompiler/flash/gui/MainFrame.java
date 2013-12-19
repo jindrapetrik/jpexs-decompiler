@@ -299,6 +299,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     static final String ACTION_SELECT_COLOR = "SELECTCOLOR";
     static final String ACTION_FONT_ADD_CHARS = "FONTADDCHARS";
     static final String ACTION_REPLACE_IMAGE = "REPLACEIMAGE";
+    static final String ACTION_REPLACE_BINARY = "REPLACEBINARY";
     static final String ACTION_REMOVE_ITEM = "REMOVEITEM";
     static final String ACTION_EDIT_TEXT = "EDITTEXT";
     static final String ACTION_CANCEL_TEXT = "CANCELTEXT";
@@ -347,10 +348,18 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         final JMenuItem removeMenuItem = new JMenuItem(translate("contextmenu.remove"));
         removeMenuItem.addActionListener(this);
         removeMenuItem.setActionCommand(ACTION_REMOVE_ITEM);
-        JMenuItem exportSelectionMenuItem = new JMenuItem(translate("menu.file.export.selection"));
+        final JMenuItem exportSelectionMenuItem = new JMenuItem(translate("menu.file.export.selection"));
         exportSelectionMenuItem.setActionCommand(MainFrameRibbon.ACTION_EXPORT_SEL);
         exportSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(exportSelectionMenuItem);
+        final JMenuItem replaceImageSelectionMenuItem = new JMenuItem(translate("button.replace"));
+        replaceImageSelectionMenuItem.setActionCommand(ACTION_REPLACE_IMAGE);
+        replaceImageSelectionMenuItem.addActionListener(this);
+        contextPopupMenu.add(replaceImageSelectionMenuItem);
+        final JMenuItem replaceBinarySelectionMenuItem = new JMenuItem(translate("button.replace"));
+        replaceBinarySelectionMenuItem.setActionCommand(ACTION_REPLACE_BINARY);
+        replaceBinarySelectionMenuItem.addActionListener(this);
+        contextPopupMenu.add(replaceBinarySelectionMenuItem);
 
         contextPopupMenu.add(removeMenuItem);
         tagTree.addMouseListener(new MouseAdapter() {
@@ -381,6 +390,24 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         }
                     }
 
+                    replaceImageSelectionMenuItem.setVisible(false);
+                    replaceBinarySelectionMenuItem.setVisible(false);
+                    
+                    if (paths.length == 1) {
+                        Object tagObj = paths[0].getLastPathComponent();
+
+                        if (tagObj instanceof TagNode) {
+                            Object tag = ((TagNode) tagObj).tag;
+
+                            if (tag instanceof ImageTag && ((ImageTag) tag).importSupported()) {
+                                replaceImageSelectionMenuItem.setVisible(true);
+                            }
+                            if (tag instanceof DefineBinaryDataTag) {
+                                replaceBinarySelectionMenuItem.setVisible(true);
+                            }
+                        }
+                    }
+                    
                     removeMenuItem.setVisible(allSelectedIsTag);
                     contextPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
@@ -440,6 +467,18 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
         imagesCard.add(imageButtonsPanel, BorderLayout.SOUTH);
         return imagesCard;
+    }
+    
+    private void showHideImageReplaceButton(boolean show) {
+        imageReplaceButton.setVisible(show);
+        setImageButtonPanelVisibility();
+    }
+    
+    private void setImageButtonPanelVisibility() {
+        // hide button panel when no button is visible
+        // now there is only one button, later add here the other buttons
+        boolean visible = imageReplaceButton.isVisible();
+        imageButtonsPanel.setVisible(visible);
     }
     
     public MainFrame(SWF swf) {
@@ -2301,34 +2340,69 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 }
                 break;
             case ACTION_REPLACE_IMAGE:
-                Object tagObj = tagTree.getLastSelectedPathComponent();
-                if (tagObj == null) {
-                    return;
-                }
+                {
+                    Object tagObj = tagTree.getLastSelectedPathComponent();
+                    if (tagObj == null) {
+                        return;
+                    }
 
-                if (tagObj instanceof TagNode) {
-                    tagObj = ((TagNode) tagObj).tag;
+                    if (tagObj instanceof TagNode) {
+                        tagObj = ((TagNode) tagObj).tag;
+                    }
+                    if (tagObj instanceof ImageTag) {
+                        ImageTag it = (ImageTag) tagObj;
+                        if (it.importSupported()) {
+                            JFileChooser fc = new JFileChooser();
+                            fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+                            fc.setFileFilter(new FileFilter() {
+                                @Override
+                                public boolean accept(File f) {
+                                    return (f.getName().toLowerCase().endsWith(".jpg"))
+                                            || (f.getName().toLowerCase().endsWith(".jpeg"))
+                                            || (f.getName().toLowerCase().endsWith(".gif"))
+                                            || (f.getName().toLowerCase().endsWith(".png"))
+                                            || (f.isDirectory());
+                                }
+
+                                @Override
+                                public String getDescription() {
+                                    return translate("filter.images");
+                                }
+                            });
+                            JFrame f = new JFrame();
+                            View.setWindowIcon(f);
+                            int returnVal = fc.showOpenDialog(f);
+                            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                                Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                                File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                                byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                                try {
+                                    it.setImage(data);
+                                    swf.clearImageCache();
+                                } catch (IOException ex) {
+                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Invalid image", ex);
+                                    View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                                }
+                                reload(true);
+                            }
+                        }
+                    }
                 }
-                if (tagObj instanceof ImageTag) {
-                    ImageTag it = (ImageTag) tagObj;
-                    if (it.importSupported()) {
+                break;
+            case ACTION_REPLACE_BINARY:
+                {
+                    Object tagObj = tagTree.getLastSelectedPathComponent();
+                    if (tagObj == null) {
+                        return;
+                    }
+
+                    if (tagObj instanceof TagNode) {
+                        tagObj = ((TagNode) tagObj).tag;
+                    }
+                    if (tagObj instanceof DefineBinaryDataTag) {
+                        DefineBinaryDataTag bt = (DefineBinaryDataTag) tagObj;
                         JFileChooser fc = new JFileChooser();
                         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
-                        fc.setFileFilter(new FileFilter() {
-                            @Override
-                            public boolean accept(File f) {
-                                return (f.getName().toLowerCase().endsWith(".jpg"))
-                                        || (f.getName().toLowerCase().endsWith(".jpeg"))
-                                        || (f.getName().toLowerCase().endsWith(".gif"))
-                                        || (f.getName().toLowerCase().endsWith(".png"))
-                                        || (f.isDirectory());
-                            }
-
-                            @Override
-                            public String getDescription() {
-                                return translate("filter.images");
-                            }
-                        });
                         JFrame f = new JFrame();
                         View.setWindowIcon(f);
                         int returnVal = fc.showOpenDialog(f);
@@ -2336,13 +2410,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
                             File selfile = Helper.fixDialogFile(fc.getSelectedFile());
                             byte[] data = Helper.readFile(selfile.getAbsolutePath());
-                            try {
-                                it.setImage(data);
-                                swf.clearImageCache();
-                            } catch (IOException ex) {
-                                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Invalid image", ex);
-                                View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                            }
+                            bt.binaryData = data;
                             reload(true);
                         }
                     }
@@ -2562,7 +2630,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
 
         if ((tagObj instanceof SWFRoot)) {
-            if (mainRibbon.miInternalViewer.isSelected()) {
+            if (mainRibbon.isInternalFlashViewerSelected()) {
                 showCard(CARDSWFPREVIEWPANEL);
                 swfPreviewPanel.load(swf);
                 swfPreviewPanel.play();
@@ -2602,17 +2670,17 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             showCard(CARDACTIONSCRIPTPANEL);
             actionPanel.setSource((ASMSource) tagObj, !forceReload);
         } else if (tagObj instanceof ImageTag) {
-            imageButtonsPanel.setVisible(((ImageTag) tagObj).importSupported());
+            showHideImageReplaceButton(((ImageTag) tagObj).importSupported());
             showCard(CARDIMAGEPANEL);
             imagePanel.setImage(((ImageTag) tagObj).getImage(swf.tags));
-        } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (mainRibbon.miInternalViewer.isSelected())) {
+        } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (mainRibbon.isInternalFlashViewerSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
-        } else if ((tagObj instanceof FontTag) && (mainRibbon.miInternalViewer.isSelected())) {
+        } else if ((tagObj instanceof FontTag) && (mainRibbon.isInternalFlashViewerSelected())) {
             showCard(CARDFLASHPANEL);
             previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
             showFontTag((FontTag) tagObj);
-        } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (mainRibbon.miInternalViewer.isSelected())) {
+        } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (mainRibbon.isInternalFlashViewerSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             FrameNode fn = (FrameNode) tagObj;
             List<Tag> controlTags = swf.tags;
@@ -3013,7 +3081,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     }
 
     private void showFontTag(FontTag ft) {
-        if (mainRibbon.miInternalViewer.isSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
+        if (mainRibbon.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
             internelViewerPanel.setDrawable(ft, swf, characters, 1);
         } else {

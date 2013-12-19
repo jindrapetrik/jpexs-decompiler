@@ -103,7 +103,7 @@ public class MainFrameRibbon implements ActionListener {
     private MainFrame mainFrame;
 
     private JCheckBox miAutoDeobfuscation;
-    public JCheckBox miInternalViewer;
+    private JCheckBox miInternalViewer;
     private JCheckBox miParallelSpeedUp;
     private JCheckBox miAssociate;
     private JCheckBox miDecompile;
@@ -128,7 +128,11 @@ public class MainFrameRibbon implements ActionListener {
         createMenuBar(hasAbc, externalFlashPlayerUnavailable);
     }
 
-    public String translate(String key) {
+    public boolean isInternalFlashViewerSelected() {
+        return miInternalViewer.isSelected();
+    }
+    
+    private String translate(String key) {
         return mainFrame.translate(key);
     }
 
