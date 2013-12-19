@@ -31,7 +31,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -239,7 +238,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private SWF swf;
     public ABCPanel abcPanel;
     public ActionPanel actionPanel;
-    public MainFrameStatusPanel statusPanel;
+    private MainFrameStatusPanel statusPanel;
+    private MainFrameRibbon mainRibbon;
     public JProgressBar progressBar = new JProgressBar(0, 100);
     private DeobfuscationDialog deobfuscationDialog;
     public JTree tagTree;
@@ -268,7 +268,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private JPanel detailPanel;
     private JTextField filterField = new MyTextField("");
     private JPanel searchPanel;
-    private JCheckBox miAutoDeobfuscation;
     private JPanel displayWithPreview;
     private JButton textSaveButton;
     private JButton textEditButton;
@@ -277,12 +276,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private JSplitPane previewSplitPane;
     private JButton imageReplaceButton;
     private JPanel imageButtonsPanel;
-    private JCheckBox miInternalViewer;
-    private JCheckBox miParallelSpeedUp;
-    private JCheckBox miAssociate;
-    private JCheckBox miDecompile;
-    private JCheckBox miCacheDisk;
-    private JCheckBox miGotoMainClassOnStartup;
     private JLabel fontNameLabel;
     private JLabel fontIsBoldLabel;
     private JLabel fontIsItalicLabel;
@@ -293,7 +286,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private JTextField fontAddCharactersField;
     private ComponentListener fontChangeList;
     private JComboBox<String> fontSelection;
-    private JCommandButton saveCommandButton;
     private PlayerControls flashControls;
     private ImagePanel internelViewerPanel;
     private JPanel viewerCards;
@@ -305,48 +297,12 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
     static final String ACTION_FONT_EMBED = "FONTEMBED";
     static final String ACTION_SELECT_COLOR = "SELECTCOLOR";
-    static final String ACTION_RELOAD = "RELOAD";
-    static final String ACTION_ADVANCED_SETTINGS = "ADVANCEDSETTINGS";
-    static final String ACTION_LOAD_MEMORY = "LOADMEMORY";
-    static final String ACTION_LOAD_CACHE = "LOADCACHE";
     static final String ACTION_FONT_ADD_CHARS = "FONTADDCHARS";
-    static final String ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP = "GOTODOCUMENTCLASSONSTARTUP";
-    static final String ACTION_CACHE_ON_DISK = "CACHEONDISK";
-    static final String ACTION_SET_LANGUAGE = "SETLANGUAGE";
-    static final String ACTION_DISABLE_DECOMPILATION = "DISABLEDECOMPILATION";
-    static final String ACTION_ASSOCIATE = "ASSOCIATE";
-    static final String ACTION_GOTO_DOCUMENT_CLASS = "GOTODOCUMENTCLASS";
-    static final String ACTION_PARALLEL_SPEED_UP = "PARALLELSPEEDUP";
-    static final String ACTION_INTERNAL_VIEWER_SWITCH = "INTERNALVIEWERSWITCH";
-    static final String ACTION_SEARCH_AS = "SEARCHAS";
     static final String ACTION_REPLACE_IMAGE = "REPLACEIMAGE";
     static final String ACTION_REMOVE_ITEM = "REMOVEITEM";
     static final String ACTION_EDIT_TEXT = "EDITTEXT";
     static final String ACTION_CANCEL_TEXT = "CANCELTEXT";
     static final String ACTION_SAVE_TEXT = "SAVETEXT";
-    static final String ACTION_AUTO_DEOBFUSCATE = "AUTODEOBFUSCATE";
-    static final String ACTION_EXIT = "EXIT";
-
-    static final String ACTION_RENAME_ONE_IDENTIFIER = "RENAMEONEIDENTIFIER";
-    static final String ACTION_ABOUT = "ABOUT";
-    static final String ACTION_SHOW_PROXY = "SHOWPROXY";
-    static final String ACTION_SUB_LIMITER = "SUBLIMITER";
-    static final String ACTION_SAVE = "SAVE";
-    static final String ACTION_SAVE_AS = "SAVEAS";
-    static final String ACTION_OPEN = "OPEN";
-    static final String ACTION_EXPORT_FLA = "EXPORTFLA";
-    static final String ACTION_EXPORT_SEL = "EXPORTSEL";
-    static final String ACTION_EXPORT = "EXPORT";
-    static final String ACTION_CHECK_UPDATES = "CHECKUPDATES";
-    static final String ACTION_HELP_US = "HELPUS";
-    static final String ACTION_HOMEPAGE = "HOMEPAGE";
-    static final String ACTION_RESTORE_CONTROL_FLOW = "RESTORECONTROLFLOW";
-    static final String ACTION_RESTORE_CONTROL_FLOW_ALL = "RESTORECONTROLFLOWALL";
-    static final String ACTION_RENAME_IDENTIFIERS = "RENAMEIDENTIFIERS";
-    static final String ACTION_DEOBFUSCATE = "DEOBFUSCATE";
-    static final String ACTION_DEOBFUSCATE_ALL = "DEOBFUSCATEALL";
-    static final String ACTION_REMOVE_NON_SCRIPTS = "REMOVENONSCRIPTS";
-    static final String ACTION_REFRESH_DECOMPILED = "REFRESHDECOMPILED";
     
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -386,478 +342,13 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         statusPanel.setWorkStatus(s, worker);
     }
 
-    private String fixCommandTitle(String title) {
-        if (title.length() > 2) {
-            if (title.charAt(1) == ' ') {
-                title = title.charAt(0) + "\u00A0" + title.substring(2);
-            }
-        }
-        return title;
-    }
-
-    private void assignListener(JCheckBox b, final String command) {
-        b.setActionCommand(command);
-        b.addActionListener(this);
-    }
-
-    private void assignListener(JCommandButton b, final String command) {
-        final MainFrame t = this;
-        b.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                t.actionPerformed(new ActionEvent(e.getSource(), 0, command));
-            }
-        });
-    }
-
-    private RibbonApplicationMenu createMainMenu(boolean swfLoaded) {
-        RibbonApplicationMenu mainMenu = new RibbonApplicationMenu();
-        RibbonApplicationMenuEntryPrimary exportFlaMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportfla32"), translate("menu.file.export.fla"), new ActionRedirector(this, "EXPORTFLA"), CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary exportAllMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("export32"), translate("menu.file.export.all"), new ActionRedirector(this, "EXPORT"), CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary exportSelMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportsel32"), translate("menu.file.export.selection"), new ActionRedirector(this, "EXPORTSEL"), CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary checkUpdatesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("update32"), translate("menu.help.checkupdates"), new ActionRedirector(this, "CHECKUPDATES"), CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary aboutMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("about32"), translate("menu.help.about"), new ActionRedirector(this, "ABOUT"), CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary openFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("open32"), translate("menu.file.open"), new ActionRedirector(this, "OPEN"), CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
-        openFileMenu.setRolloverCallback(new RibbonApplicationMenuEntryPrimary.PrimaryRolloverCallback() {
-            @Override
-            public void menuEntryActivated(JPanel targetPanel) {
-               targetPanel.removeAll();
-               JCommandButtonPanel openHistoryPanel = new JCommandButtonPanel(CommandButtonDisplayState.MEDIUM);
-               String groupName = translate("menu.recentFiles");
-               openHistoryPanel.addButtonGroup(groupName);
-               List<String> recentFiles = Configuration.getRecentFiles();
-               int j = 0;
-               for (int i = recentFiles.size() - 1; i >= 0; i--) {
-                  String path = recentFiles.get(i); 
-                  RecentFilesButton historyButton = new RecentFilesButton(j + "    " + path, null);
-                  historyButton.fileName = path;
-                  historyButton.addActionListener(new ActionListener() {
-
-                      @Override
-                      public void actionPerformed(ActionEvent ae) {
-                          RecentFilesButton source = (RecentFilesButton) ae.getSource();
-                          if (Main.openFile(source.fileName) == OpenFileResult.NOT_FOUND) {
-                              if (View.showConfirmDialog(null, translate("message.confirm.recentFileNotFound"), translate("message.confirm"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
-                                  Configuration.removeRecentFile(source.fileName);
-                              }
-                          }
-                      }
-                  });
-                  j++;
-                  historyButton.setHorizontalAlignment(SwingUtilities.LEFT);
-                  openHistoryPanel.addButtonToLastGroup(historyButton);
-               }
-               openHistoryPanel.setMaxButtonColumns(1);
-               targetPanel.setLayout(new BorderLayout());
-               targetPanel.add(openHistoryPanel, BorderLayout.CENTER);
-            }
-        });
-        
-        RibbonApplicationMenuEntryFooter exitMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon("exit32"), translate("menu.file.exit"), new ActionRedirector(this, "EXIT"));
-
-        mainMenu.addMenuEntry(openFileMenu);
-        mainMenu.addMenuSeparator();
-        mainMenu.addMenuEntry(exportFlaMenu);
-        mainMenu.addMenuEntry(exportAllMenu);
-        mainMenu.addMenuEntry(exportSelMenu);
-        mainMenu.addMenuSeparator();
-        mainMenu.addMenuEntry(checkUpdatesMenu);
-        mainMenu.addMenuEntry(aboutMenu);
-        mainMenu.addFooterEntry(exitMenu);
-        mainMenu.addMenuSeparator();
-
-        if (!swfLoaded) {
-            exportAllMenu.setEnabled(false);
-            exportFlaMenu.setEnabled(false);
-            exportSelMenu.setEnabled(false);
-        }
-
-        return mainMenu;
-    }
-
-    private List<RibbonBandResizePolicy> getResizePolicies(JRibbonBand ribbonBand) {
-        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
-        resizePolicies.add(new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel()));
-        resizePolicies.add(new IconRibbonBandResizePolicy(ribbonBand.getControlPanel()));
-        return resizePolicies;
-    }
-    
-    private RibbonTask createFileRibbonTask(boolean swfLoaded) {
-        JRibbonBand editBand = new JRibbonBand(translate("menu.general"), null);
-        editBand.setResizePolicies(getResizePolicies(editBand));
-        JCommandButton openCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.open")), View.getResizableIcon("open32"));
-        assignListener(openCommandButton, ACTION_OPEN);
-        saveCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.save")), View.getResizableIcon("save32"));
-        assignListener(saveCommandButton, ACTION_SAVE);
-        JCommandButton saveasCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveas")), View.getResizableIcon("saveas16"));
-        assignListener(saveasCommandButton, ACTION_SAVE_AS);
-
-        JCommandButton reloadCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.reload")), View.getResizableIcon("reload16"));
-        assignListener(reloadCommandButton, ACTION_RELOAD);
-
-        editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
-        editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
-        editBand.addCommandButton(saveasCommandButton, RibbonElementPriority.MEDIUM);
-        editBand.addCommandButton(reloadCommandButton, RibbonElementPriority.MEDIUM);
-        saveCommandButton.setEnabled(!Main.readOnly);
-
-        JRibbonBand exportBand = new JRibbonBand(translate("menu.export"), null);
-        exportBand.setResizePolicies(getResizePolicies(exportBand));
-        JCommandButton exportFlaCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.fla")), View.getResizableIcon("exportfla32"));
-        assignListener(exportFlaCommandButton, ACTION_EXPORT_FLA);
-        JCommandButton exportAllCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.all")), View.getResizableIcon("export16"));
-        assignListener(exportAllCommandButton, ACTION_EXPORT);
-        JCommandButton exportSelectionCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.selection")), View.getResizableIcon("exportsel16"));
-        assignListener(exportSelectionCommandButton, ACTION_EXPORT_SEL);
-
-        exportBand.addCommandButton(exportFlaCommandButton, RibbonElementPriority.TOP);
-        exportBand.addCommandButton(exportAllCommandButton, RibbonElementPriority.MEDIUM);
-        exportBand.addCommandButton(exportSelectionCommandButton, RibbonElementPriority.MEDIUM);
-
-        if (!swfLoaded) {
-            saveasCommandButton.setEnabled(false);
-            exportAllCommandButton.setEnabled(false);
-            exportFlaCommandButton.setEnabled(false);
-            exportSelectionCommandButton.setEnabled(false);
-            reloadCommandButton.setEnabled(false);
-        }
-
-        return new RibbonTask(translate("menu.file"), editBand, exportBand);
-    }
-    
-    private RibbonTask createToolsRibbonTask(boolean swfLoaded, boolean hasAbc) {
-        //----------------------------------------- TOOLS -----------------------------------
-        
-        JRibbonBand toolsBand = new JRibbonBand(translate("menu.tools"), null);
-        toolsBand.setResizePolicies(getResizePolicies(toolsBand));
-
-        JCommandButton searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchas")), View.getResizableIcon("search32"));
-        assignListener(searchCommandButton, ACTION_SEARCH_AS);
-        JCommandButton gotoDocumentClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.gotodocumentclass")), View.getResizableIcon("gotomainclass32"));
-        assignListener(gotoDocumentClassCommandButton, ACTION_GOTO_DOCUMENT_CLASS);
-
-        JCommandButton proxyCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.proxy")), View.getResizableIcon("proxy16"));
-        assignListener(proxyCommandButton, ACTION_SHOW_PROXY);
-
-        JCommandButton loadMemoryCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchmemory")), View.getResizableIcon("loadmemory16"));
-        assignListener(loadMemoryCommandButton, ACTION_LOAD_MEMORY);
-
-        JCommandButton loadCacheCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchcache")), View.getResizableIcon("loadcache16"));
-        assignListener(loadCacheCommandButton, ACTION_LOAD_CACHE);
-
-        toolsBand.addCommandButton(searchCommandButton, RibbonElementPriority.TOP);
-        toolsBand.addCommandButton(gotoDocumentClassCommandButton, RibbonElementPriority.TOP);
-        toolsBand.addCommandButton(proxyCommandButton, RibbonElementPriority.MEDIUM);
-        toolsBand.addCommandButton(loadMemoryCommandButton, RibbonElementPriority.MEDIUM);
-        toolsBand.addCommandButton(loadCacheCommandButton, RibbonElementPriority.MEDIUM);
-        if (!ProcessTools.toolsAvailable()) {
-            loadMemoryCommandButton.setEnabled(false);
-        }
-        JRibbonBand deobfuscationBand = new JRibbonBand(translate("menu.tools.deobfuscation"), null);
-        deobfuscationBand.setResizePolicies(getResizePolicies(deobfuscationBand));
-
-        JCommandButton deobfuscationCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.pcode")), View.getResizableIcon("deobfuscate32"));
-        assignListener(deobfuscationCommandButton, ACTION_DEOBFUSCATE);
-        JCommandButton globalrenameCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.globalrename")), View.getResizableIcon("rename16"));
-        assignListener(globalrenameCommandButton, ACTION_RENAME_ONE_IDENTIFIER);
-        JCommandButton renameinvalidCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.renameinvalid")), View.getResizableIcon("renameall16"));
-        assignListener(renameinvalidCommandButton, ACTION_RENAME_IDENTIFIERS);
-
-        deobfuscationBand.addCommandButton(deobfuscationCommandButton, RibbonElementPriority.TOP);
-        deobfuscationBand.addCommandButton(globalrenameCommandButton, RibbonElementPriority.MEDIUM);
-        deobfuscationBand.addCommandButton(renameinvalidCommandButton, RibbonElementPriority.MEDIUM);
-
-        if (!swfLoaded) {
-            renameinvalidCommandButton.setEnabled(false);
-            globalrenameCommandButton.setEnabled(false);
-            saveCommandButton.setEnabled(false);
-            deobfuscationCommandButton.setEnabled(false);
-            searchCommandButton.setEnabled(false);
-        }
-
-        if (!hasAbc) {
-            gotoDocumentClassCommandButton.setEnabled(false);
-            deobfuscationCommandButton.setEnabled(false);
-            //miDeobfuscation.setEnabled(false);
-        }
-        
-        return new RibbonTask(translate("menu.tools"), toolsBand, deobfuscationBand);
-    }
-    
-    private RibbonTask createSettingsRibbonTask() {
-        //----------------------------------------- SETTINGS -----------------------------------
-        
-        JRibbonBand settingsBand = new JRibbonBand(translate("menu.settings"), null);
-        settingsBand.setResizePolicies(getResizePolicies(settingsBand));
-
-        miAutoDeobfuscation = new JCheckBox(translate("menu.settings.autodeobfuscation"));
-
-        miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
-        miParallelSpeedUp = new JCheckBox(translate("menu.settings.parallelspeedup"));
-        miDecompile = new JCheckBox(translate("menu.settings.disabledecompilation"));
-        miAssociate = new JCheckBox(translate("menu.settings.addtocontextmenu"));
-        miCacheDisk = new JCheckBox(translate("menu.settings.cacheOnDisk"));
-        miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
-
-        settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miParallelSpeedUp));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miDecompile));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miAssociate));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miCacheDisk));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miGotoMainClassOnStartup));
-
-        JRibbonBand languageBand = new JRibbonBand(translate("menu.language"), null);
-        List<RibbonBandResizePolicy> languageBandResizePolicies = new ArrayList<>();
-        languageBandResizePolicies.add(new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(languageBand.getControlPanel()) {
-            @Override
-            public int getPreferredWidth(int i, int i1) {
-                return 105;
-            }
-
-            @Override
-            public void install(int i, int i1) {
-            }
-        });
-        languageBandResizePolicies.add(new IconRibbonBandResizePolicy(languageBand.getControlPanel()));
-        languageBand.setResizePolicies(languageBandResizePolicies);
-        JCommandButton setLanguageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.settings.language")), View.getResizableIcon("setlanguage32"));
-        assignListener(setLanguageCommandButton, ACTION_SET_LANGUAGE);
-        languageBand.addCommandButton(setLanguageCommandButton, RibbonElementPriority.TOP);
-
-        JRibbonBand advancedSettingsBand = new JRibbonBand(translate("menu.advancedsettings.advancedsettings"), null);
-        advancedSettingsBand.setResizePolicies(getResizePolicies(advancedSettingsBand));
-        JCommandButton advancedSettingsCommandButton = new JCommandButton(fixCommandTitle(translate("menu.advancedsettings.advancedsettings")), View.getResizableIcon("settings16"));
-        assignListener(advancedSettingsCommandButton, ACTION_ADVANCED_SETTINGS);
-
-        advancedSettingsBand.addCommandButton(advancedSettingsCommandButton, RibbonElementPriority.MEDIUM);
-        
-        return new RibbonTask(translate("menu.settings"), settingsBand, languageBand, advancedSettingsBand);
-    }
-    
-    private RibbonTask createHelpRibbonTask() {
-        //----------------------------------------- HELP -----------------------------------
-
-        JRibbonBand helpBand = new JRibbonBand(translate("menu.help"), null);
-        helpBand.setResizePolicies(getResizePolicies(helpBand));
-
-        JCommandButton checkForUpdatesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.checkupdates")), View.getResizableIcon("update16"));
-        assignListener(checkForUpdatesCommandButton, ACTION_CHECK_UPDATES);
-        JCommandButton helpUsUpdatesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.helpus")), View.getResizableIcon("donate32"));
-        assignListener(helpUsUpdatesCommandButton, ACTION_HELP_US);
-        JCommandButton homepageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.homepage")), View.getResizableIcon("homepage16"));
-        assignListener(homepageCommandButton, ACTION_HOMEPAGE);
-        JCommandButton aboutCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.about")), View.getResizableIcon("about32"));
-        assignListener(aboutCommandButton, ACTION_ABOUT);
-
-        helpBand.addCommandButton(aboutCommandButton, RibbonElementPriority.TOP);
-        helpBand.addCommandButton(checkForUpdatesCommandButton, RibbonElementPriority.MEDIUM);
-        helpBand.addCommandButton(homepageCommandButton, RibbonElementPriority.MEDIUM);
-        helpBand.addCommandButton(helpUsUpdatesCommandButton, RibbonElementPriority.TOP);
-        return new RibbonTask(translate("menu.help"), helpBand);
-    }
-    
-    private RibbonTask createDebugRibbonTask() {
-        //----------------------------------------- DEBUG -----------------------------------
-
-        JRibbonBand debugBand = new JRibbonBand("Debug", null);
-        debugBand.setResizePolicies(getResizePolicies(debugBand));
-
-        JCommandButton removeNonScriptsCommandButton = new JCommandButton(fixCommandTitle("Remove non scripts"), View.getResizableIcon("update16"));
-        assignListener(removeNonScriptsCommandButton, ACTION_REMOVE_NON_SCRIPTS);
-
-        JCommandButton refreshDecompiledCommandButton = new JCommandButton(fixCommandTitle("Refresh decompiled script"), View.getResizableIcon("update16"));
-        assignListener(refreshDecompiledCommandButton, ACTION_REFRESH_DECOMPILED);
-
-        debugBand.addCommandButton(removeNonScriptsCommandButton, RibbonElementPriority.MEDIUM);
-        debugBand.addCommandButton(refreshDecompiledCommandButton, RibbonElementPriority.MEDIUM);
-        return new RibbonTask("Debug", debugBand);
-    }
-
-    // not used
-    private void createMenuBar(boolean hasAbc) {
-        JMenuBar menuBar = new JMenuBar();
-
-        JMenu menuFile = new JMenu(translate("menu.file"));
-        JMenuItem miOpen = new JMenuItem(translate("menu.file.open"));
-        miOpen.setIcon(View.getIcon("open16"));
-        miOpen.setActionCommand(ACTION_OPEN);
-        miOpen.addActionListener(this);
-        JMenuItem miSave = new JMenuItem(translate("menu.file.save"));
-        miSave.setIcon(View.getIcon("save16"));
-        miSave.setActionCommand(ACTION_SAVE);
-        miSave.addActionListener(this);
-        JMenuItem miSaveAs = new JMenuItem(translate("menu.file.saveas"));
-        miSaveAs.setIcon(View.getIcon("saveas16"));
-        miSaveAs.setActionCommand(ACTION_SAVE_AS);
-        miSaveAs.addActionListener(this);
-
-        JMenuItem menuExportFla = new JMenuItem(translate("menu.file.export.fla"));
-        menuExportFla.setActionCommand(ACTION_EXPORT_FLA);
-        menuExportFla.addActionListener(this);
-        menuExportFla.setIcon(View.getIcon("flash16"));
-
-        JMenuItem menuExportAll = new JMenuItem(translate("menu.file.export.all"));
-        menuExportAll.setActionCommand(ACTION_EXPORT);
-        menuExportAll.addActionListener(this);
-        JMenuItem menuExportSel = new JMenuItem(translate("menu.file.export.selection"));
-        menuExportSel.setActionCommand(ACTION_EXPORT_SEL);
-        menuExportSel.addActionListener(this);
-        menuExportAll.setIcon(View.getIcon("export16"));
-        menuExportSel.setIcon(View.getIcon("exportsel16"));
-
-
-
-        menuFile.add(miOpen);
-        menuFile.add(miSave);
-        menuFile.add(miSaveAs);
-        menuFile.add(menuExportFla);
-        menuFile.add(menuExportAll);
-        menuFile.add(menuExportSel);
-        menuFile.addSeparator();
-        JMenuItem miClose = new JMenuItem(translate("menu.file.exit"));
-        miClose.setIcon(View.getIcon("exit16"));
-        miClose.setActionCommand(ACTION_EXIT);
-        miClose.addActionListener(this);
-        menuFile.add(miClose);
-        menuBar.add(menuFile);
-        JMenu menuDeobfuscation = new JMenu(translate("menu.tools.deobfuscation"));
-        menuDeobfuscation.setIcon(View.getIcon("deobfuscate16"));
-
-        JMenuItem miDeobfuscation = new JMenuItem(translate("menu.tools.deobfuscation.pcode"));
-        miDeobfuscation.setActionCommand(ACTION_DEOBFUSCATE);
-        miDeobfuscation.addActionListener(this);
-
-        miAutoDeobfuscation.setSelected(Configuration.autoDeobfuscate.get());
-        miAutoDeobfuscation.addActionListener(this);
-        miAutoDeobfuscation.setActionCommand(ACTION_AUTO_DEOBFUSCATE);
-
-        JMenuItem miRenameOneIdentifier = new JMenuItem(translate("menu.tools.deobfuscation.globalrename"));
-        miRenameOneIdentifier.setActionCommand(ACTION_RENAME_ONE_IDENTIFIER);
-        miRenameOneIdentifier.addActionListener(this);
-
-        JMenuItem miRenameIdentifiers = new JMenuItem(translate("menu.tools.deobfuscation.renameinvalid"));
-        miRenameIdentifiers.setActionCommand(ACTION_RENAME_IDENTIFIERS);
-        miRenameIdentifiers.addActionListener(this);
-
-
-        menuDeobfuscation.add(miRenameOneIdentifier);
-        menuDeobfuscation.add(miRenameIdentifiers);
-        menuDeobfuscation.add(miDeobfuscation);
-        JMenu menuTools = new JMenu(translate("menu.tools"));
-        JMenuItem miProxy = new JMenuItem(translate("menu.tools.proxy"));
-        miProxy.setActionCommand(ACTION_SHOW_PROXY);
-        miProxy.setIcon(View.getIcon("proxy16"));
-        miProxy.addActionListener(this);
-
-        JMenuItem miSearchScript = new JMenuItem(translate("menu.tools.searchas"));
-        miSearchScript.addActionListener(this);
-        miSearchScript.setActionCommand(ACTION_SEARCH_AS);
-        miSearchScript.setIcon(View.getIcon("search16"));
-
-        menuTools.add(miSearchScript);
-
-        boolean externalFlashPlayerUnavailable = flashPanel == null;
-        miInternalViewer.setSelected(Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
-        if (externalFlashPlayerUnavailable) {
-            miInternalViewer.setEnabled(false);
-        }
-        miInternalViewer.setActionCommand(ACTION_INTERNAL_VIEWER_SWITCH);
-        miInternalViewer.addActionListener(this);
-
-        miParallelSpeedUp.setSelected(Configuration.parallelSpeedUp.get());
-        miParallelSpeedUp.setActionCommand(ACTION_PARALLEL_SPEED_UP);
-        miParallelSpeedUp.addActionListener(this);
-
-
-        menuTools.add(miProxy);
-
-        menuTools.add(menuDeobfuscation);
-
-        JMenuItem miGotoDocumentClass = new JMenuItem(translate("menu.tools.gotodocumentclass"));
-        miGotoDocumentClass.setActionCommand(ACTION_GOTO_DOCUMENT_CLASS);
-        miGotoDocumentClass.addActionListener(this);
-        menuBar.add(menuTools);
-
-        miDecompile.setSelected(!Configuration.decompile.get());
-        miDecompile.setActionCommand(ACTION_DISABLE_DECOMPILATION);
-        miDecompile.addActionListener(this);
-
-
-        miCacheDisk.setSelected(Configuration.cacheOnDisk.get());
-        miCacheDisk.setActionCommand(ACTION_CACHE_ON_DISK);
-        miCacheDisk.addActionListener(this);
-
-        miGotoMainClassOnStartup.setSelected(Configuration.gotoMainClassOnStartup.get());
-        miGotoMainClassOnStartup.setActionCommand(ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP);
-        miGotoMainClassOnStartup.addActionListener(this);
-
-        /*JMenu menuSettings = new JMenu(translate("menu.settings"));
-         menuSettings.add(autoDeobfuscateMenuItem);
-         menuSettings.add(miInternalViewer);
-         menuSettings.add(miParallelSpeedUp);
-         menuSettings.add(miDecompile);
-         menuSettings.add(miCacheDisk);
-         menuSettings.add(miGotoMainClassOnStartup);*/
-
-        miAssociate.setActionCommand(ACTION_ASSOCIATE);
-        miAssociate.addActionListener(this);
-        miAssociate.setSelected(ContextMenuTools.isAddedToContextMenu());
-
-
-        JMenuItem miLanguage = new JMenuItem(translate("menu.settings.language"));
-        miLanguage.setActionCommand(ACTION_SET_LANGUAGE);
-        miLanguage.addActionListener(this);
-
-        /* if (Platform.isWindows()) {
-         menuSettings.add(miAssociate);
-         }
-         menuSettings.add(miLanguage);
-
-         menuBar.add(menuSettings);*/
-        JMenu menuHelp = new JMenu(translate("menu.help"));
-        JMenuItem miAbout = new JMenuItem(translate("menu.help.about"));
-        miAbout.setIcon(View.getIcon("about16"));
-
-        miAbout.setActionCommand(ACTION_ABOUT);
-        miAbout.addActionListener(this);
-
-        JMenuItem miCheckUpdates = new JMenuItem(translate("menu.help.checkupdates"));
-        miCheckUpdates.setActionCommand(ACTION_CHECK_UPDATES);
-        miCheckUpdates.setIcon(View.getIcon("update16"));
-        miCheckUpdates.addActionListener(this);
-
-        JMenuItem miHelpUs = new JMenuItem(translate("menu.help.helpus"));
-        miHelpUs.setActionCommand(ACTION_HELP_US);
-        miHelpUs.setIcon(View.getIcon("donate16"));
-        miHelpUs.addActionListener(this);
-
-        JMenuItem miHomepage = new JMenuItem(translate("menu.help.homepage"));
-        miHomepage.setActionCommand(ACTION_HOMEPAGE);
-        miHomepage.setIcon(View.getIcon("homepage16"));
-        miHomepage.addActionListener(this);
-
-
-        menuHelp.add(miCheckUpdates);
-        menuHelp.add(miHelpUs);
-        menuHelp.add(miHomepage);
-        menuHelp.add(miAbout);
-        menuBar.add(menuHelp);
-
-        //setJMenuBar(menuBar);
-        
-        if (hasAbc) {
-            menuTools.add(miGotoDocumentClass);
-        }
-    }
-    
     private void createContextMenu() {
         final JPopupMenu contextPopupMenu = new JPopupMenu();
         final JMenuItem removeMenuItem = new JMenuItem(translate("contextmenu.remove"));
         removeMenuItem.addActionListener(this);
         removeMenuItem.setActionCommand(ACTION_REMOVE_ITEM);
         JMenuItem exportSelectionMenuItem = new JMenuItem(translate("menu.file.export.selection"));
-        exportSelectionMenuItem.setActionCommand(ACTION_EXPORT_SEL);
+        exportSelectionMenuItem.setActionCommand(MainFrameRibbon.ACTION_EXPORT_SEL);
         exportSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(exportSelectionMenuItem);
 
@@ -962,18 +453,13 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         abcList = new ArrayList<>();
         getActionScript3(objs, abcList);
 
-        JRibbon rib = getRibbon();
-
-        rib.addTask(createFileRibbonTask(swf != null));
-        rib.addTask(createToolsRibbonTask(swf != null, !abcList.isEmpty()));
-        rib.addTask(createSettingsRibbonTask());
-        rib.addTask(createHelpRibbonTask());
-
-        if (Configuration.debugMode.get()) {
-            rib.addTask(createDebugRibbonTask());
+        try {
+            flashPanel = new FlashPlayerPanel(this);
+        } catch (FlashUnsupportedException fue) {
         }
 
-        rib.setApplicationMenu(createMainMenu(swf != null));
+        boolean externalFlashPlayerUnavailable = flashPanel == null;
+        mainRibbon = new MainFrameRibbon(this, getRibbon(), swf != null, !abcList.isEmpty(), externalFlashPlayerUnavailable);
 
         int w = Configuration.guiWindowWidth.get();
         int h = Configuration.guiWindowHeight.get();
@@ -1042,14 +528,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         });
         setTitle(ApplicationInfo.applicationVerName + ((swf != null && Configuration.displayFileName.get()) ? " - " + Main.getFileTitle() : ""));
 
-
-        try {
-            flashPanel = new FlashPlayerPanel(this);
-        } catch (FlashUnsupportedException fue) {
-        }
-
-        createMenuBar(!abcList.isEmpty());
-        
         this.swf = swf;
         java.awt.Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
@@ -1728,7 +1206,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
                     splitPos = splitPane2.getDividerLocation();
                     splitsInited = true;
-                    if (miGotoMainClassOnStartup.isSelected()) {
+                    if (Configuration.gotoMainClassOnStartup.get()) {
                         gotoDocumentClass();
                     }
                 }
@@ -2374,6 +1852,417 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
     }
 
+    public void disableDecompilationChanged() {
+        clearCache();
+        if (abcPanel != null) {
+            abcPanel.reload();
+        }
+        reload(true);
+        doFilter();
+    }
+    
+    public void searchAs() {
+        if (searchDialog == null) {
+            searchDialog = new SearchDialog();
+        }
+        searchDialog.setVisible(true);
+        if (searchDialog.result) {
+            final String txt = searchDialog.searchField.getText();
+            if (!txt.isEmpty()) {
+                if (abcPanel != null) {
+                    new CancellableWorker() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                View.execInEventDispatch(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showDetail(DETAILCARDAS3NAVIGATOR);
+                                        showCard(CARDACTIONSCRIPTPANEL);
+                                    }
+                                });
+                            } else {
+                                View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                            }
+                            return null;
+                        }
+                    }.execute();
+                } else {
+                    new CancellableWorker() {
+                        @Override
+                        protected Void doInBackground() {
+                            if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                View.execInEventDispatch(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showCard(CARDACTIONSCRIPTPANEL);
+                                    }
+                                });
+                            } else {
+                                View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                            }
+                            return null;
+                        }
+                    }.execute();
+                }
+            }
+        }
+    }
+    
+    public void autoDeobfuscateChanged() {
+        clearCache();
+        if (abcPanel != null) {
+            abcPanel.reload();
+        }
+        reload(true);
+        doFilter();
+    }
+    
+    public void renameOneIdentifier() {
+        if (swf.fileAttributes.actionScript3) {
+            final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
+            if (multiName > 0) {
+                new CancellableWorker() {
+                    @Override
+                    public Void doInBackground() throws Exception {
+                        Main.startWork(translate("work.renaming") + "...");
+                        renameMultiname(multiName);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        Main.stopWork();
+                    }
+                }.execute();
+
+            } else {
+                View.showMessageDialog(null, translate("message.rename.notfound.multiname"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else {
+            final String identifier = actionPanel.getStringUnderCursor();
+            if (identifier != null) {
+                new CancellableWorker() {
+                    @Override
+                    public Void doInBackground() throws Exception {
+                        Main.startWork(translate("work.renaming") + "...");
+                        try {
+                            renameIdentifier(identifier);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        Main.stopWork();
+                    }
+                }.execute();
+            } else {
+                View.showMessageDialog(null, translate("message.rename.notfound.identifier"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+    
+    public void exportFla() {
+        JFileChooser fc = new JFileChooser();
+        String selDir = Configuration.lastOpenDir.get();
+        fc.setCurrentDirectory(new File(selDir));
+        if (!selDir.endsWith(File.separator)) {
+            selDir += File.separator;
+        }
+        String fileName = (new File(Main.file).getName());
+        fileName = fileName.substring(0, fileName.length() - 4) + ".fla";
+        fc.setSelectedFile(new File(selDir + fileName));
+        FileFilter fla = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || (f.getName().toLowerCase().endsWith(".fla"));
+            }
+
+            @Override
+            public String getDescription() {
+                return translate("filter.fla");
+            }
+        };
+        FileFilter xfl = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || (f.getName().toLowerCase().endsWith(".xfl"));
+            }
+
+            @Override
+            public String getDescription() {
+                return translate("filter.xfl");
+            }
+        };
+        fc.setFileFilter(fla);
+        fc.addChoosableFileFilter(xfl);
+        fc.setAcceptAllFileFilterUsed(false);
+        JFrame f = new JFrame();
+        View.setWindowIcon(f);
+        int returnVal = fc.showSaveDialog(f);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+            File sf = Helper.fixDialogFile(fc.getSelectedFile());
+
+            Main.startWork(translate("work.exporting.fla") + "...");
+            final boolean compressed = fc.getFileFilter() == fla;
+            if (!compressed) {
+                if (sf.getName().endsWith(".fla")) {
+                    sf = new File(sf.getAbsolutePath().substring(0, sf.getAbsolutePath().length() - 4) + ".xfl");
+                }
+            }
+            final File selfile = sf;
+            new CancellableWorker() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    Helper.freeMem();
+                    try {
+                        if (compressed) {
+                            swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
+                        } else {
+                            swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
+                        }
+                    } catch (IOException ex) {
+                        View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    }
+                    Helper.freeMem();
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    Main.stopWork();
+                }
+            }.execute();
+        }
+    }
+    
+    public void export(final boolean onlySel) {
+        final ExportDialog export = new ExportDialog();
+        export.setVisible(true);
+        if (!export.cancelled) {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+            chooser.setDialogTitle(translate("export.select.directory"));
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            chooser.setAcceptAllFileFilterUsed(false);
+            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                final long timeBefore = System.currentTimeMillis();
+                Main.startWork(translate("work.exporting") + "...");
+                final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+                Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
+                final ExportMode exportMode = ExportMode.get(export.getOption(ExportDialog.OPTION_ACTIONSCRIPT));
+                final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
+                final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
+                new CancellableWorker() {
+                    @Override
+                    public Void doInBackground() throws Exception {
+                        try {
+                            if (onlySel) {
+                                exportSelection(errorHandler, selFile, export);
+                            } else {
+                                swf.exportImages(errorHandler, selFile + File.separator + "images");
+                                swf.exportShapes(errorHandler, selFile + File.separator + "shapes");
+                                swf.exportTexts(errorHandler, selFile + File.separator + "texts", isFormatted);
+                                swf.exportMovies(errorHandler, selFile + File.separator + "movies");
+                                swf.exportSounds(errorHandler, selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
+                                swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData");
+                                swf.exportActionScript(errorHandler, selFile, exportMode, Configuration.parallelSpeedUp.get());
+                            }
+                        } catch (Exception ex) {
+                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
+                            View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        Main.stopWork();
+                        long timeAfter = System.currentTimeMillis();
+                        final long timeMs = timeAfter - timeBefore;
+
+                        View.execInEventDispatchLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                            }
+                        });
+                    }
+                }.execute();
+
+            }
+        }
+    }
+    
+    public void restoreControlFlow(final boolean all) {
+        Main.startWork(translate("work.restoringControlFlow"));
+        if ((!all) || confirmExperimental()) {
+            new CancellableWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    int cnt = 0;
+                    if (all) {
+                        for (ABCContainerTag tag : abcPanel.list) {
+                            tag.getABC().restoreControlFlow();
+                        }
+                    } else {
+                        int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                        if (bi != -1) {
+                            abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants, abcPanel.decompiledTextArea.getCurrentTrait(), abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
+                        }
+                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, abcPanel.decompiledTextArea.getCurrentTrait());
+                    }
+                    return true;
+                }
+
+                @Override
+                protected void done() {
+                    Main.stopWork();
+                    View.showMessageDialog(null, translate("work.restoringControlFlow.complete"));
+
+                    View.execInEventDispatch(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            abcPanel.reload();
+                            doFilter();
+                        }
+                    });
+                }
+            }.execute();
+        }
+    }
+    
+    public void renameIdentifiers() {
+        if (confirmExperimental()) {
+            final RenameType renameType = new RenameDialog().display();
+            if (renameType != null) {
+                Main.startWork(translate("work.renaming.identifiers") + "...");
+                new CancellableWorker<Integer>() {
+                    @Override
+                    protected Integer doInBackground() throws Exception {
+                        int cnt = swf.deobfuscateIdentifiers(renameType);
+                        return cnt;
+                    }
+
+                    @Override
+                    protected void done() {
+                        View.execInEventDispatch(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                try {
+                                    int cnt = get();
+                                    Main.stopWork();
+                                    View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", "" + cnt));
+                                    swf.assignClassesToSymbols();
+                                    clearCache();
+                                    if (abcPanel != null) {
+                                        abcPanel.reload();
+                                    }
+                                    doFilter();
+                                    reload(true);
+                                } catch (Exception ex) {
+                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during renaming identifiers", ex);
+                                    Main.stopWork();
+                                    View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
+                                }
+                            }
+                        });
+                    }
+                }.execute();
+            }
+        }
+    }
+    
+    public void deobfuscate() {
+        if (deobfuscationDialog == null) {
+            deobfuscationDialog = new DeobfuscationDialog();
+        }
+        deobfuscationDialog.setVisible(true);
+        if (deobfuscationDialog.ok) {
+            Main.startWork(translate("work.deobfuscating") + "...");
+            new CancellableWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    try {
+                        if (deobfuscationDialog.processAllCheckbox.isSelected()) {
+                            for (ABCContainerTag tag : abcPanel.list) {
+                                if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
+                                    tag.getABC().removeDeadCode();
+                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
+                                    tag.getABC().removeTraps();
+                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
+                                    tag.getABC().removeTraps();
+                                    tag.getABC().restoreControlFlow();
+                                }
+                            }
+                        } else {
+                            int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                            Trait t = abcPanel.decompiledTextArea.getCurrentTrait();
+                            if (bi != -1) {
+                                if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
+                                    abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants, t, abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
+                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
+                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
+                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
+                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
+                                    abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants, t, abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
+                                }
+                            }
+                            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, t);
+                        }
+                    } catch (Exception ex) {
+                        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);
+                    }
+                    return true;
+                }
+
+                @Override
+                protected void done() {
+                    Main.stopWork();
+                    View.showMessageDialog(null, translate("work.deobfuscating.complete"));
+
+                    View.execInEventDispatch(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            clearCache();
+                            abcPanel.reload();
+                            doFilter();
+                        }
+                    });
+                }
+            }.execute();
+        }
+    }
+    
+    public void removeNonScripts() {
+        List<Tag> tags = new ArrayList<>(swf.tags);
+        for (Tag tag : tags) {
+            System.out.println(tag.getClass());
+            if (!(tag instanceof ABCContainerTag || tag instanceof ASMSource)) {
+                swf.removeTag(tag);
+            }
+        }
+        showCard(CARDEMPTYPANEL);
+        refreshTree();
+    }
+    
+    public void refreshDecompiled() {
+        clearCache();
+        if (abcPanel != null) {
+            abcPanel.reload();
+        }
+        reload(true);
+        doFilter();
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -2399,20 +2288,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     reload(true);
                 }
                 break;
-            case ACTION_RELOAD:
-                if (View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-                    Main.reloadSWF();
-                }
-                break;
-            case ACTION_ADVANCED_SETTINGS:
-                Main.advancedSettings();
-                break;
-            case ACTION_LOAD_MEMORY:
-                Main.loadFromMemory();
-                break;
-            case ACTION_LOAD_CACHE:
-                Main.loadFromCache();
-                break;
             case ACTION_FONT_ADD_CHARS:
                 String newchars = fontAddCharactersField.getText();
                 if (oldValue instanceof FontTag) {
@@ -2423,110 +2298,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     fontAddChars((FontTag) oldValue, selChars, fontSelection.getSelectedItem().toString());
                     fontAddCharactersField.setText("");
                     reload(true);
-                }
-                break;
-            case ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP:
-                Configuration.gotoMainClassOnStartup.set(miGotoMainClassOnStartup.isSelected());
-                break;
-            case ACTION_CACHE_ON_DISK:
-                Configuration.cacheOnDisk.set(miCacheDisk.isSelected());
-                if (miCacheDisk.isSelected()) {
-                    Cache.setStorageType(Cache.STORAGE_FILES);
-                } else {
-                    Cache.setStorageType(Cache.STORAGE_MEMORY);
-                }
-                break;
-            case ACTION_SET_LANGUAGE:
-                new SelectLanguageDialog().display();
-                break;
-            case ACTION_DISABLE_DECOMPILATION:
-                Configuration.decompile.set(!miDecompile.isSelected());
-                clearCache();
-                if (abcPanel != null) {
-                    abcPanel.reload();
-                }
-                reload(true);
-                doFilter();
-                break;
-            case ACTION_ASSOCIATE:
-                if (miAssociate.isSelected() == ContextMenuTools.isAddedToContextMenu()) {
-                    return;
-                }
-                ContextMenuTools.addToContextMenu(miAssociate.isSelected());
-
-                //Update checkbox menuitem accordingly (User can cancel rights elevation)
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        miAssociate.setSelected(ContextMenuTools.isAddedToContextMenu());
-                    }
-                }, 1000); //It takes some time registry change to apply
-                break;
-            case ACTION_GOTO_DOCUMENT_CLASS:
-                gotoDocumentClass();
-                break;
-            case ACTION_PARALLEL_SPEED_UP:
-                String confStr = translate("message.confirm.parallel") + "\r\n";
-                if (miParallelSpeedUp.isSelected()) {
-                    confStr += " " + translate("message.confirm.on");
-                } else {
-                    confStr += " " + translate("message.confirm.off");
-                }
-                if (View.showConfirmDialog(null, confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.parallelSpeedUp.set((Boolean) miParallelSpeedUp.isSelected());
-                } else {
-                    miParallelSpeedUp.setSelected(!miParallelSpeedUp.isSelected());
-                }
-                break;
-            case ACTION_INTERNAL_VIEWER_SWITCH:
-                Configuration.internalFlashViewer.set(miInternalViewer.isSelected());
-                reload(true);
-                break;
-            case ACTION_SEARCH_AS:
-                if (searchDialog == null) {
-                    searchDialog = new SearchDialog();
-                }
-                searchDialog.setVisible(true);
-                if (searchDialog.result) {
-                    final String txt = searchDialog.searchField.getText();
-                    if (!txt.isEmpty()) {
-                        if (abcPanel != null) {
-                            new CancellableWorker() {
-                                @Override
-                                protected Void doInBackground() throws Exception {
-                                    if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
-                                        View.execInEventDispatch(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                showDetail(DETAILCARDAS3NAVIGATOR);
-                                                showCard(CARDACTIONSCRIPTPANEL);
-                                            }
-                                        });
-                                    } else {
-                                        View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
-                                    }
-                                    return null;
-                                }
-                            }.execute();
-                        } else {
-                            new CancellableWorker() {
-                                @Override
-                                protected Void doInBackground() {
-                                    if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
-                                        View.execInEventDispatch(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                showCard(CARDACTIONSCRIPTPANEL);
-                                            }
-                                        });
-                                    } else {
-                                        View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
-                                    }
-                                    return null;
-                                }
-                            }.execute();
-                        }
-                    }
                 }
                 break;
             case ACTION_REPLACE_IMAGE:
@@ -2643,443 +2414,15 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 }
                 break;
 
-            case ACTION_AUTO_DEOBFUSCATE:
-                if (View.showConfirmDialog(this, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
-                    clearCache();
-                    if (abcPanel != null) {
-                        abcPanel.reload();
-                    }
-                    reload(true);
-                    doFilter();
-                } else {
-                    miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
-                }
-                break;
-            case ACTION_EXIT:
-                setVisible(false);
-                if (Main.proxyFrame != null) {
-                    if (Main.proxyFrame.isVisible()) {
-                        return;
-                    }
-                }
-                Main.exit();
-                break;
         }
         if (Main.isWorking()) {
             return;
         }
 
         switch (e.getActionCommand()) {
-            case ACTION_RENAME_ONE_IDENTIFIER:
 
-                if (swf.fileAttributes.actionScript3) {
-                    final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
-                    if (multiName > 0) {
-                        new CancellableWorker() {
-                            @Override
-                            public Void doInBackground() throws Exception {
-                                Main.startWork(translate("work.renaming") + "...");
-                                renameMultiname(multiName);
-                                return null;
-                            }
-                            
-                            @Override
-                            protected void done() {
-                                Main.stopWork();
-                            }
-                        }.execute();
-
-                    } else {
-                        View.showMessageDialog(null, translate("message.rename.notfound.multiname"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else {
-                    final String identifier = actionPanel.getStringUnderCursor();
-                    if (identifier != null) {
-                        new CancellableWorker() {
-                            @Override
-                            public Void doInBackground() throws Exception {
-                                Main.startWork(translate("work.renaming") + "...");
-                                try {
-                                    renameIdentifier(identifier);
-                                } catch (InterruptedException ex) {
-                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                                return null;
-                            }
-
-                            @Override
-                            protected void done() {
-                                Main.stopWork();
-                            }
-                        }.execute();
-                    } else {
-                        View.showMessageDialog(null, translate("message.rename.notfound.identifier"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }
-                break;
-            case ACTION_ABOUT:
-                Main.about();
-                break;
-
-            case ACTION_SHOW_PROXY:
-                Main.showProxy();
-                break;
-
-            case ACTION_SUB_LIMITER:
-                if (e.getSource() instanceof JCheckBoxMenuItem) {
-                    Main.setSubLimiter(((JCheckBoxMenuItem) e.getSource()).getState());
-                }
-
-                break;
-
-            case ACTION_SAVE:
-                try {
-                    Main.saveFile(Main.file);
-                } catch (IOException ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                }
-                break;
-            case ACTION_SAVE_AS:
-                if (Main.saveFileDialog()) {
-                    setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + Main.getFileTitle() : ""));
-                    saveCommandButton.setEnabled(!Main.readOnly);
-                }
-                break;
-            case ACTION_OPEN:
-                Main.openFileDialog();
-                break;
-            case ACTION_EXPORT_FLA:
-                JFileChooser fc = new JFileChooser();
-                String selDir = Configuration.lastOpenDir.get();
-                fc.setCurrentDirectory(new File(selDir));
-                if (!selDir.endsWith(File.separator)) {
-                    selDir += File.separator;
-                }
-                String fileName = (new File(Main.file).getName());
-                fileName = fileName.substring(0, fileName.length() - 4) + ".fla";
-                fc.setSelectedFile(new File(selDir + fileName));
-                FileFilter fla = new FileFilter() {
-                    @Override
-                    public boolean accept(File f) {
-                        return f.isDirectory() || (f.getName().toLowerCase().endsWith(".fla"));
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return translate("filter.fla");
-                    }
-                };
-                FileFilter xfl = new FileFilter() {
-                    @Override
-                    public boolean accept(File f) {
-                        return f.isDirectory() || (f.getName().toLowerCase().endsWith(".xfl"));
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return translate("filter.xfl");
-                    }
-                };
-                fc.setFileFilter(fla);
-                fc.addChoosableFileFilter(xfl);
-                fc.setAcceptAllFileFilterUsed(false);
-                JFrame f = new JFrame();
-                View.setWindowIcon(f);
-                int returnVal = fc.showSaveDialog(f);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
-                    File sf = Helper.fixDialogFile(fc.getSelectedFile());
-
-                    Main.startWork(translate("work.exporting.fla") + "...");
-                    final boolean compressed = fc.getFileFilter() == fla;
-                    if (!compressed) {
-                        if (sf.getName().endsWith(".fla")) {
-                            sf = new File(sf.getAbsolutePath().substring(0, sf.getAbsolutePath().length() - 4) + ".xfl");
-                        }
-                    }
-                    final File selfile = sf;
-                    new CancellableWorker() {
-                        @Override
-                        protected Void doInBackground() throws Exception {
-                            Helper.freeMem();
-                            try {
-                                if (compressed) {
-                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
-                                } else {
-                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
-                                }
-                            } catch (IOException ex) {
-                                View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
-                            }
-                            Helper.freeMem();
-                            return null;
-                        }
-
-                        @Override
-                        protected void done() {
-                            Main.stopWork();
-                        }
-                    }.execute();
-                }
-                break;
-            case ACTION_EXPORT_SEL:
-            case ACTION_EXPORT:
-                final ExportDialog export = new ExportDialog();
-                export.setVisible(true);
-                if (!export.cancelled) {
-                    JFileChooser chooser = new JFileChooser();
-                    chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
-                    chooser.setDialogTitle(translate("export.select.directory"));
-                    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    chooser.setAcceptAllFileFilterUsed(false);
-                    if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                        final long timeBefore = System.currentTimeMillis();
-                        Main.startWork(translate("work.exporting") + "...");
-                        final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
-                        Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
-                        final ExportMode exportMode = ExportMode.get(export.getOption(ExportDialog.OPTION_ACTIONSCRIPT));
-                        final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
-                        final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
-                        final boolean onlySel = e.getActionCommand().endsWith("SEL");
-                        new CancellableWorker() {
-                            @Override
-                            public Void doInBackground() throws Exception {
-                                try {
-                                    if (onlySel) {
-                                        exportSelection(errorHandler, selFile, export);
-                                    } else {
-                                        swf.exportImages(errorHandler, selFile + File.separator + "images");
-                                        swf.exportShapes(errorHandler, selFile + File.separator + "shapes");
-                                        swf.exportTexts(errorHandler, selFile + File.separator + "texts", isFormatted);
-                                        swf.exportMovies(errorHandler, selFile + File.separator + "movies");
-                                        swf.exportSounds(errorHandler, selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
-                                        swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData");
-                                        swf.exportActionScript(errorHandler, selFile, exportMode, Configuration.parallelSpeedUp.get());
-                                    }
-                                } catch (Exception ex) {
-                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
-                                    View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
-                                }
-                                return null;
-                            }
-
-                            @Override
-                            protected void done() {
-                                Main.stopWork();
-                                long timeAfter = System.currentTimeMillis();
-                                final long timeMs = timeAfter - timeBefore;
-
-                                View.execInEventDispatchLater(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
-                                    }
-                                });
-                            }
-                        }.execute();
-
-                    }
-                }
-                break;
-
-            case ACTION_CHECK_UPDATES:
-                if (!Main.checkForUpdates()) {
-                    View.showMessageDialog(null, translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
-                }
-                break;
-
-            case ACTION_HELP_US:
-                String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html";
-                if (java.awt.Desktop.isDesktopSupported()) {
-                    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                    try {
-                        java.net.URI uri = new java.net.URI(helpUsURL);
-                        desktop.browse(uri);
-                    } catch (URISyntaxException | IOException ex) {
-                    }
-                } else {
-                    View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
-                }
-                break;
-
-            case ACTION_HOMEPAGE:
-                String homePageURL = ApplicationInfo.PROJECT_PAGE;
-                if (java.awt.Desktop.isDesktopSupported()) {
-                    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                    try {
-                        java.net.URI uri = new java.net.URI(homePageURL);
-                        desktop.browse(uri);
-                    } catch (URISyntaxException | IOException ex) {
-                    }
-                } else {
-                    View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
-                }
-                break;
-
-            case ACTION_RESTORE_CONTROL_FLOW:
-            case ACTION_RESTORE_CONTROL_FLOW_ALL:
-                Main.startWork(translate("work.restoringControlFlow"));
-                final boolean all = e.getActionCommand().endsWith("ALL");
-                if ((!all) || confirmExperimental()) {
-                    new CancellableWorker() {
-                        @Override
-                        protected Object doInBackground() throws Exception {
-                            int cnt = 0;
-                            if (all) {
-                                for (ABCContainerTag tag : abcPanel.list) {
-                                    tag.getABC().restoreControlFlow();
-                                }
-                            } else {
-                                int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                                if (bi != -1) {
-                                    abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants, abcPanel.decompiledTextArea.getCurrentTrait(), abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
-                                }
-                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, abcPanel.decompiledTextArea.getCurrentTrait());
-                            }
-                            return true;
-                        }
-
-                        @Override
-                        protected void done() {
-                            Main.stopWork();
-                            View.showMessageDialog(null, translate("work.restoringControlFlow.complete"));
-
-                            View.execInEventDispatch(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    abcPanel.reload();
-                                    doFilter();
-                                }
-                            });
-                        }
-                    }.execute();
-                }
-                break;
-            case ACTION_RENAME_IDENTIFIERS:
-                if (confirmExperimental()) {
-                    final RenameType renameType = new RenameDialog().display();
-                    if (renameType != null) {
-                        Main.startWork(translate("work.renaming.identifiers") + "...");
-                        new CancellableWorker<Integer>() {
-                            @Override
-                            protected Integer doInBackground() throws Exception {
-                                int cnt = swf.deobfuscateIdentifiers(renameType);
-                                return cnt;
-                            }
-
-                            @Override
-                            protected void done() {
-                                View.execInEventDispatch(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            int cnt = get();
-                                            Main.stopWork();
-                                            View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", "" + cnt));
-                                            swf.assignClassesToSymbols();
-                                            clearCache();
-                                            if (abcPanel != null) {
-                                                abcPanel.reload();
-                                            }
-                                            doFilter();
-                                            reload(true);
-                                        } catch (Exception ex) {
-                                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during renaming identifiers", ex);
-                                            Main.stopWork();
-                                            View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
-                                        }
-                                    }
-                                });
-                            }
-                        }.execute();
-                    }
-                }
-                break;
-            case ACTION_DEOBFUSCATE:
-            case ACTION_DEOBFUSCATE_ALL:
-                if (deobfuscationDialog == null) {
-                    deobfuscationDialog = new DeobfuscationDialog();
-                }
-                deobfuscationDialog.setVisible(true);
-                if (deobfuscationDialog.ok) {
-                    Main.startWork(translate("work.deobfuscating") + "...");
-                    new CancellableWorker() {
-                        @Override
-                        protected Object doInBackground() throws Exception {
-                            try {
-                                if (deobfuscationDialog.processAllCheckbox.isSelected()) {
-                                    for (ABCContainerTag tag : abcPanel.list) {
-                                        if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
-                                            tag.getABC().removeDeadCode();
-                                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                            tag.getABC().removeTraps();
-                                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                            tag.getABC().removeTraps();
-                                            tag.getABC().restoreControlFlow();
-                                        }
-                                    }
-                                } else {
-                                    int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                                    Trait t = abcPanel.decompiledTextArea.getCurrentTrait();
-                                    if (bi != -1) {
-                                        if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
-                                            abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants, t, abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
-                                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                            abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
-                                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                            abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
-                                            abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants, t, abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
-                                        }
-                                    }
-                                    abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, t);
-                                }
-                            } catch (Exception ex) {
-                                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);
-                            }
-                            return true;
-                        }
-
-                        @Override
-                        protected void done() {
-                            Main.stopWork();
-                            View.showMessageDialog(null, translate("work.deobfuscating.complete"));
-
-                            View.execInEventDispatch(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    clearCache();
-                                    abcPanel.reload();
-                                    doFilter();
-                                }
-                            });
-                        }
-                    }.execute();
-                }
-                break;
-            case ACTION_REMOVE_NON_SCRIPTS:
-                List<Tag> tags = new ArrayList<>(swf.tags);
-                for (Tag tag : tags) {
-                    System.out.println(tag.getClass());
-                    if (!(tag instanceof ABCContainerTag || tag instanceof ASMSource)) {
-                        swf.removeTag(tag);
-                    }
-                }
-                showCard(CARDEMPTYPANEL);
-                refreshTree();
-                break;
-            case ACTION_REFRESH_DECOMPILED:
-                clearCache();
-                if (abcPanel != null) {
-                    abcPanel.reload();
-                }
-                reload(true);
-                doFilter();
+            case MainFrameRibbon.ACTION_EXPORT_SEL:
+                export(true);
                 break;
         }
     }
@@ -3219,7 +2562,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
 
         if ((tagObj instanceof SWFRoot)) {
-            if (miInternalViewer.isSelected()) {
+            if (mainRibbon.miInternalViewer.isSelected()) {
                 showCard(CARDSWFPREVIEWPANEL);
                 swfPreviewPanel.load(swf);
                 swfPreviewPanel.play();
@@ -3262,14 +2605,14 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             imageButtonsPanel.setVisible(((ImageTag) tagObj).importSupported());
             showCard(CARDIMAGEPANEL);
             imagePanel.setImage(((ImageTag) tagObj).getImage(swf.tags));
-        } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (miInternalViewer.isSelected())) {
+        } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (mainRibbon.miInternalViewer.isSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
-        } else if ((tagObj instanceof FontTag) && (miInternalViewer.isSelected())) {
+        } else if ((tagObj instanceof FontTag) && (mainRibbon.miInternalViewer.isSelected())) {
             showCard(CARDFLASHPANEL);
             previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
             showFontTag((FontTag) tagObj);
-        } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (miInternalViewer.isSelected())) {
+        } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (mainRibbon.miInternalViewer.isSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             FrameNode fn = (FrameNode) tagObj;
             List<Tag> controlTags = swf.tags;
@@ -3670,7 +3013,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     }
 
     private void showFontTag(FontTag ft) {
-        if (miInternalViewer.isSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
+        if (mainRibbon.miInternalViewer.isSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
             internelViewerPanel.setDrawable(ft, swf, characters, 1);
         } else {

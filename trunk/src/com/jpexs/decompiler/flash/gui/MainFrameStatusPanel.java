@@ -61,7 +61,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
         statusLeftPanel.setLayout(new BoxLayout(statusLeftPanel, BoxLayout.X_AXIS));
         loadingPanel.setPreferredSize(new Dimension(30, 30));
         // todo: this button is a little bit ugly in the UI. Maybe it can be changed to an icon (as in NetBeans)
-        cancelButton.setText(mainFrame.translate("button.cancel"));
+        cancelButton.setText(translate("button.cancel"));
         cancelButton.setPreferredSize(new Dimension(100, 30));
         cancelButton.setBorderPainted(false);
         cancelButton.setOpaque(false);
@@ -91,7 +91,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
         errorNotificationButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         errorNotificationButton.setActionCommand(ACTION_SHOW_ERROR_LOG);
         errorNotificationButton.addActionListener(this);
-        errorNotificationButton.setToolTipText(mainFrame.translate("errors.none"));
+        errorNotificationButton.setToolTipText(translate("errors.none"));
         add(errorNotificationButton, BorderLayout.EAST);
 
         loadingPanel.setVisible(false);
@@ -107,6 +107,10 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
         }
     }
     
+    public String translate(String key) {
+        return mainFrame.translate(key);
+    }
+
     public void setStatus(String s) {
         statusLabel.setText(s);
     }
@@ -124,7 +128,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
 
     public void clearErrorState() {
         errorNotificationButton.setIcon(View.getIcon("okay16"));
-        errorNotificationButton.setToolTipText(mainFrame.translate("errors.none"));
+        errorNotificationButton.setToolTipText(translate("errors.none"));
     }
 
     public void setErrorState() {
@@ -134,7 +138,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
             return;
         }
         errorNotificationButton.setIcon(View.getIcon("error16"));
-        errorNotificationButton.setToolTipText(mainFrame.translate("errors.present"));
+        errorNotificationButton.setToolTipText(translate("errors.present"));
         if (blinkTimer != null) {
             blinkTimer.cancel();
         }
