@@ -22,14 +22,20 @@ package com.jpexs.decompiler.flash;
  */
 public class FrameNode {
 
+    private SWF swf;
     private int frame;
     private Object parent;
     private boolean display;
 
-    public FrameNode(int frame, Object parent, boolean display) {
+    public FrameNode(SWF swf, int frame, Object parent, boolean display) {
+        this.swf = swf;
         this.frame = frame;
         this.parent = parent;
         this.display = display;
+    }
+
+    public SWF getSwf() {
+        return swf;
     }
 
     public boolean isDisplayed() {

@@ -498,19 +498,21 @@ public class Helper {
             try {
                 f.setAccessible(true);
                 Object v = f.get(obj);
-                if (v instanceof Collection) {
-                    ((Collection) v).clear();
-                }
-                if (v instanceof Component) {
-                    if (((Component) v).getParent() != null) {
-                        ((Component) v).getParent().remove((Component) v);
+                if (v != null) {
+                    if (v instanceof Collection) {
+                        ((Collection) v).clear();
                     }
+                    if (v instanceof Component) {
+                        if (((Component) v).getParent() != null) {
+                            ((Component) v).getParent().remove((Component) v);
+                        }
+                    }
+                    if (v instanceof Freed) {
+                        ((Freed) v).free();
+                    }
+                    f.set(obj, null);
                 }
-                if (v instanceof Freed) {
-                    ((Freed) v).free();
-                }
-                f.set(obj, null);
-            } catch (SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            } catch (UnsupportedOperationException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
             }
         }
     }

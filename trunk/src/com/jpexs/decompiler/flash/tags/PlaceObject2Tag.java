@@ -240,7 +240,7 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
             clipDepth = sis.readUI16();
         }
         if (placeFlagHasClipActions) {
-            clipActions = sis.readCLIPACTIONS();
+            clipActions = sis.readCLIPACTIONS(swf);
         }
     }
 

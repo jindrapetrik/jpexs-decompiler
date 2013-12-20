@@ -781,7 +781,7 @@ public final class SWF {
             }
             TagNode addNode = null;
             if (t instanceof ShowFrameTag) {
-                TagNode tti = new TagNode(new FrameNode(frame, parent, false));
+                TagNode tti = new TagNode(new FrameNode(t.getSwf(), frame, parent, false));
 
                 for (int r = ret.size() - 1; r >= 0; r--) {
                     if (!(ret.get(r).tag instanceof DefineSpriteTag)) {

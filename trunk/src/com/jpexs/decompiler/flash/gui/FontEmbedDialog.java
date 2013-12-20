@@ -47,6 +47,9 @@ import javax.swing.JTextField;
  */
 public class FontEmbedDialog extends AppDialog implements ActionListener {
 
+    static final String ACTION_OK = "OK";
+    static final String ACTION_CANCEL = "CANCEL";
+    
     private JComboBox<String> sourceFont;
     private JCheckBox[] rangeCheckboxes;
     private String rangeNames[];
@@ -130,10 +133,10 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton okButton = new JButton(AppStrings.translate("button.ok"));
-        okButton.setActionCommand("OK");
+        okButton.setActionCommand(ACTION_OK);
         okButton.addActionListener(this);
         JButton cancelButton = new JButton(AppStrings.translate("button.cancel"));
-        cancelButton.setActionCommand("CANCEL");
+        cancelButton.setActionCommand(ACTION_CANCEL);
         cancelButton.addActionListener(this);
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
@@ -198,11 +201,11 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "OK":
+            case ACTION_OK:
                 result = true;
                 setVisible(false);
                 break;
-            case "CANCEL":
+            case ACTION_CANCEL:
                 result = false;
                 setVisible(false);
                 break;

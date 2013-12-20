@@ -41,6 +41,9 @@ import javax.swing.JProgressBar;
  */
 public class PlayerControls extends JPanel implements ActionListener {
 
+    static final String ACTION_PAUSE = "PAUSE";
+    static final String ACTION_STOP = "STOP";
+
     private JButton pauseButton;
     private boolean paused = false;
     private FlashDisplay display;
@@ -64,11 +67,11 @@ public class PlayerControls extends JPanel implements ActionListener {
 
         pauseButton = new JButton(AppStrings.translate("preview.pause"), pauseIcon);
         pauseButton.setMargin(new Insets(0, 0, 0, 0));
-        pauseButton.setActionCommand("PAUSE");
+        pauseButton.setActionCommand(ACTION_PAUSE);
         pauseButton.addActionListener(this);
         JButton stopButton = new JButton(AppStrings.translate("preview.stop"), View.getIcon("stop16"));
         stopButton.setMargin(new Insets(0, 0, 0, 0));
-        stopButton.setActionCommand("STOP");
+        stopButton.setActionCommand(ACTION_STOP);
         stopButton.addActionListener(this);
         buttonsPanel.add(pauseButton);
         buttonsPanel.add(stopButton);
@@ -165,14 +168,14 @@ public class PlayerControls extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "PAUSE":
+            case ACTION_PAUSE:
                 if (paused) {
                     display.play();
                 } else {
                     display.pause();
                 }
                 break;
-            case "STOP":
+            case ACTION_STOP:
                 display.pause();
                 display.rewind();
                 break;

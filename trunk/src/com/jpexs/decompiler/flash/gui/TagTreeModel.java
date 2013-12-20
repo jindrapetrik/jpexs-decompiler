@@ -16,9 +16,20 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.FrameNode;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.TagNode;
+import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.TreeElement;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TreeModelListener;
@@ -27,12 +38,171 @@ import javax.swing.tree.TreePath;
 
 public class TagTreeModel implements TreeModel {
 
-    private Object root;
+    private SWFRoot root;
     private List<TagNode> list = new ArrayList<>();
+    private MainFrame mainFrame;
 
-    public TagTreeModel(List<TagNode> list, Object rootName) {
-        this.root = rootName;
-        this.list = list;
+    public TagTreeModel(MainFrame mainFrame, List<SWF> swfs, ABCPanel abcPanel) {
+        this.mainFrame = mainFrame;
+        SWF swf = swfs.get(0); // todo honfika: add multiple swfs
+        this.root = new SWFRoot(swf, new File(Main.file).getName());
+
+        List<ContainerItem> objs = new ArrayList<>();
+        objs.addAll(swf.tags);
+        this.list = createTagList(objs, null, abcPanel);
+    }
+
+    private String translate(String key) {
+        return mainFrame.translate(key);
+    }
+
+    public List<TagNode> getTagNodesWithType(List<? extends ContainerItem> list, TagType type, Object parent, boolean display) {
+        List<TagNode> ret = new ArrayList<>();
+        int frameCnt = 0;
+        for (ContainerItem o : list) {
+            TagType ttype = MainFrame.getTagType(o);
+            if (ttype == TagType.SHOW_FRAME && type == TagType.FRAME) {
+                frameCnt++;
+                ret.add(new TagNode(new FrameNode(o.getSwf(), frameCnt, parent, display)));
+            } else if (type == ttype) {
+                ret.add(new TagNode(o));
+            }
+        }
+        return ret;
+    }
+
+    private List<TagNode> createTagList(List<ContainerItem> list, Object parent, ABCPanel abcPanel) {
+        List<TagNode> ret = new ArrayList<>();
+        List<TagNode> frames = getTagNodesWithType(list, TagType.FRAME, parent, true);
+        List<TagNode> shapes = getTagNodesWithType(list, TagType.SHAPE, parent, true);
+        List<TagNode> morphShapes = getTagNodesWithType(list, TagType.MORPH_SHAPE, parent, true);
+        List<TagNode> sprites = getTagNodesWithType(list, TagType.SPRITE, parent, true);
+        List<TagNode> buttons = getTagNodesWithType(list, TagType.BUTTON, parent, true);
+        List<TagNode> images = getTagNodesWithType(list, TagType.IMAGE, parent, true);
+        List<TagNode> fonts = getTagNodesWithType(list, TagType.FONT, parent, true);
+        List<TagNode> texts = getTagNodesWithType(list, TagType.TEXT, parent, true);
+        List<TagNode> movies = getTagNodesWithType(list, TagType.MOVIE, parent, true);
+        List<TagNode> sounds = getTagNodesWithType(list, TagType.SOUND, parent, true);
+        List<TagNode> binaryData = getTagNodesWithType(list, TagType.BINARY_DATA, parent, true);
+        List<TagNode> actionScript = new ArrayList<>();
+
+        for (int i = 0; i < sounds.size(); i++) {
+            if (sounds.get(i).tag instanceof SoundStreamHeadTypeTag) {
+                List<SoundStreamBlockTag> blocks = new ArrayList<>();
+                SWF.populateSoundStreamBlocks(list, (Tag) sounds.get(i).tag, blocks);
+                if (blocks.isEmpty()) {
+                    sounds.remove(i);
+                    i--;
+                }
+            }
+        }
+
+        for (TagNode n : sprites) {
+            n.subItems = getTagNodesWithType(((DefineSpriteTag) n.tag).subTags, TagType.FRAME, n.tag, true);
+        }
+
+        List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
+        for (Object t : list) {
+            if (t instanceof ExportAssetsTag) {
+                exportAssetsTags.add((ExportAssetsTag) t);
+            }
+            /*if (t instanceof ASMSource) {
+             TagNode tti = new TagNode(t);
+             ret.add(tti);
+             } else */
+            if (t instanceof Container) {
+                TagNode tti = new TagNode(t);
+                if (((Container) t).getItemCount() > 0) {
+                    List<ContainerItem> subItems = ((Container) t).getSubItems();
+                    tti.subItems = createTagList(subItems, t, abcPanel);
+                }
+                //ret.add(tti);
+            }
+        }
+
+        actionScript = SWF.createASTagList(list, null);
+        TagNode textsNode = new TagNode(translate("node.texts"));
+        textsNode.subItems.addAll(texts);
+
+        TagNode imagesNode = new TagNode(translate("node.images"));
+        imagesNode.subItems.addAll(images);
+
+        TagNode moviesNode = new TagNode(translate("node.movies"));
+        moviesNode.subItems.addAll(movies);
+
+        TagNode soundsNode = new TagNode(translate("node.sounds"));
+        soundsNode.subItems.addAll(sounds);
+
+
+        TagNode binaryDataNode = new TagNode(translate("node.binaryData"));
+        binaryDataNode.subItems.addAll(binaryData);
+
+        TagNode fontsNode = new TagNode(translate("node.fonts"));
+        fontsNode.subItems.addAll(fonts);
+
+
+        TagNode spritesNode = new TagNode(translate("node.sprites"));
+        spritesNode.subItems.addAll(sprites);
+
+        TagNode shapesNode = new TagNode(translate("node.shapes"));
+        shapesNode.subItems.addAll(shapes);
+
+        TagNode morphShapesNode = new TagNode(translate("node.morphshapes"));
+        morphShapesNode.subItems.addAll(morphShapes);
+
+        TagNode buttonsNode = new TagNode(translate("node.buttons"));
+        buttonsNode.subItems.addAll(buttons);
+
+        TagNode framesNode = new TagNode(translate("node.frames"));
+        framesNode.subItems.addAll(frames);
+
+        TagNode actionScriptNode = new TagNode(translate("node.scripts"));
+        actionScriptNode.mark = "scripts";
+        actionScriptNode.subItems.addAll(actionScript);
+
+        if (!shapesNode.subItems.isEmpty()) {
+            ret.add(shapesNode);
+        }
+        if (!morphShapesNode.subItems.isEmpty()) {
+            ret.add(morphShapesNode);
+        }
+        if (!spritesNode.subItems.isEmpty()) {
+            ret.add(spritesNode);
+        }
+        if (!textsNode.subItems.isEmpty()) {
+            ret.add(textsNode);
+        }
+        if (!imagesNode.subItems.isEmpty()) {
+            ret.add(imagesNode);
+        }
+        if (!moviesNode.subItems.isEmpty()) {
+            ret.add(moviesNode);
+        }
+        if (!soundsNode.subItems.isEmpty()) {
+            ret.add(soundsNode);
+        }
+        if (!buttonsNode.subItems.isEmpty()) {
+            ret.add(buttonsNode);
+        }
+        if (!fontsNode.subItems.isEmpty()) {
+            ret.add(fontsNode);
+        }
+        if (!binaryDataNode.subItems.isEmpty()) {
+            ret.add(binaryDataNode);
+        }
+        if (!framesNode.subItems.isEmpty()) {
+            ret.add(framesNode);
+        }
+
+        if (abcPanel != null) {
+            actionScriptNode.subItems.clear();
+            actionScriptNode.tag = abcPanel.classTree.getModel();
+        }
+        if ((!actionScriptNode.subItems.isEmpty()) || (abcPanel != null)) {
+            ret.add(actionScriptNode);
+        }
+
+        return ret;
     }
 
     private List<Object> searchTag(Object obj, Object parent, List<Object> path) {

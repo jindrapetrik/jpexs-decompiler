@@ -36,6 +36,9 @@ import javax.swing.JRadioButton;
  */
 public class RenameDialog extends AppDialog implements ActionListener {
 
+    static final String ACTION_OK = "OK";
+    static final String ACTION_CANCEL = "CANCEL";
+
     private JRadioButton typeNumberRadioButton = new JRadioButton(translate("rename.type.typenumber"));
     private JRadioButton randomWordRadioButton = new JRadioButton(translate("rename.type.randomword"));
     private JButton okButton = new JButton(translate("button.ok"));
@@ -70,10 +73,10 @@ public class RenameDialog extends AppDialog implements ActionListener {
         add(pan, BorderLayout.CENTER);
         JPanel panButtons = new JPanel(new FlowLayout());
         panButtons.add(okButton);
-        okButton.setActionCommand("OK");
+        okButton.setActionCommand(ACTION_OK);
         okButton.addActionListener(this);
         panButtons.add(cancelButton);
-        cancelButton.setActionCommand("CANCEL");
+        cancelButton.setActionCommand(ACTION_CANCEL);
         cancelButton.addActionListener(this);
         add(panButtons, BorderLayout.SOUTH);
         setModalityType(ModalityType.APPLICATION_MODAL);
@@ -95,12 +98,12 @@ public class RenameDialog extends AppDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "OK":
+            case ACTION_OK:
                 confirmed = true;
                 Configuration.lastRenameType.set((Integer) (getRenameType() == RenameType.TYPENUMBER ? 1 : 2));
                 setVisible(false);
                 break;
-            case "CANCEL":
+            case ACTION_CANCEL:
                 confirmed = false;
                 setVisible(false);
                 break;

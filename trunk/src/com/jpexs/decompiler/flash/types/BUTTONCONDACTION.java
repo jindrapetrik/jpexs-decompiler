@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
@@ -42,14 +43,21 @@ import java.util.logging.Logger;
  */
 public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
 
+    private SWF swf;
     private long pos;
+
+    @Override
+    public SWF getSwf() {
+        return swf;
+    }
 
     @Override
     public long getPos() {
         return pos;
     }
 
-    public BUTTONCONDACTION(InputStream is, int version, long containerOffset) throws IOException {
+    public BUTTONCONDACTION(SWF swf, InputStream is, int version, long containerOffset) throws IOException {
+        this.swf = swf;
         SWFInputStream sis = new SWFInputStream(is, version);
         pos = containerOffset;
         int condActionSize = sis.readUI16();

@@ -203,7 +203,7 @@ import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationM
  */
 public final class MainFrame extends AppRibbonFrame implements ActionListener, TreeSelectionListener, Freed {
 
-    private SWF swf;
+    private List<SWF> swfs;
     public ABCPanel abcPanel;
     public ActionPanel actionPanel;
     private MainFrameStatusPanel statusPanel;
@@ -437,7 +437,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         imageButtonsPanel.setVisible(visible);
     }
     
-    public MainFrame(SWF swf) {
+    public MainFrame(final SWF swf) {
         super();
 
         List<ContainerItem> objs = new ArrayList<>();
@@ -523,7 +523,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         });
         setTitle(ApplicationInfo.applicationVerName + ((swf != null && Configuration.displayFileName.get()) ? " - " + Main.getFileTitle() : ""));
 
-        this.swf = swf;
+        this.swfs = Arrays.asList(swf);
         java.awt.Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         cnt.add(getRibbon(), BorderLayout.NORTH);
@@ -547,7 +547,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         if (swf == null) {
             tagTree = new JTree((TreeModel) null);
         } else {
-            tagTree = new JTree(new TagTreeModel(createTagList(objs, null), new SWFRoot((new File(Main.file)).getName())));
+            tagTree = new JTree(new TagTreeModel(this, swfs, abcPanel));
         }
         tagTree.addTreeSelectionListener(this);
         tagTree.setBackground(Color.white);
@@ -598,7 +598,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
                             try {
                                 File ftemp = new File(tempDir);
-                                files = exportSelection(errorHandler, tempDir, export);
+                                files = exportSelection(swf, errorHandler, tempDir, export);
                                 files.clear();
 
                                 File[] fs = ftemp.listFiles();
@@ -664,14 +664,15 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 if (val instanceof TagNode) {
                     val = ((TagNode) val).tag;
                 }
-                String type = getTagType(val);
+                TagType type = getTagType(val);
                 if (row == 0) {
                     setIcon(View.getIcon("flash16"));
                 } else if (type != null) {
-                    if (type.equals("folder") && expanded) {
-                        type = "folderopen";
+                    if (type == TagType.FOLDER && expanded) {
+                        type = TagType.FOLDER_OPEN;
                     }
-                    setIcon(View.getIcon(type + "16"));
+                    String tagTypeStr = type.toString().toLowerCase().replace("_", "");
+                    setIcon(View.getIcon(tagTypeStr + "16"));
                     //setToolTipText("This book is in the Tutorial series.");
                 } else {
                     //setToolTipText(null); //no tool tip
@@ -1077,7 +1078,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     splitPos = splitPane2.getDividerLocation();
                     splitsInited = true;
                     if (Configuration.gotoMainClassOnStartup.get()) {
-                        gotoDocumentClass();
+                        gotoDocumentClass(getCurrentSwf());
                     }
                 }
             });
@@ -1211,18 +1212,18 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         return ret;
     }
 
-    public String getTagType(Object t) {
+    public static TagType getTagType(Object t) {
         if ((t instanceof DefineFontTag)
                 || (t instanceof DefineFont2Tag)
                 || (t instanceof DefineFont3Tag)
                 || (t instanceof DefineFont4Tag)
                 || (t instanceof DefineCompactedFont)) {
-            return "font";
+            return TagType.FONT;
         }
         if ((t instanceof DefineTextTag)
                 || (t instanceof DefineText2Tag)
                 || (t instanceof DefineEditTextTag)) {
-            return "text";
+            return TagType.TEXT;
         }
 
         if ((t instanceof DefineBitsTag)
@@ -1231,88 +1232,73 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 || (t instanceof DefineBitsJPEG4Tag)
                 || (t instanceof DefineBitsLosslessTag)
                 || (t instanceof DefineBitsLossless2Tag)) {
-            return "image";
+            return TagType.IMAGE;
         }
         if ((t instanceof DefineShapeTag)
                 || (t instanceof DefineShape2Tag)
                 || (t instanceof DefineShape3Tag)
                 || (t instanceof DefineShape4Tag)) {
-            return "shape";
+            return TagType.SHAPE;
         }
 
         if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
-            return "morphshape";
+            return TagType.MORPH_SHAPE;
         }
 
         if (t instanceof DefineSpriteTag) {
-            return "sprite";
+            return TagType.SPRITE;
         }
         if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
-            return "button";
+            return TagType.BUTTON;
         }
         if (t instanceof ASMSource) {
-            return "as";
+            return TagType.AS;
         }
         if (t instanceof TreeElement) {
             TreeElement te = (TreeElement) t;
             if (te.getItem() instanceof ScriptPack) {
-                return "as";
+                return TagType.AS;
             } else {
-                return "package";
+                return TagType.PACKAGE;
             }
         }
         if (t instanceof PackageNode) {
-            return "package";
+            return TagType.PACKAGE;
         }
         if (t instanceof FrameNode) {
-            return "frame";
+            return TagType.FRAME;
         }
         if (t instanceof ShowFrameTag) {
-            return "showframe";
+            return TagType.SHOW_FRAME;
         }
 
         if (t instanceof DefineVideoStreamTag) {
-            return "movie";
+            return TagType.MOVIE;
         }
 
         if ((t instanceof DefineSoundTag) || (t instanceof SoundStreamHeadTag) || (t instanceof SoundStreamHead2Tag)) {
-            return "sound";
+            return TagType.SOUND;
         }
 
         if (t instanceof DefineBinaryDataTag) {
-            return "binaryData";
+            return TagType.BINARY_DATA;
         }
 
-        return "folder";
+        return TagType.FOLDER;
     }
 
-    public List<Object> getTagsWithType(List<Object> list, String type) {
+    public List<Object> getTagsWithType(List<Object> list, TagType type) {
         List<Object> ret = new ArrayList<>();
         for (Object o : list) {
-            String ttype = getTagType(o);
-            if (type.equals(ttype)) {
+            TagType ttype = getTagType(o);
+            if (type == ttype) {
                 ret.add(o);
             }
         }
         return ret;
     }
 
-    public List<TagNode> getTagNodesWithType(List<? extends ContainerItem> list, String type, Object parent, boolean display) {
-        List<TagNode> ret = new ArrayList<>();
-        int frameCnt = 0;
-        for (ContainerItem o : list) {
-            String ttype = getTagType(o);
-            if ("showframe".equals(ttype) && "frame".equals(type)) {
-                frameCnt++;
-                ret.add(new TagNode(new FrameNode(frameCnt, parent, display)));
-            } else if (type.equals(ttype)) {
-                ret.add(new TagNode(o));
-            }
-        }
-        return ret;
-    }
-
-    public void renameIdentifier(String identifier) throws InterruptedException {
+    public void renameIdentifier(SWF swf, String identifier) throws InterruptedException {
         String oldName = identifier;
         String newName = View.showInputDialog(translate("rename.enternew"), oldName);
         if (newName != null) {
@@ -1421,149 +1407,12 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         return null;
     }
 
-    public List<TagNode> createTagList(List<ContainerItem> list, Object parent) {
-        List<TagNode> ret = new ArrayList<>();
-        List<TagNode> frames = getTagNodesWithType(list, "frame", parent, true);
-        List<TagNode> shapes = getTagNodesWithType(list, "shape", parent, true);
-        List<TagNode> morphShapes = getTagNodesWithType(list, "morphshape", parent, true);
-        List<TagNode> sprites = getTagNodesWithType(list, "sprite", parent, true);
-        List<TagNode> buttons = getTagNodesWithType(list, "button", parent, true);
-        List<TagNode> images = getTagNodesWithType(list, "image", parent, true);
-        List<TagNode> fonts = getTagNodesWithType(list, "font", parent, true);
-        List<TagNode> texts = getTagNodesWithType(list, "text", parent, true);
-        List<TagNode> movies = getTagNodesWithType(list, "movie", parent, true);
-        List<TagNode> sounds = getTagNodesWithType(list, "sound", parent, true);
-        List<TagNode> binaryData = getTagNodesWithType(list, "binaryData", parent, true);
-        List<TagNode> actionScript = new ArrayList<>();
-
-        for (int i = 0; i < sounds.size(); i++) {
-            if (sounds.get(i).tag instanceof SoundStreamHeadTypeTag) {
-                List<SoundStreamBlockTag> blocks = new ArrayList<>();
-                SWF.populateSoundStreamBlocks(list, (Tag) sounds.get(i).tag, blocks);
-                if (blocks.isEmpty()) {
-                    sounds.remove(i);
-                    i--;
-                }
-            }
-        }
-
-        for (TagNode n : sprites) {
-            n.subItems = getTagNodesWithType(((DefineSpriteTag) n.tag).subTags, "frame", n.tag, true);
-        }
-
-        List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
-        for (Object t : list) {
-            if (t instanceof ExportAssetsTag) {
-                exportAssetsTags.add((ExportAssetsTag) t);
-            }
-            /*if (t instanceof ASMSource) {
-             TagNode tti = new TagNode(t);
-             ret.add(tti);
-             } else */
-            if (t instanceof Container) {
-                TagNode tti = new TagNode(t);
-                if (((Container) t).getItemCount() > 0) {
-                    List<ContainerItem> subItems = ((Container) t).getSubItems();
-                    tti.subItems = createTagList(subItems, t);
-                }
-                //ret.add(tti);
-            }
-        }
-
-        actionScript = SWF.createASTagList(list, null);
-        TagNode textsNode = new TagNode(translate("node.texts"));
-        textsNode.subItems.addAll(texts);
-
-        TagNode imagesNode = new TagNode(translate("node.images"));
-        imagesNode.subItems.addAll(images);
-
-        TagNode moviesNode = new TagNode(translate("node.movies"));
-        moviesNode.subItems.addAll(movies);
-
-        TagNode soundsNode = new TagNode(translate("node.sounds"));
-        soundsNode.subItems.addAll(sounds);
-
-
-        TagNode binaryDataNode = new TagNode(translate("node.binaryData"));
-        binaryDataNode.subItems.addAll(binaryData);
-
-        TagNode fontsNode = new TagNode(translate("node.fonts"));
-        fontsNode.subItems.addAll(fonts);
-
-
-        TagNode spritesNode = new TagNode(translate("node.sprites"));
-        spritesNode.subItems.addAll(sprites);
-
-        TagNode shapesNode = new TagNode(translate("node.shapes"));
-        shapesNode.subItems.addAll(shapes);
-
-        TagNode morphShapesNode = new TagNode(translate("node.morphshapes"));
-        morphShapesNode.subItems.addAll(morphShapes);
-
-        TagNode buttonsNode = new TagNode(translate("node.buttons"));
-        buttonsNode.subItems.addAll(buttons);
-
-        TagNode framesNode = new TagNode(translate("node.frames"));
-        framesNode.subItems.addAll(frames);
-
-        TagNode actionScriptNode = new TagNode(translate("node.scripts"));
-        actionScriptNode.mark = "scripts";
-        actionScriptNode.subItems.addAll(actionScript);
-
-        if (!shapesNode.subItems.isEmpty()) {
-            ret.add(shapesNode);
-        }
-        if (!morphShapesNode.subItems.isEmpty()) {
-            ret.add(morphShapesNode);
-        }
-        if (!spritesNode.subItems.isEmpty()) {
-            ret.add(spritesNode);
-        }
-        if (!textsNode.subItems.isEmpty()) {
-            ret.add(textsNode);
-        }
-        if (!imagesNode.subItems.isEmpty()) {
-            ret.add(imagesNode);
-        }
-        if (!moviesNode.subItems.isEmpty()) {
-            ret.add(moviesNode);
-        }
-        if (!soundsNode.subItems.isEmpty()) {
-            ret.add(soundsNode);
-        }
-        if (!buttonsNode.subItems.isEmpty()) {
-            ret.add(buttonsNode);
-        }
-        if (!fontsNode.subItems.isEmpty()) {
-            ret.add(fontsNode);
-        }
-        if (!binaryDataNode.subItems.isEmpty()) {
-            ret.add(binaryDataNode);
-        }
-        if (!framesNode.subItems.isEmpty()) {
-            ret.add(framesNode);
-        }
-
-
-
-
-        if (abcPanel != null) {
-            actionScriptNode.subItems.clear();
-            actionScriptNode.tag = abcPanel.classTree.getModel();
-        }
-        if ((!actionScriptNode.subItems.isEmpty()) || (abcPanel != null)) {
-            ret.add(actionScriptNode);
-        }
-
-        return ret;
-    }
-
     public boolean confirmExperimental() {
         return View.showConfirmDialog(null, translate("message.confirm.experimental"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
     }
     private SearchDialog searchDialog;
 
-    public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
+    public List<File> exportSelection(SWF swf, AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
         final ExportMode exportMode = ExportMode.get(export.getOption(ExportDialog.OPTION_ACTIONSCRIPT));
         final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
         final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
@@ -1589,25 +1438,25 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         for (Object d : sel) {
             if (d instanceof TagNode) {
                 TagNode n = (TagNode) d;
-                if ("image".equals(getTagType(n.tag))) {
+                if (getTagType(n.tag) == TagType.IMAGE) {
                     images.add((Tag) n.tag);
                 }
-                if ("shape".equals(getTagType(n.tag))) {
+                if (getTagType(n.tag) == TagType.SHAPE) {
                     shapes.add((Tag) n.tag);
                 }
-                if ("as".equals(getTagType(n.tag))) {
+                if (getTagType(n.tag) == TagType.AS) {
                     actionNodes.add(n);
                 }
-                if ("movie".equals(getTagType(n.tag))) {
+                if (getTagType(n.tag) == TagType.MOVIE) {
                     movies.add((Tag) n.tag);
                 }
-                if ("sound".equals(getTagType(n.tag))) {
+                if (getTagType(n.tag) == TagType.SOUND) {
                     sounds.add((Tag) n.tag);
                 }
-                if ("binaryData".equals(getTagType(n.tag))) {
+                if (getTagType(n.tag) == TagType.BINARY_DATA) {
                     binaryData.add((Tag) n.tag);
                 }
-                if ("text".equals(getTagType(n.tag))) {
+                if (getTagType(n.tag) == TagType.TEXT) {
                     texts.add((Tag) n.tag);
                 }
             }
@@ -1642,6 +1491,10 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         return ret;
     }
 
+    public SWF getCurrentSwf() {
+        return swfs == null || swfs.isEmpty() ? null : swfs.get(0);
+    }
+    
     private void clearCache() {
         if (abcPanel != null) {
             abcPanel.decompiledTextArea.clearScriptCache();
@@ -1651,7 +1504,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
     }
 
-    public void gotoDocumentClass() {
+    public void gotoDocumentClass(SWF swf) {
         if (swf == null) {
             return;
         }
@@ -1741,7 +1594,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         doFilter();
     }
     
-    public void renameOneIdentifier() {
+    public void renameOneIdentifier(final SWF swf) {
         if (swf.fileAttributes.actionScript3) {
             final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
             if (multiName > 0) {
@@ -1770,7 +1623,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     public Void doInBackground() throws Exception {
                         Main.startWork(translate("work.renaming") + "...");
                         try {
-                            renameIdentifier(identifier);
+                            renameIdentifier(swf, identifier);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -1788,7 +1641,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
     }
     
-    public void exportFla() {
+    public void exportFla(final SWF swf) {
         JFileChooser fc = new JFileChooser();
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
@@ -1863,7 +1716,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
     }
     
-    public void export(final boolean onlySel) {
+    public void export(final SWF swf, final boolean onlySel) {
         final ExportDialog export = new ExportDialog();
         export.setVisible(true);
         if (!export.cancelled) {
@@ -1885,7 +1738,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     public Void doInBackground() throws Exception {
                         try {
                             if (onlySel) {
-                                exportSelection(errorHandler, selFile, export);
+                                exportSelection(swf, errorHandler, selFile, export);
                             } else {
                                 swf.exportImages(errorHandler, selFile + File.separator + "images");
                                 swf.exportShapes(errorHandler, selFile + File.separator + "shapes");
@@ -1961,7 +1814,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
     }
     
-    public void renameIdentifiers() {
+    public void renameIdentifiers(final SWF swf) {
         if (confirmExperimental()) {
             final RenameType renameType = new RenameDialog().display();
             if (renameType != null) {
@@ -2065,7 +1918,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
     }
     
-    public void removeNonScripts() {
+    public void removeNonScripts(SWF swf) {
         List<Tag> tags = new ArrayList<>(swf.tags);
         for (Tag tag : tags) {
             System.out.println(tag.getClass());
@@ -2135,7 +1988,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                 byte[] data = Helper.readFile(selfile.getAbsolutePath());
                                 try {
                                     it.setImage(data);
-                                    swf.clearImageCache();
+                                    it.getSwf().clearImageCache();
                                 } catch (IOException ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Invalid image", ex);
                                     View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2190,14 +2043,14 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 if (tagsToRemove.size() == 1) {
                     Tag tag = tagsToRemove.get(0);
                     if (View.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tag.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                        swf.removeTag(tag);
+                        tag.getSwf().removeTag(tag);
                         showCard(CARDEMPTYPANEL);
                         refreshTree();
                     }
                 } else if (tagsToRemove.size() > 1) {
                     if (View.showConfirmDialog(this, translate("message.confirm.removemultiple").replace("%count%", Integer.toString(tagsToRemove.size())), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                         for (Tag tag : tagsToRemove) {
-                            swf.removeTag(tag);
+                            tag.getSwf().removeTag(tag);
                         }
                         showCard(CARDEMPTYPANEL);
                         refreshTree();
@@ -2212,8 +2065,9 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 break;
             case ACTION_SAVE_TEXT:
                 if (oldValue instanceof TextTag) {
+                    TextTag textTag = (TextTag) oldValue;
                     try {
-                        if (((TextTag) oldValue).setFormattedText(new MissingCharacterHandler() {
+                        if (textTag.setFormattedText(new MissingCharacterHandler() {
                             @Override
                             public boolean handle(FontTag font, List<Tag> tags, char character) {
                                 String fontName = fontPanel.sourceFontsMap.get(font.getFontId());
@@ -2230,7 +2084,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                 return true;
 
                             }
-                        }, swf.tags, textValue.getText(), fontPanel.getSelectedFont())) {
+                        }, textTag.getSwf().tags, textValue.getText(), fontPanel.getSelectedFont())) {
                             setEditText(false);
                         }
                     } catch (ParseException ex) {
@@ -2247,7 +2101,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         switch (e.getActionCommand()) {
 
             case MainFrameRibbon.ACTION_EXPORT_SEL:
-                export(true);
+                export(getCurrentSwf(), true);
                 break;
         }
     }
@@ -2387,6 +2241,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
 
         if ((tagObj instanceof SWFRoot)) {
+            SWFRoot swfRoot = (SWFRoot) tagObj;
+            SWF swf = swfRoot.getSwf();
             if (mainRibbon.isInternalFlashViewerSelected()) {
                 showCard(CARDSWFPREVIEWPANEL);
                 swfPreviewPanel.load(swf);
@@ -2427,19 +2283,23 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             showCard(CARDACTIONSCRIPTPANEL);
             actionPanel.setSource((ASMSource) tagObj, !forceReload);
         } else if (tagObj instanceof ImageTag) {
-            showHideImageReplaceButton(((ImageTag) tagObj).importSupported());
+            ImageTag imageTag = (ImageTag) tagObj;
+            showHideImageReplaceButton(imageTag.importSupported());
             showCard(CARDIMAGEPANEL);
-            imagePanel.setImage(((ImageTag) tagObj).getImage(swf.tags));
+            imagePanel.setImage(imageTag.getImage(imageTag.getSwf().tags));
         } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (mainRibbon.isInternalFlashViewerSelected())) {
+            Tag tag = (Tag) tagObj;
             showCard(CARDDRAWPREVIEWPANEL);
-            previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
+            previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), characters, 50/*FIXME*/);
         } else if ((tagObj instanceof FontTag) && (mainRibbon.isInternalFlashViewerSelected())) {
+            Tag tag = (Tag) tagObj;
             showCard(CARDFLASHPANEL);
-            previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters, 50/*FIXME*/);
+            previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), characters, 50/*FIXME*/);
             showFontTag((FontTag) tagObj);
         } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (mainRibbon.isInternalFlashViewerSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             FrameNode fn = (FrameNode) tagObj;
+            SWF swf = fn.getSwf();
             List<Tag> controlTags = swf.tags;
             int containerId = 0;
             RECT rect = swf.displayRect;
@@ -2455,379 +2315,12 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             createAndShowTempSwf(tagObj);
             
-            try {
-                if (tempFile != null) {
-                    tempFile.delete();
-                }
-                tempFile = File.createTempFile("temp", ".swf");
-                tempFile.deleteOnExit();
-
-                Color backgroundColor = View.swfBackgroundColor;
-                if (tagObj instanceof FontTag) { //Fonts are always black on white
-                    backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
-                }
-                int frameCount = 1;
-                int frameRate = swf.frameRate;
-                HashMap<Integer, VideoFrameTag> videoFrames = new HashMap<>();
-                DefineVideoStreamTag vs = null;
-                if (tagObj instanceof DefineVideoStreamTag) {
-                    vs = (DefineVideoStreamTag) tagObj;
-                    swf.populateVideoFrames(vs.getCharacterId(), swf.tags, videoFrames);
-                    frameCount = videoFrames.size();
-                }
-
-                List<SoundStreamBlockTag> soundFrames = new ArrayList<>();
-                if (tagObj instanceof SoundStreamHeadTypeTag) {
-                    SWF.populateSoundStreamBlocks(swf.tags, (Tag) tagObj, soundFrames);
-                    frameCount = soundFrames.size();
-                }
-
-                if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
-                    frameCount = 100;
-                    frameRate = 50;
-                }
-
-                if (tagObj instanceof DefineSoundTag) {
-                    frameCount = 1;
-                }
-                
-                byte[] data;
-                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                    SWFOutputStream sos2 = new SWFOutputStream(baos, 10);
-                    int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
-                    int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
-                    sos2.writeRECT(swf.displayRect);
-                    sos2.writeUI8(0);
-                    sos2.writeUI8(frameRate);
-                    sos2.writeUI16(frameCount); //framecnt
-
-                    /*FileAttributesTag fa = new FileAttributesTag();
-                     sos2.writeTag(fa);
-                     */
-                    if (tagObj instanceof FrameNode) {
-                        FrameNode fn = (FrameNode) tagObj;
-                        if (fn.getParent() == null) {
-                            for (Tag t : swf.tags) {
-                                if (t instanceof SetBackgroundColorTag) {
-                                    backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    sos2.writeTag(new SetBackgroundColorTag(null, new RGB(backgroundColor)));
-
-                    if (tagObj instanceof FrameNode) {
-                        FrameNode fn = (FrameNode) tagObj;
-                        Object parent = fn.getParent();
-                        List<ContainerItem> subs = new ArrayList<>();
-                        if (parent == null) {
-                            subs.addAll(swf.tags);
-                        } else {
-                            if (parent instanceof Container) {
-                                subs = ((Container) parent).getSubItems();
-                            }
-                        }
-                        List<Integer> doneCharacters = new ArrayList<>();
-                        int frameCnt = 1;
-                        for (Object o : subs) {
-                            if (o instanceof ShowFrameTag) {
-                                frameCnt++;
-                                continue;
-                            }
-                            if (frameCnt > fn.getFrame()) {
-                                break;
-                            }
-                            Tag t = (Tag) o;
-                            Set<Integer> needed = t.getDeepNeededCharacters(characters, new ArrayList<Integer>());
-                            for (int n : needed) {
-                                if (!doneCharacters.contains(n)) {
-                                    sos2.writeTag(classicTag(characters.get(n)));
-                                    doneCharacters.add(n);
-                                }
-                            }
-                            if (t instanceof CharacterTag) {
-                                doneCharacters.add(((CharacterTag) t).getCharacterId());
-                            }
-                            sos2.writeTag(classicTag(t));
-
-                            if (parent != null) {
-                                if (t instanceof PlaceObjectTypeTag) {
-                                    PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
-                                    int chid = pot.getCharacterId();
-                                    int depth = pot.getDepth();
-                                    MATRIX mat = pot.getMatrix();
-                                    if (mat == null) {
-                                        mat = new MATRIX();
-                                    }
-                                    mat = (MATRIX) Helper.deepCopy(mat);
-                                    if (parent instanceof BoundedTag) {
-                                        RECT r = ((BoundedTag) parent).getRect(characters, new Stack<Integer>());
-                                        mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
-                                        mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
-                                    } else {
-                                        mat.translateX += width / 2;
-                                        mat.translateY += height / 2;
-                                    }
-                                    sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
-
-                                }
-                            }
-                        }
-                        sos2.writeTag(new ShowFrameTag(null));
-                    } else {
-
-                        if (tagObj instanceof DefineBitsTag) {
-                            if (jtt != null) {
-                                sos2.writeTag(jtt);
-                            }
-                        } else if (tagObj instanceof AloneTag) {
-                        } else {
-                            Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters, new ArrayList<Integer>());
-                            for (int n : needed) {
-                                sos2.writeTag(classicTag(characters.get(n)));
-                            }
-                        }
-
-                        sos2.writeTag(classicTag((Tag) tagObj));
-
-                        int chtId = 0;
-                        if (tagObj instanceof CharacterTag) {
-                            chtId = ((CharacterTag) tagObj).getCharacterId();
-                        }
-
-                        MATRIX mat = new MATRIX();
-                        mat.hasRotate = false;
-                        mat.hasScale = false;
-                        mat.translateX = 0;
-                        mat.translateY = 0;
-                        if (tagObj instanceof BoundedTag) {
-                            RECT r = ((BoundedTag) tagObj).getRect(characters, new Stack<Integer>());
-                            mat.translateX = -r.Xmin;
-                            mat.translateY = -r.Ymin;
-                            mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
-                            mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
-                        } else {
-                            mat.translateX = width / 4;
-                            mat.translateY = height / 4;
-                        }
-                        if (tagObj instanceof FontTag) {
-
-                            int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().size();
-                            int fontId = ((FontTag) tagObj).getFontId();
-                            int sloupcu = (int) Math.ceil(Math.sqrt(countGlyphs));
-                            int radku = (int) Math.ceil(((float) countGlyphs) / ((float) sloupcu));
-                            int x = 0;
-                            int y = 1;
-                            for (int f = 0; f < countGlyphs; f++) {
-                                if (x >= sloupcu) {
-                                    x = 0;
-                                    y++;
-                                }
-                                List<TEXTRECORD> rec = new ArrayList<>();
-                                TEXTRECORD tr = new TEXTRECORD();
-                                int textHeight = height / radku;
-                                tr.fontId = fontId;
-                                tr.styleFlagsHasFont = true;
-                                tr.textHeight = textHeight;
-                                tr.glyphEntries = new GLYPHENTRY[1];
-                                tr.styleFlagsHasColor = true;
-                                tr.textColor = new RGB(0, 0, 0);
-                                tr.glyphEntries[0] = new GLYPHENTRY();
-                                tr.glyphEntries[0].glyphAdvance = 0;
-                                tr.glyphEntries[0].glyphIndex = f;
-                                rec.add(tr);
-                                mat.translateX = x * width / sloupcu;
-                                mat.translateY = y * height / radku;
-                                sos2.writeTag(new DefineTextTag(null, 999 + f, new RECT(0, width, 0, height), new MATRIX(), rec));
-                                sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
-                                x++;
-                            }
-                            sos2.writeTag(new ShowFrameTag(null));
-                        } else if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
-                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                            sos2.writeTag(new ShowFrameTag(null));
-                            int numFrames = 100;
-                            for (int ratio = 0; ratio < 65536; ratio += 65536 / numFrames) {
-                                sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null));
-                                sos2.writeTag(new ShowFrameTag(null));
-                            }
-                        } else if (tagObj instanceof SoundStreamHeadTypeTag) {
-                            for (SoundStreamBlockTag blk : soundFrames) {
-                                sos2.writeTag(blk);
-                                sos2.writeTag(new ShowFrameTag(null));
-                            }
-                        } else if (tagObj instanceof DefineSoundTag) {
-                            ExportAssetsTag ea = new ExportAssetsTag();
-                            DefineSoundTag ds = (DefineSoundTag) tagObj;
-                            ea.tags.add(ds.soundId);
-                            ea.names.add("my_define_sound");
-                            sos2.writeTag(ea);
-                            List<Action> actions;
-                            DoActionTag doa;
-
-
-                            doa = new DoActionTag(null, new byte[]{}, SWF.DEFAULT_VERSION, 0);
-                            actions = ASMParser.parse(0, 0, false,
-                                    "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
-                                    + "Push \"_root\"\n"
-                                    + "GetVariable\n"
-                                    + "Push \"my_sound\" 0.0 \"Sound\"\n"
-                                    + "NewObject\n"
-                                    + "SetMember\n"
-                                    + "Push \"my_define_sound\" 1 \"_root\"\n"
-                                    + "GetVariable\n"
-                                    + "Push \"my_sound\"\n"
-                                    + "GetMember\n"
-                                    + "Push \"attachSound\"\n"
-                                    + "CallMethod\n"
-                                    + "Pop\n"
-                                    + "Stop", SWF.DEFAULT_VERSION, false);
-                            doa.setActions(actions, SWF.DEFAULT_VERSION);
-                            sos2.writeTag(doa);
-                            sos2.writeTag(new ShowFrameTag(null));
-
-
-                            actions = ASMParser.parse(0, 0, false,
-                                    "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
-                                    + "StopSounds\n"
-                                    + "Push \"_root\"\n"
-                                    + "GetVariable\n"
-                                    + "Push \"my_sound\" 0.0 \"Sound\"\n"
-                                    + "NewObject\n"
-                                    + "SetMember\n"
-                                    + "Push \"my_define_sound\" 1 \"_root\"\n"
-                                    + "GetVariable\n"
-                                    + "Push \"my_sound\"\n"
-                                    + "GetMember\n"
-                                    + "Push \"attachSound\"\n"
-                                    + "CallMethod\n"
-                                    + "Pop\n"
-                                    + "Push 9999 0.0 2 \"_root\"\n"
-                                    + "GetVariable\n"
-                                    + "Push \"my_sound\"\n"
-                                    + "GetMember\n"
-                                    + "Push \"start\"\n"
-                                    + "CallMethod\n"
-                                    + "Pop\n"
-                                    + "Stop", SWF.DEFAULT_VERSION, false);
-                            doa.setActions(actions, SWF.DEFAULT_VERSION);
-                            sos2.writeTag(doa);
-                            sos2.writeTag(new ShowFrameTag(null));
-
-                            actions = ASMParser.parse(0, 0, false,
-                                    "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
-                                    + "StopSounds\n"
-                                    + "Push \"_root\"\n"
-                                    + "GetVariable\n"
-                                    + "Push \"my_sound\" 0.0 \"Sound\"\n"
-                                    + "NewObject\n"
-                                    + "SetMember\n"
-                                    + "Push \"my_define_sound\" 1 \"_root\"\n"
-                                    + "GetVariable\n"
-                                    + "Push \"my_sound\"\n"
-                                    + "GetMember\n"
-                                    + "Push \"attachSound\"\n"
-                                    + "CallMethod\n"
-                                    + "Pop\n"
-                                    + "Push \"_root\"\n"
-                                    + "GetVariable\n"
-                                    + "Push \"my_sound\"\n"
-                                    + "GetMember\n"
-                                    + "Push \"onSoundComplete\"\n"
-                                    + "DefineFunction2 \"\" 0 2 false true true false true false true false false  {\n"
-                                    + "Push 0.0 register1 \"my_sound\"\n"
-                                    + "GetMember\n"
-                                    + "Push \"start\"\n"
-                                    + "CallMethod\n"
-                                    + "Pop\n"
-                                    + "}\n"
-                                    + "SetMember\n"
-                                    + "Push \"_root\"\n"
-                                    + "GetVariable\n"
-                                    + "Push \"execParam\"\n"
-                                    + "GetMember\n"
-                                    + "Push 1 \"_root\"\n"
-                                    + "GetVariable\n"
-                                    + "Push \"my_sound\"\n"
-                                    + "GetMember\n"
-                                    + "Push \"start\"\n"
-                                    + "CallMethod\n"
-                                    + "Pop\n"
-                                    + "Stop", SWF.DEFAULT_VERSION, false);
-                            doa.setActions(actions, SWF.DEFAULT_VERSION);
-                            sos2.writeTag(doa);
-                            sos2.writeTag(new ShowFrameTag(null));
-
-
-                            actions = ASMParser.parse(0, 0, false,
-                                    "StopSounds\n"
-                                    + "Stop", SWF.DEFAULT_VERSION, false);
-                            doa.setActions(actions, SWF.DEFAULT_VERSION);
-                            sos2.writeTag(doa);
-                            sos2.writeTag(new ShowFrameTag(null));
-
-
-                            sos2.writeTag(new ShowFrameTag(null));
-                            if (flashPanel != null) {
-                                flashPanel.specialPlayback = true;
-                            }
-                        } else if (tagObj instanceof DefineVideoStreamTag) {
-
-                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                            List<VideoFrameTag> frs = new ArrayList<>(videoFrames.values());
-                            Collections.sort(frs, new Comparator<VideoFrameTag>() {
-                                @Override
-                                public int compare(VideoFrameTag o1, VideoFrameTag o2) {
-                                    return o1.frameNum - o2.frameNum;
-                                }
-                            });
-                            boolean first = true;
-                            int ratio = 0;
-                            for (VideoFrameTag f : frs) {
-                                if (!first) {
-                                    ratio++;
-                                    sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, false, false, true, 1, 0, null, null, ratio, null, 0, null));
-                                }
-                                sos2.writeTag(f);
-                                sos2.writeTag(new ShowFrameTag(null));
-                                first = false;
-                            }
-                        } else {
-                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                            sos2.writeTag(new ShowFrameTag(null));
-                        }
-
-
-                    }//not showframe
-
-                    sos2.writeTag(new EndTag(null));
-                    data = baos.toByteArray();
-                }
-
-                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                    SWFOutputStream sos = new SWFOutputStream(fos, 10);
-                    sos.write("FWS".getBytes());
-                    sos.write(swf.version);
-                    sos.writeUI32(sos.getPos() + data.length + 4);
-                    sos.write(data);
-                    fos.flush();
-                }
-                showCard(CARDFLASHPANEL);
-                if (flashPanel != null) {
-                    flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
-                }
-
-            } catch (IOException | com.jpexs.decompiler.flash.action.parser.ParseException ex) {
-                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
             if (tagObj instanceof TextTag) {
+                TextTag textTag = (TextTag) tagObj;
                 parametersPanel.setVisible(true);
                 previewSplitPane.setDividerLocation(previewSplitPane.getWidth() / 2);
                 showDetailWithPreview(CARDTEXTPANEL);
-                textValue.setText(((TextTag) tagObj).getFormattedText(swf.tags));
+                textValue.setText(textTag.getFormattedText(textTag.getSwf().tags));
             } else if (tagObj instanceof FontTag) {
                 showFontTag((FontTag) tagObj);
             } else {
@@ -2840,6 +2333,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     }
     
     private void createAndShowTempSwf(Object tagObj) {
+        SWF swf;
         try {
             if (tempFile != null) {
                 tempFile.delete();
@@ -2848,9 +2342,27 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             tempFile.deleteOnExit();
 
             Color backgroundColor = View.swfBackgroundColor;
+            
             if (tagObj instanceof FontTag) { //Fonts are always black on white
                 backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
             }
+
+            if (tagObj instanceof FrameNode) {
+                FrameNode fn = (FrameNode) tagObj;
+                swf = fn.getSwf();
+                if (fn.getParent() == null) {
+                    for (Tag t : swf.tags) {
+                        if (t instanceof SetBackgroundColorTag) {
+                            backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
+                            break;
+                        }
+                    }
+                }
+            } else {
+                Tag tag = (Tag) tagObj;
+                swf = tag.getSwf();
+            }
+
             int frameCount = 1;
             int frameRate = swf.frameRate;
             HashMap<Integer, VideoFrameTag> videoFrames = new HashMap<>();
@@ -2889,18 +2401,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 /*FileAttributesTag fa = new FileAttributesTag();
                  sos2.writeTag(fa);
                  */
-                if (tagObj instanceof FrameNode) {
-                    FrameNode fn = (FrameNode) tagObj;
-                    if (fn.getParent() == null) {
-                        for (Tag t : swf.tags) {
-                            if (t instanceof SetBackgroundColorTag) {
-                                backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
-                                break;
-                            }
-                        }
-                    }
-                }
-
                 sos2.writeTag(new SetBackgroundColorTag(null, new RGB(backgroundColor)));
 
                 if (tagObj instanceof FrameNode) {
@@ -3212,7 +2712,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private void showFontTag(FontTag ft) {
         if (mainRibbon.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
-            internelViewerPanel.setDrawable(ft, swf, characters, 1);
+            internelViewerPanel.setDrawable(ft, ft.getSwf(), characters, 1);
         } else {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
         }
@@ -3224,12 +2724,9 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     }
 
     public void refreshTree() {
-        List<ContainerItem> objs = new ArrayList<>();
-        objs.addAll(swf.tags);
-
         List<List<String>> expandedNodes = getExpandedNodes(tagTree);
 
-        tagTree.setModel(new TagTreeModel(createTagList(objs, null), new SWFRoot((new File(Main.file)).getName())));
+        tagTree.setModel(new TagTreeModel(this, swfs, abcPanel));
 
         expandTreeNodes(tagTree, expandedNodes);
     }

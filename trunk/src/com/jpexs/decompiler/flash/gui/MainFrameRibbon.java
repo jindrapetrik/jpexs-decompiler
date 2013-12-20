@@ -644,7 +644,7 @@ public class MainFrameRibbon implements ActionListener {
                 }, 1000); //It takes some time registry change to apply
                 break;
             case ACTION_GOTO_DOCUMENT_CLASS:
-                mainFrame.gotoDocumentClass();
+                mainFrame.gotoDocumentClass(mainFrame.getCurrentSwf());
                 break;
             case ACTION_PARALLEL_SPEED_UP:
                 String confStr = translate("message.confirm.parallel") + "\r\n";
@@ -691,7 +691,7 @@ public class MainFrameRibbon implements ActionListener {
 
         switch (e.getActionCommand()) {
             case ACTION_RENAME_ONE_IDENTIFIER:
-                mainFrame.renameOneIdentifier();
+                mainFrame.renameOneIdentifier(mainFrame.getCurrentSwf());
                 break;
             case ACTION_ABOUT:
                 Main.about();
@@ -722,12 +722,12 @@ public class MainFrameRibbon implements ActionListener {
                 Main.openFileDialog();
                 break;
             case ACTION_EXPORT_FLA:
-                mainFrame.exportFla();
+                mainFrame.exportFla(mainFrame.getCurrentSwf());
                 break;
             case ACTION_EXPORT_SEL:
             case ACTION_EXPORT:
                 boolean onlySel = e.getActionCommand().endsWith("SEL");
-                mainFrame.export(onlySel);
+                mainFrame.export(mainFrame.getCurrentSwf(), onlySel);
                 break;
             case ACTION_CHECK_UPDATES:
                 if (!Main.checkForUpdates()) {
@@ -766,14 +766,14 @@ public class MainFrameRibbon implements ActionListener {
                 mainFrame.restoreControlFlow(all);
                 break;
             case ACTION_RENAME_IDENTIFIERS:
-                mainFrame.renameIdentifiers();
+                mainFrame.renameIdentifiers(mainFrame.getCurrentSwf());
                 break;
             case ACTION_DEOBFUSCATE:
             case ACTION_DEOBFUSCATE_ALL:
                 mainFrame.deobfuscate();
                 break;
             case ACTION_REMOVE_NON_SCRIPTS:
-                mainFrame.removeNonScripts();
+                mainFrame.removeNonScripts(mainFrame.getCurrentSwf());
                 break;
             case ACTION_REFRESH_DECOMPILED:
                 mainFrame.refreshDecompiled();

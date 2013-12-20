@@ -42,6 +42,9 @@ import javax.swing.UIManager;
  */
 public class NewVersionDialog extends AppDialog implements ActionListener {
 
+    static final String ACTION_OK = "OK";
+    static final String ACTION_CANCEL = "CANCEL";
+
     Version latestVersion;
 
     public NewVersionDialog(List<Version> versions) {
@@ -82,11 +85,11 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
         cnt.add(span);
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton buttonOk = new JButton(translate("button.ok"));
-        buttonOk.setActionCommand("OK");
+        buttonOk.setActionCommand(ACTION_OK);
         buttonOk.addActionListener(this);
 
         JButton buttonCancel = new JButton(translate("button.cancel"));
-        buttonCancel.setActionCommand("CANCEL");
+        buttonCancel.setActionCommand(ACTION_CANCEL);
         buttonCancel.addActionListener(this);
 
         buttonsPanel.add(buttonOk);
@@ -108,7 +111,7 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("OK")) {
+        if (e.getActionCommand() == ACTION_OK) {
             java.awt.Desktop desktop = null;
             if (java.awt.Desktop.isDesktopSupported()) {
                 desktop = java.awt.Desktop.getDesktop();

@@ -73,6 +73,11 @@ import javax.swing.filechooser.FileFilter;
  */
 public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
 
+    static final String ACTION_SELECT_PROCESS = "SELECTPROCESS";
+    static final String ACTION_REFRESH_PROCESS_LIST = "REFRESHPROCESSLIST";
+    static final String ACTION_OPEN_SWF = "OPENSWF";
+    static final String ACTION_SAVE = "SAVE";
+
     private List<com.jpexs.process.Process> processlist;
     private List<ReReadableInputStream> foundIs;
     private com.jpexs.process.Process selProcess;
@@ -292,10 +297,10 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         leftPanel.add(new JScrollPane(list), BorderLayout.CENTER);
         JPanel leftButtonsPanel = new JPanel(new FlowLayout());
         JButton selectButton = new JButton(translate("button.select"));
-        selectButton.setActionCommand("SELECTPROCESS");
+        selectButton.setActionCommand(ACTION_SELECT_PROCESS);
         selectButton.addActionListener(this);
         JButton refreshButton = new JButton(translate("button.refresh"));
-        refreshButton.setActionCommand("REFRESHPROCESSLIST");
+        refreshButton.setActionCommand(ACTION_REFRESH_PROCESS_LIST);
         refreshButton.addActionListener(this);
         leftButtonsPanel.add(selectButton);
         leftButtonsPanel.add(refreshButton);
@@ -305,11 +310,11 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         rightPanel.add(new JScrollPane(listRes), BorderLayout.CENTER);
         JPanel rightButtonsPanel = new JPanel(new FlowLayout());
         JButton openButton = new JButton(translate("button.open"));
-        openButton.setActionCommand("OPENSWF");
+        openButton.setActionCommand(ACTION_OPEN_SWF);
         openButton.addActionListener(this);
 
         JButton saveButton = new JButton(translate("button.save"));
-        saveButton.setActionCommand("SAVE");
+        saveButton.setActionCommand(ACTION_SAVE);
         saveButton.addActionListener(this);
 
         rightButtonsPanel.add(openButton);
@@ -336,16 +341,16 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "SELECTPROCESS":
+            case ACTION_SELECT_PROCESS:
                 selectProcess();
                 break;
-            case "OPENSWF":
+            case ACTION_OPEN_SWF:
                 openSWF();
                 break;
-            case "REFRESHPROCESSLIST":
+            case ACTION_REFRESH_PROCESS_LIST:
                 refreshList();
                 break;
-            case "SAVE":
+            case ACTION_SAVE:
                 if (foundIs == null) {
                     return;
                 }

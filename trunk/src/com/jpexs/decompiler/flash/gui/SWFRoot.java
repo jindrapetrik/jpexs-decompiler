@@ -16,16 +16,23 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
+
 /**
  *
  * @author JPEXS
  */
 public class SWFRoot {
 
+    private SWF swf;
     private String name;
 
-    public SWFRoot(String name) {
+    public SWFRoot(SWF swf, String name) {
         this.name = name;
+    }
+
+    public SWF getSwf() {
+        return swf;
     }
 
     @Override

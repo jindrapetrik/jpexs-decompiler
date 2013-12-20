@@ -33,6 +33,10 @@ import javax.swing.JLabel;
  */
 public class ModeFrame extends AppFrame implements ActionListener {
 
+    static final String ACTION_OPEN = "OPEN";
+    static final String ACTION_PROXY = "PROXY";
+    static final String ACTION_EXIT = "EXIT";
+
     private JButton openButton = new JButton(translate("button.open"));
     private JButton proxyButton = new JButton(translate("button.proxy"));
     private JButton exitButton = new JButton(translate("button.exit"));
@@ -43,13 +47,13 @@ public class ModeFrame extends AppFrame implements ActionListener {
     public ModeFrame() {
         setSize(350, 200);
         openButton.addActionListener(this);
-        openButton.setActionCommand("OPEN");
+        openButton.setActionCommand(ACTION_OPEN);
         openButton.setIcon(View.getIcon("open32"));
         proxyButton.addActionListener(this);
-        proxyButton.setActionCommand("PROXY");
+        proxyButton.setActionCommand(ACTION_PROXY);
         proxyButton.setIcon(View.getIcon("proxy32"));
         exitButton.addActionListener(this);
-        exitButton.setActionCommand("EXIT");
+        exitButton.setActionCommand(ACTION_EXIT);
         exitButton.setIcon(View.getIcon("exit32"));
         setResizable(false);
         Container cont = getContentPane();
@@ -78,19 +82,21 @@ public class ModeFrame extends AppFrame implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("OPEN")) {
-            setVisible(false);
-            if (!Main.openFileDialog()) {
-                setVisible(true);
-            }
-        }
-        if (e.getActionCommand().equals("PROXY")) {
-            setVisible(false);
-            Main.showProxy();
-        }
-        if (e.getActionCommand().equals("EXIT")) {
-            setVisible(false);
-            Main.exit();
+        switch (e.getActionCommand()) {
+            case ACTION_OPEN:
+                setVisible(false);
+                if (!Main.openFileDialog()) {
+                    setVisible(true);
+                }
+                break;
+            case ACTION_PROXY:
+                setVisible(false);
+                Main.showProxy();
+                break;
+            case ACTION_EXIT:
+                setVisible(false);
+                Main.exit();
+                break;
         }
     }
 }

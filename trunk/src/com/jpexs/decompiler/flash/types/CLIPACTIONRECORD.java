@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
@@ -84,10 +85,13 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
         null,
         "<Space>"
     };
+    
+    private SWF swf;
     private long pos;
     private long hdrPos;
 
-    public CLIPACTIONRECORD(InputStream is, int version, long pos) throws IOException {
+    public CLIPACTIONRECORD(SWF swf, InputStream is, int version, long pos) throws IOException {
+        this.swf = swf;
         SWFInputStream sis = new SWFInputStream(is, version);
         eventFlags = sis.readCLIPEVENTFLAGS();
         if (eventFlags.isClear()) {
@@ -102,6 +106,11 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
         actionBytes = sis.readBytes(actionRecordSize);
         this.pos = pos;
 
+    }
+
+    @Override
+    public SWF getSwf() {
+        return swf;
     }
 
     @Override

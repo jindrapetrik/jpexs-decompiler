@@ -67,6 +67,10 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
         return id;
     }
 
+    public SWF getSwf() {
+        return swf;
+    }
+
     /**
      * Constructor
      *

@@ -38,6 +38,8 @@ import javax.swing.JPanel;
 
 public final class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
 
+    static final String ACTION_SELECT_COLOR = "SELECTCOLOR";
+    
     public JLabel label = new JLabel();
     public DrawableTag drawable;
     private Timer timer;
@@ -68,7 +70,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton selectColorButton = new JButton(View.getIcon("color16"));
         selectColorButton.addActionListener(this);
-        selectColorButton.setActionCommand("SELECTCOLOR");
+        selectColorButton.setActionCommand(ACTION_SELECT_COLOR);
         selectColorButton.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
         buttonsPanel.add(selectColorButton);
         bottomPanel.add(buttonsPanel, BorderLayout.EAST);
@@ -77,7 +79,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if ("SELECTCOLOR".equals(e.getActionCommand())) {
+        if (e.getActionCommand() == ACTION_SELECT_COLOR) {
             View.execInEventDispatch(new Runnable() {
                 @Override
                 public void run() {

@@ -14,16 +14,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
-
-import com.jpexs.decompiler.flash.SWF;
+package com.jpexs.decompiler.flash.gui;
 
 /**
- * Object which contains other objects
  *
  * @author JPEXS
  */
-public interface ContainerItem {
-    
-    SWF getSwf();
+public enum TagType {
+
+    FONT,
+    TEXT,
+    IMAGE,
+    SHAPE,
+    MORPH_SHAPE,
+    SPRITE,
+    BUTTON,
+    AS,
+    PACKAGE,
+    FRAME,
+    SHOW_FRAME,
+    MOVIE,
+    SOUND,
+    BINARY_DATA,
+    FOLDER,
+    FOLDER_OPEN
 }

@@ -80,6 +80,19 @@ import jsyntaxpane.actions.DocumentSearchData;
 
 public class ActionPanel extends JPanel implements ActionListener {
 
+    static final String ACTION_SEARCH_PREV = "SEARCHPREV";
+    static final String ACTION_SEARCH_NEXT = "SEARCHNEXT";
+    static final String ACTION_SEARCH_CANCEL = "SEARCHCANCEL";
+    static final String ACTION_GRAPH = "GRAPH";
+    static final String ACTION_HEX = "HEX";
+    static final String ACTION_HEX_ONLY = "HEXONLY";
+    static final String ACTION_SAVE_ACTION = "SAVEACTION";
+    static final String ACTION_EDIT_ACTION = "EDITACTION";
+    static final String ACTION_CANCEL_ACTION = "CANCELACTION";
+    static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
+    static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
+    static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
+
     public LineMarkedEditorPane editor;
     public LineMarkedEditorPane decompiledEditor;
     public List<Tag> list;
@@ -422,15 +435,15 @@ public class ActionPanel extends JPanel implements ActionListener {
         JButton prevSearchButton = new JButton(View.getIcon("prev16"));
         prevSearchButton.setMargin(new Insets(3, 3, 3, 3));
         prevSearchButton.addActionListener(this);
-        prevSearchButton.setActionCommand("SEARCHPREV");
+        prevSearchButton.setActionCommand(ACTION_SEARCH_PREV);
         JButton nextSearchButton = new JButton(View.getIcon("next16"));
         nextSearchButton.setMargin(new Insets(3, 3, 3, 3));
         nextSearchButton.addActionListener(this);
-        nextSearchButton.setActionCommand("SEARCHNEXT");
+        nextSearchButton.setActionCommand(ACTION_SEARCH_NEXT);
         JButton cancelSearchButton = new JButton(View.getIcon("cancel16"));
         cancelSearchButton.setMargin(new Insets(3, 3, 3, 3));
         cancelSearchButton.addActionListener(this);
-        cancelSearchButton.setActionCommand("SEARCHCANCEL");
+        cancelSearchButton.setActionCommand(ACTION_SEARCH_CANCEL);
         searchPos = new JLabel("0/0");
         searchForLabel = new JLabel(AppStrings.translate("search.info").replace("%text%", ""));
         searchPanel.add(searchForLabel);
@@ -442,20 +455,20 @@ public class ActionPanel extends JPanel implements ActionListener {
 
 
         JButton graphButton = new JButton(View.getIcon("graph16"));
-        graphButton.setActionCommand("GRAPH");
+        graphButton.setActionCommand(ACTION_GRAPH);
         graphButton.addActionListener(this);
         graphButton.setToolTipText(AppStrings.translate("button.viewgraph"));
         graphButton.setMargin(new Insets(3, 3, 3, 3));
 
         hexButton = new JToggleButton(View.getIcon("hex16"));
-        hexButton.setActionCommand("HEX");
+        hexButton.setActionCommand(ACTION_HEX);
         hexButton.addActionListener(this);
         hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
         // todo: find icon
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
-        hexOnlyButton.setActionCommand("HEXONLY");
+        hexOnlyButton.setActionCommand(ACTION_HEX_ONLY);
         hexOnlyButton.addActionListener(this);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
@@ -507,23 +520,23 @@ public class ActionPanel extends JPanel implements ActionListener {
         panB.add(buttonsPan, BorderLayout.SOUTH);
 
         saveButton.addActionListener(this);
-        saveButton.setActionCommand("SAVEACTION");
+        saveButton.setActionCommand(ACTION_SAVE_ACTION);
         editButton.addActionListener(this);
-        editButton.setActionCommand("EDITACTION");
+        editButton.setActionCommand(ACTION_EDIT_ACTION);
         cancelButton.addActionListener(this);
-        cancelButton.setActionCommand("CANCELACTION");
+        cancelButton.setActionCommand(ACTION_CANCEL_ACTION);
         saveButton.setVisible(false);
         cancelButton.setVisible(false);
 
 
 
         saveDecompiledButton.addActionListener(this);
-        saveDecompiledButton.setActionCommand("SAVEDECOMPILED");
+        saveDecompiledButton.setActionCommand(ACTION_SAVE_DECOMPILED);
         editDecompiledButton.addActionListener(this);
-        editDecompiledButton.setActionCommand("EDITDECOMPILED");
+        editDecompiledButton.setActionCommand(ACTION_EDIT_DECOMPILED);
 
         cancelDecompiledButton.addActionListener(this);
-        cancelDecompiledButton.setActionCommand("CANCELDECOMPILED");
+        cancelDecompiledButton.setActionCommand(ACTION_CANCEL_DECOMPILED);
         saveDecompiledButton.setVisible(false);
         cancelDecompiledButton.setVisible(false);
 
@@ -720,7 +733,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             updateSearchPos();
         }
         switch (e.getActionCommand()) {
-            case "GRAPH":
+            case ACTION_GRAPH:
                 if (lastCode != null) {
                     try {
                         GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
@@ -730,23 +743,23 @@ public class ActionPanel extends JPanel implements ActionListener {
                     }
                 }
                 break;
-            case "EDITACTION":
+            case ACTION_EDIT_ACTION:
                 setEditMode(true);
                 break;
-            case "HEX":
-            case "HEXONLY":
-                if (e.getActionCommand().equals("HEX")) {
+            case ACTION_HEX:
+            case ACTION_HEX_ONLY:
+                if (e.getActionCommand() == ACTION_HEX) {
                     hexOnlyButton.setSelected(false);
                 } else {
                     hexButton.setSelected(false);
                 }
                 setHex(getExportMode());
                 break;
-            case "CANCELACTION":
+            case ACTION_CANCEL_ACTION:
                 setEditMode(false);
                 setHex(getExportMode());
                 break;
-            case "SAVEACTION":
+            case ACTION_SAVE_ACTION:
                 try {
                     String text = editor.getText();
                     if (text.trim().startsWith("#hexdata")) {
@@ -766,13 +779,13 @@ public class ActionPanel extends JPanel implements ActionListener {
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 break;
-            case "EDITDECOMPILED":
+            case ACTION_EDIT_DECOMPILED:
                 setDecompiledEditMode(true);
                 break;
-            case "CANCELDECOMPILED":
+            case ACTION_CANCEL_DECOMPILED:
                 setDecompiledEditMode(false);
                 break;
-            case "SAVEDECOMPILED":
+            case ACTION_SAVE_DECOMPILED:
                 try {
                     ActionScriptParser par = new ActionScriptParser();
                     src.setActions(par.actionsFromString(decompiledEditor.getText()), SWF.DEFAULT_VERSION);

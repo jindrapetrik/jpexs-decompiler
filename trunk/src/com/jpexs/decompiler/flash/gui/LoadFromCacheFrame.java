@@ -55,6 +55,10 @@ import javax.swing.filechooser.FileFilter;
  */
 public class LoadFromCacheFrame extends AppFrame implements ActionListener {
 
+    static final String ACTION_OPEN = "OPEN";
+    static final String ACTION_SAVE = "SAVE";
+    static final String ACTION_REFRESH = "REFRESH";
+
     private JList<CacheEntry> list;
     private JTextField searchField;
     private List<CacheImplementation> caches;
@@ -105,17 +109,17 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
         openButton = new JButton(translate("button.open"));
-        openButton.setActionCommand("OPEN");
+        openButton.setActionCommand(ACTION_OPEN);
         openButton.addActionListener(this);
         buttonsPanel.add(openButton);
 
         saveButton = new JButton(translate("button.save"));
-        saveButton.setActionCommand("SAVE");
+        saveButton.setActionCommand(ACTION_SAVE);
         saveButton.addActionListener(this);
         buttonsPanel.add(saveButton);
 
         refreshButton = new JButton(translate("button.refresh"));
-        refreshButton.setActionCommand("REFRESH");
+        refreshButton.setActionCommand(ACTION_REFRESH);
         refreshButton.addActionListener(this);
         buttonsPanel.add(refreshButton);
 
@@ -228,13 +232,13 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "REFRESH":
+            case ACTION_REFRESH:
                 refresh();
                 break;
-            case "OPEN":
+            case ACTION_OPEN:
                 openSWF();
                 break;
-            case "SAVE":
+            case ACTION_SAVE:
                 List<CacheEntry> selected = list.getSelectedValuesList();
                 if (!selected.isEmpty()) {
                     JFileChooser fc = new JFileChooser();

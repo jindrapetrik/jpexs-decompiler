@@ -43,6 +43,9 @@ import javax.swing.event.AncestorListener;
  */
 public class NewTraitDialog extends AppDialog implements ActionListener {
 
+    static final String ACTION_OK = "OK";
+    static final String ACTION_CANCEL = "CANCEL";
+
     private static int modifiers[] = new int[]{
         Namespace.KIND_PACKAGE,
         Namespace.KIND_PRIVATE,
@@ -121,10 +124,10 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
         cnt.add(optionsPanel, BorderLayout.CENTER);
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton buttonOk = new JButton(AppStrings.translate("button.ok"));
-        buttonOk.setActionCommand("OK");
+        buttonOk.setActionCommand(ACTION_OK);
         buttonOk.addActionListener(this);
         JButton buttonCancel = new JButton(AppStrings.translate("button.cancel"));
-        buttonCancel.setActionCommand("CANCEL");
+        buttonCancel.setActionCommand(ACTION_CANCEL);
         buttonCancel.addActionListener(this);
         buttonsPanel.add(buttonOk);
         buttonsPanel.add(buttonCancel);
@@ -161,7 +164,7 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "OK":
+            case ACTION_OK:
                 if (nameField.getText().trim().isEmpty()) {
                     View.showMessageDialog(null, translate("error.name"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     return;
@@ -169,7 +172,7 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
                 result = true;
                 setVisible(false);
                 break;
-            case "CANCEL":
+            case ACTION_CANCEL:
                 result = false;
                 setVisible(false);
                 break;

@@ -41,6 +41,10 @@ import javax.swing.JToggleButton;
  */
 public class MethodCodePanel extends JPanel implements ActionListener {
 
+    static final String ACTION_GRAPH = "GRAPH";
+    static final String ACTION_HEX = "HEX";
+    static final String ACTION_HEX_ONLY = "HEXONLY";
+
     private ASMSourceEditorPane sourceTextArea;
     public JPanel buttonsPanel;
     private JToggleButton hexButton;
@@ -98,20 +102,20 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
 
         JButton graphButton = new JButton(View.getIcon("graph16"));
-        graphButton.setActionCommand("GRAPH");
+        graphButton.setActionCommand(ACTION_GRAPH);
         graphButton.addActionListener(this);
         graphButton.setToolTipText(AppStrings.translate("button.viewgraph"));
         graphButton.setMargin(new Insets(3, 3, 3, 3));
 
         hexButton = new JToggleButton(View.getIcon("hex16"));
-        hexButton.setActionCommand("HEX");
+        hexButton.setActionCommand(ACTION_HEX);
         hexButton.addActionListener(this);
         hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
         // todo: find icon
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
-        hexOnlyButton.setActionCommand("HEXONLY");
+        hexOnlyButton.setActionCommand(ACTION_HEX_ONLY);
         hexOnlyButton.addActionListener(this);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
@@ -134,17 +138,20 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         if (Main.isWorking()) {
             return;
         }
-        if (e.getActionCommand().equals("GRAPH")) {
-            sourceTextArea.graph();
-        }
 
-        if (e.getActionCommand().equals("HEX") || e.getActionCommand().equals("HEXONLY")) {
-            if (e.getActionCommand().equals("HEX")) {
-                hexOnlyButton.setSelected(false);
-            } else {
-                hexButton.setSelected(false);
-            }
-            sourceTextArea.setHex(getExportMode(), false);
+        switch (e.getActionCommand()) {
+            case ACTION_GRAPH:
+                sourceTextArea.graph();
+                break;
+            case ACTION_HEX:
+            case ACTION_HEX_ONLY:
+                if (e.getActionCommand() == ACTION_HEX) {
+                    hexOnlyButton.setSelected(false);
+                } else {
+                    hexButton.setSelected(false);
+                }
+                sourceTextArea.setHex(getExportMode(), false);
+                break;
         }
     }
 

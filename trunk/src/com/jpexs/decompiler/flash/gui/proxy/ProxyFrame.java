@@ -48,6 +48,12 @@ import javax.swing.*;
  */
 public class ProxyFrame extends AppFrame implements ActionListener, CatchedListener, MouseListener, ReplacedListener {
 
+    static final String ACTION_SWITCH_STATE = "SWITCHSTATE";
+    static final String ACTION_OPEN = "OPEN";
+    static final String ACTION_CLEAR = "CLEAR";
+    static final String ACTION_RENAME = "RENAME";
+    static final String ACTION_REMOVE = "REMOVE";
+
     private JList swfList;
     private SWFListModel listModel;
     private JButton switchButton = new JButton(translate("proxy.start"));
@@ -87,7 +93,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         swfList.addMouseListener(this);
         swfList.setFont(new Font("Monospaced", Font.PLAIN, 12));
         switchButton.addActionListener(this);
-        switchButton.setActionCommand("SWITCHSTATE");
+        switchButton.setActionCommand(ACTION_SWITCH_STATE);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         cnt.add(new JScrollPane(swfList), BorderLayout.CENTER);
@@ -108,19 +114,19 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         JPanel buttonsPanel2 = new JPanel();
         buttonsPanel2.setLayout(new FlowLayout());
         JButton openButton = new JButton(translate("open"));
-        openButton.setActionCommand("OPEN");
+        openButton.setActionCommand(ACTION_OPEN);
         openButton.addActionListener(this);
         buttonsPanel2.add(openButton);
         JButton clearButton = new JButton(translate("clear"));
-        clearButton.setActionCommand("CLEAR");
+        clearButton.setActionCommand(ACTION_CLEAR);
         clearButton.addActionListener(this);
         buttonsPanel2.add(clearButton);
         JButton renameButton = new JButton(translate("rename"));
-        renameButton.setActionCommand("RENAME");
+        renameButton.setActionCommand(ACTION_RENAME);
         renameButton.addActionListener(this);
         buttonsPanel2.add(renameButton);
         JButton removeButton = new JButton(translate("remove"));
-        removeButton.setActionCommand("REMOVE");
+        removeButton.setActionCommand(ACTION_REMOVE);
         removeButton.addActionListener(this);
         buttonsPanel2.add(removeButton);
 
@@ -183,54 +189,56 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("OPEN")) {
-            open();
-        }
-        if (e.getActionCommand().equals("RENAME")) {
-            if (swfList.getSelectedIndex() > -1) {
-                Replacement r = (Replacement) listModel.getElementAt(swfList.getSelectedIndex());
-                String s = View.showInputDialog("URL", r.urlPattern);
-                r.urlPattern = s;
-                listModel.dataChanged(swfList.getSelectedIndex());
-            }
-        }
-        if (e.getActionCommand().equals("CLEAR")) {
-            for (int i = 0; i < listModel.getSize(); i++) {
-                Replacement r = (Replacement) listModel.getElementAt(i);
-                File f;
-                try {
-                    f = (new File(Main.tempFile(r.targetFile)));
-                    if (f.exists()) {
-                        f.delete();
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(ProxyFrame.class.getName()).log(Level.SEVERE, null, ex);
+        switch (e.getActionCommand()) {
+            case ACTION_OPEN:
+                open();
+                break;
+            case ACTION_RENAME:
+                if (swfList.getSelectedIndex() > -1) {
+                    Replacement r = (Replacement) listModel.getElementAt(swfList.getSelectedIndex());
+                    String s = View.showInputDialog("URL", r.urlPattern);
+                    r.urlPattern = s;
+                    listModel.dataChanged(swfList.getSelectedIndex());
                 }
+                break;
+            case ACTION_CLEAR:
+                for (int i = 0; i < listModel.getSize(); i++) {
+                    Replacement r = (Replacement) listModel.getElementAt(i);
+                    File f;
+                    try {
+                        f = (new File(Main.tempFile(r.targetFile)));
+                        if (f.exists()) {
+                            f.delete();
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(ProxyFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
 
-            }
-            listModel.clear();
-        }
-        if (e.getActionCommand().equals("REMOVE")) {
-            int lastIndex = -1;
-            for (int k = listModel.getSize() - 1; k >= 0; k--) {
-                if (swfList.isSelectedIndex(k)) {
-                    Replacement r = listModel.removeURL(k);
-                    File f = (new File(r.targetFile));
-                    if (f.exists()) {
-                        f.delete();
-                    }
-                    lastIndex = k;
                 }
-            }
-            if (lastIndex >= listModel.getSize()) {
-                lastIndex--;
-            }
-            if (lastIndex > -1) {
-                swfList.setSelectedIndex(lastIndex);
-            }
-        }
-        if (e.getActionCommand().equals("SWITCHSTATE")) {
-            Main.switchProxy();
+                listModel.clear();
+                break;
+            case ACTION_REMOVE:
+                int lastIndex = -1;
+                for (int k = listModel.getSize() - 1; k >= 0; k--) {
+                    if (swfList.isSelectedIndex(k)) {
+                        Replacement r = listModel.removeURL(k);
+                        File f = (new File(r.targetFile));
+                        if (f.exists()) {
+                            f.delete();
+                        }
+                        lastIndex = k;
+                    }
+                }
+                if (lastIndex >= listModel.getSize()) {
+                    lastIndex--;
+                }
+                if (lastIndex > -1) {
+                    swfList.setSelectedIndex(lastIndex);
+                }
+                break;
+            case ACTION_SWITCH_STATE:
+                Main.switchProxy();
+                break;
         }
     }
 

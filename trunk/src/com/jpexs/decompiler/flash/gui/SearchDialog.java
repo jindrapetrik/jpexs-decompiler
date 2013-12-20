@@ -38,6 +38,9 @@ import javax.swing.JTextField;
  */
 public class SearchDialog extends AppDialog implements ActionListener {
 
+    static final String ACTION_OK = "OK";
+    static final String ACTION_CANCEL = "CANCEL";
+
     public JTextField searchField = new MyTextField();
     public JCheckBox ignoreCaseCheckBox = new JCheckBox(translate("checkbox.ignorecase"));
     public JCheckBox regexpCheckBox = new JCheckBox(translate("checkbox.regexp"));
@@ -50,10 +53,10 @@ public class SearchDialog extends AppDialog implements ActionListener {
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.PAGE_AXIS));
         JPanel panButtons = new JPanel(new FlowLayout());
         JButton okButton = new JButton(translate("button.ok"));
-        okButton.setActionCommand("OK");
+        okButton.setActionCommand(ACTION_OK);
         okButton.addActionListener(this);
         JButton cancelButton = new JButton(translate("button.cancel"));
-        cancelButton.setActionCommand("CANCEL");
+        cancelButton.setActionCommand(ACTION_CANCEL);
         cancelButton.addActionListener(this);
         panButtons.add(okButton);
         panButtons.add(cancelButton);
@@ -87,7 +90,7 @@ public class SearchDialog extends AppDialog implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("OK")) {
+        if (e.getActionCommand() == ACTION_OK) {
             if (regexpCheckBox.isSelected()) {
                 try {
                     Pattern pat = Pattern.compile(searchField.getText());

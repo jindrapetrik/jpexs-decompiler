@@ -38,6 +38,9 @@ import javax.swing.JSlider;
  */
 public class DeobfuscationDialog extends AppDialog implements ActionListener {
 
+    static final String ACTION_OK = "OK";
+    static final String ACTION_CANCEL = "CANCEL";
+
     public JCheckBox processAllCheckbox = new JCheckBox(translate("processallclasses"));
     public JSlider codeProcessingLevel;
     public boolean ok = false;
@@ -86,10 +89,10 @@ public class DeobfuscationDialog extends AppDialog implements ActionListener {
 
         JButton cancelButton = new JButton(translate("button.cancel"));
         cancelButton.addActionListener(this);
-        cancelButton.setActionCommand("CANCEL");
+        cancelButton.setActionCommand(ACTION_CANCEL);
         JButton okButton = new JButton(translate("button.ok"));
         okButton.addActionListener(this);
-        okButton.setActionCommand("OK");
+        okButton.setActionCommand(ACTION_OK);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         buttonsPanel.add(okButton);
@@ -105,13 +108,15 @@ public class DeobfuscationDialog extends AppDialog implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("OK")) {
-            ok = true;
-            setVisible(false);
-        }
-        if (e.getActionCommand().equals("CANCEL")) {
-            ok = false;
-            setVisible(false);
+        switch (e.getActionCommand()) {
+            case ACTION_OK:
+                ok = true;
+                setVisible(false);
+                break;
+            case ACTION_CANCEL:
+                ok = false;
+                setVisible(false);
+                break;
         }
     }
 

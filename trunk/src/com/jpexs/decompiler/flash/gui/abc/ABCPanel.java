@@ -330,7 +330,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         JButton newTraitButton = new JButton(View.getIcon("traitadd16"));
         newTraitButton.setMargin(new Insets(5, 5, 5, 5));
         newTraitButton.addActionListener(this);
-        newTraitButton.setActionCommand("ADDTRAIT");
+        newTraitButton.setActionCommand(ACTION_ADD_TRAIT);
         newTraitButton.setToolTipText(AppStrings.translate("button.addtrait"));
         iconsPanel.add(newTraitButton);
 
@@ -394,7 +394,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
         Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
 
-        filterField.setActionCommand("FILTERSCRIPT");
+        filterField.setActionCommand(ACTION_FILTER_SCRIPT);
         filterField.addActionListener(this);
 
 
@@ -428,16 +428,16 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         JButton prevSearchButton = new JButton(View.getIcon("prev16"));
         prevSearchButton.setMargin(new Insets(3, 3, 3, 3));
         prevSearchButton.addActionListener(this);
-        prevSearchButton.setActionCommand("SEARCHPREV");
+        prevSearchButton.setActionCommand(ACTION_SEARCH_PREV);
 
         JButton nextSearchButton = new JButton(View.getIcon("next16"));
         nextSearchButton.setMargin(new Insets(3, 3, 3, 3));
         nextSearchButton.addActionListener(this);
-        nextSearchButton.setActionCommand("SEARCHNEXT");
+        nextSearchButton.setActionCommand(ACTION_SEARCH_NEXT);
         JButton cancelSearchButton = new JButton(View.getIcon("cancel16"));
         cancelSearchButton.setMargin(new Insets(3, 3, 3, 3));
         cancelSearchButton.addActionListener(this);
-        cancelSearchButton.setActionCommand("SEARCHCANCEL");
+        cancelSearchButton.setActionCommand(ACTION_SEARCH_CANCEL);
         searchPos = new JLabel("0/0");
         searchForLabel = new JLabel(AppStrings.translate("search.info").replace("%text%", "") + " ");
         searchPanel.add(searchForLabel);

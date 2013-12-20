@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.View;
+import static com.jpexs.decompiler.flash.gui.abc.NewTraitDialog.ACTION_OK;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -40,6 +41,9 @@ import javax.swing.*;
  * @author JPEXS
  */
 public class UsageFrame extends AppFrame implements ActionListener, MouseListener {
+
+    static final String ACTION_GOTO = "GOTO";
+    static final String ACTION_CANCEL = "CANCEL";
 
     private JButton gotoButton = new JButton(translate("button.goto"));
     private JButton cancelButton = new JButton(translate("button.cancel"));
@@ -59,9 +63,9 @@ public class UsageFrame extends AppFrame implements ActionListener, MouseListene
         }
         usageList = new JList(usageListModel);
         usageList.setBackground(Color.white);
-        gotoButton.setActionCommand("GOTO");
+        gotoButton.setActionCommand(ACTION_GOTO);
         gotoButton.addActionListener(this);
-        cancelButton.setActionCommand("CANCEL");
+        cancelButton.setActionCommand(ACTION_CANCEL);
         cancelButton.addActionListener(this);
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
@@ -114,12 +118,14 @@ public class UsageFrame extends AppFrame implements ActionListener, MouseListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("GOTO")) {
-            gotoUsage();
-            setVisible(false);
-        }
-        if (e.getActionCommand().equals("CANCEL")) {
-            setVisible(false);
+        switch (e.getActionCommand()) {
+            case ACTION_GOTO:
+                gotoUsage();
+                setVisible(false);
+                break;
+            case ACTION_CANCEL:
+                setVisible(false);
+                break;
         }
     }
 

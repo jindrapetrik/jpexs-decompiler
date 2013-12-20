@@ -38,6 +38,9 @@ import jsyntaxpane.DefaultSyntaxKit;
  */
 public class SelectLanguageDialog extends AppDialog implements ActionListener {
 
+    static final String ACTION_OK = "OK";
+    static final String ACTION_CANCEL = "CANCEL";
+
     JComboBox<Language> languageCombobox = new JComboBox<>();
     public String languageCode = null;
     private String[] languages = new String[]{"en", "cs", "zh", "de", "es", "hu", "nl", "pt", "ru", "sv", "uk"};
@@ -81,10 +84,10 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         buttonsPanel.setAlignmentX(0.5f);
         JButton okButton = new JButton(translate("button.ok"));
-        okButton.setActionCommand("OK");
+        okButton.setActionCommand(ACTION_OK);
         okButton.addActionListener(this);
         JButton cancelButton = new JButton(translate("button.cancel"));
-        cancelButton.setActionCommand("CANCEL");
+        cancelButton.setActionCommand(ACTION_CANCEL);
         cancelButton.addActionListener(this);
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
@@ -103,7 +106,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "OK":
+            case ACTION_OK:
                 if (languageCombobox.getSelectedIndex() == -1) {
                 } else {
                     languageCode = ((Language) languageCombobox.getSelectedItem()).code;
@@ -116,7 +119,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
                     reloadUi();
                 }
                 break;
-            case "CANCEL":
+            case ACTION_CANCEL:
                 setVisible(false);
                 break;
         }
