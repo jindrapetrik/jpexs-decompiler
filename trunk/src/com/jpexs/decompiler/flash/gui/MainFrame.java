@@ -100,10 +100,8 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.graph.ExportMode;
-import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
-import com.jpexs.process.ProcessTools;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -132,9 +130,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -150,20 +145,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -171,16 +161,11 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -189,7 +174,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
@@ -210,23 +194,7 @@ import javax.swing.tree.TreeSelectionModel;
 import org.pushingpixels.flamingo.api.common.AbstractCommandButton;
 import org.pushingpixels.flamingo.api.common.CommandButtonDisplayState;
 import org.pushingpixels.flamingo.api.common.CommandButtonLayoutManager;
-import org.pushingpixels.flamingo.api.common.JCommandButton;
-import org.pushingpixels.flamingo.api.common.JCommandButton.CommandButtonKind;
-import org.pushingpixels.flamingo.api.common.JCommandButtonPanel;
 import org.pushingpixels.flamingo.api.common.icon.ResizableIcon;
-import org.pushingpixels.flamingo.api.ribbon.JRibbon;
-import org.pushingpixels.flamingo.api.ribbon.JRibbonBand;
-import org.pushingpixels.flamingo.api.ribbon.JRibbonComponent;
-import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenu;
-import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryFooter;
-import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryPrimary;
-import org.pushingpixels.flamingo.api.ribbon.RibbonElementPriority;
-import org.pushingpixels.flamingo.api.ribbon.RibbonTask;
-import org.pushingpixels.flamingo.api.ribbon.resize.BaseRibbonBandResizePolicy;
-import org.pushingpixels.flamingo.api.ribbon.resize.CoreRibbonResizePolicies;
-import org.pushingpixels.flamingo.api.ribbon.resize.IconRibbonBandResizePolicy;
-import org.pushingpixels.flamingo.api.ribbon.resize.RibbonBandResizePolicy;
-import org.pushingpixels.flamingo.internal.ui.ribbon.AbstractBandControlPanel;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
 
 /**
@@ -240,6 +208,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     public ActionPanel actionPanel;
     private MainFrameStatusPanel statusPanel;
     private MainFrameRibbon mainRibbon;
+    private FontPanel fontPanel;
     public JProgressBar progressBar = new JProgressBar(0, 100);
     private DeobfuscationDialog deobfuscationDialog;
     public JTree tagTree;
@@ -276,28 +245,15 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private JSplitPane previewSplitPane;
     private JButton imageReplaceButton;
     private JPanel imageButtonsPanel;
-    private JLabel fontNameLabel;
-    private JLabel fontIsBoldLabel;
-    private JLabel fontIsItalicLabel;
-    private JLabel fontAscentLabel;
-    private JLabel fontDescentLabel;
-    private JLabel fontLeadingLabel;
-    private JTextArea fontCharactersTextArea;
-    private JTextField fontAddCharactersField;
-    private ComponentListener fontChangeList;
-    private JComboBox<String> fontSelection;
     private PlayerControls flashControls;
     private ImagePanel internelViewerPanel;
     private JPanel viewerCards;
     public static final String FLASH_VIEWER_CARD = "FLASHVIEWER";
     public static final String INTERNAL_VIEWER_CARD = "INTERNALVIEWER";
-    private Map<Integer, String> sourceFontsMap = new HashMap<>();
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
     private CancellableWorker setSourceWorker;
 
-    static final String ACTION_FONT_EMBED = "FONTEMBED";
     static final String ACTION_SELECT_COLOR = "SELECTCOLOR";
-    static final String ACTION_FONT_ADD_CHARS = "FONTADDCHARS";
     static final String ACTION_REPLACE_IMAGE = "REPLACEIMAGE";
     static final String ACTION_REPLACE_BINARY = "REPLACEBINARY";
     static final String ACTION_REMOVE_ITEM = "REMOVEITEM";
@@ -791,132 +747,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
         displayWithPreview.add(textTopPanel, CARDTEXTPANEL);
 
-
-
-        //TODO: This layout SUCKS! If you know something better, please fix it!
-        final JPanel fontPanel = new JPanel();
-        final JPanel fontParams2 = new JPanel();
-        fontParams2.setLayout(null);
-        final Component[][] ctable = new Component[][]{
-            {new JLabel(translate("font.name")), fontNameLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.isbold")), fontIsBoldLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.isitalic")), fontIsItalicLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.ascent")), fontAscentLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.descent")), fontDescentLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.leading")), fontLeadingLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.characters")), fontCharactersTextArea = new JTextArea("")}
-        };
-        fontCharactersTextArea.setLineWrap(true);
-        fontCharactersTextArea.setWrapStyleWord(true);
-        fontCharactersTextArea.setOpaque(false);
-        fontCharactersTextArea.setEditable(false);
-        fontCharactersTextArea.setFont(new JLabel().getFont());
-
-        final int borderLeft = 10;
-
-        final int[] maxws = new int[ctable[0].length];
-        for (int x = 0; x < ctable[0].length; x++) {
-            int maxw = 0;
-            for (int y = 0; y < ctable.length; y++) {
-                Dimension d = ctable[y][x].getPreferredSize();
-                if (d.width > maxw) {
-                    maxw = d.width;
-                }
-            }
-            maxws[x] = maxw;
-        }
-
-        for (int i = 0; i < ctable.length; i++) {
-            fontParams2.add(ctable[i][0]);
-            fontParams2.add(ctable[i][1]);
-        }
-
-        //fontParams2.setPreferredSize(new Dimension(600, ctable.length * 25));
-        fontChangeList = new ComponentListener() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                int h = 0;
-                Insets is = fontPanel.getInsets();
-                Insets is2 = fontParams2.getInsets();
-                for (int i = 0; i < ctable.length; i++) {
-                    Dimension d = ctable[i][0].getPreferredSize();
-                    Dimension d2 = ctable[i][1].getPreferredSize();
-                    ctable[i][0].setBounds(borderLeft, h, maxws[0], d2.height);
-
-                    int w2 = fontPanel.getWidth() - 3 * borderLeft - maxws[0] - is.left - is.right - 10;
-                    ctable[i][1].setBounds(borderLeft + maxws[0] + borderLeft, h, w2, d2.height);
-                    h += Math.max(d.height, d2.height);
-                }
-
-                fontParams2.setPreferredSize(new Dimension(fontPanel.getWidth() - 20, h));
-                fontPanel.revalidate();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                componentResized(null);
-            }
-
-            @Override
-            public void componentShown(ComponentEvent e) {
-                componentResized(null);
-            }
-
-            @Override
-            public void componentHidden(ComponentEvent e) {
-                componentResized(null);
-            }
-        };
-        final JPanel fontParams1 = new JPanel();
-        fontPanel.addComponentListener(fontChangeList);
-
-        fontChangeList.componentResized(null);
-        fontParams1.setLayout(new BoxLayout(fontParams1, BoxLayout.Y_AXIS));
-        fontParams1.add(fontParams2);
-
-        JPanel fontAddCharsPanel = new JPanel(new FlowLayout());
-        fontAddCharsPanel.add(new JLabel(translate("font.characters.add")));
-        fontAddCharactersField = new MyTextField();
-        fontAddCharactersField.setPreferredSize(new Dimension(150, fontAddCharactersField.getPreferredSize().height));
-        fontAddCharsPanel.add(fontAddCharactersField);
-        JButton fontAddCharsButton = new JButton(translate("button.ok"));
-        fontAddCharsButton.setActionCommand(ACTION_FONT_ADD_CHARS);
-        fontAddCharsButton.addActionListener(this);
-        fontAddCharsPanel.add(fontAddCharsButton);
-
-        JButton fontEmbedButton = new JButton(translate("button.font.embed"));
-        fontEmbedButton.setActionCommand(ACTION_FONT_EMBED);
-        fontEmbedButton.addActionListener(this);
-        //fontAddCharsPanel.add(fontEmbedButton);
-
-        fontParams1.add(fontAddCharsPanel);
-        JPanel fontSelectionPanel = new JPanel(new FlowLayout());
-        fontSelectionPanel.add(new JLabel(translate("font.source")));
-        fontSelection = new JComboBox<>(FontTag.fontNames.toArray(new String[FontTag.fontNames.size()]));
-        fontSelection.setSelectedIndex(0);
-        fontSelection.setSelectedItem("Times New Roman");
-        fontSelection.setSelectedItem("Arial");
-        fontSelection.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (oldValue instanceof FontTag) {
-                    FontTag f = (FontTag) oldValue;
-                    sourceFontsMap.put(f.getFontId(), (String) fontSelection.getSelectedItem());
-                }
-            }
-        });
-        fontSelectionPanel.add(fontSelection);
-
-        JPanel fontCharPanel = new JPanel();
-        fontCharPanel.setLayout(new ListLayout());
-        fontCharPanel.add(fontAddCharsPanel);
-        fontCharPanel.add(fontSelectionPanel);
-        fontParams1.add(fontCharPanel);
-        fontParams1.add(fontEmbedButton);
-        fontPanel.setLayout(new BorderLayout());
-        fontParams1.add(Box.createVerticalGlue());
-        fontPanel.add(new JScrollPane(fontParams1), BorderLayout.CENTER);
-
+        fontPanel = new FontPanel(this, swf);
         displayWithPreview.add(fontPanel, CARDFONTPANEL);
 
 
@@ -1184,8 +1015,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         mbutton.setDisplayState(new CommandButtonDisplayState(
                                 "My Ribbon Application Menu Button", mbutton.getSize().width) {
                             @Override
-                            public org.pushingpixels.flamingo.api.common.CommandButtonLayoutManager createLayoutManager(
-                                    org.pushingpixels.flamingo.api.common.AbstractCommandButton commandButton) {
+                            public CommandButtonLayoutManager createLayoutManager(
+                                    AbstractCommandButton commandButton) {
                                 return new CommandButtonLayoutManager() {
                                     @Override
                                     public int getPreferredIconSize() {
@@ -1844,53 +1675,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
     }
 
-    private void fontAddChars(FontTag ft, Set<Integer> selChars, String selFont) {
-        FontTag f = (FontTag) oldValue;
-        String oldchars = f.getCharacters(swf.tags);
-        for (int ic : selChars) {
-            char c = (char) ic;
-            if (oldchars.indexOf((int) c) == -1) {
-                Font font = new Font(selFont, f.getFontStyle(), 1024);
-                if (!font.canDisplay(c)) {
-                    View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + c), translate("error"), JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            }
-        }
-
-        String[] yesno = new String[]{translate("button.yes"), translate("button.no"), translate("button.yes.all"), translate("button.no.all")};
-        boolean yestoall = false;
-        boolean notoall = false;
-        for (int ic : selChars) {
-            char c = (char) ic;
-            if (oldchars.indexOf((int) c) > -1) {
-                int opt; //yes
-                if (!(yestoall || notoall)) {
-                    opt = View.showOptionDialog(null, translate("message.font.add.exists").replace("%char%", "" + c), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, translate("button.yes"));
-                    if (opt == 2) {
-                        yestoall = true;
-                    }
-                    if (opt == 3) {
-                        notoall = true;
-                    }
-                }
-                if (yestoall) {
-                    opt = 0; //yes                
-                } else if (notoall) {
-                    opt = 1; //no
-                } else {
-                    opt = 1;
-                }
-
-                if (opt == 1) {
-                    continue;
-                }
-            }
-            f.addCharacter(swf.tags, c, fontSelection.getSelectedItem().toString());
-            oldchars += c;
-        }
-    }
-
     public void disableDecompilationChanged() {
         clearCache();
         if (abcPanel != null) {
@@ -2305,37 +2089,10 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case ACTION_FONT_EMBED:
-                if (oldValue instanceof FontTag) {
-                    FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ((FontTag) oldValue).getFontStyle());
-                    if (fed.display()) {
-                        Set<Integer> selChars = fed.getSelectedChars();
-                        if (!selChars.isEmpty()) {
-                            String selFont = fed.getSelectedFont();
-                            fontSelection.setSelectedItem(selFont);
-                            fontAddChars((FontTag) oldValue, selChars, selFont);
-                            fontAddCharactersField.setText("");
-                            reload(true);
-                        }
-                    }
-                }
-                break;
             case ACTION_SELECT_COLOR:
                 Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectcolor.title"), View.swfBackgroundColor);
                 if (newColor != null) {
                     View.swfBackgroundColor = newColor;
-                    reload(true);
-                }
-                break;
-            case ACTION_FONT_ADD_CHARS:
-                String newchars = fontAddCharactersField.getText();
-                if (oldValue instanceof FontTag) {
-                    Set<Integer> selChars = new TreeSet<>();
-                    for (int c = 0; c < newchars.length(); c++) {
-                        selChars.add(newchars.codePointAt(c));
-                    }
-                    fontAddChars((FontTag) oldValue, selChars, fontSelection.getSelectedItem().toString());
-                    fontAddCharactersField.setText("");
                     reload(true);
                 }
                 break;
@@ -2459,7 +2216,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         if (((TextTag) oldValue).setFormattedText(new MissingCharacterHandler() {
                             @Override
                             public boolean handle(FontTag font, List<Tag> tags, char character) {
-                                String fontName = sourceFontsMap.get(font.getFontId());
+                                String fontName = fontPanel.sourceFontsMap.get(font.getFontId());
                                 if (fontName == null) {
                                     fontName = font.getFontName(tags);
                                 }
@@ -2473,7 +2230,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                 return true;
 
                             }
-                        }, swf.tags, textValue.getText(), fontSelection.getSelectedItem().toString())) {
+                        }, swf.tags, textValue.getText(), fontPanel.getSelectedFont())) {
                             setEditText(false);
                         }
                     } catch (ParseException ex) {
@@ -2523,7 +2280,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         CardLayout cl = (CardLayout) (displayPanel.getLayout());
         cl.show(displayPanel, card);
     }
-    private Object oldValue;
+    public Object oldValue;
     private File tempFile;
 
     @Override
@@ -2696,6 +2453,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             previewImagePanel.setImage(SWF.frameToImage(containerId, ((FrameNode) tagObj).getFrame() - 1, swf.tags, controlTags, rect, totalFrameCount, new Stack<Integer>()));
         } else if (((tagObj instanceof FrameNode) && ((FrameNode) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
+            createAndShowTempSwf(tagObj);
+            
             try {
                 if (tempFile != null) {
                     tempFile.delete();
@@ -3079,6 +2838,376 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             showCard(CARDEMPTYPANEL);
         }
     }
+    
+    private void createAndShowTempSwf(Object tagObj) {
+        try {
+            if (tempFile != null) {
+                tempFile.delete();
+            }
+            tempFile = File.createTempFile("temp", ".swf");
+            tempFile.deleteOnExit();
+
+            Color backgroundColor = View.swfBackgroundColor;
+            if (tagObj instanceof FontTag) { //Fonts are always black on white
+                backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
+            }
+            int frameCount = 1;
+            int frameRate = swf.frameRate;
+            HashMap<Integer, VideoFrameTag> videoFrames = new HashMap<>();
+            DefineVideoStreamTag vs = null;
+            if (tagObj instanceof DefineVideoStreamTag) {
+                vs = (DefineVideoStreamTag) tagObj;
+                swf.populateVideoFrames(vs.getCharacterId(), swf.tags, videoFrames);
+                frameCount = videoFrames.size();
+            }
+
+            List<SoundStreamBlockTag> soundFrames = new ArrayList<>();
+            if (tagObj instanceof SoundStreamHeadTypeTag) {
+                SWF.populateSoundStreamBlocks(swf.tags, (Tag) tagObj, soundFrames);
+                frameCount = soundFrames.size();
+            }
+
+            if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
+                frameCount = 100;
+                frameRate = 50;
+            }
+
+            if (tagObj instanceof DefineSoundTag) {
+                frameCount = 1;
+            }
+
+            byte[] data;
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                SWFOutputStream sos2 = new SWFOutputStream(baos, 10);
+                int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
+                int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
+                sos2.writeRECT(swf.displayRect);
+                sos2.writeUI8(0);
+                sos2.writeUI8(frameRate);
+                sos2.writeUI16(frameCount); //framecnt
+
+                /*FileAttributesTag fa = new FileAttributesTag();
+                 sos2.writeTag(fa);
+                 */
+                if (tagObj instanceof FrameNode) {
+                    FrameNode fn = (FrameNode) tagObj;
+                    if (fn.getParent() == null) {
+                        for (Tag t : swf.tags) {
+                            if (t instanceof SetBackgroundColorTag) {
+                                backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                sos2.writeTag(new SetBackgroundColorTag(null, new RGB(backgroundColor)));
+
+                if (tagObj instanceof FrameNode) {
+                    FrameNode fn = (FrameNode) tagObj;
+                    Object parent = fn.getParent();
+                    List<ContainerItem> subs = new ArrayList<>();
+                    if (parent == null) {
+                        subs.addAll(swf.tags);
+                    } else {
+                        if (parent instanceof Container) {
+                            subs = ((Container) parent).getSubItems();
+                        }
+                    }
+                    List<Integer> doneCharacters = new ArrayList<>();
+                    int frameCnt = 1;
+                    for (Object o : subs) {
+                        if (o instanceof ShowFrameTag) {
+                            frameCnt++;
+                            continue;
+                        }
+                        if (frameCnt > fn.getFrame()) {
+                            break;
+                        }
+                        Tag t = (Tag) o;
+                        Set<Integer> needed = t.getDeepNeededCharacters(characters, new ArrayList<Integer>());
+                        for (int n : needed) {
+                            if (!doneCharacters.contains(n)) {
+                                sos2.writeTag(classicTag(characters.get(n)));
+                                doneCharacters.add(n);
+                            }
+                        }
+                        if (t instanceof CharacterTag) {
+                            doneCharacters.add(((CharacterTag) t).getCharacterId());
+                        }
+                        sos2.writeTag(classicTag(t));
+
+                        if (parent != null) {
+                            if (t instanceof PlaceObjectTypeTag) {
+                                PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
+                                int chid = pot.getCharacterId();
+                                int depth = pot.getDepth();
+                                MATRIX mat = pot.getMatrix();
+                                if (mat == null) {
+                                    mat = new MATRIX();
+                                }
+                                mat = (MATRIX) Helper.deepCopy(mat);
+                                if (parent instanceof BoundedTag) {
+                                    RECT r = ((BoundedTag) parent).getRect(characters, new Stack<Integer>());
+                                    mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
+                                    mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
+                                } else {
+                                    mat.translateX += width / 2;
+                                    mat.translateY += height / 2;
+                                }
+                                sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
+
+                            }
+                        }
+                    }
+                    sos2.writeTag(new ShowFrameTag(null));
+                } else {
+
+                    if (tagObj instanceof DefineBitsTag) {
+                        if (jtt != null) {
+                            sos2.writeTag(jtt);
+                        }
+                    } else if (tagObj instanceof AloneTag) {
+                    } else {
+                        Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters, new ArrayList<Integer>());
+                        for (int n : needed) {
+                            sos2.writeTag(classicTag(characters.get(n)));
+                        }
+                    }
+
+                    sos2.writeTag(classicTag((Tag) tagObj));
+
+                    int chtId = 0;
+                    if (tagObj instanceof CharacterTag) {
+                        chtId = ((CharacterTag) tagObj).getCharacterId();
+                    }
+
+                    MATRIX mat = new MATRIX();
+                    mat.hasRotate = false;
+                    mat.hasScale = false;
+                    mat.translateX = 0;
+                    mat.translateY = 0;
+                    if (tagObj instanceof BoundedTag) {
+                        RECT r = ((BoundedTag) tagObj).getRect(characters, new Stack<Integer>());
+                        mat.translateX = -r.Xmin;
+                        mat.translateY = -r.Ymin;
+                        mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
+                        mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
+                    } else {
+                        mat.translateX = width / 4;
+                        mat.translateY = height / 4;
+                    }
+                    if (tagObj instanceof FontTag) {
+
+                        int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().size();
+                        int fontId = ((FontTag) tagObj).getFontId();
+                        int sloupcu = (int) Math.ceil(Math.sqrt(countGlyphs));
+                        int radku = (int) Math.ceil(((float) countGlyphs) / ((float) sloupcu));
+                        int x = 0;
+                        int y = 1;
+                        for (int f = 0; f < countGlyphs; f++) {
+                            if (x >= sloupcu) {
+                                x = 0;
+                                y++;
+                            }
+                            List<TEXTRECORD> rec = new ArrayList<>();
+                            TEXTRECORD tr = new TEXTRECORD();
+                            int textHeight = height / radku;
+                            tr.fontId = fontId;
+                            tr.styleFlagsHasFont = true;
+                            tr.textHeight = textHeight;
+                            tr.glyphEntries = new GLYPHENTRY[1];
+                            tr.styleFlagsHasColor = true;
+                            tr.textColor = new RGB(0, 0, 0);
+                            tr.glyphEntries[0] = new GLYPHENTRY();
+                            tr.glyphEntries[0].glyphAdvance = 0;
+                            tr.glyphEntries[0].glyphIndex = f;
+                            rec.add(tr);
+                            mat.translateX = x * width / sloupcu;
+                            mat.translateY = y * height / radku;
+                            sos2.writeTag(new DefineTextTag(null, 999 + f, new RECT(0, width, 0, height), new MATRIX(), rec));
+                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
+                            x++;
+                        }
+                        sos2.writeTag(new ShowFrameTag(null));
+                    } else if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
+                        sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
+                        sos2.writeTag(new ShowFrameTag(null));
+                        int numFrames = 100;
+                        for (int ratio = 0; ratio < 65536; ratio += 65536 / numFrames) {
+                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null));
+                            sos2.writeTag(new ShowFrameTag(null));
+                        }
+                    } else if (tagObj instanceof SoundStreamHeadTypeTag) {
+                        for (SoundStreamBlockTag blk : soundFrames) {
+                            sos2.writeTag(blk);
+                            sos2.writeTag(new ShowFrameTag(null));
+                        }
+                    } else if (tagObj instanceof DefineSoundTag) {
+                        ExportAssetsTag ea = new ExportAssetsTag();
+                        DefineSoundTag ds = (DefineSoundTag) tagObj;
+                        ea.tags.add(ds.soundId);
+                        ea.names.add("my_define_sound");
+                        sos2.writeTag(ea);
+                        List<Action> actions;
+                        DoActionTag doa;
+
+
+                        doa = new DoActionTag(null, new byte[]{}, SWF.DEFAULT_VERSION, 0);
+                        actions = ASMParser.parse(0, 0, false,
+                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
+                                + "Push \"_root\"\n"
+                                + "GetVariable\n"
+                                + "Push \"my_sound\" 0.0 \"Sound\"\n"
+                                + "NewObject\n"
+                                + "SetMember\n"
+                                + "Push \"my_define_sound\" 1 \"_root\"\n"
+                                + "GetVariable\n"
+                                + "Push \"my_sound\"\n"
+                                + "GetMember\n"
+                                + "Push \"attachSound\"\n"
+                                + "CallMethod\n"
+                                + "Pop\n"
+                                + "Stop", SWF.DEFAULT_VERSION, false);
+                        doa.setActions(actions, SWF.DEFAULT_VERSION);
+                        sos2.writeTag(doa);
+                        sos2.writeTag(new ShowFrameTag(null));
+
+
+                        actions = ASMParser.parse(0, 0, false,
+                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
+                                + "StopSounds\n"
+                                + "Push \"_root\"\n"
+                                + "GetVariable\n"
+                                + "Push \"my_sound\" 0.0 \"Sound\"\n"
+                                + "NewObject\n"
+                                + "SetMember\n"
+                                + "Push \"my_define_sound\" 1 \"_root\"\n"
+                                + "GetVariable\n"
+                                + "Push \"my_sound\"\n"
+                                + "GetMember\n"
+                                + "Push \"attachSound\"\n"
+                                + "CallMethod\n"
+                                + "Pop\n"
+                                + "Push 9999 0.0 2 \"_root\"\n"
+                                + "GetVariable\n"
+                                + "Push \"my_sound\"\n"
+                                + "GetMember\n"
+                                + "Push \"start\"\n"
+                                + "CallMethod\n"
+                                + "Pop\n"
+                                + "Stop", SWF.DEFAULT_VERSION, false);
+                        doa.setActions(actions, SWF.DEFAULT_VERSION);
+                        sos2.writeTag(doa);
+                        sos2.writeTag(new ShowFrameTag(null));
+
+                        actions = ASMParser.parse(0, 0, false,
+                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
+                                + "StopSounds\n"
+                                + "Push \"_root\"\n"
+                                + "GetVariable\n"
+                                + "Push \"my_sound\" 0.0 \"Sound\"\n"
+                                + "NewObject\n"
+                                + "SetMember\n"
+                                + "Push \"my_define_sound\" 1 \"_root\"\n"
+                                + "GetVariable\n"
+                                + "Push \"my_sound\"\n"
+                                + "GetMember\n"
+                                + "Push \"attachSound\"\n"
+                                + "CallMethod\n"
+                                + "Pop\n"
+                                + "Push \"_root\"\n"
+                                + "GetVariable\n"
+                                + "Push \"my_sound\"\n"
+                                + "GetMember\n"
+                                + "Push \"onSoundComplete\"\n"
+                                + "DefineFunction2 \"\" 0 2 false true true false true false true false false  {\n"
+                                + "Push 0.0 register1 \"my_sound\"\n"
+                                + "GetMember\n"
+                                + "Push \"start\"\n"
+                                + "CallMethod\n"
+                                + "Pop\n"
+                                + "}\n"
+                                + "SetMember\n"
+                                + "Push \"_root\"\n"
+                                + "GetVariable\n"
+                                + "Push \"execParam\"\n"
+                                + "GetMember\n"
+                                + "Push 1 \"_root\"\n"
+                                + "GetVariable\n"
+                                + "Push \"my_sound\"\n"
+                                + "GetMember\n"
+                                + "Push \"start\"\n"
+                                + "CallMethod\n"
+                                + "Pop\n"
+                                + "Stop", SWF.DEFAULT_VERSION, false);
+                        doa.setActions(actions, SWF.DEFAULT_VERSION);
+                        sos2.writeTag(doa);
+                        sos2.writeTag(new ShowFrameTag(null));
+
+
+                        actions = ASMParser.parse(0, 0, false,
+                                "StopSounds\n"
+                                + "Stop", SWF.DEFAULT_VERSION, false);
+                        doa.setActions(actions, SWF.DEFAULT_VERSION);
+                        sos2.writeTag(doa);
+                        sos2.writeTag(new ShowFrameTag(null));
+
+
+                        sos2.writeTag(new ShowFrameTag(null));
+                        if (flashPanel != null) {
+                            flashPanel.specialPlayback = true;
+                        }
+                    } else if (tagObj instanceof DefineVideoStreamTag) {
+
+                        sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
+                        List<VideoFrameTag> frs = new ArrayList<>(videoFrames.values());
+                        Collections.sort(frs, new Comparator<VideoFrameTag>() {
+                            @Override
+                            public int compare(VideoFrameTag o1, VideoFrameTag o2) {
+                                return o1.frameNum - o2.frameNum;
+                            }
+                        });
+                        boolean first = true;
+                        int ratio = 0;
+                        for (VideoFrameTag f : frs) {
+                            if (!first) {
+                                ratio++;
+                                sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, false, false, true, 1, 0, null, null, ratio, null, 0, null));
+                            }
+                            sos2.writeTag(f);
+                            sos2.writeTag(new ShowFrameTag(null));
+                            first = false;
+                        }
+                    } else {
+                        sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
+                        sos2.writeTag(new ShowFrameTag(null));
+                    }
+
+
+                }//not showframe
+
+                sos2.writeTag(new EndTag(null));
+                data = baos.toByteArray();
+            }
+
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                SWFOutputStream sos = new SWFOutputStream(fos, 10);
+                sos.write("FWS".getBytes());
+                sos.write(swf.version);
+                sos.writeUI32(sos.getPos() + data.length + 4);
+                sos.write(data);
+                fos.flush();
+            }
+            
+            showCard(CARDFLASHPANEL);
+            if (flashPanel != null) {
+                flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
+            }
+        } catch (IOException | com.jpexs.decompiler.flash.action.parser.ParseException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     private void showFontTag(FontTag ft) {
         if (mainRibbon.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
@@ -3090,20 +3219,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
         parametersPanel.setVisible(true);
         previewSplitPane.setDividerLocation(previewSplitPane.getWidth() / 2);
-        fontNameLabel.setText(ft.getFontName(swf.tags));
-        fontIsBoldLabel.setText(ft.isBold() ? translate("yes") : translate("no"));
-        fontIsItalicLabel.setText(ft.isItalic() ? translate("yes") : translate("no"));
-        fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : "" + ft.getDescent());
-        fontAscentLabel.setText(ft.getAscent() == -1 ? translate("value.unknown") : "" + ft.getAscent());
-        fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : "" + ft.getLeading());
-        String chars = ft.getCharacters(swf.tags);
-        fontCharactersTextArea.setText(chars);
-        if (sourceFontsMap.containsKey(ft.getFontId())) {
-            fontSelection.setSelectedItem(sourceFontsMap.get(ft.getFontId()));
-        } else {
-            fontSelection.setSelectedItem(FontTag.findInstalledFontName(ft.getFontName(swf.tags)));
-        }
-        fontChangeList.componentResized(null);
+        fontPanel.showFontTag(ft);
         showDetailWithPreview(CARDFONTPANEL);
     }
 
@@ -3183,6 +3299,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
     @Override
     public void free() {
+        Helper.emptyObject(mainRibbon);
         Helper.emptyObject(statusPanel);
         Helper.emptyObject(this);
     }
