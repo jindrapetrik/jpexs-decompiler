@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.TreeNode;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import java.util.List;
 import javax.swing.event.TreeModelListener;
@@ -77,18 +79,19 @@ class ClassIndexVisitor implements TreeVisitor {
 
 public class ClassesListTreeModel implements TreeModel {
 
-    private Tree classTree = new Tree();
+    private Tree classTree;
     private List<MyEntry<ClassPath, ScriptPack>> list;
 
     public List<MyEntry<ClassPath, ScriptPack>> getList() {
         return list;
     }
 
-    public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list) {
-        this(list, null);
+    public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list, SWF swf) {
+        this(list, swf, null);
     }
 
-    public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list, String filter) {
+    public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list, SWF swf, String filter) {
+        classTree = new Tree(swf);
         for (MyEntry<ClassPath, ScriptPack> item : list) {
             if (filter != null) {
                 if (!filter.isEmpty()) {
@@ -125,7 +128,7 @@ public class ClassesListTreeModel implements TreeModel {
     }
 
     @Override
-    public Object getChild(Object parent, int index) {
+    public TreeNode getChild(Object parent, int index) {
         TreeElement pte = (TreeElement) parent;
         TreeElement te = pte.getChild(index);
         return te;

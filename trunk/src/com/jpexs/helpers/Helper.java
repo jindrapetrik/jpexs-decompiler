@@ -508,7 +508,10 @@ public class Helper {
                         }
                     }
                     if (v instanceof Freed) {
-                        ((Freed) v).free();
+                        Freed freed = ((Freed) v);
+                        if (!freed.isFreeing()) {
+                            ((Freed) v).free();
+                        }
                     }
                     f.set(obj, null);
                 }

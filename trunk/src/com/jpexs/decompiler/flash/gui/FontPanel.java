@@ -55,7 +55,6 @@ public class FontPanel extends JPanel implements ActionListener {
     static final String ACTION_FONT_ADD_CHARS = "FONTADDCHARS";
 
     private MainFrame mainFrame;
-    private SWF swf;
 
     public Map<Integer, String> sourceFontsMap = new HashMap<>();
 
@@ -70,9 +69,8 @@ public class FontPanel extends JPanel implements ActionListener {
     private ComponentListener fontChangeList;
     private JComboBox<String> fontSelection;
 
-    public FontPanel(MainFrame mainFrame, SWF swf) {
+    public FontPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
-        this.swf = swf;
         createFontPanel();
     }
     
@@ -214,6 +212,7 @@ public class FontPanel extends JPanel implements ActionListener {
 
     private void fontAddChars(FontTag ft, Set<Integer> selChars, String selFont) {
         FontTag f = (FontTag) mainFrame.oldValue;
+        SWF swf = ft.getSwf();
         String oldchars = f.getCharacters(swf.tags);
         for (int ic : selChars) {
             char c = (char) ic;
@@ -260,6 +259,7 @@ public class FontPanel extends JPanel implements ActionListener {
     }
 
     public void showFontTag(FontTag ft) {
+        SWF swf = ft.getSwf();
         fontNameLabel.setText(ft.getFontName(swf.tags));
         fontIsBoldLabel.setText(ft.isBold() ? translate("yes") : translate("no"));
         fontIsItalicLabel.setText(ft.isItalic() ? translate("yes") : translate("no"));

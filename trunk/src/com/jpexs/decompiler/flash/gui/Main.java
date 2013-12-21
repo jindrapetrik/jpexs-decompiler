@@ -40,6 +40,7 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.logging.ConsoleHandler;
@@ -66,21 +67,17 @@ import javax.swing.filechooser.FileFilter;
 public class Main {
 
     public static ProxyFrame proxyFrame;
-    public static String file;
-    public static InputStream inputStream;
-    public static String fileTitle;
-    public static SWF swf;
+    private static List<SWFSourceInfo> sourceInfos = new ArrayList<>();
     public static LoadingDialog loadingDialog;
     public static ModeFrame modeFrame;
     private static boolean working = false;
     private static TrayIcon trayIcon;
     private static MenuItem stopMenuItem;
-    public static MainFrame mainFrame;
+    private static MainFrame mainFrame;
     private static final int UPDATE_SYSTEM_MAJOR = 1;
     private static final int UPDATE_SYSTEM_MINOR = 0;
     public static LoadFromMemoryFrame loadFromMemoryFrame;
     public static LoadFromCacheFrame loadFromCacheFrame;
-    public static boolean readOnly = false;
     private static ErrorLogFrame errorLogFrame;
 
     public static void loadFromCache() {
@@ -92,21 +89,9 @@ public class Main {
 
     public static void loadFromMemory() {
         if (loadFromMemoryFrame == null) {
-            loadFromMemoryFrame = new LoadFromMemoryFrame();
+            loadFromMemoryFrame = new LoadFromMemoryFrame(mainFrame);
         }
         loadFromMemoryFrame.setVisible(true);
-    }
-
-    /**
-     * Get title of the file
-     *
-     * @return file title
-     */
-    public static String getFileTitle() {
-        if (fileTitle != null) {
-            return fileTitle;
-        }
-        return file;
     }
 
     public static void setSubLimiter(boolean value) {
@@ -126,7 +111,7 @@ public class Main {
             @Override
             public void run() {
                 if (proxyFrame == null) {
-                    proxyFrame = new ProxyFrame();
+                    proxyFrame = new ProxyFrame(mainFrame);
                 }
             }
         });
@@ -137,7 +122,7 @@ public class Main {
     
     public static void showProxy() {
         if (proxyFrame == null) {
-            proxyFrame = new ProxyFrame();
+            proxyFrame = new ProxyFrame(mainFrame);
         }
         proxyFrame.setVisible(true);
         proxyFrame.setState(Frame.NORMAL);
@@ -200,10 +185,10 @@ public class Main {
     }
 
     public static SWF parseSWF(String file) throws Exception {
-        return parseSWF(new FileInputStream(file));
+        return parseSWF(new FileInputStream(file), file, null);
     }
 
-    public static SWF parseSWF(InputStream fis) throws Exception {
+    public static SWF parseSWF(InputStream fis, String file, String fileTitle) throws Exception {
         SWF locswf;
         locswf = new SWF(fis, new ProgressListener() {
             @Override
@@ -211,6 +196,8 @@ public class Main {
                 startWork(AppStrings.translate("work.reading.swf"), p);
             }
         }, Configuration.parallelSpeedUp.get());
+        locswf.file = file;
+        locswf.fileTitle = fileTitle;
         locswf.addEventListener(new EventListener() {
             @Override
             public void handleEvent(String event, Object data) {
@@ -232,8 +219,8 @@ public class Main {
         return locswf;
     }
 
-    public static void saveFile(String outfile) throws IOException {
-        file = outfile;
+    public static void saveFile(SWF swf, String outfile) throws IOException {
+        swf.file = outfile;
         File outfileF = new File(outfile);
         File tmpFile = new File(outfile + ".tmp");
         swf.saveTo(new FileOutputStream(tmpFile));
@@ -252,36 +239,42 @@ public class Main {
 
     private static class OpenFileWorker extends SwingWorker {
 
+        private SWFSourceInfo sourceInfo;
+        
+        public OpenFileWorker(SWFSourceInfo sourceInfo) {
+            this.sourceInfo = sourceInfo;
+        }
+
         @Override
         protected Object doInBackground() throws Exception {
+            SWF swf = null;
             try {
                 Main.startWork(AppStrings.translate("work.reading.swf") + "...");
-                swf = parseSWF(Main.inputStream);
-                if (Main.inputStream instanceof FileInputStream) {
-                    Main.inputStream.close();
+                InputStream inputStream = sourceInfo.getInputStream();
+                swf = parseSWF(inputStream, sourceInfo.getFile(), sourceInfo.getFileTitle());
+                if (inputStream instanceof FileInputStream) {
+                    inputStream.close();
                 }
             } catch (OutOfMemoryError ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 View.showMessageDialog(null, "Cannot load SWF file. Out of memory.");
                 loadingDialog.setVisible(false);
-                swf = null;
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 View.showMessageDialog(null, "Cannot load SWF file.");
                 loadingDialog.setVisible(false);
-                swf = null;
             }
 
+            final SWF swf1 = swf;
             try {
                 Main.startWork(AppStrings.translate("work.creatingwindow") + "...");
                 View.execInEventDispatch(new Runnable() {
                     @Override
                     public void run() {
-                        try{
-                        mainFrame = new MainFrame(swf);
-                        } catch(Exception ex) {
-                            String a = ex.toString();
+                        if (mainFrame == null) {
+                            mainFrame = new MainFrame();
                         }
+                        mainFrame.load(swf1);
                         if (errorState) {
                             mainFrame.setErrorState();
                         }
@@ -306,33 +299,35 @@ public class Main {
         }
     }
 
-    public static boolean reloadSWF() {
+    public static boolean reloadSWFs() {
         CancellableWorker.cancelBackgroundThreads();
-        if (Main.inputStream == null) {
-            mainFrame.setVisible(false);
-            Helper.emptyObject(mainFrame);
+        if (Main.sourceInfos.isEmpty()) {
             Cache.clearAll();
             System.gc();
-            mainFrame = null;
             showModeFrame();
             return true;
         } else {
-            if (inputStream instanceof FileInputStream) {
-                openFile(file);
-            } else if (inputStream instanceof SeekableInputStream) {
-                try {
-                    ((SeekableInputStream) inputStream).seek(0);
-                } catch (IOException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            SWFSourceInfo[] sourceInfosCopy = new SWFSourceInfo[sourceInfos.size()];
+            sourceInfos.toArray(sourceInfosCopy);
+            for (SWFSourceInfo sourceInfo : sourceInfosCopy) {
+                InputStream inputStream = sourceInfo.getInputStream();
+                if (inputStream instanceof FileInputStream) {
+                    openFile(sourceInfo.getFile(), null);
+                } else if (inputStream instanceof SeekableInputStream) {
+                    try {
+                        ((SeekableInputStream) inputStream).seek(0);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    return openFile(inputStream, sourceInfo.getFileTitle()) == OpenFileResult.OK;
+                } else if (inputStream instanceof BufferedInputStream) {
+                    try {
+                        ((BufferedInputStream) inputStream).reset();
+                    } catch (IOException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    return openFile(inputStream, sourceInfo.getFileTitle()) == OpenFileResult.OK;
                 }
-                return openFile(fileTitle, inputStream) == OpenFileResult.OK;
-            } else if (inputStream instanceof BufferedInputStream) {
-                try {
-                    ((BufferedInputStream) inputStream).reset();
-                } catch (IOException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                return openFile(fileTitle, inputStream) == OpenFileResult.OK;
             }
             return false;
         }
@@ -355,18 +350,16 @@ public class Main {
             loadFromCacheFrame.setVisible(false);
             loadFromCacheFrame = null;
         }
-        reloadSWF();
+        reloadSWFs();
     }
 
-    public static OpenFileResult openFile(String swfFile) {
+    public static OpenFileResult openFile(String swfFile, String fileTitle) {
         try {
             File file = new File(swfFile);
             swfFile = file.getCanonicalPath();
             Configuration.addRecentFile(swfFile);
-            OpenFileResult openResult = openFile(swfFile, new FileInputStream(swfFile));
-            if (openResult == OpenFileResult.OK) {
-                readOnly = false;
-            }
+            SWFSourceInfo sourceInfo = new SWFSourceInfo(new FileInputStream(swfFile), swfFile, fileTitle);
+            OpenFileResult openResult = openFile(sourceInfo);
             return openResult;
         } catch (FileNotFoundException ex) {
             View.showMessageDialog(null, "File not found", "Error", JOptionPane.ERROR_MESSAGE);
@@ -377,19 +370,14 @@ public class Main {
         }
     }
 
-    public static OpenFileResult openFile(String fileTitle, InputStream is) {
-        Main.file = fileTitle;
-        Main.inputStream = is;
-        Main.fileTitle = fileTitle;
-        readOnly = true;
-        if (mainFrame != null) {
+    public static OpenFileResult openFile(SWFSourceInfo sourceInfo) {
+        if (mainFrame != null && !Configuration.openMultiple.get()) {
+            mainFrame.closeAll();
             mainFrame.setVisible(false);
-            Helper.emptyObject(mainFrame);
-            swf = null;
-            mainFrame = null;
             Cache.clearAll();
             System.gc();
         }
+
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
@@ -400,12 +388,18 @@ public class Main {
         });
 
         Main.loadingDialog.setVisible(true);
-        OpenFileWorker wrk = new OpenFileWorker();
+        OpenFileWorker wrk = new OpenFileWorker(sourceInfo);
         wrk.execute();
+        sourceInfos.add(sourceInfo);
         return OpenFileResult.OK;
     }
+    
+    public static OpenFileResult openFile(InputStream is, String fileTitle) {
+        SWFSourceInfo sourceInfo = new SWFSourceInfo(is, null, fileTitle);
+        return openFile(sourceInfo);
+    }
 
-    public static boolean saveFileDialog() {
+    public static boolean saveFileDialog(SWF swf) {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
         FileFilter swfFilter = new FileFilter() {
@@ -461,10 +455,8 @@ public class Main {
                     }
                     swf.gfx = true;
                 }
-                Main.saveFile(fileName);
+                Main.saveFile(swf, fileName);
                 Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
-                fileTitle = null;
-                readOnly = false;
                 return true;
             } catch (IOException ex) {
                 View.showMessageDialog(null, AppStrings.translate("error.file.write"));
@@ -474,7 +466,6 @@ public class Main {
     }
 
     public static boolean openFileDialog() {
-        fileTitle = null;
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
@@ -522,7 +513,7 @@ public class Main {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
             File selfile = Helper.fixDialogFile(fc.getSelectedFile());
-            Main.openFile(selfile.getAbsolutePath());
+            Main.openFile(selfile.getAbsolutePath(), null);
             return true;
         } else {
             return false;
@@ -582,7 +573,7 @@ public class Main {
             @Override
             public void run() {
                 if (mainFrame == null) {
-                    mainFrame = new MainFrame(null);
+                    mainFrame = new MainFrame();
                     if (errorState) {
                         mainFrame.setErrorState();
                     }
@@ -741,7 +732,7 @@ public class Main {
             String fileToOpen = CommandLineArgumentParser.parseArguments(args);
             if (fileToOpen != null) {
                 initGui();
-                openFile(fileToOpen);
+                openFile(fileToOpen, null);
             }
         }
     }

@@ -16,10 +16,12 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.TreeNode;
 import java.util.*;
 import javax.swing.tree.TreePath;
 
-public class TreeElement {
+public class TreeElement implements TreeNode {
 
     private SortedMap<String, TreeElement> branches;
     private SortedMap<String, TreeElement> leafs;
@@ -27,14 +29,20 @@ public class TreeElement {
     private String path;
     private Object item;
     private TreeElement parent;
+    private SWF swf;
 
-    public TreeElement(String name, String path, Object item, TreeElement parent) {
+    public TreeElement(SWF swf, String name, String path, Object item, TreeElement parent) {
+        this.swf = swf;
         this.name = name;
         this.path = path;
         this.item = item;
         this.parent = parent;
         branches = new TreeMap<>();
         leafs = new TreeMap<>();
+    }
+
+    public SWF getSwf() {
+        return swf;
     }
 
     public TreeElement getParent() {
@@ -70,14 +78,14 @@ public class TreeElement {
     TreeElement getBranch(String pathElement) {
         TreeElement branch = branches.get(pathElement);
         if (branch == null) {
-            branch = new TreeElement(pathElement, path + "." + pathElement, null, this);
+            branch = new TreeElement(swf, pathElement, path + "." + pathElement, null, this);
             branches.put(pathElement, branch);
         }
         return branch;
     }
 
     void addLeaf(String pathElement, Object item) {
-        TreeElement child = new TreeElement(pathElement, path + "." + pathElement, item, this);
+        TreeElement child = new TreeElement(swf, pathElement, path + "." + pathElement, item, this);
         leafs.put(pathElement, child);
     }
 

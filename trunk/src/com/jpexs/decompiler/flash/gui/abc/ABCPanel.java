@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.MyTextField;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
@@ -79,10 +80,12 @@ import jsyntaxpane.actions.DocumentSearchData;
 
 public class ABCPanel extends JPanel implements ItemListener, ActionListener, Freed {
 
+    private MainFrame mainFrame;
     public TraitsList navigator;
     public ClassesListTree classTree;
     public ABC abc;
     public List<ABCContainerTag> list;
+    public SWF swf;
     public JComboBox abcComboBox;
     public int listIndex = -1;
     public DecompiledEditorPane decompiledTextArea;
@@ -265,9 +268,22 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         //colModel.getColumn(0).setMaxWidth(50);
     }
 
+    @SuppressWarnings("unchecked")
+    public void setSwf(List<ABCContainerTag> list, SWF swf) {
+        this.list = list;
+        this.swf = swf;
+        switchAbc(0); // todo honika: do we need this?
+        abcComboBox.setModel(new ABCComboBoxModel(list));
+        if (list.size() > 0) {
+            this.abc = list.get(0).getABC();
+        }
+
+        navigator.setABC(list, abc);
+    }
+    
     public void switchAbc(int index) {
         listIndex = index;
-        classTree.setDoABCTags(list);
+        classTree.setDoABCTags(list, swf);
 
         if (index != -1) {
             this.abc = list.get(index).getABC();
@@ -294,33 +310,31 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
     }
 
+    private boolean isFreeing;
+
+    @Override
+    public boolean isFreeing() {
+        return isFreeing;
+    }
+
     @Override
     public void free() {
+        isFreeing = true;
         Helper.emptyObject(this);
     }
 
     @SuppressWarnings("unchecked")
-    public ABCPanel(List<ABCContainerTag> list, SWF swf) {
+    public ABCPanel(MainFrame mainFrame) {
         DefaultSyntaxKit.initKit();
 
-        this.list = list;
-        if (list.size() > 0) {
-            this.abc = list.get(0).getABC();
-        }
+        this.mainFrame = mainFrame;
         setLayout(new BorderLayout());
 
-
-
-
-
-
         decompiledTextArea = new DecompiledEditorPane(this);
-
 
         searchPanel = new JPanel(new FlowLayout());
 
         decompiledScrollPane = new JScrollPane(decompiledTextArea);
-
 
         JPanel iconDecPanel = new JPanel();
         iconDecPanel.setLayout(new BoxLayout(iconDecPanel, BoxLayout.Y_AXIS));
@@ -370,10 +384,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
         JPanel pan2 = new JPanel();
         pan2.setLayout(new BorderLayout());
-        pan2.add((abcComboBox = new JComboBox(new ABCComboBoxModel(list))), BorderLayout.NORTH);
+        pan2.add((abcComboBox = new JComboBox(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()))), BorderLayout.NORTH);
 
         navigator = new TraitsList(this);
-        navigator.setABC(list, abc);
 
 
         navPanel = new JPanel(new BorderLayout());
@@ -421,7 +434,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
         JPanel treePanel = new JPanel();
         treePanel.setLayout(new BorderLayout());
-        treePanel.add(new JScrollPane(classTree = new ClassesListTree(list, this, swf)), BorderLayout.CENTER);
+        treePanel.add(new JScrollPane(classTree = new ClassesListTree(this)), BorderLayout.CENTER);
         JPanel filterPanel = new JPanel();
         filterPanel.setLayout(new BorderLayout());
         filterPanel.add(filterField, BorderLayout.CENTER);
@@ -488,7 +501,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         }
         constantTable.setAutoCreateRowSorter(true);
 
-        final List<ABCContainerTag> inlist = list;
         final ABCPanel t = this;
         constantTable.addMouseListener(new MouseAdapter() {
             @Override
@@ -501,7 +513,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                         }
                         int multinameIndex = constantTable.convertRowIndexToModel(rowIndex);
                         if (multinameIndex > 0) {
-                            UsageFrame usageFrame = new UsageFrame(inlist, abc, multinameIndex, t);
+                            UsageFrame usageFrame = new UsageFrame(t.list, abc, multinameIndex, t);
                             usageFrame.setVisible(true);
                         }
                     }
@@ -562,13 +574,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     }
 
     public void hilightScript(ScriptPack pack) {
-        TagTreeModel ttm = (TagTreeModel) Main.mainFrame.tagTree.getModel();
+        TagTreeModel ttm = (TagTreeModel) mainFrame.tagTree.getModel();
         final TreePath tp = ttm.getTagPath(pack);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Main.mainFrame.tagTree.setSelectionPath(tp);
-                Main.mainFrame.tagTree.scrollPathToVisible(tp);
+                mainFrame.tagTree.setSelectionPath(tp);
+                mainFrame.tagTree.scrollPathToVisible(tp);
             }
         });
 

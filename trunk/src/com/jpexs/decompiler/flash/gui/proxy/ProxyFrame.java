@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.proxy;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.proxy.CatchedListener;
 import com.jpexs.proxy.ReplacedListener;
@@ -54,6 +55,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     static final String ACTION_RENAME = "RENAME";
     static final String ACTION_REMOVE = "REMOVE";
 
+    private MainFrame mainFrame;
     private JList swfList;
     private SWFListModel listModel;
     private JButton switchButton = new JButton(translate("proxy.start"));
@@ -86,8 +88,9 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
      * Constructor
      */
     @SuppressWarnings("unchecked")
-    public ProxyFrame() {
+    public ProxyFrame(final MainFrame mainFrame) {
 
+        this.mainFrame = mainFrame;
         listModel = new SWFListModel(Configuration.getReplacements());
         swfList = new JList(listModel);
         swfList.addMouseListener(this);
@@ -152,8 +155,8 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
             public void windowClosing(WindowEvent e) {
                 setVisible(false);
                 Main.removeTrayIcon();
-                if (Main.mainFrame != null) {
-                    if (Main.mainFrame.isVisible()) {
+                if (mainFrame != null) {
+                    if (mainFrame.isVisible()) {
                         return;
                     }
                 }
@@ -177,8 +180,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     private void open() {
         if (swfList.getSelectedIndex() > -1) {
             Replacement r = (Replacement) listModel.getElementAt(swfList.getSelectedIndex());
-            Main.fileTitle = r.urlPattern;
-            Main.openFile(r.targetFile);
+            Main.openFile(r.targetFile, r.urlPattern);
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 JPEXS
+ *  Copyright (C) 2010-2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,32 +16,34 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.TagNode;
-import java.util.List;
+import java.io.InputStream;
 
 /**
  *
  * @author JPEXS
  */
-public class SWFRoot implements TreeNode {
+public class SWFSourceInfo {
 
-    private SWF swf;
-    private String name;
-    public List<TagNode> list;
-
-    public SWFRoot(SWF swf, String name, List<TagNode> list) {
-        this.swf = swf;
-        this.name = name;
-        this.list = list;
+    private InputStream inputStream;
+    private String file;
+    private String fileTitle;
+    
+    public SWFSourceInfo(InputStream inputStream, String file, String fileTitle) {
+        this.inputStream = inputStream;
+        this.file = file;
+        this.fileTitle = fileTitle;
+    }
+    
+    public InputStream getInputStream() {
+        return inputStream;
     }
 
-    public SWF getSwf() {
-        return swf;
+    public String getFile() {
+        return file;
     }
 
-    @Override
-    public String toString() {
-        return name;
+    public String getFileTitle() {
+        return fileTitle;
     }
+
 }

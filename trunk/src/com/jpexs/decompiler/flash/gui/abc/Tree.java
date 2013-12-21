@@ -16,11 +16,16 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.SWF;
 import java.util.StringTokenizer;
 
 public class Tree {
 
-    private final TreeElement ROOT = new TreeElement("", "", null, null);
+    private final TreeElement ROOT;
+    
+    public Tree(SWF swf) {
+        ROOT = new TreeElement(swf, "", "", null, null);
+    }
 
     public void add(String name, String path, Object item) {
         StringTokenizer st = new StringTokenizer(path, ".");

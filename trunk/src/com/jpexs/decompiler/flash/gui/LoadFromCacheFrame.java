@@ -225,7 +225,7 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         CacheEntry en = list.getSelectedValue();
         if (en != null) {
             ReReadableInputStream str = new ReReadableInputStream(en.getResponseDataStream());
-            Main.openFile(entryToFileName(en), str);
+            Main.openFile(str, entryToFileName(en));
         }
     }
 

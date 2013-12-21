@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.View;
-import static com.jpexs.decompiler.flash.gui.abc.NewTraitDialog.ACTION_OK;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.awt.BorderLayout;
 import java.awt.Color;

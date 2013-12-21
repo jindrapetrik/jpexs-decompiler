@@ -51,12 +51,8 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
         scrollPathToVisible(treePath);
     }
 
-    public ClassesListTree(List<ABCContainerTag> list, ABCPanel abcPanel, SWF swf) {
-        this.abcList = list;
-        this.swf = swf;
-        this.treeList = getTreeList(list);
+    public ClassesListTree(ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
-        setModel(new ClassesListTreeModel(this.treeList));
         addTreeSelectionListener(this);
         DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
         ClassLoader cldr = this.getClass().getClassLoader();
@@ -99,19 +95,15 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
         return selectedScripts;
     }
 
-    public List<MyEntry<ClassPath, ScriptPack>> getTreeList(List<ABCContainerTag> list) {
-
-        return swf.getAS3Packs();
-    }
-
-    public void setDoABCTags(List<ABCContainerTag> list) {
+    public void setDoABCTags(List<ABCContainerTag> list, SWF swf) {
         this.abcList = list;
-        this.treeList = getTreeList(list);
-        setModel(new ClassesListTreeModel(this.treeList));
+        this.treeList = swf.getAS3Packs();
+        this.swf = swf;
+        setModel(new ClassesListTreeModel(this.treeList, swf));
     }
 
     public void applyFilter(String filter) {
-        setModel(new ClassesListTreeModel(this.treeList, filter));
+        setModel(new ClassesListTreeModel(this.treeList, swf, filter));
     }
 
     @Override

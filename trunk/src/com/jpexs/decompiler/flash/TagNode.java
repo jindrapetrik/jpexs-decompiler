@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.TreeNode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -65,10 +66,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TagNode {
+public class TagNode implements TreeNode {
 
     public List<TagNode> subItems;
     public Object tag;
+    private SWF swf;
     public boolean export = false;
     public String mark;
 
@@ -81,17 +83,27 @@ public class TagNode {
         return ret;
     }
 
-    public TagNode(Object tag) {
+    public TagNode(ContainerItem containerItem) {
+        this(containerItem, containerItem.getSwf());
+    }
+
+    public TagNode(Object tag, SWF swf) {
+        this.swf = swf;
         this.tag = tag;
         this.subItems = new ArrayList<>();
     }
 
     @Override
+    public SWF getSwf() {
+        return swf;
+    }
+    
+    @Override
     public String toString() {
         return tag.toString();
     }
 
-    public static List<TagNode> createTagList(List<ContainerItem> list) {
+    public static List<TagNode> createTagList(List<ContainerItem> list, SWF swf) {
         List<TagNode> ret = new ArrayList<>();
         int frame = 1;
         List<TagNode> frames = new ArrayList<>();
@@ -105,7 +117,7 @@ public class TagNode {
 
 
         List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
-        for (Object t : list) {
+        for (ContainerItem t : list) {
             if (t instanceof ExportAssetsTag) {
                 exportAssetsTags.add((ExportAssetsTag) t);
             }
@@ -147,7 +159,7 @@ public class TagNode {
                 buttons.add(new TagNode(t));
             }
             if (t instanceof ShowFrameTag) {
-                TagNode tti = new TagNode("frame" + frame);
+                TagNode tti = new TagNode("frame" + frame, t.getSwf());
 
                 /*           for (int r = ret.size() - 1; r >= 0; r--) {
                  if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
@@ -171,35 +183,35 @@ public class TagNode {
                 TagNode tti = new TagNode(t);
                 if (((Container) t).getItemCount() > 0) {
                     List<ContainerItem> subItems = ((Container) t).getSubItems();
-                    tti.subItems = createTagList(subItems);
+                    tti.subItems = createTagList(subItems, t.getSwf());
                 }
                 //ret.add(tti);
             }
         }
 
-        TagNode textsNode = new TagNode("texts");
+        TagNode textsNode = new TagNode("texts", swf);
         textsNode.subItems.addAll(texts);
 
-        TagNode imagesNode = new TagNode("images");
+        TagNode imagesNode = new TagNode("images", swf);
         imagesNode.subItems.addAll(images);
 
-        TagNode fontsNode = new TagNode("fonts");
+        TagNode fontsNode = new TagNode("fonts", swf);
         fontsNode.subItems.addAll(fonts);
 
 
-        TagNode spritesNode = new TagNode("sprites");
+        TagNode spritesNode = new TagNode("sprites", swf);
         spritesNode.subItems.addAll(sprites);
 
-        TagNode shapesNode = new TagNode("shapes");
+        TagNode shapesNode = new TagNode("shapes", swf);
         shapesNode.subItems.addAll(shapes);
 
-        TagNode morphShapesNode = new TagNode("morphshapes");
+        TagNode morphShapesNode = new TagNode("morphshapes", swf);
         morphShapesNode.subItems.addAll(morphShapes);
 
-        TagNode buttonsNode = new TagNode("buttons");
+        TagNode buttonsNode = new TagNode("buttons", swf);
         buttonsNode.subItems.addAll(buttons);
 
-        TagNode framesNode = new TagNode("frames");
+        TagNode framesNode = new TagNode("frames", swf);
         framesNode.subItems.addAll(frames);
         ret.add(shapesNode);
         ret.add(morphShapesNode);;

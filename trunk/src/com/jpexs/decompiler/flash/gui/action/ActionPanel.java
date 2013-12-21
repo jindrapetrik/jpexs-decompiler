@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
@@ -93,6 +94,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
     static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
 
+    private MainFrame mainFrame;
     public LineMarkedEditorPane editor;
     public LineMarkedEditorPane decompiledEditor;
     public List<Tag> list;
@@ -220,7 +222,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         if ((txt != null) && (!txt.isEmpty())) {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
-            List<TagNode> list = SWF.createASTagList(Main.swf.tags, null);
+            List<TagNode> list = SWF.createASTagList(mainFrame.getCurrentSwf().tags, null);
             Map<String, ASMSource> asms = getASMs("", list);
             found = new ArrayList<>();
             Pattern pat = null;
@@ -423,8 +425,9 @@ public class ActionPanel extends JPanel implements ActionListener {
     public void hilightOffset(long offset) {
     }
 
-    public ActionPanel() {
+    public ActionPanel(MainFrame mainFrame) {
         DefaultSyntaxKit.initKit();
+        this.mainFrame = mainFrame;
         editor = new LineMarkedEditorPane();
         editor.setEditable(false);
         decompiledEditor = new LineMarkedEditorPane();
@@ -811,10 +814,10 @@ public class ActionPanel extends JPanel implements ActionListener {
     public void updateSearchPos() {
         searchPos.setText((foundPos + 1) + "/" + found.size());
         setSource(found.get(foundPos), true);
-        TagTreeModel ttm = (TagTreeModel) Main.mainFrame.tagTree.getModel();
+        TagTreeModel ttm = (TagTreeModel) mainFrame.tagTree.getModel();
         TreePath tp = ttm.getTagPath(found.get(foundPos));
-        Main.mainFrame.tagTree.setSelectionPath(tp);
-        Main.mainFrame.tagTree.scrollPathToVisible(tp);
+        mainFrame.tagTree.setSelectionPath(tp);
+        mainFrame.tagTree.scrollPathToVisible(tp);
         decompiledEditor.setCaretPosition(0);
         java.util.Timer t = new java.util.Timer();
         SwingUtilities.invokeLater(new Runnable() {

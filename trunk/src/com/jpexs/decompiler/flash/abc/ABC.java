@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
@@ -66,6 +67,7 @@ public class ABC {
     protected HashSet<EventListener> listeners = new HashSet<>();
     private static final Logger logger = Logger.getLogger(ABC.class.getName());
     private AVM2Deobfuscation deobfuscation;
+    public SWF swf;
 
     public int addMethodBody(MethodBody body) {
         bodies = Arrays.copyOf(bodies, bodies.length + 1);
@@ -304,7 +306,8 @@ public class ABC {
         }
     }
 
-    public ABC(InputStream is) throws IOException {
+    public ABC(InputStream is, SWF swf) throws IOException {
+        this.swf = swf;
         ABCInputStream ais = new ABCInputStream(is);
         minor_version = ais.readU16();
         major_version = ais.readU16();

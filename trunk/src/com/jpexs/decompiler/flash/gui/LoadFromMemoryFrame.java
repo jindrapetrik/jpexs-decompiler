@@ -78,6 +78,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
     static final String ACTION_OPEN_SWF = "OPENSWF";
     static final String ACTION_SAVE = "SAVE";
 
+    private MainFrame mainFrame;
     private List<com.jpexs.process.Process> processlist;
     private List<ReReadableInputStream> foundIs;
     private com.jpexs.process.Process selProcess;
@@ -170,7 +171,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 return;
             }
             str.mark(Integer.MAX_VALUE);
-            Main.openFile("" + selProcess + " [" + (index + 1) + "]", str);
+            Main.openFile(str, selProcess + " [" + (index + 1) + "]");
         }
     }
 
@@ -221,16 +222,18 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
     }
 
     @SuppressWarnings("unchecked")
-    public LoadFromMemoryFrame() {
+    public LoadFromMemoryFrame(final MainFrame mainFrame) {
         setSize(800, 600);
         //setAlwaysOnTop(true);
         setTitle(translate("dialog.title"));
 
+        this.mainFrame = mainFrame;
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (!Main.mainFrame.isVisible()) {
-                    Main.mainFrame.setVisible(true);
+                if (!mainFrame.isVisible()) {
+                    mainFrame.setVisible(true);
                 }
             }
         });

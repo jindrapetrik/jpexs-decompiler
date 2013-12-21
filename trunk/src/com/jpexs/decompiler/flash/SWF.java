@@ -203,6 +203,9 @@ public final class SWF {
      * ScaleForm GFx
      */
     public boolean gfx = false;
+
+    public String file;
+    public String fileTitle;
     
     /**
      * Gets all tags with specified id
@@ -396,6 +399,18 @@ public final class SWF {
             assignClassesToSymbols();
             findFileAttributes();
         }
+    }
+
+    /**
+     * Get title of the file
+     *
+     * @return file title
+     */
+    public String getFileTitle() {
+        if (fileTitle != null) {
+            return fileTitle;
+        }
+        return file;
     }
 
     private void findFileAttributes() {
@@ -781,7 +796,7 @@ public final class SWF {
             }
             TagNode addNode = null;
             if (t instanceof ShowFrameTag) {
-                TagNode tti = new TagNode(new FrameNode(t.getSwf(), frame, parent, false));
+                TagNode tti = new TagNode(new FrameNode(t.getSwf(), frame, parent, false), t.getSwf());
 
                 for (int r = ret.size() - 1; r >= 0; r--) {
                     if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
@@ -856,7 +871,7 @@ public final class SWF {
                             }
                         }
                         if (selNode == null) {
-                            items.add(pkgCount, selNode = new TagNode(new PackageNode(pathParts[pos])));
+                            items.add(pkgCount, selNode = new TagNode(new PackageNode(pathParts[pos]), t.getSwf()));
                         }
                         pos++;
                         if (selNode != null) {

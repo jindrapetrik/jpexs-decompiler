@@ -38,18 +38,21 @@ import javax.swing.tree.TreePath;
 
 public class TagTreeModel implements TreeModel {
 
-    private SWFRoot root;
-    private List<TagNode> list = new ArrayList<>();
+    private TagTreeRoot root = new TagTreeRoot();
+    private List<SWFRoot> swfs;
     private MainFrame mainFrame;
 
     public TagTreeModel(MainFrame mainFrame, List<SWF> swfs, ABCPanel abcPanel) {
         this.mainFrame = mainFrame;
-        SWF swf = swfs.get(0); // todo honfika: add multiple swfs
-        this.root = new SWFRoot(swf, new File(Main.file).getName());
+        this.swfs = new ArrayList<>();
+        for (SWF swf : swfs) {
+            List<ContainerItem> objs = new ArrayList<>();
+            objs.addAll(swf.tags);
+            List<TagNode> list = createTagList(objs, null, abcPanel, swf);
 
-        List<ContainerItem> objs = new ArrayList<>();
-        objs.addAll(swf.tags);
-        this.list = createTagList(objs, null, abcPanel);
+            SWFRoot swfRoot = new SWFRoot(swf, new File(swf.file).getName(), list);
+            this.swfs.add(swfRoot);
+        }
     }
 
     private String translate(String key) {
@@ -63,7 +66,7 @@ public class TagTreeModel implements TreeModel {
             TagType ttype = MainFrame.getTagType(o);
             if (ttype == TagType.SHOW_FRAME && type == TagType.FRAME) {
                 frameCnt++;
-                ret.add(new TagNode(new FrameNode(o.getSwf(), frameCnt, parent, display)));
+                ret.add(new TagNode(new FrameNode(o.getSwf(), frameCnt, parent, display), o.getSwf()));
             } else if (type == ttype) {
                 ret.add(new TagNode(o));
             }
@@ -71,7 +74,7 @@ public class TagTreeModel implements TreeModel {
         return ret;
     }
 
-    private List<TagNode> createTagList(List<ContainerItem> list, Object parent, ABCPanel abcPanel) {
+    private List<TagNode> createTagList(List<ContainerItem> list, Object parent, ABCPanel abcPanel, SWF swf) {
         List<TagNode> ret = new ArrayList<>();
         List<TagNode> frames = getTagNodesWithType(list, TagType.FRAME, parent, true);
         List<TagNode> shapes = getTagNodesWithType(list, TagType.SHAPE, parent, true);
@@ -102,7 +105,7 @@ public class TagTreeModel implements TreeModel {
         }
 
         List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
-        for (Object t : list) {
+        for (ContainerItem t : list) {
             if (t instanceof ExportAssetsTag) {
                 exportAssetsTags.add((ExportAssetsTag) t);
             }
@@ -114,49 +117,49 @@ public class TagTreeModel implements TreeModel {
                 TagNode tti = new TagNode(t);
                 if (((Container) t).getItemCount() > 0) {
                     List<ContainerItem> subItems = ((Container) t).getSubItems();
-                    tti.subItems = createTagList(subItems, t, abcPanel);
+                    tti.subItems = createTagList(subItems, t, abcPanel, t.getSwf());
                 }
                 //ret.add(tti);
             }
         }
 
         actionScript = SWF.createASTagList(list, null);
-        TagNode textsNode = new TagNode(translate("node.texts"));
+        TagNode textsNode = new TagNode(translate("node.texts"), swf);
         textsNode.subItems.addAll(texts);
 
-        TagNode imagesNode = new TagNode(translate("node.images"));
+        TagNode imagesNode = new TagNode(translate("node.images"), swf);
         imagesNode.subItems.addAll(images);
 
-        TagNode moviesNode = new TagNode(translate("node.movies"));
+        TagNode moviesNode = new TagNode(translate("node.movies"), swf);
         moviesNode.subItems.addAll(movies);
 
-        TagNode soundsNode = new TagNode(translate("node.sounds"));
+        TagNode soundsNode = new TagNode(translate("node.sounds"), swf);
         soundsNode.subItems.addAll(sounds);
 
 
-        TagNode binaryDataNode = new TagNode(translate("node.binaryData"));
+        TagNode binaryDataNode = new TagNode(translate("node.binaryData"), swf);
         binaryDataNode.subItems.addAll(binaryData);
 
-        TagNode fontsNode = new TagNode(translate("node.fonts"));
+        TagNode fontsNode = new TagNode(translate("node.fonts"), swf);
         fontsNode.subItems.addAll(fonts);
 
 
-        TagNode spritesNode = new TagNode(translate("node.sprites"));
+        TagNode spritesNode = new TagNode(translate("node.sprites"), swf);
         spritesNode.subItems.addAll(sprites);
 
-        TagNode shapesNode = new TagNode(translate("node.shapes"));
+        TagNode shapesNode = new TagNode(translate("node.shapes"), swf);
         shapesNode.subItems.addAll(shapes);
 
-        TagNode morphShapesNode = new TagNode(translate("node.morphshapes"));
+        TagNode morphShapesNode = new TagNode(translate("node.morphshapes"), swf);
         morphShapesNode.subItems.addAll(morphShapes);
 
-        TagNode buttonsNode = new TagNode(translate("node.buttons"));
+        TagNode buttonsNode = new TagNode(translate("node.buttons"), swf);
         buttonsNode.subItems.addAll(buttons);
 
-        TagNode framesNode = new TagNode(translate("node.frames"));
+        TagNode framesNode = new TagNode(translate("node.frames"), swf);
         framesNode.subItems.addAll(frames);
 
-        TagNode actionScriptNode = new TagNode(translate("node.scripts"));
+        TagNode actionScriptNode = new TagNode(translate("node.scripts"), swf);
         actionScriptNode.mark = "scripts";
         actionScriptNode.subItems.addAll(actionScript);
 
@@ -243,17 +246,13 @@ public class TagTreeModel implements TreeModel {
         return tp;
     }
 
-    public List<TagNode> getNodeList() {
-        return list;
-    }
-
     @Override
     public Object getRoot() {
         return root;
     }
 
     @Override
-    public Object getChild(Object parent, int index) {
+    public TreeNode getChild(Object parent, int index) {
         if (parent instanceof TagNode) {
             if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
                 ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
@@ -263,29 +262,29 @@ public class TagTreeModel implements TreeModel {
             return ((TreeElement) parent).getChild(index);
         }
         if (parent == root) {
-            return list.get(index);
-        } else {
-            return ((TagNode) parent).subItems.get(index);
+            return swfs.get(index);
+        } else if (parent instanceof SWFRoot) {
+            return ((SWFRoot) parent).list.get(index);
         }
+        return ((TagNode) parent).subItems.get(index);
     }
 
     @Override
     public int getChildCount(Object parent) {
         if (parent == root) {
-            return list.size();
-        } else {
-            if (parent instanceof TagNode) {
-                if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
-                    ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
-                    return clt.getChildCount(clt.getRoot());
-                }
-                return ((TagNode) parent).subItems.size();
-            } else if (parent instanceof TreeElement) {
-                return ((TreeElement) parent).getChildCount();
+            return swfs.size();
+        } else if (parent instanceof TagNode) {
+            if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
+                ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
+                return clt.getChildCount(clt.getRoot());
             }
-            return 0;
-
+            return ((TagNode) parent).subItems.size();
+        } else if (parent instanceof TreeElement) {
+            return ((TreeElement) parent).getChildCount();
+        } else if (parent instanceof SWFRoot) {
+            return ((SWFRoot) parent).list.size();
         }
+        return 0;
     }
 
     @Override
@@ -306,27 +305,16 @@ public class TagTreeModel implements TreeModel {
             }
         }
         if (parent == root) {
-            for (int t = 0; t < list.size(); t++) {
-                if (list.get(t) == child) {
-                    return t;
-                }
-            }
-            return -1;
-        } else {
-            if (parent instanceof TagNode) {
-                List<TagNode> subTags = ((TagNode) parent).subItems;
-                for (int t = 0; t < subTags.size(); t++) {
-                    if (subTags.get(t) == child) {
-                        return t;
-                    }
-                }
-            }
-            if (parent instanceof TreeElement) {
-                return ((TreeElement) parent).getIndexOfChild((TreeElement) child);
-            }
-
-            return -1;
+            return swfs.indexOf(child);
+        } else if (parent instanceof TagNode) {
+            List<TagNode> subTags = ((TagNode) parent).subItems;
+            return subTags.indexOf(child);
+        } else if (parent instanceof TreeElement) {
+            return ((TreeElement) parent).getIndexOfChild((TreeElement) child);
+        } else if (parent instanceof SWFRoot) {
+            return ((SWFRoot) parent).list.indexOf(child);
         }
+        return -1;
     }
 
     @Override
