@@ -79,6 +79,7 @@ class ClassIndexVisitor implements TreeVisitor {
 
 public class ClassesListTreeModel implements TreeModel, TreeElementItem {
 
+    private SWF swf;
     private Tree classTree;
     private List<MyEntry<ClassPath, ScriptPack>> list;
 
@@ -89,8 +90,14 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
     public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list, SWF swf) {
         this(list, swf, null);
     }
-
+    
     public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list, SWF swf, String filter) {
+        this.swf = swf;
+        this.list = list;
+        setFilter(filter);
+    }
+    
+    public final void setFilter(String filter) {
         classTree = new Tree(swf);
         for (MyEntry<ClassPath, ScriptPack> item : list) {
             if (filter != null) {
@@ -104,8 +111,6 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
             //String packageName = path.contains(".") ? path.substring(0, path.lastIndexOf(".")) : "";
             classTree.add(item.key.className, item.key.packageStr, item.value);
         }
-        this.list = list;
-
     }
 
     public Object getItemByPath(String fullPath) {

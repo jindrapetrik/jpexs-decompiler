@@ -16,14 +16,21 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
+
 /**
  *
  * @author JPEXS
  */
-public class TagTreeRoot {
+public class TagTreeRoot implements TreeNode {
     
     @Override
     public String toString() {
         return "root";
+    }
+
+    @Override
+    public SWF getSwf() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

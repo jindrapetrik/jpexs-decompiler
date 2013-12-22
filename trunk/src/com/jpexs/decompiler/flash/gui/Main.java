@@ -40,6 +40,7 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -191,13 +192,35 @@ public class Main {
 
     public static SWF parseSWF(SWFSourceInfo sourceInfo) throws Exception {
         SWF locswf;
-        InputStream fis = sourceInfo.getInputStream();
-        locswf = new SWF(fis, new ProgressListener() {
+    
+        InputStream inputStream = sourceInfo.getInputStream();
+        if (inputStream == null) {
+            inputStream = new FileInputStream(sourceInfo.getFile());
+        } else if (inputStream instanceof SeekableInputStream) {
+            try {
+                ((SeekableInputStream) inputStream).seek(0);
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if (inputStream instanceof BufferedInputStream) {
+            try {
+                ((BufferedInputStream) inputStream).reset();
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        locswf = new SWF(inputStream, new ProgressListener() {
             @Override
             public void progress(int p) {
                 startWork(AppStrings.translate("work.reading.swf"), p);
             }
         }, Configuration.parallelSpeedUp.get());
+        
+        if (inputStream instanceof FileInputStream) {
+            inputStream.close();
+        }
+        
         locswf.sourceInfo = sourceInfo;
         locswf.file = sourceInfo.getFile();
         locswf.fileTitle = sourceInfo.getFileTitle();
@@ -242,51 +265,52 @@ public class Main {
 
     private static class OpenFileWorker extends SwingWorker {
 
-        private SWFSourceInfo sourceInfo;
+        private SWFSourceInfo[] sourceInfos;
         
         public OpenFileWorker(SWFSourceInfo sourceInfo) {
-            this.sourceInfo = sourceInfo;
+            this.sourceInfos = new SWFSourceInfo[] { sourceInfo };
+        }
+
+        public OpenFileWorker(SWFSourceInfo[] sourceInfos) {
+            this.sourceInfos = sourceInfos;
         }
 
         @Override
         protected Object doInBackground() throws Exception {
-            SWF swf = null;
-            try {
-                Main.startWork(AppStrings.translate("work.reading.swf") + "...");
-                InputStream inputStream = sourceInfo.getInputStream();
-                swf = parseSWF(sourceInfo);
-                if (inputStream instanceof FileInputStream) {
-                    inputStream.close();
+            for (SWFSourceInfo sourceInfo : sourceInfos) {
+                SWF swf = null;
+                try {
+                    Main.startWork(AppStrings.translate("work.reading.swf") + "...");
+                    swf = parseSWF(sourceInfo);
+                } catch (OutOfMemoryError ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    View.showMessageDialog(null, "Cannot load SWF file. Out of memory.");
+                } catch (Exception ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    View.showMessageDialog(null, "Cannot load SWF file.");
                 }
-            } catch (OutOfMemoryError ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                View.showMessageDialog(null, "Cannot load SWF file. Out of memory.");
-                loadingDialog.setVisible(false);
-            } catch (Exception ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                View.showMessageDialog(null, "Cannot load SWF file.");
-                loadingDialog.setVisible(false);
+
+                final SWF swf1 = swf;
+                try {
+                    Main.startWork(AppStrings.translate("work.creatingwindow") + "...");
+                    View.execInEventDispatch(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mainFrame == null) {
+                                mainFrame = new MainFrame();
+                            }
+                            mainFrame.load(swf1);
+                            if (errorState) {
+                                mainFrame.setErrorState();
+                            }
+                        }
+                    });
+
+                } catch (Exception ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
 
-            final SWF swf1 = swf;
-            try {
-                Main.startWork(AppStrings.translate("work.creatingwindow") + "...");
-                View.execInEventDispatch(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mainFrame == null) {
-                            mainFrame = new MainFrame();
-                        }
-                        mainFrame.load(swf1);
-                        if (errorState) {
-                            mainFrame.setErrorState();
-                        }
-                    }
-                });
-
-            } catch (Exception ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            }
             loadingDialog.setVisible(false);
             View.execInEventDispatch(new Runnable() {
                 @Override
@@ -304,6 +328,7 @@ public class Main {
 
     public static boolean reloadSWFs() {
         CancellableWorker.cancelBackgroundThreads();
+        mainFrame.closeAll();
         if (Main.sourceInfos.isEmpty()) {
             Cache.clearAll();
             System.gc();
@@ -312,27 +337,9 @@ public class Main {
         } else {
             SWFSourceInfo[] sourceInfosCopy = new SWFSourceInfo[sourceInfos.size()];
             sourceInfos.toArray(sourceInfosCopy);
-            for (SWFSourceInfo sourceInfo : sourceInfosCopy) {
-                InputStream inputStream = sourceInfo.getInputStream();
-                if (inputStream instanceof FileInputStream) {
-                    openFile(sourceInfo.getFile(), null);
-                } else if (inputStream instanceof SeekableInputStream) {
-                    try {
-                        ((SeekableInputStream) inputStream).seek(0);
-                    } catch (IOException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    return openFile(inputStream, sourceInfo.getFileTitle()) == OpenFileResult.OK;
-                } else if (inputStream instanceof BufferedInputStream) {
-                    try {
-                        ((BufferedInputStream) inputStream).reset();
-                    } catch (IOException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    return openFile(inputStream, sourceInfo.getFileTitle()) == OpenFileResult.OK;
-                }
-            }
-            return false;
+            sourceInfos.clear();
+            openFile(sourceInfosCopy);
+            return true;
         }
     }
 
@@ -363,14 +370,15 @@ public class Main {
     public static OpenFileResult openFile(String swfFile, String fileTitle) {
         try {
             File file = new File(swfFile);
+            if (!file.exists()) {
+                View.showMessageDialog(null, "File not found", "Error", JOptionPane.ERROR_MESSAGE);
+                return OpenFileResult.NOT_FOUND;
+            }
             swfFile = file.getCanonicalPath();
             Configuration.addRecentFile(swfFile);
-            SWFSourceInfo sourceInfo = new SWFSourceInfo(new FileInputStream(swfFile), swfFile, fileTitle);
+            SWFSourceInfo sourceInfo = new SWFSourceInfo(null, swfFile, fileTitle);
             OpenFileResult openResult = openFile(sourceInfo);
             return openResult;
-        } catch (FileNotFoundException ex) {
-            View.showMessageDialog(null, "File not found", "Error", JOptionPane.ERROR_MESSAGE);
-            return OpenFileResult.NOT_FOUND;
         } catch (IOException ex) {
             View.showMessageDialog(null, "Cannot open file", "Error", JOptionPane.ERROR_MESSAGE);
             return OpenFileResult.ERROR;
@@ -378,6 +386,10 @@ public class Main {
     }
 
     public static OpenFileResult openFile(SWFSourceInfo sourceInfo) {
+        return openFile(new SWFSourceInfo[] { sourceInfo });
+    }
+    
+    public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos) {
         if (mainFrame != null && !Configuration.openMultiple.get()) {
             sourceInfos.clear();
             mainFrame.closeAll();
@@ -396,9 +408,9 @@ public class Main {
         });
 
         Main.loadingDialog.setVisible(true);
-        OpenFileWorker wrk = new OpenFileWorker(sourceInfo);
+        OpenFileWorker wrk = new OpenFileWorker(newSourceInfos);
         wrk.execute();
-        sourceInfos.add(sourceInfo);
+        sourceInfos.addAll(Arrays.asList(newSourceInfos));
         return OpenFileResult.OK;
     }
     

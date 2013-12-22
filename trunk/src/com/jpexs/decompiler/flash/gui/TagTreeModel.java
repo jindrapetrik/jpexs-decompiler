@@ -49,7 +49,7 @@ public class TagTreeModel implements TreeModel {
         for (SWF swf : swfs) {
             List<ContainerItem> objs = new ArrayList<>();
             objs.addAll(swf.tags);
-            List<TagNode> list = createTagList(objs, null, abcPanel, swf);
+            List<TagNode> list = createTagList(objs, null, swf);
 
             SWFRoot swfRoot = new SWFRoot(swf, new File(swf.file).getName(), list);
             this.swfs.add(swfRoot);
@@ -75,7 +75,7 @@ public class TagTreeModel implements TreeModel {
         return ret;
     }
 
-    private List<TagNode> createTagList(List<ContainerItem> list, Object parent, ABCPanel abcPanel, SWF swf) {
+    private List<TagNode> createTagList(List<ContainerItem> list, Object parent, SWF swf) {
         List<TagNode> ret = new ArrayList<>();
         List<TagNode> frames = getTagNodesWithType(list, TagType.FRAME, parent, true);
         List<TagNode> shapes = getTagNodesWithType(list, TagType.SHAPE, parent, true);
@@ -88,7 +88,6 @@ public class TagTreeModel implements TreeModel {
         List<TagNode> movies = getTagNodesWithType(list, TagType.MOVIE, parent, true);
         List<TagNode> sounds = getTagNodesWithType(list, TagType.SOUND, parent, true);
         List<TagNode> binaryData = getTagNodesWithType(list, TagType.BINARY_DATA, parent, true);
-        List<TagNode> actionScript = new ArrayList<>();
 
         for (int i = 0; i < sounds.size(); i++) {
             if (sounds.get(i).tag instanceof SoundStreamHeadTypeTag) {
@@ -118,13 +117,13 @@ public class TagTreeModel implements TreeModel {
                 TagNode tti = new TagNode(t, t.getSwf());
                 if (((Container) t).getItemCount() > 0) {
                     List<ContainerItem> subItems = ((Container) t).getSubItems();
-                    tti.subItems = createTagList(subItems, t, abcPanel, t.getSwf());
+                    tti.subItems = createTagList(subItems, t, swf);
                 }
                 //ret.add(tti);
             }
         }
 
-        actionScript = SWF.createASTagList(list, null);
+        List<TagNode> actionScript = SWF.createASTagList(list, null);
         TagNode textsNode = new TagNode(new StringNode(translate("node.texts")), swf);
         textsNode.subItems.addAll(texts);
 
@@ -198,11 +197,13 @@ public class TagTreeModel implements TreeModel {
             ret.add(framesNode);
         }
 
-        if (abcPanel != null) {
+        boolean hasAbc = swf.abcList != null && !swf.abcList.isEmpty();
+        
+        if (hasAbc) {
             actionScriptNode.subItems.clear();
-            actionScriptNode.tag = abcPanel.classTree.getModel();
+            actionScriptNode.tag = swf.classTreeModel;
         }
-        if ((!actionScriptNode.subItems.isEmpty()) || (abcPanel != null)) {
+        if ((!actionScriptNode.subItems.isEmpty()) || hasAbc) {
             ret.add(actionScriptNode);
         }
 
@@ -248,7 +249,7 @@ public class TagTreeModel implements TreeModel {
     }
 
     @Override
-    public Object getRoot() {
+    public TreeNode getRoot() {
         return root;
     }
 

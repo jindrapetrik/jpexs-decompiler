@@ -1009,6 +1009,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             actionPanel.clearSource();
         }
         updateUi();
+        updateTagTree();
     }
 
     public void close(SWF swf) {
@@ -1019,6 +1020,12 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         actionPanel.clearSource();
         oldValue = null;
         updateUi();
+        updateTagTree();
+    }
+    
+    private void updateTagTree() {
+        tagTree.setModel(new TagTreeModel(this, swfs, null));
+        expandSwfRoots();
     }
 
     public void enableDrop(boolean value) {
@@ -1048,7 +1055,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         boolean updateNeeded = false;
         for (TagNode n : nodes) {
             if (n.tag instanceof ClassesListTreeModel) {
-                n.tag = new ClassesListTreeModel(abcPanel.classTree.treeList, n.getSwf(), filterField.getText());
+                ((ClassesListTreeModel) n.tag).setFilter(filterField.getText());
                 updateNeeded = true;
             }
         }
@@ -1473,19 +1480,21 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
     public List<TagNode> getASTagNode(JTree tree) {
         List<TagNode> result = new ArrayList<>();
-        TreeModel tm = tree.getModel();
+        TagTreeModel tm = (TagTreeModel) tree.getModel();
         if (tm == null) {
             return result;
         }
-        Object root = tm.getRoot();
-        for (int i = 0; i < tm.getChildCount(root); i++) {
-            Object node = tm.getChild(root, i);
-            if (node instanceof TagNode) {
-                Object tag = ((TagNode) tm.getChild(root, i)).tag;
-                if (tag != null) {
-                    if ("scripts".equals(((TagNode) node).mark)) {
+        TreeNode root = tm.getRoot();
+        for (int j = 0; j < tm.getChildCount(root); j++) {
+            SWFRoot swfRoot = (SWFRoot) tm.getChild(root, j);
+                for (int i = 0; i < tm.getChildCount(swfRoot); i++) {
+                TreeNode node = tm.getChild(swfRoot, i);
+                if (node instanceof TagNode) {
+                    TagNode tagNode = (TagNode) node;
+                    TreeElementItem tag = tagNode.tag;
+                    if (tag != null && "scripts".equals(tagNode.mark)) {
                         result.add((TagNode) node);
-                    }
+                    } 
                 }
             }
         }

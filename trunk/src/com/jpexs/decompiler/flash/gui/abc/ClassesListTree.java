@@ -38,7 +38,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 public final class ClassesListTree extends JTree implements TreeSelectionListener {
 
-    private List<ABCContainerTag> abcList;
     public List<MyEntry<ClassPath, ScriptPack>> treeList;
     private ABCPanel abcPanel;
     private SWF swf;
@@ -55,7 +54,6 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
         this.abcPanel = abcPanel;
         addTreeSelectionListener(this);
         DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
-        ClassLoader cldr = this.getClass().getClassLoader();
         treeRenderer.setLeafIcon(View.getIcon("as16"));
         setCellRenderer(treeRenderer);
     }
@@ -96,21 +94,21 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
     }
 
     public void clearDoABCTags() {
-        this.abcList = null;
         this.treeList = null;
         this.swf = null;
         setModel(null);
     }
 
     public void setDoABCTags(List<ABCContainerTag> list, SWF swf) {
-        this.abcList = list;
         this.treeList = swf.getAS3Packs();
         this.swf = swf;
-        setModel(new ClassesListTreeModel(this.treeList, swf));
+        ClassesListTreeModel model = new ClassesListTreeModel(this.treeList, swf);
+        this.swf.classTreeModel = model;
+        setModel(model);
     }
 
     public void applyFilter(String filter) {
-        setModel(new ClassesListTreeModel(this.treeList, swf, filter));
+        getModel().setFilter(filter);
     }
 
     @Override
@@ -142,10 +140,10 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
                                 break;
                             }
                         }
-                        abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
+                        abcPanel.navigator.setABC(swf.abcList, scriptLeaf.abc);
                         abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
                         abcPanel.setAbc(scriptLeaf.abc);
-                        abcPanel.decompiledTextArea.setScript(scriptLeaf, abcList);
+                        abcPanel.decompiledTextArea.setScript(scriptLeaf, swf.abcList);
                         abcPanel.decompiledTextArea.setClassIndex(classIndex);
                         abcPanel.decompiledTextArea.setNoTrait();
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
