@@ -215,6 +215,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private DeobfuscationDialog deobfuscationDialog;
     public JTree tagTree;
     private FlashPlayerPanel flashPanel;
+    private JPanel contentPanel;
     private JPanel displayPanel;
     private ImagePanel imagePanel;
     private ImagePanel previewImagePanel;
@@ -233,6 +234,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private static final String CARDFONTPANEL = "Font card";
     private static final String FLASH_VIEWER_CARD = "FLASHVIEWER";
     private static final String INTERNAL_VIEWER_CARD = "INTERNALVIEWER";
+    private static final String SPLIT_PANE1 = "SPLITPANE1";
+    private static final String WELCOME_PANEL = "WELCOMEPANEL";
     private LineMarkedEditorPane textValue;
     private JSplitPane splitPane1;
     private JSplitPane splitPane2;
@@ -351,6 +354,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                 allSelectedIsTag = false;
                                 break;
                             }
+                        } else {
+                            allSelectedIsTag = false;
                         }
                     }
 
@@ -896,6 +901,13 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             }
         });
 
+        CardLayout cl3 = new CardLayout();
+        contentPanel = new JPanel(cl3);
+        contentPanel.add(welcomePanel, WELCOME_PANEL);
+        contentPanel.add(splitPane1, SPLIT_PANE1);
+        cnt.add(contentPanel);
+        cl3.show(contentPanel, WELCOME_PANEL);
+        
         View.centerScreen(this);
         tagTree.addKeyListener(new KeyAdapter() {
             @Override
@@ -974,9 +986,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
 
         if (isWelcomeScreen) {
-            java.awt.Container cnt = getContentPane();
-            cnt.remove(welcomePanel);
-            cnt.add(splitPane1, BorderLayout.CENTER);
+            CardLayout cl = (CardLayout) (contentPanel.getLayout());
+            cl.show(contentPanel, SPLIT_PANE1);
             isWelcomeScreen = false;
         }
         
@@ -985,9 +996,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     
     private void updateUi() {
         if (!isWelcomeScreen) {
-            java.awt.Container cnt = getContentPane();
-            cnt.remove(splitPane1);
-            cnt.add(welcomePanel, BorderLayout.CENTER);
+            CardLayout cl = (CardLayout) (contentPanel.getLayout());
+            cl.show(contentPanel, WELCOME_PANEL);
             isWelcomeScreen = true;
         }
         
@@ -1017,7 +1027,9 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         if (abcPanel != null && abcPanel.swf == swf) {
             abcPanel.clearSwf();
         }
-        actionPanel.clearSource();
+        if (actionPanel != null) {
+            actionPanel.clearSource();
+        }
         oldValue = null;
         updateUi();
         updateTagTree();

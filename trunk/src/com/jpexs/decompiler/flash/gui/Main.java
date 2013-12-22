@@ -328,7 +328,9 @@ public class Main {
 
     public static boolean reloadSWFs() {
         CancellableWorker.cancelBackgroundThreads();
-        mainFrame.closeAll();
+        if (mainFrame != null) {
+            mainFrame.closeAll();
+        }
         if (Main.sourceInfos.isEmpty()) {
             Cache.clearAll();
             System.gc();
