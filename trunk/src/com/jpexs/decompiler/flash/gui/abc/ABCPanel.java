@@ -269,9 +269,21 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     }
 
     @SuppressWarnings("unchecked")
+    public void clearSwf() {
+        this.list = null;
+        this.swf = null;
+        this.abc = null;
+        constantTable.setModel(new DefaultTableModel());
+        classTree.clearDoABCTags();
+        abcComboBox.setModel(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()));
+        navigator.clearABC();
+    }
+    
+    @SuppressWarnings("unchecked")
     public void setSwf(List<ABCContainerTag> list, SWF swf) {
         this.list = list;
         this.swf = swf;
+        listIndex = -1;
         switchAbc(0); // todo honika: do we need this?
         abcComboBox.setModel(new ABCComboBoxModel(list));
         if (list.size() > 0) {

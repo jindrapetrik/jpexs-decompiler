@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.TreeNode;
+import com.jpexs.decompiler.flash.gui.abc.TreeElementItem;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -69,7 +70,7 @@ import java.util.logging.Logger;
 public class TagNode implements TreeNode {
 
     public List<TagNode> subItems;
-    public Object tag;
+    public TreeElementItem tag;
     private SWF swf;
     public boolean export = false;
     public String mark;
@@ -83,11 +84,11 @@ public class TagNode implements TreeNode {
         return ret;
     }
 
-    public TagNode(ContainerItem containerItem) {
-        this(containerItem, containerItem.getSwf());
+    public TagNode(Tag tag) {
+        this(tag, tag.getSwf());
     }
 
-    public TagNode(Object tag, SWF swf) {
+    public TagNode(TreeElementItem tag, SWF swf) {
         this.swf = swf;
         this.tag = tag;
         this.subItems = new ArrayList<>();
@@ -125,12 +126,12 @@ public class TagNode implements TreeNode {
                     || (t instanceof DefineFont2Tag)
                     || (t instanceof DefineFont3Tag)
                     || (t instanceof DefineFont4Tag)) {
-                fonts.add(new TagNode(t));
+                fonts.add(new TagNode(t, t.getSwf()));
             }
             if ((t instanceof DefineTextTag)
                     || (t instanceof DefineText2Tag)
                     || (t instanceof DefineEditTextTag)) {
-                texts.add(new TagNode(t));
+                texts.add(new TagNode(t, t.getSwf()));
             }
 
             if ((t instanceof DefineBitsTag)
@@ -139,27 +140,27 @@ public class TagNode implements TreeNode {
                     || (t instanceof DefineBitsJPEG4Tag)
                     || (t instanceof DefineBitsLosslessTag)
                     || (t instanceof DefineBitsLossless2Tag)) {
-                images.add(new TagNode(t));
+                images.add(new TagNode(t, t.getSwf()));
             }
             if ((t instanceof DefineShapeTag)
                     || (t instanceof DefineShape2Tag)
                     || (t instanceof DefineShape3Tag)
                     || (t instanceof DefineShape4Tag)) {
-                shapes.add(new TagNode(t));
+                shapes.add(new TagNode(t, t.getSwf()));
             }
 
             if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
-                morphShapes.add(new TagNode(t));
+                morphShapes.add(new TagNode(t, t.getSwf()));
             }
 
             if (t instanceof DefineSpriteTag) {
-                sprites.add(new TagNode(t));
+                sprites.add(new TagNode(t, t.getSwf()));
             }
             if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
-                buttons.add(new TagNode(t));
+                buttons.add(new TagNode(t, t.getSwf()));
             }
             if (t instanceof ShowFrameTag) {
-                TagNode tti = new TagNode("frame" + frame, t.getSwf());
+                TagNode tti = new TagNode(new StringNode("frame" + frame), t.getSwf());
 
                 /*           for (int r = ret.size() - 1; r >= 0; r--) {
                  if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
@@ -180,7 +181,7 @@ public class TagNode implements TreeNode {
              ret.add(tti);
              } else */
             if (t instanceof Container) {
-                TagNode tti = new TagNode(t);
+                TagNode tti = new TagNode(t, t.getSwf());
                 if (((Container) t).getItemCount() > 0) {
                     List<ContainerItem> subItems = ((Container) t).getSubItems();
                     tti.subItems = createTagList(subItems, t.getSwf());
@@ -189,29 +190,29 @@ public class TagNode implements TreeNode {
             }
         }
 
-        TagNode textsNode = new TagNode("texts", swf);
+        TagNode textsNode = new TagNode(new StringNode("texts"), swf);
         textsNode.subItems.addAll(texts);
 
-        TagNode imagesNode = new TagNode("images", swf);
+        TagNode imagesNode = new TagNode(new StringNode("images"), swf);
         imagesNode.subItems.addAll(images);
 
-        TagNode fontsNode = new TagNode("fonts", swf);
+        TagNode fontsNode = new TagNode(new StringNode("fonts"), swf);
         fontsNode.subItems.addAll(fonts);
 
 
-        TagNode spritesNode = new TagNode("sprites", swf);
+        TagNode spritesNode = new TagNode(new StringNode("sprites"), swf);
         spritesNode.subItems.addAll(sprites);
 
-        TagNode shapesNode = new TagNode("shapes", swf);
+        TagNode shapesNode = new TagNode(new StringNode("shapes"), swf);
         shapesNode.subItems.addAll(shapes);
 
-        TagNode morphShapesNode = new TagNode("morphshapes", swf);
+        TagNode morphShapesNode = new TagNode(new StringNode("morphshapes"), swf);
         morphShapesNode.subItems.addAll(morphShapes);
 
-        TagNode buttonsNode = new TagNode("buttons", swf);
+        TagNode buttonsNode = new TagNode(new StringNode("buttons"), swf);
         buttonsNode.subItems.addAll(buttons);
 
-        TagNode framesNode = new TagNode("frames", swf);
+        TagNode framesNode = new TagNode(new StringNode("frames"), swf);
         framesNode.subItems.addAll(frames);
         ret.add(shapesNode);
         ret.add(morphShapesNode);;

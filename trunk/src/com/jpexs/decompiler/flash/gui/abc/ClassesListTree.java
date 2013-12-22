@@ -95,6 +95,13 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
         return selectedScripts;
     }
 
+    public void clearDoABCTags() {
+        this.abcList = null;
+        this.treeList = null;
+        this.swf = null;
+        setModel(null);
+    }
+
     public void setDoABCTags(List<ABCContainerTag> list, SWF swf) {
         this.abcList = list;
         this.treeList = swf.getAS3Packs();
@@ -106,6 +113,11 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
         setModel(new ClassesListTreeModel(this.treeList, swf, filter));
     }
 
+    @Override
+    public ClassesListTreeModel getModel() {
+        return (ClassesListTreeModel) super.getModel();
+    }
+    
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         if (Main.isWorking()) {

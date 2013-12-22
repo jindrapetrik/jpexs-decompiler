@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.StringNode;
 import com.jpexs.decompiler.flash.TagNode;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
@@ -68,7 +69,7 @@ public class TagTreeModel implements TreeModel {
                 frameCnt++;
                 ret.add(new TagNode(new FrameNode(o.getSwf(), frameCnt, parent, display), o.getSwf()));
             } else if (type == ttype) {
-                ret.add(new TagNode(o));
+                ret.add(new TagNode(o, o.getSwf()));
             }
         }
         return ret;
@@ -114,7 +115,7 @@ public class TagTreeModel implements TreeModel {
              ret.add(tti);
              } else */
             if (t instanceof Container) {
-                TagNode tti = new TagNode(t);
+                TagNode tti = new TagNode(t, t.getSwf());
                 if (((Container) t).getItemCount() > 0) {
                     List<ContainerItem> subItems = ((Container) t).getSubItems();
                     tti.subItems = createTagList(subItems, t, abcPanel, t.getSwf());
@@ -124,42 +125,42 @@ public class TagTreeModel implements TreeModel {
         }
 
         actionScript = SWF.createASTagList(list, null);
-        TagNode textsNode = new TagNode(translate("node.texts"), swf);
+        TagNode textsNode = new TagNode(new StringNode(translate("node.texts")), swf);
         textsNode.subItems.addAll(texts);
 
-        TagNode imagesNode = new TagNode(translate("node.images"), swf);
+        TagNode imagesNode = new TagNode(new StringNode(translate("node.images")), swf);
         imagesNode.subItems.addAll(images);
 
-        TagNode moviesNode = new TagNode(translate("node.movies"), swf);
+        TagNode moviesNode = new TagNode(new StringNode(translate("node.movies")), swf);
         moviesNode.subItems.addAll(movies);
 
-        TagNode soundsNode = new TagNode(translate("node.sounds"), swf);
+        TagNode soundsNode = new TagNode(new StringNode(translate("node.sounds")), swf);
         soundsNode.subItems.addAll(sounds);
 
 
-        TagNode binaryDataNode = new TagNode(translate("node.binaryData"), swf);
+        TagNode binaryDataNode = new TagNode(new StringNode(translate("node.binaryData")), swf);
         binaryDataNode.subItems.addAll(binaryData);
 
-        TagNode fontsNode = new TagNode(translate("node.fonts"), swf);
+        TagNode fontsNode = new TagNode(new StringNode(translate("node.fonts")), swf);
         fontsNode.subItems.addAll(fonts);
 
 
-        TagNode spritesNode = new TagNode(translate("node.sprites"), swf);
+        TagNode spritesNode = new TagNode(new StringNode(translate("node.sprites")), swf);
         spritesNode.subItems.addAll(sprites);
 
-        TagNode shapesNode = new TagNode(translate("node.shapes"), swf);
+        TagNode shapesNode = new TagNode(new StringNode(translate("node.shapes")), swf);
         shapesNode.subItems.addAll(shapes);
 
-        TagNode morphShapesNode = new TagNode(translate("node.morphshapes"), swf);
+        TagNode morphShapesNode = new TagNode(new StringNode(translate("node.morphshapes")), swf);
         morphShapesNode.subItems.addAll(morphShapes);
 
-        TagNode buttonsNode = new TagNode(translate("node.buttons"), swf);
+        TagNode buttonsNode = new TagNode(new StringNode(translate("node.buttons")), swf);
         buttonsNode.subItems.addAll(buttons);
 
-        TagNode framesNode = new TagNode(translate("node.frames"), swf);
+        TagNode framesNode = new TagNode(new StringNode(translate("node.frames")), swf);
         framesNode.subItems.addAll(frames);
 
-        TagNode actionScriptNode = new TagNode(translate("node.scripts"), swf);
+        TagNode actionScriptNode = new TagNode(new StringNode(translate("node.scripts")), swf);
         actionScriptNode.mark = "scripts";
         actionScriptNode.subItems.addAll(actionScript);
 

@@ -40,8 +40,8 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -185,19 +185,22 @@ public class Main {
     }
 
     public static SWF parseSWF(String file) throws Exception {
-        return parseSWF(new FileInputStream(file), file, null);
+        SWFSourceInfo sourceInfo = new SWFSourceInfo(new FileInputStream(file), file, null);
+        return parseSWF(sourceInfo);
     }
 
-    public static SWF parseSWF(InputStream fis, String file, String fileTitle) throws Exception {
+    public static SWF parseSWF(SWFSourceInfo sourceInfo) throws Exception {
         SWF locswf;
+        InputStream fis = sourceInfo.getInputStream();
         locswf = new SWF(fis, new ProgressListener() {
             @Override
             public void progress(int p) {
                 startWork(AppStrings.translate("work.reading.swf"), p);
             }
         }, Configuration.parallelSpeedUp.get());
-        locswf.file = file;
-        locswf.fileTitle = fileTitle;
+        locswf.sourceInfo = sourceInfo;
+        locswf.file = sourceInfo.getFile();
+        locswf.fileTitle = sourceInfo.getFileTitle();
         locswf.addEventListener(new EventListener() {
             @Override
             public void handleEvent(String event, Object data) {
@@ -251,7 +254,7 @@ public class Main {
             try {
                 Main.startWork(AppStrings.translate("work.reading.swf") + "...");
                 InputStream inputStream = sourceInfo.getInputStream();
-                swf = parseSWF(inputStream, sourceInfo.getFile(), sourceInfo.getFileTitle());
+                swf = parseSWF(sourceInfo);
                 if (inputStream instanceof FileInputStream) {
                     inputStream.close();
                 }
@@ -350,6 +353,10 @@ public class Main {
             loadFromCacheFrame.setVisible(false);
             loadFromCacheFrame = null;
         }
+        if (mainFrame != null) {
+            mainFrame.setVisible(false);
+            mainFrame = null;
+        }
         reloadSWFs();
     }
 
@@ -372,6 +379,7 @@ public class Main {
 
     public static OpenFileResult openFile(SWFSourceInfo sourceInfo) {
         if (mainFrame != null && !Configuration.openMultiple.get()) {
+            sourceInfos.clear();
             mainFrame.closeAll();
             mainFrame.setVisible(false);
             Cache.clearAll();
@@ -399,6 +407,11 @@ public class Main {
         return openFile(sourceInfo);
     }
 
+    public static void closeFile(SWF swf) {
+       sourceInfos.remove(swf.sourceInfo);
+       mainFrame.close(swf);
+    }
+    
     public static boolean saveFileDialog(SWF swf) {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));

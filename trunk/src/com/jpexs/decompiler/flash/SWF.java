@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
+import com.jpexs.decompiler.flash.gui.SWFSourceInfo;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -66,6 +67,7 @@ import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
@@ -204,9 +206,13 @@ public final class SWF {
      */
     public boolean gfx = false;
 
+    public SWFSourceInfo sourceInfo;
     public String file;
     public String fileTitle;
-    
+    public HashMap<Integer, CharacterTag> characters;
+    public List<ABCContainerTag> abcList;
+    public JPEGTablesTag jtt;
+            
     /**
      * Gets all tags with specified id
      *
@@ -815,13 +821,13 @@ public final class SWF {
                 frame++;
                 frames.add(tti);
             } else if (t instanceof ASMSource) {
-                TagNode tti = new TagNode(t);
+                TagNode tti = new TagNode(t, t.getSwf());
                 //ret.add(tti);
                 addNode = tti;
             } else if (t instanceof Container) {
                 if (((Container) t).getItemCount() > 0) {
 
-                    TagNode tti = new TagNode(t);
+                    TagNode tti = new TagNode(t, t.getSwf());
                     List<ContainerItem> subItems = ((Container) t).getSubItems();
 
                     tti.subItems = createASTagList(subItems, t);

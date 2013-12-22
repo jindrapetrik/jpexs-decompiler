@@ -22,11 +22,11 @@ import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataListener;
 
-public class ABCComboBoxModel implements ComboBoxModel<Object> {
+public class ABCComboBoxModel implements ComboBoxModel<ABCContainerTag> {
 
     public List<ABCContainerTag> list;
     public int itemIndex = 0;
-    public static final String ROOT = " - all - ";
+    public static final ABCContainerTag ROOT = new RootABCContainerTag();
 
     public ABCComboBoxModel(List<ABCContainerTag> list) {
         this.list = list;
@@ -39,7 +39,7 @@ public class ABCComboBoxModel implements ComboBoxModel<Object> {
     }
 
     @Override
-    public Object getElementAt(int index) {
+    public ABCContainerTag getElementAt(int index) {
         if (index == 0) {
             return ROOT;
         }
@@ -64,7 +64,7 @@ public class ABCComboBoxModel implements ComboBoxModel<Object> {
     }
 
     @Override
-    public Object getSelectedItem() {
+    public ABCContainerTag getSelectedItem() {
         return getElementAt(itemIndex);
     }
 }

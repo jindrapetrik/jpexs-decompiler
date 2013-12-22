@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.gui.abc.TreeElementItem;
+
 /**
  *
  * @author JPEXS
  */
-public class PackageNode {
+public class PackageNode implements TreeElementItem {
 
     public String packageName;
 

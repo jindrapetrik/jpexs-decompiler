@@ -38,7 +38,6 @@ import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -97,7 +96,6 @@ public class ActionPanel extends JPanel implements ActionListener {
     private MainFrame mainFrame;
     public LineMarkedEditorPane editor;
     public LineMarkedEditorPane decompiledEditor;
-    public List<Tag> list;
     public JSplitPane splitPane;
     public JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
     public JButton editButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
@@ -134,6 +132,18 @@ public class ActionPanel extends JPanel implements ActionListener {
     private Cache cache = Cache.getInstance(true);
     private CancellableWorker setSourceWorker;
         
+    public void clearSource() {
+        lastCode = null;
+        lastASM = null;
+        lastDecompiled = null;
+        found = new ArrayList<>();
+        foundPos = 0;
+        src = null;
+        srcWithHex = null;
+        srcNoHex = null;
+        srcHexOnly = null;
+    }
+
     public void clearCache() {
         cache.clear();
     }

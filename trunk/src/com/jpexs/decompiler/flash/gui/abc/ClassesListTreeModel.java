@@ -77,7 +77,7 @@ class ClassIndexVisitor implements TreeVisitor {
     }
 }
 
-public class ClassesListTreeModel implements TreeModel {
+public class ClassesListTreeModel implements TreeModel, TreeElementItem {
 
     private Tree classTree;
     private List<MyEntry<ClassPath, ScriptPack>> list;

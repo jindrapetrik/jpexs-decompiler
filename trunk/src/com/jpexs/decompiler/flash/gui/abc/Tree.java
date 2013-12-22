@@ -27,7 +27,7 @@ public class Tree {
         ROOT = new TreeElement(swf, "", "", null, null);
     }
 
-    public void add(String name, String path, Object item) {
+    public void add(String name, String path, TreeElementItem item) {
         StringTokenizer st = new StringTokenizer(path, ".");
         TreeElement parent = ROOT;
         while (st.hasMoreTokens()) {

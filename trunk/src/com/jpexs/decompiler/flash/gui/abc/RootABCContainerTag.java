@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 JPEXS
+ *  Copyright (C) 2010-2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,46 +14,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.gui.abc.TreeElementItem;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 
 /**
  *
  * @author JPEXS
  */
-public class FrameNode implements TreeElementItem {
+public class RootABCContainerTag implements ABCContainerTag {
 
-    private SWF swf;
-    private int frame;
-    private Object parent;
-    private boolean display;
-
-    public FrameNode(SWF swf, int frame, Object parent, boolean display) {
-        this.swf = swf;
-        this.frame = frame;
-        this.parent = parent;
-        this.display = display;
-    }
-
-    public SWF getSwf() {
-        return swf;
-    }
-
-    public boolean isDisplayed() {
-        return display;
+    @Override
+    public ABC getABC() {
+        return null;
     }
 
     @Override
+    public int compareTo(ABCContainerTag t) {
+        if (t instanceof RootABCContainerTag) {
+            return 0;
+        }
+        return -1;
+    }
+    
+    @Override
     public String toString() {
-        return "frame " + frame;
+        return " - all - ";
     }
 
-    public int getFrame() {
-        return frame;
-    }
-
-    public Object getParent() {
-        return parent;
-    }
 }

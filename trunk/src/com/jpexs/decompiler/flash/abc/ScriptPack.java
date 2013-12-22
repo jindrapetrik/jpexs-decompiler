@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.abc.TreeElementItem;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -44,7 +45,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class ScriptPack {
+public class ScriptPack implements TreeElementItem {
 
     public ABC abc;
     public int scriptIndex;

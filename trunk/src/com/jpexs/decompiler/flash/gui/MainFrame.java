@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.TreeElement;
+import com.jpexs.decompiler.flash.gui.abc.TreeElementItem;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
@@ -151,7 +152,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
@@ -226,7 +226,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private static final String CARDIMAGEPANEL = "Image card";
     private static final String CARDEMPTYPANEL = "Empty card";
     private static final String CARDACTIONSCRIPTPANEL = "ActionScript card";
-    private static final String CARDACTIONSCRIPT3PANEL = "ActionScript card";
+    private static final String CARDACTIONSCRIPT3PANEL = "ActionScript3 card";
     private static final String DETAILCARDAS3NAVIGATOR = "Traits list";
     private static final String DETAILCARDEMPTYPANEL = "Empty card";
     private static final String CARDTEXTPANEL = "Text card";
@@ -234,9 +234,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private static final String FLASH_VIEWER_CARD = "FLASHVIEWER";
     private static final String INTERNAL_VIEWER_CARD = "INTERNALVIEWER";
     private LineMarkedEditorPane textValue;
-    private Map<SWF, JPEGTablesTag> jtts;
-    private HashMap<Integer, CharacterTag> characters;
-    private Map<SWF, List<ABCContainerTag>> abcLists;
     private JSplitPane splitPane1;
     private JSplitPane splitPane2;
     private boolean splitsInited = false;
@@ -256,6 +253,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private JPanel viewerCards;
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
     private CancellableWorker setSourceWorker;
+    public TreeNode oldValue;
+    private File tempFile;
 
     private static final String ACTION_SELECT_COLOR = "SELECTCOLOR";
     private static final String ACTION_REPLACE_IMAGE = "REPLACEIMAGE";
@@ -452,8 +451,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     
     public MainFrame() {
         super();
-
-        abcLists = new HashMap<>();
 
         try {
             flashPanel = new FlashPlayerPanel(this);
@@ -692,8 +689,6 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         statusPanel = new MainFrameStatusPanel(this);
         cnt.add(statusPanel, BorderLayout.SOUTH);
 
-        jtts = new HashMap<>();
-        characters = new HashMap<>();
         JPanel textTopPanel = new JPanel(new BorderLayout());
         textValue = new LineMarkedEditorPane();
         textTopPanel.add(new JScrollPane(textValue), BorderLayout.CENTER);
@@ -880,8 +875,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
 
         welcomePanel = createWelcomePanel();
-        actionPanel = null;
-        abcPanel = null;
+        cnt.add(welcomePanel, BorderLayout.CENTER);
         //splitPane1.setDividerLocation(0.5);
 
         splitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
@@ -930,15 +924,17 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         getActionScript3(objs, abcList);
 
         swfs.add(swf);
-        abcLists.put(swf, abcList);
+        swf.abcList = abcList;
+        
+        boolean hasAbc = !abcList.isEmpty();
 
-        if (!abcList.isEmpty()) {
+        if (hasAbc) {
             if (abcPanel == null) {
                 abcPanel = new ABCPanel(this);
-                abcPanel.setSwf(abcList, swf);
                 displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
                 detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
             }
+            abcPanel.setSwf(abcList, swf);
         } else {
             if (actionPanel == null) {
                 actionPanel = new ActionPanel(this);
@@ -946,19 +942,22 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             }
         }
 
-        tagTree.setModel(new TagTreeModel(this, swfs, abcPanel));
+        tagTree.setModel(new TagTreeModel(this, swfs, hasAbc ? abcPanel : null));
         expandSwfRoots();
 
         for (Tag t : swf.tags) {
             if (t instanceof JPEGTablesTag) {
-                jtts.put(swf, (JPEGTablesTag) t);
+                swf.jtt = (JPEGTablesTag) t;
             }
         }
 
         List<ContainerItem> list2 = new ArrayList<>();
         list2.addAll(swf.tags);
-        parseCharacters(list2);
+        swf.characters = new HashMap<>();
+        parseCharacters(swf, list2);
 
+        showDetail(DETAILCARDEMPTYPANEL);
+        showCard(CARDEMPTYPANEL);
         updateUi(swf);
     }
 
@@ -966,9 +965,11 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
         setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
 
-        List<ABCContainerTag> abcList = abcLists.get(swf);
+        List<ABCContainerTag> abcList = swf.abcList;
         
-        if (abcList != null && !abcList.isEmpty()) {
+        boolean hasAbc = !abcList.isEmpty();
+
+        if (hasAbc) {
             abcPanel.setSwf(abcList, swf);
         }
 
@@ -1000,15 +1001,23 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     
     public void closeAll() {
         swfs.clear();
-        abcLists.clear();
-        jtts.clear();
+        oldValue = null;
+        if (abcPanel != null) {
+            abcPanel.clearSwf();
+        }
+        if (actionPanel != null) {
+            actionPanel.clearSource();
+        }
         updateUi();
     }
 
     public void close(SWF swf) {
         swfs.remove(swf);
-        abcLists.remove(swf);
-        jtts.remove(swf);
+        if (abcPanel != null && abcPanel.swf == swf) {
+            abcPanel.clearSwf();
+        }
+        actionPanel.clearSource();
+        oldValue = null;
         updateUi();
     }
 
@@ -1162,13 +1171,13 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
     }
 
-    private void parseCharacters(List<ContainerItem> list) {
+    private void parseCharacters(SWF swf, List<ContainerItem> list) {
         for (ContainerItem t : list) {
             if (t instanceof CharacterTag) {
-                characters.put(((CharacterTag) t).getCharacterId(), (CharacterTag) t);
+                swf.characters.put(((CharacterTag) t).getCharacterId(), (CharacterTag) t);
             }
             if (t instanceof Container) {
-                parseCharacters(((Container) t).getSubItems());
+                parseCharacters(swf, ((Container) t).getSubItems());
             }
         }
     }
@@ -1555,7 +1564,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies));
             ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav));
             ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData));
-            List<ABCContainerTag> abcList = abcLists.get(swf);
+            List<ABCContainerTag> abcList = swf.abcList;
             if (abcPanel != null) {
                 for (int i = 0; i < tlsList.size(); i++) {
                     ScriptPack tls = tlsList.get(i);
@@ -1691,7 +1700,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     public void renameOneIdentifier(final SWF swf) {
         if (swf.fileAttributes.actionScript3) {
             final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
-            final List<ABCContainerTag> abcList = abcLists.get(swf);
+            final List<ABCContainerTag> abcList = swf.abcList;
             if (multiName > 0) {
                 new CancellableWorker() {
                     @Override
@@ -2190,7 +2199,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 break;
             case ACTION_CLOSE_SWF:
                 {
-                    close(getCurrentSwf());
+                    Main.closeFile(getCurrentSwf());
                 }
         }
         if (Main.isWorking()) {
@@ -2233,14 +2242,16 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         CardLayout cl = (CardLayout) (displayPanel.getLayout());
         cl.show(displayPanel, card);
     }
-    public Object oldValue;
-    private File tempFile;
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         TreeNode treeNode = (TreeNode) e.getPath().getLastPathComponent();
         SWF swf = treeNode.getSwf();
-        updateUi(swf);
+        if (swfs.contains(swf)) {
+            updateUi(swf);
+        } else {
+            updateUi();
+        }
         setEditText(false, false);
         reload(false);
     }
@@ -2261,31 +2272,34 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     }
 
     public void reload(boolean forceReload) {
-        Object tagObj = tagTree.getLastSelectedPathComponent();
-        if (tagObj == null) {
+        TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
+        if (treeNode == null) {
             return;
         }
 
-        if (tagObj instanceof TagNode) {
-            tagObj = ((TagNode) tagObj).tag;
-        }
-        if (tagObj instanceof TreeElement) {
-            tagObj = ((TreeElement) tagObj).getItem();
-        }
-
-        if (!forceReload && (tagObj == oldValue)) {
+        if (!forceReload && (treeNode == oldValue)) {
             return;
         }
+
+        oldValue = treeNode;
+
+        TreeElementItem  tagObj = null;
+        if (treeNode instanceof TagNode) {
+            tagObj = ((TagNode) treeNode).tag;
+        }
+        if (treeNode instanceof TreeElement) {
+            tagObj = ((TreeElement) treeNode).getItem();
+        }
+
 
         if (flashPanel != null) {
             flashPanel.specialPlayback = false;
         }
         swfPreviewPanel.stop();
         stopFlashPlayer();
-        oldValue = tagObj;
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
-            final List<ABCContainerTag> abcList = abcLists.get(scriptLeaf.abc.swf);
+            final List<ABCContainerTag> abcList = scriptLeaf.abc.swf.abcList;
             if (setSourceWorker != null) {
                 setSourceWorker.cancel(true);
             }
@@ -2343,8 +2357,8 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         }
 
 
-        if ((tagObj instanceof SWFRoot)) {
-            SWFRoot swfRoot = (SWFRoot) tagObj;
+        if (treeNode instanceof SWFRoot) {
+            SWFRoot swfRoot = (SWFRoot) treeNode;
             SWF swf = swfRoot.getSwf();
             if (mainRibbon.isInternalFlashViewerSelected()) {
                 showCard(CARDSWFPREVIEWPANEL);
@@ -2393,11 +2407,11 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (mainRibbon.isInternalFlashViewerSelected())) {
             Tag tag = (Tag) tagObj;
             showCard(CARDDRAWPREVIEWPANEL);
-            previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), characters, 50/*FIXME*/);
+            previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), tag.getSwf().characters, 50/*FIXME*/);
         } else if ((tagObj instanceof FontTag) && (mainRibbon.isInternalFlashViewerSelected())) {
             Tag tag = (Tag) tagObj;
             showCard(CARDFLASHPANEL);
-            previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), characters, 50/*FIXME*/);
+            previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), tag.getSwf().characters, 50/*FIXME*/);
             showFontTag((FontTag) tagObj);
         } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (mainRibbon.isInternalFlashViewerSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
@@ -2410,10 +2424,10 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             if (fn.getParent() instanceof DefineSpriteTag) {
                 controlTags = ((DefineSpriteTag) fn.getParent()).subTags;
                 containerId = ((DefineSpriteTag) fn.getParent()).spriteId;
-                rect = ((DefineSpriteTag) fn.getParent()).getRect(characters, new Stack<Integer>());
+                rect = ((DefineSpriteTag) fn.getParent()).getRect(swf.characters, new Stack<Integer>());
                 totalFrameCount = ((DefineSpriteTag) fn.getParent()).frameCount;
             }
-            previewImagePanel.setImage(SWF.frameToImage(containerId, ((FrameNode) tagObj).getFrame() - 1, swf.tags, controlTags, rect, totalFrameCount, new Stack<Integer>()));
+            previewImagePanel.setImage(SWF.frameToImage(containerId, fn.getFrame() - 1, swf.tags, controlTags, rect, totalFrameCount, new Stack<Integer>()));
         } else if (((tagObj instanceof FrameNode) && ((FrameNode) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             createAndShowTempSwf(tagObj);
@@ -2528,10 +2542,10 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                             break;
                         }
                         Tag t = (Tag) o;
-                        Set<Integer> needed = t.getDeepNeededCharacters(characters, new ArrayList<Integer>());
+                        Set<Integer> needed = t.getDeepNeededCharacters(swf.characters, new ArrayList<Integer>());
                         for (int n : needed) {
                             if (!doneCharacters.contains(n)) {
-                                sos2.writeTag(classicTag(characters.get(n)));
+                                sos2.writeTag(classicTag(swf.characters.get(n)));
                                 doneCharacters.add(n);
                             }
                         }
@@ -2551,7 +2565,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                 }
                                 mat = (MATRIX) Helper.deepCopy(mat);
                                 if (parent instanceof BoundedTag) {
-                                    RECT r = ((BoundedTag) parent).getRect(characters, new Stack<Integer>());
+                                    RECT r = ((BoundedTag) parent).getRect(swf.characters, new Stack<Integer>());
                                     mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
                                     mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
                                 } else {
@@ -2567,15 +2581,15 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 } else {
 
                     if (tagObj instanceof DefineBitsTag) {
-                        JPEGTablesTag jtt = jtts.get(swf);
+                        JPEGTablesTag jtt = swf.jtt;
                         if (jtt != null) {
                             sos2.writeTag(jtt);
                         }
                     } else if (tagObj instanceof AloneTag) {
                     } else {
-                        Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters, new ArrayList<Integer>());
+                        Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(swf.characters, new ArrayList<Integer>());
                         for (int n : needed) {
-                            sos2.writeTag(classicTag(characters.get(n)));
+                            sos2.writeTag(classicTag(swf.characters.get(n)));
                         }
                     }
 
@@ -2592,7 +2606,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                     mat.translateX = 0;
                     mat.translateY = 0;
                     if (tagObj instanceof BoundedTag) {
-                        RECT r = ((BoundedTag) tagObj).getRect(characters, new Stack<Integer>());
+                        RECT r = ((BoundedTag) tagObj).getRect(swf.characters, new Stack<Integer>());
                         mat.translateX = -r.Xmin;
                         mat.translateY = -r.Ymin;
                         mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
@@ -2816,7 +2830,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     private void showFontTag(FontTag ft) {
         if (mainRibbon.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
-            internelViewerPanel.setDrawable(ft, ft.getSwf(), characters, 1);
+            internelViewerPanel.setDrawable(ft, ft.getSwf(), ft.getSwf().characters, 1);
         } else {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
         }

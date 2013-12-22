@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 JPEXS
+ *  Copyright (C) 2010-2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,38 +22,16 @@ import com.jpexs.decompiler.flash.gui.abc.TreeElementItem;
  *
  * @author JPEXS
  */
-public class FrameNode implements TreeElementItem {
-
-    private SWF swf;
-    private int frame;
-    private Object parent;
-    private boolean display;
-
-    public FrameNode(SWF swf, int frame, Object parent, boolean display) {
-        this.swf = swf;
-        this.frame = frame;
-        this.parent = parent;
-        this.display = display;
-    }
-
-    public SWF getSwf() {
-        return swf;
-    }
-
-    public boolean isDisplayed() {
-        return display;
-    }
+public class StringNode implements TreeElementItem {
+    
+    private String str;
+    
+    public StringNode(String str) {
+        this.str = str;
+    } 
 
     @Override
     public String toString() {
-        return "frame " + frame;
-    }
-
-    public int getFrame() {
-        return frame;
-    }
-
-    public Object getParent() {
-        return parent;
-    }
+        return str;
+    } 
 }

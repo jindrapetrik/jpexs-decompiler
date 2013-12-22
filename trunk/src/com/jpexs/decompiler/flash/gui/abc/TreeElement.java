@@ -27,11 +27,11 @@ public class TreeElement implements TreeNode {
     private SortedMap<String, TreeElement> leafs;
     private String name;
     private String path;
-    private Object item;
+    private TreeElementItem item;
     private TreeElement parent;
     private SWF swf;
 
-    public TreeElement(SWF swf, String name, String path, Object item, TreeElement parent) {
+    public TreeElement(SWF swf, String name, String path, TreeElementItem item, TreeElement parent) {
         this.swf = swf;
         this.name = name;
         this.path = path;
@@ -66,7 +66,7 @@ public class TreeElement implements TreeNode {
         return new TreePath(pathList.toArray());
     }
 
-    public Object getItem() {
+    public TreeElementItem getItem() {
         return item;
     }
 
@@ -84,7 +84,7 @@ public class TreeElement implements TreeNode {
         return branch;
     }
 
-    void addLeaf(String pathElement, Object item) {
+    void addLeaf(String pathElement, TreeElementItem item) {
         TreeElement child = new TreeElement(swf, pathElement, path + "." + pathElement, item, this);
         leafs.put(pathElement, child);
     }
