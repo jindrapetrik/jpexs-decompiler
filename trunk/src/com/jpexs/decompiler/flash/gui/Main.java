@@ -392,7 +392,7 @@ public class Main {
     }
     
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos) {
-        if (mainFrame != null && !Configuration.openMultiple.get()) {
+        if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
             sourceInfos.clear();
             mainFrame.closeAll();
             mainFrame.setVisible(false);

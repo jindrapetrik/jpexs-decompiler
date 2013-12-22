@@ -49,8 +49,8 @@ public class Configuration {
      */
     private static List<Replacement> replacements = new ArrayList<>();
 
-    @ConfigurationDefaultBoolean(false)
-    public static final ConfigurationItem<Boolean> openMultiple = null;
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> openMultipleFiles = null;
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> decompile = null;
     @ConfigurationDefaultBoolean(true)
