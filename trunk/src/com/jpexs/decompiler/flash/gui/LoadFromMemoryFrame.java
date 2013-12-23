@@ -63,9 +63,12 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -80,67 +83,75 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
 
     private MainFrame mainFrame;
     private List<com.jpexs.process.Process> processlist;
-    private List<ReReadableInputStream> foundIs;
-    private com.jpexs.process.Process selProcess;
+    private List<SwfInMemory> foundIs;
+    private List<com.jpexs.process.Process> selProcesses;
     private JList<com.jpexs.process.Process> list;
     private DefaultListModel<com.jpexs.process.Process> model;
-    private DefaultListModel<String> resModel;
-    private final JList listRes;
+    private DefaultTableModel resTableModel;
+    private final JTable tableRes;
     private JLabel stateLabel;
     private boolean processing = false;
     private JProgressBar progress;
 
-    private class SelectProcessWorker extends SwingWorker<List<ReReadableInputStream>, Object> {
+    private class SelectProcessWorker extends SwingWorker<List<SwfInMemory>, Object> {
 
-        private com.jpexs.process.Process proc;
+        private List<com.jpexs.process.Process> procs;
 
-        public SelectProcessWorker(com.jpexs.process.Process proc) {
-            this.proc = proc;
+        public SelectProcessWorker(List<com.jpexs.process.Process> procs) {
+            this.procs = procs;
         }
 
         @Override
         protected void process(List<Object> chunks) {
             for (Object s : chunks) {
-                if (s instanceof String) {
-                    resModel.addElement((String) s);
+                if (s instanceof com.jpexs.process.Process) {
+                    stateLabel.setText(s.toString());
+                }
+                if (s instanceof SwfInMemory) {
+                    SwfInMemory swf = (SwfInMemory) s;
+                    addResultRow(swf);
                 }
             }
         }
 
         @Override
-        protected List<ReReadableInputStream> doInBackground() throws Exception {
+        protected List<SwfInMemory> doInBackground() throws Exception {
             Map<Long, InputStream> ret = new HashMap<>();
-            ret = proc.search(new ProgressListener() {
-                @Override
-                public void progress(int p) {
-                    setProgress(p);
-                }
-            }, "CWS".getBytes(), "FWS".getBytes(), "ZWS".getBytes());
-            List<ReReadableInputStream> swfStreams = new ArrayList<>();
-            int pos = 0;
-            for (Long addr : ret.keySet()) {
-                setProgress(pos * 100 / ret.size());
-                pos++;
-                try {
-                    PosMarkedInputStream pmi = new PosMarkedInputStream(ret.get(addr));
-                    ReReadableInputStream is = new ReReadableInputStream(pmi);
-                    SWF swf = new SWF(is, null, false, true);
-                    long limit = pmi.getPos();
-                    is.seek(0);
-                    is = new ReReadableInputStream(new LimitedInputStream(is, limit));
-                    if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
-                        String p = translate("swfitem").replace("%version%", "" + swf.version).replace("%size%", "" + swf.fileSize);
-                        publish(p);
-                        swfStreams.add(is);
+            List<SwfInMemory> swfStreams = new ArrayList<>();
+            for (com.jpexs.process.Process proc : procs) {
+                publish(proc);
+                ret = proc.search(new ProgressListener() {
+                    @Override
+                    public void progress(int p) {
+                        setProgress(p);
+                    }
+                }, "CWS".getBytes(), "FWS".getBytes(), "ZWS".getBytes());
+                int pos = 0;
+                for (Long addr : ret.keySet()) {
+                    setProgress(pos * 100 / ret.size());
+                    pos++;
+                    try {
+                        PosMarkedInputStream pmi = new PosMarkedInputStream(ret.get(addr));
+                        ReReadableInputStream is = new ReReadableInputStream(pmi);
+                        SWF swf = new SWF(is, null, false, true);
+                        long limit = pmi.getPos();
+                        is.seek(0);
+                        is = new ReReadableInputStream(new LimitedInputStream(is, limit));
+                        if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
+                            SwfInMemory s = new SwfInMemory(is, swf.version, swf.fileSize, proc);
+                            String p = translate("swfitem").replace("%version%", "" + swf.version).replace("%size%", "" + swf.fileSize);
+                            publish(s);
+                            swfStreams.add(s);
+                        }
+
+                    } catch (OutOfMemoryError ome) {
+                        System.gc();
+                    } catch (Exception | Error ex) {
                     }
 
-                } catch (OutOfMemoryError ome) {
-                    System.gc();
-                } catch (Exception | Error ex) {
                 }
-
+                setProgress(100);
             }
-            setProgress(100);
             if (swfStreams.isEmpty()) {
                 return null;
             }
@@ -148,6 +159,17 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         }
     }
 
+    private void addResultRow(SwfInMemory swf) {
+        if (swf != null) {
+            com.jpexs.process.Process process = swf.process;
+            resTableModel.addRow(new Object[] {swf.version, swf.fileSize, process.getPid(), process.getFileName()});
+        }
+        else {
+            String notFound = translate("notfound");
+            resTableModel.addRow(new Object[] {notFound, 0, "", ""});
+        }
+    }
+    
     private void refreshList() {
         model.clear();
         processlist = ProcessTools.listProcesses();
@@ -161,9 +183,10 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         if (foundIs == null) {
             return;
         }
-        int index = listRes.getSelectedIndex();
+        int index = tableRes.getSelectedRow();
         if (index > -1) {
-            ReReadableInputStream str = foundIs.get(index);
+            SwfInMemory swf = foundIs.get(index);
+            ReReadableInputStream str = swf.is;
             try {
                 str.seek(0);
             } catch (IOException ex) {
@@ -171,7 +194,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 return;
             }
             str.mark(Integer.MAX_VALUE);
-            Main.openFile(str, selProcess + " [" + (index + 1) + "]");
+            Main.openFile(str, swf.process + " [" + (index + 1) + "]");
         }
     }
 
@@ -179,17 +202,17 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         if (processing) {
             return;
         }
-        selProcess = (com.jpexs.process.Process) list.getSelectedValue();
-        if (selProcess != null) {
+        selProcesses = list.getSelectedValuesList();
+        if (!selProcesses.isEmpty()) {
             processing = true;
-            stateLabel.setText(selProcess.toString());
-            resModel.clear();
+            resTableModel.getDataVector().removeAllElements();
+            resTableModel.fireTableDataChanged();
             foundIs = null;
             progress.setIndeterminate(true);
             progress.setString(translate("searching"));
             progress.setStringPainted(true);
             progress.setVisible(true);
-            final SelectProcessWorker wrk = new SelectProcessWorker(selProcess);
+            final SelectProcessWorker wrk = new SelectProcessWorker(selProcesses);
             wrk.addPropertyChangeListener(new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
@@ -207,9 +230,9 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                                     Logger.getLogger(LoadFromMemoryFrame.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                                 if (foundIs == null) {
-                                    resModel.addElement(translate("notfound"));
+                                    addResultRow(null);
                                 }
-                                listRes.setEnabled(foundIs != null);
+                                tableRes.setEnabled(foundIs != null);
                                 progress.setVisible(false);
                                 processing = false;
                             }
@@ -239,8 +262,33 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         });
         model = new DefaultListModel<>();
 
-        resModel = new DefaultListModel<>();
-        listRes = new JList(resModel);
+        resTableModel = new DefaultTableModel() {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                switch (columnIndex) {
+                    case 0:
+                        return Integer.class;
+                    case 1:
+                        return Integer.class;
+                    case 2:
+                        return String.class;
+                    case 3:
+                        return String.class;
+                }
+                return null;
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return false;
+            }
+        };
+        resTableModel.addColumn("Version");
+        resTableModel.addColumn("FileSize");
+        resTableModel.addColumn("PID");
+        resTableModel.addColumn("ProcessName");
+        tableRes = new JTable(resTableModel);
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(resTableModel);
+        tableRes.setRowSorter(sorter);
         list = new JList(model);
         list.addKeyListener(new KeyAdapter() {
             @Override
@@ -258,7 +306,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 }
             }
         });
-        listRes.addMouseListener(new MouseAdapter() {
+        tableRes.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
@@ -266,7 +314,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 }
             }
         });
-        listRes.addKeyListener(new KeyAdapter() {
+        tableRes.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == 10) { //Enter pressed
@@ -310,7 +358,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         leftPanel.add(leftButtonsPanel, BorderLayout.SOUTH);
 
         JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.add(new JScrollPane(listRes), BorderLayout.CENTER);
+        rightPanel.add(new JScrollPane(tableRes), BorderLayout.CENTER);
         JPanel rightButtonsPanel = new JPanel(new FlowLayout());
         JButton openButton = new JButton(translate("button.open"));
         openButton.setActionCommand(ACTION_OPEN_SWF);
@@ -357,7 +405,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 if (foundIs == null) {
                     return;
                 }
-                int[] selected = listRes.getSelectedIndices();
+                int[] selected = tableRes.getSelectedRows();
                 if (selected.length > 0) {
                     JFileChooser fc = new JFileChooser();
                     fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
@@ -385,12 +433,14 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                         File file = Helper.fixDialogFile(fc.getSelectedFile());
                         try {
                             if (selected.length == 1) {
-                                ReReadableInputStream bis = foundIs.get(selected[0]);
+                                SwfInMemory swf = foundIs.get(selected[0]);
+                                ReReadableInputStream bis = swf.is;
                                 bis.seek(0);
                                 Helper.saveStream(bis, file);
                             } else {
                                 for (int sel : selected) {
-                                    ReReadableInputStream bis = foundIs.get(sel);
+                                    SwfInMemory swf = foundIs.get(sel);
+                                    ReReadableInputStream bis = swf.is;
                                     bis.seek(0);
                                     Helper.saveStream(bis, new File(file, "movie" + sel + ".swf"));
                                 }

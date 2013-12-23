@@ -51,7 +51,7 @@ public class TagTreeModel implements TreeModel {
             objs.addAll(swf.tags);
             List<TagNode> list = createTagList(objs, null, swf);
 
-            SWFRoot swfRoot = new SWFRoot(swf, new File(swf.file).getName(), list);
+            SWFRoot swfRoot = new SWFRoot(swf, new File(swf.getFileTitle()).getName(), list);
             this.swfs.add(swfRoot);
         }
     }
