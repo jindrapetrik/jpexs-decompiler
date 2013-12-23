@@ -361,6 +361,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
 
                     replaceImageSelectionMenuItem.setVisible(false);
                     replaceBinarySelectionMenuItem.setVisible(false);
+                    closeSelectionMenuItem.setVisible(false);
                     
                     if (paths.length == 1) {
                         Object tagObj = paths[0].getLastPathComponent();
