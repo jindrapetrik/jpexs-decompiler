@@ -406,6 +406,16 @@ public final class SWF {
             assignExportNamesToSymbols();
             assignClassesToSymbols();
             findFileAttributes();
+        } else {
+            boolean hasNonUnknownTag = false;
+            for (Tag tag : tags) {
+                if(tag.getData(version).length > 0 && Tag.getRequiredTags().contains(tag.getId())) {
+                    hasNonUnknownTag = true;
+                }
+            }
+            if (!hasNonUnknownTag) {
+                throw new IOException("Invalid SWF file. No known tag found.");
+            }
         }
     }
 

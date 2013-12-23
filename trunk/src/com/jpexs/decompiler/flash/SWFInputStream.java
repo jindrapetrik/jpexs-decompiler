@@ -1001,7 +1001,7 @@ public class SWFInputStream extends InputStream {
                     ret = new DefineExternalImage2(swf, data, version, pos);
                     break;
                 default:
-                    ret = new Tag(swf, tag.getId(), "Unknown", data, pos);
+                    ret = new UnknownTag(swf, tag.getId(), data, pos);
             }
         } catch (IOException ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", ex);
@@ -1038,7 +1038,7 @@ public class SWFInputStream extends InputStream {
             readLong = true;
         }
         byte[] data = readBytes((int) tagLength);
-        Tag ret = new Tag(swf, tagID, "Unknown", data, pos);
+        Tag ret = new Tag(swf, tagID, "Unresolved", data, pos);
         ret.forceWriteAsLong = readLong;
         byte[] dataNew = ret.getData(version);
 
@@ -1074,7 +1074,11 @@ public class SWFInputStream extends InputStream {
             }
         }
         if (resolve) {
-            return resolveTag(swf, ret, version, level, parallel, skipUnusualTags);
+            try {
+                return resolveTag(swf, ret, version, level, parallel, skipUnusualTags);
+            } catch (EndOfStreamException ex) {
+                return ret;
+            }
         }
         return ret;
     }

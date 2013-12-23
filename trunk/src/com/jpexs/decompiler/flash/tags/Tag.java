@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import com.jpexs.decompiler.flash.tags.gfx.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -88,6 +90,152 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
         this.swf = swf;
     }
 
+    private static Object lockObject = new Object();
+    private static List<Integer> knownTagIds;
+    private static List<Integer> requiredTagIds;
+    
+    public static List<Integer> getKnownTags() {
+        if (knownTagIds == null) {
+            synchronized(lockObject) {
+                if (knownTagIds == null) {
+                    List<Integer> tagIds = Arrays.asList(
+                        CSMTextSettingsTag.ID,
+                        DebugIDTag.ID,
+                        DefineBinaryDataTag.ID,
+                        DefineBitsJPEG2Tag.ID,
+                        DefineBitsJPEG3Tag.ID,
+                        DefineBitsJPEG4Tag.ID,
+                        DefineBitsLossless2Tag.ID,
+                        DefineBitsLosslessTag.ID,
+                        DefineBitsTag.ID,
+                        DefineButton2Tag.ID,
+                        DefineButtonCxformTag.ID,
+                        DefineButtonSoundTag.ID,
+                        DefineButtonTag.ID,
+                        DefineEditTextTag.ID,
+                        DefineFont2Tag.ID,
+                        DefineFont3Tag.ID,
+                        DefineFont4Tag.ID,
+                        DefineFontAlignZonesTag.ID,
+                        DefineFontInfo2Tag.ID,
+                        DefineFontInfoTag.ID,
+                        DefineFontNameTag.ID,
+                        DefineFontTag.ID,
+                        DefineMorphShape2Tag.ID,
+                        DefineMorphShapeTag.ID,
+                        DefineScalingGridTag.ID,
+                        DefineSceneAndFrameLabelDataTag.ID,
+                        DefineShape2Tag.ID,
+                        DefineShape3Tag.ID,
+                        DefineShape4Tag.ID,
+                        DefineShapeTag.ID,
+                        DefineSoundTag.ID,
+                        DefineSpriteTag.ID,
+                        DefineText2Tag.ID,
+                        DefineTextTag.ID,
+                        DefineVideoStreamTag.ID,
+                        DoABCDefineTag.ID,
+                        DoABCTag.ID,
+                        DoActionTag.ID,
+                        DoInitActionTag.ID,
+                        EnableDebugger2Tag.ID,
+                        EnableDebuggerTag.ID,
+                        EnableTelemetryTag.ID,
+                        EndTag.ID,
+                        ExportAssetsTag.ID,
+                        FileAttributesTag.ID,
+                        FrameLabelTag.ID,
+                        ImportAssets2Tag.ID,
+                        ImportAssetsTag.ID,
+                        JPEGTablesTag.ID,
+                        MetadataTag.ID,
+                        PlaceObject2Tag.ID,
+                        PlaceObject3Tag.ID,
+                        PlaceObject4Tag.ID,
+                        PlaceObjectTag.ID,
+                        ProductInfoTag.ID,
+                        ProtectTag.ID,
+                        RemoveObject2Tag.ID,
+                        RemoveObjectTag.ID,
+                        ScriptLimitsTag.ID,
+                        SetBackgroundColorTag.ID,
+                        SetTabIndexTag.ID,
+                        ShowFrameTag.ID,
+                        SoundStreamBlockTag.ID,
+                        SoundStreamHead2Tag.ID,
+                        SoundStreamHeadTag.ID,
+                        StartSound2Tag.ID,
+                        StartSoundTag.ID,
+                        SymbolClassTag.ID,
+                        TagStub.ID,
+                        VideoFrameTag.ID,
+                        DefineCompactedFont.ID,
+                        DefineExternalGradient.ID,
+                        DefineExternalImage.ID,
+                        DefineExternalImage2.ID,
+                        DefineExternalSound.ID,
+                        DefineExternalStreamSound.ID,
+                        DefineGradientMap.ID,
+                        DefineSubImage.ID,
+                        ExporterInfoTag.ID,
+                        FontTextureInfo.ID);
+                    knownTagIds = tagIds;
+                }
+            }
+        }
+        return knownTagIds;
+    }
+    
+    public static List<Integer> getRequiredTags() {
+        if (requiredTagIds == null) {
+            synchronized(lockObject) {
+                if (requiredTagIds == null) {
+                    List<Integer> tagIds = Arrays.asList(
+                        DefineBinaryDataTag.ID,
+                        DefineBitsJPEG2Tag.ID,
+                        DefineBitsJPEG3Tag.ID,
+                        DefineBitsJPEG4Tag.ID,
+                        DefineBitsLossless2Tag.ID,
+                        DefineBitsLosslessTag.ID,
+                        DefineBitsTag.ID,
+                        DefineButton2Tag.ID,
+                        DefineButtonCxformTag.ID,
+                        DefineButtonSoundTag.ID,
+                        DefineButtonTag.ID,
+                        DefineEditTextTag.ID,
+                        DefineFont2Tag.ID,
+                        DefineFont3Tag.ID,
+                        DefineFont4Tag.ID,
+                        DefineFontAlignZonesTag.ID,
+                        DefineFontInfo2Tag.ID,
+                        DefineFontInfoTag.ID,
+                        DefineFontNameTag.ID,
+                        DefineFontTag.ID,
+                        DefineMorphShape2Tag.ID,
+                        DefineMorphShapeTag.ID,
+                        DefineScalingGridTag.ID,
+                        DefineSceneAndFrameLabelDataTag.ID,
+                        DefineShape2Tag.ID,
+                        DefineShape3Tag.ID,
+                        DefineShape4Tag.ID,
+                        DefineShapeTag.ID,
+                        DefineSoundTag.ID,
+                        DefineSpriteTag.ID,
+                        DefineText2Tag.ID,
+                        DefineTextTag.ID,
+                        DefineVideoStreamTag.ID,
+                        DoABCDefineTag.ID,
+                        DoABCTag.ID,
+                        DoActionTag.ID,
+                        DoInitActionTag.ID,
+                        ShowFrameTag.ID);
+                    requiredTagIds = tagIds;
+                }
+            }
+        }
+        return requiredTagIds;
+    }
+    
     /**
      * Gets data bytes
      *
