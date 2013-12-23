@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.Cache;
 import com.jpexs.process.ProcessTools;
+import com.sun.jna.Platform;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -519,7 +520,9 @@ public class MainFrameRibbon implements ActionListener {
         settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
         settingsBand.addRibbonComponent(new JRibbonComponent(miParallelSpeedUp));
         settingsBand.addRibbonComponent(new JRibbonComponent(miDecompile));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miAssociate));
+        if (Platform.isWindows()) {
+            settingsBand.addRibbonComponent(new JRibbonComponent(miAssociate));
+        }
         settingsBand.addRibbonComponent(new JRibbonComponent(miCacheDisk));
         settingsBand.addRibbonComponent(new JRibbonComponent(miGotoMainClassOnStartup));
         settingsBand.addRibbonComponent(new JRibbonComponent(miAutoRenameIdentifiers));
