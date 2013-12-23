@@ -70,6 +70,7 @@ public class MainFrameRibbon implements ActionListener {
     static final String ACTION_LOAD_MEMORY = "LOADMEMORY";
     static final String ACTION_LOAD_CACHE = "LOADCACHE";
     static final String ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP = "GOTODOCUMENTCLASSONSTARTUP";
+    static final String ACTION_AUTO_RENAME_IDENTIFIERS = "AUTORENAMEIDENTIFIERS";
     static final String ACTION_CACHE_ON_DISK = "CACHEONDISK";
     static final String ACTION_SET_LANGUAGE = "SETLANGUAGE";
     static final String ACTION_DISABLE_DECOMPILATION = "DISABLEDECOMPILATION";
@@ -111,6 +112,7 @@ public class MainFrameRibbon implements ActionListener {
     private JCheckBox miDecompile;
     private JCheckBox miCacheDisk;
     private JCheckBox miGotoMainClassOnStartup;
+    private JCheckBox miAutoRenameIdentifiers;
     private JCommandButton saveCommandButton;
     private JCommandButton saveasCommandButton;
     private JCommandButton exportAllCommandButton;
@@ -288,13 +290,18 @@ public class MainFrameRibbon implements ActionListener {
         miGotoMainClassOnStartup.setActionCommand(ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP);
         miGotoMainClassOnStartup.addActionListener(this);
 
+        miAutoRenameIdentifiers.setSelected(Configuration.autoRenameIdentifiers.get());
+        miAutoRenameIdentifiers.setActionCommand(ACTION_AUTO_RENAME_IDENTIFIERS);
+        miAutoRenameIdentifiers.addActionListener(this);
+
         /*JMenu menuSettings = new JMenu(translate("menu.settings"));
          menuSettings.add(autoDeobfuscateMenuItem);
          menuSettings.add(miInternalViewer);
          menuSettings.add(miParallelSpeedUp);
          menuSettings.add(miDecompile);
          menuSettings.add(miCacheDisk);
-         menuSettings.add(miGotoMainClassOnStartup);*/
+         menuSettings.add(miGotoMainClassOnStartup);
+         menuSettings.add(miAutoRenameIdentifiers);*/
 
         miAssociate.setActionCommand(ACTION_ASSOCIATE);
         miAssociate.addActionListener(this);
@@ -506,6 +513,7 @@ public class MainFrameRibbon implements ActionListener {
         miAssociate = new JCheckBox(translate("menu.settings.addtocontextmenu"));
         miCacheDisk = new JCheckBox(translate("menu.settings.cacheOnDisk"));
         miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
+        miAutoRenameIdentifiers = new JCheckBox(translate("menu.settings.autoRenameIdentifiers"));
 
         settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
         settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
@@ -514,6 +522,7 @@ public class MainFrameRibbon implements ActionListener {
         settingsBand.addRibbonComponent(new JRibbonComponent(miAssociate));
         settingsBand.addRibbonComponent(new JRibbonComponent(miCacheDisk));
         settingsBand.addRibbonComponent(new JRibbonComponent(miGotoMainClassOnStartup));
+        settingsBand.addRibbonComponent(new JRibbonComponent(miAutoRenameIdentifiers));
 
         JRibbonBand languageBand = new JRibbonBand(translate("menu.language"), null);
         List<RibbonBandResizePolicy> languageBandResizePolicies = new ArrayList<>();
@@ -625,6 +634,9 @@ public class MainFrameRibbon implements ActionListener {
                 break;
             case ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP:
                 Configuration.gotoMainClassOnStartup.set(miGotoMainClassOnStartup.isSelected());
+                break;
+            case ACTION_AUTO_RENAME_IDENTIFIERS:
+                Configuration.autoRenameIdentifiers.set(miAutoRenameIdentifiers.isSelected());
                 break;
             case ACTION_CACHE_ON_DISK:
                 Configuration.cacheOnDisk.set(miCacheDisk.isSelected());

@@ -954,7 +954,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             }
         }
 
-        tagTree.setModel(new TagTreeModel(this, swfs, hasAbc ? abcPanel : null));
+        tagTree.setModel(new TagTreeModel(this, swfs));
         expandSwfRoots();
 
         for (Tag t : swf.tags) {
@@ -967,6 +967,20 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         list2.addAll(swf.tags);
         swf.characters = new HashMap<>();
         parseCharacters(swf, list2);
+
+        if (Configuration.autoRenameIdentifiers.get()) {
+            try {
+                swf.deobfuscateIdentifiers(RenameType.TYPENUMBER);
+                swf.assignClassesToSymbols();
+                clearCache();
+                if (abcPanel != null) {
+                    abcPanel.reload();
+                }
+                updateClassesList();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
         showDetail(DETAILCARDEMPTYPANEL);
         showCard(CARDEMPTYPANEL);
@@ -1036,7 +1050,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     }
     
     private void updateTagTree() {
-        tagTree.setModel(new TagTreeModel(this, swfs, null));
+        tagTree.setModel(new TagTreeModel(this, swfs));
         expandSwfRoots();
     }
 
@@ -1059,6 +1073,28 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             });
         } else {
             setDropTarget(null);
+        }
+    }
+
+    public void updateClassesList() {
+        List<TagNode> nodes = getASTagNode(tagTree);
+        boolean updateNeeded = false;
+        for (TagNode n : nodes) {
+            if (n.tag instanceof ClassesListTreeModel) {
+                ((ClassesListTreeModel) n.tag).update();
+                updateNeeded = true;
+            }
+        }
+    
+        refreshTree();
+        
+        if (updateNeeded) {
+            View.execInEventDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    tagTree.updateUI();
+                }
+            });
         }
     }
 
@@ -1408,7 +1444,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             if (!oldName.equals(newName)) {
                 swf.renameAS2Identifier(oldName, newName);
                 View.showMessageDialog(null, translate("rename.finished.identifier"));
-                doFilter();
+                updateClassesList();
                 reload(true);
             }
         }
@@ -1441,7 +1477,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                 if (abcPanel != null) {
                     abcPanel.reload();
                 }
-                doFilter();
+                updateClassesList();
                 reload(true);
                 abcPanel.hilightScript(abcPanel.decompiledTextArea.getScriptLeaf().getPath().toString());
             }
@@ -1613,7 +1649,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
         
         TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
         if (treeNode == null) {
-            return null;
+            return swfs.get(0);
         }
         
         return treeNode.getSwf();
@@ -1658,7 +1694,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             abcPanel.reload();
         }
         reload(true);
-        doFilter();
+        updateClassesList();
     }
     
     public void searchAs() {
@@ -1715,7 +1751,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             abcPanel.reload();
         }
         reload(true);
-        doFilter();
+        updateClassesList();
     }
     
     public void renameOneIdentifier(final SWF swf) {
@@ -1932,7 +1968,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         @Override
                         public void run() {
                             abcPanel.reload();
-                            doFilter();
+                            updateClassesList();
                         }
                     });
                 }
@@ -1967,7 +2003,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                                     if (abcPanel != null) {
                                         abcPanel.reload();
                                     }
-                                    doFilter();
+                                    updateClassesList();
                                     reload(true);
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during renaming identifiers", ex);
@@ -2036,7 +2072,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
                         public void run() {
                             clearCache();
                             abcPanel.reload();
-                            doFilter();
+                            updateClassesList();
                         }
                     });
                 }
@@ -2062,7 +2098,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
             abcPanel.reload();
         }
         reload(true);
-        doFilter();
+        updateClassesList();
     }
     
     @Override
@@ -2865,7 +2901,7 @@ public final class MainFrame extends AppRibbonFrame implements ActionListener, T
     public void refreshTree() {
         List<List<String>> expandedNodes = getExpandedNodes(tagTree);
 
-        tagTree.setModel(new TagTreeModel(this, swfs, abcPanel));
+        tagTree.setModel(new TagTreeModel(this, swfs));
 
         expandSwfRoots();
         expandTreeNodes(tagTree, expandedNodes);

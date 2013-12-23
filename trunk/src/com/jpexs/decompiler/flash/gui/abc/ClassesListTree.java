@@ -38,7 +38,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 public final class ClassesListTree extends JTree implements TreeSelectionListener {
 
-    public List<MyEntry<ClassPath, ScriptPack>> treeList;
     private ABCPanel abcPanel;
     private SWF swf;
 
@@ -94,15 +93,13 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
     }
 
     public void clearDoABCTags() {
-        this.treeList = null;
         this.swf = null;
         setModel(null);
     }
 
     public void setDoABCTags(List<ABCContainerTag> list, SWF swf) {
-        this.treeList = swf.getAS3Packs();
         this.swf = swf;
-        ClassesListTreeModel model = new ClassesListTreeModel(this.treeList, swf);
+        ClassesListTreeModel model = new ClassesListTreeModel(swf);
         this.swf.classTreeModel = model;
         setModel(model);
     }

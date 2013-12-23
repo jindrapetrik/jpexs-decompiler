@@ -65,6 +65,8 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> internalFlashViewer = null;
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> gotoMainClassOnStartup = null;
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> autoRenameIdentifiers = null;
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> deobfuscateUsePrevTagOnly = null;
     @ConfigurationDefaultBoolean(false)

@@ -43,7 +43,7 @@ public class TagTreeModel implements TreeModel {
     private List<SWFRoot> swfs;
     private MainFrame mainFrame;
 
-    public TagTreeModel(MainFrame mainFrame, List<SWF> swfs, ABCPanel abcPanel) {
+    public TagTreeModel(MainFrame mainFrame, List<SWF> swfs) {
         this.mainFrame = mainFrame;
         this.swfs = new ArrayList<>();
         for (SWF swf : swfs) {

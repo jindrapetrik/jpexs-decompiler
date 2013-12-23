@@ -24,7 +24,9 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.TreeNode;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import java.util.ArrayList;
 import java.util.List;
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -82,22 +84,33 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
     private SWF swf;
     private Tree classTree;
     private List<MyEntry<ClassPath, ScriptPack>> list;
+    private String filter;
+    private List<TreeModelListener> listeners = new ArrayList<>();
 
     public List<MyEntry<ClassPath, ScriptPack>> getList() {
         return list;
     }
 
-    public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list, SWF swf) {
-        this(list, swf, null);
+    public ClassesListTreeModel(SWF swf) {
+        this(swf, null);
     }
     
-    public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list, SWF swf, String filter) {
+    public ClassesListTreeModel(SWF swf, String filter) {
         this.swf = swf;
-        this.list = list;
+        this.list = swf.getAS3Packs();
         setFilter(filter);
     }
     
+    public final void update() {
+        this.list = swf.getAS3Packs();
+        TreeModelEvent event = new TreeModelEvent(this, new TreePath(classTree.getRoot()));
+        for (TreeModelListener listener : listeners) {
+            listener.treeStructureChanged(event);
+        }
+    }
+    
     public final void setFilter(String filter) {
+        this.filter = filter;
         classTree = new Tree(swf);
         for (MyEntry<ClassPath, ScriptPack> item : list) {
             if (filter != null) {
@@ -164,10 +177,12 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
 
     @Override
     public void addTreeModelListener(TreeModelListener l) {
+        listeners.add(l);
     }
 
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
+        listeners.remove(l);
     }
 
     @Override
