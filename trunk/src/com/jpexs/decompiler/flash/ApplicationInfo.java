@@ -29,6 +29,8 @@ public class ApplicationInfo {
     public static final String SHORT_APPLICATION_NAME = "FFDec";
     public static final String VENDOR = "JPEXS";
     public static String version = "";
+    public static String build = "";
+    public static String nightly = "";
     public static String applicationVerName;
     public static String shortApplicationVerName;
     public static final String PROJECT_PAGE = "http://www.free-decompiler.com/flash";
@@ -44,13 +46,19 @@ public class ApplicationInfo {
         try {
             prop.load(ApplicationInfo.class.getResourceAsStream("/project.properties"));
             version = prop.getProperty("version");
-            applicationVerName = APPLICATION_NAME + " v." + version;
-            updatePage = updatePageStub + version;
-            shortApplicationVerName = SHORT_APPLICATION_NAME + " v." + version;
+            build = prop.getProperty("build");
+            nightly = prop.getProperty("nightly");
+            if (nightly.equals("true")) {
+                version = version + " nightly build " + build;
+            }
         } catch (IOException | NullPointerException ex) {
             //ignore
             version = "unknown";
         }
+
+        applicationVerName = APPLICATION_NAME + " v." + version;
+        updatePage = updatePageStub + version;
+        shortApplicationVerName = SHORT_APPLICATION_NAME + " v." + version;
     }
 
 }
