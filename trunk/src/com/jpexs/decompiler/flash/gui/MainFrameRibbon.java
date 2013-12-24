@@ -89,6 +89,7 @@ public class MainFrameRibbon implements ActionListener {
     static final String ACTION_SUB_LIMITER = "SUBLIMITER";
     static final String ACTION_SAVE = "SAVE";
     static final String ACTION_SAVE_AS = "SAVEAS";
+    static final String ACTION_SAVE_AS_EXE = "SAVEASEXE";
     static final String ACTION_OPEN = "OPEN";
     static final String ACTION_EXPORT_FLA = "EXPORTFLA";
     public static final String ACTION_EXPORT_SEL = "EXPORTSEL";
@@ -116,6 +117,7 @@ public class MainFrameRibbon implements ActionListener {
     private JCheckBox miAutoRenameIdentifiers;
     private JCommandButton saveCommandButton;
     private JCommandButton saveasCommandButton;
+    private JCommandButton saveasexeCommandButton;
     private JCommandButton exportAllCommandButton;
     private JCommandButton exportFlaCommandButton;
     private JCommandButton exportSelectionCommandButton;
@@ -191,6 +193,10 @@ public class MainFrameRibbon implements ActionListener {
         miSaveAs.setIcon(View.getIcon("saveas16"));
         miSaveAs.setActionCommand(ACTION_SAVE_AS);
         miSaveAs.addActionListener(this);
+        JMenuItem miSaveAsExe = new JMenuItem(translate("menu.file.saveasexe"));
+        miSaveAsExe.setIcon(View.getIcon("saveas16"));
+        miSaveAsExe.setActionCommand(ACTION_SAVE_AS_EXE);
+        miSaveAsExe.addActionListener(this);
 
         JMenuItem menuExportFla = new JMenuItem(translate("menu.file.export.fla"));
         menuExportFla.setActionCommand(ACTION_EXPORT_FLA);
@@ -211,6 +217,7 @@ public class MainFrameRibbon implements ActionListener {
         menuFile.add(miOpen);
         menuFile.add(miSave);
         menuFile.add(miSaveAs);
+        menuFile.add(miSaveAsExe);
         menuFile.add(menuExportFla);
         menuFile.add(menuExportAll);
         menuFile.add(menuExportSel);
@@ -430,6 +437,8 @@ public class MainFrameRibbon implements ActionListener {
         assignListener(saveCommandButton, ACTION_SAVE);
         saveasCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveas")), View.getResizableIcon("saveas16"));
         assignListener(saveasCommandButton, ACTION_SAVE_AS);
+        saveasexeCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveasexe")), View.getResizableIcon("saveas16"));
+        assignListener(saveasexeCommandButton, ACTION_SAVE_AS_EXE);
 
         reloadCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.reload")), View.getResizableIcon("reload16"));
         assignListener(reloadCommandButton, ACTION_RELOAD);
@@ -437,6 +446,7 @@ public class MainFrameRibbon implements ActionListener {
         editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveasCommandButton, RibbonElementPriority.MEDIUM);
+        editBand.addCommandButton(saveasexeCommandButton, RibbonElementPriority.MEDIUM);
         editBand.addCommandButton(reloadCommandButton, RibbonElementPriority.MEDIUM);
 
         JRibbonBand exportBand = new JRibbonBand(translate("menu.export"), null);
@@ -604,6 +614,7 @@ public class MainFrameRibbon implements ActionListener {
 
         saveCommandButton.setEnabled(swfLoaded);
         saveasCommandButton.setEnabled(swfLoaded);
+        saveasexeCommandButton.setEnabled(swfLoaded);
         exportAllCommandButton.setEnabled(swfLoaded);
         exportFlaCommandButton.setEnabled(swfLoaded);
         exportSelectionCommandButton.setEnabled(swfLoaded);
@@ -741,10 +752,21 @@ public class MainFrameRibbon implements ActionListener {
                 }
                 break;
             case ACTION_SAVE_AS:
-                SWF swf = mainFrame.getCurrentSwf();
-                if (Main.saveFileDialog(swf)) {
-                    mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
-                    saveCommandButton.setEnabled(mainFrame.getCurrentSwf() != null);
+                {
+                    SWF swf = mainFrame.getCurrentSwf();
+                    if (Main.saveFileDialog(swf)) {
+                        mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
+                        saveCommandButton.setEnabled(mainFrame.getCurrentSwf() != null);
+                    }
+                }
+                break;
+            case ACTION_SAVE_AS_EXE:
+                {
+                    SWF swf = mainFrame.getCurrentSwf();
+                    if (Main.saveFileDialog(swf, ".exe")) {
+                        mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
+                        saveCommandButton.setEnabled(mainFrame.getCurrentSwf() != null);
+                    }
                 }
                 break;
             case ACTION_OPEN:

@@ -246,10 +246,25 @@ public class Main {
     }
 
     public static void saveFile(SWF swf, String outfile) throws IOException {
-        swf.file = outfile;
+        saveFile(swf, outfile, ".swf");
+    }
+    
+    public static void saveFile(SWF swf, String outfile, String extension) throws IOException {
+        if (extension.equals(".swf")) {
+            swf.file = outfile;
+        }
         File outfileF = new File(outfile);
         File tmpFile = new File(outfile + ".tmp");
-        swf.saveTo(new FileOutputStream(tmpFile));
+        FileOutputStream fos = new FileOutputStream(tmpFile);
+        if (extension.equals(".exe")) {
+            InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
+            byte [] buffer = new byte[4096];
+            int bytesRead = 0;
+            while((bytesRead = exeStream.read(buffer)) != -1) {
+                fos.write(buffer, 0, bytesRead);
+            }
+        }
+        swf.saveTo(fos);
         if (tmpFile.exists()) {
             if (tmpFile.length() > 0) {
                 outfileF.delete();
@@ -427,17 +442,21 @@ public class Main {
     }
     
     public static boolean saveFileDialog(SWF swf) {
+        return saveFileDialog(swf, ".swf");
+    }
+    
+    public static boolean saveFileDialog(SWF swf, final String extension) {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(".swf")) || (f.isDirectory());
+                return (f.getName().toLowerCase().endsWith(extension)) || (f.isDirectory());
             }
 
             @Override
             public String getDescription() {
-                return AppStrings.translate("filter.swf");
+                return AppStrings.translate("filter" + extension);
             }
         };
         if (!swf.gfx) {
@@ -471,8 +490,8 @@ public class Main {
             try {
                 String fileName = file.getAbsolutePath();
                 if (selFilter == swfFilter) {
-                    if (!fileName.toLowerCase().endsWith(".swf")) {
-                        fileName += ".swf";
+                    if (!fileName.toLowerCase().endsWith(extension)) {
+                        fileName += extension;
                     }
                     swf.gfx = false;
                 }
@@ -482,7 +501,7 @@ public class Main {
                     }
                     swf.gfx = true;
                 }
-                Main.saveFile(swf, fileName);
+                Main.saveFile(swf, fileName, extension);
                 Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
                 return true;
             } catch (IOException ex) {

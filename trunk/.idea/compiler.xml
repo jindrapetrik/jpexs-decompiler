@@ -5,6 +5,7 @@
     <resourceExtensions>
       <entry name=".+\.(properties|xml|html|dtd|tld)" />
       <entry name=".+\.(gif|png|jpeg|jpg)" />
+      <entry name=".+\.(bin)" />
     </resourceExtensions>
     <wildcardResourcePatterns>
       <entry name="?*.properties" />
