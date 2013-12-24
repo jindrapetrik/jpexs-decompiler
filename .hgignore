@@ -1,4 +1,6 @@
 \.orig$ 
+\.dcu$ 
+\.ddp$ 
 \.orig\..*$ 
 \.chg\..*$ 
 \.rej$ 
