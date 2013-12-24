@@ -645,6 +645,7 @@ object frmMain: TfrmMain
     0000E0070000F81F0000}
   OldCreateOrder = False
   OnCreate = FormCreate
+  OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 13
 end
