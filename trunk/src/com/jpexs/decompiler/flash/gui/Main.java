@@ -263,6 +263,17 @@ public class Main {
             while((bytesRead = exeStream.read(buffer)) != -1) {
                 fos.write(buffer, 0, bytesRead);
             }
+            int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
+            int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
+            fos.write(width & 0xff);
+            fos.write((width >> 8) & 0xff);
+            fos.write((width >> 16) & 0xff);
+            fos.write((width >> 24) & 0xff);
+            fos.write(height & 0xff);
+            fos.write((height >> 8) & 0xff);
+            fos.write((height >> 16) & 0xff);
+            fos.write((height >> 24) & 0xff);
+            fos.write(Configuration.saveAsExeScaleMode.get());
         }
         swf.saveTo(fos);
         if (tmpFile.exists()) {

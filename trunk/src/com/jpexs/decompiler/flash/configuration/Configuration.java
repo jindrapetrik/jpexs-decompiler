@@ -173,6 +173,8 @@ public class Configuration {
     public static final ConfigurationItem<Integer> guiSplitPane1DividerLocation = null;
     @ConfigurationName("gui.splitPane2.dividerLocation")
     public static final ConfigurationItem<Integer> guiSplitPane2DividerLocation = null;
+    @ConfigurationDefaultInt(3)
+    public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
     
     private enum OSId {
 
