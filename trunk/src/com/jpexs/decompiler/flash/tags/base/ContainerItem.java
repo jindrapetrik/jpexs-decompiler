@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.gui.abc.TreeElementItem;
+import com.jpexs.decompiler.flash.TreeElementItem;
 
 /**
  * Object which contains other objects

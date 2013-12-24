@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.StringNode;
 import com.jpexs.decompiler.flash.TagNode;
-import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
+import com.jpexs.decompiler.flash.TreeNode;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.TreeElement;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;

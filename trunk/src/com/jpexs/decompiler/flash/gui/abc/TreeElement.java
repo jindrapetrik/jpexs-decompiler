@@ -17,7 +17,8 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.gui.TreeNode;
+import com.jpexs.decompiler.flash.TreeElementItem;
+import com.jpexs.decompiler.flash.TreeNode;
 import java.util.*;
 import javax.swing.tree.TreePath;
 

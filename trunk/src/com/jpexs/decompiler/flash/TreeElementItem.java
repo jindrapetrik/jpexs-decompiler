@@ -14,36 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui;
-
-import java.io.InputStream;
+package com.jpexs.decompiler.flash;
 
 /**
  *
  * @author JPEXS
  */
-public class SWFSourceInfo {
-
-    private InputStream inputStream;
-    private String file;
-    private String fileTitle;
+public interface TreeElementItem {
     
-    public SWFSourceInfo(InputStream inputStream, String file, String fileTitle) {
-        this.inputStream = inputStream;
-        this.file = file;
-        this.fileTitle = fileTitle;
-    }
-    
-    public InputStream getInputStream() {
-        return inputStream;
-    }
-
-    public String getFile() {
-        return file;
-    }
-
-    public String getFileTitle() {
-        return fileTitle;
-    }
-
 }

@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.gui.abc.TreeElementItem;
-
 /**
  *
  * @author JPEXS

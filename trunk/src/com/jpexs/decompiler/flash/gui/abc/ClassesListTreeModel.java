@@ -17,12 +17,13 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.TreeElementItem;
+import com.jpexs.decompiler.flash.TreeNode;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.gui.AppStrings;
-import com.jpexs.decompiler.flash.gui.TreeNode;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +85,6 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
     private SWF swf;
     private Tree classTree;
     private List<MyEntry<ClassPath, ScriptPack>> list;
-    private String filter;
     private List<TreeModelListener> listeners = new ArrayList<>();
 
     public List<MyEntry<ClassPath, ScriptPack>> getList() {
@@ -110,7 +110,6 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
     }
     
     public final void setFilter(String filter) {
-        this.filter = filter;
         classTree = new Tree(swf);
         for (MyEntry<ClassPath, ScriptPack> item : list) {
             if (filter != null) {

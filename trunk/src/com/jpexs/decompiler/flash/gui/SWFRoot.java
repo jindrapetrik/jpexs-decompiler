@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.TagNode;
+import com.jpexs.decompiler.flash.TreeNode;
 import java.util.List;
 
 /**

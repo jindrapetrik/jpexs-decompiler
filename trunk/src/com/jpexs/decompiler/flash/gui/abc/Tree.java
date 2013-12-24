@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.TreeElementItem;
 import java.util.StringTokenizer;
 
 public class Tree {
