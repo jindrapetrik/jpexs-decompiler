@@ -225,7 +225,7 @@ public class TagTreeModel implements TreeModel {
                 if (obj == it) {
                     return newPath;
                 }
-            }
+            }   
             if (n instanceof TagNode) {
                 TagNode nd = (TagNode) n;
                 if (nd.tag == obj) {

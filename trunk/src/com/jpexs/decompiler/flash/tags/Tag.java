@@ -69,6 +69,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
         return id;
     }
 
+    @Override
     public SWF getSwf() {
         return swf;
     }

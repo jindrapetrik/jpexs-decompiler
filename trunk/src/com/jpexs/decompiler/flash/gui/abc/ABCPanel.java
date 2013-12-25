@@ -295,7 +295,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     
     public void switchAbc(int index) {
         listIndex = index;
-        classTree.setDoABCTags(list, swf);
+        classTree.setSwf(swf);
 
         if (index != -1) {
             this.abc = list.get(index).getABC();

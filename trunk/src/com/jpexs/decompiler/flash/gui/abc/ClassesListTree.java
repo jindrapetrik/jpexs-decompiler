@@ -95,11 +95,13 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
         setModel(null);
     }
 
-    public void setDoABCTags(List<ABCContainerTag> list, SWF swf) {
-        this.swf = swf;
-        ClassesListTreeModel model = new ClassesListTreeModel(swf);
-        this.swf.classTreeModel = model;
-        setModel(model);
+    public void setSwf(SWF swf) {
+        if (swf != this.swf) {
+            this.swf = swf;
+            ClassesListTreeModel model = new ClassesListTreeModel(swf);
+            this.swf.classTreeModel = model;
+            setModel(model);
+        }
     }
 
     public void applyFilter(String filter) {

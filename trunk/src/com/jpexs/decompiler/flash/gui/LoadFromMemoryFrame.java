@@ -278,6 +278,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 return null;
             }
 
+            @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return false;
             }

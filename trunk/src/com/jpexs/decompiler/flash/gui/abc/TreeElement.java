@@ -42,6 +42,7 @@ public class TreeElement implements TreeNode {
         leafs = new TreeMap<>();
     }
 
+    @Override
     public SWF getSwf() {
         return swf;
     }

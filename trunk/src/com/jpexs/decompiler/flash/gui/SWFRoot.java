@@ -37,6 +37,7 @@ public class SWFRoot implements TreeNode {
         this.list = list;
     }
 
+    @Override
     public SWF getSwf() {
         return swf;
     }
