@@ -175,10 +175,12 @@ public class DirectValueActionItem extends ActionItem {
 
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
-        if (dependencies.contains(computedRegValue)) {
-            return false;
+        if (computedRegValue != null) {
+            if (dependencies.contains(computedRegValue)) {
+                return false;
+            }
+            dependencies.add(computedRegValue);
         }
-        dependencies.add(computedRegValue);
         return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value instanceof Null) || (computedRegValue != null && computedRegValue.isCompileTime(dependencies)) || (value instanceof String) || (value instanceof ConstantIndex);
     }
 

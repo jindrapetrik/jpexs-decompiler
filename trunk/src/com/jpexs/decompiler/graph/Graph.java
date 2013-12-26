@@ -1787,7 +1787,6 @@ public class Graph {
                         currentRet.add(new IfItem(null, expr, onTrue, onFalse));
                     }
                     if (next != null) {
-                        /* todo: honfika
                         if (trueStack.size() != trueStackSizeBefore || falseStack.size() != falseStackSizeBefore) {
                             // it's a hack, because duplicates all instructions in the next part, but better than EmptyStackException
                             onTrue = printGraph(visited, localData, trueStack, allParts, part, next, stopPart, loops, null, staticOperation, path, recursionLevel + 1);
@@ -1799,8 +1798,7 @@ public class Graph {
                             }
                         } else {
                             printGraph(visited, localData, stack, allParts, part, next, stopPart, loops, currentRet, staticOperation, path, recursionLevel + 1);
-                        }*/
-                        printGraph(visited, localData, stack, allParts, part, next, stopPart, loops, currentRet, staticOperation, path, recursionLevel + 1);
+                        }
                         //currentRet.addAll();
                     }
                 }

@@ -119,6 +119,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -532,8 +533,11 @@ public final class SWF {
                         sos.writeUI32(fileSize);
                         InflaterInputStream iis = new InflaterInputStream(fis);
                         int i;
-                        while ((i = iis.read()) != -1) {
-                            fos.write(i);
+                        try {
+                            while ((i = iis.read()) != -1) {
+                                fos.write(i);
+                            }
+                        } catch (EOFException ex) {
                         }
                         fis.close();
                         fos.close();
