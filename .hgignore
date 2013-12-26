@@ -16,6 +16,7 @@
 ^trunk/testdata/decompile$
 ^trunk/testdata/recompile$
 ^trunk/build_exe\.xml$
+^trunk/build_exe64\.xml$
 ^trunk/coverage\.ec$
 ^trunk/libsrc/jsyntaxpane/jsyntaxpane/src/target$
 ^trunk/hs_err_pid.*.log$
