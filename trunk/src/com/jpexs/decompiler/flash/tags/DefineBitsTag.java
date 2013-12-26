@@ -49,7 +49,7 @@ public class DefineBitsTag extends ImageTag {
         super(swf, ID, "DefineBits", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
-        jpegData = sis.readBytes(sis.available());
+        jpegData = sis.readBytesEx(sis.available());
     }
 
     private void getJPEGTables(List<Tag> tags) {

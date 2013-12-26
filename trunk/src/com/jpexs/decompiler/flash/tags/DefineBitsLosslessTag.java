@@ -165,7 +165,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
             bitmapColorTableSize = sis.readUI8();
         }
-        zlibBitmapData = sis.readBytes(sis.available());
+        zlibBitmapData = sis.readBytesEx(sis.available());
     }
 
     /**

@@ -101,7 +101,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         characters = sis.readBUTTONRECORDList(false);
         //actions = sis.readActionList();
         hdrSize = sis.getPos();
-        actionBytes = sis.readBytes(sis.available());
+        actionBytes = sis.readBytesEx(sis.available());
     }
 
     /**

@@ -137,7 +137,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
                 SWFInputStream sis = new SWFInputStream(bais, version);
                 int len = sis.readUI16();
                 if (len != 0) {
-                    origbrdata = sis.readBytes(len - 2);
+                    origbrdata = sis.readBytesEx(len - 2);
                     os2 = new CopyOutputStream(os2, new ByteArrayInputStream(origbrdata));
                 }
             }

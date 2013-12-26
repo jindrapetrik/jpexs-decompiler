@@ -57,7 +57,7 @@ public class DefineBinaryDataTag extends CharacterTag {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         tag = sis.readUI16();
         reserved = sis.readUI32();
-        binaryData = sis.readBytes(sis.available());
+        binaryData = sis.readBytesEx(sis.available());
     }
 
     @Override

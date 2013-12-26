@@ -63,7 +63,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         spriteId = sis.readUI16();
         //actions = sis.readActionList();
-        actionBytes = sis.readBytes(sis.available());
+        actionBytes = sis.readBytesEx(sis.available());
     }
 
     /**

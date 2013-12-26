@@ -93,7 +93,7 @@ public class DefineExternalStreamSound extends Tag {
         startFrame = sis.readUI32();
         lastFrame = sis.readUI32();
         int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytes(fileNameLen));
+        fileName = new String(sis.readBytesEx(fileNameLen));
 
     }
 }

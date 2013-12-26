@@ -131,7 +131,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         characterID = sis.readUI16();
         long alphaDataOffset = sis.readUI32();
         deblockParam = sis.readUI16();
-        imageData = sis.readBytes(alphaDataOffset);
-        bitmapAlphaData = sis.readBytes(sis.available());
+        imageData = sis.readBytesEx(alphaDataOffset);
+        bitmapAlphaData = sis.readBytesEx(sis.available());
     }
 }

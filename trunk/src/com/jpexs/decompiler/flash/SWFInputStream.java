@@ -192,7 +192,7 @@ public class SWFInputStream extends InputStream {
         bitPos = 0;
         try {
             return readNoBitReset();
-        } catch (EndOfStreamException ex) {
+        } catch (EOFException | EndOfStreamException ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, null, ex);
         }
         return -1;
@@ -356,7 +356,7 @@ public class SWFInputStream extends InputStream {
     }
 
     private long readLong() throws IOException {
-        byte[] readBuffer = readBytes(8);
+        byte[] readBuffer = readBytesEx(8);
         return (((long) readBuffer[3] << 56)
                 + ((long) (readBuffer[2] & 255) << 48)
                 + ((long) (readBuffer[1] & 255) << 40)
@@ -419,7 +419,7 @@ public class SWFInputStream extends InputStream {
      * @return Array of read bytes
      * @throws IOException
      */
-    public byte[] readBytes(long count) throws IOException {
+    public byte[] readBytesEx(long count) throws IOException {
         if (count <= 0) {
             return new byte[0];
         }
@@ -430,8 +430,30 @@ public class SWFInputStream extends InputStream {
         return ret;
     }
 
+    /**
+     * Reads bytes from the stream
+     *
+     * @param count Number of bytes to read
+     * @return Array of read bytes
+     * @throws IOException
+     */
+    public byte[] readBytes(long count) throws IOException {
+        if (count <= 0) {
+            return new byte[0];
+        }
+        byte[] ret = new byte[(int) count];
+        try {
+            for (int i = 0; i < count; i++) {
+                ret[i] = (byte) readEx();
+            }
+        } catch (EOFException | EndOfStreamException ex) {
+            Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return ret;
+    }
+
     public byte[] readBytesZlib(long count) throws IOException {
-        byte[] data = readBytes(count);
+        byte[] data = readBytesEx(count);
         InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf = new byte[4096];
@@ -2560,7 +2582,7 @@ public class SWFInputStream extends InputStream {
                 x++;
             }
         }
-        ret.colorMapPixelData = readBytes(dataLen);
+        ret.colorMapPixelData = readBytesEx(dataLen);
         return ret;
     }
 
@@ -2649,7 +2671,7 @@ public class SWFInputStream extends InputStream {
                 x++;
             }
         }
-        ret.colorMapPixelData = readBytes(dataLen);
+        ret.colorMapPixelData = readBytesEx(dataLen);
         return ret;
     }
 

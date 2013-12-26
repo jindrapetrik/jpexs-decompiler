@@ -93,7 +93,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         long alphaDataOffset = sis.readUI32();
-        imageData = sis.readBytes(alphaDataOffset);
+        imageData = sis.readBytesEx(alphaDataOffset);
         bitmapAlphaData = sis.readBytesZlib(sis.available());
     }
 

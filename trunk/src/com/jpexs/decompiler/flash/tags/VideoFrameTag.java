@@ -68,6 +68,6 @@ public class VideoFrameTag extends Tag {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         streamID = sis.readUI16();
         frameNum = sis.readUI16();
-        videoData = sis.readBytes(sis.available()); //TODO: Parse video packets
+        videoData = sis.readBytesEx(sis.available()); //TODO: Parse video packets
     }
 }

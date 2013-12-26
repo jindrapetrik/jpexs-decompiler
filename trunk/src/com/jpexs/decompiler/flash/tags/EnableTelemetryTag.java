@@ -70,7 +70,7 @@ public class EnableTelemetryTag extends Tag {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         reserved = (int) sis.readUB(16);
         if (sis.available() > 0) {
-            passwordHash = sis.readBytes(32);
+            passwordHash = sis.readBytesEx(32);
         }
     }
 }

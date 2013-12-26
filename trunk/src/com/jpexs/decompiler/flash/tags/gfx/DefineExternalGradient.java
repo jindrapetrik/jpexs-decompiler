@@ -80,6 +80,6 @@ public class DefineExternalGradient extends Tag {
         bitmapsFormat = sis.readUI16();
         gradientSize = sis.readUI16();
         int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytes(fileNameLen));
+        fileName = new String(sis.readBytesEx(fileNameLen));
     }
 }

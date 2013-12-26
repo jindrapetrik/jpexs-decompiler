@@ -99,7 +99,7 @@ public class FontTextureInfo extends Tag {
         textureID = sis.readUI32();
         textureFormat = sis.readUI16();
         int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytes(fileNameLen));
+        fileName = new String(sis.readBytesEx(fileNameLen));
         textureWidth = sis.readUI16();
         textureHeight = sis.readUI16();
         padPixels = sis.readUI8();

@@ -94,9 +94,9 @@ public class DefineExternalSound extends Tag {
         sampleCount = sis.readUI32();
         seekSample = sis.readUI32();
         int exportNameLen = sis.readUI8();
-        exportName = new String(sis.readBytes(exportNameLen));
+        exportName = new String(sis.readBytesEx(exportNameLen));
         int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytes(fileNameLen));
+        fileName = new String(sis.readBytesEx(fileNameLen));
 
     }
 }

@@ -83,7 +83,7 @@ public class DefineExternalImage extends Tag {
         targetWidth = sis.readUI16();
         targetHeight = sis.readUI16();
         int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytes(fileNameLen));
+        fileName = new String(sis.readBytesEx(fileNameLen));
 
     }
 }

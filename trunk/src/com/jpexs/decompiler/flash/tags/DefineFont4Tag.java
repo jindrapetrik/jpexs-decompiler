@@ -49,7 +49,7 @@ public class DefineFont4Tag extends CharacterTag {
         fontFlagsItalic = sis.readUB(1) == 1;
         fontFlagsBold = sis.readUB(1) == 1;
         fontName = sis.readString();
-        fontData = sis.readBytes(sis.available());
+        fontData = sis.readBytesEx(sis.available());
     }
 
     /**

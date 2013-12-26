@@ -100,9 +100,9 @@ public class ExporterInfoTag extends Tag {
         }
         bitmapFormat = sis.readUI16();
         int prefixLen = sis.readUI8();
-        prefix = sis.readBytes(prefixLen);
+        prefix = sis.readBytesEx(prefixLen);
         int swfNameLen = sis.readUI8();
-        swfName = new String(sis.readBytes(swfNameLen));
+        swfName = new String(sis.readBytesEx(swfNameLen));
         if (sis.available() > 0) // (version >= 0x401) //?                
         {
             codeOffsets = new ArrayList<>();

@@ -190,7 +190,7 @@ public class DefineFont2Tag extends FontTag {
         fontFlagsBold = sis.readUB(1) == 1;
         languageCode = sis.readLANGCODE();
         int fontNameLen = sis.readUI8();
-        fontName = new String(sis.readBytes(fontNameLen));
+        fontName = new String(sis.readBytesEx(fontNameLen));
         numGlyphs = sis.readUI16();
         //offsetTable = new long[numGlyphs];
         for (int i = 0; i < numGlyphs; i++) { //offsetTable

@@ -103,7 +103,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
             actionRecordSize--;
         }
         hdrPos = sis.getPos();
-        actionBytes = sis.readBytes(actionRecordSize);
+        actionBytes = sis.readBytesEx(actionRecordSize);
         this.pos = pos;
 
     }

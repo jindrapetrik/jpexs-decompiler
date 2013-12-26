@@ -94,7 +94,7 @@ public class DefineSoundTag extends CharacterTag {
         soundSize = (int) sis.readUB(1);
         soundType = (int) sis.readUB(1);
         soundSampleCount = sis.readUI32();
-        soundData = sis.readBytes(sis.available());
+        soundData = sis.readBytesEx(sis.available());
     }
 
     public String getExportFormat() {

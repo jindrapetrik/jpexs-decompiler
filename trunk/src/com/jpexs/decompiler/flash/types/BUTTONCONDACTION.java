@@ -73,9 +73,9 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
         condKeyPress = (int) sis.readUB(7);
         condOverDownToIddle = sis.readUB(1) == 1;
         if (condActionSize <= 0) {
-            actionBytes = sis.readBytes(sis.available());
+            actionBytes = sis.readBytesEx(sis.available());
         } else {
-            actionBytes = sis.readBytes(condActionSize - 4);
+            actionBytes = sis.readBytesEx(condActionSize - 4);
         }
     }
     /**

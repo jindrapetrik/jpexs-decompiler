@@ -93,7 +93,7 @@ public class DefineFontInfoTag extends Tag {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontId = sis.readUI16();
         int fontNameLen = sis.readUI8();
-        fontName = new String(sis.readBytes(fontNameLen));
+        fontName = new String(sis.readBytesEx(fontNameLen));
         sis.readUB(2); //reserved
         fontFlagsSmallText = sis.readUB(1) == 1;
         fontFlagsShiftJIS = sis.readUB(1) == 1;

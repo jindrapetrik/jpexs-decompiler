@@ -91,11 +91,11 @@ public class DefineExternalImage2 extends Tag {
         targetWidth = sis.readUI16();
         targetHeight = sis.readUI16();
         int exportNameLen = sis.readUI8();
-        exportName = new String(sis.readBytes(exportNameLen));
+        exportName = new String(sis.readBytesEx(exportNameLen));
         int fileNameLen = sis.readUI8();
-        fileName = new String(sis.readBytes(fileNameLen));
+        fileName = new String(sis.readBytesEx(fileNameLen));
         if (sis.available() > 0) { //there is usually one zero byte, bod knows why
-            extraData = sis.readBytes(sis.available());
+            extraData = sis.readBytesEx(sis.available());
         }
     }
 }
