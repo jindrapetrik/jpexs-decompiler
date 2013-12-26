@@ -58,6 +58,7 @@ import com.jpexs.helpers.streams.SeekableInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -650,7 +651,7 @@ public class SWFInputStream extends InputStream {
             long pos = getPos();
             try {
                 tag = readTag(swf, level, pos, parseTags && !parallel, parallel, skipUnusualTags);
-            } catch (EndOfStreamException ex) {
+            } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
             if (tag == null) {
