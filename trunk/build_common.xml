@@ -164,6 +164,45 @@
             </launch4jConfig>
         </echoxml>
     </target>
+    <target name="-exe64-config">
+        <echoxml file="${EXE64CONFIG}">
+            <launch4jConfig>
+                <dontWrapJar>true</dontWrapJar>
+                <headerType>gui</headerType>
+                <jar>${JARFILENAME}.jar</jar>
+                <outfile>${DISTRIBUTIONDIR}/${EXE64FILENAME}.exe</outfile>
+                <errTitle></errTitle>
+                <cmdLine></cmdLine>
+                <chdir></chdir>
+                <priority>normal</priority>
+                <downloadUrl>http://java.com/download</downloadUrl>
+                <supportUrl></supportUrl>
+                <customProcName>false</customProcName>
+                <stayAlive>false</stayAlive>
+                <manifest></manifest>
+                <icon>${EXEICON}</icon>
+                <jre>
+                    <path></path>
+                    <minVersion>${MINJAVAVERSION}</minVersion>
+                    <maxVersion></maxVersion>
+                    <jdkPreference>preferJre</jdkPreference>
+                    <maxHeapSize>${MAXHEAPSIZE64}</maxHeapSize>
+                </jre>
+                <versionInfo>
+                    <fileVersion>${VERSIONNUMBER}</fileVersion>
+                    <txtFileVersion>${VERSION}${VERSIONSUFFIX}</txtFileVersion>
+                    <fileDescription>${PRODUCTNAME}</fileDescription>
+                    <copyright>${VENDOR}</copyright>
+                    <productVersion>${VERSIONNUMBER}</productVersion>
+                    <txtProductVersion>${VERSION}${VERSIONSUFFIX}</txtProductVersion>
+                    <productName>${PRODUCTNAME}</productName>
+                    <companyName></companyName>
+                    <internalName>${INTERNALNAME}</internalName>
+                    <originalFilename>${EXE64FILENAME}.exe</originalFilename>
+                </versionInfo>
+            </launch4jConfig>
+        </echoxml>
+    </target>
     <target name="-exe-linux" unless="is_windows" depends="-exe-config">
         <exec dir="${LAUNCH4JPATH}" executable="${LAUNCH4JPATH}/launch4j">
             <arg file="${EXECONFIG}" />
@@ -174,7 +213,12 @@
             <arg file="${EXECONFIG}" />
         </exec>
     </target>
-    <target name="exe" depends="-exe-linux,-exe-windows">
+    <target name="-exe64-windows" if="is_windows" depends="-exe64-config">
+        <exec dir="${LAUNCH4JPATH}" executable="${LAUNCH4JPATH}\launch4jc.exe">
+            <arg file="${EXE64CONFIG}" />
+        </exec>
+    </target>
+    <target name="exe" depends="-exe-linux,-exe-windows,-exe64-windows">
         
     </target>
 

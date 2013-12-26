@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>ffdec.jar</jar>
+  <outfile>C:\Projectek\ffdec\asdec\trunk/dist/ffdec64.exe</outfile>
+  <errTitle />
+  <cmdLine />
+  <chdir />
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl />
+  <customProcName>false</customProcName>
+  <stayAlive>false</stayAlive>
+  <manifest />
+  <icon>C:\Projectek\ffdec\asdec\trunk/graphics/icon_ffdec_round.ico</icon>
+  <jre>
+    <path />
+    <minVersion>1.7.0</minVersion>
+    <maxVersion />
+    <jdkPreference>preferJre</jdkPreference>
+    <maxHeapSize>8192</maxHeapSize>
+  </jre>
+  <versionInfo>
+    <fileVersion>1.7.4.1</fileVersion>
+    <txtFileVersion>1.7.4u1_fec2956aac20+</txtFileVersion>
+    <fileDescription>JPEXS Free Flash Decompiler</fileDescription>
+    <copyright>JPEXS</copyright>
+    <productVersion>1.7.4.1</productVersion>
+    <txtProductVersion>1.7.4u1_fec2956aac20+</txtProductVersion>
+    <productName>JPEXS Free Flash Decompiler</productName>
+    <companyName />
+    <internalName>FFDec</internalName>
+    <originalFilename>ffdec64.exe</originalFilename>
+  </versionInfo>
+</launch4jConfig>

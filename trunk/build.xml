@@ -10,6 +10,7 @@
     <property name="PREFIXFILENAME" value="ffdec"/>
     <property name="JARFILENAME" value="${PREFIXFILENAME}"/>
     <property name="EXEFILENAME" value="${PREFIXFILENAME}"/>
+    <property name="EXE64FILENAME" value="${PREFIXFILENAME}64"/>
     <property name="EXEICON" value="${basedir}/graphics/icon_ffdec_round.ico"/>
     <property name="TARGETJAVA" value="1.7"/>
     <property name="MINJAVAVERSION" value="1.7.0"/>
@@ -20,6 +21,7 @@
     <property name="INNOSETUPPATH" value="c:\program files (x86)\inno setup 5"/>
     <property name="LAUNCH4JPATH" value="c:\program files (x86)\launch4j" />
     <property name="MAXHEAPSIZE" value="1024"/> <!-- MB -->
+    <property name="MAXHEAPSIZE64" value="8192"/> <!-- MB -->
        
     
     <property name="SOURCEDIR" value="${basedir}/src"/>
@@ -47,6 +49,7 @@
     <property name="INSTALLERCONFIG" value="${basedir}/installer.cfg"/>
     <property name="INSTALLERPROJECT" value="${basedir}/installer.iss"/>
     <property name="EXECONFIG" value="${basedir}/build_exe.xml"/>    
+    <property name="EXE64CONFIG" value="${basedir}/build_exe64.xml"/>    
     <property name="RUNPARAMS" value=""/>
 
     <import file="build_common.xml"/>

@@ -68,13 +68,26 @@ public class ContextMenuTools {
             return true;
         }
 
+        String exeName32 = "ffdec.exe";
+        String exeName64 = "ffdec64.exe";
+        
+        if (add) {
+            String exeName = Platform.is64Bit() ? exeName64 : exeName32;
+            return addToContextMenu(add, exeName);
+        } else {
+            // remove both 32 and 64 bit references
+            addToContextMenu(add, exeName32);
+            return addToContextMenu(add, exeName64);
+        }
+    }
+    
+    private static boolean addToContextMenu(boolean add, String exeName) {
         final String extensions[] = new String[]{"swf", "gfx"};
 
         final WinReg.HKEY REG_CLASSES_HKEY = WinReg.HKEY_LOCAL_MACHINE;
         final String REG_CLASSES_PATH = "Software\\Classes\\";
 
         String appDir = getAppDir();
-        String exeName = "ffdec.exe";
         String verb = "ffdec";
         String verbName = "Open with FFDec";
         boolean exists;
