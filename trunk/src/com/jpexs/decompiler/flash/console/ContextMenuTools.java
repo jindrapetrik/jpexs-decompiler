@@ -131,43 +131,47 @@ public class ContextMenuTools {
                     Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb + "\\command", "", "\"" + appDir + exeName + "\" \"%1\"");
                 }
                 if (exists && (!add)) { //remove
-                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb + "\\command");
-                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb);
+                    registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb + "\\command");
+                    registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\" + verb);
                 }
 
+                exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
+
                 if (exists && (!add)) { //remove
-                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command");
-                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open");
-                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell");
-                    Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
+                    registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command");
+                    registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open");
+                    registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell");
+                    registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
                 }
                 //2) Add to OpenWith list
-                String mruList = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "MRUList");
-                if (mruList != null) {
-                    exists = false;
-                    char appChar = 0;
-                    for (int i = 0; i < mruList.length(); i++) {
-                        String app = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "" + mruList.charAt(i));
-                        if (app.equals(exeName)) {
-                            appChar = mruList.charAt(i);
-                            exists = true;
-                            break;
-                        }
-                    }
-                    if ((!exists) && add) { //add
-                        for (int c = 'a'; c <= 'z'; c++) {
-                            if (mruList.indexOf(c) == -1) {
-                                mruList += (char) c;
-                                Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "" + (char) c, exeName);
-                                Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "MRUList", mruList);
+                if (Advapi32Util.registryValueExists(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "MRUList")) {
+                    String mruList = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "MRUList");
+                    if (mruList != null) {
+                        exists = false;
+                        char appChar = 0;
+                        for (int i = 0; i < mruList.length(); i++) {
+                            String app = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "" + mruList.charAt(i));
+                            if (app.equals(exeName)) {
+                                appChar = mruList.charAt(i);
+                                exists = true;
                                 break;
                             }
                         }
-                    }
-                    if (exists && (!add)) { //remove
-                        mruList = mruList.replace("" + appChar, "");
-                        Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "MRUList", mruList);
-                        Advapi32Util.registryDeleteValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "" + appChar);
+                        if ((!exists) && add) { //add
+                            for (int c = 'a'; c <= 'z'; c++) {
+                                if (mruList.indexOf(c) == -1) {
+                                    mruList += (char) c;
+                                    Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "" + (char) c, exeName);
+                                    Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "MRUList", mruList);
+                                    break;
+                                }
+                            }
+                        }
+                        if (exists && (!add)) { //remove
+                            mruList = mruList.replace("" + appChar, "");
+                            Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "MRUList", mruList);
+                            registryDeleteValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + ext + "\\OpenWithList", "" + appChar);
+                        }
                     }
                 }
 
@@ -187,8 +191,8 @@ public class ContextMenuTools {
                         Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb + "\\Command", "", "\"" + appDir + exeName + "\" \"%1\"");
                     }
                     if (exists && (!add)) { //remove        
-                        Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb + "\\Command");
-                        Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb);
+                        registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb + "\\Command");
+                        registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb);
                     }
                 }
             }
@@ -206,5 +210,19 @@ public class ContextMenuTools {
             Kernel32.INSTANCE.WaitForSingleObject(sei.hProcess, 1000 * 60 * 60 * 24 /*1 day max*/);
         }
         return false;
+    }
+    
+    private static void registryDeleteKey(WinReg.HKEY hKey, String keyName) {
+        boolean exists = Advapi32Util.registryKeyExists(hKey, keyName);
+        if (exists) {
+            Advapi32Util.registryDeleteKey(hKey, keyName);
+        }
+    }
+
+    private static void registryDeleteValue(WinReg.HKEY root, String keyPath, String valueName) {
+        boolean exists = Advapi32Util.registryValueExists(root, keyPath, valueName);
+        if (exists) {
+            Advapi32Util.registryDeleteValue(root, keyPath, valueName);
+        }
     }
 }

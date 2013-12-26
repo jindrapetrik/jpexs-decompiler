@@ -125,7 +125,7 @@ public abstract class Advapi32Util {
                     throw new Win32Exception(rc);
             }
         } finally {
-            if (phkKey.getValue() != WinBase.INVALID_HANDLE_VALUE) {
+            if (phkKey.getValue() != null && phkKey.getValue() != WinBase.INVALID_HANDLE_VALUE) {
                 rc = Advapi32.INSTANCE.RegCloseKey(phkKey.getValue());
                 if (rc != W32Errors.ERROR_SUCCESS) {
                     throw new Win32Exception(rc);
