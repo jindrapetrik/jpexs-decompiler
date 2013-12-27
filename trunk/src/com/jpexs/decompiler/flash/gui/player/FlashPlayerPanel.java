@@ -29,6 +29,7 @@ import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinUser;
 import com.sun.jna.ptr.IntByReference;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Panel;
 import java.awt.event.ComponentEvent;
@@ -38,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
 
 /**
  *
@@ -51,7 +51,7 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     private HANDLE pipe;
     private static List<HANDLE> processes = new ArrayList<>();
     private static List<HANDLE> pipes = new ArrayList<>();
-    private JFrame frame;
+    private Component frame;
     private boolean stopped = true;
     private static final int CMD_PLAY = 1;
     private static final int CMD_RESIZE = 2;
@@ -193,7 +193,7 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()}, 3, ibr, null);
     }
 
-    public FlashPlayerPanel(JFrame frame) {
+    public FlashPlayerPanel(Component frame) {
         if (!Platform.isWindows()) {
             throw new FlashUnsupportedException();
         }

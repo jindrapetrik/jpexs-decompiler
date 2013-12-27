@@ -54,7 +54,7 @@ public class FontPanel extends JPanel implements ActionListener {
     static final String ACTION_FONT_EMBED = "FONTEMBED";
     static final String ACTION_FONT_ADD_CHARS = "FONTADDCHARS";
 
-    private MainFrame mainFrame;
+    private MainFramePanel mainFramePanel;
 
     public Map<Integer, String> sourceFontsMap = new HashMap<>();
 
@@ -69,8 +69,8 @@ public class FontPanel extends JPanel implements ActionListener {
     private ComponentListener fontChangeList;
     private JComboBox<String> fontSelection;
 
-    public FontPanel(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+    public FontPanel(MainFramePanel mainFramePanel) {
+        this.mainFramePanel = mainFramePanel;
         createFontPanel();
     }
     
@@ -181,8 +181,8 @@ public class FontPanel extends JPanel implements ActionListener {
         fontSelection.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (mainFrame.oldValue instanceof FontTag) {
-                    FontTag f = (FontTag) mainFrame.oldValue;
+                if (mainFramePanel.oldValue instanceof FontTag) {
+                    FontTag f = (FontTag) mainFramePanel.oldValue;
                     sourceFontsMap.put(f.getFontId(), (String) fontSelection.getSelectedItem());
                 }
             }
@@ -207,11 +207,11 @@ public class FontPanel extends JPanel implements ActionListener {
     }
     
     private String translate(String key) {
-        return mainFrame.translate(key);
+        return mainFramePanel.translate(key);
     }
 
     private void fontAddChars(FontTag ft, Set<Integer> selChars, String selFont) {
-        FontTag f = (FontTag) mainFrame.oldValue;
+        FontTag f = (FontTag) mainFramePanel.oldValue;
         SWF swf = ft.getSwf();
         String oldchars = f.getCharacters(swf.tags);
         for (int ic : selChars) {
@@ -280,30 +280,30 @@ public class FontPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case ACTION_FONT_EMBED:
-                if (mainFrame.oldValue instanceof FontTag) {
-                    FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ((FontTag) mainFrame.oldValue).getFontStyle());
+                if (mainFramePanel.oldValue instanceof FontTag) {
+                    FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ((FontTag) mainFramePanel.oldValue).getFontStyle());
                     if (fed.display()) {
                         Set<Integer> selChars = fed.getSelectedChars();
                         if (!selChars.isEmpty()) {
                             String selFont = fed.getSelectedFont();
                             fontSelection.setSelectedItem(selFont);
-                            fontAddChars((FontTag) mainFrame.oldValue, selChars, selFont);
+                            fontAddChars((FontTag) mainFramePanel.oldValue, selChars, selFont);
                             fontAddCharactersField.setText("");
-                            mainFrame.reload(true);
+                            mainFramePanel.reload(true);
                         }
                     }
                 }
                 break;
             case ACTION_FONT_ADD_CHARS:
                 String newchars = fontAddCharactersField.getText();
-                if (mainFrame.oldValue instanceof FontTag) {
+                if (mainFramePanel.oldValue instanceof FontTag) {
                     Set<Integer> selChars = new TreeSet<>();
                     for (int c = 0; c < newchars.length(); c++) {
                         selChars.add(newchars.codePointAt(c));
                     }
-                    fontAddChars((FontTag) mainFrame.oldValue, selChars, fontSelection.getSelectedItem().toString());
+                    fontAddChars((FontTag) mainFramePanel.oldValue, selChars, fontSelection.getSelectedItem().toString());
                     fontAddCharactersField.setText("");
-                    mainFrame.reload(true);
+                    mainFramePanel.reload(true);
                 }
                 break;
         }

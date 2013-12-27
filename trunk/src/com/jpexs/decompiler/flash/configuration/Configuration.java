@@ -79,6 +79,8 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> decimalAddress = null;
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> showAllAddresses = null;
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> useRibbonInterface = null;
 
     /**
      * Debug mode = throwing an error when comparing original file and

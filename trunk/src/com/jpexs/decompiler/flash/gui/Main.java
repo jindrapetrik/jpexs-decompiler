@@ -148,11 +148,11 @@ public class Main {
             @Override
             public void run() {
                 if (mainFrame != null) {
-                    mainFrame.setWorkStatus(name, worker);
+                    mainFrame.getPanel().setWorkStatus(name, worker);
                     if (percent == -1) {
-                        mainFrame.hidePercent();
+                        mainFrame.getPanel().hidePercent();
                     } else {
-                        mainFrame.setPercent(percent);
+                        mainFrame.getPanel().setPercent(percent);
                     }
                 }
                 if (loadingDialog != null) {
@@ -177,7 +177,7 @@ public class Main {
             @Override
             public void run() {
                 if (mainFrame != null) {
-                    mainFrame.setWorkStatus("", null);
+                    mainFrame.getPanel().setWorkStatus("", null);
                 }
                 if (loadingDialog != null) {
                     loadingDialog.setDetail("");
@@ -324,11 +324,15 @@ public class Main {
                         @Override
                         public void run() {
                             if (mainFrame == null) {
-                                mainFrame = new MainFrame();
+                                if (Configuration.useRibbonInterface.get()) {
+                                    mainFrame = new MainFrameRibbon();
+                                } else {
+                                    mainFrame = new MainFrameClassic();
+                                }
                             }
-                            mainFrame.load(swf1);
+                            mainFrame.getPanel().load(swf1);
                             if (errorState) {
-                                mainFrame.setErrorState();
+                                mainFrame.getPanel().setErrorState();
                             }
                         }
                     });
@@ -356,7 +360,7 @@ public class Main {
     public static boolean reloadSWFs() {
         CancellableWorker.cancelBackgroundThreads();
         if (mainFrame != null) {
-            mainFrame.closeAll();
+            mainFrame.getPanel().closeAll();
         }
         if (Main.sourceInfos.isEmpty()) {
             Cache.clearAll();
@@ -421,7 +425,7 @@ public class Main {
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos) {
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
             sourceInfos.clear();
-            mainFrame.closeAll();
+            mainFrame.getPanel().closeAll();
             mainFrame.setVisible(false);
             Cache.clearAll();
             System.gc();
@@ -450,7 +454,7 @@ public class Main {
 
     public static void closeFile(SWF swf) {
        sourceInfos.remove(swf.sourceInfo);
-       mainFrame.close(swf);
+       mainFrame.getPanel().close(swf);
     }
     
     public static boolean saveFileDialog(SWF swf) {
@@ -586,7 +590,9 @@ public class Main {
     private static boolean errorState = false;
 
     private static void initGui() {
-        View.setLookAndFeel();
+        if (Configuration.useRibbonInterface.get()) {
+            View.setLookAndFeel();
+        }
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
@@ -604,7 +610,7 @@ public class Main {
                                 if (record.getLevel() == Level.SEVERE) {
                                     errorState = true;
                                     if (mainFrame != null) {
-                                        mainFrame.setErrorState();
+                                        mainFrame.getPanel().setErrorState();
                                     }
                                 }
                             }
@@ -631,9 +637,13 @@ public class Main {
             @Override
             public void run() {
                 if (mainFrame == null) {
-                    mainFrame = new MainFrame();
+                    if (Configuration.useRibbonInterface.get()) {
+                        mainFrame = new MainFrameRibbon();
+                    } else {
+                        mainFrame = new MainFrameClassic();
+                    }
                     if (errorState) {
-                        mainFrame.setErrorState();
+                        mainFrame.getPanel().setErrorState();
                     }
                 }
                 mainFrame.setVisible(true);
@@ -1033,7 +1043,7 @@ public class Main {
 
         errorState = false;
         if (mainFrame != null) {
-            mainFrame.clearErrorState();
+            mainFrame.getPanel().clearErrorState();
         }
     }
 

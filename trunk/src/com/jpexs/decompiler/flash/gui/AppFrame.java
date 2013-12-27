@@ -25,9 +25,14 @@ import javax.swing.JFrame;
  */
 public abstract class AppFrame extends JFrame {
 
-    private ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
+    private ResourceBundle resourceBundle;
 
     public AppFrame() {
+        if (getClass().equals(MainFrameClassic.class)) {
+            resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(MainFrame.class));
+        } else {
+            resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
+        }
     }
 
     public String translate(String key) {

@@ -64,7 +64,7 @@ public class TagTreeModel implements TreeModel {
         List<TagNode> ret = new ArrayList<>();
         int frameCnt = 0;
         for (ContainerItem o : list) {
-            TagType ttype = MainFrame.getTagType(o);
+            TagType ttype = MainFramePanel.getTagType(o);
             if (ttype == TagType.SHOW_FRAME && type == TagType.FRAME) {
                 frameCnt++;
                 ret.add(new TagNode(new FrameNode(o.getSwf(), frameCnt, parent, display), o.getSwf()));

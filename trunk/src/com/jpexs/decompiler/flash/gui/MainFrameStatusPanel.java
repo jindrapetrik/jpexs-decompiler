@@ -39,7 +39,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
     
     static final String ACTION_SHOW_ERROR_LOG = "SHOWERRORLOG";
 
-    private MainFrame mainFrame;
+    private MainFramePanel mainFramePanel;
     
     private LoadingPanel loadingPanel = new LoadingPanel(20, 20);
     private JLabel statusLabel = new JLabel("");
@@ -51,8 +51,8 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
 
     private CancellableWorker currentWorker;
 
-    public MainFrameStatusPanel(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+    public MainFrameStatusPanel(MainFramePanel mainFramePanel) {
+        this.mainFramePanel = mainFramePanel;
         createStatusPanel();
     }
     
@@ -108,7 +108,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
     }
     
     private String translate(String key) {
-        return mainFrame.translate(key);
+        return mainFramePanel.translate(key);
     }
 
     public void setStatus(String s) {

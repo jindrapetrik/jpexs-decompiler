@@ -39,7 +39,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.MainFrame;
+import com.jpexs.decompiler.flash.gui.MainFramePanel;
 import com.jpexs.decompiler.flash.gui.MyTextField;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
@@ -80,7 +80,7 @@ import jsyntaxpane.actions.DocumentSearchData;
 
 public class ABCPanel extends JPanel implements ItemListener, ActionListener, Freed {
 
-    private MainFrame mainFrame;
+    private MainFramePanel mainFramePanel;
     public TraitsList navigator;
     public ClassesListTree classTree;
     public ABC abc;
@@ -336,10 +336,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     }
 
     @SuppressWarnings("unchecked")
-    public ABCPanel(MainFrame mainFrame) {
+    public ABCPanel(MainFramePanel mainFramePanel) {
         DefaultSyntaxKit.initKit();
 
-        this.mainFrame = mainFrame;
+        this.mainFramePanel = mainFramePanel;
         setLayout(new BorderLayout());
 
         decompiledTextArea = new DecompiledEditorPane(this);
@@ -586,13 +586,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     }
 
     public void hilightScript(ScriptPack pack) {
-        TagTreeModel ttm = (TagTreeModel) mainFrame.tagTree.getModel();
+        TagTreeModel ttm = (TagTreeModel) mainFramePanel.tagTree.getModel();
         final TreePath tp = ttm.getTagPath(pack);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                mainFrame.tagTree.setSelectionPath(tp);
-                mainFrame.tagTree.scrollPathToVisible(tp);
+                mainFramePanel.tagTree.setSelectionPath(tp);
+                mainFramePanel.tagTree.scrollPathToVisible(tp);
             }
         });
 

@@ -16,820 +16,221 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.ApplicationInfo;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.console.ContextMenuTools;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.helpers.Cache;
-import com.jpexs.process.ProcessTools;
-import com.sun.jna.Platform;
+import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
+import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import org.pushingpixels.flamingo.api.common.AbstractCommandButton;
 import org.pushingpixels.flamingo.api.common.CommandButtonDisplayState;
-import org.pushingpixels.flamingo.api.common.JCommandButton;
-import org.pushingpixels.flamingo.api.common.JCommandButtonPanel;
+import org.pushingpixels.flamingo.api.common.CommandButtonLayoutManager;
+import org.pushingpixels.flamingo.api.common.icon.ResizableIcon;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
-import org.pushingpixels.flamingo.api.ribbon.JRibbonBand;
-import org.pushingpixels.flamingo.api.ribbon.JRibbonComponent;
-import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenu;
-import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryFooter;
-import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryPrimary;
-import org.pushingpixels.flamingo.api.ribbon.RibbonElementPriority;
-import org.pushingpixels.flamingo.api.ribbon.RibbonTask;
-import org.pushingpixels.flamingo.api.ribbon.resize.BaseRibbonBandResizePolicy;
-import org.pushingpixels.flamingo.api.ribbon.resize.CoreRibbonResizePolicies;
-import org.pushingpixels.flamingo.api.ribbon.resize.IconRibbonBandResizePolicy;
-import org.pushingpixels.flamingo.api.ribbon.resize.RibbonBandResizePolicy;
-import org.pushingpixels.flamingo.internal.ui.ribbon.AbstractBandControlPanel;
+import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
 
 /**
  *
  * @author JPEXS
  */
-public class MainFrameRibbon implements ActionListener {
+public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
 
-    static final String ACTION_RELOAD = "RELOAD";
-    static final String ACTION_ADVANCED_SETTINGS = "ADVANCEDSETTINGS";
-    static final String ACTION_LOAD_MEMORY = "LOADMEMORY";
-    static final String ACTION_LOAD_CACHE = "LOADCACHE";
-    static final String ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP = "GOTODOCUMENTCLASSONSTARTUP";
-    static final String ACTION_AUTO_RENAME_IDENTIFIERS = "AUTORENAMEIDENTIFIERS";
-    static final String ACTION_CACHE_ON_DISK = "CACHEONDISK";
-    static final String ACTION_SET_LANGUAGE = "SETLANGUAGE";
-    static final String ACTION_DISABLE_DECOMPILATION = "DISABLEDECOMPILATION";
-    static final String ACTION_ASSOCIATE = "ASSOCIATE";
-    static final String ACTION_GOTO_DOCUMENT_CLASS = "GOTODOCUMENTCLASS";
-    static final String ACTION_PARALLEL_SPEED_UP = "PARALLELSPEEDUP";
-    static final String ACTION_INTERNAL_VIEWER_SWITCH = "INTERNALVIEWERSWITCH";
-    static final String ACTION_SEARCH_AS = "SEARCHAS";
-    static final String ACTION_AUTO_DEOBFUSCATE = "AUTODEOBFUSCATE";
-    static final String ACTION_EXIT = "EXIT";
-
-    static final String ACTION_RENAME_ONE_IDENTIFIER = "RENAMEONEIDENTIFIER";
-    static final String ACTION_ABOUT = "ABOUT";
-    static final String ACTION_SHOW_PROXY = "SHOWPROXY";
-    static final String ACTION_SUB_LIMITER = "SUBLIMITER";
-    static final String ACTION_SAVE = "SAVE";
-    static final String ACTION_SAVE_AS = "SAVEAS";
-    static final String ACTION_SAVE_AS_EXE = "SAVEASEXE";
-    static final String ACTION_OPEN = "OPEN";
-    static final String ACTION_EXPORT_FLA = "EXPORTFLA";
-    public static final String ACTION_EXPORT_SEL = "EXPORTSEL";
-    static final String ACTION_EXPORT = "EXPORT";
-    static final String ACTION_CHECK_UPDATES = "CHECKUPDATES";
-    static final String ACTION_HELP_US = "HELPUS";
-    static final String ACTION_HOMEPAGE = "HOMEPAGE";
-    static final String ACTION_RESTORE_CONTROL_FLOW = "RESTORECONTROLFLOW";
-    static final String ACTION_RESTORE_CONTROL_FLOW_ALL = "RESTORECONTROLFLOWALL";
-    static final String ACTION_RENAME_IDENTIFIERS = "RENAMEIDENTIFIERS";
-    static final String ACTION_DEOBFUSCATE = "DEOBFUSCATE";
-    static final String ACTION_DEOBFUSCATE_ALL = "DEOBFUSCATEALL";
-    static final String ACTION_REMOVE_NON_SCRIPTS = "REMOVENONSCRIPTS";
-    static final String ACTION_REFRESH_DECOMPILED = "REFRESHDECOMPILED";
-
-    private MainFrame mainFrame;
-
-    private JCheckBox miAutoDeobfuscation;
-    private JCheckBox miInternalViewer;
-    private JCheckBox miParallelSpeedUp;
-    private JCheckBox miAssociate;
-    private JCheckBox miDecompile;
-    private JCheckBox miCacheDisk;
-    private JCheckBox miGotoMainClassOnStartup;
-    private JCheckBox miAutoRenameIdentifiers;
-    private JCommandButton saveCommandButton;
-    private JCommandButton saveasCommandButton;
-    private JCommandButton saveasexeCommandButton;
-    private JCommandButton exportAllCommandButton;
-    private JCommandButton exportFlaCommandButton;
-    private JCommandButton exportSelectionCommandButton;
+    public MainFramePanel panel;
+    private MainFrameMenu mainMenu;
     
-    private JCommandButton reloadCommandButton;
-    private JCommandButton renameinvalidCommandButton;
-    private JCommandButton globalrenameCommandButton;
-    private JCommandButton deobfuscationCommandButton;
-    private JCommandButton searchCommandButton;
-    private JCommandButton gotoDocumentClassCommandButton;
+    public MainFrameRibbon() {
+        super();
 
-    RibbonApplicationMenuEntryPrimary exportFlaMenu;
-    RibbonApplicationMenuEntryPrimary exportAllMenu;
-    RibbonApplicationMenuEntryPrimary exportSelMenu;
-        
-    public MainFrameRibbon(MainFrame mainFrame, JRibbon ribbon, boolean externalFlashPlayerUnavailable) {
-        this.mainFrame = mainFrame;
-
-        ribbon.addTask(createFileRibbonTask());
-        ribbon.addTask(createToolsRibbonTask());
-        ribbon.addTask(createSettingsRibbonTask());
-        ribbon.addTask(createHelpRibbonTask());
-
-        if (Configuration.debugMode.get()) {
-            ribbon.addTask(createDebugRibbonTask());
+        FlashPlayerPanel flashPanel = null;
+        try {
+            flashPanel = new FlashPlayerPanel(this);
+        } catch (FlashUnsupportedException fue) {
         }
 
-        ribbon.setApplicationMenu(createMainMenu());
+        java.awt.Container cnt = getContentPane();
+        cnt.setLayout(new BorderLayout());
+        JRibbon ribbon = getRibbon();
+        cnt.add(ribbon, BorderLayout.NORTH);
 
-        createMenuBar(externalFlashPlayerUnavailable);
-    }
+        boolean externalFlashPlayerUnavailable = flashPanel == null;
+        mainMenu = new MainFrameRibbonMenu(this, ribbon, externalFlashPlayerUnavailable);
 
-    public boolean isInternalFlashViewerSelected() {
-        return miInternalViewer.isSelected();
-    }
-    
-    private String translate(String key) {
-        return mainFrame.translate(key);
-    }
+        panel = new MainFramePanel(this, mainMenu, flashPanel);
+        panel.setBackground(Color.yellow);
+        cnt.add(panel, BorderLayout.CENTER);
 
-    private void assignListener(JCommandButton b, final String command) {
-        final MainFrameRibbon t = this;
-        b.addActionListener(new ActionListener() {
+        int w = Configuration.guiWindowWidth.get();
+        int h = Configuration.guiWindowHeight.get();
+        Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        if (w > dim.width) {
+            w = dim.width;
+        }
+        if (h > dim.height) {
+            h = dim.height;
+        }
+        setSize(w, h);
+
+        boolean maximizedHorizontal = Configuration.guiWindowMaximizedHorizontal.get();
+        boolean maximizedVertical = Configuration.guiWindowMaximizedVertical.get();
+
+        int state = 0;
+        if (maximizedHorizontal) {
+            state |= JFrame.MAXIMIZED_HORIZ;
+        }
+        if (maximizedVertical) {
+            state |= JFrame.MAXIMIZED_VERT;
+        }
+        setExtendedState(state);
+
+        View.setWindowIcon(this);
+        addWindowStateListener(new WindowStateListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                t.actionPerformed(new ActionEvent(e.getSource(), 0, command));
+            public void windowStateChanged(WindowEvent e) {
+                int state = e.getNewState();
+                Configuration.guiWindowMaximizedHorizontal.set((state & JFrame.MAXIMIZED_HORIZ) == JFrame.MAXIMIZED_HORIZ);
+                Configuration.guiWindowMaximizedVertical.set((state & JFrame.MAXIMIZED_VERT) == JFrame.MAXIMIZED_VERT);
             }
         });
-    }
-
-    private String fixCommandTitle(String title) {
-        if (title.length() > 2) {
-            if (title.charAt(1) == ' ') {
-                title = title.charAt(0) + "\u00A0" + title.substring(2);
-            }
-        }
-        return title;
-    }
-
-    private void createMenuBar(boolean externalFlashPlayerUnavailable) {
-        JMenuBar menuBar = new JMenuBar();
-
-        JMenu menuFile = new JMenu(translate("menu.file"));
-        JMenuItem miOpen = new JMenuItem(translate("menu.file.open"));
-        miOpen.setIcon(View.getIcon("open16"));
-        miOpen.setActionCommand(ACTION_OPEN);
-        miOpen.addActionListener(this);
-        JMenuItem miSave = new JMenuItem(translate("menu.file.save"));
-        miSave.setIcon(View.getIcon("save16"));
-        miSave.setActionCommand(ACTION_SAVE);
-        miSave.addActionListener(this);
-        JMenuItem miSaveAs = new JMenuItem(translate("menu.file.saveas"));
-        miSaveAs.setIcon(View.getIcon("saveas16"));
-        miSaveAs.setActionCommand(ACTION_SAVE_AS);
-        miSaveAs.addActionListener(this);
-        JMenuItem miSaveAsExe = new JMenuItem(translate("menu.file.saveasexe"));
-        miSaveAsExe.setIcon(View.getIcon("saveas16"));
-        miSaveAsExe.setActionCommand(ACTION_SAVE_AS_EXE);
-        miSaveAsExe.addActionListener(this);
-
-        JMenuItem menuExportFla = new JMenuItem(translate("menu.file.export.fla"));
-        menuExportFla.setActionCommand(ACTION_EXPORT_FLA);
-        menuExportFla.addActionListener(this);
-        menuExportFla.setIcon(View.getIcon("flash16"));
-
-        JMenuItem menuExportAll = new JMenuItem(translate("menu.file.export.all"));
-        menuExportAll.setActionCommand(ACTION_EXPORT);
-        menuExportAll.addActionListener(this);
-        JMenuItem menuExportSel = new JMenuItem(translate("menu.file.export.selection"));
-        menuExportSel.setActionCommand(ACTION_EXPORT_SEL);
-        menuExportSel.addActionListener(this);
-        menuExportAll.setIcon(View.getIcon("export16"));
-        menuExportSel.setIcon(View.getIcon("exportsel16"));
-
-
-
-        menuFile.add(miOpen);
-        menuFile.add(miSave);
-        menuFile.add(miSaveAs);
-        menuFile.add(miSaveAsExe);
-        menuFile.add(menuExportFla);
-        menuFile.add(menuExportAll);
-        menuFile.add(menuExportSel);
-        menuFile.addSeparator();
-        JMenuItem miClose = new JMenuItem(translate("menu.file.exit"));
-        miClose.setIcon(View.getIcon("exit16"));
-        miClose.setActionCommand(ACTION_EXIT);
-        miClose.addActionListener(this);
-        menuFile.add(miClose);
-        menuBar.add(menuFile);
-        JMenu menuDeobfuscation = new JMenu(translate("menu.tools.deobfuscation"));
-        menuDeobfuscation.setIcon(View.getIcon("deobfuscate16"));
-
-        JMenuItem miDeobfuscation = new JMenuItem(translate("menu.tools.deobfuscation.pcode"));
-        miDeobfuscation.setActionCommand(ACTION_DEOBFUSCATE);
-        miDeobfuscation.addActionListener(this);
-
-        miAutoDeobfuscation.setSelected(Configuration.autoDeobfuscate.get());
-        miAutoDeobfuscation.addActionListener(this);
-        miAutoDeobfuscation.setActionCommand(ACTION_AUTO_DEOBFUSCATE);
-
-        JMenuItem miRenameOneIdentifier = new JMenuItem(translate("menu.tools.deobfuscation.globalrename"));
-        miRenameOneIdentifier.setActionCommand(ACTION_RENAME_ONE_IDENTIFIER);
-        miRenameOneIdentifier.addActionListener(this);
-
-        JMenuItem miRenameIdentifiers = new JMenuItem(translate("menu.tools.deobfuscation.renameinvalid"));
-        miRenameIdentifiers.setActionCommand(ACTION_RENAME_IDENTIFIERS);
-        miRenameIdentifiers.addActionListener(this);
-
-
-        menuDeobfuscation.add(miRenameOneIdentifier);
-        menuDeobfuscation.add(miRenameIdentifiers);
-        menuDeobfuscation.add(miDeobfuscation);
-        JMenu menuTools = new JMenu(translate("menu.tools"));
-        JMenuItem miProxy = new JMenuItem(translate("menu.tools.proxy"));
-        miProxy.setActionCommand(ACTION_SHOW_PROXY);
-        miProxy.setIcon(View.getIcon("proxy16"));
-        miProxy.addActionListener(this);
-
-        JMenuItem miSearchScript = new JMenuItem(translate("menu.tools.searchas"));
-        miSearchScript.addActionListener(this);
-        miSearchScript.setActionCommand(ACTION_SEARCH_AS);
-        miSearchScript.setIcon(View.getIcon("search16"));
-
-        menuTools.add(miSearchScript);
-
-        miInternalViewer.setSelected(Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
-        if (externalFlashPlayerUnavailable) {
-            miInternalViewer.setEnabled(false);
-        }
-        miInternalViewer.setActionCommand(ACTION_INTERNAL_VIEWER_SWITCH);
-        miInternalViewer.addActionListener(this);
-
-        miParallelSpeedUp.setSelected(Configuration.parallelSpeedUp.get());
-        miParallelSpeedUp.setActionCommand(ACTION_PARALLEL_SPEED_UP);
-        miParallelSpeedUp.addActionListener(this);
-
-
-        menuTools.add(miProxy);
-
-        menuTools.add(menuDeobfuscation);
-
-        JMenuItem miGotoDocumentClass = new JMenuItem(translate("menu.tools.gotodocumentclass"));
-        miGotoDocumentClass.setActionCommand(ACTION_GOTO_DOCUMENT_CLASS);
-        miGotoDocumentClass.addActionListener(this);
-        menuBar.add(menuTools);
-
-        miDecompile.setSelected(!Configuration.decompile.get());
-        miDecompile.setActionCommand(ACTION_DISABLE_DECOMPILATION);
-        miDecompile.addActionListener(this);
-
-
-        miCacheDisk.setSelected(Configuration.cacheOnDisk.get());
-        miCacheDisk.setActionCommand(ACTION_CACHE_ON_DISK);
-        miCacheDisk.addActionListener(this);
-
-        miGotoMainClassOnStartup.setSelected(Configuration.gotoMainClassOnStartup.get());
-        miGotoMainClassOnStartup.setActionCommand(ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP);
-        miGotoMainClassOnStartup.addActionListener(this);
-
-        miAutoRenameIdentifiers.setSelected(Configuration.autoRenameIdentifiers.get());
-        miAutoRenameIdentifiers.setActionCommand(ACTION_AUTO_RENAME_IDENTIFIERS);
-        miAutoRenameIdentifiers.addActionListener(this);
-
-        /*JMenu menuSettings = new JMenu(translate("menu.settings"));
-         menuSettings.add(autoDeobfuscateMenuItem);
-         menuSettings.add(miInternalViewer);
-         menuSettings.add(miParallelSpeedUp);
-         menuSettings.add(miDecompile);
-         menuSettings.add(miCacheDisk);
-         menuSettings.add(miGotoMainClassOnStartup);
-         menuSettings.add(miAutoRenameIdentifiers);*/
-
-        miAssociate.setActionCommand(ACTION_ASSOCIATE);
-        miAssociate.addActionListener(this);
-        miAssociate.setSelected(ContextMenuTools.isAddedToContextMenu());
-
-
-        JMenuItem miLanguage = new JMenuItem(translate("menu.settings.language"));
-        miLanguage.setActionCommand(ACTION_SET_LANGUAGE);
-        miLanguage.addActionListener(this);
-
-        /* if (Platform.isWindows()) {
-         menuSettings.add(miAssociate);
-         }
-         menuSettings.add(miLanguage);
-
-         menuBar.add(menuSettings);*/
-        JMenu menuHelp = new JMenu(translate("menu.help"));
-        JMenuItem miAbout = new JMenuItem(translate("menu.help.about"));
-        miAbout.setIcon(View.getIcon("about16"));
-
-        miAbout.setActionCommand(ACTION_ABOUT);
-        miAbout.addActionListener(this);
-
-        JMenuItem miCheckUpdates = new JMenuItem(translate("menu.help.checkupdates"));
-        miCheckUpdates.setActionCommand(ACTION_CHECK_UPDATES);
-        miCheckUpdates.setIcon(View.getIcon("update16"));
-        miCheckUpdates.addActionListener(this);
-
-        JMenuItem miHelpUs = new JMenuItem(translate("menu.help.helpus"));
-        miHelpUs.setActionCommand(ACTION_HELP_US);
-        miHelpUs.setIcon(View.getIcon("donate16"));
-        miHelpUs.addActionListener(this);
-
-        JMenuItem miHomepage = new JMenuItem(translate("menu.help.homepage"));
-        miHomepage.setActionCommand(ACTION_HOMEPAGE);
-        miHomepage.setIcon(View.getIcon("homepage16"));
-        miHomepage.addActionListener(this);
-
-
-        menuHelp.add(miCheckUpdates);
-        menuHelp.add(miHelpUs);
-        menuHelp.add(miHomepage);
-        menuHelp.add(miAbout);
-        menuBar.add(menuHelp);
-
-        //setJMenuBar(menuBar);
-        
-        //if (hasAbc) {
-        menuTools.add(miGotoDocumentClass);
-        //}
-    }
-    
-    private RibbonApplicationMenu createMainMenu() {
-        RibbonApplicationMenu mainMenu = new RibbonApplicationMenu();
-        exportFlaMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportfla32"), translate("menu.file.export.fla"), new ActionRedirector(this, ACTION_EXPORT_FLA), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        exportAllMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("export32"), translate("menu.file.export.all"), new ActionRedirector(this, ACTION_EXPORT), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        exportSelMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportsel32"), translate("menu.file.export.selection"), new ActionRedirector(this, ACTION_EXPORT_SEL), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary checkUpdatesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("update32"), translate("menu.help.checkupdates"), new ActionRedirector(this, ACTION_CHECK_UPDATES), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary aboutMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("about32"), translate("menu.help.about"), new ActionRedirector(this, ACTION_ABOUT), JCommandButton.CommandButtonKind.ACTION_ONLY);
-        RibbonApplicationMenuEntryPrimary openFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("open32"), translate("menu.file.open"), new ActionRedirector(this, ACTION_OPEN), JCommandButton.CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
-        openFileMenu.setRolloverCallback(new RibbonApplicationMenuEntryPrimary.PrimaryRolloverCallback() {
+        addComponentListener(new ComponentAdapter() {
             @Override
-            public void menuEntryActivated(JPanel targetPanel) {
-               targetPanel.removeAll();
-               JCommandButtonPanel openHistoryPanel = new JCommandButtonPanel(CommandButtonDisplayState.MEDIUM);
-               String groupName = translate("menu.recentFiles");
-               openHistoryPanel.addButtonGroup(groupName);
-               List<String> recentFiles = Configuration.getRecentFiles();
-               int j = 0;
-               for (int i = recentFiles.size() - 1; i >= 0; i--) {
-                  String path = recentFiles.get(i); 
-                  RecentFilesButton historyButton = new RecentFilesButton(j + "    " + path, null);
-                  historyButton.fileName = path;
-                  historyButton.addActionListener(new ActionListener() {
-
-                      @Override
-                      public void actionPerformed(ActionEvent ae) {
-                          RecentFilesButton source = (RecentFilesButton) ae.getSource();
-                          if (Main.openFile(source.fileName, null) == OpenFileResult.NOT_FOUND) {
-                              if (View.showConfirmDialog(null, translate("message.confirm.recentFileNotFound"), translate("message.confirm"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
-                                  Configuration.removeRecentFile(source.fileName);
-                              }
-                          }
-                      }
-                  });
-                  j++;
-                  historyButton.setHorizontalAlignment(SwingUtilities.LEFT);
-                  openHistoryPanel.addButtonToLastGroup(historyButton);
-               }
-               openHistoryPanel.setMaxButtonColumns(1);
-               targetPanel.setLayout(new BorderLayout());
-               targetPanel.add(openHistoryPanel, BorderLayout.CENTER);
+            public void componentResized(ComponentEvent e) {
+                int state = getExtendedState();
+                if ((state & JFrame.MAXIMIZED_HORIZ) == 0) {
+                    Configuration.guiWindowWidth.set(getWidth());
+                }
+                if ((state & JFrame.MAXIMIZED_VERT) == 0) {
+                    Configuration.guiWindowHeight.set(getHeight());
+                }
             }
         });
-        
-        RibbonApplicationMenuEntryFooter exitMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon("exit32"), translate("menu.file.exit"), new ActionRedirector(this, "EXIT"));
-
-        mainMenu.addMenuEntry(openFileMenu);
-        mainMenu.addMenuSeparator();
-        mainMenu.addMenuEntry(exportFlaMenu);
-        mainMenu.addMenuEntry(exportAllMenu);
-        mainMenu.addMenuEntry(exportSelMenu);
-        mainMenu.addMenuSeparator();
-        mainMenu.addMenuEntry(checkUpdatesMenu);
-        mainMenu.addMenuEntry(aboutMenu);
-        mainMenu.addFooterEntry(exitMenu);
-        mainMenu.addMenuSeparator();
-
-        return mainMenu;
-    }
-
-    private List<RibbonBandResizePolicy> getResizePolicies(JRibbonBand ribbonBand) {
-        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
-        resizePolicies.add(new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel()));
-        resizePolicies.add(new IconRibbonBandResizePolicy(ribbonBand.getControlPanel()));
-        return resizePolicies;
-    }
-    
-    private RibbonTask createFileRibbonTask() {
-        JRibbonBand editBand = new JRibbonBand(translate("menu.general"), null);
-        editBand.setResizePolicies(getResizePolicies(editBand));
-        JCommandButton openCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.open")), View.getResizableIcon("open32"));
-        assignListener(openCommandButton, ACTION_OPEN);
-        saveCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.save")), View.getResizableIcon("save32"));
-        assignListener(saveCommandButton, ACTION_SAVE);
-        saveasCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveas")), View.getResizableIcon("saveas16"));
-        assignListener(saveasCommandButton, ACTION_SAVE_AS);
-        saveasexeCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveasexe")), View.getResizableIcon("saveas16"));
-        assignListener(saveasexeCommandButton, ACTION_SAVE_AS_EXE);
-
-        reloadCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.reload")), View.getResizableIcon("reload16"));
-        assignListener(reloadCommandButton, ACTION_RELOAD);
-
-        editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
-        editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
-        editBand.addCommandButton(saveasCommandButton, RibbonElementPriority.MEDIUM);
-        editBand.addCommandButton(saveasexeCommandButton, RibbonElementPriority.MEDIUM);
-        editBand.addCommandButton(reloadCommandButton, RibbonElementPriority.MEDIUM);
-
-        JRibbonBand exportBand = new JRibbonBand(translate("menu.export"), null);
-        exportBand.setResizePolicies(getResizePolicies(exportBand));
-        exportFlaCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.fla")), View.getResizableIcon("exportfla32"));
-        assignListener(exportFlaCommandButton, ACTION_EXPORT_FLA);
-        exportAllCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.all")), View.getResizableIcon("export16"));
-        assignListener(exportAllCommandButton, ACTION_EXPORT);
-        exportSelectionCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.selection")), View.getResizableIcon("exportsel16"));
-        assignListener(exportSelectionCommandButton, ACTION_EXPORT_SEL);
-
-        exportBand.addCommandButton(exportFlaCommandButton, RibbonElementPriority.TOP);
-        exportBand.addCommandButton(exportAllCommandButton, RibbonElementPriority.MEDIUM);
-        exportBand.addCommandButton(exportSelectionCommandButton, RibbonElementPriority.MEDIUM);
-
-        return new RibbonTask(translate("menu.file"), editBand, exportBand);
-    }
-    
-    private RibbonTask createToolsRibbonTask() {
-        //----------------------------------------- TOOLS -----------------------------------
-        
-        JRibbonBand toolsBand = new JRibbonBand(translate("menu.tools"), null);
-        toolsBand.setResizePolicies(getResizePolicies(toolsBand));
-
-        searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchas")), View.getResizableIcon("search32"));
-        assignListener(searchCommandButton, ACTION_SEARCH_AS);
-        gotoDocumentClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.gotodocumentclass")), View.getResizableIcon("gotomainclass32"));
-        assignListener(gotoDocumentClassCommandButton, ACTION_GOTO_DOCUMENT_CLASS);
-
-        JCommandButton proxyCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.proxy")), View.getResizableIcon("proxy16"));
-        assignListener(proxyCommandButton, ACTION_SHOW_PROXY);
-
-        JCommandButton loadMemoryCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchmemory")), View.getResizableIcon("loadmemory16"));
-        assignListener(loadMemoryCommandButton, ACTION_LOAD_MEMORY);
-
-        JCommandButton loadCacheCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchcache")), View.getResizableIcon("loadcache16"));
-        assignListener(loadCacheCommandButton, ACTION_LOAD_CACHE);
-
-        toolsBand.addCommandButton(searchCommandButton, RibbonElementPriority.TOP);
-        toolsBand.addCommandButton(gotoDocumentClassCommandButton, RibbonElementPriority.TOP);
-        toolsBand.addCommandButton(proxyCommandButton, RibbonElementPriority.MEDIUM);
-        toolsBand.addCommandButton(loadMemoryCommandButton, RibbonElementPriority.MEDIUM);
-        toolsBand.addCommandButton(loadCacheCommandButton, RibbonElementPriority.MEDIUM);
-        if (!ProcessTools.toolsAvailable()) {
-            loadMemoryCommandButton.setEnabled(false);
-        }
-        JRibbonBand deobfuscationBand = new JRibbonBand(translate("menu.tools.deobfuscation"), null);
-        deobfuscationBand.setResizePolicies(getResizePolicies(deobfuscationBand));
-
-        deobfuscationCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.pcode")), View.getResizableIcon("deobfuscate32"));
-        assignListener(deobfuscationCommandButton, ACTION_DEOBFUSCATE);
-        globalrenameCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.globalrename")), View.getResizableIcon("rename16"));
-        assignListener(globalrenameCommandButton, ACTION_RENAME_ONE_IDENTIFIER);
-        renameinvalidCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.renameinvalid")), View.getResizableIcon("renameall16"));
-        assignListener(renameinvalidCommandButton, ACTION_RENAME_IDENTIFIERS);
-
-        deobfuscationBand.addCommandButton(deobfuscationCommandButton, RibbonElementPriority.TOP);
-        deobfuscationBand.addCommandButton(globalrenameCommandButton, RibbonElementPriority.MEDIUM);
-        deobfuscationBand.addCommandButton(renameinvalidCommandButton, RibbonElementPriority.MEDIUM);
-
-        return new RibbonTask(translate("menu.tools"), toolsBand, deobfuscationBand);
-    }
-    
-    private RibbonTask createSettingsRibbonTask() {
-        //----------------------------------------- SETTINGS -----------------------------------
-        
-        JRibbonBand settingsBand = new JRibbonBand(translate("menu.settings"), null);
-        settingsBand.setResizePolicies(getResizePolicies(settingsBand));
-
-        miAutoDeobfuscation = new JCheckBox(translate("menu.settings.autodeobfuscation"));
-
-        miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
-        miParallelSpeedUp = new JCheckBox(translate("menu.settings.parallelspeedup"));
-        miDecompile = new JCheckBox(translate("menu.settings.disabledecompilation"));
-        miAssociate = new JCheckBox(translate("menu.settings.addtocontextmenu"));
-        miCacheDisk = new JCheckBox(translate("menu.settings.cacheOnDisk"));
-        miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
-        miAutoRenameIdentifiers = new JCheckBox(translate("menu.settings.autoRenameIdentifiers"));
-
-        settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miParallelSpeedUp));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miDecompile));
-        if (Platform.isWindows()) {
-            settingsBand.addRibbonComponent(new JRibbonComponent(miAssociate));
-        }
-        settingsBand.addRibbonComponent(new JRibbonComponent(miCacheDisk));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miGotoMainClassOnStartup));
-        settingsBand.addRibbonComponent(new JRibbonComponent(miAutoRenameIdentifiers));
-
-        JRibbonBand languageBand = new JRibbonBand(translate("menu.language"), null);
-        List<RibbonBandResizePolicy> languageBandResizePolicies = new ArrayList<>();
-        languageBandResizePolicies.add(new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(languageBand.getControlPanel()) {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public int getPreferredWidth(int i, int i1) {
-                return 105;
-            }
-
-            @Override
-            public void install(int i, int i1) {
-            }
-        });
-        languageBandResizePolicies.add(new IconRibbonBandResizePolicy(languageBand.getControlPanel()));
-        languageBand.setResizePolicies(languageBandResizePolicies);
-        JCommandButton setLanguageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.settings.language")), View.getResizableIcon("setlanguage32"));
-        assignListener(setLanguageCommandButton, ACTION_SET_LANGUAGE);
-        languageBand.addCommandButton(setLanguageCommandButton, RibbonElementPriority.TOP);
-
-        JRibbonBand advancedSettingsBand = new JRibbonBand(translate("menu.advancedsettings.advancedsettings"), null);
-        advancedSettingsBand.setResizePolicies(getResizePolicies(advancedSettingsBand));
-        JCommandButton advancedSettingsCommandButton = new JCommandButton(fixCommandTitle(translate("menu.advancedsettings.advancedsettings")), View.getResizableIcon("settings16"));
-        assignListener(advancedSettingsCommandButton, ACTION_ADVANCED_SETTINGS);
-
-        advancedSettingsBand.addCommandButton(advancedSettingsCommandButton, RibbonElementPriority.MEDIUM);
-        
-        return new RibbonTask(translate("menu.settings"), settingsBand, languageBand, advancedSettingsBand);
-    }
-    
-    private RibbonTask createHelpRibbonTask() {
-        //----------------------------------------- HELP -----------------------------------
-
-        JRibbonBand helpBand = new JRibbonBand(translate("menu.help"), null);
-        helpBand.setResizePolicies(getResizePolicies(helpBand));
-
-        JCommandButton checkForUpdatesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.checkupdates")), View.getResizableIcon("update16"));
-        assignListener(checkForUpdatesCommandButton, ACTION_CHECK_UPDATES);
-        JCommandButton helpUsUpdatesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.helpus")), View.getResizableIcon("donate32"));
-        assignListener(helpUsUpdatesCommandButton, ACTION_HELP_US);
-        JCommandButton homepageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.homepage")), View.getResizableIcon("homepage16"));
-        assignListener(homepageCommandButton, ACTION_HOMEPAGE);
-        JCommandButton aboutCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.about")), View.getResizableIcon("about32"));
-        assignListener(aboutCommandButton, ACTION_ABOUT);
-
-        helpBand.addCommandButton(aboutCommandButton, RibbonElementPriority.TOP);
-        helpBand.addCommandButton(checkForUpdatesCommandButton, RibbonElementPriority.MEDIUM);
-        helpBand.addCommandButton(homepageCommandButton, RibbonElementPriority.MEDIUM);
-        helpBand.addCommandButton(helpUsUpdatesCommandButton, RibbonElementPriority.TOP);
-        return new RibbonTask(translate("menu.help"), helpBand);
-    }
-    
-    private RibbonTask createDebugRibbonTask() {
-        //----------------------------------------- DEBUG -----------------------------------
-
-        JRibbonBand debugBand = new JRibbonBand("Debug", null);
-        debugBand.setResizePolicies(getResizePolicies(debugBand));
-
-        JCommandButton removeNonScriptsCommandButton = new JCommandButton(fixCommandTitle("Remove non scripts"), View.getResizableIcon("update16"));
-        assignListener(removeNonScriptsCommandButton, ACTION_REMOVE_NON_SCRIPTS);
-
-        JCommandButton refreshDecompiledCommandButton = new JCommandButton(fixCommandTitle("Refresh decompiled script"), View.getResizableIcon("update16"));
-        assignListener(refreshDecompiledCommandButton, ACTION_REFRESH_DECOMPILED);
-
-        debugBand.addCommandButton(removeNonScriptsCommandButton, RibbonElementPriority.MEDIUM);
-        debugBand.addCommandButton(refreshDecompiledCommandButton, RibbonElementPriority.MEDIUM);
-        return new RibbonTask("Debug", debugBand);
-    }
-
-    public void updateComponets(SWF swf, List<ABCContainerTag> abcList) {
-        boolean swfLoaded = swf != null;
-        boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
-                
-        exportAllMenu.setEnabled(swfLoaded);
-        exportFlaMenu.setEnabled(swfLoaded);
-        exportSelMenu.setEnabled(swfLoaded);
-
-        saveCommandButton.setEnabled(swfLoaded);
-        saveasCommandButton.setEnabled(swfLoaded);
-        saveasexeCommandButton.setEnabled(swfLoaded);
-        exportAllCommandButton.setEnabled(swfLoaded);
-        exportFlaCommandButton.setEnabled(swfLoaded);
-        exportSelectionCommandButton.setEnabled(swfLoaded);
-        reloadCommandButton.setEnabled(swfLoaded);
-
-        renameinvalidCommandButton.setEnabled(swfLoaded);
-        globalrenameCommandButton.setEnabled(swfLoaded);
-        deobfuscationCommandButton.setEnabled(swfLoaded);
-        searchCommandButton.setEnabled(swfLoaded);
-
-        gotoDocumentClassCommandButton.setEnabled(hasAbc);
-        deobfuscationCommandButton.setEnabled(hasAbc);
-    }
-    
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_RELOAD:
-                if (View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-                    Main.reloadSWFs();
-                }
-                break;
-            case ACTION_ADVANCED_SETTINGS:
-                Main.advancedSettings();
-                break;
-            case ACTION_LOAD_MEMORY:
-                Main.loadFromMemory();
-                break;
-            case ACTION_LOAD_CACHE:
-                Main.loadFromCache();
-                break;
-            case ACTION_GOTO_DOCUMENT_CLASS_ON_STARTUP:
-                Configuration.gotoMainClassOnStartup.set(miGotoMainClassOnStartup.isSelected());
-                break;
-            case ACTION_AUTO_RENAME_IDENTIFIERS:
-                Configuration.autoRenameIdentifiers.set(miAutoRenameIdentifiers.isSelected());
-                break;
-            case ACTION_CACHE_ON_DISK:
-                Configuration.cacheOnDisk.set(miCacheDisk.isSelected());
-                if (miCacheDisk.isSelected()) {
-                    Cache.setStorageType(Cache.STORAGE_FILES);
-                } else {
-                    Cache.setStorageType(Cache.STORAGE_MEMORY);
-                }
-                break;
-            case ACTION_SET_LANGUAGE:
-                new SelectLanguageDialog().display();
-                break;
-            case ACTION_DISABLE_DECOMPILATION:
-                Configuration.decompile.set(!miDecompile.isSelected());
-                mainFrame.disableDecompilationChanged();
-                break;
-            case ACTION_ASSOCIATE:
-                if (miAssociate.isSelected() == ContextMenuTools.isAddedToContextMenu()) {
-                    return;
-                }
-                ContextMenuTools.addToContextMenu(miAssociate.isSelected());
-
-                //Update checkbox menuitem accordingly (User can cancel rights elevation)
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        miAssociate.setSelected(ContextMenuTools.isAddedToContextMenu());
-                    }
-                }, 1000); //It takes some time registry change to apply
-                break;
-            case ACTION_GOTO_DOCUMENT_CLASS:
-                mainFrame.gotoDocumentClass(mainFrame.getCurrentSwf());
-                break;
-            case ACTION_PARALLEL_SPEED_UP:
-                String confStr = translate("message.confirm.parallel") + "\r\n";
-                if (miParallelSpeedUp.isSelected()) {
-                    confStr += " " + translate("message.confirm.on");
-                } else {
-                    confStr += " " + translate("message.confirm.off");
-                }
-                if (View.showConfirmDialog(null, confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.parallelSpeedUp.set((Boolean) miParallelSpeedUp.isSelected());
-                } else {
-                    miParallelSpeedUp.setSelected(!miParallelSpeedUp.isSelected());
-                }
-                break;
-            case ACTION_INTERNAL_VIEWER_SWITCH:
-                Configuration.internalFlashViewer.set(miInternalViewer.isSelected());
-                mainFrame.reload(true);
-                break;
-            case ACTION_SEARCH_AS:
-                mainFrame.searchAs();
-                break;
-            case ACTION_AUTO_DEOBFUSCATE:
-                if (View.showConfirmDialog(mainFrame, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.autoDeobfuscate.set(miAutoDeobfuscation.isSelected());
-                    mainFrame.autoDeobfuscateChanged();
-                } else {
-                    miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
-                }
-                break;
-            case ACTION_EXIT:
-                mainFrame.setVisible(false);
+            public void windowClosing(WindowEvent e) {
                 if (Main.proxyFrame != null) {
                     if (Main.proxyFrame.isVisible()) {
                         return;
                     }
                 }
+                if (Main.loadFromMemoryFrame != null) {
+                    if (Main.loadFromMemoryFrame.isVisible()) {
+                        return;
+                    }
+                }
+                if (Main.loadFromCacheFrame != null) {
+                    if (Main.loadFromCacheFrame.isVisible()) {
+                        return;
+                    }
+                }
                 Main.exit();
-                break;
-        }
+            }
+        });
 
-        if (Main.isWorking()) {
+        View.centerScreen(this);
+    }
+
+    private static void getApplicationMenuButtons(Component comp, List<JRibbonApplicationMenuButton> ret) {
+        if (comp instanceof JRibbonApplicationMenuButton) {
+            ret.add((JRibbonApplicationMenuButton) comp);
             return;
         }
-
-        switch (e.getActionCommand()) {
-            case ACTION_RENAME_ONE_IDENTIFIER:
-                mainFrame.renameOneIdentifier(mainFrame.getCurrentSwf());
-                break;
-            case ACTION_ABOUT:
-                Main.about();
-                break;
-            case ACTION_SHOW_PROXY:
-                Main.showProxy();
-                break;
-            case ACTION_SUB_LIMITER:
-                if (e.getSource() instanceof JCheckBoxMenuItem) {
-                    Main.setSubLimiter(((JCheckBoxMenuItem) e.getSource()).getState());
-                }
-                break;
-            case ACTION_SAVE:
-                try {
-                    SWF swf = mainFrame.getCurrentSwf();
-                    Main.saveFile(swf, swf.file);
-                } catch (IOException ex) {
-                    Logger.getLogger(MainFrameRibbon.class.getName()).log(Level.SEVERE, null, ex);
-                    View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                }
-                break;
-            case ACTION_SAVE_AS:
-                {
-                    SWF swf = mainFrame.getCurrentSwf();
-                    if (Main.saveFileDialog(swf)) {
-                        mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
-                        saveCommandButton.setEnabled(mainFrame.getCurrentSwf() != null);
-                    }
-                }
-                break;
-            case ACTION_SAVE_AS_EXE:
-                {
-                    SWF swf = mainFrame.getCurrentSwf();
-                    if (Main.saveFileDialog(swf, ".exe")) {
-                        mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
-                        saveCommandButton.setEnabled(mainFrame.getCurrentSwf() != null);
-                    }
-                }
-                break;
-            case ACTION_OPEN:
-                Main.openFileDialog();
-                break;
-            case ACTION_EXPORT_FLA:
-                mainFrame.exportFla(mainFrame.getCurrentSwf());
-                break;
-            case ACTION_EXPORT_SEL:
-            case ACTION_EXPORT:
-                boolean onlySel = e.getActionCommand().endsWith("SEL");
-                mainFrame.export(onlySel);
-                break;
-            case ACTION_CHECK_UPDATES:
-                if (!Main.checkForUpdates()) {
-                    View.showMessageDialog(null, translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
-                }
-                break;
-            case ACTION_HELP_US:
-                String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html";
-                if (java.awt.Desktop.isDesktopSupported()) {
-                    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                    try {
-                        java.net.URI uri = new java.net.URI(helpUsURL);
-                        desktop.browse(uri);
-                    } catch (URISyntaxException | IOException ex) {
-                    }
-                } else {
-                    View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
-                }
-                break;
-            case ACTION_HOMEPAGE:
-                String homePageURL = ApplicationInfo.PROJECT_PAGE;
-                if (java.awt.Desktop.isDesktopSupported()) {
-                    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                    try {
-                        java.net.URI uri = new java.net.URI(homePageURL);
-                        desktop.browse(uri);
-                    } catch (URISyntaxException | IOException ex) {
-                    }
-                } else {
-                    View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
-                }
-                break;
-            case ACTION_RESTORE_CONTROL_FLOW:
-            case ACTION_RESTORE_CONTROL_FLOW_ALL:
-                boolean all = e.getActionCommand().endsWith("ALL");
-                mainFrame.restoreControlFlow(all);
-                break;
-            case ACTION_RENAME_IDENTIFIERS:
-                mainFrame.renameIdentifiers(mainFrame.getCurrentSwf());
-                break;
-            case ACTION_DEOBFUSCATE:
-            case ACTION_DEOBFUSCATE_ALL:
-                mainFrame.deobfuscate();
-                break;
-            case ACTION_REMOVE_NON_SCRIPTS:
-                mainFrame.removeNonScripts(mainFrame.getCurrentSwf());
-                break;
-            case ACTION_REFRESH_DECOMPILED:
-                mainFrame.refreshDecompiled();
-                break;
+        if (comp instanceof java.awt.Container) {
+            java.awt.Container cont = (java.awt.Container) comp;
+            for (int i = 0; i < cont.getComponentCount(); i++) {
+                getApplicationMenuButtons(cont.getComponent(i), ret);
+            }
         }
     }
 
-}
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+
+            final MainFrameRibbon t = this;
+
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    List<JRibbonApplicationMenuButton> mbuttons = new ArrayList<>();
+                    getApplicationMenuButtons(t, mbuttons);
+
+                    for (final JRibbonApplicationMenuButton mbutton : mbuttons) {
+                        mbutton.setIcon(View.getResizableIcon("buttonicon_256"));
+                        mbutton.setDisplayState(new CommandButtonDisplayState(
+                                "My Ribbon Application Menu Button", mbutton.getSize().width) {
+                            @Override
+                            public CommandButtonLayoutManager createLayoutManager(
+                                    AbstractCommandButton commandButton) {
+                                return new CommandButtonLayoutManager() {
+                                    @Override
+                                    public int getPreferredIconSize() {
+                                        return mbutton.getSize().width;
+                                    }
+
+                                    @Override
+                                    public CommandButtonLayoutManager.CommandButtonLayoutInfo getLayoutInfo(
+                                            AbstractCommandButton commandButton, Graphics g) {
+                                        CommandButtonLayoutManager.CommandButtonLayoutInfo result = new CommandButtonLayoutManager.CommandButtonLayoutInfo();
+                                        result.actionClickArea = new Rectangle(0, 0, 0, 0);
+                                        result.popupClickArea = new Rectangle(0, 0, commandButton
+                                                .getWidth(), commandButton.getHeight());
+                                        result.popupActionRect = new Rectangle(0, 0, 0, 0);
+                                        ResizableIcon icon = commandButton.getIcon();
+                                        icon.setDimension(new Dimension(commandButton.getWidth(), commandButton.getHeight()));
+                                        result.iconRect = new Rectangle(
+                                                0,
+                                                0,
+                                                commandButton.getWidth(), commandButton.getHeight());
+                                        result.isTextInActionArea = false;
+                                        return result;
+                                    }
+
+                                    @Override
+                                    public Dimension getPreferredSize(
+                                            AbstractCommandButton commandButton) {
+                                        return new Dimension(40, 40);
+                                    }
+
+                                    @Override
+                                    public void propertyChange(PropertyChangeEvent evt) {
+                                    }
+
+                                    @Override
+                                    public Point getKeyTipAnchorCenterPoint(
+                                            AbstractCommandButton commandButton) {
+                                        // dead center
+                                        return new Point(commandButton.getWidth() / 2,
+                                                commandButton.getHeight() / 2);
+                                    }
+                                };
+                            }
+                        });
+
+                        MyRibbonApplicationMenuButtonUI mui = (MyRibbonApplicationMenuButtonUI) mbutton.getUI();
+                        mui.setHoverIcon(View.getResizableIcon("buttonicon_hover_256"));
+                        mui.setNormalIcon(View.getResizableIcon("buttonicon_256"));
+                        mui.setClickIcon(View.getResizableIcon("buttonicon_down_256"));
+                    }
+                }
+            });
+            
+        panel.setVisible(b);
+    }
+
+    @Override
+    public MainFramePanel getPanel() {
+        return panel;
+    }
+ }

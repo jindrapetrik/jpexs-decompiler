@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 JPEXS
+ *  Copyright (C) 2010-2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,26 +16,17 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import java.util.ResourceBundle;
-import org.pushingpixels.flamingo.api.ribbon.JRibbonFrame;
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class AppRibbonFrame extends JRibbonFrame {
+public interface MainFrameMenu {
+    
+    public boolean isInternalFlashViewerSelected();
 
-    private ResourceBundle resourceBundle;
-
-    public AppRibbonFrame() {
-        if (getClass().equals(MainFrameRibbon.class)) {
-            resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(MainFrame.class));
-        } else {
-            resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
-        }
-    }
-
-    public String translate(String key) {
-        return resourceBundle.getString(key);
-    }
+    public void updateComponets(SWF swf, List<ABCContainerTag> abcList);
 }

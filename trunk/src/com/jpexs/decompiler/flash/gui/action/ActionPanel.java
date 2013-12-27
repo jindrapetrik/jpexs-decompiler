@@ -31,7 +31,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.MainFrame;
+import com.jpexs.decompiler.flash.gui.MainFramePanel;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
@@ -93,7 +93,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
     static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
 
-    private MainFrame mainFrame;
+    private MainFramePanel mainFramePanel;
     public LineMarkedEditorPane editor;
     public LineMarkedEditorPane decompiledEditor;
     public JSplitPane splitPane;
@@ -232,7 +232,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         if ((txt != null) && (!txt.isEmpty())) {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
-            List<TagNode> list = SWF.createASTagList(mainFrame.getCurrentSwf().tags, null);
+            List<TagNode> list = SWF.createASTagList(mainFramePanel.getCurrentSwf().tags, null);
             Map<String, ASMSource> asms = getASMs("", list);
             found = new ArrayList<>();
             Pattern pat = null;
@@ -435,9 +435,9 @@ public class ActionPanel extends JPanel implements ActionListener {
     public void hilightOffset(long offset) {
     }
 
-    public ActionPanel(MainFrame mainFrame) {
+    public ActionPanel(MainFramePanel mainFramePanel) {
         DefaultSyntaxKit.initKit();
-        this.mainFrame = mainFrame;
+        this.mainFramePanel = mainFramePanel;
         editor = new LineMarkedEditorPane();
         editor.setEditable(false);
         decompiledEditor = new LineMarkedEditorPane();
@@ -824,10 +824,10 @@ public class ActionPanel extends JPanel implements ActionListener {
     public void updateSearchPos() {
         searchPos.setText((foundPos + 1) + "/" + found.size());
         setSource(found.get(foundPos), true);
-        TagTreeModel ttm = (TagTreeModel) mainFrame.tagTree.getModel();
+        TagTreeModel ttm = (TagTreeModel) mainFramePanel.tagTree.getModel();
         TreePath tp = ttm.getTagPath(found.get(foundPos));
-        mainFrame.tagTree.setSelectionPath(tp);
-        mainFrame.tagTree.scrollPathToVisible(tp);
+        mainFramePanel.tagTree.setSelectionPath(tp);
+        mainFramePanel.tagTree.scrollPathToVisible(tp);
         decompiledEditor.setCaretPosition(0);
         java.util.Timer t = new java.util.Timer();
         SwingUtilities.invokeLater(new Runnable() {
