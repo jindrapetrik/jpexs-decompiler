@@ -680,8 +680,6 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
             leftComponent = swtPanel;
         }
 
-        textValue.setContentType("text/swf_text");
-
         previewSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         previewSplitPane.setDividerLocation(300);
         JPanel pan = new JPanel(new BorderLayout());
@@ -2355,6 +2353,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                 parametersPanel.setVisible(true);
                 previewSplitPane.setDividerLocation(previewSplitPane.getWidth() / 2);
                 showDetailWithPreview(CARDTEXTPANEL);
+                textValue.setContentType("text/swf_text");
                 textValue.setText(textTag.getFormattedText(textTag.getSwf().tags));
             } else if (tagObj instanceof FontTag) {
                 showFontTag((FontTag) tagObj);
