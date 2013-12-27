@@ -62,7 +62,7 @@ public class CallMethodActionItem extends ActionItem {
             }
         }
         if (!blankMethod) {
-            if (scriptObject.precedence > this.precedence) {
+            if (scriptObject.getPrecedence() > this.precedence) {
                 writer.append("(");
                 scriptObject.toString(writer, localData);
                 writer.append(")");

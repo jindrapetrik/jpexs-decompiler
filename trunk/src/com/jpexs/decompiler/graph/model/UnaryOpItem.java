@@ -38,7 +38,7 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
     protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append(operator);
         if (value != null) {
-            if (value.precedence > precedence) {
+            if (value.getPrecedence() > precedence) {
                 writer.append("(");
                 value.toString(writer, localData);
                 writer.append(")");

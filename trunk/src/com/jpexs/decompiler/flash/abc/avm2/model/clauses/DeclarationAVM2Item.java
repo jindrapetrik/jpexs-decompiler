@@ -35,7 +35,7 @@ public class DeclarationAVM2Item extends AVM2Item {
     public String type;
 
     public DeclarationAVM2Item(GraphTargetItem assignment, String type) {
-        super(assignment.src, assignment.precedence);
+        super(assignment.src, assignment.getPrecedence());
         this.type = type;
         this.assignment = assignment;
     }

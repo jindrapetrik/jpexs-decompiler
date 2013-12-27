@@ -36,8 +36,8 @@ public class SubtractAVM2Item extends BinaryOpItem {
 
     @Override
     protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (rightSide.precedence >= precedence) { // >=  add or subtract too
-            if (leftSide.precedence > precedence) {
+        if (rightSide.getPrecedence() >= precedence) { // >=  add or subtract too
+            if (leftSide.getPrecedence() > precedence) {
                 writer.append("(");
                 leftSide.toString(writer, localData);
                 writer.append(")");

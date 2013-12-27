@@ -49,7 +49,7 @@ public abstract class AVM2Item extends GraphTargetItem {
         }
 
         if (!empty) {
-            if (object.precedence > PRECEDENCE_PRIMARY) {
+            if (object.getPrecedence() > PRECEDENCE_PRIMARY) {
                 writer.append("(");
                 object.toString(writer, localData);
                 writer.append(")");

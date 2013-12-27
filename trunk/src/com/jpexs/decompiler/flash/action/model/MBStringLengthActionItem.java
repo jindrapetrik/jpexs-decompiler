@@ -36,7 +36,7 @@ public class MBStringLengthActionItem extends ActionItem {
     @Override
     protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("mblength(");
-        if (value.precedence > precedence) {
+        if (value.getPrecedence() > precedence) {
             writer.append("(");
             value.toString(writer, localData);
             writer.append(")");

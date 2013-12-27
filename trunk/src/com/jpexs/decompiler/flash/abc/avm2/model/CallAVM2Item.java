@@ -44,7 +44,7 @@ public class CallAVM2Item extends AVM2Item {
          if (receiver instanceof ThisAVM2Item) {
          recPart = "";
          }*/
-        if (function.precedence > precedence) {
+        if (function.getPrecedence() > precedence) {
             writer.append("(");
             function.toString(writer, localData);
             writer.append(")");

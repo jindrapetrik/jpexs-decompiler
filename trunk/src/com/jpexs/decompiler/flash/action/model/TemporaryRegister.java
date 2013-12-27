@@ -31,7 +31,7 @@ public class TemporaryRegister extends GraphTargetItem {
     private int regId;
 
     public TemporaryRegister(int regId, GraphTargetItem value) {
-        super(value.src, value.precedence);
+        super(value.src, value.getPrecedence());
         this.value = value;
         this.regId = regId;
     }

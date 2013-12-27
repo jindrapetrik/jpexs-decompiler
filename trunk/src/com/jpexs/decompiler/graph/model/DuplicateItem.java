@@ -30,7 +30,7 @@ import java.util.Set;
 public class DuplicateItem extends GraphTargetItem {
 
     public DuplicateItem(GraphSourceItem src, GraphTargetItem value) {
-        super(src, value.precedence);
+        super(src, value.getPrecedence());
         this.value = value;
     }
 

@@ -51,7 +51,7 @@ public abstract class GraphTargetItem implements Serializable {
     public static final int NOPRECEDENCE = 16;
     public GraphSourceItem src;
     public int pos = -1;
-    public int precedence;
+    protected int precedence;
     public List<GraphSourceItemPos> moreSrc = new ArrayList<>();
     public GraphPart firstPart;
     public GraphTargetItem value;

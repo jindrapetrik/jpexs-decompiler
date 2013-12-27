@@ -39,9 +39,9 @@ public class SubtractActionItem extends BinaryOpItem {
 
     @Override
     protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (rightSide.precedence >= precedence) { // >=  add or subtract too
+        if (rightSide.getPrecedence() >= precedence) { // >=  add or subtract too
             String ret = "";
-            if (leftSide.precedence > precedence) {
+            if (leftSide.getPrecedence() > precedence) {
                 writer.append("(");
                 leftSide.toString(writer, localData);
                 writer.append(")");
