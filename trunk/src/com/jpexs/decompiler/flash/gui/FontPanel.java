@@ -74,9 +74,8 @@ public class FontPanel extends JPanel implements ActionListener {
         createFontPanel();
     }
     
-    private JPanel createFontPanel() {
+    private void createFontPanel() {
         //TODO: This layout SUCKS! If you know something better, please fix it!
-        final JPanel fontPanel = new JPanel();
         final JPanel fontParams2 = new JPanel();
         fontParams2.setLayout(null);
         final Component[][] ctable = new Component[][]{
@@ -118,20 +117,20 @@ public class FontPanel extends JPanel implements ActionListener {
             @Override
             public void componentResized(ComponentEvent e) {
                 int h = 0;
-                Insets is = fontPanel.getInsets();
+                Insets is = getInsets();
                 Insets is2 = fontParams2.getInsets();
                 for (int i = 0; i < ctable.length; i++) {
                     Dimension d = ctable[i][0].getPreferredSize();
                     Dimension d2 = ctable[i][1].getPreferredSize();
                     ctable[i][0].setBounds(borderLeft, h, maxws[0], d2.height);
 
-                    int w2 = fontPanel.getWidth() - 3 * borderLeft - maxws[0] - is.left - is.right - 10;
+                    int w2 = getWidth() - 3 * borderLeft - maxws[0] - is.left - is.right - 10;
                     ctable[i][1].setBounds(borderLeft + maxws[0] + borderLeft, h, w2, d2.height);
                     h += Math.max(d.height, d2.height);
                 }
 
-                fontParams2.setPreferredSize(new Dimension(fontPanel.getWidth() - 20, h));
-                fontPanel.revalidate();
+                fontParams2.setPreferredSize(new Dimension(getWidth() - 20, h));
+                revalidate();
             }
 
             @Override
@@ -150,7 +149,7 @@ public class FontPanel extends JPanel implements ActionListener {
             }
         };
         final JPanel fontParams1 = new JPanel();
-        fontPanel.addComponentListener(fontChangeList);
+        addComponentListener(fontChangeList);
 
         fontChangeList.componentResized(null);
         fontParams1.setLayout(new BoxLayout(fontParams1, BoxLayout.Y_AXIS));
@@ -195,11 +194,9 @@ public class FontPanel extends JPanel implements ActionListener {
         fontCharPanel.add(fontSelectionPanel);
         fontParams1.add(fontCharPanel);
         fontParams1.add(fontEmbedButton);
-        fontPanel.setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
         fontParams1.add(Box.createVerticalGlue());
-        fontPanel.add(new JScrollPane(fontParams1), BorderLayout.CENTER);
-        
-        return fontPanel;
+        add(new JScrollPane(fontParams1), BorderLayout.CENTER);
     }
     
     public String getSelectedFont() {

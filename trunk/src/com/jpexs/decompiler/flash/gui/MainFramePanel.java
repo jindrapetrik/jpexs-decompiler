@@ -454,6 +454,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
 
         this.mainFrame = mainFrame;
         this.mainMenu = mainMenu;
+        this.flashPanel = flashPanel;
         
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
         
