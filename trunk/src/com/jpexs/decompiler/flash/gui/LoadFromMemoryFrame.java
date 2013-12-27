@@ -183,7 +183,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         if (foundIs == null) {
             return;
         }
-        int index = tableRes.getSelectedRow();
+        int index = tableRes.getRowSorter().convertRowIndexToModel(tableRes.getSelectedRow());
         if (index > -1) {
             SwfInMemory swf = foundIs.get(index);
             ReReadableInputStream str = swf.is;
@@ -434,13 +434,13 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                         File file = Helper.fixDialogFile(fc.getSelectedFile());
                         try {
                             if (selected.length == 1) {
-                                SwfInMemory swf = foundIs.get(selected[0]);
+                                SwfInMemory swf = foundIs.get(tableRes.getRowSorter().convertRowIndexToModel(selected[0]));
                                 ReReadableInputStream bis = swf.is;
                                 bis.seek(0);
                                 Helper.saveStream(bis, file);
                             } else {
                                 for (int sel : selected) {
-                                    SwfInMemory swf = foundIs.get(sel);
+                                    SwfInMemory swf = foundIs.get(tableRes.getRowSorter().convertRowIndexToModel(sel));
                                     ReReadableInputStream bis = swf.is;
                                     bis.seek(0);
                                     Helper.saveStream(bis, new File(file, "movie" + sel + ".swf"));
