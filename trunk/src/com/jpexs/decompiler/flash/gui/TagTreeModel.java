@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.StringNode;
 import com.jpexs.decompiler.flash.TagNode;
+import com.jpexs.decompiler.flash.TreeElementItem;
 import com.jpexs.decompiler.flash.TreeNode;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.TreeElement;
@@ -210,18 +211,18 @@ public class TagTreeModel implements TreeModel {
         return ret;
     }
 
-    private List<Object> searchTag(Object obj, Object parent, List<Object> path) {
-        List<Object> ret = null;
+    private List<TreeNode> searchTag(TreeElementItem obj, TreeNode parent, List<TreeNode> path) {
+        List<TreeNode> ret = null;
         int cnt = getChildCount(parent);
         for (int i = 0; i < cnt; i++) {
-            Object n = getChild(parent, i);
-            List<Object> newPath = new ArrayList<>();
+            TreeNode n = getChild(parent, i);
+            List<TreeNode> newPath = new ArrayList<>();
             newPath.addAll(path);
             newPath.add(n);
 
             if (n instanceof TreeElement) {
                 TreeElement te = (TreeElement) n;
-                Object it = te.getItem();
+                TreeElementItem it = te.getItem();
                 if (obj == it) {
                     return newPath;
                 }
@@ -240,8 +241,8 @@ public class TagTreeModel implements TreeModel {
         return ret;
     }
 
-    public TreePath getTagPath(Object obj) {
-        List<Object> path = new ArrayList<>();
+    public TreePath getTagPath(TreeElementItem obj) {
+        List<TreeNode> path = new ArrayList<>();
         path.add(getRoot());
         path = searchTag(obj, getRoot(), path);
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));

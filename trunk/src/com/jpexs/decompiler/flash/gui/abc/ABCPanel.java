@@ -84,7 +84,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     public TraitsList navigator;
     public ClassesListTree classTree;
     public ABC abc;
-    public List<ABCContainerTag> list;
     public SWF swf;
     public JComboBox abcComboBox;
     public int listIndex = -1;
@@ -143,7 +142,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
                         @Override
                         public Void doInBackground() throws Exception {
-                            decompiledTextArea.cacheScriptPack(item.value, list);
+                            decompiledTextArea.cacheScriptPack(item.value, swf.abcList);
                             if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
                                 found.add(item.value);
                                 foundPath.add(item.key);
@@ -168,7 +167,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                 return false;
             } else {
                 foundPos = 0;
-                decompiledTextArea.setScript(found.get(foundPos), list);
+                decompiledTextArea.setScript(found.get(foundPos), swf.abcList);
                 searchPanel.setVisible(true);
                 searchFor = txt;
                 updateSearchPos();
@@ -270,7 +269,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
     @SuppressWarnings("unchecked")
     public void clearSwf() {
-        this.list = null;
         this.swf = null;
         this.abc = null;
         constantTable.setModel(new DefaultTableModel());
@@ -280,17 +278,18 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     }
     
     @SuppressWarnings("unchecked")
-    public void setSwf(List<ABCContainerTag> list, SWF swf) {
-        this.list = list;
-        this.swf = swf;
-        listIndex = -1;
-        switchAbc(0); // todo honika: do we need this?
-        abcComboBox.setModel(new ABCComboBoxModel(list));
-        if (list.size() > 0) {
-            this.abc = list.get(0).getABC();
-        }
+    public void setSwf(SWF swf) {
+        if (this.swf != swf) {
+            this.swf = swf;
+            listIndex = -1;
+            switchAbc(0); // todo honika: do we need this?
+            abcComboBox.setModel(new ABCComboBoxModel(swf.abcList));
+            if (swf.abcList.size() > 0) {
+                this.abc = swf.abcList.get(0).getABC();
+            }
 
-        navigator.setABC(list, abc);
+            navigator.setABC(swf.abcList, abc);
+        }
     }
     
     public void switchAbc(int index) {
@@ -298,7 +297,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         classTree.setSwf(swf);
 
         if (index != -1) {
-            this.abc = list.get(index).getABC();
+            this.abc = swf.abcList.get(index).getABC();
         }
         updateConstList();
     }
@@ -525,7 +524,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                         }
                         int multinameIndex = constantTable.convertRowIndexToModel(rowIndex);
                         if (multinameIndex > 0) {
-                            UsageFrame usageFrame = new UsageFrame(t.list, abc, multinameIndex, t);
+                            UsageFrame usageFrame = new UsageFrame(t.swf.abcList, abc, multinameIndex, t);
                             usageFrame.setVisible(true);
                         }
                     }
@@ -602,7 +601,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         searchPos.setText((foundPos + 1) + "/" + found.size());
         ScriptPack pack = found.get(foundPos);
         setAbc(pack.abc);
-        decompiledTextArea.setScript(pack, list);
+        decompiledTextArea.setScript(pack, swf.abcList);
         hilightScript(found.get(foundPos));
         decompiledTextArea.setCaretPosition(0);
         SwingUtilities.invokeLater(new Runnable() {

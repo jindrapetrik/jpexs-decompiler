@@ -97,9 +97,10 @@ public final class ClassesListTree extends JTree implements TreeSelectionListene
     public void setSwf(SWF swf) {
         if (swf != this.swf) {
             this.swf = swf;
-            ClassesListTreeModel model = new ClassesListTreeModel(swf);
-            this.swf.classTreeModel = model;
-            setModel(model);
+            if (swf.classTreeModel == null) {
+                swf.classTreeModel = new ClassesListTreeModel(swf);
+            }
+            setModel(swf.classTreeModel);
         }
     }
 

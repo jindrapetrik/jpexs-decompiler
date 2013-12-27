@@ -305,6 +305,7 @@ public class Main {
 
         @Override
         protected Object doInBackground() throws Exception {
+            boolean first = true;
             for (SWFSourceInfo sourceInfo : sourceInfos) {
                 SWF swf = null;
                 try {
@@ -319,6 +320,8 @@ public class Main {
                 }
 
                 final SWF swf1 = swf;
+                final boolean first1 = first;
+                first = false;
                 try {
                     Main.startWork(AppStrings.translate("work.creatingwindow") + "...");
                     View.execInEventDispatch(new Runnable() {
@@ -331,7 +334,7 @@ public class Main {
                                     mainFrame = new MainFrameClassic();
                                 }
                             }
-                            mainFrame.getPanel().load(swf1);
+                            mainFrame.getPanel().load(swf1, first1);
                             if (errorState) {
                                 mainFrame.getPanel().setErrorState();
                             }

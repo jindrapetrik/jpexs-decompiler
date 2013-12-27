@@ -848,11 +848,9 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         enableDrop(true);
     }
     
-    public void load(SWF swf) {
+    public void load(SWF swf, boolean first) {
         List<ContainerItem> objs = new ArrayList<>();
-        if (swf != null) {
-            objs.addAll(swf.tags);
-        }
+        objs.addAll(swf.tags);
 
         ArrayList<ABCContainerTag> abcList = new ArrayList<>();
         getActionScript3(objs, abcList);
@@ -868,7 +866,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                 displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
                 detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
             }
-            abcPanel.setSwf(abcList, swf);
+            abcPanel.setSwf(swf);
         } else {
             if (actionPanel == null) {
                 actionPanel = new ActionPanel(this);
@@ -907,6 +905,10 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         showDetail(DETAILCARDEMPTYPANEL);
         showCard(CARDEMPTYPANEL);
         updateUi(swf);
+
+        if (first && Configuration.gotoMainClassOnStartup.get()) {
+            gotoDocumentClass(swf);
+        }
     }
 
     private void updateUi(final SWF swf) {
@@ -918,7 +920,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         boolean hasAbc = !abcList.isEmpty();
 
         if (hasAbc) {
-            abcPanel.setSwf(abcList, swf);
+            abcPanel.setSwf(swf);
         }
 
         if (isWelcomeScreen) {
@@ -1067,9 +1069,6 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
 
                     splitPos = splitPane2.getDividerLocation();
                     splitsInited = true;
-                    if (Configuration.gotoMainClassOnStartup.get()) {
-                        gotoDocumentClass(getCurrentSwf());
-                    }
                 }
             });
 
@@ -1535,6 +1534,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         if (documentClass != null) {
             showDetail(DETAILCARDAS3NAVIGATOR);
             showCard(CARDACTIONSCRIPT3PANEL);
+            abcPanel.setSwf(swf);
             abcPanel.hilightScript(documentClass);
         }
     }
@@ -1796,7 +1796,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                 protected Object doInBackground() throws Exception {
                     int cnt = 0;
                     if (all) {
-                        for (ABCContainerTag tag : abcPanel.list) {
+                        for (ABCContainerTag tag : abcPanel.swf.abcList) {
                             tag.getABC().restoreControlFlow();
                         }
                     } else {
@@ -1881,7 +1881,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                 protected Object doInBackground() throws Exception {
                     try {
                         if (deobfuscationDialog.processAllCheckbox.isSelected()) {
-                            for (ABCContainerTag tag : abcPanel.list) {
+                            for (ABCContainerTag tag : abcPanel.swf.abcList) {
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
                                     tag.getABC().removeDeadCode();
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
