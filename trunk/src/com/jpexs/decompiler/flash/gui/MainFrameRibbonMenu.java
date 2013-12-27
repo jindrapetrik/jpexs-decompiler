@@ -239,6 +239,22 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         return resizePolicies;
     }
     
+    private List<RibbonBandResizePolicy> getIconBandResizePolicies(JRibbonBand ribbonBand) {
+        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
+        resizePolicies.add(new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(ribbonBand.getControlPanel()) {
+            @Override
+            public int getPreferredWidth(int i, int i1) {
+                return 105;
+            }
+
+            @Override
+            public void install(int i, int i1) {
+            }
+        });
+        resizePolicies.add(new IconRibbonBandResizePolicy(ribbonBand.getControlPanel()));
+        return resizePolicies;
+    }
+    
     private RibbonTask createFileRibbonTask() {
         JRibbonBand editBand = new JRibbonBand(translate("menu.general"), null);
         editBand.setResizePolicies(getResizePolicies(editBand));
@@ -382,29 +398,18 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         settingsBand.addRibbonComponent(new JRibbonComponent(miAutoRenameIdentifiers));
 
         JRibbonBand languageBand = new JRibbonBand(translate("menu.language"), null);
-        List<RibbonBandResizePolicy> languageBandResizePolicies = new ArrayList<>();
-        languageBandResizePolicies.add(new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(languageBand.getControlPanel()) {
-            @Override
-            public int getPreferredWidth(int i, int i1) {
-                return 105;
-            }
-
-            @Override
-            public void install(int i, int i1) {
-            }
-        });
-        languageBandResizePolicies.add(new IconRibbonBandResizePolicy(languageBand.getControlPanel()));
+        List<RibbonBandResizePolicy> languageBandResizePolicies = getIconBandResizePolicies(languageBand);
         languageBand.setResizePolicies(languageBandResizePolicies);
         JCommandButton setLanguageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.settings.language")), View.getResizableIcon("setlanguage32"));
         assignListener(setLanguageCommandButton, ACTION_SET_LANGUAGE);
         languageBand.addCommandButton(setLanguageCommandButton, RibbonElementPriority.TOP);
 
         JRibbonBand advancedSettingsBand = new JRibbonBand(translate("menu.advancedsettings.advancedsettings"), null);
-        advancedSettingsBand.setResizePolicies(getResizePolicies(advancedSettingsBand));
-        JCommandButton advancedSettingsCommandButton = new JCommandButton(fixCommandTitle(translate("menu.advancedsettings.advancedsettings")), View.getResizableIcon("settings16"));
+        List<RibbonBandResizePolicy> advancedSettingsBandResizePolicies = getIconBandResizePolicies(languageBand);
+        advancedSettingsBand.setResizePolicies(advancedSettingsBandResizePolicies);
+        JCommandButton advancedSettingsCommandButton = new JCommandButton(fixCommandTitle(translate("menu.advancedsettings.advancedsettings")), View.getResizableIcon("settings32"));
         assignListener(advancedSettingsCommandButton, ACTION_ADVANCED_SETTINGS);
-
-        advancedSettingsBand.addCommandButton(advancedSettingsCommandButton, RibbonElementPriority.MEDIUM);
+        advancedSettingsBand.addCommandButton(advancedSettingsCommandButton, RibbonElementPriority.TOP);
         
         return new RibbonTask(translate("menu.settings"), settingsBand, languageBand, advancedSettingsBand);
     }
