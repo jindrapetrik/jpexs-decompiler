@@ -59,6 +59,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -397,6 +398,7 @@ public class Main {
             mainFrame.setVisible(false);
             mainFrame = null;
         }
+        initGui();
         reloadSWFs();
     }
 
@@ -592,6 +594,12 @@ public class Main {
     private static void initGui() {
         if (Configuration.useRibbonInterface.get()) {
             View.setLookAndFeel();
+        } else {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         View.execInEventDispatch(new Runnable() {
             @Override

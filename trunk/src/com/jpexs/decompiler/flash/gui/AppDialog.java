@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.util.ResourceBundle;
 import javax.swing.JDialog;
 import javax.swing.JRootPane;
@@ -30,7 +31,9 @@ public abstract class AppDialog extends JDialog {
 
     public AppDialog() {
         View.installEscapeCloseOperation(this);
-        getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+        if (Configuration.useRibbonInterface.get()) {
+            getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+        }
     }
 
     public String translate(String key) {

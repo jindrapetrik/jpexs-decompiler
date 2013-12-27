@@ -296,6 +296,12 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
         }
         menuSettings.add(miLanguage);
 
+        JMenuItem advancedSettingsCommandButton = new JMenuItem(translate("menu.advancedsettings.advancedsettings"));
+        advancedSettingsCommandButton.setActionCommand(ACTION_ADVANCED_SETTINGS);
+        advancedSettingsCommandButton.setIcon(View.getIcon("settings16"));
+        advancedSettingsCommandButton.addActionListener(this);
+        menuSettings.add(advancedSettingsCommandButton);
+
         menuBar.add(menuSettings);
         JMenu menuHelp = new JMenu(translate("menu.help"));
         JMenuItem miAbout = new JMenuItem(translate("menu.help.about"));
