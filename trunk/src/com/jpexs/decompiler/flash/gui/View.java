@@ -180,11 +180,33 @@ public class View {
      * @param f Frame to center on the screen
      */
     public static void centerScreen(Window f) {
-        f.setLocationRelativeTo(null);
-        Dimension dim = f.getToolkit().getScreenSize();
-        Rectangle abounds = f.getBounds();
-        f.setLocation((dim.width - abounds.width) / 2,
-                (dim.height - abounds.height) / 2);
+        centerScreen(f, 0); // todo, set screen to the currently active screen instead of the first screen in a multi screen setup, (maybe by using the screen where the main window is now classic or ribbon?)
+    }
+
+    public static void centerScreen(Window f,int screen) {
+
+        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] allDevices = env.getScreenDevices();
+        int topLeftX, topLeftY, screenX, screenY, windowPosX, windowPosY;
+
+        if (screen < allDevices.length && screen > -1) {
+            topLeftX = allDevices[screen].getDefaultConfiguration().getBounds().x;
+            topLeftY = allDevices[screen].getDefaultConfiguration().getBounds().y;
+
+            screenX = allDevices[screen].getDefaultConfiguration().getBounds().width;
+            screenY = allDevices[screen].getDefaultConfiguration().getBounds().height;
+        } else {
+            topLeftX = allDevices[0].getDefaultConfiguration().getBounds().x;
+            topLeftY = allDevices[0].getDefaultConfiguration().getBounds().y;
+
+            screenX = allDevices[0].getDefaultConfiguration().getBounds().width;
+            screenY = allDevices[0].getDefaultConfiguration().getBounds().height;
+        }
+
+        windowPosX = ((screenX - f.getWidth()) / 2) + topLeftX;
+        windowPosY = ((screenY - f.getHeight()) / 2) + topLeftY;
+
+        f.setLocation(windowPosX, windowPosY);
     }
 
     public static ImageIcon getIcon(String name) {
