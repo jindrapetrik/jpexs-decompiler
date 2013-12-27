@@ -246,7 +246,8 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
     private JPanel viewerCards;
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
     private CancellableWorker setSourceWorker;
-    public TreeNode oldValue;
+    public TreeNode oldNode;
+    public TreeElementItem oldTag;
     private File tempFile;
 
     private static final String ACTION_SELECT_COLOR = "SELECTCOLOR";
@@ -948,7 +949,8 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
     
     public void closeAll() {
         swfs.clear();
-        oldValue = null;
+        oldNode = null;
+        oldTag = null;
         if (abcPanel != null) {
             abcPanel.clearSwf();
         }
@@ -967,7 +969,8 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         if (actionPanel != null) {
             actionPanel.clearSource();
         }
-        oldValue = null;
+        oldNode = null;
+        oldTag = null;
         updateUi();
         updateTagTree();
     }
@@ -1951,6 +1954,34 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         updateClassesList();
     }
     
+    public boolean saveText(TextTag textTag, String text) {
+        try {
+            if (textTag.setFormattedText(new MissingCharacterHandler() {
+                @Override
+                public boolean handle(FontTag font, List<Tag> tags, char character) {
+                    String fontName = fontPanel.sourceFontsMap.get(font.getFontId());
+                    if (fontName == null) {
+                        fontName = font.getFontName(tags);
+                    }
+                    fontName = FontTag.findInstalledFontName(fontName);
+                    Font f = new Font(fontName, font.getFontStyle(), 18);
+                    if (!f.canDisplay(character)) {
+                        View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
+                        return false;
+                    }
+                    font.addCharacter(tags, character, fontName);
+                    return true;
+
+                }
+            }, textTag.getSwf().tags, text, fontPanel.getSelectedFont())) {
+                return true;
+            }
+        } catch (ParseException ex) {
+            View.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
+        }
+        return false;
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -2076,31 +2107,10 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                 setEditText(false);
                 break;
             case ACTION_SAVE_TEXT:
-                if (oldValue instanceof TextTag) {
-                    TextTag textTag = (TextTag) oldValue;
-                    try {
-                        if (textTag.setFormattedText(new MissingCharacterHandler() {
-                            @Override
-                            public boolean handle(FontTag font, List<Tag> tags, char character) {
-                                String fontName = fontPanel.sourceFontsMap.get(font.getFontId());
-                                if (fontName == null) {
-                                    fontName = font.getFontName(tags);
-                                }
-                                fontName = FontTag.findInstalledFontName(fontName);
-                                Font f = new Font(fontName, font.getFontStyle(), 18);
-                                if (!f.canDisplay(character)) {
-                                    View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
-                                    return false;
-                                }
-                                font.addCharacter(tags, character, fontName);
-                                return true;
-
-                            }
-                        }, textTag.getSwf().tags, textValue.getText(), fontPanel.getSelectedFont())) {
-                            setEditText(false);
-                        }
-                    } catch (ParseException ex) {
-                        View.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
+                if (oldTag instanceof TextTag) {
+                    TextTag textTag = (TextTag) oldTag;
+                    if (saveText(textTag, textValue.getText())) {
+                        setEditText(false);
                     }
                 }
                 break;
@@ -2184,11 +2194,11 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
             return;
         }
 
-        if (!forceReload && (treeNode == oldValue)) {
+        if (!forceReload && (treeNode == oldNode)) {
             return;
         }
 
-        oldValue = treeNode;
+        oldNode = treeNode;
 
         TreeElementItem  tagObj = null;
         if (treeNode instanceof TagNode) {
@@ -2198,6 +2208,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
             tagObj = ((TreeElement) treeNode).getItem();
         }
 
+        oldTag = tagObj;
 
         if (flashPanel != null) {
             flashPanel.specialPlayback = false;
