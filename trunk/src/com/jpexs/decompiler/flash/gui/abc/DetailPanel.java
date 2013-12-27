@@ -190,6 +190,7 @@ public class DetailPanel extends JPanel implements ActionListener {
 
                             @Override
                             protected void done() {
+                                setEditMode(false);
                                 View.showMessageDialog(null, AppStrings.translate("message.trait.saved"));
                             }
                         };
