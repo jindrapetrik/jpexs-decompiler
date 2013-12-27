@@ -160,13 +160,19 @@ public class ActionScript3Test {
                 + "}\r\n", false);
     }
 
-    @Test
+    //@Test //todo honfika: re-enable after as3.swf is compiled
     public void testPrecedence() {
         decompileMethod("testPrecedence", "var a:* = 0;\r\n"
                 + "a = (5 + 6) * 7;\r\n"
                 + "a = 5 * (2 + 3);\r\n"
                 + "a = 5 + 6 * 7;\r\n"
                 + "a = 5 * 2 + 2;\r\n"
+                + "a = 5 * (25 % 3);\r\n"
+                + "a = 5 % (24 * 307);\r\n"
+                + "a = 1 / (2 / 3);\r\n"
+                + "a = 1 / (2 * 3);\r\n"
+                + "a = 1 * 2 * 3;\r\n"
+                + "a = 1 * 2 / 3;\r\n"
                 + "trace(\"a=\" + a);\r\n", false);
     }
 

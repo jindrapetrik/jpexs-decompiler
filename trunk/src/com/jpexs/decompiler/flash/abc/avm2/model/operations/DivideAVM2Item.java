@@ -18,8 +18,10 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 
 public class DivideAVM2Item extends BinaryOpItem {
 
@@ -33,5 +35,27 @@ public class DivideAVM2Item extends BinaryOpItem {
             return Double.NaN;
         }
         return (EcmaScript.toNumber(leftSide.getResult())) / (EcmaScript.toNumber(rightSide.getResult()));
+    }
+
+    @Override
+    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        if (rightSide.precedence >= precedence) { // >=  add or subtract too
+            if (leftSide.precedence > precedence) {
+                writer.append("(");
+                leftSide.toString(writer, localData);
+                writer.append(")");
+            } else {
+                leftSide.toString(writer, localData);
+            }
+            writer.append(" ");
+            writer.append(operator);
+            writer.append(" ");
+
+            writer.append("(");
+            rightSide.toString(writer, localData);
+            return writer.append(")");
+        } else {
+            return super.appendTo(writer, localData);
+        }
     }
 }
