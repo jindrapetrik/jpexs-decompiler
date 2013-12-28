@@ -1977,7 +1977,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (textTag.setFormattedText(new MissingCharacterHandler() {
                 @Override
                 public boolean handle(FontTag font, List<Tag> tags, char character) {
-                    String fontName = fontPanel.sourceFontsMap.get(font.getFontId());
+                    String fontName = font.getSwf().sourceFontsMap.get(font.getFontId());
                     if (fontName == null) {
                         fontName = font.getFontName(tags);
                     }
@@ -1991,7 +1991,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     return true;
 
                 }
-            }, textTag.getSwf().tags, text, fontPanel.getSelectedFont())) {
+            }, textTag.getSwf().tags, text)) {
                 return true;
             }
         } catch (ParseException ex) {

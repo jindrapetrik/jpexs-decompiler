@@ -153,7 +153,7 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
     }
 
     @Override
-    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text, String fontName) throws ParseException {
+    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text) throws ParseException {
         List<TEXTRECORD> oldTextRecords = textRecords;
         try {
             TextLexer lexer = new TextLexer(new StringReader(text));
@@ -163,6 +163,7 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
             int fontId = -1;
             int textHeight = -1;
             FontTag font = null;
+            String fontName = null;
             Integer x = null;
             Integer y = null;
             int currentX = 0;
@@ -195,6 +196,7 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
                                 if (t instanceof FontTag) {
                                     if (((FontTag) t).getFontId() == fontId) {
                                         font = (FontTag) t;
+                                        fontName = font.getSystemFontName(tags);
                                         break;
                                     }
                                 }

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -118,6 +120,15 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         return name + " (" + getCharacterId() + nameAppend + ")";
     }
 
+    public String getSystemFontName(List<Tag> tags) {
+        Map<String, String> fontPairs = Configuration.getFontPairs();
+        String name = getFontName(tags);
+        if (fontPairs.containsKey(name)) {
+            return fontPairs.get(name);
+        }
+        return defaultFontName;
+    }
+    
     public static void shiftGlyphIndices(int fontId, int startIndex, List<Tag> tags) {
         List<TEXTRECORD> textRecords = new ArrayList<>();
         for (Tag t : tags) {
@@ -156,7 +167,20 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         GlyphMetrics gm = gv.getGlyphMetrics(0);
         return gm.getAdvanceX();
     }
-    public static List<String> fontNames = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+
+    public static final String[] fontNamesArray = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+    public static final List<String> fontNames = Arrays.asList(fontNamesArray);
+    public static final String defaultFontName;
+    
+    static {
+        if (fontNames.contains("Times New Roman")) {
+            defaultFontName = "Times New Roman";
+        } else if (fontNames.contains("Arial")) {
+            defaultFontName = "Arial";
+        } else {
+            defaultFontName = fontNames.get(0);
+        }
+    }
 
     public static String isFontInstalled(String fontName) {
         if (fontNames.contains(fontName)) {
@@ -181,15 +205,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
                 return beforeUnderscore;
             }
         }
-        fontName = "Times New Roman";
-        if (fontNames.contains(fontName)) {
-            return fontName;
-        }
-        fontName = "Arial";
-        if (fontNames.contains(fontName)) {
-            return fontName;
-        }
-        return fontNames.get(0);
+        return defaultFontName;
     }
 
     @Override

@@ -163,7 +163,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text, String fontName) throws ParseException {
+    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text) throws ParseException {
         try {
             TextLexer lexer = new TextLexer(new StringReader(text));
             ParsedSymbol s = null;

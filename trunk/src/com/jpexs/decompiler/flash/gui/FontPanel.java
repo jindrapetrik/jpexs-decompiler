@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -32,8 +33,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Box;
@@ -58,8 +57,6 @@ public class FontPanel extends JPanel implements ActionListener {
     static final String ACTION_FONT_ADD_CHARS = "FONTADDCHARS";
 
     private MainPanel mainPanel;
-
-    public Map<Integer, String> sourceFontsMap = new HashMap<>();
 
     private JLabel fontNameLabel;
     private JLabel fontIsBoldLabel;
@@ -180,16 +177,17 @@ public class FontPanel extends JPanel implements ActionListener {
         fontParams1.add(fontAddCharsPanel);
         JPanel fontSelectionPanel = new JPanel(new FlowLayout());
         fontSelectionPanel.add(new JLabel(translate("font.source")));
-        fontSelection = new JComboBox<>(FontTag.fontNames.toArray(new String[FontTag.fontNames.size()]));
-        fontSelection.setSelectedIndex(0);
-        fontSelection.setSelectedItem("Times New Roman");
-        fontSelection.setSelectedItem("Arial");
+        fontSelection = new JComboBox<>(FontTag.fontNamesArray);
+        fontSelection.setSelectedItem(FontTag.defaultFontName);
         fontSelection.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (mainPanel.oldTag instanceof FontTag) {
                     FontTag f = (FontTag) mainPanel.oldTag;
-                    sourceFontsMap.put(f.getFontId(), (String) fontSelection.getSelectedItem());
+                    SWF swf = f.getSwf();
+                    String selectedSystemFont = (String) fontSelection.getSelectedItem();
+                    swf.sourceFontsMap.put(f.getFontId(), selectedSystemFont);
+                    Configuration.addFontPair(f.getFontName(swf.tags), selectedSystemFont);
                 }
             }
         });
@@ -282,8 +280,10 @@ public class FontPanel extends JPanel implements ActionListener {
         fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : "" + ft.getLeading());
         String chars = ft.getCharacters(swf.tags);
         fontCharactersTextArea.setText(chars);
-        if (sourceFontsMap.containsKey(ft.getFontId())) {
-            fontSelection.setSelectedItem(sourceFontsMap.get(ft.getFontId()));
+        if (swf.sourceFontsMap.containsKey(ft.getFontId())) {
+            fontSelection.setSelectedItem(swf.sourceFontsMap.get(ft.getFontId()));
+        } else if (Configuration.getFontPairs().containsKey(ft.getFontName(swf.tags))) {
+            fontSelection.setSelectedItem(Configuration.getFontPairs().get(ft.getFontName(swf.tags)));
         } else {
             fontSelection.setSelectedItem(FontTag.findInstalledFontName(ft.getFontName(swf.tags)));
         }

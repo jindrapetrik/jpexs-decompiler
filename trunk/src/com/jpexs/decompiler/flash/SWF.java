@@ -212,6 +212,7 @@ public final class SWF {
     public HashMap<Integer, CharacterTag> characters;
     public List<ABCContainerTag> abcList;
     public JPEGTablesTag jtt;
+    public Map<Integer, String> sourceFontsMap = new HashMap<>();
             
     /**
      * Gets all tags with specified id
