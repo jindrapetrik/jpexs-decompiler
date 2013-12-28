@@ -260,7 +260,7 @@ public class Configuration {
 
     public static List<String> getRecentFiles() {
         String files = recentFiles.get();
-        if (files == null) {
+        if (files == null || files.isEmpty()) {
             return new ArrayList<>();
         }
         return Arrays.asList(files.split("::"));

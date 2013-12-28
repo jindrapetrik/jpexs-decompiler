@@ -462,6 +462,11 @@ public class Main {
        mainFrame.getPanel().close(swf);
     }
     
+    public static void closeAll() {
+       sourceInfos.clear();
+       mainFrame.getPanel().closeAll();
+    }
+    
     public static boolean saveFileDialog(SWF swf) {
         return saveFileDialog(swf, ".swf");
     }

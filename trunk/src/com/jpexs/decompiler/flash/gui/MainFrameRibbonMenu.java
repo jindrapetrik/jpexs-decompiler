@@ -35,6 +35,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
@@ -88,6 +89,8 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_SAVE_AS = "SAVEAS";
     static final String ACTION_SAVE_AS_EXE = "SAVEASEXE";
     static final String ACTION_OPEN = "OPEN";
+    static final String ACTION_CLOSE = "CLOSE";
+    static final String ACTION_CLOSE_ALL = "CLOSEALL";
     static final String ACTION_EXPORT_FLA = "EXPORTFLA";
     public static final String ACTION_EXPORT_SEL = "EXPORTSEL";
     static final String ACTION_EXPORT = "EXPORT";
@@ -101,6 +104,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_DEOBFUSCATE_ALL = "DEOBFUSCATEALL";
     static final String ACTION_REMOVE_NON_SCRIPTS = "REMOVENONSCRIPTS";
     static final String ACTION_REFRESH_DECOMPILED = "REFRESHDECOMPILED";
+    static final String ACTION_CLEAR_RECENT_FILES = "CLEARRECENTFILES";
 
     private MainFrameRibbon mainFrame;
 
@@ -125,10 +129,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     private JCommandButton deobfuscationCommandButton;
     private JCommandButton searchCommandButton;
     private JCommandButton gotoDocumentClassCommandButton;
+    private JCommandButton clearRecentFilesCommandButton;
 
     RibbonApplicationMenuEntryPrimary exportFlaMenu;
     RibbonApplicationMenuEntryPrimary exportAllMenu;
     RibbonApplicationMenuEntryPrimary exportSelMenu;
+    RibbonApplicationMenuEntryPrimary closeFileMenu;
+    RibbonApplicationMenuEntryPrimary closeAllFilesMenu;
         
     public MainFrameRibbonMenu(MainFrameRibbon mainFrame, JRibbon ribbon, boolean externalFlashPlayerUnavailable) {
         this.mainFrame = mainFrame;
@@ -181,6 +188,8 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         RibbonApplicationMenuEntryPrimary checkUpdatesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("update32"), translate("menu.help.checkupdates"), new ActionRedirector(this, ACTION_CHECK_UPDATES), JCommandButton.CommandButtonKind.ACTION_ONLY);
         RibbonApplicationMenuEntryPrimary aboutMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("about32"), translate("menu.help.about"), new ActionRedirector(this, ACTION_ABOUT), JCommandButton.CommandButtonKind.ACTION_ONLY);
         RibbonApplicationMenuEntryPrimary openFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("open32"), translate("menu.file.open"), new ActionRedirector(this, ACTION_OPEN), JCommandButton.CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
+        closeFileMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("close32"), translate("menu.file.close"), new ActionRedirector(this, ACTION_CLOSE), JCommandButton.CommandButtonKind.ACTION_ONLY);
+        closeAllFilesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("close32"), translate("menu.file.closeAll"), new ActionRedirector(this, ACTION_CLOSE_ALL), JCommandButton.CommandButtonKind.ACTION_ONLY);
         openFileMenu.setRolloverCallback(new RibbonApplicationMenuEntryPrimary.PrimaryRolloverCallback() {
             @Override
             public void menuEntryActivated(JPanel targetPanel) {
@@ -219,6 +228,8 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         RibbonApplicationMenuEntryFooter exitMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon("exit32"), translate("menu.file.exit"), new ActionRedirector(this, "EXIT"));
 
         mainMenu.addMenuEntry(openFileMenu);
+        mainMenu.addMenuEntry(closeFileMenu);
+        mainMenu.addMenuEntry(closeAllFilesMenu);
         mainMenu.addMenuSeparator();
         mainMenu.addMenuEntry(exportFlaMenu);
         mainMenu.addMenuEntry(exportAllMenu);
@@ -334,7 +345,15 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         deobfuscationBand.addCommandButton(globalrenameCommandButton, RibbonElementPriority.MEDIUM);
         deobfuscationBand.addCommandButton(renameinvalidCommandButton, RibbonElementPriority.MEDIUM);
 
-        return new RibbonTask(translate("menu.tools"), toolsBand, deobfuscationBand);
+        JRibbonBand otherToolsBand = new JRibbonBand(translate("menu.tools.otherTools"), null);
+        otherToolsBand.setResizePolicies(getResizePolicies(otherToolsBand));
+
+        clearRecentFilesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.otherTools.clearRecentFiles")), View.getResizableIcon("deobfuscate32"));
+        assignListener(clearRecentFilesCommandButton, ACTION_CLEAR_RECENT_FILES);
+
+        otherToolsBand.addCommandButton(clearRecentFilesCommandButton, RibbonElementPriority.MEDIUM);
+
+        return new RibbonTask(translate("menu.tools"), toolsBand, deobfuscationBand, otherToolsBand);
     }
     
     private RibbonTask createSettingsRibbonTask(boolean externalFlashPlayerUnavailable) {
@@ -461,6 +480,8 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         exportAllMenu.setEnabled(swfLoaded);
         exportFlaMenu.setEnabled(swfLoaded);
         exportSelMenu.setEnabled(swfLoaded);
+        closeFileMenu.setEnabled(swfLoaded);
+        closeAllFilesMenu.setEnabled(swfLoaded);
 
         saveCommandButton.setEnabled(swfLoaded);
         saveasCommandButton.setEnabled(swfLoaded);
@@ -562,6 +583,9 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                     miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
                 }
                 break;
+            case ACTION_CLEAR_RECENT_FILES:
+                Configuration.recentFiles.set(null);
+                break;
             case ACTION_EXIT:
                 mainFrame.panel.setVisible(false);
                 if (Main.proxyFrame != null) {
@@ -621,6 +645,12 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 break;
             case ACTION_OPEN:
                 Main.openFileDialog();
+                break;
+            case ACTION_CLOSE:
+                Main.closeFile(mainFrame.panel.getCurrentSwf());
+                break;
+            case ACTION_CLOSE_ALL:
+                Main.closeAll();
                 break;
             case ACTION_EXPORT_FLA:
                 mainFrame.panel.exportFla(mainFrame.panel.getCurrentSwf());
