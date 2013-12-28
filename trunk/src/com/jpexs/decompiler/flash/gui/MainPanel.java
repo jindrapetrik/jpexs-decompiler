@@ -108,6 +108,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -1743,6 +1744,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 @Override
                 protected void done() {
                     Main.stopWork();
+                    if (Configuration.openFolderAfterFlaExport.get()) {
+                        try {
+                            Desktop.getDesktop().open(selfile.getAbsoluteFile().getParentFile());
+                        } catch (IOException ex) {
+                            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                 }
             }.execute();
         }
