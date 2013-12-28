@@ -598,13 +598,19 @@ public class Helper {
             
             for (int i = 0; i < bytesPerRow; i++) {
                 int idx = row * bytesPerRow + i;
-                if (data.length == idx) {
-                    break;
+                if (data.length > idx) {
+                    if (i> 0 && i % groupSize == 0) {
+                        writer.appendNoHilight(" ");
+                    }
+                    writer.appendNoHilight(String.format("%02x ", data[idx]));
+                } else {
+                    if (addChars) {
+                        if (i> 0 && i % groupSize == 0) {
+                            writer.appendNoHilight(" ");
+                        }
+                        writer.appendNoHilight("   ");
+                    }
                 }
-                if (i> 0 && i % groupSize == 0) {
-                    writer.appendNoHilight(" ");
-                }
-                writer.appendNoHilight(String.format("%02x ", data[idx]));
             }
             
             if (addChars) {

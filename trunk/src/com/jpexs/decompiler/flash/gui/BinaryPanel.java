@@ -35,15 +35,14 @@ public final class BinaryPanel extends JPanel implements ActionListener, Compone
     
     public BinaryPanel() {
         super(new BorderLayout());
-        setOpaque(true);
-        setBackground(View.DEFAULT_BACKGROUND_COLOR);
-        // todo: set textArea size, to hide horizontal scrollbar
+
         add(new JScrollPane(hexEditor), BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         bottomPanel.add(buttonsPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
+        addComponentListener(this);
     }
 
     @Override
@@ -52,13 +51,17 @@ public final class BinaryPanel extends JPanel implements ActionListener, Compone
 
     public void setBinaryData(byte[] data) {
         this.data = data;
-        setBackground(View.swfBackgroundColor);
-        int widthInChars = getWidth() / 7 -3; // -3: scrollbar
-        int blockCount = widthInChars / 34;
         hexEditor.setEditable(false);
-        hexEditor.setText(Helper.byteArrayToHex(data, blockCount * 8));
-        hexEditor.setFont(new Font("Monospaced", Font.PLAIN, hexEditor.getFont().getSize()));
-        //hexEditor.setContentType("text/plain"); //throws exception. why?
+        if (data != null) {
+            int widthInChars = getWidth() / 7 - 3; // -3: scrollbar
+            int blockCount = widthInChars / 34;
+            hexEditor.setFont(new Font("Monospaced", Font.PLAIN, hexEditor.getFont().getSize()));
+            hexEditor.setContentType("text/plain");
+            hexEditor.setText(Helper.byteArrayToHex(data, blockCount * 8));
+            hexEditor.setCaretPosition(0);
+        } else {
+            hexEditor.setText("");
+        }
     }
 
     @Override
