@@ -570,10 +570,10 @@ public class Helper {
 
     public static GraphTextWriter byteArrayToHexWithHeader(GraphTextWriter writer, byte[] data) {
         writer.appendNoHilight("#hexdata").newLine().newLine();
-        return byteArrayToHex(writer, data, 8, 8);
+        return byteArrayToHex(writer, data, 8, 8, false);
     }
     
-    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize) {
+    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize, boolean addChars) {
 
         /* // hex data from decompiled actions
          Scanner scanner = new Scanner(srcWithHex);
@@ -586,15 +586,44 @@ public class Helper {
          }
          }*/
 
-        for (int i = 0; i < data.length; i++) {
-            if (i > 0) {
-                if (i % bytesPerRow == 0) {
-                    writer.newLine();
-                } else if (i % groupSize == 0) {
+        int rowCount = data.length / bytesPerRow;
+        if (data.length % bytesPerRow > 0) {
+            rowCount++;
+        }
+        
+        for (int row = 0; row < rowCount; row++) {
+            if (row > 0) {
+                writer.newLine();
+            }
+            
+            for (int i = 0; i < bytesPerRow; i++) {
+                int idx = row * bytesPerRow + i;
+                if (data.length == idx) {
+                    break;
+                }
+                if (i> 0 && i % groupSize == 0) {
                     writer.appendNoHilight(" ");
                 }
+                writer.appendNoHilight(String.format("%02x ", data[idx]));
             }
-            writer.appendNoHilight(String.format("%02x ", data[i]));
+            
+            if (addChars) {
+                writer.appendNoHilight("  ");
+                for (int i = 0; i < bytesPerRow; i++) {
+                    int idx = row * bytesPerRow + i;
+                    if (data.length == idx) {
+                        break;
+                    }
+                    if (i> 0 && i % groupSize == 0) {
+                        writer.appendNoHilight(" ");
+                    }
+                    byte ch = data[idx];
+                    if (ch >=0 && ch < 32) {
+                        ch = '.';
+                    }
+                    writer.appendNoHilight((char) ch + "");
+                }
+            }
         }
 
         writer.newLine();
@@ -603,7 +632,7 @@ public class Helper {
     
     public static String byteArrayToHex(byte[] data, int bytesPerRow) {
         HilightedTextWriter writer = new HilightedTextWriter(false);
-        byteArrayToHex(writer, data, bytesPerRow, 8);
+        byteArrayToHex(writer, data, bytesPerRow, 8, true);
         return writer.toString();
     }
 

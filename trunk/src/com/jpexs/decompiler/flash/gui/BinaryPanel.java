@@ -20,19 +20,25 @@ import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
-public final class BinaryPanel extends JPanel implements ActionListener {
+public final class BinaryPanel extends JPanel implements ActionListener, ComponentListener {
 
     public LineMarkedEditorPane hexEditor = new LineMarkedEditorPane();
+    private byte[] data;
     
     public BinaryPanel() {
         super(new BorderLayout());
         setOpaque(true);
         setBackground(View.DEFAULT_BACKGROUND_COLOR);
-        add(hexEditor, BorderLayout.CENTER);
+        // todo: set textArea size, to hide horizontal scrollbar
+        add(new JScrollPane(hexEditor), BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         JPanel buttonsPanel = new JPanel(new FlowLayout());
@@ -45,9 +51,30 @@ public final class BinaryPanel extends JPanel implements ActionListener {
     }
 
     public void setBinaryData(byte[] data) {
+        this.data = data;
         setBackground(View.swfBackgroundColor);
+        int widthInChars = getWidth() / 7 -3; // -3: scrollbar
+        int blockCount = widthInChars / 34;
         hexEditor.setEditable(false);
-        hexEditor.setText(Helper.byteArrayToHex(data, 32));
+        hexEditor.setText(Helper.byteArrayToHex(data, blockCount * 8));
+        hexEditor.setFont(new Font("Monospaced", Font.PLAIN, hexEditor.getFont().getSize()));
         //hexEditor.setContentType("text/plain"); //throws exception. why?
+    }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        setBinaryData(data);
+    }
+    
+    @Override
+    public void componentMoved(ComponentEvent ce) {
+    }
+
+    @Override
+    public void componentShown(ComponentEvent ce) {
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent ce) {
     }
 }
