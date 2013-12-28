@@ -82,7 +82,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
     private MainFramePanel mainFramePanel;
     public TraitsList navigator;
-    public ClassesListTree classTree;
     public ABC abc;
     public SWF swf;
     public JComboBox abcComboBox;
@@ -97,7 +96,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
     public DetailPanel detailPanel;
-    public JTextField filterField = new MyTextField();
     public JPanel navPanel;
     public JTabbedPane tabbedPane;
     public JPanel searchPanel;
@@ -113,7 +111,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     public JLabel scriptNameLabel;
 
     static final String ACTION_ADD_TRAIT = "ADDTRAIT";
-    public static final String ACTION_FILTER_SCRIPT = "FILTERSCRIPT";
     static final String ACTION_SEARCH_CANCEL = "SEARCHCANCEL";
     static final String ACTION_SEARCH_PREV = "SEARCHPREV";
     static final String ACTION_SEARCH_NEXT = "SEARCHNEXT";
@@ -122,7 +119,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         if ((txt != null) && (!txt.isEmpty())) {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
-            ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
+            TagTreeModel ttm = (TagTreeModel) mainFramePanel.tagTree.getModel();
+            ClassesListTreeModel clModel = ttm.getSwfRoot(mainFramePanel.getCurrentSwf()).classTreeModel;
             List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
             found = new ArrayList<>();
             final Pattern pat = regexp ?
@@ -272,7 +270,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         this.swf = null;
         this.abc = null;
         constantTable.setModel(new DefaultTableModel());
-        classTree.clearDoABCTags();
         abcComboBox.setModel(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()));
         navigator.clearABC();
     }
@@ -294,7 +291,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     
     public void switchAbc(int index) {
         listIndex = index;
-        classTree.setSwf(swf);
 
         if (index != -1) {
             this.abc = swf.abcList.get(index).getABC();
@@ -418,37 +414,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
         Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
 
-        filterField.setActionCommand(ACTION_FILTER_SCRIPT);
-        filterField.addActionListener(this);
-
-
-        filterField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                warn();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                warn();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                warn();
-            }
-
-            public void warn() {
-                doFilter();
-            }
-        });
-
-        JPanel treePanel = new JPanel();
-        treePanel.setLayout(new BorderLayout());
-        treePanel.add(new JScrollPane(classTree = new ClassesListTree(this)), BorderLayout.CENTER);
-        JPanel filterPanel = new JPanel();
-        filterPanel.setLayout(new BorderLayout());
-        filterPanel.add(filterField, BorderLayout.CENTER);
         JButton prevSearchButton = new JButton(View.getIcon("prev16"));
         prevSearchButton.setMargin(new Insets(3, 3, 3, 3));
         prevSearchButton.addActionListener(this);
@@ -471,9 +436,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         searchPanel.add(nextSearchButton);
         searchPanel.add(cancelSearchButton);
         searchPanel.setVisible(false);
-        JLabel picLabel = new JLabel(View.getIcon("search16"));
-        filterPanel.add(picLabel, BorderLayout.EAST);
-        treePanel.add(filterPanel, BorderLayout.NORTH);
 
         /* splitPaneTreeVSNavigator = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
          treePanel,
@@ -537,10 +499,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         tabbedPane.addTab(AppStrings.translate("constants"), panConstants);
     }
 
-    public void doFilter() {
-        classTree.applyFilter(filterField.getText());
-    }
-
     public void reload() {
         switchAbc(listIndex);
         decompiledTextArea.clearScriptCache();
@@ -570,8 +528,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         setVisible(true);
     }
 
-    public void hilightScript(String name) {
-        ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
+    public void hilightScript(SWF swf, String name) {
+        TagTreeModel ttm = (TagTreeModel) mainFramePanel.tagTree.getModel();
+        ClassesListTreeModel clModel = ttm.getSwfRoot(swf).classTreeModel;
         ScriptPack pack = null;
         for (MyEntry<ClassPath, ScriptPack> item : clModel.getList()) {
             if (item.key.toString().equals(name)) {
@@ -719,9 +678,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                     decompiledTextArea.gotoTrait(traitId);
                 }
 
-                break;
-            case ACTION_FILTER_SCRIPT:
-                doFilter();
                 break;
             case ACTION_SEARCH_CANCEL:
                 foundPos = 0;

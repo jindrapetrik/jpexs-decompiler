@@ -87,7 +87,6 @@ public class UsageFrame extends AppFrame implements ActionListener, MouseListene
             MultinameUsage usage = usageListModel.getUsage(usageList.getSelectedIndex());
             if (usage instanceof InsideClassMultinameUsage) {
                 InsideClassMultinameUsage icu = (InsideClassMultinameUsage) usage;
-                abcPanel.classTree.selectClass(icu.classIndex);
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex) {

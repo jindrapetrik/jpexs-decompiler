@@ -771,7 +771,6 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         pan1.add(new JScrollPane(tagTree), BorderLayout.CENTER);
         pan1.add(searchPanel, BorderLayout.SOUTH);
 
-        filterField.setActionCommand(ABCPanel.ACTION_FILTER_SCRIPT);
         filterField.addActionListener(this);
 
         searchPanel.setVisible(false);
@@ -857,6 +856,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
 
         swfs.add(swf);
         swf.abcList = abcList;
+        tagTree.setModel(new TagTreeModel(mainFrame, swfs));
         
         boolean hasAbc = !abcList.isEmpty();
 
@@ -874,7 +874,6 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
             }
         }
 
-        tagTree.setModel(new TagTreeModel(mainFrame, swfs));
         expandSwfRoots();
 
         for (Tag t : swf.tags) {
@@ -1329,7 +1328,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                 }
                 updateClassesList();
                 reload(true);
-                abcPanel.hilightScript(abcPanel.decompiledTextArea.getScriptLeaf().getPath().toString());
+                abcPanel.hilightScript(abcPanel.swf, abcPanel.decompiledTextArea.getScriptLeaf().getPath().toString());
             }
         }
     }
@@ -1535,7 +1534,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
             showDetail(DETAILCARDAS3NAVIGATOR);
             showCard(CARDACTIONSCRIPT3PANEL);
             abcPanel.setSwf(swf);
-            abcPanel.hilightScript(documentClass);
+            abcPanel.hilightScript(swf, documentClass);
         }
     }
 
@@ -2220,6 +2219,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                 setSourceWorker.cancel(true);
             }
             if (!Main.isWorking()) {
+                Main.startWork(AppStrings.translate("work.decompiling") + "...");
                 CancellableWorker worker = new CancellableWorker() {
 
                     @Override

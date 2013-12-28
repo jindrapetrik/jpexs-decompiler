@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.TagNode;
 import com.jpexs.decompiler.flash.TreeNode;
+import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import java.util.List;
 
 /**
@@ -30,6 +31,7 @@ public class SWFRoot implements TreeNode {
     private SWF swf;
     private String name;
     public List<TagNode> list;
+    public ClassesListTreeModel classTreeModel;
 
     public SWFRoot(SWF swf, String name, List<TagNode> list) {
         this.swf = swf;

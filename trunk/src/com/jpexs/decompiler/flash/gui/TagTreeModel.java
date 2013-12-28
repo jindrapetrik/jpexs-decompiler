@@ -33,7 +33,9 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -42,18 +44,23 @@ public class TagTreeModel implements TreeModel {
 
     private TagTreeRoot root = new TagTreeRoot();
     private List<SWFRoot> swfs;
+    private Map<SWF, SWFRoot> swfToSwfRoot;
     private MainFrame mainFrame;
 
     public TagTreeModel(MainFrame mainFrame, List<SWF> swfs) {
         this.mainFrame = mainFrame;
         this.swfs = new ArrayList<>();
+        swfToSwfRoot = new HashMap<>();
         for (SWF swf : swfs) {
             List<ContainerItem> objs = new ArrayList<>();
             objs.addAll(swf.tags);
-            List<TagNode> list = createTagList(objs, null, swf);
+            ClassesListTreeModel classTreeModel = new ClassesListTreeModel(swf);
+            List<TagNode> list = createTagList(objs, null, swf, classTreeModel);
 
             SWFRoot swfRoot = new SWFRoot(swf, new File(swf.getFileTitle()).getName(), list);
+            swfRoot.classTreeModel = classTreeModel;
             this.swfs.add(swfRoot);
+            swfToSwfRoot.put(swf, swfRoot);
         }
     }
 
@@ -76,7 +83,7 @@ public class TagTreeModel implements TreeModel {
         return ret;
     }
 
-    private List<TagNode> createTagList(List<ContainerItem> list, Object parent, SWF swf) {
+    private List<TagNode> createTagList(List<ContainerItem> list, Object parent, SWF swf, ClassesListTreeModel classTreeModel) {
         List<TagNode> ret = new ArrayList<>();
         List<TagNode> frames = getTagNodesWithType(list, TagType.FRAME, parent, true);
         List<TagNode> shapes = getTagNodesWithType(list, TagType.SHAPE, parent, true);
@@ -118,7 +125,7 @@ public class TagTreeModel implements TreeModel {
                 TagNode tti = new TagNode(t, t.getSwf());
                 if (((Container) t).getItemCount() > 0) {
                     List<ContainerItem> subItems = ((Container) t).getSubItems();
-                    tti.subItems = createTagList(subItems, t, swf);
+                    tti.subItems = createTagList(subItems, t, swf, classTreeModel);
                 }
                 //ret.add(tti);
             }
@@ -202,7 +209,7 @@ public class TagTreeModel implements TreeModel {
         
         if (hasAbc) {
             actionScriptNode.subItems.clear();
-            actionScriptNode.tag = swf.classTreeModel;
+            actionScriptNode.tag = classTreeModel;
         }
         if ((!actionScriptNode.subItems.isEmpty()) || hasAbc) {
             ret.add(actionScriptNode);
@@ -239,6 +246,10 @@ public class TagTreeModel implements TreeModel {
             }
         }
         return ret;
+    }
+
+    public SWFRoot getSwfRoot(SWF swf) {
+        return swfToSwfRoot.get(swf);
     }
 
     public TreePath getTagPath(TreeElementItem obj) {
