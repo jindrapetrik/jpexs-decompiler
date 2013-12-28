@@ -111,12 +111,11 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
     
     public final void setFilter(String filter) {
         classTree = new Tree(swf);
+        filter = (filter == null || filter.isEmpty()) ? null : filter.toLowerCase();
         for (MyEntry<ClassPath, ScriptPack> item : list) {
             if (filter != null) {
-                if (!filter.isEmpty()) {
-                    if (!item.key.toString().contains(filter)) {
-                        continue;
-                    }
+                if (!item.key.toString().toLowerCase().contains(filter)) {
+                    continue;
                 }
             }
             //String nsName = path.contains(".") ? path.substring(path.lastIndexOf(".") + 1) : path;
