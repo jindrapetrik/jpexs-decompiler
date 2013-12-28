@@ -53,7 +53,7 @@ public final class BinaryPanel extends JPanel implements ActionListener, Compone
         this.data = data;
         hexEditor.setEditable(false);
         if (data != null) {
-            int widthInChars = getWidth() / 7 - 3; // -3: scrollbar
+            int widthInChars = getWidth() / 7 - 3 - 11; // -3: scrollbar, -11: address in hex format
             int blockCount = widthInChars / 34;
             hexEditor.setFont(new Font("Monospaced", Font.PLAIN, hexEditor.getFont().getSize()));
             hexEditor.setContentType("text/plain");

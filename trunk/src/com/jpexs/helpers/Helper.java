@@ -570,10 +570,10 @@ public class Helper {
 
     public static GraphTextWriter byteArrayToHexWithHeader(GraphTextWriter writer, byte[] data) {
         writer.appendNoHilight("#hexdata").newLine().newLine();
-        return byteArrayToHex(writer, data, 8, 8, false);
+        return byteArrayToHex(writer, data, 8, 8, false, false);
     }
     
-    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize, boolean addChars) {
+    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize, boolean addChars, boolean showAddress) {
 
         /* // hex data from decompiled actions
          Scanner scanner = new Scanner(srcWithHex);
@@ -591,9 +591,14 @@ public class Helper {
             rowCount++;
         }
         
+        long address = 0;
         for (int row = 0; row < rowCount; row++) {
             if (row > 0) {
                 writer.newLine();
+            }
+            
+            if (showAddress) {
+                writer.appendNoHilight("0x" + String.format("%08x ", address));
             }
             
             for (int i = 0; i < bytesPerRow; i++) {
@@ -611,6 +616,7 @@ public class Helper {
                         writer.appendNoHilight("   ");
                     }
                 }
+                address += bytesPerRow;
             }
             
             if (addChars) {
@@ -638,7 +644,7 @@ public class Helper {
     
     public static String byteArrayToHex(byte[] data, int bytesPerRow) {
         HilightedTextWriter writer = new HilightedTextWriter(false);
-        byteArrayToHex(writer, data, bytesPerRow, 8, true);
+        byteArrayToHex(writer, data, bytesPerRow, 8, true, true);
         return writer.toString();
     }
 
