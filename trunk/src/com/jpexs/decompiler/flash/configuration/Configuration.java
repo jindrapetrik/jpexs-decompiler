@@ -152,6 +152,7 @@ public class Configuration {
     @ConfigurationDefaultInt(8)
     public static final ConfigurationItem<Integer> maxRecentFileCount = null;
     public static final ConfigurationItem<String> recentFiles = null;
+    public static final ConfigurationItem<String> fontPairing = null;
     
     public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
 
@@ -262,7 +263,7 @@ public class Configuration {
         if (files == null) {
             return new ArrayList<>();
         }
-        return Arrays.asList(recentFiles.get().split("::"));
+        return Arrays.asList(files.split("::"));
     }
     
     public static void addRecentFile(String path) {
@@ -285,6 +286,35 @@ public class Configuration {
             recentFilesArray.remove(idx);
         }        
         recentFiles.set(Helper.joinStrings(recentFilesArray, "::"));
+    }
+    
+    public static Map<String, String> getFontPairs() {
+        String fonts = fontPairing.get();
+        if (fonts == null) {
+            return new HashMap<>();
+        }
+
+        Map<String, String> result = new HashMap<>();
+        for (String pair : fonts.split("::")) {
+            String[] splittedPair = pair.split("=");
+            result.put(splittedPair[0], splittedPair[1]);
+        }
+        return result;
+    }
+    
+    public static void addFontPair(String fontName, String systemFontName) {
+        Map<String, String> fontPairs = getFontPairs();
+        fontPairs.put(fontName, systemFontName);
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        for (Entry<String, String> pair : fontPairs.entrySet()) {
+            if (i != 0) {
+                sb.append("::");
+            }
+            sb.append(pair.getKey()).append("=").append(pair.getValue());
+            i++;
+        }
+        fontPairing.set(sb.toString());
     }
     
     /**
