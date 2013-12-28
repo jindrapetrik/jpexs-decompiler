@@ -19,12 +19,9 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
 public final class BinaryPanel extends JPanel implements ActionListener {

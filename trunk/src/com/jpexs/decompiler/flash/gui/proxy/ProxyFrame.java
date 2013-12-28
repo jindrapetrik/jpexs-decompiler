@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainFrame;
-import com.jpexs.decompiler.flash.gui.MainFrameRibbon;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.proxy.CatchedListener;
 import com.jpexs.proxy.ReplacedListener;

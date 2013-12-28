@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.gui.ErrorLogFrame;
 import com.jpexs.decompiler.flash.gui.ExportDialog;
 import com.jpexs.decompiler.flash.gui.FontEmbedDialog;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
-import com.jpexs.decompiler.flash.gui.GraphTreeFrame;
 import com.jpexs.decompiler.flash.gui.LoadFromCacheFrame;
 import com.jpexs.decompiler.flash.gui.LoadFromMemoryFrame;
 import com.jpexs.decompiler.flash.gui.LoadingDialog;
