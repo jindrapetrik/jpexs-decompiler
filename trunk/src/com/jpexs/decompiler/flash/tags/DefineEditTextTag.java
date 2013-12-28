@@ -34,6 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -136,6 +137,13 @@ public class DefineEditTextTag extends TextTag {
             ret = stripTags(ret);
             ret = entitiesReplace(ret);
         }
+        return ret;
+    }
+
+    @Override
+    public List<Integer> getFontIds(List<Tag> tags) {
+        List<Integer> ret = new ArrayList<>();
+        ret.add(fontId);
         return ret;
     }
 

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -259,12 +260,15 @@ public class FontPanel extends JPanel implements ActionListener {
             oldchars += c;
         }
         
+        int fontId = ft.getFontId();
         if (updateTextsCheckBox.isSelected()) {
             for (Tag tag : swf.tags) {
                 if (tag instanceof TextTag) {
                     TextTag textTag = (TextTag) tag;
-                    String text = textTag.getFormattedText(textTag.getSwf().tags);
-                    mainPanel.saveText(textTag, text);
+                    if (textTag.getFontIds(swf.tags).contains(fontId)) {
+                        String text = textTag.getFormattedText(textTag.getSwf().tags);
+                        mainPanel.saveText(textTag, text);
+                    }
                 }
             }
         }

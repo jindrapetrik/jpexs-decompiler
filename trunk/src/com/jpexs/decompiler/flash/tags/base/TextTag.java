@@ -54,6 +54,8 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
 
     public abstract String getText(List<Tag> tags);
 
+    public abstract List<Integer> getFontIds(List<Tag> tags);
+
     public abstract String getFormattedText(List<Tag> tags);
 
     public abstract boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text) throws ParseException;

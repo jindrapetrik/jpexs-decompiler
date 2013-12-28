@@ -103,6 +103,17 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
     }
 
     @Override
+    public List<Integer> getFontIds(List<Tag> tags) {
+        List<Integer> ret = new ArrayList<>();
+        for (TEXTRECORD rec : textRecords) {
+            if (rec.styleFlagsHasFont) {
+                ret.add(rec.fontId);
+            }
+        }
+        return ret;
+    }
+
+    @Override
     public String getFormattedText(List<Tag> tags) {
         FontTag fnt = null;
         String ret = "";
