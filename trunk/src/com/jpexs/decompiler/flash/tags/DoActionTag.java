@@ -146,7 +146,7 @@ public class DoActionTag extends Tag implements ASMSource {
 
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
-        return Helper.byteArrayToHex(writer, actionBytes);
+        return Helper.byteArrayToHexWithHeader(writer, actionBytes);
     }
 
     List<DisassemblyListener> listeners = new ArrayList<>();

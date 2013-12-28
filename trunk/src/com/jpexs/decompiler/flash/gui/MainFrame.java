@@ -24,7 +24,7 @@ public interface MainFrame {
     
     public void setTitle(String string);
     public String translate(String key);
-    public MainFramePanel getPanel();
+    public MainPanel getPanel();
     public boolean isVisible();
     public void setVisible(boolean b);
 }

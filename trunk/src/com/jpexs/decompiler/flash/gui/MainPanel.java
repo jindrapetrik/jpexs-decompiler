@@ -191,7 +191,7 @@ import javax.swing.tree.TreeSelectionModel;
  *
  * @author JPEXS
  */
-public final class MainFramePanel extends JPanel implements ActionListener, TreeSelectionListener, Freed {
+public final class MainPanel extends JPanel implements ActionListener, TreeSelectionListener, Freed {
     
     private MainFrame mainFrame;
     private List<SWF> swfs;
@@ -208,6 +208,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
     private JPanel contentPanel;
     private JPanel displayPanel;
     private ImagePanel imagePanel;
+    private BinaryPanel binaryPanel;
     private ImagePanel previewImagePanel;
     private SWFPreviwPanel swfPreviewPanel;
     private boolean isWelcomeScreen = true;
@@ -215,6 +216,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
     private static final String CARDSWFPREVIEWPANEL = "SWF card";
     private static final String CARDDRAWPREVIEWPANEL = "Draw card";
     private static final String CARDIMAGEPANEL = "Image card";
+    private static final String CARDBINARYPANEL = "Binary card";
     private static final String CARDEMPTYPANEL = "Empty card";
     private static final String CARDACTIONSCRIPTPANEL = "ActionScript card";
     private static final String CARDACTIONSCRIPT3PANEL = "ActionScript3 card";
@@ -241,6 +243,8 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
     private JSplitPane previewSplitPane;
     private JButton imageReplaceButton;
     private JPanel imageButtonsPanel;
+    private JButton binaryReplaceButton;
+    private JPanel binaryButtonsPanel;
     private PlayerControls flashControls;
     private ImagePanel internelViewerPanel;
     private JPanel viewerCards;
@@ -274,7 +278,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         try {
             File.createTempFile("temp", ".swf").delete(); //First call to this is slow, so make it first
         } catch (IOException ex) {
-            Logger.getLogger(MainFramePanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -434,6 +438,22 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         return imagesCard;
     }
     
+    private JPanel createBinaryCard() {
+        JPanel binaryCard = new JPanel(new BorderLayout());
+        binaryPanel = new BinaryPanel();
+        binaryCard.add(binaryPanel, BorderLayout.CENTER);
+
+        binaryReplaceButton = new JButton(translate("button.replace"), View.getIcon("edit16"));
+        binaryReplaceButton.setMargin(new Insets(3, 3, 3, 10));
+        binaryReplaceButton.setActionCommand(ACTION_REPLACE_BINARY);
+        binaryReplaceButton.addActionListener(this);
+        binaryButtonsPanel = new JPanel(new FlowLayout());
+        binaryButtonsPanel.add(binaryReplaceButton);
+
+        binaryCard.add(binaryButtonsPanel, BorderLayout.SOUTH);
+        return binaryCard;
+    }
+    
     private void showHideImageReplaceButton(boolean show) {
         imageReplaceButton.setVisible(show);
         setImageButtonPanelVisibility();
@@ -450,7 +470,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         return mainFrame.translate(key);
     }
 
-    public MainFramePanel(MainFrame mainFrame, MainFrameMenu mainMenu, FlashPlayerPanel flashPanel) {
+    public MainPanel(MainFrame mainFrame, MainFrameMenu mainMenu, FlashPlayerPanel flashPanel) {
         super();
 
         this.mainFrame = mainFrame;
@@ -727,6 +747,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
         displayPanel.add(previewSplitPane, CARDFLASHPANEL);
 
         displayPanel.add(createImagesCard(), CARDIMAGEPANEL);
+        displayPanel.add(createBinaryCard(), CARDBINARYPANEL);
 
         JPanel shapesCard = new JPanel(new BorderLayout());
 
@@ -897,7 +918,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                 }
                 updateClassesList();
             } catch (InterruptedException ex) {
-                Logger.getLogger(MainFramePanel.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
@@ -1054,7 +1075,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                 actionPanel.initSplits();
             }
 
-            final MainFramePanel t = this;
+            final MainPanel t = this;
 
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -1636,7 +1657,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                         try {
                             renameIdentifier(swf, identifier);
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(MainFramePanel.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         return null;
                     }
@@ -1761,7 +1782,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                                 swf.exportActionScript(errorHandler, selFile, exportMode, Configuration.parallelSpeedUp.get());
                             }
                         } catch (Exception ex) {
-                            Logger.getLogger(MainFramePanel.class.getName()).log(Level.SEVERE, "Error during export", ex);
+                            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Error during export", ex);
                             View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
                         }
                         return null;
@@ -1856,7 +1877,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                                     updateClassesList();
                                     reload(true);
                                 } catch (Exception ex) {
-                                    Logger.getLogger(MainFramePanel.class.getName()).log(Level.SEVERE, "Error during renaming identifiers", ex);
+                                    Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Error during renaming identifiers", ex);
                                     Main.stopWork();
                                     View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
                                 }
@@ -1906,7 +1927,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                             abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, t);
                         }
                     } catch (Exception ex) {
-                        Logger.getLogger(MainFramePanel.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);
+                        Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);
                     }
                     return true;
                 }
@@ -2030,7 +2051,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                                     it.setImage(data);
                                     it.getSwf().clearImageCache();
                                 } catch (IOException ex) {
-                                    Logger.getLogger(MainFramePanel.class.getName()).log(Level.SEVERE, "Invalid image", ex);
+                                    Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Invalid image", ex);
                                     View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                                 }
                                 reload(true);
@@ -2301,7 +2322,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                         swf.saveTo(new BufferedOutputStream(new FileOutputStream(tempFile)));
                         flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
                     } catch (IOException iex) {
-                        Logger.getLogger(MainFramePanel.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);
+                        Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);
                     }
                 }
             }
@@ -2311,7 +2332,9 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
          } else if ((tagObj instanceof DefineSoundTag) || (tagObj instanceof SoundStreamHeadTag) || (tagObj instanceof SoundStreamHead2Tag)) {
          showCard(CARDEMPTYPANEL);
          } */ else if (tagObj instanceof DefineBinaryDataTag) {
-            showCard(CARDEMPTYPANEL);
+            DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) tagObj;
+            showCard(CARDBINARYPANEL);
+            binaryPanel.setBinaryData(binaryTag.binaryData);
         } else if (tagObj instanceof ASMSource) {
             showCard(CARDACTIONSCRIPTPANEL);
             actionPanel.setSource((ASMSource) tagObj, !forceReload);
@@ -2740,7 +2763,7 @@ public final class MainFramePanel extends JPanel implements ActionListener, Tree
                 flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
             }
         } catch (IOException | com.jpexs.decompiler.flash.action.parser.ParseException ex) {
-            Logger.getLogger(MainFramePanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

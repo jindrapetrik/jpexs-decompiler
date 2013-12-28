@@ -209,7 +209,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
     
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
-        return Helper.byteArrayToHex(writer, actionBytes);
+        return Helper.byteArrayToHexWithHeader(writer, actionBytes);
     }
     
     List<DisassemblyListener> listeners = new ArrayList<>();

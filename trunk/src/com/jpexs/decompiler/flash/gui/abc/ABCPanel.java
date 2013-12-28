@@ -39,7 +39,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.MainFramePanel;
+import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.MyTextField;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
@@ -80,7 +80,7 @@ import jsyntaxpane.actions.DocumentSearchData;
 
 public class ABCPanel extends JPanel implements ItemListener, ActionListener, Freed {
 
-    private MainFramePanel mainFramePanel;
+    private MainPanel mainPanel;
     public TraitsList navigator;
     public ABC abc;
     public SWF swf;
@@ -119,8 +119,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         if ((txt != null) && (!txt.isEmpty())) {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
-            TagTreeModel ttm = (TagTreeModel) mainFramePanel.tagTree.getModel();
-            ClassesListTreeModel clModel = ttm.getSwfRoot(mainFramePanel.getCurrentSwf()).classTreeModel;
+            TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
+            ClassesListTreeModel clModel = ttm.getSwfRoot(mainPanel.getCurrentSwf()).classTreeModel;
             List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
             found = new ArrayList<>();
             final Pattern pat = regexp ?
@@ -331,10 +331,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     }
 
     @SuppressWarnings("unchecked")
-    public ABCPanel(MainFramePanel mainFramePanel) {
+    public ABCPanel(MainPanel mainPanel) {
         DefaultSyntaxKit.initKit();
 
-        this.mainFramePanel = mainFramePanel;
+        this.mainPanel = mainPanel;
         setLayout(new BorderLayout());
 
         decompiledTextArea = new DecompiledEditorPane(this);
@@ -529,7 +529,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     }
 
     public void hilightScript(SWF swf, String name) {
-        TagTreeModel ttm = (TagTreeModel) mainFramePanel.tagTree.getModel();
+        TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
         ClassesListTreeModel clModel = ttm.getSwfRoot(swf).classTreeModel;
         ScriptPack pack = null;
         for (MyEntry<ClassPath, ScriptPack> item : clModel.getList()) {
@@ -544,13 +544,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     }
 
     public void hilightScript(ScriptPack pack) {
-        TagTreeModel ttm = (TagTreeModel) mainFramePanel.tagTree.getModel();
+        TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
         final TreePath tp = ttm.getTagPath(pack);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                mainFramePanel.tagTree.setSelectionPath(tp);
-                mainFramePanel.tagTree.scrollPathToVisible(tp);
+                mainPanel.tagTree.setSelectionPath(tp);
+                mainPanel.tagTree.scrollPathToVisible(tp);
             }
         });
 

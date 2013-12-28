@@ -568,8 +568,12 @@ public class Helper {
         return timeStr;
     }
 
-    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data) {
-        writer.appendNoHilight("#hexdata").newLine();
+    public static GraphTextWriter byteArrayToHexWithHeader(GraphTextWriter writer, byte[] data) {
+        writer.appendNoHilight("#hexdata").newLine().newLine();
+        return byteArrayToHex(writer, data, 8, 8);
+    }
+    
+    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize) {
 
         /* // hex data from decompiled actions
          Scanner scanner = new Scanner(srcWithHex);
@@ -583,8 +587,12 @@ public class Helper {
          }*/
 
         for (int i = 0; i < data.length; i++) {
-            if (i % 8 == 0) {
-                writer.newLine();
+            if (i > 0) {
+                if (i % bytesPerRow == 0) {
+                    writer.newLine();
+                } else if (i % groupSize == 0) {
+                    writer.appendNoHilight(" ");
+                }
             }
             writer.appendNoHilight(String.format("%02x ", data[i]));
         }
@@ -593,9 +601,9 @@ public class Helper {
         return writer;
     }
     
-    public static String byteArrayToHex(byte[] data) {
+    public static String byteArrayToHex(byte[] data, int bytesPerRow) {
         HilightedTextWriter writer = new HilightedTextWriter(false);
-        byteArrayToHex(writer, data);
+        byteArrayToHex(writer, data, bytesPerRow, 8);
         return writer.toString();
     }
 

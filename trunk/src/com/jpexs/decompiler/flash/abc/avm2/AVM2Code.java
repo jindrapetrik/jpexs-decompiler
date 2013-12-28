@@ -918,7 +918,7 @@ public class AVM2Code implements Serializable {
         boolean markOffsets = code.size() <= largeLimit;
         
         if (exportMode == ExportMode.HEX) {
-            Helper.byteArrayToHex(writer, getBytes());
+            Helper.byteArrayToHexWithHeader(writer, getBytes());
         } else {
             for (AVM2Instruction ins : code) {
                 if (exportMode == ExportMode.PCODEWITHHEX) {

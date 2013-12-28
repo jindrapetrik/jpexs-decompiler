@@ -57,7 +57,7 @@ public class FontPanel extends JPanel implements ActionListener {
     static final String ACTION_FONT_EMBED = "FONTEMBED";
     static final String ACTION_FONT_ADD_CHARS = "FONTADDCHARS";
 
-    private MainFramePanel mainFramePanel;
+    private MainPanel mainPanel;
 
     public Map<Integer, String> sourceFontsMap = new HashMap<>();
 
@@ -73,8 +73,8 @@ public class FontPanel extends JPanel implements ActionListener {
     private ComponentListener fontChangeList;
     private JComboBox<String> fontSelection;
 
-    public FontPanel(MainFramePanel mainFramePanel) {
-        this.mainFramePanel = mainFramePanel;
+    public FontPanel(MainPanel mainPanel) {
+        this.mainPanel = mainPanel;
         createFontPanel();
     }
     
@@ -187,8 +187,8 @@ public class FontPanel extends JPanel implements ActionListener {
         fontSelection.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (mainFramePanel.oldTag instanceof FontTag) {
-                    FontTag f = (FontTag) mainFramePanel.oldTag;
+                if (mainPanel.oldTag instanceof FontTag) {
+                    FontTag f = (FontTag) mainPanel.oldTag;
                     sourceFontsMap.put(f.getFontId(), (String) fontSelection.getSelectedItem());
                 }
             }
@@ -211,11 +211,11 @@ public class FontPanel extends JPanel implements ActionListener {
     }
     
     private String translate(String key) {
-        return mainFramePanel.translate(key);
+        return mainPanel.translate(key);
     }
 
     private void fontAddChars(FontTag ft, Set<Integer> selChars, String selFont) {
-        FontTag f = (FontTag) mainFramePanel.oldTag;
+        FontTag f = (FontTag) mainPanel.oldTag;
         SWF swf = ft.getSwf();
         String oldchars = f.getCharacters(swf.tags);
         for (int ic : selChars) {
@@ -266,7 +266,7 @@ public class FontPanel extends JPanel implements ActionListener {
                 if (tag instanceof TextTag) {
                     TextTag textTag = (TextTag) tag;
                     String text = textTag.getFormattedText(textTag.getSwf().tags);
-                    mainFramePanel.saveText(textTag, text);
+                    mainPanel.saveText(textTag, text);
                 }
             }
         }
@@ -294,30 +294,30 @@ public class FontPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case ACTION_FONT_EMBED:
-                if (mainFramePanel.oldTag instanceof FontTag) {
-                    FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ((FontTag) mainFramePanel.oldTag).getFontStyle());
+                if (mainPanel.oldTag instanceof FontTag) {
+                    FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ((FontTag) mainPanel.oldTag).getFontStyle());
                     if (fed.display()) {
                         Set<Integer> selChars = fed.getSelectedChars();
                         if (!selChars.isEmpty()) {
                             String selFont = fed.getSelectedFont();
                             fontSelection.setSelectedItem(selFont);
-                            fontAddChars((FontTag) mainFramePanel.oldTag, selChars, selFont);
+                            fontAddChars((FontTag) mainPanel.oldTag, selChars, selFont);
                             fontAddCharactersField.setText("");
-                            mainFramePanel.reload(true);
+                            mainPanel.reload(true);
                         }
                     }
                 }
                 break;
             case ACTION_FONT_ADD_CHARS:
                 String newchars = fontAddCharactersField.getText();
-                if (mainFramePanel.oldTag instanceof FontTag) {
+                if (mainPanel.oldTag instanceof FontTag) {
                     Set<Integer> selChars = new TreeSet<>();
                     for (int c = 0; c < newchars.length(); c++) {
                         selChars.add(newchars.codePointAt(c));
                     }
-                    fontAddChars((FontTag) mainFramePanel.oldTag, selChars, fontSelection.getSelectedItem().toString());
+                    fontAddChars((FontTag) mainPanel.oldTag, selChars, fontSelection.getSelectedItem().toString());
                     fontAddCharactersField.setText("");
-                    mainFramePanel.reload(true);
+                    mainPanel.reload(true);
                 }
                 break;
         }

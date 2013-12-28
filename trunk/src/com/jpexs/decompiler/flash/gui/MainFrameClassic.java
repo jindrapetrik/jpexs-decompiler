@@ -33,7 +33,7 @@ import javax.swing.JFrame;
  */
 public final class MainFrameClassic extends AppFrame implements MainFrame {
 
-    public MainFramePanel panel;
+    public MainPanel panel;
     private MainFrameMenu mainMenu;
     
     public MainFrameClassic() {
@@ -48,7 +48,7 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
         boolean externalFlashPlayerUnavailable = flashPanel == null;
         mainMenu = new MainFrameClassicMenu(this, externalFlashPlayerUnavailable);
 
-        panel = new MainFramePanel(this, mainMenu, flashPanel);
+        panel = new MainPanel(this, mainMenu, flashPanel);
 
         int w = Configuration.guiWindowWidth.get();
         int h = Configuration.guiWindowHeight.get();
@@ -130,7 +130,7 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
     }
     
     @Override
-    public MainFramePanel getPanel() {
+    public MainPanel getPanel() {
         return panel;
     }
  }

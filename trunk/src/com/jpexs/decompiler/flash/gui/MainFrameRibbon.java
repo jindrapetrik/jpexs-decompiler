@@ -48,7 +48,7 @@ import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationM
  */
 public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
 
-    public MainFramePanel panel;
+    public MainPanel panel;
     private MainFrameMenu mainMenu;
     
     public MainFrameRibbon() {
@@ -68,7 +68,7 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
         boolean externalFlashPlayerUnavailable = flashPanel == null;
         mainMenu = new MainFrameRibbonMenu(this, ribbon, externalFlashPlayerUnavailable);
 
-        panel = new MainFramePanel(this, mainMenu, flashPanel);
+        panel = new MainPanel(this, mainMenu, flashPanel);
         panel.setBackground(Color.yellow);
         cnt.add(panel, BorderLayout.CENTER);
 
@@ -230,7 +230,7 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
     }
 
     @Override
-    public MainFramePanel getPanel() {
+    public MainPanel getPanel() {
         return panel;
     }
  }

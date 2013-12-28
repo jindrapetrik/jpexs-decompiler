@@ -203,7 +203,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
 
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
-        return Helper.byteArrayToHex(writer, actionBytes);
+        return Helper.byteArrayToHexWithHeader(writer, actionBytes);
     }
 
     @Override
