@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -401,6 +402,8 @@ public class Main {
             mainFrame.setVisible(false);
             mainFrame = null;
         }
+        FontTag.reload();
+        Cache.clearAll();
         initGui();
         reloadSWFs();
     }

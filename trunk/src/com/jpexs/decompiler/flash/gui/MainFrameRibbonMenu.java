@@ -504,7 +504,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         switch (e.getActionCommand()) {
             case ACTION_RELOAD:
                 if (View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-                    Main.reloadSWFs();
+                    Main.reloadApp();
                 }
                 break;
             case ACTION_ADVANCED_SETTINGS:

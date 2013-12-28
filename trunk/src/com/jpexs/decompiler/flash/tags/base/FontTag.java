@@ -83,6 +83,16 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract int getLeading();
 
+    public static String[] fontNamesArray;
+
+    public static List<String> fontNames;
+    
+    public static String defaultFontName;
+    
+    static {
+        reload();
+    }
+    
     public boolean hasLayout() {
         return false;
     }
@@ -168,11 +178,9 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         return gm.getAdvanceX();
     }
 
-    public static final String[] fontNamesArray = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-    public static final List<String> fontNames = Arrays.asList(fontNamesArray);
-    public static final String defaultFontName;
-    
-    static {
+    public static void reload() {
+        fontNamesArray = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+        fontNames = Arrays.asList(fontNamesArray);
         if (fontNames.contains("Times New Roman")) {
             defaultFontName = "Times New Roman";
         } else if (fontNames.contains("Arial")) {
