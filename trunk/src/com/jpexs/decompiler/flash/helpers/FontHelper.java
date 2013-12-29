@@ -16,11 +16,7 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
-import com.sun.jna.Platform;
 import java.awt.GraphicsEnvironment;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -29,7 +25,8 @@ import java.util.logging.Logger;
 public class FontHelper {
 
     public static String[] getInstalledFontFamilyNames() {
-        if (Platform.isWindows()) {
+        // todo: cannot load newly installed fonts, so this feature is disabled until i find a solution for font loading problem
+        /*if (Platform.isWindows()) {
             try {
                 Class<?> clW32Fm = Class.forName("sun.awt.Win32FontManager");
                 Class<?> clSunFm = Class.forName("sun.font.SunFontManager");
@@ -39,7 +36,7 @@ public class FontHelper {
                 // catch everything to avoid class not found problems, because Win32FontManager is an internal proprietary API
                 Logger.getLogger(FontHelper.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        }*/
         return GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
     }
 }
