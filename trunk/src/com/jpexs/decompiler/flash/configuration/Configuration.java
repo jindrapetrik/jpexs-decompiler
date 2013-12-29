@@ -174,6 +174,8 @@ public class Configuration {
     public static final ConfigurationItem<Integer> guiAvm2SplitPaneDividerLocation = null;
     @ConfigurationName("guiActionSplitPaneDividerLocation")
     public static final ConfigurationItem<Integer> guiActionSplitPaneDividerLocation = null;
+    @ConfigurationName("guiPreviewSplitPaneDividerLocation")
+    public static final ConfigurationItem<Integer> guiPreviewSplitPaneDividerLocation = null;
     @ConfigurationName("gui.splitPane1.dividerLocation")
     public static final ConfigurationItem<Integer> guiSplitPane1DividerLocation = null;
     @ConfigurationName("gui.splitPane2.dividerLocation")

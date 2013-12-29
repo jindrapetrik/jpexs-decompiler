@@ -702,7 +702,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         previewSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        previewSplitPane.setDividerLocation(300);
+
+        previewSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent pce) {
+                if (splitsInited) {
+                    Configuration.guiPreviewSplitPaneDividerLocation.set((int) pce.getNewValue());
+                }
+            }
+        });
+        
         JPanel pan = new JPanel(new BorderLayout());
         JLabel prevLabel = new HeaderLabel(translate("swfpreview"));
         prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -825,7 +834,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         welcomePanel = createWelcomePanel();
         add(welcomePanel, BorderLayout.CENTER);
-        //splitPane1.setDividerLocation(0.5);
 
         splitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
             @Override
@@ -1087,6 +1095,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         confDivLoc = splitPane2.getHeight() * 3 / 5;
                     }
                     splitPane2.setDividerLocation(confDivLoc);
+                    previewSplitPane.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewSplitPane.getWidth() / 2));
 
                     splitPos = splitPane2.getDividerLocation();
                     splitsInited = true;
@@ -2382,7 +2391,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (tagObj instanceof TextTag) {
                 TextTag textTag = (TextTag) tagObj;
                 parametersPanel.setVisible(true);
-                previewSplitPane.setDividerLocation(previewSplitPane.getWidth() / 2);
                 showDetailWithPreview(CARDTEXTPANEL);
                 textValue.setContentType("text/swf_text");
                 textValue.setText(textTag.getFormattedText(textTag.getSwf().tags));
@@ -2784,7 +2792,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         parametersPanel.setVisible(true);
-        previewSplitPane.setDividerLocation(previewSplitPane.getWidth() / 2);
         fontPanel.showFontTag(ft);
         showDetailWithPreview(CARDFONTPANEL);
     }
