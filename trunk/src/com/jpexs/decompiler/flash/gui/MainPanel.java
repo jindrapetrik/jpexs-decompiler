@@ -2394,6 +2394,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 showDetailWithPreview(CARDTEXTPANEL);
                 textValue.setContentType("text/swf_text");
                 textValue.setText(textTag.getFormattedText(textTag.getSwf().tags));
+                textValue.setCaretPosition(0);
             } else if (tagObj instanceof FontTag) {
                 showFontTag((FontTag) tagObj);
             } else {
