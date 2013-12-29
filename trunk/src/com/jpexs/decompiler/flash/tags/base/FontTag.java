@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -28,7 +29,6 @@ import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
@@ -179,7 +179,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     public static void reload() {
-        fontNamesArray = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+        fontNamesArray = FontHelper.getInstalledFontFamilyNames();
         fontNames = Arrays.asList(fontNamesArray);
         if (fontNames.contains("Times New Roman")) {
             defaultFontName = "Times New Roman";
