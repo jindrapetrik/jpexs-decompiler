@@ -47,8 +47,10 @@ import javax.swing.JTextField;
  */
 public class FontEmbedDialog extends AppDialog implements ActionListener {
 
-    static final String ACTION_OK = "OK";
-    static final String ACTION_CANCEL = "CANCEL";
+    private static final String ACTION_OK = "OK";
+    private static final String ACTION_CANCEL = "CANCEL";
+    
+    private static final int SAMPLE_MAX_LENGTH = 50;
     
     private JComboBox<String> sourceFont;
     private JCheckBox[] rangeCheckboxes;
@@ -108,7 +110,6 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         for (int i = 0; i < rc; i++) {
             rangeNames[i] = CharacterRanges.rangeName(i);
             rangeSamples[i] = new JLabel("");
-            int codes[] = CharacterRanges.rangeCodes(i);
             rangeCheckboxes[i] = new JCheckBox(rangeNames[i]);
             JPanel rangeRowPanel = new JPanel();
             rangeRowPanel.setLayout(new BoxLayout(rangeRowPanel, BoxLayout.X_AXIS));
@@ -184,9 +185,9 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
             String sample = "";
             for (int c = 0; c < codes.length; c++) {
                 if (f.canDisplay(codes[c])) {
-                    avail++;
-                    if (avail < 20) {
+                    if (avail < SAMPLE_MAX_LENGTH) {
                         sample += "" + (char) codes[c];
+                        avail++;
                     }
                 }
             }
