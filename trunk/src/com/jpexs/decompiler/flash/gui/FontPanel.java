@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -59,6 +60,8 @@ public class FontPanel extends JPanel implements ActionListener {
     private MainPanel mainPanel;
 
     private JLabel fontNameLabel;
+    private JLabel fontDisplayNameLabel;
+    private JLabel fontCopyrightLabel;
     private JLabel fontIsBoldLabel;
     private JLabel fontIsItalicLabel;
     private JLabel fontAscentLabel;
@@ -81,6 +84,8 @@ public class FontPanel extends JPanel implements ActionListener {
         fontParams2.setLayout(null);
         final Component[][] ctable = new Component[][]{
             {new JLabel(translate("font.name")), fontNameLabel = new JLabel(translate("value.unknown"))},
+            {new JLabel(translate("fontName.name")), fontDisplayNameLabel = new JLabel(translate("value.unknown"))},
+            {new JLabel(translate("fontName.copyright")), fontCopyrightLabel = new JLabel(translate("value.unknown"))},
             {new JLabel(translate("font.isbold")), fontIsBoldLabel = new JLabel(translate("value.unknown"))},
             {new JLabel(translate("font.isitalic")), fontIsItalicLabel = new JLabel(translate("value.unknown"))},
             {new JLabel(translate("font.ascent")), fontAscentLabel = new JLabel(translate("value.unknown"))},
@@ -275,7 +280,22 @@ public class FontPanel extends JPanel implements ActionListener {
 
     public void showFontTag(FontTag ft) {
         SWF swf = ft.getSwf();
+        DefineFontNameTag fontNameTag = null;
+        for (Tag tag : swf.tags) {
+            if (tag instanceof DefineFontNameTag) {
+                DefineFontNameTag dfnt = (DefineFontNameTag) tag;
+                if (dfnt.fontId == ft.getFontId()) {
+                    fontNameTag = dfnt;
+                }
+            }
+        }
+
         fontNameLabel.setText(ft.getFontName(swf.tags));
+        if (fontNameTag != null) {
+            fontDisplayNameLabel.setText(fontNameTag.fontName);
+            fontCopyrightLabel.setText(fontNameTag.fontCopyright);
+        }
+        
         fontIsBoldLabel.setText(ft.isBold() ? translate("yes") : translate("no"));
         fontIsItalicLabel.setText(ft.isItalic() ? translate("yes") : translate("no"));
         fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : "" + ft.getDescent());
