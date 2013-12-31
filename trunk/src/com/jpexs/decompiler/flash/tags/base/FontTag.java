@@ -190,6 +190,20 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         }
     }
 
+    public static String getFontNameWithFallback(String fontName) {
+        if (fontNames.contains(fontName)) {
+            return fontName;
+        }
+        if (fontNames.contains("Times New Roman")) {
+            return "Times New Roman";
+        }
+        if (fontNames.contains("Arial")) {
+            return "Arial";
+        }
+        //Fallback to DIALOG
+        return "Dialog"; 
+    }
+    
     public static String isFontInstalled(String fontName) {
         if (fontNames.contains(fontName)) {
             return fontName;

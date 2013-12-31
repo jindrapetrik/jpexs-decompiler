@@ -29,13 +29,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,8 +93,6 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         double descent = 0;
         double lineDistance = 0;
 
-        List<String> availableFonts = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
-
         List<SHAPE> glyphs = new ArrayList<>();
         boolean firstLine = true;
         double top = 0;
@@ -121,13 +117,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 glyphs = font.getGlyphShapeTable();
 
                 if (!font.hasLayout()) {
-                    String fontName = font.getFontName(tags);
-                    if (!availableFonts.contains(fontName)) {
-                        fontName = "Times New Roman";
-                    }
-                    if (!availableFonts.contains(fontName)) {
-                        fontName = "Arial";
-                    }
+                    String fontName = FontTag.getFontNameWithFallback(font.getFontName(tags));
                     aFont = new Font(fontName, font.getFontStyle(), textHeight / 20);
                     fontMetrics = bi.getGraphics().getFontMetrics(aFont);
                     LineMetrics lm = fontMetrics.getLineMetrics("A", bi.getGraphics());

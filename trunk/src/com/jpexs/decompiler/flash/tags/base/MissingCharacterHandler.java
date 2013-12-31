@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,11 +26,9 @@ import java.util.List;
  */
 public class MissingCharacterHandler {
 
-    protected static List<String> fontNames = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
-
     public boolean handle(FontTag font, List<Tag> tags, char character) {
         String fontName = font.getFontName(tags);
-        if (!fontNames.contains(fontName)) {
+        if (!FontTag.fontNames.contains(fontName)) {
             return false;
         }
         Font f = new Font(fontName, font.getFontStyle(), 18);

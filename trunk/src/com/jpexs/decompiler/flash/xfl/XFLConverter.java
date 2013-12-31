@@ -93,7 +93,6 @@ import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -2254,7 +2253,6 @@ public class XFLConverter {
             FontTag font = null;
             String fontName = null;
             String psFontName = null;
-            String[] availableFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
             int textHeight = -1;
             RGB textColor = null;
             RGBA textColorA = null;

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types.shaperecords;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -39,7 +40,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Point;
@@ -59,7 +59,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -938,7 +937,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         }
         return ret;
     }
-    private static List<String> existingFonts = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
 
     public static SHAPE systemFontCharacterToSHAPE(final String fontName, final int fontStyle, int fontSize, char character) {
         int multiplier = 1;
@@ -947,21 +945,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             fontSize = 1024;
         }
         List<SHAPERECORD> retList = new ArrayList<>();
-        String[] defaultFonts = new String[]{"Times New Roman", "Arial"};
-        Font f = null;
-        if (existingFonts.contains(fontName)) {
-            f = new Font(fontName, fontStyle, fontSize);
-        } else {
-            for (String defName : defaultFonts) {
-                if (existingFonts.contains(defName)) {
-                    f = new Font(defName, fontStyle, fontSize);
-                    break;
-                }
-            }
-        }
-        if (f == null) {
-            f = new Font("Dialog", fontStyle, fontSize); //Fallback to DIALOG
-        }
+        Font f = new Font(FontTag.getFontNameWithFallback(fontName), fontStyle, fontSize);
         GlyphVector v = f.createGlyphVector((new JPanel()).getFontMetrics(f).getFontRenderContext(), "" + character);
         Shape shp = v.getOutline();
         double[] points = new double[6];
