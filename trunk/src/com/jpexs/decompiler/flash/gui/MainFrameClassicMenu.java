@@ -403,7 +403,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
                 if (miAssociate.isSelected() == ContextMenuTools.isAddedToContextMenu()) {
                     return;
                 }
-                ContextMenuTools.addToContextMenu(miAssociate.isSelected());
+                ContextMenuTools.addToContextMenu(miAssociate.isSelected(), false);
 
                 //Update checkbox menuitem accordingly (User can cancel rights elevation)
                 new Timer().schedule(new TimerTask() {

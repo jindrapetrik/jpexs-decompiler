@@ -27,6 +27,8 @@ import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinReg;
 import com.sun.jna.platform.win32.WinUser;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -63,7 +65,7 @@ public class ContextMenuTools {
         }
     }
 
-    public static boolean addToContextMenu(boolean add) {
+    public static boolean addToContextMenu(boolean add, boolean fromCommandLine) {
         if (add == isAddedToContextMenu()) {
             return true;
         }
@@ -73,15 +75,15 @@ public class ContextMenuTools {
         
         if (add) {
             String exeName = Platform.is64Bit() ? exeName64 : exeName32;
-            return addToContextMenu(add, exeName);
+            return addToContextMenu(add, fromCommandLine, exeName);
         } else {
             // remove both 32 and 64 bit references
-            addToContextMenu(add, exeName32);
-            return addToContextMenu(add, exeName64);
+            return addToContextMenu(add, fromCommandLine, exeName32) && 
+                    addToContextMenu(add, fromCommandLine, exeName64);
         }
     }
     
-    private static boolean addToContextMenu(boolean add, String exeName) {
+    private static boolean addToContextMenu(boolean add, boolean fromCommandLine, String exeName) {
         final String extensions[] = new String[]{"swf", "gfx"};
 
         final WinReg.HKEY REG_CLASSES_HKEY = WinReg.HKEY_LOCAL_MACHINE;
@@ -198,16 +200,20 @@ public class ContextMenuTools {
             }
             return true;
         } catch (Exception ex) {
-            //Updating registry failed, try elevating rights
-            SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
-            sei.fMask = 0x00000040;
-            sei.lpVerb = new WString("runas");
-            sei.lpFile = new WString(appDir + exeName);
-            sei.lpParameters = new WString(add ? "-addtocontextmenu" : "-removefromcontextmenu");
-            sei.nShow = WinUser.SW_NORMAL;
-            Shell32.INSTANCE.ShellExecuteEx(sei);
-            //Wait till exit
-            Kernel32.INSTANCE.WaitForSingleObject(sei.hProcess, 1000 * 60 * 60 * 24 /*1 day max*/);
+            if (!fromCommandLine) {
+                //Updating registry failed, try elevating rights
+                SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
+                sei.fMask = 0x00000040;
+                sei.lpVerb = new WString("runas");
+                sei.lpFile = new WString(appDir + exeName);
+                sei.lpParameters = new WString(add ? "-addtocontextmenu" : "-removefromcontextmenu");
+                sei.nShow = WinUser.SW_NORMAL;
+                Shell32.INSTANCE.ShellExecuteEx(sei);
+                //Wait till exit
+                Kernel32.INSTANCE.WaitForSingleObject(sei.hProcess, 1000 * 60 * 60 * 24 /*1 day max*/);
+            } else {
+                Logger.getLogger(ContextMenuTools.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return false;
     }

@@ -173,10 +173,10 @@ public class CommandLineArgumentParser {
             }
         }
         if (nextParam.equals("-removefromcontextmenu")) {
-            ContextMenuTools.addToContextMenu(false);
+            ContextMenuTools.addToContextMenu(false, true);
             System.exit(0);
         } else if (nextParam.equals("-addtocontextmenu")) {
-            ContextMenuTools.addToContextMenu(true);
+            ContextMenuTools.addToContextMenu(true, true);
             System.exit(0);
         } else if (nextParam.equals("-proxy")) {
             parseProxy(args);

@@ -676,7 +676,7 @@ public class Main {
         if (!offered) {
             if (Platform.isWindows()) {
                 if ((!ContextMenuTools.isAddedToContextMenu()) && View.showConfirmDialog(null, "Do you want to add FFDec to context menu of SWF files?\n(Can be changed later from main menu)", "Context menu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                    ContextMenuTools.addToContextMenu(true);
+                    ContextMenuTools.addToContextMenu(true, false);
                 }
             }
         }
