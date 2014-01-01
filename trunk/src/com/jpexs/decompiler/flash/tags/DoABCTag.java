@@ -45,7 +45,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
     }
 
     @Override
-    public String getName(List<Tag> tags) {
+    public String getName() {
         return "DoABC";
     }
 

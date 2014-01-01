@@ -51,13 +51,13 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
     public Tag previousTag;
     protected SWF swf;
 
-    public String getName(List<Tag> tags) {
+    public String getName() {
         return name;
     }
 
     @Override
-    public String getExportFileName(List<Tag> tags) {
-        return getName(tags);
+    public String getExportFileName() {
+        return getName();
     }
 
     /**
@@ -263,7 +263,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
      */
     @Override
     public String toString() {
-        return getName(swf.tags);
+        return getName();
     }
 
     public final long getOrigDataLength() {

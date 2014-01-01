@@ -27,7 +27,7 @@ import java.util.List;
 public class MissingCharacterHandler {
 
     public boolean handle(FontTag font, List<Tag> tags, char character) {
-        String fontName = font.getFontName(tags);
+        String fontName = font.getFontName();
         if (!FontTag.fontNames.contains(fontName)) {
             return false;
         }

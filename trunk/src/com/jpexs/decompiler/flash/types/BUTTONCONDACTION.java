@@ -289,7 +289,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
     }
 
     @Override
-    public String getExportFileName(List<Tag> tags) {
+    public String getExportFileName() {
         return getHeader(true);
     }
 }

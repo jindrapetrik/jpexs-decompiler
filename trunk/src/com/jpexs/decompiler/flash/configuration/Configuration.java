@@ -306,8 +306,10 @@ public class Configuration {
         return result;
     }
     
-    public static void addFontPair(String fontName, String systemFontName) {
+    public static void addFontPair(String fileName, int fontId, String fontName, String systemFontName) {
+        String key = fileName + "_" + fontId + "_" + fontName;
         Map<String, String> fontPairs = getFontPairs();
+        fontPairs.put(key, systemFontName);
         fontPairs.put(fontName, systemFontName);
         StringBuilder sb = new StringBuilder();
         int i = 0;

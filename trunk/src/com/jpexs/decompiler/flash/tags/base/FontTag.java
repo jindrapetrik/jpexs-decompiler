@@ -67,7 +67,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract int getGlyphWidth(int glyphIndex);
 
-    public abstract String getFontName(List<Tag> tags);
+    public abstract String getFontName();
 
     public abstract boolean isSmall();
 
@@ -115,7 +115,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     public abstract String getCharacters(List<Tag> tags);
 
     @Override
-    public String getName(List<Tag> tags) {
+    public String getName() {
         String nameAppend = "";
         if (exportName != null) {
             nameAppend = ": " + exportName;
@@ -123,18 +123,22 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         if (className != null) {
             nameAppend = ": " + className;
         }
-        String fontName = getFontName(tags);
+        String fontName = getFontName();
         if (fontName != null) {
             nameAppend = ": " + fontName;
         }
         return name + " (" + getCharacterId() + nameAppend + ")";
     }
 
-    public String getSystemFontName(List<Tag> tags) {
+    public String getSystemFontName() {
         Map<String, String> fontPairs = Configuration.getFontPairs();
-        String name = getFontName(tags);
-        if (fontPairs.containsKey(name)) {
-            return fontPairs.get(name);
+        String key = swf.getShortFileName() + "_" + getFontId() + "_" + getFontName();
+        if (fontPairs.containsKey(key)) {
+            return fontPairs.get(key);
+        }
+        key = getFontName();
+        if (fontPairs.containsKey(key)) {
+            return fontPairs.get(key);
         }
         return defaultFontName;
     }

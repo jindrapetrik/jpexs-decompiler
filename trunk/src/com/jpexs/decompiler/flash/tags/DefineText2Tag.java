@@ -207,7 +207,7 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
                                 if (t instanceof FontTag) {
                                     if (((FontTag) t).getFontId() == fontId) {
                                         font = (FontTag) t;
-                                        fontName = font.getSystemFontName(tags);
+                                        fontName = font.getSystemFontName();
                                         break;
                                     }
                                 }

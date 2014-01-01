@@ -254,7 +254,7 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public String getFontName(List<Tag> tags) {
+    public String getFontName() {
         String ret = fontName;
         if (ret.contains("" + (char) 0)) {
             ret = ret.substring(0, ret.indexOf(0));

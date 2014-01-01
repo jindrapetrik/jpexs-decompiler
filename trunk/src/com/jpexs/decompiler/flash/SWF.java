@@ -430,6 +430,13 @@ public final class SWF {
         return file;
     }
 
+    public String getShortFileName() {
+        if (file == null) {
+            return "";
+        }
+        return new File(file).getName();
+    }
+
     private void findFileAttributes() {
         for (Tag t : tags) {
             if (t instanceof FileAttributesTag) {
@@ -713,7 +720,7 @@ public final class SWF {
             outdir += File.separator;
         }
         outdir += "scripts" + File.separator;
-        ret.addAll(TagNode.exportNodeAS(tags, handler, list, outdir, exportMode, evl));
+        ret.addAll(TagNode.exportNodeAS(handler, list, outdir, exportMode, evl));
         return ret;
     }
 

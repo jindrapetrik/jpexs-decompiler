@@ -170,8 +170,8 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public String getFontName(List<Tag> tags) {
-        ensureFontInfo(tags);
+    public String getFontName() {
+        ensureFontInfo(swf.tags);
         if (fontInfo2Tag != null) {
             return fontInfo2Tag.fontName;
         }

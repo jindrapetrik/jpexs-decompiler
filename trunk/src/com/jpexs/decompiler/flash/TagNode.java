@@ -270,7 +270,7 @@ public class TagNode implements TreeNode {
         return count;
     }
 
-    public static List<File> exportNodeAS(final List<Tag> allTags, final AbortRetryIgnoreHandler handler, final List<TagNode> nodeList, final String outdir, final ExportMode exportMode, final EventListener ev) throws IOException {
+    public static List<File> exportNodeAS(final AbortRetryIgnoreHandler handler, final List<TagNode> nodeList, final String outdir, final ExportMode exportMode, final EventListener ev) throws IOException {
         try {
             List<File> result = CancellableWorker.call(new Callable<List<File>>() {
 
@@ -278,7 +278,7 @@ public class TagNode implements TreeNode {
                 public List<File> call() throws Exception {
                     AtomicInteger cnt = new AtomicInteger(1);
                     int totalCount = TagNode.getTagCountRecursive(nodeList);
-                    return exportNodeAS(allTags, handler, nodeList, outdir, exportMode, cnt, totalCount, ev);
+                    return exportNodeAS(handler, nodeList, outdir, exportMode, cnt, totalCount, ev);
                 }
             }, Configuration.exportTimeout.get(), TimeUnit.SECONDS);
             return result;
@@ -287,7 +287,7 @@ public class TagNode implements TreeNode {
         return new ArrayList<>();
     }
 
-    public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, ExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
+    public static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, ExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
         File dir = new File(outdir);
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
@@ -297,7 +297,7 @@ public class TagNode implements TreeNode {
         for (TagNode node : nodeList) {
             String name = "";
             if (node.tag instanceof Exportable) {
-                name = ((Exportable) node.tag).getExportFileName(allTags);
+                name = ((Exportable) node.tag).getExportFileName();
             } else {
                 name = Helper.makeFileName(node.tag.toString());
             }
@@ -375,7 +375,7 @@ public class TagNode implements TreeNode {
                     } while (retry);
                 }
             } else {
-                ret.addAll(exportNodeAS(allTags, handler, node.subItems, outdir + name, exportMode, index, count, ev));
+                ret.addAll(exportNodeAS(handler, node.subItems, outdir + name, exportMode, index, count, ev));
             }
 
         }

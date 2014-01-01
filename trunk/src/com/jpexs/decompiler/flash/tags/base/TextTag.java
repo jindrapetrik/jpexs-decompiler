@@ -117,7 +117,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 glyphs = font.getGlyphShapeTable();
 
                 if (!font.hasLayout()) {
-                    String fontName = FontTag.getFontNameWithFallback(font.getFontName(tags));
+                    String fontName = FontTag.getFontNameWithFallback(font.getFontName());
                     aFont = new Font(fontName, font.getFontStyle(), textHeight / 20);
                     fontMetrics = bi.getGraphics().getFontMetrics(aFont);
                     LineMetrics lm = fontMetrics.getLineMetrics("A", bi.getGraphics());

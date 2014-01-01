@@ -204,7 +204,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private FontPanel fontPanel;
     private JProgressBar progressBar = new JProgressBar(0, 100);
     private DeobfuscationDialog deobfuscationDialog;
-    public JTree tagTree;
+    public TagTree tagTree;
     private FlashPlayerPanel flashPanel;
     private JPanel contentPanel;
     private JPanel displayPanel;
@@ -492,19 +492,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         cl2.show(detailPanel, DETAILCARDEMPTYPANEL);
 
         UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName());
-        tagTree = new JTree((TreeModel) null);
-        tagTree.setRootVisible(false);
+        tagTree = new TagTree((TagTreeModel) null);
         tagTree.addTreeSelectionListener(this);
-        tagTree.setBackground(Color.white);
-        tagTree.setUI(new BasicTreeUI() {
-            @Override
-            public void paint(Graphics g, JComponent c) {
-                setHashColor(Color.gray);
-                super.paint(g, c);
-            }
-        });
-
-
 
         DragSource dragSource = DragSource.getDefaultDragSource();
         dragSource.createDefaultDragGestureRecognizer(tagTree, DnDConstants.ACTION_COPY_OR_MOVE, new DragGestureListener() {
@@ -590,53 +579,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         createContextMenu();
         
-        TreeCellRenderer tcr = new DefaultTreeCellRenderer() {
-            @Override
-            public Component getTreeCellRendererComponent(
-                    JTree tree,
-                    Object value,
-                    boolean sel,
-                    boolean expanded,
-                    boolean leaf,
-                    int row,
-                    boolean hasFocus) {
-
-                super.getTreeCellRendererComponent(
-                        tree, value, sel,
-                        expanded, leaf, row,
-                        hasFocus);
-                Object val = value;
-                if (val instanceof TagNode) {
-                    val = ((TagNode) val).tag;
-                }
-                TagType type = getTagType(val);
-                if (val instanceof SWFRoot) {
-                    setIcon(View.getIcon("flash16"));
-                } else if (type != null) {
-                    if (type == TagType.FOLDER && expanded) {
-                        type = TagType.FOLDER_OPEN;
-                    }
-                    String tagTypeStr = type.toString().toLowerCase().replace("_", "");
-                    setIcon(View.getIcon(tagTypeStr + "16"));
-                    //setToolTipText("This book is in the Tutorial series.");
-                } else {
-                    //setToolTipText(null); //no tool tip
-                }
-
-                String tos = value.toString();
-                int sw = getFontMetrics(getFont()).stringWidth(tos);
-                setPreferredSize(new Dimension(18 + sw, getPreferredSize().height));
-                setUI(new BasicLabelUI());
-                setOpaque(false);
-                //setBackground(Color.green);
-                setBackgroundNonSelectionColor(Color.white);
-                //setBackgroundSelectionColor(Color.ORANGE);
-                return this;
-            }
-        };
-
-        tagTree.setCellRenderer(tcr);
-
         statusPanel = new MainFrameStatusPanel(this);
         add(statusPanel, BorderLayout.SOUTH);
 
@@ -1231,92 +1173,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return ret;
     }
 
-    public static TagType getTagType(Object t) {
-        if ((t instanceof DefineFontTag)
-                || (t instanceof DefineFont2Tag)
-                || (t instanceof DefineFont3Tag)
-                || (t instanceof DefineFont4Tag)
-                || (t instanceof DefineCompactedFont)) {
-            return TagType.FONT;
-        }
-        if ((t instanceof DefineTextTag)
-                || (t instanceof DefineText2Tag)
-                || (t instanceof DefineEditTextTag)) {
-            return TagType.TEXT;
-        }
-
-        if ((t instanceof DefineBitsTag)
-                || (t instanceof DefineBitsJPEG2Tag)
-                || (t instanceof DefineBitsJPEG3Tag)
-                || (t instanceof DefineBitsJPEG4Tag)
-                || (t instanceof DefineBitsLosslessTag)
-                || (t instanceof DefineBitsLossless2Tag)) {
-            return TagType.IMAGE;
-        }
-        if ((t instanceof DefineShapeTag)
-                || (t instanceof DefineShape2Tag)
-                || (t instanceof DefineShape3Tag)
-                || (t instanceof DefineShape4Tag)) {
-            return TagType.SHAPE;
-        }
-
-        if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
-            return TagType.MORPH_SHAPE;
-        }
-
-        if (t instanceof DefineSpriteTag) {
-            return TagType.SPRITE;
-        }
-        if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
-            return TagType.BUTTON;
-        }
-        if (t instanceof ASMSource) {
-            return TagType.AS;
-        }
-        if (t instanceof TreeElement) {
-            TreeElement te = (TreeElement) t;
-            if (te.getItem() instanceof ScriptPack) {
-                return TagType.AS;
-            } else {
-                return TagType.PACKAGE;
-            }
-        }
-        if (t instanceof PackageNode) {
-            return TagType.PACKAGE;
-        }
-        if (t instanceof FrameNode) {
-            return TagType.FRAME;
-        }
-        if (t instanceof ShowFrameTag) {
-            return TagType.SHOW_FRAME;
-        }
-
-        if (t instanceof DefineVideoStreamTag) {
-            return TagType.MOVIE;
-        }
-
-        if ((t instanceof DefineSoundTag) || (t instanceof SoundStreamHeadTag) || (t instanceof SoundStreamHead2Tag)) {
-            return TagType.SOUND;
-        }
-
-        if (t instanceof DefineBinaryDataTag) {
-            return TagType.BINARY_DATA;
-        }
-
-        return TagType.FOLDER;
-    }
-
-    public List<Object> getTagsWithType(List<Object> list, TagType type) {
-        List<Object> ret = new ArrayList<>();
-        for (Object o : list) {
-            TagType ttype = getTagType(o);
-            if (type == ttype) {
-                ret.add(o);
-            }
-        }
-        return ret;
-    }
-
     public void renameIdentifier(SWF swf, String identifier) throws InterruptedException {
         String oldName = identifier;
         String newName = View.showInputDialog(translate("rename.enternew"), oldName);
@@ -1464,25 +1320,25 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (n.getSwf() != swf) {
                         continue;
                     }
-                    if (getTagType(n.tag) == TagType.IMAGE) {
+                    if (TagTree.getTagType(n.tag) == TagType.IMAGE) {
                         images.add((Tag) n.tag);
                     }
-                    if (getTagType(n.tag) == TagType.SHAPE) {
+                    if (TagTree.getTagType(n.tag) == TagType.SHAPE) {
                         shapes.add((Tag) n.tag);
                     }
-                    if (getTagType(n.tag) == TagType.AS) {
+                    if (TagTree.getTagType(n.tag) == TagType.AS) {
                         actionNodes.add(n);
                     }
-                    if (getTagType(n.tag) == TagType.MOVIE) {
+                    if (TagTree.getTagType(n.tag) == TagType.MOVIE) {
                         movies.add((Tag) n.tag);
                     }
-                    if (getTagType(n.tag) == TagType.SOUND) {
+                    if (TagTree.getTagType(n.tag) == TagType.SOUND) {
                         sounds.add((Tag) n.tag);
                     }
-                    if (getTagType(n.tag) == TagType.BINARY_DATA) {
+                    if (TagTree.getTagType(n.tag) == TagType.BINARY_DATA) {
                         binaryData.add((Tag) n.tag);
                     }
-                    if (getTagType(n.tag) == TagType.TEXT) {
+                    if (TagTree.getTagType(n.tag) == TagType.TEXT) {
                         texts.add((Tag) n.tag);
                     }
                 }
@@ -1515,7 +1371,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     allNodes.add(asn);
                     TagNode.setExport(allNodes, false);
                     TagNode.setExport(actionNodes, true);
-                    ret.addAll(TagNode.exportNodeAS(swf.tags, handler, allNodes, selFile, exportMode, null));
+                    ret.addAll(TagNode.exportNodeAS(handler, allNodes, selFile, exportMode, null));
                 }
             }
         }
@@ -1996,7 +1852,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 public boolean handle(FontTag font, List<Tag> tags, char character) {
                     String fontName = font.getSwf().sourceFontsMap.get(font.getFontId());
                     if (fontName == null) {
-                        fontName = font.getFontName(tags);
+                        fontName = font.getFontName();
                     }
                     fontName = FontTag.findInstalledFontName(fontName);
                     Font f = new Font(fontName, font.getFontStyle(), 18);

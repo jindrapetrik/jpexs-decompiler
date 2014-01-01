@@ -53,7 +53,7 @@ public abstract class CharacterIdTag extends Tag {
     }
 
     @Override
-    public String getName(List<Tag> tags) {
+    public String getName() {
         String nameAppend = "";
         if (exportName != null) {
             nameAppend = ": " + exportName;
@@ -61,12 +61,12 @@ public abstract class CharacterIdTag extends Tag {
         if (className != null) {
             nameAppend = ": " + className;
         }
-        return super.getName(tags) + " (" + getCharacterId() + nameAppend + ")";
+        return super.getName() + " (" + getCharacterId() + nameAppend + ")";
     }
 
     @Override
-    public String getExportFileName(List<Tag> tags) {
-        return super.getName(tags) + "_" + getCharacterId() + (((exportName != null) && (!exportName.isEmpty())) ? "_" + exportName : "");
+    public String getExportFileName() {
+        return super.getName() + "_" + getCharacterId() + (((exportName != null) && (!exportName.isEmpty())) ? "_" + exportName : "");
     }
 
     public String getCharacterExportFileName() {

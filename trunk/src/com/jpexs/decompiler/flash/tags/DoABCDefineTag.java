@@ -56,7 +56,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
     public static final int ID = 82;
 
     @Override
-    public String getName(List<Tag> tags) {
+    public String getName() {
         return "DoABCDefine (" + name + ")";
     }
 

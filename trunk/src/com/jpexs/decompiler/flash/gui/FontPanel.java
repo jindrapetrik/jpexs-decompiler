@@ -34,6 +34,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Box;
@@ -192,7 +193,7 @@ public class FontPanel extends JPanel implements ActionListener {
                     SWF swf = f.getSwf();
                     String selectedSystemFont = (String) fontSelection.getSelectedItem();
                     swf.sourceFontsMap.put(f.getFontId(), selectedSystemFont);
-                    Configuration.addFontPair(f.getFontName(swf.tags), selectedSystemFont);
+                    Configuration.addFontPair(swf.getShortFileName(), f.getFontId(), f.getFontName(), selectedSystemFont);
                 }
             }
         });
@@ -290,7 +291,7 @@ public class FontPanel extends JPanel implements ActionListener {
             }
         }
 
-        fontNameLabel.setText(ft.getFontName(swf.tags));
+        fontNameLabel.setText(ft.getFontName());
         if (fontNameTag != null) {
             fontDisplayNameLabel.setText(fontNameTag.fontName);
             fontCopyrightLabel.setText(fontNameTag.fontCopyright);
@@ -303,12 +304,15 @@ public class FontPanel extends JPanel implements ActionListener {
         fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : "" + ft.getLeading());
         String chars = ft.getCharacters(swf.tags);
         fontCharactersTextArea.setText(chars);
+        String key = swf.getShortFileName() + "_" + ft.getFontId() + "_" + ft.getFontName();
         if (swf.sourceFontsMap.containsKey(ft.getFontId())) {
             fontSelection.setSelectedItem(swf.sourceFontsMap.get(ft.getFontId()));
-        } else if (Configuration.getFontPairs().containsKey(ft.getFontName(swf.tags))) {
-            fontSelection.setSelectedItem(Configuration.getFontPairs().get(ft.getFontName(swf.tags)));
+        } else if (Configuration.getFontPairs().containsKey(key)) {
+            fontSelection.setSelectedItem(Configuration.getFontPairs().get(key));
+        } else if (Configuration.getFontPairs().containsKey(ft.getFontName())) {
+            fontSelection.setSelectedItem(Configuration.getFontPairs().get(ft.getFontName()));
         } else {
-            fontSelection.setSelectedItem(FontTag.findInstalledFontName(ft.getFontName(swf.tags)));
+            fontSelection.setSelectedItem(FontTag.findInstalledFontName(ft.getFontName()));
         }
         fontChangeList.componentResized(null);
     }

@@ -25,5 +25,5 @@ import java.util.List;
  */
 public interface Exportable {
 
-    public String getExportFileName(List<Tag> tags);
+    public String getExportFileName();
 }
