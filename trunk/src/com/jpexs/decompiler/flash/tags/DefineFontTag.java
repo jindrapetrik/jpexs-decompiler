@@ -204,6 +204,21 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
+    public boolean isSmallEditable() {
+        return false;
+    }
+
+    @Override
+    public boolean isBoldEditable() {
+        return fontInfo2Tag != null || fontInfoTag != null;
+    }
+
+    @Override
+    public boolean isItalicEditable() {
+        return fontInfo2Tag != null || fontInfoTag != null;
+    }
+
+    @Override
     public void setSmall(boolean value) {
     }
 

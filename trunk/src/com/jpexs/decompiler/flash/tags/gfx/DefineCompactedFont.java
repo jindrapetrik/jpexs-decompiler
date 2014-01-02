@@ -298,6 +298,21 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
+    public boolean isSmallEditable() {
+        return false;
+    }
+
+    @Override
+    public boolean isBoldEditable() {
+        return true;
+    }
+
+    @Override
+    public boolean isItalicEditable() {
+        return true;
+    }
+
+    @Override
     public void setSmall(boolean value) {
     }
 

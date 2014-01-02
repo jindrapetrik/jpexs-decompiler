@@ -56,8 +56,12 @@ public class FontPanel extends javax.swing.JPanel {
             buttonEdit.setVisible(false);
             buttonSave.setVisible(true);
             buttonCancel.setVisible(true);
-            fontIsBoldCheckBox.setEnabled(true);
-            fontIsItalicCheckBox.setEnabled(true);
+            if (fontTag.isBoldEditable()) {
+                fontIsBoldCheckBox.setEnabled(true);
+            }
+            if (fontTag.isItalicEditable()) {
+                fontIsItalicCheckBox.setEnabled(true);
+            }
         } else {
             buttonEdit.setVisible(true);
             buttonSave.setVisible(false);
@@ -544,8 +548,12 @@ public class FontPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_buttonEditActionPerformed
 
     private void buttonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSaveActionPerformed
-        fontTag.setBold(fontIsBoldCheckBox.isSelected());
-        fontTag.setItalic(fontIsItalicCheckBox.isSelected());
+        if (fontTag.isBoldEditable()) {
+            fontTag.setBold(fontIsBoldCheckBox.isSelected());
+        }
+        if (fontTag.isItalicEditable()) {
+            fontTag.setItalic(fontIsItalicCheckBox.isSelected());
+        }
         setEditable(false);
     }//GEN-LAST:event_buttonSaveActionPerformed
 

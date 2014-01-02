@@ -75,6 +75,12 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract boolean isItalic();
 
+    public abstract boolean isSmallEditable();
+
+    public abstract boolean isBoldEditable();
+
+    public abstract boolean isItalicEditable();
+
     public abstract void setSmall(boolean value);
 
     public abstract void setBold(boolean value);
