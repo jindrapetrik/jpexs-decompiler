@@ -39,7 +39,12 @@ public class AboutDialog extends AppDialog {
         "Capasha",
         "focus",
         "honfika",
-        "pepka"};
+        "Krock",
+        "Laurent LOUVET",
+        "MaGiC",
+        "pepka",
+        "poxyran",
+        "Rtsjx"};
     private static final String AUTHOR = "JPEXS";
 
     public AboutDialog() {
@@ -102,7 +107,7 @@ public class AboutDialog extends AppDialog {
 
 
 
-        JLabel dateLabel = new JLabel("2010-2013");
+        JLabel dateLabel = new JLabel("2010-2014");
         dateLabel.setAlignmentX(0.5f);
         //dateLabel.setPreferredSize(new Dimension(300, 10));
         dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
