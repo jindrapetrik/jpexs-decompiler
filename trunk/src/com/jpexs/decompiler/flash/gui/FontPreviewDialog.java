@@ -17,7 +17,19 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 
 /**
  *
@@ -62,6 +74,20 @@ public class FontPreviewDialog extends AppDialog {
         labelSample48.setText(text);
         labelSample60.setText(text);
         labelSample72.setText(text);
+    }
+
+    private ComboBoxModel<String> getModel() {
+        List<String> sampleTexts = new ArrayList<>();
+        BufferedReader br = new BufferedReader(new InputStreamReader(FontPreviewDialog.class.getResourceAsStream("/com/jpexs/decompiler/flash/tags/font/font_preview_samples.txt"), Utf8Helper.charset));
+        String s;
+        try {
+            while ((s = br.readLine()) != null) {
+                sampleTexts.add(s);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(FontPreviewDialog.class.getName()).log(Level.SEVERE, "Cannot read font preview dialog sample texts", ex);
+        }
+        return new DefaultComboBoxModel<>(sampleTexts.toArray(new String[0]));
     }
 
     /**
@@ -200,7 +226,7 @@ public class FontPreviewDialog extends AppDialog {
 
         jScrollPane1.setViewportView(jPanel1);
 
-        comboBoxSampleTexts.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "The quick brown fox jumps over the lazy dog.", "Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich", "Nechť již hříšné saxofony ďáblů rozzvučí síň úděsnými tóny waltzu, tanga a quickstepu.", "Egy hűtlen vejét fülöncsípő, dühös mexikói úr ázik Quitóban.", "Mężny bądź, chroń pułk twój i sześć flag", "Pijamalı hasta yağız şoföre çabucak güvendi", "Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч", "Ξεσκεπάζω την ψυχοφθόρα βδελυγμία.", "עטלף אבק נס דרך מזגן שהתפוצץ כי חם.‎", " いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん", " " }));
+        comboBoxSampleTexts.setModel(getModel());
         comboBoxSampleTexts.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 comboBoxSampleTextsItemStateChanged(evt);
