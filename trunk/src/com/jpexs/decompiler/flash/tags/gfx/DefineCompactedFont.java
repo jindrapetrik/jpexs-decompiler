@@ -298,6 +298,30 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
+    public void setSmall(boolean value) {
+    }
+
+    @Override
+    public void setBold(boolean value) {
+        for (FontType font : fonts) {
+            font.flags &= FontType.FF_Bold;
+            if (!value) {
+                font.flags ^= FontType.FF_Bold;
+            }
+        }
+    }
+
+    @Override
+    public void setItalic(boolean value) {
+        for (FontType font : fonts) {
+            font.flags &= FontType.FF_Italic;
+            if (!value) {
+                font.flags ^= FontType.FF_Italic;
+            }
+        }
+    }
+
+    @Override
     public int getDivider() {
         return 1;
     }

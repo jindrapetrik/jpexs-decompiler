@@ -273,6 +273,21 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
+    public void setSmall(boolean value) {
+        fontFlagsSmallText = value;
+    }
+
+    @Override
+    public void setBold(boolean value) {
+        fontFlagsBold = value;
+    }
+
+    @Override
+    public void setItalic(boolean value) {
+        fontFlagsItalic = value;
+    }
+
+    @Override
     public int getDivider() {
         return 20;
     }

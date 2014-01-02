@@ -204,6 +204,30 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
+    public void setSmall(boolean value) {
+    }
+
+    @Override
+    public void setBold(boolean value) {
+        if (fontInfo2Tag != null) {
+            fontInfo2Tag.fontFlagsBold = value;
+        }
+        if (fontInfoTag != null) {
+            fontInfoTag.fontFlagsBold = value;
+        }
+    }
+
+    @Override
+    public void setItalic(boolean value) {
+        if (fontInfo2Tag != null) {
+            fontInfo2Tag.fontFlagsItalic = value;
+        }
+        if (fontInfoTag != null) {
+            fontInfoTag.fontFlagsItalic = value;
+        }
+    }
+
+    @Override
     public int getAscent() {
         return -1;
     }

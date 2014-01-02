@@ -22,196 +22,49 @@ import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.File;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 /**
  *
  * @author JPEXS
  */
-public class FontPanel extends JPanel implements ActionListener {
-    
-    static final String ACTION_FONT_EMBED = "FONTEMBED";
-    static final String ACTION_FONT_ADD_CHARS = "FONTADDCHARS";
+public class FontPanel extends javax.swing.JPanel {
 
     private MainPanel mainPanel;
-
-    private JLabel fontNameLabel;
-    private JLabel fontDisplayNameLabel;
-    private JLabel fontCopyrightLabel;
-    private JLabel fontIsBoldLabel;
-    private JLabel fontIsItalicLabel;
-    private JLabel fontAscentLabel;
-    private JLabel fontDescentLabel;
-    private JLabel fontLeadingLabel;
-    private JTextArea fontCharactersTextArea;
-    private JTextField fontAddCharactersField;
-    private JCheckBox updateTextsCheckBox;
-    private ComponentListener fontChangeList;
-    private JComboBox<String> fontSelection;
-
+    private FontTag fontTag;
+    
+    /**
+     * Creates new form FontPanel
+     */
     public FontPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
-        createFontPanel();
+        initComponents();
     }
-    
-    private void createFontPanel() {
-        //TODO: This layout SUCKS! If you know something better, please fix it!
-        final JPanel fontParams2 = new JPanel();
-        fontParams2.setLayout(null);
-        final Component[][] ctable = new Component[][]{
-            {new JLabel(translate("font.name")), fontNameLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("fontName.name")), fontDisplayNameLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("fontName.copyright")), fontCopyrightLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.isbold")), fontIsBoldLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.isitalic")), fontIsItalicLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.ascent")), fontAscentLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.descent")), fontDescentLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.leading")), fontLeadingLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.characters")), fontCharactersTextArea = new JTextArea("")}
-        };
-        fontCharactersTextArea.setLineWrap(true);
-        fontCharactersTextArea.setWrapStyleWord(true);
-        fontCharactersTextArea.setOpaque(false);
-        fontCharactersTextArea.setEditable(false);
-        fontCharactersTextArea.setFont(new JLabel().getFont());
 
-        final int borderLeft = 10;
-
-        final int[] maxws = new int[ctable[0].length];
-        for (int x = 0; x < ctable[0].length; x++) {
-            int maxw = 0;
-            for (int y = 0; y < ctable.length; y++) {
-                Dimension d = ctable[y][x].getPreferredSize();
-                if (d.width > maxw) {
-                    maxw = d.width;
-                }
-            }
-            maxws[x] = maxw;
-        }
-
-        for (int i = 0; i < ctable.length; i++) {
-            fontParams2.add(ctable[i][0]);
-            fontParams2.add(ctable[i][1]);
-        }
-
-        //fontParams2.setPreferredSize(new Dimension(600, ctable.length * 25));
-        fontChangeList = new ComponentListener() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                int h = 0;
-                Insets is = getInsets();
-                Insets is2 = fontParams2.getInsets();
-                for (int i = 0; i < ctable.length; i++) {
-                    Dimension d = ctable[i][0].getPreferredSize();
-                    Dimension d2 = ctable[i][1].getPreferredSize();
-                    ctable[i][0].setBounds(borderLeft, h, maxws[0], d2.height);
-
-                    int w2 = getWidth() - 3 * borderLeft - maxws[0] - is.left - is.right - 10;
-                    ctable[i][1].setBounds(borderLeft + maxws[0] + borderLeft, h, w2, d2.height);
-                    h += Math.max(d.height, d2.height);
-                }
-
-                fontParams2.setPreferredSize(new Dimension(getWidth() - 20, h));
-                revalidate();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                componentResized(null);
-            }
-
-            @Override
-            public void componentShown(ComponentEvent e) {
-                componentResized(null);
-            }
-
-            @Override
-            public void componentHidden(ComponentEvent e) {
-                componentResized(null);
-            }
-        };
-        final JPanel fontParams1 = new JPanel();
-        addComponentListener(fontChangeList);
-
-        fontChangeList.componentResized(null);
-        fontParams1.setLayout(new BoxLayout(fontParams1, BoxLayout.Y_AXIS));
-        fontParams1.add(fontParams2);
-
-        JPanel fontAddCharsPanel = new JPanel(new FlowLayout());
-        fontAddCharsPanel.add(new JLabel(translate("font.characters.add")));
-        fontAddCharactersField = new MyTextField();
-        fontAddCharactersField.setPreferredSize(new Dimension(150, fontAddCharactersField.getPreferredSize().height));
-        fontAddCharsPanel.add(fontAddCharactersField);
-        JButton fontAddCharsButton = new JButton(translate("button.ok"));
-        fontAddCharsButton.setActionCommand(ACTION_FONT_ADD_CHARS);
-        fontAddCharsButton.addActionListener(this);
-        fontAddCharsPanel.add(fontAddCharsButton);
-        
-        updateTextsCheckBox = new JCheckBox(translate("font.updateTexts"));
-        fontAddCharsPanel.add(updateTextsCheckBox);
-
-        JButton fontEmbedButton = new JButton(translate("button.font.embed"));
-        fontEmbedButton.setActionCommand(ACTION_FONT_EMBED);
-        fontEmbedButton.addActionListener(this);
-        //fontAddCharsPanel.add(fontEmbedButton);
-
-        fontParams1.add(fontAddCharsPanel);
-        JPanel fontSelectionPanel = new JPanel(new FlowLayout());
-        fontSelectionPanel.add(new JLabel(translate("font.source")));
-        fontSelection = new JComboBox<>(FontTag.fontNamesArray);
-        fontSelection.setSelectedItem(FontTag.defaultFontName);
-        fontSelection.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (mainPanel.oldTag instanceof FontTag) {
-                    FontTag f = (FontTag) mainPanel.oldTag;
-                    SWF swf = f.getSwf();
-                    String selectedSystemFont = (String) fontSelection.getSelectedItem();
-                    swf.sourceFontsMap.put(f.getFontId(), selectedSystemFont);
-                    Configuration.addFontPair(swf.getShortFileName(), f.getFontId(), f.getFontName(), selectedSystemFont);
-                }
-            }
-        });
-        fontSelectionPanel.add(fontSelection);
-
-        JPanel fontCharPanel = new JPanel();
-        fontCharPanel.setLayout(new ListLayout());
-        fontCharPanel.add(fontAddCharsPanel);
-        fontCharPanel.add(fontSelectionPanel);
-        fontParams1.add(fontCharPanel);
-        fontParams1.add(fontEmbedButton);
-        setLayout(new BorderLayout());
-        fontParams1.add(Box.createVerticalGlue());
-        add(new JScrollPane(fontParams1), BorderLayout.CENTER);
+    private ComboBoxModel<String> getModel() {
+        return new DefaultComboBoxModel<>(FontTag.fontNamesArray);
     }
-    
-    public String getSelectedFont() {
-        return fontSelection.getSelectedItem().toString();
+
+    private void setEditable(boolean editable) {
+        if (editable) {
+            buttonEdit.setVisible(false);
+            buttonSave.setVisible(true);
+            buttonCancel.setVisible(true);
+            fontIsBoldCheckBox.setEnabled(true);
+            fontIsItalicCheckBox.setEnabled(true);
+        } else {
+            buttonEdit.setVisible(true);
+            buttonSave.setVisible(false);
+            buttonCancel.setVisible(false);
+            fontIsBoldCheckBox.setEnabled(false);
+            fontIsItalicCheckBox.setEnabled(false);
+        }
     }
     
     private String translate(String key) {
@@ -281,6 +134,7 @@ public class FontPanel extends JPanel implements ActionListener {
 
     public void showFontTag(FontTag ft) {
         SWF swf = ft.getSwf();
+        fontTag = ft;
         DefineFontNameTag fontNameTag = null;
         for (Tag tag : swf.tags) {
             if (tag instanceof DefineFontNameTag) {
@@ -293,12 +147,12 @@ public class FontPanel extends JPanel implements ActionListener {
 
         fontNameLabel.setText(ft.getFontName());
         if (fontNameTag != null) {
-            fontDisplayNameLabel.setText(fontNameTag.fontName);
-            fontCopyrightLabel.setText(fontNameTag.fontCopyright);
+            fontDisplayNameTextArea.setText(fontNameTag.fontName);
+            fontCopyrightTextArea.setText(fontNameTag.fontCopyright);
         }
         
-        fontIsBoldLabel.setText(ft.isBold() ? translate("yes") : translate("no"));
-        fontIsItalicLabel.setText(ft.isItalic() ? translate("yes") : translate("no"));
+        fontIsBoldCheckBox.setSelected(ft.isBold());
+        fontIsItalicCheckBox.setSelected(ft.isItalic());
         fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : "" + ft.getDescent());
         fontAscentLabel.setText(ft.getAscent() == -1 ? translate("value.unknown") : "" + ft.getAscent());
         fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : "" + ft.getLeading());
@@ -314,40 +168,416 @@ public class FontPanel extends JPanel implements ActionListener {
         } else {
             fontSelection.setSelectedItem(FontTag.findInstalledFontName(ft.getFontName()));
         }
-        fontChangeList.componentResized(null);
+        setEditable(false);
     }
     
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case ACTION_FONT_EMBED:
-                if (mainPanel.oldTag instanceof FontTag) {
-                    FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ((FontTag) mainPanel.oldTag).getFontStyle());
-                    if (fed.display()) {
-                        Set<Integer> selChars = fed.getSelectedChars();
-                        if (!selChars.isEmpty()) {
-                            String selFont = fed.getSelectedFont();
-                            fontSelection.setSelectedItem(selFont);
-                            fontAddChars((FontTag) mainPanel.oldTag, selChars, selFont);
-                            fontAddCharactersField.setText("");
-                            mainPanel.reload(true);
-                        }
-                    }
-                }
-                break;
-            case ACTION_FONT_ADD_CHARS:
-                String newchars = fontAddCharactersField.getText();
-                if (mainPanel.oldTag instanceof FontTag) {
-                    Set<Integer> selChars = new TreeSet<>();
-                    for (int c = 0; c < newchars.length(); c++) {
-                        selChars.add(newchars.codePointAt(c));
-                    }
-                    fontAddChars((FontTag) mainPanel.oldTag, selChars, fontSelection.getSelectedItem().toString());
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        jPanel1 = new javax.swing.JPanel();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+        fontNameLabel = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel3 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel4 = new javax.swing.JLabel();
+        fontIsBoldCheckBox = new javax.swing.JCheckBox();
+        javax.swing.JLabel jLabel5 = new javax.swing.JLabel();
+        fontIsItalicCheckBox = new javax.swing.JCheckBox();
+        javax.swing.JLabel jLabel6 = new javax.swing.JLabel();
+        fontAscentLabel = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel7 = new javax.swing.JLabel();
+        fontDescentLabel = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel8 = new javax.swing.JLabel();
+        fontLeadingLabel = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel9 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        fontDisplayNameTextArea = new javax.swing.JTextArea();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        fontCopyrightTextArea = new javax.swing.JTextArea();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        fontCharactersTextArea = new javax.swing.JTextArea();
+        javax.swing.JLabel jLabel10 = new javax.swing.JLabel();
+        fontAddCharactersField = new javax.swing.JTextField();
+        fontAddCharsButton = new javax.swing.JButton();
+        updateTextsCheckBox = new javax.swing.JCheckBox();
+        jLabel11 = new javax.swing.JLabel();
+        fontSelection = new javax.swing.JComboBox();
+        fontEmbedButton = new javax.swing.JButton();
+        buttonEdit = new javax.swing.JButton();
+        buttonSave = new javax.swing.JButton();
+        buttonCancel = new javax.swing.JButton();
+
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/jpexs/decompiler/flash/gui/locales/MainFrame"); // NOI18N
+        jLabel1.setText(bundle.getString("font.name")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jLabel1, gridBagConstraints);
+
+        fontNameLabel.setText(bundle.getString("value.unknown")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        jPanel1.add(fontNameLabel, gridBagConstraints);
+
+        jLabel2.setText(bundle.getString("fontName.name")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.ipadx = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jLabel2, gridBagConstraints);
+
+        jLabel3.setText(bundle.getString("fontName.copyright")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jLabel3, gridBagConstraints);
+
+        jLabel4.setText(bundle.getString("font.isbold")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jLabel4, gridBagConstraints);
+
+        fontIsBoldCheckBox.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        jPanel1.add(fontIsBoldCheckBox, gridBagConstraints);
+
+        jLabel5.setText(bundle.getString("font.isitalic")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jLabel5, gridBagConstraints);
+
+        fontIsItalicCheckBox.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        jPanel1.add(fontIsItalicCheckBox, gridBagConstraints);
+
+        jLabel6.setText(bundle.getString("font.ascent")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jLabel6, gridBagConstraints);
+
+        fontAscentLabel.setText(bundle.getString("value.unknown")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        jPanel1.add(fontAscentLabel, gridBagConstraints);
+
+        jLabel7.setText(bundle.getString("font.descent")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jLabel7, gridBagConstraints);
+
+        fontDescentLabel.setText(bundle.getString("value.unknown")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        jPanel1.add(fontDescentLabel, gridBagConstraints);
+
+        jLabel8.setText(bundle.getString("font.leading")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jLabel8, gridBagConstraints);
+
+        fontLeadingLabel.setText(bundle.getString("value.unknown")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        jPanel1.add(fontLeadingLabel, gridBagConstraints);
+
+        jLabel9.setText(bundle.getString("font.characters")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jLabel9, gridBagConstraints);
+
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        jPanel1.add(jPanel2, gridBagConstraints);
+
+        jScrollPane3.setBorder(null);
+
+        fontDisplayNameTextArea.setEditable(false);
+        fontDisplayNameTextArea.setColumns(20);
+        fontDisplayNameTextArea.setFont(new JLabel().getFont());
+        fontDisplayNameTextArea.setLineWrap(true);
+        fontDisplayNameTextArea.setText(bundle.getString("value.unknown")); // NOI18N
+        fontDisplayNameTextArea.setWrapStyleWord(true);
+        fontDisplayNameTextArea.setOpaque(false);
+        jScrollPane3.setViewportView(fontDisplayNameTextArea);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        jPanel1.add(jScrollPane3, gridBagConstraints);
+
+        jScrollPane4.setBorder(null);
+
+        fontCopyrightTextArea.setEditable(false);
+        fontCopyrightTextArea.setColumns(20);
+        fontCopyrightTextArea.setFont(new JLabel().getFont());
+        fontCopyrightTextArea.setLineWrap(true);
+        fontCopyrightTextArea.setText(bundle.getString("value.unknown")); // NOI18N
+        fontCopyrightTextArea.setWrapStyleWord(true);
+        fontCopyrightTextArea.setOpaque(false);
+        jScrollPane4.setViewportView(fontCopyrightTextArea);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        jPanel1.add(jScrollPane4, gridBagConstraints);
+
+        jScrollPane5.setBorder(null);
+
+        fontCharactersTextArea.setEditable(false);
+        fontCharactersTextArea.setColumns(20);
+        fontCharactersTextArea.setFont(new JLabel().getFont());
+        fontCharactersTextArea.setLineWrap(true);
+        fontCharactersTextArea.setWrapStyleWord(true);
+        fontCharactersTextArea.setOpaque(false);
+        jScrollPane5.setViewportView(fontCharactersTextArea);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        jPanel1.add(jScrollPane5, gridBagConstraints);
+
+        jLabel10.setText(bundle.getString("font.characters.add")); // NOI18N
+
+        fontAddCharsButton.setText(bundle.getString("button.ok")); // NOI18N
+        fontAddCharsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fontAddCharsButtonActionPerformed(evt);
+            }
+        });
+
+        updateTextsCheckBox.setText(bundle.getString("font.updateTexts")); // NOI18N
+
+        jLabel11.setText(bundle.getString("font.source")); // NOI18N
+
+        fontSelection.setModel(getModel());
+        fontSelection.setSelectedItem(FontTag.defaultFontName);
+        fontSelection.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                fontSelectionItemStateChanged(evt);
+            }
+        });
+
+        fontEmbedButton.setText(bundle.getString("button.font.embed")); // NOI18N
+        fontEmbedButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fontEmbedButtonActionPerformed(evt);
+            }
+        });
+
+        buttonEdit.setText(bundle.getString("button.edit")); // NOI18N
+        buttonEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonEditActionPerformed(evt);
+            }
+        });
+
+        buttonSave.setText(bundle.getString("button.save")); // NOI18N
+        buttonSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSaveActionPerformed(evt);
+            }
+        });
+
+        buttonCancel.setText(bundle.getString("button.cancel")); // NOI18N
+        buttonCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonCancelActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel11)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(fontSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel10)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(fontAddCharactersField, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fontAddCharsButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(updateTextsCheckBox))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(buttonEdit)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(buttonSave)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(buttonCancel))
+                            .addComponent(fontEmbedButton))
+                        .addGap(0, 68, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(fontAddCharactersField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fontAddCharsButton)
+                    .addComponent(updateTextsCheckBox))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(fontSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(fontEmbedButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(buttonEdit)
+                    .addComponent(buttonSave)
+                    .addComponent(buttonCancel))
+                .addContainerGap())
+        );
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void fontAddCharsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontAddCharsButtonActionPerformed
+        if (mainPanel.oldTag instanceof FontTag) {
+            FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ((FontTag) mainPanel.oldTag).getFontStyle());
+            if (fed.display()) {
+                Set<Integer> selChars = fed.getSelectedChars();
+                if (!selChars.isEmpty()) {
+                    String selFont = fed.getSelectedFont();
+                    fontSelection.setSelectedItem(selFont);
+                    fontAddChars((FontTag) mainPanel.oldTag, selChars, selFont);
                     fontAddCharactersField.setText("");
                     mainPanel.reload(true);
                 }
-                break;
+            }
         }
-    }
+    }//GEN-LAST:event_fontAddCharsButtonActionPerformed
 
+    private void fontEmbedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontEmbedButtonActionPerformed
+        String newchars = fontAddCharactersField.getText();
+        if (mainPanel.oldTag instanceof FontTag) {
+            Set<Integer> selChars = new TreeSet<>();
+            for (int c = 0; c < newchars.length(); c++) {
+                selChars.add(newchars.codePointAt(c));
+            }
+            fontAddChars((FontTag) mainPanel.oldTag, selChars, fontSelection.getSelectedItem().toString());
+            fontAddCharactersField.setText("");
+            mainPanel.reload(true);
+        }
+    }//GEN-LAST:event_fontEmbedButtonActionPerformed
+
+    private void fontSelectionItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_fontSelectionItemStateChanged
+        if (mainPanel.oldTag instanceof FontTag) {
+            FontTag f = (FontTag) mainPanel.oldTag;
+            SWF swf = f.getSwf();
+            String selectedSystemFont = (String) fontSelection.getSelectedItem();
+            swf.sourceFontsMap.put(f.getFontId(), selectedSystemFont);
+            Configuration.addFontPair(swf.getShortFileName(), f.getFontId(), f.getFontName(), selectedSystemFont);
+        }
+    }//GEN-LAST:event_fontSelectionItemStateChanged
+
+    private void buttonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEditActionPerformed
+        setEditable(true);
+    }//GEN-LAST:event_buttonEditActionPerformed
+
+    private void buttonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSaveActionPerformed
+        fontTag.setBold(fontIsBoldCheckBox.isSelected());
+        fontTag.setItalic(fontIsItalicCheckBox.isSelected());
+        setEditable(false);
+    }//GEN-LAST:event_buttonSaveActionPerformed
+
+    private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
+        showFontTag(fontTag);
+        setEditable(false);
+    }//GEN-LAST:event_buttonCancelActionPerformed
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonCancel;
+    private javax.swing.JButton buttonEdit;
+    private javax.swing.JButton buttonSave;
+    private javax.swing.JTextField fontAddCharactersField;
+    private javax.swing.JButton fontAddCharsButton;
+    private javax.swing.JLabel fontAscentLabel;
+    private javax.swing.JTextArea fontCharactersTextArea;
+    private javax.swing.JTextArea fontCopyrightTextArea;
+    private javax.swing.JLabel fontDescentLabel;
+    private javax.swing.JTextArea fontDisplayNameTextArea;
+    private javax.swing.JButton fontEmbedButton;
+    private javax.swing.JCheckBox fontIsBoldCheckBox;
+    private javax.swing.JCheckBox fontIsItalicCheckBox;
+    private javax.swing.JLabel fontLeadingLabel;
+    private javax.swing.JLabel fontNameLabel;
+    private javax.swing.JComboBox fontSelection;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JCheckBox updateTextsCheckBox;
+    // End of variables declaration//GEN-END:variables
 }
