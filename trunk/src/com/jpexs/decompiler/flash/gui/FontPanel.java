@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import java.awt.Font;
+import java.awt.Panel;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.ComboBoxModel;
@@ -217,6 +218,13 @@ public class FontPanel extends javax.swing.JPanel {
         buttonEdit = new javax.swing.JButton();
         buttonSave = new javax.swing.JButton();
         buttonCancel = new javax.swing.JButton();
+        buttonPreviewFont = new javax.swing.JButton();
+
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
+            }
+        });
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
@@ -230,11 +238,15 @@ public class FontPanel extends javax.swing.JPanel {
         jPanel1.add(jLabel1, gridBagConstraints);
 
         fontNameLabel.setText(bundle.getString("value.unknown")); // NOI18N
+        fontNameLabel.setMaximumSize(new java.awt.Dimension(250, 14));
+        fontNameLabel.setMinimumSize(new java.awt.Dimension(250, 14));
+        fontNameLabel.setPreferredSize(new java.awt.Dimension(250, 14));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         jPanel1.add(fontNameLabel, gridBagConstraints);
 
         jLabel2.setText(bundle.getString("fontName.name")); // NOI18N
@@ -247,6 +259,8 @@ public class FontPanel extends javax.swing.JPanel {
         jPanel1.add(jLabel2, gridBagConstraints);
 
         fontDisplayNameScrollPane.setBorder(null);
+        fontDisplayNameScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        fontDisplayNameScrollPane.setHorizontalScrollBar(null);
 
         fontDisplayNameTextArea.setEditable(false);
         fontDisplayNameTextArea.setColumns(20);
@@ -254,6 +268,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontDisplayNameTextArea.setLineWrap(true);
         fontDisplayNameTextArea.setText(bundle.getString("value.unknown")); // NOI18N
         fontDisplayNameTextArea.setWrapStyleWord(true);
+        fontDisplayNameTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
         fontDisplayNameTextArea.setOpaque(false);
         fontDisplayNameScrollPane.setViewportView(fontDisplayNameTextArea);
 
@@ -262,6 +277,7 @@ public class FontPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         jPanel1.add(fontDisplayNameScrollPane, gridBagConstraints);
 
         jLabel3.setText(bundle.getString("fontName.copyright")); // NOI18N
@@ -273,6 +289,8 @@ public class FontPanel extends javax.swing.JPanel {
         jPanel1.add(jLabel3, gridBagConstraints);
 
         fontCopyrightScrollPane.setBorder(null);
+        fontCopyrightScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        fontCopyrightScrollPane.setHorizontalScrollBar(null);
 
         fontCopyrightTextArea.setEditable(false);
         fontCopyrightTextArea.setColumns(20);
@@ -280,6 +298,7 @@ public class FontPanel extends javax.swing.JPanel {
         fontCopyrightTextArea.setLineWrap(true);
         fontCopyrightTextArea.setText(bundle.getString("value.unknown")); // NOI18N
         fontCopyrightTextArea.setWrapStyleWord(true);
+        fontCopyrightTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
         fontCopyrightTextArea.setOpaque(false);
         fontCopyrightScrollPane.setViewportView(fontCopyrightTextArea);
 
@@ -288,6 +307,7 @@ public class FontPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         jPanel1.add(fontCopyrightScrollPane, gridBagConstraints);
 
         jLabel4.setText(bundle.getString("font.isbold")); // NOI18N
@@ -303,6 +323,7 @@ public class FontPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         jPanel1.add(fontIsBoldCheckBox, gridBagConstraints);
 
         jLabel5.setText(bundle.getString("font.isitalic")); // NOI18N
@@ -318,6 +339,7 @@ public class FontPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         jPanel1.add(fontIsItalicCheckBox, gridBagConstraints);
 
         jLabel6.setText(bundle.getString("font.ascent")); // NOI18N
@@ -333,6 +355,7 @@ public class FontPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         jPanel1.add(fontAscentLabel, gridBagConstraints);
 
         jLabel7.setText(bundle.getString("font.descent")); // NOI18N
@@ -348,6 +371,7 @@ public class FontPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         jPanel1.add(fontDescentLabel, gridBagConstraints);
 
         jLabel8.setText(bundle.getString("font.leading")); // NOI18N
@@ -363,6 +387,7 @@ public class FontPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         jPanel1.add(fontLeadingLabel, gridBagConstraints);
 
         jLabel9.setText(bundle.getString("font.characters")); // NOI18N
@@ -374,12 +399,15 @@ public class FontPanel extends javax.swing.JPanel {
         jPanel1.add(jLabel9, gridBagConstraints);
 
         fontCharactersScrollPane.setBorder(null);
+        fontCharactersScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        fontCharactersScrollPane.setHorizontalScrollBar(null);
 
         fontCharactersTextArea.setEditable(false);
         fontCharactersTextArea.setColumns(20);
         fontCharactersTextArea.setFont(new JLabel().getFont());
         fontCharactersTextArea.setLineWrap(true);
         fontCharactersTextArea.setWrapStyleWord(true);
+        fontCharactersTextArea.setMinimumSize(new java.awt.Dimension(250, 16));
         fontCharactersTextArea.setOpaque(false);
         fontCharactersScrollPane.setViewportView(fontCharactersTextArea);
 
@@ -388,6 +416,7 @@ public class FontPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         jPanel1.add(fontCharactersScrollPane, gridBagConstraints);
 
         jLabel10.setText(bundle.getString("font.characters.add")); // NOI18N
@@ -442,6 +471,13 @@ public class FontPanel extends javax.swing.JPanel {
             }
         });
 
+        buttonPreviewFont.setText(bundle.getString("button.preview")); // NOI18N
+        buttonPreviewFont.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonPreviewFontActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -451,7 +487,7 @@ public class FontPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 453, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
@@ -461,13 +497,9 @@ public class FontPanel extends javax.swing.JPanel {
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jLabel10)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(fontAddCharactersField, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(fontAddCharsButton)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(updateTextsCheckBox))
+                                        .addComponent(fontAddCharactersField, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(fontEmbedButton))
-                                .addGap(0, 68, Short.MAX_VALUE)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -476,7 +508,15 @@ public class FontPanel extends javax.swing.JPanel {
                         .addComponent(buttonSave)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(buttonCancel)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(fontAddCharsButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(updateTextsCheckBox))
+                            .addComponent(buttonPreviewFont))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -486,7 +526,9 @@ public class FontPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(fontAddCharactersField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fontAddCharactersField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(fontAddCharsButton)
                     .addComponent(updateTextsCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -494,8 +536,10 @@ public class FontPanel extends javax.swing.JPanel {
                     .addComponent(jLabel11)
                     .addComponent(fontSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonPreviewFont)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(fontEmbedButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 78, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonEdit)
                     .addComponent(buttonSave)
@@ -562,9 +606,19 @@ public class FontPanel extends javax.swing.JPanel {
         setEditable(false);
     }//GEN-LAST:event_buttonCancelActionPerformed
 
+    private void buttonPreviewFontActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPreviewFontActionPerformed
+        String selectedSystemFont = (String) fontSelection.getSelectedItem();
+        new FontPreviewDialog(null, true, new Font(selectedSystemFont, fontTag.getFontStyle(), 1024)).setVisible(true);
+    }//GEN-LAST:event_buttonPreviewFontActionPerformed
+
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+        jPanel1.updateUI();
+    }//GEN-LAST:event_formComponentResized
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonCancel;
     private javax.swing.JButton buttonEdit;
+    private javax.swing.JButton buttonPreviewFont;
     private javax.swing.JButton buttonSave;
     private javax.swing.JTextField fontAddCharactersField;
     private javax.swing.JButton fontAddCharsButton;

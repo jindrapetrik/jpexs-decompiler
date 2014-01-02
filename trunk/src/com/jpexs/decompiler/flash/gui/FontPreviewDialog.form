@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="2"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="comboBoxSampleTexts" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="labelFontName" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="519" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+          <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="comboBoxSampleTexts" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="labelFontName" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jScrollPane1" pref="431" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Container class="javax.swing.JPanel" name="jPanel1">
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="labelSample72" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelSample18" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelSample12" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelSample24" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelSample36" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelSample48" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelSample60" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="692" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="labelSample12" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="labelSample18" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="labelSample24" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="labelSample36" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="labelSample48" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="labelSample60" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="labelSample72" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JLabel" name="labelSample72">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Tahoma" size="72" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="---"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelSample60">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Tahoma" size="60" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="---"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelSample12">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Tahoma" size="12" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="---"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelSample24">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Tahoma" size="24" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="---"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelSample48">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Tahoma" size="48" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="---"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelSample36">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Tahoma" size="36" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="---"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelSample18">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Tahoma" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="---"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel2">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="12"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel3">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="18"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel4">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="24"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel5">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="36"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel6">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="48"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel7">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="60"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel8">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="72"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
+      </SubComponents>
+    </Container>
+    <Component class="javax.swing.JComboBox" name="comboBoxSampleTexts">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="11">
+            <StringItem index="0" value="The quick brown fox jumps over the lazy dog."/>
+            <StringItem index="1" value="Victor jagt zw&#xf6;lf Boxk&#xe4;mpfer quer &#xfc;ber den gro&#xdf;en Sylter Deich"/>
+            <StringItem index="2" value="Nech&#x165; ji&#x17e; h&#x159;&#xed;&#x161;n&#xe9; saxofony &#x10f;&#xe1;bl&#x16f; rozzvu&#x10d;&#xed; s&#xed;&#x148; &#xfa;d&#x11b;sn&#xfd;mi t&#xf3;ny waltzu, tanga a quickstepu."/>
+            <StringItem index="3" value="Egy h&#x171;tlen vej&#xe9;t f&#xfc;l&#xf6;ncs&#xed;p&#x151;, d&#xfc;h&#xf6;s mexik&#xf3;i &#xfa;r &#xe1;zik Quit&#xf3;ban."/>
+            <StringItem index="4" value="M&#x119;&#x17c;ny b&#x105;d&#x17a;, chro&#x144; pu&#x142;k tw&#xf3;j i sze&#x15b;&#x107; flag"/>
+            <StringItem index="5" value="Pijamal&#x131; hasta ya&#x11f;&#x131;z &#x15f;of&#xf6;re &#xe7;abucak g&#xfc;vendi"/>
+            <StringItem index="6" value="&#x41b;&#x44e;&#x431;&#x44f;, &#x441;&#x44a;&#x435;&#x448;&#x44c; &#x449;&#x438;&#x43f;&#x446;&#x44b;, &#x2014; &#x432;&#x437;&#x434;&#x43e;&#x445;&#x43d;&#x451;&#x442; &#x43c;&#x44d;&#x440;, &#x2014; &#x43a;&#x430;&#x439;&#x444; &#x436;&#x433;&#x443;&#x447;"/>
+            <StringItem index="7" value="&#x39e;&#x3b5;&#x3c3;&#x3ba;&#x3b5;&#x3c0;&#x3ac;&#x3b6;&#x3c9; &#x3c4;&#x3b7;&#x3bd; &#x3c8;&#x3c5;&#x3c7;&#x3bf;&#x3c6;&#x3b8;&#x3cc;&#x3c1;&#x3b1; &#x3b2;&#x3b4;&#x3b5;&#x3bb;&#x3c5;&#x3b3;&#x3bc;&#x3af;&#x3b1;."/>
+            <StringItem index="8" value="&#x5e2;&#x5d8;&#x5dc;&#x5e3; &#x5d0;&#x5d1;&#x5e7; &#x5e0;&#x5e1; &#x5d3;&#x5e8;&#x5da; &#x5de;&#x5d6;&#x5d2;&#x5df; &#x5e9;&#x5d4;&#x5ea;&#x5e4;&#x5d5;&#x5e6;&#x5e5; &#x5db;&#x5d9; &#x5d7;&#x5dd;.&#x200e;"/>
+            <StringItem index="9" value=" &#x3044;&#x308d;&#x306f;&#x306b;&#x307b;&#x3078;&#x3068; &#x3061;&#x308a;&#x306c;&#x308b;&#x3092; &#x308f;&#x304b;&#x3088;&#x305f;&#x308c;&#x305d; &#x3064;&#x306d;&#x306a;&#x3089;&#x3080; &#x3046;&#x3090;&#x306e;&#x304a;&#x304f;&#x3084;&#x307e; &#x3051;&#x3075;&#x3053;&#x3048;&#x3066; &#x3042;&#x3055;&#x304d;&#x3086;&#x3081;&#x307f;&#x3057; &#x3091;&#x3072;&#x3082;&#x305b;&#x3059;&#x3093;"/>
+            <StringItem index="10" value=" "/>
+          </StringArray>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="comboBoxSampleTextsItemStateChanged"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel1">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="com/jpexs/decompiler/flash/gui/locales/MainFrame.properties" key="font.name" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="labelFontName">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="-"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>
