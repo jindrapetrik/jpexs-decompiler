@@ -2238,6 +2238,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (tagObj instanceof TextTag) {
                 TextTag textTag = (TextTag) tagObj;
                 parametersPanel.setVisible(true);
+                previewSplitPane.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewSplitPane.getWidth() / 2));
                 showDetailWithPreview(CARDTEXTPANEL);
                 textValue.setContentType("text/swf_text");
                 textValue.setText(textTag.getFormattedText(textTag.getSwf().tags));
@@ -2640,6 +2641,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         parametersPanel.setVisible(true);
+        previewSplitPane.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewSplitPane.getWidth() / 2));
         fontPanel.showFontTag(ft);
         showDetailWithPreview(CARDFONTPANEL);
     }
