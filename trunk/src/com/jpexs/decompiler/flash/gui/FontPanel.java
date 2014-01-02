@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import java.awt.Font;
-import java.awt.Panel;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.ComboBoxModel;
