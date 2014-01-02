@@ -341,11 +341,9 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
 
 	@Override
 	public void deinstall(JEditorPane editorPane) {
-		List<SyntaxComponent> l = editorComponents.get(editorPane);
-		for (SyntaxComponent c : editorComponents.get(editorPane)) {
+		for (SyntaxComponent c : editorComponents.remove(editorPane)) {
 			c.deinstall(editorPane);
 		}
-		editorComponents.clear();
 		editorPane.getInputMap().clear();
 		editorPane.getActionMap().clear();
 	}
