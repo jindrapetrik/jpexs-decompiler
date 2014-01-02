@@ -639,7 +639,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         previewSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
-                if (splitsInited) {
+                if (splitsInited && previewSplitPane.getRightComponent().isVisible()) {
                     Configuration.guiPreviewSplitPaneDividerLocation.set((int) pce.getNewValue());
                 }
             }
