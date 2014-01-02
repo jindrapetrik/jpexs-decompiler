@@ -84,6 +84,8 @@ public class AdvancedSettingsDialog extends AppDialog {
         btnReset = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/jpexs/decompiler/flash/gui/locales/AdvancedSettingsDialog"); // NOI18N
+        setTitle(bundle.getString("advancedSettings.dialog.title")); // NOI18N
         setModal(true);
         setPreferredSize(new java.awt.Dimension(600, 400));
 

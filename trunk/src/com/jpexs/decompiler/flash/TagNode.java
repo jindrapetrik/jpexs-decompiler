@@ -287,7 +287,7 @@ public class TagNode implements TreeNode {
         return new ArrayList<>();
     }
 
-    public static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, ExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
+    private static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, ExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
         File dir = new File(outdir);
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
