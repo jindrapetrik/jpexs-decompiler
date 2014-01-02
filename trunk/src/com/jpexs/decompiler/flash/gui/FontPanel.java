@@ -505,6 +505,19 @@ public class FontPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void fontAddCharsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontAddCharsButtonActionPerformed
+        String newchars = fontAddCharactersField.getText();
+        if (mainPanel.oldTag instanceof FontTag) {
+            Set<Integer> selChars = new TreeSet<>();
+            for (int c = 0; c < newchars.length(); c++) {
+                selChars.add(newchars.codePointAt(c));
+            }
+            fontAddChars((FontTag) mainPanel.oldTag, selChars, fontSelection.getSelectedItem().toString());
+            fontAddCharactersField.setText("");
+            mainPanel.reload(true);
+        }
+    }//GEN-LAST:event_fontAddCharsButtonActionPerformed
+
+    private void fontEmbedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontEmbedButtonActionPerformed
         if (mainPanel.oldTag instanceof FontTag) {
             FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ((FontTag) mainPanel.oldTag).getFontStyle());
             if (fed.display()) {
@@ -517,19 +530,6 @@ public class FontPanel extends javax.swing.JPanel {
                     mainPanel.reload(true);
                 }
             }
-        }
-    }//GEN-LAST:event_fontAddCharsButtonActionPerformed
-
-    private void fontEmbedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontEmbedButtonActionPerformed
-        String newchars = fontAddCharactersField.getText();
-        if (mainPanel.oldTag instanceof FontTag) {
-            Set<Integer> selChars = new TreeSet<>();
-            for (int c = 0; c < newchars.length(); c++) {
-                selChars.add(newchars.codePointAt(c));
-            }
-            fontAddChars((FontTag) mainPanel.oldTag, selChars, fontSelection.getSelectedItem().toString());
-            fontAddCharactersField.setText("");
-            mainPanel.reload(true);
         }
     }//GEN-LAST:event_fontEmbedButtonActionPerformed
 
