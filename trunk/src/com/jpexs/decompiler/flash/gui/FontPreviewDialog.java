@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.Font;
 
 /**
@@ -38,6 +39,7 @@ public class FontPreviewDialog extends AppDialog {
         labelSample48.setFont(font.deriveFont(Font.PLAIN, 48));
         labelSample60.setFont(font.deriveFont(Font.PLAIN, 60));
         labelSample72.setFont(font.deriveFont(Font.PLAIN, 72));
+        comboBoxSampleTexts.setSelectedIndex(Configuration.fontPreviewSampleText.get(0));
         setText((String) comboBoxSampleTexts.getSelectedItem());
         labelFontName.setText(font.getFontName());
     }
@@ -224,6 +226,7 @@ public class FontPreviewDialog extends AppDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void comboBoxSampleTextsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBoxSampleTextsItemStateChanged
+        Configuration.fontPreviewSampleText.set(comboBoxSampleTexts.getSelectedIndex());
         setText((String) comboBoxSampleTexts.getSelectedItem());
     }//GEN-LAST:event_comboBoxSampleTextsItemStateChanged
 

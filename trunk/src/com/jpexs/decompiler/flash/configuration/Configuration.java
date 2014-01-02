@@ -184,6 +184,7 @@ public class Configuration {
     public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
     @ConfigurationDefaultInt(1024 * 100/*100KB*/)
     public static final ConfigurationItem<Integer> syntaxHighlightLimit = null;
+    public static final ConfigurationItem<Integer> fontPreviewSampleText = null;
     
     private enum OSId {
 
