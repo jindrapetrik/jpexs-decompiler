@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 359
-  Top = 168
+  Left = 300
+  Top = 617
   Width = 1381
   Height = 811
   Caption = 'FFDec Flash Player'

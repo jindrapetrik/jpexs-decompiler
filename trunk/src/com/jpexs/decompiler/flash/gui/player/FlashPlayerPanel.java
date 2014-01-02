@@ -268,22 +268,24 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         this.frameRate = frameRate;
         if (!executed) {
             execute();
+            /*
+            //How about commenting this out? Will it work? Let's try...
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }*/
         }
         if (bgColor != null) {
             setBackground(bgColor);
         }
+        resize();
         if (pipe != null) {
             IntByReference ibr = new IntByReference();
             Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PLAY}, 1, ibr, null);
             Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) flash.getBytes().length}, 1, ibr, null);
             Kernel32.INSTANCE.WriteFile(pipe, flash.getBytes(), flash.getBytes().length, ibr, null);
-        }
-        resize();
+        }        
         stopped = false;
         specialPlaying = false;
         specialPosition = 0;

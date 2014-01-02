@@ -74,10 +74,13 @@ end;
 procedure TPipeThread.displaySWF();
 begin
   windows.SetParent(frmMain.Handle,target);
-  flaPreview.Stop;
-  flaPreview.Movie := '';
-  flaPreview.Free;
-  flaPreview := nil;
+  if Assigned(flaPreview) then
+  begin
+      flaPreview.Stop;
+      flaPreview.Movie := '';
+      flaPreview.Free;
+      flaPreview := nil;
+  end;
   flaPreview := TMySWF.Create(frmMain);
   flaPreview.Left:=0;
   flaPreview.Top:=0;
@@ -86,7 +89,7 @@ begin
   frmMain.Caption:='set movie:'+flashFile;
   flaPreview.Parent := frmMain;
   flaPreview.Movie:=flashFile;
-
+  flaPreview.SetFocus;
 end;
 
 procedure TPipeThread.setBGColor();
