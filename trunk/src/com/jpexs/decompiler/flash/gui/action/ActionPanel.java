@@ -277,7 +277,31 @@ public class ActionPanel extends JPanel implements ActionListener {
         return false;
     }
 
-    public void setText(HilightedText text) {
+    private void setDecompiledText(final String text) {
+        View.execInEventDispatch(new Runnable() {
+
+            @Override
+            public void run() {
+                ignoreCarret = true;
+                decompiledEditor.setText(text, "text/actionscript");
+                ignoreCarret = false;
+            }
+        });
+    }
+    
+    private void setEditorText(final String text, final String contentType) {
+        View.execInEventDispatch(new Runnable() {
+
+            @Override
+            public void run() {
+                ignoreCarret = true;
+                editor.setText(text, contentType);
+                ignoreCarret = false;
+            }
+        });
+    }
+    
+    private void setText(HilightedText text, String contentType) {
         int pos = editor.getCaretPosition();
         Highlighting lastH = null;
         for (Highlighting h : disassembledHilights) {
@@ -287,22 +311,17 @@ public class ActionPanel extends JPanel implements ActionListener {
             lastH = h;
         }
         String offset = lastH == null ? "0" : lastH.getPropertyString("offset");
-        editor.setText("; " + AppStrings.translate("work.gettinghilights") + "...");
+        // getting hilights is fast now
+        // setEditorText("; " + AppStrings.translate("work.gettinghilights") + "...", "text/flasm");
         disassembledHilights = text.instructionHilights;
         String stripped = text.text;
-        /*if(stripped.length()>30000){
-         editor.setContentType("text/plain");
-         }else{
-         editor.setContentType("text/flasm");
-         }*/
-        editor.setText(stripped);
+        setEditorText(stripped, contentType);
         Highlighting h = Highlighting.search(disassembledHilights, "offset", offset);
         if (h != null) {
             if (h.startPos <= editor.getText().length()) {
                 editor.setCaretPosition(h.startPos);
             }
         }
-
     }
 
     private HilightedText getHilightedText(ExportMode exportMode) {
@@ -321,26 +340,24 @@ public class ActionPanel extends JPanel implements ActionListener {
     
     public void setHex(ExportMode exportMode) {
         if (exportMode != ExportMode.HEX) {
-            editor.setContentType("text/flasm");
             if (exportMode == ExportMode.PCODE) {
                 if (srcNoHex == null) {
                     srcNoHex = getHilightedText(exportMode);
                 }
-                setText(srcNoHex);
+                setText(srcNoHex, "text/flasm");
             } else {
                 if (srcWithHex == null) {
                     srcWithHex = getHilightedText(exportMode);
                 }
-                setText(srcWithHex);
+                setText(srcWithHex, "text/flasm");
             }
         } else {
-            editor.setContentType("text/plain");
             if (srcHexOnly == null) {
                 HilightedTextWriter writer = new HilightedTextWriter(true);
                 Helper.byteArrayToHexWithHeader(writer, src.getActionBytes());
                 srcHexOnly = new HilightedText(writer);
             }
-            setText(srcHexOnly);
+            setText(srcHexOnly, "text/plain");
         }
     }
 
@@ -358,7 +375,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 if (((newpercent > percent) || (!this.phase.equals(phase))) && newpercent <= 100) {
                     percent = newpercent;
                     this.phase = phase;
-                    editor.setText("; " + AppStrings.translate("work.disassembling") + " - " + phase + " " + percent + "%...");
+                    setEditorText("; " + AppStrings.translate("work.disassembling") + " - " + phase + " " + percent + "%...", "text/flasm");
                 }
             }
         };
@@ -377,9 +394,9 @@ public class ActionPanel extends JPanel implements ActionListener {
 
             @Override
             protected Void doInBackground() throws Exception {
-                editor.setText("; " + AppStrings.translate("work.disassembling") + "...");
+                setEditorText("; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
                 if (Configuration.decompile.get()) {
-                    decompiledEditor.setText("//" + AppStrings.translate("work.waitingfordissasembly") + "...");
+                    setDecompiledText("//" + AppStrings.translate("work.waitingfordissasembly") + "...");
                 }
                 DisassemblyListener listener = getDisassemblyListener();
                 asm.addDisassemblyListener(listener);
@@ -391,7 +408,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 srcHexOnly = null;
                 setHex(getExportMode());
                 if (Configuration.decompile.get()) {
-                    decompiledEditor.setText("//" + AppStrings.translate("work.decompiling") + "...");
+                    setDecompiledText("//" + AppStrings.translate("work.decompiling") + "...");
                     if (!useCache) {
                         uncache(asm);
                     }
@@ -400,7 +417,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                     decompiledHilights = sc.hilights;
                     lastDecompiled = sc.text;
                     lastASM = asm;
-                    decompiledEditor.setText(lastDecompiled);
+                    setDecompiledText(lastDecompiled);
                 }
                 setEditMode(false);
                 setDecompiledEditMode(false);
@@ -419,9 +436,9 @@ public class ActionPanel extends JPanel implements ActionListener {
                         try {
                             get();
                         } catch (CancellationException ex) {
-                            editor.setText("; " + AppStrings.translate("work.canceled"));
+                            setEditorText("; " + AppStrings.translate("work.canceled"), "text/flasm");
                         } catch (Exception ex) {
-                            decompiledEditor.setText("//Decompilation error: " + ex);
+                            setDecompiledText("//Decompilation error: " + ex);
                         }
                     }
                 });
@@ -580,9 +597,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 Configuration.guiActionSplitPaneDividerLocation.set((int) pce.getNewValue());
             }
         });
-        editor.setContentType("text/flasm");
         editor.setFont(new Font("Monospaced", Font.PLAIN, editor.getFont().getSize()));
-        decompiledEditor.setContentType("text/actionscript");
         decompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, decompiledEditor.getFont().getSize()));
 
         //tagTree.addTreeSelectionListener(this);
@@ -660,11 +675,9 @@ public class ActionPanel extends JPanel implements ActionListener {
 
         if (val) {
             if (rawEdit) {
-                editor.setContentType("text/plain");
-                setText(srcHexOnly);
+                setText(srcHexOnly, "text/plain");
             } else {
-                editor.setContentType("text/flasm");
-                setText(srcNoHex);
+                setText(srcNoHex, "text/flasm");
             }
             editor.setEditable(true);
             saveButton.setVisible(true);
@@ -695,7 +708,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         int prefLines = lastASM.getPrefixLineCount();
         if (val) {
             String newText = lastASM.removePrefixAndSuffix(lastDecompiled);
-            decompiledEditor.setText(newText);
+            setDecompiledText(newText);
             if (lastLine > -1) {
                 if (lastLine - prefLines >= 0) {
                     decompiledEditor.gotoLine(lastLine - prefLines + 1);
@@ -710,7 +723,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             decLabel.setIcon(View.getIcon("editing16"));
         } else {
             String newText = lastDecompiled;
-            decompiledEditor.setText(newText);
+            setDecompiledText(newText);
             if (lastLine > -1) {
                 decompiledEditor.gotoLine(lastLine + prefLines + 1);
             }

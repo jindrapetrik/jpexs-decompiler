@@ -63,6 +63,12 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane {
     }
 
     @Override
+    public void setText(String t, String contentType) {
+        lastLine = -1;
+        super.setText(t, contentType);
+    }
+
+    @Override
     public void paint(Graphics g) {
         g.setColor(Color.white);
         g.fillRect(0, 0, getWidth(), getHeight());

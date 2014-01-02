@@ -182,6 +182,8 @@ public class Configuration {
     public static final ConfigurationItem<Integer> guiSplitPane2DividerLocation = null;
     @ConfigurationDefaultInt(3)
     public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
+    @ConfigurationDefaultInt(1024 * 100/*100KB*/)
+    public static final ConfigurationItem<Integer> syntaxHighlightLimit = null;
     
     private enum OSId {
 

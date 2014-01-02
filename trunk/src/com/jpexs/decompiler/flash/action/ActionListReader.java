@@ -193,7 +193,7 @@ public class ActionListReader {
                 actions = deobfuscateActionList(listeners, containerSWFOffset, actions, version, ip, path);
                 updateActionLengths(actions, version);
                 removeZeroJumps(actions, version);
-            } catch (TranslateException ex) {
+            } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
                 // keep orignal (not deobfuscated) actions
                 Logger.getLogger(ActionListReader.class.getName()).log(Level.SEVERE, null, ex);
             }

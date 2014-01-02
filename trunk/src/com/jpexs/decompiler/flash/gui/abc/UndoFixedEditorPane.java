@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import javax.swing.JEditorPane;
 import javax.swing.text.Document;
 import jsyntaxpane.SyntaxDocument;
@@ -28,8 +29,26 @@ public class UndoFixedEditorPane extends JEditorPane {
 
     @Override
     public void setText(String t) {
-        super.setText(t);
-        clearUndos();
+        if (getText() != t) {
+            super.setText(t);
+            clearUndos();
+        }
+    }
+
+    public void setText(String t, String contentType) {
+        if (getText() != t) {
+            // OK to check reference equals, because the string object should be the same
+            super.setText(null);
+            if(t.length() > Configuration.syntaxHighlightLimit.get()){
+                setContentType("text/plain");
+            } else {
+                if (!getContentType().equals(contentType)) {
+                    setContentType(contentType);
+                }
+            }
+            super.setText(t);
+            clearUndos();
+        }
     }
 
     public void clearUndos() {
