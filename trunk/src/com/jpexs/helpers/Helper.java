@@ -17,6 +17,7 @@
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
@@ -561,20 +562,28 @@ public class Helper {
         timeM %= 60;
 
         String timeStr = "";
+        String strAnd = AppStrings.translate("timeFormat.and");
+        String strHour = AppStrings.translate("timeFormat.hour");
+        String strHours = AppStrings.translate("timeFormat.hours");
+        String strMinute = AppStrings.translate("timeFormat.minute");
+        String strMinutes = AppStrings.translate("timeFormat.minutes");
+        String strSecond = AppStrings.translate("timeFormat.second");
+        String strSeconds = AppStrings.translate("timeFormat.seconds");
+        
         if (timeH > 0) {
-            timeStr += timeH + (timeH > 1 ? " hours" : " hour");
+            timeStr += timeH + " " + (timeH > 1 ? strHours : strHour);
         }
         if (timeM > 0) {
             if (timeStr.length() > 0) {
-                timeStr += " and ";
+                timeStr += " " + strAnd + " ";
             }
-            timeStr += timeM + (timeM > 1 ? " minutes" : " minute");
+            timeStr += timeM + " " + (timeM > 1 ? strMinutes : strMinute);
         }
         if (timeS > 0) {
             if (timeStr.length() > 0) {
-                timeStr += " and ";
+                timeStr += " " + strAnd + " ";
             }
-            timeStr += timeS + (timeS > 1 ? " seconds" : " second");
+            timeStr += timeS + " " + (timeS > 1 ? strSeconds : strSecond);
         }
 
         // (currently) used only in log, so no localization is required

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -156,20 +157,25 @@ public class ScriptPack implements TreeElementItem {
             writer.continueMeasure();
             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
             writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * Decompilation error").newLine();
-            writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(Configuration.decompilationTimeoutFile.get()) + ") was reached").newLine();
+            writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
+            writer.appendNoHilight(" * ").appendNoHilight(String.format(AppStrings.translate("decompilationError.timeout"), Helper.formatTimeToText(Configuration.decompilationTimeoutFile.get()))).newLine();
             writer.appendNoHilight(" */").newLine();
-            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
+            writer.appendNoHilight("throw new IllegalOperationError(\"").
+                    appendNoHilight(AppStrings.translate("decompilationError.timeout.description")).
+                    appendNoHilight("\");").newLine();
             return;
         } catch (ExecutionException ex) {
             writer.continueMeasure();
             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
             writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * Decompilation error").newLine();
-            writer.appendNoHilight(" * Code may be obfuscated").newLine();
-            writer.appendNoHilight(" * Error type: " + ex.getClass().getSimpleName()).newLine();
+            writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
+            writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.obfuscated")).newLine();
+            writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.errorType")).
+                    appendNoHilight(": " + ex.getClass().getSimpleName()).newLine();
             writer.appendNoHilight(" */").newLine();
-            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
+            writer.appendNoHilight("throw new IllegalOperationError(\"").
+                    appendNoHilight(AppStrings.translate("decompilationError.error.description")).
+                    appendNoHilight("\");").newLine();
             return;
         }
         writer.continueMeasure();
