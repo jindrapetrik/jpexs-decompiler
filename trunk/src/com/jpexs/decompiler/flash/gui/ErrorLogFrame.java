@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -112,9 +113,13 @@ public class ErrorLogFrame extends AppFrame {
 
         cnt.add(new JScrollPane(logView), BorderLayout.CENTER);
         handler = new Handler() {
+            SimpleFormatter formatter = new SimpleFormatter();
+            
             @Override
             public void publish(LogRecord record) {
-                log(record.getLevel(), record.getMessage(), record.getThrown());
+                if (getLevel().intValue() <= record.getLevel().intValue()) {
+                    log(record.getLevel(), formatter.formatMessage(record), record.getThrown());
+                }
             }
 
             @Override
@@ -125,6 +130,7 @@ public class ErrorLogFrame extends AppFrame {
             public void close() throws SecurityException {
             }
         };
+        handler.setLevel(Level.WARNING);
     }
 
     public void clearErrorState() {
@@ -180,7 +186,6 @@ public class ErrorLogFrame extends AppFrame {
                     detailTextArea.setOpaque(false);
                     detailTextArea.setFont(new JLabel().getFont());
                     detailTextArea.setBackground(Color.white);
-                    //detailTextAre
                     detailComponent = detailTextArea;
                 }
                 JPanel header = new JPanel();
@@ -238,7 +243,6 @@ public class ErrorLogFrame extends AppFrame {
                 }
 
 
-
                 if (detailComponent != null) {
                     header.add(expandButton);
                 }
@@ -246,7 +250,6 @@ public class ErrorLogFrame extends AppFrame {
                 dateLabel.setPreferredSize(new Dimension(200, (int) dateLabel.getPreferredSize().getHeight()));
                 dateLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 header.add(dateLabel);
-
 
 
                 JLabel levelLabel = new JLabel(level.getName());

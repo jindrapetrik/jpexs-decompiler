@@ -671,6 +671,8 @@ public class Main {
 
     public static void initLang() {
         Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
+        AppStrings.updateLanguage();
+                
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
         UIManager.put("OptionPane.noButtonText", AppStrings.translate("button.no"));
@@ -1036,7 +1038,7 @@ public class Main {
         
         try {
             fileName = Configuration.getFFDecHome() + File.separator + "logs" + File.separator;
-            if (Configuration.logLevel.intValue() < Level.WARNING.intValue()) {
+            if (Configuration.useDetailedLogging.get()) {
                 fileName += "log-" + sdf.format(new Date()) + ".txt";
             } else {
                 fileName += "log.txt";
@@ -1070,12 +1072,16 @@ public class Main {
         try {
             Logger logger = Logger.getLogger("");
             logger.setLevel(Configuration.logLevel);
-            if (debug) {
-                ConsoleHandler conHan = new ConsoleHandler();
-                SimpleFormatter formatterTxt = new SimpleFormatter();
-                conHan.setFormatter(formatterTxt);
-                logger.addHandler(conHan);
+
+            int handlerCount = logger.getHandlers().length;
+            for (int i = handlerCount - 1; i >= 0; i--) {
+                logger.removeHandler(logger.getHandlers()[i]);
             }
+            ConsoleHandler conHan = new ConsoleHandler();
+            conHan.setLevel(debug ? Level.CONFIG : Level.WARNING);
+            SimpleFormatter formatterTxt = new SimpleFormatter();
+            conHan.setFormatter(formatterTxt);
+            logger.addHandler(conHan);
             clearLogFile();
 
         } catch (Exception ex) {

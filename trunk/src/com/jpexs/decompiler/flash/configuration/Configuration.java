@@ -85,6 +85,8 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> useRibbonInterface = null;
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> openFolderAfterFlaExport = null;
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> useDetailedLogging = null;
 
     /**
      * Debug mode = throwing an error when comparing original file and
@@ -446,7 +448,7 @@ public class Configuration {
 
     static {
         setConfigurationFields();
-        if (debugMode.get()) {
+        if (useDetailedLogging.get() || debugMode.get()) {
             logLevel = Level.CONFIG;
         } else {
             logLevel = Level.WARNING;
