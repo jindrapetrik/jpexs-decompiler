@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.PackageNode;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.TreeElementItem;
 import com.jpexs.decompiler.flash.TreeNode;
@@ -80,7 +81,7 @@ public class TreeElement implements TreeNode {
     TreeElement getBranch(String pathElement) {
         TreeElement branch = branches.get(pathElement);
         if (branch == null) {
-            branch = new TreeElement(swf, pathElement, path + "." + pathElement, null, this);
+            branch = new TreeElement(swf, pathElement, path + "." + pathElement, new PackageNode(pathElement), this);
             branches.put(pathElement, branch);
         }
         return branch;
@@ -159,19 +160,5 @@ public class TreeElement implements TreeNode {
             TreeElement leaf = iter.next();
             visitor.onLeaf(leaf);
         }
-    }
-
-    TreeElement getByPath(String fullPath) {
-        TreeElement te = this;
-        StringTokenizer st = new StringTokenizer(fullPath, ".");
-        while (st.hasMoreTokens()) {
-            String pathElement = st.nextToken();
-            TreeElement nte = te.branches.get(pathElement);
-            if (nte == null) {
-                nte = te.leafs.get(pathElement);
-            }
-            te = nte;
-        }
-        return te;
     }
 }

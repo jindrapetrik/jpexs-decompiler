@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.PackageNode;
 import com.jpexs.decompiler.flash.TagNode;
+import com.jpexs.decompiler.flash.TreeElementItem;
+import com.jpexs.decompiler.flash.TreeNode;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.abc.TreeElement;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -85,9 +87,12 @@ public class TagTree extends JTree {
                     tree, value, sel,
                     expanded, leaf, row,
                     hasFocus);
-            Object val = value;
-            if (val instanceof TagNode) {
-                val = ((TagNode) val).tag;
+            TreeNode treeNode = (TreeNode) value;
+            TreeElementItem val = null;
+            if (treeNode instanceof TagNode) {
+                val = ((TagNode) treeNode).tag;
+            } else if (treeNode instanceof TreeElement) {
+                val = ((TreeElement) treeNode).getItem();
             }
             TagType type = getTagType(val);
             if (val instanceof SWFRoot) {
@@ -130,7 +135,7 @@ public class TagTree extends JTree {
         });
     }
 
-    public static TagType getTagType(Object t) {
+    public static TagType getTagType(TreeElementItem t) {
         if ((t instanceof DefineFontTag)
                 || (t instanceof DefineFont2Tag)
                 || (t instanceof DefineFont3Tag)
@@ -172,13 +177,8 @@ public class TagTree extends JTree {
         if (t instanceof ASMSource) {
             return TagType.AS;
         }
-        if (t instanceof TreeElement) {
-            TreeElement te = (TreeElement) t;
-            if (te.getItem() instanceof ScriptPack) {
-                return TagType.AS;
-            } else {
-                return TagType.PACKAGE;
-            }
+        if (t instanceof ScriptPack) {
+            return TagType.AS;
         }
         if (t instanceof PackageNode) {
             return TagType.PACKAGE;
@@ -205,12 +205,12 @@ public class TagTree extends JTree {
         return TagType.FOLDER;
     }
 
-    public List<Object> getTagsWithType(List<Object> list, TagType type) {
-        List<Object> ret = new ArrayList<>();
-        for (Object o : list) {
-            TagType ttype = getTagType(o);
+    public List<TreeElementItem> getTagsWithType(List<TreeElementItem> list, TagType type) {
+        List<TreeElementItem> ret = new ArrayList<>();
+        for (TreeElementItem item : list) {
+            TagType ttype = getTagType(item);
             if (type == ttype) {
-                ret.add(o);
+                ret.add(item);
             }
         }
         return ret;

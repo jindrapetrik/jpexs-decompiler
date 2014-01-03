@@ -124,14 +124,6 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
         }
     }
 
-    public Object getItemByPath(String fullPath) {
-        TreeElement elem = classTree.get(fullPath);
-        if (elem == null) {
-            return -1;
-        }
-        return elem.getItem();
-    }
-
     public TreeElement getElementByClassIndex(int classIndex) {
         ClassIndexVisitor civ = new ClassIndexVisitor(classIndex);
         classTree.visit(civ);
@@ -139,7 +131,7 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
     }
 
     @Override
-    public Object getRoot() {
+    public TreeElement getRoot() {
         return classTree.getRoot();
     }
 

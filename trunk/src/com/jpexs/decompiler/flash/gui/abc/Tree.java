@@ -46,11 +46,4 @@ public class Tree {
         ROOT.visitLeafs(visitor);
         ROOT.visitBranches(visitor);
     }
-
-    public TreeElement get(String fullPath) {
-        if ("".equals(fullPath)) {
-            return ROOT;
-        }
-        return ROOT.getByPath(fullPath);
-    }
 }
