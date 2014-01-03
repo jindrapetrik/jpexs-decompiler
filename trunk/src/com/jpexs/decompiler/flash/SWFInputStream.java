@@ -85,7 +85,7 @@ public class SWFInputStream extends InputStream {
     private Stack<Integer> margedPos = new Stack<>();
     private long pos;
     private int version;
-    private static final Logger log = Logger.getLogger(SWFInputStream.class.getName());
+    private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
     private List<ProgressListener> listeners = new ArrayList<>();
     private long percentMax;
     private List<byte[]> buffered = new ArrayList<>();
@@ -1054,6 +1054,9 @@ public class SWFInputStream extends InputStream {
         if (tagID == 0) {
             return null;
         }
+
+        logger.log(Level.INFO, "Reading tag. ID={0}, position: {1}", new Object[]{tagID, pos});
+
         long tagLength = (tagIDTagLength & 0x003F);
         boolean readLong = false;
         if (tagLength == 0x3f) {
@@ -1093,7 +1096,7 @@ public class SWFInputStream extends InputStream {
                         e += (Long.toHexString(data[j] & 0xff) + " ");
                     }
                 }
-                log.fine(e);
+                logger.fine(e);
             }
         }
         if (resolve) {

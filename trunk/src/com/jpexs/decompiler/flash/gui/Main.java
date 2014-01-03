@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import static com.jpexs.decompiler.flash.ApplicationInfo.applicationVerName;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
@@ -32,6 +33,7 @@ import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.Stopwatch;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import com.sun.jna.Platform;
 import java.awt.*;
@@ -41,14 +43,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
-import java.util.logging.Handler;
+import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -82,7 +86,22 @@ public class Main {
     private static final int UPDATE_SYSTEM_MINOR = 0;
     public static LoadFromMemoryFrame loadFromMemoryFrame;
     public static LoadFromCacheFrame loadFromCacheFrame;
-    private static ErrorLogFrame errorLogFrame;
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
+
+    public static void ensureMainFrame() {
+        if (mainFrame == null) {
+            if (Configuration.useRibbonInterface.get()) {
+                mainFrame = new MainFrameRibbon();
+            } else {
+                mainFrame = new MainFrameClassic();
+            }
+            mainFrame.getPanel().setErrorState(ErrorLogFrame.getInstance().getErrorState());
+        }
+    }
+
+    public static MainFrame getMainFrame() {
+        return mainFrame;
+    }
 
     public static void loadFromCache() {
         if (loadFromCacheFrame == null) {
@@ -189,7 +208,7 @@ public class Main {
     }
 
     public static SWF parseSWF(String file) throws Exception {
-        SWFSourceInfo sourceInfo = new SWFSourceInfo(new FileInputStream(file), file, null);
+        SWFSourceInfo sourceInfo = new SWFSourceInfo(null, file, null);
         return parseSWF(sourceInfo);
     }
 
@@ -199,20 +218,24 @@ public class Main {
         InputStream inputStream = sourceInfo.getInputStream();
         if (inputStream == null) {
             inputStream = new FileInputStream(sourceInfo.getFile());
+            logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
         } else if (inputStream instanceof SeekableInputStream) {
             try {
                 ((SeekableInputStream) inputStream).seek(0);
             } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
+            logger.log(Level.INFO, "Load stream: {0}", sourceInfo.getFileTitle());
         } else if (inputStream instanceof BufferedInputStream) {
             try {
                 ((BufferedInputStream) inputStream).reset();
             } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
+            logger.log(Level.INFO, "Load stream: {0}", sourceInfo.getFileTitle());
         }
         
+        Stopwatch sw = Stopwatch.startNew();
         locswf = new SWF(inputStream, new ProgressListener() {
             @Override
             public void progress(int p) {
@@ -221,8 +244,20 @@ public class Main {
         }, Configuration.parallelSpeedUp.get());
         
         if (inputStream instanceof FileInputStream) {
+            logger.log(Level.INFO, "File loaded in {0} seconds.", (sw.getElapsedMilliseconds() / 1000));
             inputStream.close();
+        } else {
+            logger.log(Level.INFO, "Stream loaded in {0} seconds.", (sw.getElapsedMilliseconds() / 1000));
         }
+
+        logger.log(Level.INFO, "");
+        logger.log(Level.INFO, "== File information ==");
+        logger.log(Level.INFO, "Size: {0}", Helper.formatFileSize(locswf.fileSize));
+        logger.log(Level.INFO, "Flash version: {0}", locswf.version);
+        int width = (locswf.displayRect.Xmax - locswf.displayRect.Xmin) / 20;
+        int height = (locswf.displayRect.Ymax - locswf.displayRect.Ymin) / 20;
+        logger.log(Level.INFO, "Width: {0}", width);
+        logger.log(Level.INFO, "Height: {0}", height);
         
         locswf.sourceInfo = sourceInfo;
         locswf.file = sourceInfo.getFile();
@@ -313,10 +348,10 @@ public class Main {
                     Main.startWork(AppStrings.translate("work.reading.swf") + "...");
                     swf = parseSWF(sourceInfo);
                 } catch (OutOfMemoryError ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     View.showMessageDialog(null, "Cannot load SWF file. Out of memory.");
                 } catch (Exception ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     View.showMessageDialog(null, "Cannot load SWF file.");
                 }
 
@@ -328,22 +363,13 @@ public class Main {
                     View.execInEventDispatch(new Runnable() {
                         @Override
                         public void run() {
-                            if (mainFrame == null) {
-                                if (Configuration.useRibbonInterface.get()) {
-                                    mainFrame = new MainFrameRibbon();
-                                } else {
-                                    mainFrame = new MainFrameClassic();
-                                }
-                            }
+                            ensureMainFrame();
                             mainFrame.getPanel().load(swf1, first1);
-                            if (errorState) {
-                                mainFrame.getPanel().setErrorState();
-                            }
                         }
                     });
 
                 } catch (Exception ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -596,11 +622,8 @@ public class Main {
     }
 
     public static void displayErrorFrame() {
-        if (errorLogFrame != null) {
-            errorLogFrame.setVisible(true);
-        }
+        ErrorLogFrame.getInstance().setVisible(true);
     }
-    private static boolean errorState = false;
 
     private static void initGui() {
         if (Configuration.useRibbonInterface.get()) {
@@ -609,42 +632,14 @@ public class Main {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
-                if (errorLogFrame == null) {
-                    errorLogFrame = new ErrorLogFrame();
-                }
                 Logger logger = Logger.getLogger("");
-                logger.addHandler(errorLogFrame.getHandler());
-                logger.addHandler(new Handler() {
-                    @Override
-                    public void publish(final LogRecord record) {
-                        View.execInEventDispatch(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (record.getLevel() == Level.SEVERE) {
-                                    errorState = true;
-                                    if (mainFrame != null) {
-                                        mainFrame.getPanel().setErrorState();
-                                    }
-                                }
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void flush() {
-                    }
-
-                    @Override
-                    public void close() throws SecurityException {
-                    }
-                });
+                logger.addHandler(ErrorLogFrame.getInstance().getHandler());
             }
         });
         autoCheckForUpdates();
@@ -655,16 +650,7 @@ public class Main {
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
-                if (mainFrame == null) {
-                    if (Configuration.useRibbonInterface.get()) {
-                        mainFrame = new MainFrameRibbon();
-                    } else {
-                        mainFrame = new MainFrameClassic();
-                    }
-                    if (errorState) {
-                        mainFrame.getPanel().setErrorState();
-                    }
-                }
+                ensureMainFrame();
                 mainFrame.setVisible(true);
             }
         });
@@ -790,7 +776,7 @@ public class Main {
                         System.gc();
                     }
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }.start();
@@ -1044,32 +1030,46 @@ public class Main {
             fileTxt.close();
             logger.removeHandler(fileTxt);
         }
+        
+        String fileName;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
+        
         try {
-            File f = new File(Configuration.getFFDecHome() + File.separator + "log.txt");
-            FileOutputStream fos = new FileOutputStream(f);
-            fos.close();
-        } catch (IOException ex) {
-        }
-        try {
-            fileTxt = new FileHandler(Configuration.getFFDecHome() + File.separator + "log.txt");
+            fileName = Configuration.getFFDecHome() + File.separator + "logs" + File.separator;
+            if (Configuration.logLevel.intValue() < Level.WARNING.intValue()) {
+                fileName += "log-" + sdf.format(new Date()) + ".txt";
+            } else {
+                fileName += "log.txt";
+            }
+            File f = new File(fileName).getParentFile();
+            if (!f.exists()) {
+                f.mkdir();
+            }
+            fileTxt = new FileHandler(fileName);
         } catch (IOException | SecurityException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
-        SimpleFormatter formatterTxt = new SimpleFormatter();
+                
+        Formatter formatterTxt = new LogFormatter();
         fileTxt.setFormatter(formatterTxt);
         logger.addHandler(fileTxt);
 
-        errorState = false;
-        if (mainFrame != null) {
-            mainFrame.getPanel().clearErrorState();
-        }
+        ErrorLogFrame.getInstance().clearErrorState();
+        
+        sdf = new SimpleDateFormat("yyyy-MM-dd");
+        logger.log(Level.INFO, "Date: {0}", sdf.format(new Date()));
+        logger.log(Level.INFO, ApplicationInfo.applicationVerName);
+        logger.log(Level.INFO, "{0} {1} {2}", new Object[]{
+            System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch")});
+        logger.log(Level.INFO, "{0} {1} {2}", new Object[]{
+            System.getProperty("java.version"), System.getProperty("java.vendor"), System.getProperty("os.arch")});
     }
 
     public static void initLogging(boolean debug) {
         try {
             Logger logger = Logger.getLogger("");
-            logger.setLevel(debug ? Level.CONFIG : Level.WARNING);
+            logger.setLevel(Configuration.logLevel);
             if (debug) {
                 ConsoleHandler conHan = new ConsoleHandler();
                 SimpleFormatter formatterTxt = new SimpleFormatter();

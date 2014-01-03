@@ -536,6 +536,19 @@ public class Helper {
         return timeStr;
     }
 
+    public static String formatFileSize(long fileSizeLong) {
+        double fileSize = fileSizeLong;
+        if (fileSize < 1024) {
+            return String.format("%d bytes", fileSizeLong) ;
+        }
+        fileSize /= 1024;
+        if (fileSize < 1024) {
+            return String.format("%.2f KB", fileSize) ;
+        }
+        fileSize /= 1024;
+        return String.format("%.2f MB", fileSize) ;
+    }
+    
     public static void freeMem() {
         Cache.clearAll();
         System.gc();

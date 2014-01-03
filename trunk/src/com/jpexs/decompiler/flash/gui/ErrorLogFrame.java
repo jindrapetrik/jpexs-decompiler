@@ -54,14 +54,28 @@ import javax.swing.SwingUtilities;
  */
 public class ErrorLogFrame extends AppFrame {
 
+    private static ErrorLogFrame instance;
+
     private JPanel logView = new JPanel();
     private JPanel logViewInner = new JPanel();
     private Handler handler;
     private ImageIcon expandIcon;
     private ImageIcon collapseIcon;
+    private ErrorState errorState;
 
     public Handler getHandler() {
         return handler;
+    }
+
+    public static ErrorLogFrame getInstance() {
+        if (instance == null) {
+            instance = new ErrorLogFrame();
+        }
+        return instance;
+    }
+
+    public ErrorState getErrorState() {
+        return errorState;
     }
 
     public ErrorLogFrame() {
@@ -113,10 +127,46 @@ public class ErrorLogFrame extends AppFrame {
         };
     }
 
+    public void clearErrorState() {
+        errorState = ErrorState.NO_ERROR;
+        MainFrame mainFrame = Main.getMainFrame();
+        if (mainFrame != null) {
+            mainFrame.getPanel().setErrorState(errorState);
+        }
+    }
+    
+    private void notifyMainFrame(Level level) {
+        boolean stateChanged = false;
+        if (level.intValue() >= Level.SEVERE.intValue()) {
+            if (errorState != ErrorState.ERROR) {
+                errorState = ErrorState.ERROR;
+                stateChanged = true;
+            }
+        } else if (level.intValue() >= Level.WARNING.intValue()) {
+            if (errorState != ErrorState.ERROR && errorState != ErrorState.WARNING) {
+                errorState = ErrorState.WARNING;
+                stateChanged = true;
+            }
+        } else if (level.intValue() >= Level.INFO.intValue()) {
+            if (errorState == ErrorState.NO_ERROR) {
+                errorState = ErrorState.INFO;
+                stateChanged = true;
+            }
+        }
+        if (stateChanged) {
+            MainFrame mainFrame = Main.getMainFrame();
+            if (mainFrame != null) {
+                mainFrame.getPanel().setErrorState(errorState);
+            }
+        }
+    }
+    
     private void log(final Level level, final String msg, final String detail) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                notifyMainFrame(level);
+                
                 JPanel pan = new JPanel();
                 pan.setBackground(Color.white);
                 pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));

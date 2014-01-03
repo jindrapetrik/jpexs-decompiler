@@ -255,6 +255,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String ACTION_SAVE_TEXT = "SAVETEXT";
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
     
+    private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
+
     public void setPercent(int percent) {
         progressBar.setValue(percent);
         progressBar.setVisible(true);
@@ -270,7 +272,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         try {
             File.createTempFile("temp", ".swf").delete(); //First call to this is slow, so make it first
         } catch (IOException ex) {
-            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -2747,10 +2749,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         Helper.emptyObject(this);
     }
 
-    public void clearErrorState() {
-        statusPanel.clearErrorState();
-    }
-    public void setErrorState() {
-        statusPanel.setErrorState();
+    public void setErrorState(ErrorState errorState) {
+        statusPanel.setErrorState(errorState);
     }
 }

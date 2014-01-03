@@ -49,6 +49,8 @@ public class Configuration {
      */
     private static List<Replacement> replacements = new ArrayList<>();
 
+    public static final Level logLevel;
+
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> openMultipleFiles = null;
     @ConfigurationDefaultBoolean(true)
@@ -444,6 +446,11 @@ public class Configuration {
 
     static {
         setConfigurationFields();
+        if (debugMode.get()) {
+            logLevel = Level.CONFIG;
+        } else {
+            logLevel = Level.WARNING;
+        }
     }
     
     @SuppressWarnings("unchecked")

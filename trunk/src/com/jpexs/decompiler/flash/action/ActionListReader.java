@@ -69,7 +69,7 @@ import java.util.logging.Logger;
  */
 public class ActionListReader {
 
-    private static final Logger log = Logger.getLogger(SWFInputStream.class.getName());
+    private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
 
     
     /**
@@ -838,7 +838,7 @@ public class ActionListReader {
                         a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
                     }
                 } catch (RuntimeException ex) {
-                    log.log(Level.SEVERE, "Disassembly exception", ex);
+                    logger.log(Level.SEVERE, "Disassembly exception", ex);
                     break;
                 }
 
