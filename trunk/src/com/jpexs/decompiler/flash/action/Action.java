@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -729,19 +730,10 @@ public class Action implements GraphSourceItem {
             Graph.graphToString(tree, writer, new LocalData());
         } else if (convertException instanceof TimeoutException) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
-            writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * Decompilation error").newLine();
-            writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached").newLine();
-            writer.appendNoHilight(" */").newLine();
-            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
+            Helper.appendTimeoutComment(writer, Configuration.decompilationTimeoutFile.get());
         } else {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
-            writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * Decompilation error").newLine();
-            writer.appendNoHilight(" * Code may be obfuscated").newLine();
-            writer.appendNoHilight(" * Error type: " + convertException.getClass().getSimpleName()).newLine();
-            writer.appendNoHilight(" */").newLine();
-            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
+            Helper.appendErrorComment(writer, convertException);
         }
         asm.getActionSourceSuffix(writer);
     }
@@ -888,9 +880,10 @@ public class Action implements GraphSourceItem {
                         out = new ArrayList<>();
                         out.add(new CommentItem(new String[] {
                             "", 
-                            " * Decompilation error",
-                            " * Code may be obfuscated",
-                            " * Error type: " + ex2.getClass().getSimpleName(), 
+                            " * " + AppStrings.translate("decompilationError"),
+                            " * " + AppStrings.translate("decompilationError.obfuscated"),
+                            " * " + AppStrings.translate("decompilationError.errorType") + ": " + 
+                                ex2.getClass().getSimpleName(), 
                             ""}));
                     }
                     outs.add(out);

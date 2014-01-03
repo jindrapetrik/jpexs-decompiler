@@ -709,4 +709,26 @@ public class Helper {
             }
         }
     }
+    
+    public static void appendTimeoutComment(GraphTextWriter writer, int timeout) {
+        writer.appendNoHilight("/*").newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(String.format(AppStrings.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
+        writer.appendNoHilight(" */").newLine();
+        writer.appendNoHilight("throw new IllegalOperationError(\"").
+                appendNoHilight(AppStrings.translate("decompilationError.timeout.description")).
+                appendNoHilight("\");").newLine();
+    }
+    
+    public static void appendErrorComment(GraphTextWriter writer, Throwable ex) {
+        writer.appendNoHilight("/*").newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.obfuscated")).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.errorType")).
+                appendNoHilight(": " + ex.getClass().getSimpleName()).newLine();
+        writer.appendNoHilight(" */").newLine();
+        writer.appendNoHilight("throw new IllegalOperationError(\"").
+                appendNoHilight(AppStrings.translate("decompilationError.error.description")).
+                appendNoHilight("\");").newLine();
+    }
 }

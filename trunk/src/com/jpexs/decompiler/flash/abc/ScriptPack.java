@@ -156,26 +156,12 @@ public class ScriptPack implements TreeElementItem {
         } catch (TimeoutException ex) {
             writer.continueMeasure();
             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
-            writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
-            writer.appendNoHilight(" * ").appendNoHilight(String.format(AppStrings.translate("decompilationError.timeout"), Helper.formatTimeToText(Configuration.decompilationTimeoutFile.get()))).newLine();
-            writer.appendNoHilight(" */").newLine();
-            writer.appendNoHilight("throw new IllegalOperationError(\"").
-                    appendNoHilight(AppStrings.translate("decompilationError.timeout.description")).
-                    appendNoHilight("\");").newLine();
+            Helper.appendTimeoutComment(writer, Configuration.decompilationTimeoutFile.get());
             return;
         } catch (ExecutionException ex) {
             writer.continueMeasure();
             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
-            writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
-            writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.obfuscated")).newLine();
-            writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.errorType")).
-                    appendNoHilight(": " + ex.getClass().getSimpleName()).newLine();
-            writer.appendNoHilight(" */").newLine();
-            writer.appendNoHilight("throw new IllegalOperationError(\"").
-                    appendNoHilight(AppStrings.translate("decompilationError.error.description")).
-                    appendNoHilight("\");").newLine();
+            Helper.appendErrorComment(writer, ex);
             return;
         }
         writer.continueMeasure();

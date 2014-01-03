@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
@@ -177,19 +178,10 @@ public class MethodBody implements Cloneable, Serializable {
                 writer.endMethod();
             } else if (convertException instanceof TimeoutException) {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
-                writer.appendNoHilight("/*").newLine();
-                writer.appendNoHilight(" * Decompilation error").newLine();
-                writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached").newLine();
-                writer.appendNoHilight(" */").newLine();
-                writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
+                Helper.appendTimeoutComment(writer, Configuration.decompilationTimeoutFile.get());
             } else {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
-                writer.appendNoHilight("/*").newLine();
-                writer.appendNoHilight(" * Decompilation error").newLine();
-                writer.appendNoHilight(" * Code may be obfuscated").newLine();
-                writer.appendNoHilight(" * Error type: " + convertException.getClass().getSimpleName()).newLine();
-                writer.appendNoHilight(" */").newLine();
-                writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
+                Helper.appendErrorComment(writer, convertException);
             }
             writer.unindent();
         }
