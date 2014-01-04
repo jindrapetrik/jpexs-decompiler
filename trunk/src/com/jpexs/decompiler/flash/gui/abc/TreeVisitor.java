@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.gui.abc.treenodes.TreeElement;
+
 public interface TreeVisitor {
 
     public void onBranch(TreeElement branch);

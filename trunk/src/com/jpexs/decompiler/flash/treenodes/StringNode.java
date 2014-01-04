@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.treenodes;
 
-import com.jpexs.decompiler.flash.StringItem;
+import com.jpexs.decompiler.flash.treeitems.StringItem;
 
 /**
  *

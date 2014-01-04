@@ -16,8 +16,8 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;

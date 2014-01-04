@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 JPEXS
+ *  Copyright (C) 2010-2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,25 +14,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.treenodes;
+package com.jpexs.decompiler.flash.treeitems;
 
-import com.jpexs.decompiler.flash.AS3PackageNodeItem;
-import com.jpexs.decompiler.flash.TreeElementItem;
-import com.jpexs.decompiler.flash.gui.abc.TreeElement;
+import com.jpexs.decompiler.flash.SWF;
 
 /**
  *
  * @author JPEXS
  */
-public class AS3PackageNode extends TreeElement {
+public class StringItem implements TreeItem {
     
-    public AS3PackageNode(String name, String path, AS3PackageNodeItem item, TreeElement parent) {
-        super(name, path, item, parent);
-    }
+    public SWF swf;
+    private String str;
+    
+    public StringItem(String str, SWF swf) {
+        this.swf = swf;
+        this.str = str;
+    } 
 
     @Override
-    public AS3PackageNodeItem getItem() {
-        return (AS3PackageNodeItem) item;
+    public SWF getSwf() {
+        return swf;
     }
-
+            
+    @Override
+    public String toString() {
+        return str;
+    } 
 }

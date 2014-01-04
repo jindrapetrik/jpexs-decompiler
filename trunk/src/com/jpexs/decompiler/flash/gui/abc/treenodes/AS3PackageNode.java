@@ -14,47 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.gui.abc.treenodes;
 
-import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
 
 /**
  *
  * @author JPEXS
  */
-public class FrameNodeItem implements TreeItem {
-
-    private SWF swf;
-    private int frame;
-    private Tag parent;
-    private boolean display;
-
-    public FrameNodeItem(SWF swf, int frame, Tag parent, boolean display) {
-        this.swf = swf;
-        this.frame = frame;
-        this.parent = parent;
-        this.display = display;
+public class AS3PackageNode extends TreeElement {
+    
+    public AS3PackageNode(String name, String path, AS3PackageNodeItem item, TreeElement parent) {
+        super(name, path, item, parent);
     }
 
     @Override
-    public SWF getSwf() {
-        return swf;
+    public AS3PackageNodeItem getItem() {
+        return (AS3PackageNodeItem) item;
     }
 
-    public boolean isDisplayed() {
-        return display;
-    }
-
-    @Override
-    public String toString() {
-        return "frame " + frame;
-    }
-
-    public int getFrame() {
-        return frame;
-    }
-
-    public Tag getParent() {
-        return parent;
-    }
 }

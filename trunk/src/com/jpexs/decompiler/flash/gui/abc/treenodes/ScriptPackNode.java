@@ -14,23 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.treenodes;
+package com.jpexs.decompiler.flash.gui.abc.treenodes;
 
-import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 
 /**
  *
  * @author JPEXS
  */
-public class ClassesListNode extends TreeNode {
+public class ScriptPackNode extends TreeElement {
     
-    public ClassesListNode(ClassesListTreeModel item) {
-        super(item);
+    public ScriptPackNode(String name, String path, ScriptPack item, TreeElement parent) {
+        super(name, path, item, parent);
     }
 
     @Override
-    public ClassesListTreeModel getItem() {
-        return (ClassesListTreeModel) item;
+    public ScriptPack getItem() {
+        return (ScriptPack) item;
     }
 
 }

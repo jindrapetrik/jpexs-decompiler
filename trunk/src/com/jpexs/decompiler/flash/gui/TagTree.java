@@ -16,11 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.AS3PackageNodeItem;
-import com.jpexs.decompiler.flash.FrameNodeItem;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.TreeElementItem;
-import com.jpexs.decompiler.flash.TreeItem;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -53,6 +49,11 @@ import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
+import com.jpexs.decompiler.flash.treeitems.AS2PackageNodeItem;
+import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
+import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
+import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import java.awt.Color;
 import java.awt.Component;

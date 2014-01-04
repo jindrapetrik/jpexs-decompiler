@@ -16,19 +16,20 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.FrameNodeItem;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.StringItem;
-import com.jpexs.decompiler.flash.TreeElementItem;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
-import com.jpexs.decompiler.flash.gui.abc.TreeElement;
+import com.jpexs.decompiler.flash.gui.abc.treenodes.ClassesListNode;
+import com.jpexs.decompiler.flash.gui.abc.treenodes.TreeElement;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
-import com.jpexs.decompiler.flash.treenodes.ClassesListNode;
+import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
+import com.jpexs.decompiler.flash.treeitems.StringItem;
+import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.ContainerNode;
 import com.jpexs.decompiler.flash.treenodes.FrameNode;
 import com.jpexs.decompiler.flash.treenodes.SWFRoot;
@@ -210,7 +211,7 @@ public class TagTreeModel implements TreeModel {
         return ret;
     }
 
-    private List<TreeNode> searchTag(TreeElementItem obj, TreeNode parent, List<TreeNode> path) {
+    private List<TreeNode> searchTag(TreeItem obj, TreeNode parent, List<TreeNode> path) {
         List<TreeNode> ret = null;
         int cnt = getChildCount(parent);
         for (int i = 0; i < cnt; i++) {
@@ -244,7 +245,7 @@ public class TagTreeModel implements TreeModel {
         return swfToSwfRoot.get(swf);
     }
 
-    public TreePath getTagPath(TreeElementItem obj) {
+    public TreePath getTagPath(TreeItem obj) {
         List<TreeNode> path = new ArrayList<>();
         path.add(getRoot());
         path = searchTag(obj, getRoot(), path);

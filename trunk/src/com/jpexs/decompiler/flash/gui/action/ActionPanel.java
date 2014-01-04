@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.action;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
@@ -26,7 +27,6 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;

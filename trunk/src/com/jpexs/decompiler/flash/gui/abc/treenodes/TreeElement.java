@@ -14,14 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui.abc;
+package com.jpexs.decompiler.flash.gui.abc.treenodes;
 
-import com.jpexs.decompiler.flash.AS3PackageNodeItem;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.TreeElementItem;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
-import com.jpexs.decompiler.flash.treenodes.AS3PackageNode;
-import com.jpexs.decompiler.flash.treenodes.ScriptPackNode;
+import com.jpexs.decompiler.flash.gui.abc.TreeVisitor;
+import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
+import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import java.util.*;
 import javax.swing.tree.TreePath;
@@ -74,7 +73,7 @@ public abstract class TreeElement extends TreeNode {
         return name;
     }
 
-    TreeElement getBranch(String pathElement, SWF swf) {
+    public TreeElement getBranch(String pathElement, SWF swf) {
         TreeElement branch = branches.get(pathElement);
         if (branch == null) {
             branch = new AS3PackageNode(pathElement, path + "." + pathElement, new AS3PackageNodeItem(pathElement, swf), this);
@@ -83,7 +82,7 @@ public abstract class TreeElement extends TreeNode {
         return branch;
     }
 
-    void addLeaf(String pathElement, ScriptPack item) {
+    public void addLeaf(String pathElement, ScriptPack item) {
         ScriptPackNode child = new ScriptPackNode(pathElement, path + "." + pathElement, item, this);
         leafs.put(pathElement, child);
     }
@@ -140,7 +139,7 @@ public abstract class TreeElement extends TreeNode {
         return -1;
     }
 
-    void visitBranches(TreeVisitor visitor) {
+    public void visitBranches(TreeVisitor visitor) {
         Iterator<TreeElement> iter = branches.values().iterator();
         while (iter.hasNext()) {
             TreeElement branch = iter.next();
@@ -150,7 +149,7 @@ public abstract class TreeElement extends TreeNode {
         }
     }
 
-    void visitLeafs(TreeVisitor visitor) {
+    public void visitLeafs(TreeVisitor visitor) {
         Iterator<TreeElement> iter = leafs.values().iterator();
         while (iter.hasNext()) {
             TreeElement leaf = iter.next();

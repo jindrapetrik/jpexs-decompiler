@@ -14,29 +14,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.gui.abc.treenodes;
+
+import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 
 /**
  *
  * @author JPEXS
  */
-public class AS3PackageNodeItem implements TreeElementItem {
-
-    private SWF swf;
-    public String packageName;
-
-    public AS3PackageNodeItem(String packageName, SWF swf) {
-        this.swf = swf;
-        this.packageName = packageName;
+public class ClassesListNode extends TreeNode {
+    
+    public ClassesListNode(ClassesListTreeModel item) {
+        super(item);
     }
 
     @Override
-    public SWF getSwf() {
-        return swf;
+    public ClassesListTreeModel getItem() {
+        return (ClassesListTreeModel) item;
     }
-            
-    @Override
-    public String toString() {
-        return packageName;
-    }
+
 }

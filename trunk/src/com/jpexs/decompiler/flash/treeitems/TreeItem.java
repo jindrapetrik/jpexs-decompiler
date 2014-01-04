@@ -14,29 +14,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.treeitems;
+
+import com.jpexs.decompiler.flash.SWF;
 
 /**
  *
  * @author JPEXS
  */
-public class StringItem implements TreeItem {
+public interface TreeItem {
     
-    public SWF swf;
-    private String str;
-    
-    public StringItem(String str, SWF swf) {
-        this.swf = swf;
-        this.str = str;
-    } 
-
-    @Override
-    public SWF getSwf() {
-        return swf;
-    }
-            
-    @Override
-    public String toString() {
-        return str;
-    } 
+    public SWF getSwf();
 }

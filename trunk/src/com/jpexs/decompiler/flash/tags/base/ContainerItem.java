@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import com.jpexs.decompiler.flash.TreeItem;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
  * Object which contains other objects

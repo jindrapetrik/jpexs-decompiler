@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2013 JPEXS
+ *  Copyright (C) 2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,42 +14,48 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.treenodes;
+package com.jpexs.decompiler.flash.treeitems;
 
-import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import java.util.ArrayList;
-import java.util.List;
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.Tag;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class TreeNode {
-    
-    protected TreeItem item;
-    public boolean export = false;
-    public List<TreeNode> subNodes;
+public class FrameNodeItem implements TreeItem {
 
-    public TreeNode(TreeItem item) {
-        this.item = item;
-        this.subNodes = new ArrayList<>();
+    private SWF swf;
+    private int frame;
+    private Tag parent;
+    private boolean display;
+
+    public FrameNodeItem(SWF swf, int frame, Tag parent, boolean display) {
+        this.swf = swf;
+        this.frame = frame;
+        this.parent = parent;
+        this.display = display;
     }
-    
-    public TreeItem getItem() {
-        return item;
+
+    @Override
+    public SWF getSwf() {
+        return swf;
+    }
+
+    public boolean isDisplayed() {
+        return display;
     }
 
     @Override
     public String toString() {
-        return item.toString();
+        return "frame " + frame;
     }
 
-    public List<TreeNode> getAllSubs() {
-        List<TreeNode> ret = new ArrayList<>();
-        ret.addAll(subNodes);
-        for (TreeNode n : subNodes) {
-            ret.addAll(n.getAllSubs());
-        }
-        return ret;
+    public int getFrame() {
+        return frame;
+    }
+
+    public Tag getParent() {
+        return parent;
     }
 }

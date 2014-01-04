@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.treenodes;
 
-import com.jpexs.decompiler.flash.gui.AS2PackageNodeItem;
+import com.jpexs.decompiler.flash.treeitems.AS2PackageNodeItem;
 
 /**
  *
