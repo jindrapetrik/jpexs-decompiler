@@ -14,29 +14,42 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
+package com.jpexs.decompiler.flash.treenodes;
 
-import com.jpexs.decompiler.flash.TreeElementItem;
+import com.jpexs.decompiler.flash.TreeItem;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Object which contains other objects
  *
  * @author JPEXS
  */
-public interface Container extends TreeElementItem {
+public abstract class TreeNode {
+    
+    protected TreeItem item;
+    public boolean export = false;
+    public List<TreeNode> subNodes;
 
-    /**
-     * Returns all sub-items
-     *
-     * @return List of sub-items
-     */
-    public List<ContainerItem> getSubItems();
+    public TreeNode(TreeItem item) {
+        this.item = item;
+        this.subNodes = new ArrayList<>();
+    }
+    
+    public TreeItem getItem() {
+        return item;
+    }
 
-    /**
-     * Returns number of sub-items
-     *
-     * @return Number of sub-items
-     */
-    public int getItemCount();
+    @Override
+    public String toString() {
+        return item.toString();
+    }
+
+    public List<TreeNode> getAllSubs() {
+        List<TreeNode> ret = new ArrayList<>();
+        ret.addAll(subNodes);
+        for (TreeNode n : subNodes) {
+            ret.addAll(n.getAllSubs());
+        }
+        return ret;
+    }
 }

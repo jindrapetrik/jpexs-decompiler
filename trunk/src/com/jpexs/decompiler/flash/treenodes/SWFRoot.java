@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2013 JPEXS
+ *  Copyright (C) 2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,29 +14,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
+package com.jpexs.decompiler.flash.treenodes;
 
-import com.jpexs.decompiler.flash.TreeElementItem;
+import com.jpexs.decompiler.flash.SWF;
 import java.util.List;
 
 /**
- * Object which contains other objects
  *
  * @author JPEXS
  */
-public interface Container extends TreeElementItem {
+public class SWFRoot extends TreeNode {
 
-    /**
-     * Returns all sub-items
-     *
-     * @return List of sub-items
-     */
-    public List<ContainerItem> getSubItems();
+    private String name;
+    public List<TreeNode> list;
+    public TreeNode scriptsNode;
 
-    /**
-     * Returns number of sub-items
-     *
-     * @return Number of sub-items
-     */
-    public int getItemCount();
+    public SWFRoot(SWF swf, String name) {
+        super(swf);
+        this.name = name;
+    }
+
+    @Override
+    public SWF getItem() {
+        return (SWF) item;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

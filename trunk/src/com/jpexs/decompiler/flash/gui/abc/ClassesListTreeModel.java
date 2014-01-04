@@ -18,13 +18,13 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.TreeElementItem;
-import com.jpexs.decompiler.flash.TreeNode;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TreeModelEvent;
@@ -101,6 +101,11 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
         setFilter(filter);
     }
     
+    @Override
+    public SWF getSwf() {
+        return swf;
+    }
+            
     public final void update() {
         this.list = swf.getAS3Packs();
         TreeModelEvent event = new TreeModelEvent(this, new TreePath(classTree.getRoot()));
@@ -110,7 +115,7 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
     }
     
     public final void setFilter(String filter) {
-        classTree = new Tree(swf);
+        classTree = new Tree();
         filter = (filter == null || filter.isEmpty()) ? null : filter.toLowerCase();
         for (MyEntry<ClassPath, ScriptPack> item : list) {
             if (filter != null) {

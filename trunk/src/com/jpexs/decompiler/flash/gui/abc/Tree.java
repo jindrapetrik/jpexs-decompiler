@@ -16,24 +16,20 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.TreeElementItem;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.treenodes.AS3PackageNode;
 import java.util.StringTokenizer;
 
 public class Tree {
 
-    private final TreeElement ROOT;
+    private final TreeElement ROOT = new AS3PackageNode("", "", null, null);
     
-    public Tree(SWF swf) {
-        ROOT = new TreeElement(swf, "", "", null, null);
-    }
-
-    public void add(String name, String path, TreeElementItem item) {
+    public void add(String name, String path, ScriptPack item) {
         StringTokenizer st = new StringTokenizer(path, ".");
         TreeElement parent = ROOT;
         while (st.hasMoreTokens()) {
             String pathElement = st.nextToken();
-            parent = parent.getBranch(pathElement);
+            parent = parent.getBranch(pathElement, item.getSwf());
         }
         parent.addLeaf(name, item);
     }

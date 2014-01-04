@@ -16,36 +16,36 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.PackageNode;
+import com.jpexs.decompiler.flash.AS3PackageNodeItem;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.TreeElementItem;
-import com.jpexs.decompiler.flash.TreeNode;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.treenodes.AS3PackageNode;
+import com.jpexs.decompiler.flash.treenodes.ScriptPackNode;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import java.util.*;
 import javax.swing.tree.TreePath;
 
-public class TreeElement implements TreeNode {
+public abstract class TreeElement extends TreeNode {
 
     private SortedMap<String, TreeElement> branches;
     private SortedMap<String, TreeElement> leafs;
     private String name;
     private String path;
-    private TreeElementItem item;
     private TreeElement parent;
-    private SWF swf;
 
-    public TreeElement(SWF swf, String name, String path, TreeElementItem item, TreeElement parent) {
-        this.swf = swf;
+    public TreeElement(String name, String path, TreeElementItem item, TreeElement parent) {
+        super(item);
         this.name = name;
         this.path = path;
-        this.item = item;
         this.parent = parent;
         branches = new TreeMap<>();
         leafs = new TreeMap<>();
     }
 
     @Override
-    public SWF getSwf() {
-        return swf;
+    public TreeElementItem getItem() {
+        return (TreeElementItem) item;
     }
 
     public TreeElement getParent() {
@@ -69,26 +69,22 @@ public class TreeElement implements TreeNode {
         return new TreePath(pathList.toArray());
     }
 
-    public TreeElementItem getItem() {
-        return item;
-    }
-
     @Override
     public String toString() {
         return name;
     }
 
-    TreeElement getBranch(String pathElement) {
+    TreeElement getBranch(String pathElement, SWF swf) {
         TreeElement branch = branches.get(pathElement);
         if (branch == null) {
-            branch = new TreeElement(swf, pathElement, path + "." + pathElement, new PackageNode(pathElement), this);
+            branch = new AS3PackageNode(pathElement, path + "." + pathElement, new AS3PackageNodeItem(pathElement, swf), this);
             branches.put(pathElement, branch);
         }
         return branch;
     }
 
-    void addLeaf(String pathElement, TreeElementItem item) {
-        TreeElement child = new TreeElement(swf, pathElement, path + "." + pathElement, item, this);
+    void addLeaf(String pathElement, ScriptPack item) {
+        ScriptPackNode child = new ScriptPackNode(pathElement, path + "." + pathElement, item, this);
         leafs.put(pathElement, child);
     }
 

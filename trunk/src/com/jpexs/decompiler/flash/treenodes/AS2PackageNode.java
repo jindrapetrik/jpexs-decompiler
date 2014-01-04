@@ -14,44 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.treenodes;
+
+import com.jpexs.decompiler.flash.gui.AS2PackageNodeItem;
 
 /**
  *
  * @author JPEXS
  */
-public class FrameNode implements TreeElementItem {
-
-    private SWF swf;
-    private int frame;
-    private Object parent;
-    private boolean display;
-
-    public FrameNode(SWF swf, int frame, Object parent, boolean display) {
-        this.swf = swf;
-        this.frame = frame;
-        this.parent = parent;
-        this.display = display;
-    }
-
-    public SWF getSwf() {
-        return swf;
-    }
-
-    public boolean isDisplayed() {
-        return display;
+public class AS2PackageNode extends TreeNode {
+    
+    public AS2PackageNode(AS2PackageNodeItem item) {
+        super(item);
     }
 
     @Override
-    public String toString() {
-        return "frame " + frame;
+    public AS2PackageNodeItem getItem() {
+        return (AS2PackageNodeItem) item;
     }
 
-    public int getFrame() {
-        return frame;
-    }
-
-    public Object getParent() {
-        return parent;
-    }
 }

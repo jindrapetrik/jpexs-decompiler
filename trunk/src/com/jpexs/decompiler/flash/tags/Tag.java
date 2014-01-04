@@ -50,6 +50,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
     protected String name;
     public Tag previousTag;
     protected SWF swf;
+    private boolean modified;
 
     public String getName() {
         return name;
@@ -280,6 +281,14 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
 
     public long getPos() {
         return pos;
+    }
+
+    public void setModified(boolean value) {
+        modified = value;
+    }
+
+    public boolean isModified() {
+        return modified;
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2013 JPEXS
+ *  Copyright (C) 2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,21 +17,29 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.TreeNode;
+import com.jpexs.decompiler.flash.TreeItem;
 
 /**
  *
  * @author JPEXS
  */
-public class TagTreeRoot implements TreeNode {
-    
-    @Override
-    public String toString() {
-        return "root";
+public class AS2PackageNodeItem implements TreeItem {
+
+    private SWF swf;
+    public String packageName;
+
+    public AS2PackageNodeItem(String packageName, SWF swf) {
+        this.swf = swf;
+        this.packageName = packageName;
     }
 
     @Override
     public SWF getSwf() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return swf;
+    }
+            
+    @Override
+    public String toString() {
+        return packageName;
     }
 }

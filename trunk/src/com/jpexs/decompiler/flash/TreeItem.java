@@ -20,7 +20,7 @@ package com.jpexs.decompiler.flash;
  *
  * @author JPEXS
  */
-public interface TreeNode {
+public interface TreeItem {
     
     public SWF getSwf();
 }

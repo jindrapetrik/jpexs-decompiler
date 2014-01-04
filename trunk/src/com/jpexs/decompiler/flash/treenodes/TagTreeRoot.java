@@ -14,22 +14,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.treenodes;
+
+import com.jpexs.decompiler.flash.StringItem;
 
 /**
  *
  * @author JPEXS
  */
-public class StringNode implements TreeElementItem {
+public class TagTreeRoot extends TreeNode {
     
-    private String str;
-    
-    public StringNode(String str) {
-        this.str = str;
-    } 
-
-    @Override
-    public String toString() {
-        return str;
-    } 
+    public TagTreeRoot() {
+        super(new StringItem("root", null));
+    }
 }

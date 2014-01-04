@@ -14,29 +14,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
-
-import com.jpexs.decompiler.flash.TreeElementItem;
-import java.util.List;
+package com.jpexs.decompiler.flash.gui;
 
 /**
- * Object which contains other objects
  *
  * @author JPEXS
  */
-public interface Container extends TreeElementItem {
+public enum TreeNodeType {
 
-    /**
-     * Returns all sub-items
-     *
-     * @return List of sub-items
-     */
-    public List<ContainerItem> getSubItems();
-
-    /**
-     * Returns number of sub-items
-     *
-     * @return Number of sub-items
-     */
-    public int getItemCount();
+    FLASH,
+    FONT,
+    TEXT,
+    IMAGE,
+    SHAPE,
+    MORPH_SHAPE,
+    SPRITE,
+    BUTTON,
+    AS,
+    PACKAGE,
+    FRAME,
+    SHOW_FRAME,
+    MOVIE,
+    SOUND,
+    BINARY_DATA,
+    FOLDER,
+    FOLDER_OPEN
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2013 JPEXS
+ *  Copyright (C) 2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,29 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
+package com.jpexs.decompiler.flash.treenodes;
 
 import com.jpexs.decompiler.flash.TreeElementItem;
-import java.util.List;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.gui.abc.TreeElement;
 
 /**
- * Object which contains other objects
  *
  * @author JPEXS
  */
-public interface Container extends TreeElementItem {
+public class ScriptPackNode extends TreeElement {
+    
+    public ScriptPackNode(String name, String path, ScriptPack item, TreeElement parent) {
+        super(name, path, item, parent);
+    }
 
-    /**
-     * Returns all sub-items
-     *
-     * @return List of sub-items
-     */
-    public List<ContainerItem> getSubItems();
+    @Override
+    public ScriptPack getItem() {
+        return (ScriptPack) item;
+    }
 
-    /**
-     * Returns number of sub-items
-     *
-     * @return Number of sub-items
-     */
-    public int getItemCount();
 }

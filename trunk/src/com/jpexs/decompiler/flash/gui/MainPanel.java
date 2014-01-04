@@ -18,12 +18,10 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
-import com.jpexs.decompiler.flash.FrameNode;
+import com.jpexs.decompiler.flash.FrameNodeItem;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.TagNode;
-import com.jpexs.decompiler.flash.TreeElementItem;
-import com.jpexs.decompiler.flash.TreeNode;
+import com.jpexs.decompiler.flash.TreeItem;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -93,6 +91,9 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
+import com.jpexs.decompiler.flash.treenodes.SWFRoot;
+import com.jpexs.decompiler.flash.treenodes.TagNode;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -243,7 +244,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
     private CancellableWorker setSourceWorker;
     public TreeNode oldNode;
-    public TreeElementItem oldTag;
+    public TreeItem oldTag;
     private File tempFile;
 
     private static final String ACTION_SELECT_COLOR = "SELECTCOLOR";
@@ -337,8 +338,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     for (TreePath treePath : paths) {
                         Object tagObj = treePath.getLastPathComponent();
 
-                        if (tagObj instanceof TagNode) {
-                            Object tag = ((TagNode) tagObj).tag;
+                        if (tagObj instanceof TreeNode) {
+                            TreeItem tag = ((TreeNode) tagObj).getItem();
                             if (!(tag instanceof Tag)) {
                                 allSelectedIsTag = false;
                                 break;
@@ -355,8 +356,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (paths.length == 1) {
                         Object tagObj = paths[0].getLastPathComponent();
 
-                        if (tagObj instanceof TagNode) {
-                            Object tag = ((TagNode) tagObj).tag;
+                        if (tagObj instanceof TreeNode) {
+                            TreeItem tag = ((TreeNode) tagObj).getItem();
 
                             if (tag instanceof ImageTag && ((ImageTag) tag).importSupported()) {
                                 replaceImageSelectionMenuItem.setVisible(true);
@@ -967,11 +968,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void updateClassesList() {
-        List<TagNode> nodes = getASTagNode(tagTree);
+        List<TreeNode> nodes = getASTagNode(tagTree);
         boolean updateNeeded = false;
-        for (TagNode n : nodes) {
-            if (n.tag instanceof ClassesListTreeModel) {
-                ((ClassesListTreeModel) n.tag).update();
+        for (TreeNode n : nodes) {
+            if (n.getItem() instanceof ClassesListTreeModel) {
+                ((ClassesListTreeModel) n.getItem()).update();
                 updateNeeded = true;
             }
         }
@@ -989,11 +990,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void doFilter() {
-        List<TagNode> nodes = getASTagNode(tagTree);
+        List<TreeNode> nodes = getASTagNode(tagTree);
         boolean updateNeeded = false;
-        for (TagNode n : nodes) {
-            if (n.tag instanceof ClassesListTreeModel) {
-                ((ClassesListTreeModel) n.tag).setFilter(filterField.getText());
+        for (TreeNode n : nodes) {
+            if (n.getItem() instanceof ClassesListTreeModel) {
+                ((ClassesListTreeModel) n.getItem()).setFilter(filterField.getText());
                 updateNeeded = true;
             }
         }
@@ -1213,50 +1214,50 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    public List<Object> getSelected(JTree tree) {
+    public List<TreeNode> getSelected(JTree tree) {
         TreeSelectionModel tsm = tree.getSelectionModel();
         TreePath[] tps = tsm.getSelectionPaths();
-        List<Object> ret = new ArrayList<>();
+        List<TreeNode> ret = new ArrayList<>();
         if (tps == null) {
             return ret;
         }
 
         for (TreePath tp : tps) {
             Object o = tp.getLastPathComponent();
-            ret.add(o);
+            ret.add((TreeNode) o);
         }
         return ret;
     }
 
-    public List<Object> getAllSubs(JTree tree, Object o) {
-        TreeModel tm = tree.getModel();
-        List<Object> ret = new ArrayList<>();
+    public List<TreeNode> getAllSubs(JTree tree, Object o) {
+        TagTreeModel tm = (TagTreeModel) tree.getModel();
+        List<TreeNode> ret = new ArrayList<>();
         for (int i = 0; i < tm.getChildCount(o); i++) {
-            Object c = tm.getChild(o, i);
+            TreeNode c = tm.getChild(o, i);
             ret.add(c);
             ret.addAll(getAllSubs(tree, c));
         }
         return ret;
     }
 
-    public List<Object> getAllSelected(JTree tree) {
+    public List<TreeNode> getAllSelected(TagTree tree) {
         TreeSelectionModel tsm = tree.getSelectionModel();
         TreePath[] tps = tsm.getSelectionPaths();
-        List<Object> ret = new ArrayList<>();
+        List<TreeNode> ret = new ArrayList<>();
         if (tps == null) {
             return ret;
         }
 
         for (TreePath tp : tps) {
             Object o = tp.getLastPathComponent();
-            ret.add(o);
+            ret.add((TreeNode) o);
             ret.addAll(getAllSubs(tree, o));
         }
         return ret;
     }
 
-    public List<TagNode> getASTagNode(JTree tree) {
-        List<TagNode> result = new ArrayList<>();
+    public List<TreeNode> getASTagNode(TagTree tree) {
+        List<TreeNode> result = new ArrayList<>();
         TagTreeModel tm = (TagTreeModel) tree.getModel();
         if (tm == null) {
             return result;
@@ -1264,16 +1265,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         TreeNode root = tm.getRoot();
         for (int j = 0; j < tm.getChildCount(root); j++) {
             SWFRoot swfRoot = (SWFRoot) tm.getChild(root, j);
-                for (int i = 0; i < tm.getChildCount(swfRoot); i++) {
-                TreeNode node = tm.getChild(swfRoot, i);
-                if (node instanceof TagNode) {
-                    TagNode tagNode = (TagNode) node;
-                    TreeElementItem tag = tagNode.tag;
-                    if (tag != null && "scripts".equals(tagNode.mark)) {
-                        result.add((TagNode) node);
-                    } 
-                }
-            }
+            result.add(swfRoot.scriptsNode);
         }
         return result;
     }
@@ -1289,58 +1281,49 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
         
         List<File> ret = new ArrayList<>();
-        List<Object> sel = getAllSelected(tagTree);
+        List<TreeNode> sel = getAllSelected(tagTree);
 
         for (SWF swf : swfs) {
             List<ScriptPack> tlsList = new ArrayList<>();
-            JPEGTablesTag jtt = null;
-            for (Tag t : swf.tags) {
-                if (t instanceof JPEGTablesTag) {
-                    jtt = (JPEGTablesTag) t;
-                    break;
-                }
-            }
             List<Tag> images = new ArrayList<>();
             List<Tag> shapes = new ArrayList<>();
             List<Tag> movies = new ArrayList<>();
             List<Tag> sounds = new ArrayList<>();
             List<Tag> texts = new ArrayList<>();
-            List<TagNode> actionNodes = new ArrayList<>();
+            List<TreeNode> actionNodes = new ArrayList<>();
             List<Tag> binaryData = new ArrayList<>();
-            for (Object d : sel) {
+            for (TreeNode d : sel) {
+                if (d.getItem().getSwf() != swf) {
+                    continue;
+                }
                 if (d instanceof TagNode) {
                     TagNode n = (TagNode) d;
-                    if (n.getSwf() != swf) {
-                        continue;
+                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.IMAGE) {
+                        images.add((Tag) n.getItem());
                     }
-                    if (TagTree.getTagType(n.tag) == TagType.IMAGE) {
-                        images.add((Tag) n.tag);
+                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.SHAPE) {
+                        shapes.add((Tag) n.getItem());
                     }
-                    if (TagTree.getTagType(n.tag) == TagType.SHAPE) {
-                        shapes.add((Tag) n.tag);
-                    }
-                    if (TagTree.getTagType(n.tag) == TagType.AS) {
+                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.AS) {
                         actionNodes.add(n);
                     }
-                    if (TagTree.getTagType(n.tag) == TagType.MOVIE) {
-                        movies.add((Tag) n.tag);
+                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.MOVIE) {
+                        movies.add((Tag) n.getItem());
                     }
-                    if (TagTree.getTagType(n.tag) == TagType.SOUND) {
-                        sounds.add((Tag) n.tag);
+                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.SOUND) {
+                        sounds.add((Tag) n.getItem());
                     }
-                    if (TagTree.getTagType(n.tag) == TagType.BINARY_DATA) {
-                        binaryData.add((Tag) n.tag);
+                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.BINARY_DATA) {
+                        binaryData.add((Tag) n.getItem());
                     }
-                    if (TagTree.getTagType(n.tag) == TagType.TEXT) {
-                        texts.add((Tag) n.tag);
+                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.TEXT) {
+                        texts.add((Tag) n.getItem());
                     }
                 }
                 if (d instanceof TreeElement) {
                     if (((TreeElement) d).isLeaf()) {
                         TreeElement treeElement = (TreeElement) d;
-                        if (treeElement.getSwf() == swf) {
-                            tlsList.add((ScriptPack) treeElement.getItem());
-                        }
+                        tlsList.add((ScriptPack) treeElement.getItem());
                     }
                 }
             }
@@ -1358,9 +1341,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     ret.add(tls.export(selFile, abcList, exportMode, Configuration.parallelSpeedUp.get()));
                 }
             } else {
-                List<TagNode> allNodes = new ArrayList<>();
-                List<TagNode> asNodes = getASTagNode(tagTree);
-                for (TagNode asn : asNodes) {
+                List<TreeNode> allNodes = new ArrayList<>();
+                List<TreeNode> asNodes = getASTagNode(tagTree);
+                for (TreeNode asn : asNodes) {
                     allNodes.add(asn);
                     TagNode.setExport(allNodes, false);
                     TagNode.setExport(actionNodes, true);
@@ -1381,7 +1364,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             return swfs.get(0);
         }
         
-        return treeNode.getSwf();
+        return treeNode.getItem().getSwf();
     }
     
     private void clearCache() {
@@ -1883,11 +1866,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         return;
                     }
 
-                    if (tagObj instanceof TagNode) {
-                        tagObj = ((TagNode) tagObj).tag;
+                    TreeItem item = null;
+                    if (tagObj instanceof TreeNode) {
+                        item = ((TreeNode) tagObj).getItem();
                     }
-                    if (tagObj instanceof ImageTag) {
-                        ImageTag it = (ImageTag) tagObj;
+                    if (item instanceof ImageTag) {
+                        ImageTag it = (ImageTag) item;
                         if (it.importSupported()) {
                             JFileChooser fc = new JFileChooser();
                             fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
@@ -1933,11 +1917,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         return;
                     }
 
-                    if (tagObj instanceof TagNode) {
-                        tagObj = ((TagNode) tagObj).tag;
+                    TreeItem item = null;
+                    if (tagObj instanceof TreeNode) {
+                        item = ((TreeNode) tagObj).getItem();
                     }
                     if (tagObj instanceof DefineBinaryDataTag) {
-                        DefineBinaryDataTag bt = (DefineBinaryDataTag) tagObj;
+                        DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
                         JFileChooser fc = new JFileChooser();
                         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
                         JFrame f = new JFrame();
@@ -1954,14 +1939,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
                 break;
             case ACTION_REMOVE_ITEM:
-                List<Object> sel = getSelected(tagTree);
+                List<TreeNode> sel = getSelected(tagTree);
 
                 List<Tag> tagsToRemove = new ArrayList<>();
-                for (Object o : sel) {
-                    Object tag = o;
-                    if (o instanceof TagNode) {
-                        tag = ((TagNode) o).tag;
-                    }
+                for (TreeNode o : sel) {
+                    TreeItem tag = o.getItem();
                     if (tag instanceof Tag) {
                         tagsToRemove.add((Tag) tag);
                     }
@@ -2047,7 +2029,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         TreeNode treeNode = (TreeNode) e.getPath().getLastPathComponent();
-        SWF swf = treeNode.getSwf();
+        SWF swf = treeNode.getItem().getSwf();
         if (swfs.contains(swf)) {
             updateUi(swf);
         } else {
@@ -2084,13 +2066,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         oldNode = treeNode;
 
-        TreeElementItem  tagObj = null;
-        if (treeNode instanceof TagNode) {
-            tagObj = ((TagNode) treeNode).tag;
-        }
-        if (treeNode instanceof TreeElement) {
-            tagObj = ((TreeElement) treeNode).getItem();
-        }
+        TreeItem  tagObj = treeNode.getItem();
 
         oldTag = tagObj;
 
@@ -2162,7 +2138,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         if (treeNode instanceof SWFRoot) {
             SWFRoot swfRoot = (SWFRoot) treeNode;
-            SWF swf = swfRoot.getSwf();
+            SWF swf = swfRoot.getItem();
             if (mainMenu.isInternalFlashViewerSelected()) {
                 showCard(CARDSWFPREVIEWPANEL);
                 swfPreviewPanel.load(swf);
@@ -2218,9 +2194,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showCard(CARDFLASHPANEL);
             previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), tag.getSwf().characters, 50/*FIXME*/);
             showFontTag((FontTag) tagObj);
-        } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (mainMenu.isInternalFlashViewerSelected())) {
+        } else if (tagObj instanceof FrameNodeItem && ((FrameNodeItem) tagObj).isDisplayed() && (mainMenu.isInternalFlashViewerSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
-            FrameNode fn = (FrameNode) tagObj;
+            FrameNodeItem fn = (FrameNodeItem) tagObj;
             SWF swf = fn.getSwf();
             List<Tag> controlTags = swf.tags;
             int containerId = 0;
@@ -2233,7 +2209,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 totalFrameCount = ((DefineSpriteTag) fn.getParent()).frameCount;
             }
             previewImagePanel.setImage(SWF.frameToImage(containerId, fn.getFrame() - 1, swf.tags, controlTags, rect, totalFrameCount, new Stack<Integer>()));
-        } else if (((tagObj instanceof FrameNode) && ((FrameNode) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
+        } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             createAndShowTempSwf(tagObj);
             
@@ -2271,8 +2247,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
             }
 
-            if (tagObj instanceof FrameNode) {
-                FrameNode fn = (FrameNode) tagObj;
+            if (tagObj instanceof FrameNodeItem) {
+                FrameNodeItem fn = (FrameNodeItem) tagObj;
                 swf = fn.getSwf();
                 if (fn.getParent() == null) {
                     for (Tag t : swf.tags) {
@@ -2327,9 +2303,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                  */
                 sos2.writeTag(new SetBackgroundColorTag(null, new RGB(backgroundColor)));
 
-                if (tagObj instanceof FrameNode) {
-                    FrameNode fn = (FrameNode) tagObj;
-                    Object parent = fn.getParent();
+                if (tagObj instanceof FrameNodeItem) {
+                    FrameNodeItem fn = (FrameNodeItem) tagObj;
+                    Tag parent = fn.getParent();
                     List<ContainerItem> subs = new ArrayList<>();
                     if (parent == null) {
                         subs.addAll(swf.tags);
@@ -2340,15 +2316,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }
                     List<Integer> doneCharacters = new ArrayList<>();
                     int frameCnt = 1;
-                    for (Object o : subs) {
-                        if (o instanceof ShowFrameTag) {
+                    for (ContainerItem item : subs) {
+                        if (item instanceof ShowFrameTag) {
                             frameCnt++;
                             continue;
                         }
                         if (frameCnt > fn.getFrame()) {
                             break;
                         }
-                        Tag t = (Tag) o;
+                        Tag t = (Tag) item;
                         Set<Integer> needed = t.getDeepNeededCharacters(swf.characters, new ArrayList<Integer>());
                         for (int n : needed) {
                             if (!doneCharacters.contains(n)) {

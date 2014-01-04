@@ -20,6 +20,6 @@ package com.jpexs.decompiler.flash;
  *
  * @author JPEXS
  */
-public interface TreeElementItem {
+public interface TreeElementItem extends TreeItem {
     
 }
