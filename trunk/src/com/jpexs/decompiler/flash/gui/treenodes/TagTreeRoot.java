@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 JPEXS
+ *  Copyright (C) 2010-2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,23 +14,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.treenodes;
+package com.jpexs.decompiler.flash.gui.treenodes;
 
 import com.jpexs.decompiler.flash.treeitems.StringItem;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 
 /**
  *
  * @author JPEXS
  */
-public class StringNode extends TreeNode {
+public class TagTreeRoot extends TreeNode {
     
-    public StringNode(StringItem item) {
-        super(item);
+    public TagTreeRoot() {
+        super(new StringItem("root", null));
     }
-
-    @Override
-    public StringItem getItem() {
-        return (StringItem) item;
-    }
-
 }

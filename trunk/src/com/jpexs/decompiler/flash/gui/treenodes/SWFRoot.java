@@ -14,9 +14,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.treenodes;
+package com.jpexs.decompiler.flash.gui.treenodes;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import java.util.List;
 
 /**
