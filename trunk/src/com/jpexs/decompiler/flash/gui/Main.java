@@ -634,13 +634,6 @@ public class Main {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
-        View.execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                Logger logger = Logger.getLogger("");
-                logger.addHandler(ErrorLogFrame.getInstance().getHandler());
-            }
-        });
         autoCheckForUpdates();
         offerAssociation();
     }
@@ -671,6 +664,7 @@ public class Main {
     public static void initLang() {
         Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
         AppStrings.updateLanguage();
+        ErrorLogFrame.createNewInstance();
                 
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
@@ -790,7 +784,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
         startFreeMemThread();
         initLogging(Configuration.debugMode.get());
-
         initLang();
 
         if (Configuration.cacheOnDisk.get()) {

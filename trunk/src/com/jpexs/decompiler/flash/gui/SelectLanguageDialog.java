@@ -128,7 +128,6 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
 
     public static void reloadUi() {
         Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
-        AppStrings.updateLanguage();
         DefaultSyntaxKit.reloadConfigs();
         Main.initLang();
         Main.reloadApp();

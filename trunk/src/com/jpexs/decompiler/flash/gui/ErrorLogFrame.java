@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -62,7 +63,7 @@ public class ErrorLogFrame extends AppFrame {
     private Handler handler;
     private ImageIcon expandIcon;
     private ImageIcon collapseIcon;
-    private ErrorState errorState;
+    private ErrorState errorState = ErrorState.NO_ERROR;
 
     public Handler getHandler() {
         return handler;
@@ -71,8 +72,31 @@ public class ErrorLogFrame extends AppFrame {
     public static ErrorLogFrame getInstance() {
         if (instance == null) {
             instance = new ErrorLogFrame();
+            View.execInEventDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    Logger logger = Logger.getLogger("");
+                    logger.addHandler(instance.getHandler());
+                }
+            });
         }
         return instance;
+    }
+
+    public static ErrorLogFrame createNewInstance() {
+        if (instance != null) {
+            View.execInEventDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    Logger logger = Logger.getLogger("");
+                    logger.removeHandler(instance.getHandler());
+                }
+            });
+            instance.setVisible(false);
+            instance.dispose();
+            instance = null;
+        }
+        return getInstance();
     }
 
     public ErrorState getErrorState() {
