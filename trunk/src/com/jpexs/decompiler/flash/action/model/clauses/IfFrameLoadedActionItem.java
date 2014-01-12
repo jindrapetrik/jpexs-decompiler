@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionWaitForFrame2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -74,7 +75,7 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         List<GraphSourceItem> body = generator.generate(localData, actions);
         return toSourceMerge(localData, generator, frame, new ActionWaitForFrame2(body.size()), body);
     }

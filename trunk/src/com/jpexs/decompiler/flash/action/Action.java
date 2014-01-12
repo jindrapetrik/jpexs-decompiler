@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -757,9 +758,9 @@ public class Action implements GraphSourceItem {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
-        translate(stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2), staticOperation, path);
+    public void translate(BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
+        ActionLocalData aLocalData = (ActionLocalData) localData;
+        translate(stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
     }
 
     @Override
@@ -823,10 +824,7 @@ public class Action implements GraphSourceItem {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
         }
-        List<Object> localData = new ArrayList<>();
-        localData.add(registerNames);
-        localData.add(variables);
-        localData.add(functions);
+        ActionLocalData localData = new ActionLocalData(registerNames, variables, functions);
         List<GraphTargetItem> output = new ArrayList<>();
         int ip = start;
         boolean isWhile = false;

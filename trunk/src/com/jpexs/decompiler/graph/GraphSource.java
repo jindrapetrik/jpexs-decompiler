@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public abstract class GraphSource implements Serializable {
 
     public abstract boolean isEmpty();
 
-    public abstract List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) throws InterruptedException;
+    public abstract List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) throws InterruptedException;
 
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {

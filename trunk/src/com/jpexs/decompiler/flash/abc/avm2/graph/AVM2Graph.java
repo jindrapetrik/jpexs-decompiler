@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.graph;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
+import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
@@ -99,42 +102,29 @@ public class AVM2Graph extends Graph {
          }*/
 
     }
-    public static final int DATA_ISSTATIC = 0;
-    public static final int DATA_CLASSINDEX = 1;
-    public static final int DATA_LOCALREGS = 2;
-    public static final int DATA_SCOPESTACK = 3;
-    public static final int DATA_CONSTANTS = 4;
-    public static final int DATA_METHOD_INFO = 5;
-    public static final int DATA_BODY = 6;
-    public static final int DATA_ABC = 7;
-    public static final int DATA_LOCALREGNAMES = 8;
-    public static final int DATA_FQN = 9;
-    public static final int DATA_PARSEDEXCEPTIONS = 10;
-    public static final int DATA_FINALLYJUMPS = 11;
-    public static final int DATA_IGNOREDSWITCHES = 12;
 
     public static List<GraphTargetItem> translateViaGraph(String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         AVM2Graph g = new AVM2Graph(code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, localRegAssigmentIps, refs);
 
-        List<Object> localData = new ArrayList<>();
-        localData.add((Boolean) isStatic);
-        localData.add((Integer) classIndex);
-        localData.add(localRegs);
-        localData.add(scopeStack);
-        localData.add(abc.constants);
-        localData.add(abc.method_info);
-        localData.add(body);
-        localData.add(abc);
-        localData.add(localRegNames);
-        localData.add(fullyQualifiedNames);
-        localData.add(new ArrayList<ABCException>());
-        localData.add(new ArrayList<Integer>()); //finallyJumps
-        localData.add(new ArrayList<Integer>());
-        localData.add((Integer) scriptIndex);
-        localData.add(new HashMap<Integer, Integer>()); //localRegAssignmentIps
-        localData.add(Integer.valueOf(0));
-        localData.add(refs);
-        localData.add(code);
+        AVM2LocalData localData = new AVM2LocalData();
+        localData.isStatic = isStatic;
+        localData.classIndex = classIndex;
+        localData.localRegs = localRegs;
+        localData.scopeStack = scopeStack;
+        localData.constants = abc.constants;
+        localData.methodInfo = abc.method_info;
+        localData.methodBody = body;
+        localData.abc = abc;
+        localData.localRegNames = localRegNames;
+        localData.fullyQualifiedNames = fullyQualifiedNames;
+        localData.parsedExceptions = new ArrayList<>();
+        localData.finallyJumps = new ArrayList<>();
+        localData.ignoredSwitches = new ArrayList<>();
+        localData.scriptIndex = scriptIndex;
+        localData.localRegAssignmentIps = new HashMap<>();
+        localData.ip = 0;
+        localData.refs = refs;
+        localData.code = code;
         g.init(localData);
         List<GraphPart> allParts = new ArrayList<>();
         for (GraphPart head : g.heads) {
@@ -186,15 +176,13 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(GraphSource code, BaseLocalData localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = null;
 
-        @SuppressWarnings("unchecked")
-        List<ABCException> parsedExceptions = (List<ABCException>) localData.get(DATA_PARSEDEXCEPTIONS);
-        @SuppressWarnings("unchecked")
-        List<Integer> finallyJumps = (List<Integer>) localData.get(DATA_FINALLYJUMPS);
-        @SuppressWarnings("unchecked")
-        List<Integer> ignoredSwitches = (List<Integer>) localData.get(DATA_IGNOREDSWITCHES);
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        List<ABCException> parsedExceptions = aLocalData.parsedExceptions;
+        List<Integer> finallyJumps = aLocalData.finallyJumps;
+        List<Integer> ignoredSwitches = aLocalData.ignoredSwitches;
         int ip = part.start;
         int addr = this.avm2code.fixAddrAfterDebugLine(this.avm2code.pos2adr(part.start));
         int maxend = -1;
@@ -331,9 +319,8 @@ public class AVM2Graph extends Graph {
                         }
                     }
                     stack.add(new ExceptionAVM2Item(catchedExceptions.get(e)));
-                    List<Object> localData2 = new ArrayList<>();
-                    localData2.addAll(localData);
-                    localData2.set(DATA_SCOPESTACK, new Stack<GraphTargetItem>());
+                    AVM2LocalData localData2 = new AVM2LocalData(aLocalData);
+                    localData2.scopeStack = new Stack<>();
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                     stopPart2.add(nepart);
                     if (retPart != null) {
@@ -619,11 +606,10 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected GraphPart checkPart(Stack<GraphTargetItem> stack, List<Object> localData, GraphPart next, List<GraphPart> allParts) {
-        @SuppressWarnings("unchecked")
-        List<Integer> finallyJumps = (List<Integer>) localData.get(DATA_FINALLYJUMPS);
-        @SuppressWarnings("unchecked")
-        List<Integer> ignoredSwitches = (List<Integer>) localData.get(DATA_IGNOREDSWITCHES);
+    protected GraphPart checkPart(Stack<GraphTargetItem> stack, BaseLocalData localData, GraphPart next, List<GraphPart> allParts) {
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        List<Integer> finallyJumps = aLocalData.finallyJumps;
+        List<Integer> ignoredSwitches = aLocalData.ignoredSwitches;
         GraphPart ret = next;
         for (int f = 0; f < finallyJumps.size(); f++) {
             int fip = finallyJumps.get(f);
@@ -678,7 +664,8 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected GraphTargetItem checkLoop(LoopItem loopItem, List<Object> localData, List<Loop> loops) {
+    protected GraphTargetItem checkLoop(LoopItem loopItem, BaseLocalData localData, List<Loop> loops) {
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
         if (loopItem instanceof WhileItem) {
             WhileItem w = (WhileItem) loopItem;
 
@@ -703,8 +690,7 @@ public class AVM2Graph extends Graph {
                                             if (spt.object instanceof LocalRegAVM2Item) {
                                                 int regIndex = ((LocalRegAVM2Item) spt.object).regIndex;
                                                 HasNextAVM2Item iti = (HasNextAVM2Item) w.expression.get(w.expression.size() - 1);
-                                                @SuppressWarnings("unchecked")
-                                                HashMap<Integer, GraphTargetItem> localRegs = (HashMap<Integer, GraphTargetItem>) localData.get(DATA_LOCALREGS);
+                                                HashMap<Integer, GraphTargetItem> localRegs = aLocalData.localRegs;
                                                 localRegs.put(regIndex, new FilterAVM2Item(null, iti.collection.getThroughRegister(), ift.expression));
                                                 return null;
                                             }
@@ -731,7 +717,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected void finalProcess(List<GraphTargetItem> list, int level, List<Object> localData) {
+    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
         if (level == 0) {
             if (!list.isEmpty()) {
                 if (list.get(list.size() - 1) instanceof ReturnVoidAVM2Item) {
@@ -822,14 +808,12 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    public List<Object> prepareBranchLocalData(List<Object> localData) {
-        List<Object> ret = new ArrayList<>();
-        ret.addAll(localData);
-        @SuppressWarnings("unchecked")
-        Stack<GraphTargetItem> scopeStack = (Stack<GraphTargetItem>) ret.get(DATA_SCOPESTACK);
+    public AVM2LocalData prepareBranchLocalData(BaseLocalData localData) {
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        AVM2LocalData ret = new AVM2LocalData(aLocalData);
         Stack<GraphTargetItem> copyScopeStack = new Stack<>();
-        copyScopeStack.addAll(scopeStack);
-        ret.set(DATA_SCOPESTACK, copyScopeStack);
+        copyScopeStack.addAll(ret.scopeStack);
+        ret.scopeStack = copyScopeStack;
         return ret;
     }
 }

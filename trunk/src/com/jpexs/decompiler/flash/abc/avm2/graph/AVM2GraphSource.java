@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.graph;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertOutput;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -83,11 +85,9 @@ public class AVM2GraphSource extends GraphSource {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) throws InterruptedException {
+    public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = new ArrayList<>();
-        Object o = localData.get(AVM2Graph.DATA_SCOPESTACK);
-        Stack<GraphTargetItem> newstack = (Stack<GraphTargetItem>) o;
+        Stack<GraphTargetItem> newstack = ((AVM2LocalData) localData).scopeStack;
         ConvertOutput co = code.toSourceOutput(path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()], localRegAssigmentIps, refs);
         ret.addAll(co.output);
         return ret;

@@ -39,7 +39,6 @@ public class UsageListModel extends DefaultListModel<Object> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Object get(int index) {
         try {
             return ((MultinameUsage) super.get(index)).toString(abcTags, abc);
@@ -50,7 +49,6 @@ public class UsageListModel extends DefaultListModel<Object> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Object getElementAt(int index) {
         try {
             return ((MultinameUsage) super.getElementAt(index)).toString(abcTags, abc);
@@ -60,7 +58,6 @@ public class UsageListModel extends DefaultListModel<Object> {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     public MultinameUsage getUsage(int index) {
         return ((MultinameUsage) super.getElementAt(index));
     }

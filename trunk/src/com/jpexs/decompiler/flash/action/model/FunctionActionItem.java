@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
@@ -150,12 +151,12 @@ public class FunctionActionItem extends ActionItem {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         List<GraphSourceItem> ret = new ArrayList<>();
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         List<Integer> paramRegs = new ArrayList<>();
         @SuppressWarnings("unchecked")
-        List<Object> localDataCopy = (List<Object>) Helper.deepCopy(localData);
+        SourceGeneratorLocalData localDataCopy = (SourceGeneratorLocalData) Helper.deepCopy(localData);
         HashMap<String, Integer> registerVars = asGenerator.getRegisterVars(localDataCopy);
         registerVars.put("_parent", REGISTER_PARENT);
         registerVars.put("_root", REGISTER_ROOT);

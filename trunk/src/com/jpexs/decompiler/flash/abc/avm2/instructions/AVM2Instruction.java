@@ -16,8 +16,9 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
-import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.abc.ABCOutputStream;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
@@ -25,8 +26,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -37,7 +36,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -279,15 +277,15 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     public List<Object> replaceWith;
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
-        definition.translate((Boolean) localData.get(0),
-                (Integer) localData.get(13),
-                (Integer) localData.get(1),
-                (HashMap<Integer, GraphTargetItem>) localData.get(2),
+    public void translate(BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        definition.translate(aLocalData.isStatic,
+                aLocalData.scriptIndex,
+                aLocalData.classIndex,
+                aLocalData.localRegs,
                 stack,
-                (Stack<GraphTargetItem>) localData.get(3),
-                (ConstantPool) localData.get(4), this, (MethodInfo[]) localData.get(5), output, (MethodBody) localData.get(6), (ABC) localData.get(7), (HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(9), null, (HashMap<Integer, Integer>) localData.get(14), (int) (Integer) localData.get(15), (HashMap<Integer, List<Integer>>) localData.get(16), (AVM2Code) localData.get(17));
+                aLocalData.scopeStack,
+                aLocalData.constants, this, aLocalData.methodInfo, output, aLocalData.methodBody, aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames, null, aLocalData.localRegAssignmentIps, aLocalData.ip, aLocalData.refs, aLocalData.code);
     }
 
     @Override

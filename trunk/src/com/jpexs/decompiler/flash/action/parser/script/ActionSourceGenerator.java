@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
@@ -72,7 +73,7 @@ import java.util.List;
 public class ActionSourceGenerator implements SourceGenerator {
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, AndItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
         ret.add(new ActionPushDuplicate());
@@ -87,7 +88,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, OrItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
         ret.add(new ActionPushDuplicate());
@@ -116,7 +117,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         return list;
     }
 
-    private List<GraphSourceItem> generateIf(List<Object> localData, GraphTargetItem expression, List<GraphTargetItem> onTrueCmds, List<GraphTargetItem> onFalseCmds, boolean ternar) {
+    private List<GraphSourceItem> generateIf(SourceGeneratorLocalData localData, GraphTargetItem expression, List<GraphTargetItem> onTrueCmds, List<GraphTargetItem> onFalseCmds, boolean ternar) {
         List<GraphSourceItem> ret = new ArrayList<>();
         if (expression instanceof Inverted) {
             ret.addAll(((Inverted) expression).invert().toSource(localData, this));
@@ -168,7 +169,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, IfItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, IfItem item) {
         return generateIf(localData, item.expression, item.onTrue, item.onFalse, false);
     }
 
@@ -195,7 +196,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, TernarOpItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TernarOpItem item) {
         List<GraphTargetItem> onTrue = new ArrayList<>();
         onTrue.add(item.onTrue);
         List<GraphTargetItem> onFalse = new ArrayList<>();
@@ -204,7 +205,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, WhileItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, WhileItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
         List<Action> whileExpr = new ArrayList<>();
 
@@ -233,7 +234,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, DoWhileItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DoWhileItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
         List<Action> doExpr = generateToActionList(localData, item.expression);
         List<Action> doBody = generateToActionList(localData, item.commands);
@@ -251,7 +252,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, ForItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
         List<Action> forExpr = generateToActionList(localData, item.expression);
         List<Action> forBody = generateToActionList(localData, item.commands);
@@ -283,7 +284,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, SwitchItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
         HashMap<String, Integer> registerVars = getRegisterVars(localData);
         int exprReg = 0;
@@ -394,7 +395,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, NotItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NotItem item) {
         if (item.getOriginal() instanceof Inverted) {
             GraphTargetItem norig = ((Inverted) item).invert();
             return norig.toSource(localData, this);
@@ -406,14 +407,14 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, DuplicateItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DuplicateItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.add(new ActionPushDuplicate());
         return ret;
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, BreakItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, BreakItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
         ActionJump abreak = new ActionJump(0);
         abreak.isBreak = true;
@@ -422,7 +423,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, ContinueItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ContinueItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
         ActionJump acontinue = new ActionJump(0);
         acontinue.isContinue = true;
@@ -430,16 +431,16 @@ public class ActionSourceGenerator implements SourceGenerator {
         return ret;
     }
 
-    private List<Action> generateToActionList(List<Object> localData, List<GraphTargetItem> commands) {
+    private List<Action> generateToActionList(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) {
         return toActionList(generate(localData, commands));
     }
 
-    private List<Action> generateToActionList(List<Object> localData, GraphTargetItem command) {
+    private List<Action> generateToActionList(SourceGeneratorLocalData localData, GraphTargetItem command) {
         return toActionList(command.toSource(localData, this));
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, List<GraphTargetItem> commands) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) {
         List<GraphSourceItem> ret = new ArrayList<>();
         for (GraphTargetItem item : commands) {
             ret.addAll(item.toSourceIgnoreReturnValue(localData, this));
@@ -447,40 +448,39 @@ public class ActionSourceGenerator implements SourceGenerator {
         return ret;
     }
 
-    @SuppressWarnings("unchecked")
-    public HashMap<String, Integer> getRegisterVars(List<Object> localData) {
-        return (HashMap<String, Integer>) localData.get(0);
+    public HashMap<String, Integer> getRegisterVars(SourceGeneratorLocalData localData) {
+        return localData.registerVars;
     }
 
-    public void setRegisterVars(List<Object> localData, HashMap<String, Integer> value) {
-        localData.set(0, value);
+    public void setRegisterVars(SourceGeneratorLocalData localData, HashMap<String, Integer> value) {
+        localData.registerVars = value;
     }
 
-    public void setInFunction(List<Object> localData, boolean value) {
-        localData.set(1, value);
+    public void setInFunction(SourceGeneratorLocalData localData, boolean value) {
+        localData.inFunction = value;
     }
 
-    public boolean isInFunction(List<Object> localData) {
-        return (Boolean) localData.get(1);
+    public boolean isInFunction(SourceGeneratorLocalData localData) {
+        return localData.inFunction;
     }
 
-    public boolean isInMethod(List<Object> localData) {
-        return (Boolean) localData.get(2);
+    public boolean isInMethod(SourceGeneratorLocalData localData) {
+        return localData.inMethod;
     }
 
-    public void setInMethod(List<Object> localData, boolean value) {
-        localData.set(2, value);
+    public void setInMethod(SourceGeneratorLocalData localData, boolean value) {
+        localData.inMethod = value;
     }
 
-    public int getForInLevel(List<Object> localData) {
-        return (Integer) localData.get(3);
+    public int getForInLevel(SourceGeneratorLocalData localData) {
+        return localData.forInLevel;
     }
 
-    public void setForInLevel(List<Object> localData, int value) {
-        localData.set(3, value);
+    public void setForInLevel(SourceGeneratorLocalData localData, int value) {
+        localData.forInLevel = value;
     }
 
-    public int getTempRegister(List<Object> localData) {
+    public int getTempRegister(SourceGeneratorLocalData localData) {
         HashMap<String, Integer> registerVars = getRegisterVars(localData);
         int tmpReg = 0;
         for (int i = 0; i < 256; i++) {
@@ -619,7 +619,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         return new ActionPush(new ConstantIndex(index));
     }
 
-    public List<GraphSourceItem> generateTraits(List<Object> localData, boolean isInterface, GraphTargetItem name, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> functions, List<MyEntry<GraphTargetItem, GraphTargetItem>> vars, List<GraphTargetItem> staticFunctions, List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars) {
+    public List<GraphSourceItem> generateTraits(SourceGeneratorLocalData localData, boolean isInterface, GraphTargetItem name, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> functions, List<MyEntry<GraphTargetItem, GraphTargetItem>> vars, List<GraphTargetItem> staticFunctions, List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars) {
         List<String> extendsStr = getVarParts(extendsVal);
         List<GraphSourceItem> ret = new ArrayList<>();
         List<String> nameStr = getVarParts(name);
@@ -750,7 +750,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(List<Object> localData, CommaExpressionItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, CommaExpressionItem item) {
         if (item.commands.isEmpty()) {
             return new ArrayList<>();
         }

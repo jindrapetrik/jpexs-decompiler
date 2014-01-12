@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.special;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
@@ -36,7 +37,7 @@ public class ActionDeobfuscatePop extends ActionPop {
     }
 
     @Override
-    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) {
+    public void translate(BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) {
         if (stack.isEmpty()) {
             return;
         }
