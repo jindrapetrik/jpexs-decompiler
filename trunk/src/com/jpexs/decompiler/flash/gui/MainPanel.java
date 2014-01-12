@@ -93,6 +93,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.treenodes.ContainerNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -1297,8 +1298,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (d.getItem().getSwf() != swf) {
                     continue;
                 }
-                if (d instanceof TagNode) {
-                    TagNode n = (TagNode) d;
+                if (d instanceof ContainerNode) {
+                    ContainerNode n = (ContainerNode) d;
                     if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.IMAGE) {
                         images.add((Tag) n.getItem());
                     }
