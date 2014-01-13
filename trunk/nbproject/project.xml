@@ -98,7 +98,17 @@
             </ide-actions>
             <export>
                 <type>folder</type>
-                <location>build/classes</location>
+                <location>build</location>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>javadoc</location>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>reports</location>
                 <build-target>build</build-target>
             </export>
             <export>
@@ -129,6 +139,10 @@
                     <ide-action name="test"/>
                     <ide-action name="profile"/>
                     <ide-action name="debug"/>
+                    <action>
+                        <label>Nightly</label>
+                        <target>nightly</target>
+                    </action>
                 </context-menu>
             </view>
             <subprojects/>
@@ -138,7 +152,9 @@
             <compilation-unit>
                 <package-root>src</package-root>
                 <classpath mode="compile">lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar;lib/trident-6.2.jar;lib/substance-flamingo-6.2.jar;lib/flamingo-6.2.jar;lib/substance-6.2.jar</classpath>
-                <built-to>build/classes</built-to>
+                <built-to>build</built-to>
+                <built-to>javadoc</built-to>
+                <built-to>reports</built-to>
                 <source-level>1.7</source-level>
             </compilation-unit>
             <compilation-unit>
