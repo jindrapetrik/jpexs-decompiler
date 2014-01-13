@@ -375,6 +375,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }
                     
                     removeMenuItem.setVisible(allSelectedIsTag);
+                    exportSelectionMenuItem.setEnabled(hasExportableNodes());
                     contextPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -1277,6 +1278,32 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
     private SearchDialog searchDialog;
 
+    public boolean hasExportableNodes() {
+        List<TreeNode> sel = getAllSelected(tagTree);
+
+        for (TreeNode d : sel) {
+            if (d instanceof ContainerNode) {
+                ContainerNode n = (ContainerNode) d;
+                TreeNodeType nodeType = TagTree.getTreeNodeType(n.getItem());
+                if (nodeType == TreeNodeType.IMAGE 
+                        || nodeType == TreeNodeType.SHAPE
+                        || nodeType == TreeNodeType.AS
+                        || nodeType == TreeNodeType.MOVIE
+                        || nodeType == TreeNodeType.SOUND
+                        || nodeType == TreeNodeType.BINARY_DATA
+                        || nodeType == TreeNodeType.TEXT) {
+                    return true;
+                }
+            }
+            if (d instanceof TreeElement) {
+                if (((TreeElement) d).isLeaf()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
         final ExportMode exportMode = ExportMode.get(export.getOption(ExportDialog.OPTION_ACTIONSCRIPT));
         final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
@@ -1300,25 +1327,26 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
                 if (d instanceof ContainerNode) {
                     ContainerNode n = (ContainerNode) d;
-                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.IMAGE) {
+                    TreeNodeType nodeType = TagTree.getTreeNodeType(n.getItem());
+                    if (nodeType == TreeNodeType.IMAGE) {
                         images.add((Tag) n.getItem());
                     }
-                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.SHAPE) {
+                    if (nodeType == TreeNodeType.SHAPE) {
                         shapes.add((Tag) n.getItem());
                     }
-                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.AS) {
+                    if (nodeType == TreeNodeType.AS) {
                         actionNodes.add(n);
                     }
-                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.MOVIE) {
+                    if (nodeType == TreeNodeType.MOVIE) {
                         movies.add((Tag) n.getItem());
                     }
-                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.SOUND) {
+                    if (nodeType == TreeNodeType.SOUND) {
                         sounds.add((Tag) n.getItem());
                     }
-                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.BINARY_DATA) {
+                    if (nodeType == TreeNodeType.BINARY_DATA) {
                         binaryData.add((Tag) n.getItem());
                     }
-                    if (TagTree.getTreeNodeType(n.getItem()) == TreeNodeType.TEXT) {
+                    if (nodeType == TreeNodeType.TEXT) {
                         texts.add((Tag) n.getItem());
                     }
                 }
