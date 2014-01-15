@@ -20,16 +20,6 @@ package com.jpexs.decompiler.flash;
  *
  * @author JPEXS
  */
-public class StringNode implements TreeElementItem {
+public abstract class BaseLocalData {
     
-    private String str;
-    
-    public StringNode(String str) {
-        this.str = str;
-    } 
-
-    @Override
-    public String toString() {
-        return str;
-    } 
 }

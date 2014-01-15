@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionStartDrag;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -85,7 +86,7 @@ public class StartDragActionItem extends ActionItem {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueActionItem) {
             if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionDeobfuscation;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
+import com.jpexs.decompiler.flash.action.ActionLocalData;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
@@ -86,6 +87,15 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.treeitems.AS2PackageNodeItem;
+import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
+import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.treenodes.AS2PackageNode;
+import com.jpexs.decompiler.flash.treenodes.ContainerNode;
+import com.jpexs.decompiler.flash.treenodes.FrameNode;
+import com.jpexs.decompiler.flash.treenodes.TagNode;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -154,7 +164,7 @@ import javax.imageio.ImageIO;
  *
  * @author JPEXS
  */
-public final class SWF {
+public final class SWF implements TreeItem {
 
     /**
      * Default version of SWF file format
@@ -418,6 +428,11 @@ public final class SWF {
         }
     }
 
+    @Override
+    public SWF getSwf() {
+        return this;
+    }
+            
     /**
      * Get title of the file
      *
@@ -713,7 +728,7 @@ public final class SWF {
         List<File> ret = new ArrayList<>();
         List<ContainerItem> list2 = new ArrayList<>();
         list2.addAll(tags);
-        List<TagNode> list = createASTagList(list2, null);
+        List<TreeNode> list = createASTagList(list2, null);
 
         TagNode.setExport(list, true);
         if (!outdir.endsWith(File.separator)) {
@@ -811,27 +826,27 @@ public final class SWF {
         return ret;
     }
 
-    public static List<TagNode> createASTagList(List<? extends ContainerItem> list, Object parent) {
-        List<TagNode> ret = new ArrayList<>();
+    public static List<TreeNode> createASTagList(List<? extends ContainerItem> list, Tag parent) {
+        List<TreeNode> ret = new ArrayList<>();
         int frame = 1;
-        List<TagNode> frames = new ArrayList<>();
+        List<TreeNode> frames = new ArrayList<>();
 
         List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
         for (ContainerItem t : list) {
             if (t instanceof ExportAssetsTag) {
                 exportAssetsTags.add((ExportAssetsTag) t);
             }
-            TagNode addNode = null;
+            TreeNode addNode = null;
             if (t instanceof ShowFrameTag) {
-                TagNode tti = new TagNode(new FrameNode(t.getSwf(), frame, parent, false), t.getSwf());
+                FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, false));
 
                 for (int r = ret.size() - 1; r >= 0; r--) {
-                    if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
-                        if (!(ret.get(r).tag instanceof DefineButtonTag)) {
-                            if (!(ret.get(r).tag instanceof DefineButton2Tag)) {
-                                if (!(ret.get(r).tag instanceof DoInitActionTag)) {
-                                    if (!(ret.get(r).tag instanceof PackageNode)) {
-                                        tti.subItems.add(ret.get(r));
+                    if (!(ret.get(r).getItem() instanceof DefineSpriteTag)) {
+                        if (!(ret.get(r).getItem() instanceof DefineButtonTag)) {
+                            if (!(ret.get(r).getItem() instanceof DefineButton2Tag)) {
+                                if (!(ret.get(r).getItem() instanceof DoInitActionTag)) {
+                                    if (!(ret.get(r).getItem() instanceof AS2PackageNodeItem)) {
+                                        tti.subNodes.add(ret.get(r));
                                         ret.remove(r);
                                     }
                                 }
@@ -842,23 +857,24 @@ public final class SWF {
                 frame++;
                 frames.add(tti);
             } else if (t instanceof ASMSource) {
-                TagNode tti = new TagNode(t, t.getSwf());
+                ContainerNode tti = new ContainerNode(t);
                 //ret.add(tti);
                 addNode = tti;
             } else if (t instanceof Container) {
                 if (((Container) t).getItemCount() > 0) {
 
-                    TagNode tti = new TagNode(t, t.getSwf());
+                    ContainerNode tti = new ContainerNode(t);
                     List<ContainerItem> subItems = ((Container) t).getSubItems();
 
-                    tti.subItems = createASTagList(subItems, t);
+                    Tag tag = t instanceof Tag ? (Tag) t : null;
+                    tti.subNodes = createASTagList(subItems, tag);
                     addNode = tti;
                     //ret.add(tti);
                 }
             }
             if (addNode != null) {
-                if (addNode.tag instanceof CharacterIdTag) {
-                    CharacterIdTag cit = (CharacterIdTag) addNode.tag;
+                if (addNode.getItem() instanceof CharacterIdTag) {
+                    CharacterIdTag cit = (CharacterIdTag) addNode.getItem();
                     String path = cit.getExportName();
                     if (path == null) {
                         path = "";
@@ -869,17 +885,17 @@ public final class SWF {
                     } else {
                         pathParts = new String[]{path};
                     }
-                    List<TagNode> items = ret;
+                    List<TreeNode> items = ret;
                     int pos = 0;
-                    TagNode selNode = null;
+                    TreeNode selNode = null;
                     do {
                         if (pos == pathParts.length - 1) {
                             break;
                         }
                         selNode = null;
-                        for (TagNode node : items) {
-                            if (node.tag instanceof PackageNode) {
-                                PackageNode pkg = (PackageNode) node.tag;
+                        for (TreeNode node : items) {
+                            if (node.getItem() instanceof AS2PackageNodeItem) {
+                                AS2PackageNodeItem pkg = (AS2PackageNodeItem) node.getItem();
                                 if (pkg.packageName.equals(pathParts[pos])) {
                                     selNode = node;
                                     break;
@@ -888,8 +904,8 @@ public final class SWF {
                         }
                         int pkgCount = 0;
                         for (; pkgCount < items.size(); pkgCount++) {
-                            if (items.get(pkgCount).tag instanceof PackageNode) {
-                                PackageNode pkg = (PackageNode) items.get(pkgCount).tag;
+                            if (items.get(pkgCount).getItem() instanceof AS3PackageNodeItem) {
+                                AS2PackageNodeItem pkg = (AS2PackageNodeItem) items.get(pkgCount).getItem();
                                 if (pkg.packageName.compareTo(pathParts[pos]) > 0) {
                                     break;
                                 }
@@ -898,19 +914,19 @@ public final class SWF {
                             }
                         }
                         if (selNode == null) {
-                            items.add(pkgCount, selNode = new TagNode(new PackageNode(pathParts[pos]), t.getSwf()));
+                            items.add(pkgCount, selNode = new AS2PackageNode(new AS2PackageNodeItem(pathParts[pos], t.getSwf())));
                         }
                         pos++;
                         if (selNode != null) {
-                            items = selNode.subItems;
+                            items = selNode.subNodes;
                         }
 
                     } while (selNode != null);
 
                     int clsCount = 0;
                     for (; clsCount < items.size(); clsCount++) {
-                        if (items.get(clsCount).tag instanceof CharacterIdTag) {
-                            CharacterIdTag ct = (CharacterIdTag) items.get(clsCount).tag;
+                        if (items.get(clsCount).getItem() instanceof CharacterIdTag) {
+                            CharacterIdTag ct = (CharacterIdTag) items.get(clsCount).getItem();
                             String expName = ct.getExportName();
                             if (expName == null) {
                                 expName = "";
@@ -918,7 +934,7 @@ public final class SWF {
                             if (expName.contains(".")) {
                                 expName = expName.substring(expName.lastIndexOf('.') + 1);
                             }
-                            if ((ct.getClass().getName() + "_" + expName).compareTo(addNode.tag.getClass().getName() + "_" + pathParts[pos]) > 0) {
+                            if ((ct.getClass().getName() + "_" + expName).compareTo(addNode.getItem().getClass().getName() + "_" + pathParts[pos]) > 0) {
                                 break;
                             }
                         }
@@ -932,25 +948,25 @@ public final class SWF {
         }
         ret.addAll(frames);
         for (int i = ret.size() - 1; i >= 0; i--) {
-            if (ret.get(i).tag instanceof DefineSpriteTag) {
-                ((DefineSpriteTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+            if (ret.get(i).getItem() instanceof DefineSpriteTag) {
+                ((DefineSpriteTag) ret.get(i).getItem()).exportAssetsTags = exportAssetsTags;
             }
-            if (ret.get(i).tag instanceof DefineButtonTag) {
-                ((DefineButtonTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+            if (ret.get(i).getItem() instanceof DefineButtonTag) {
+                ((DefineButtonTag) ret.get(i).getItem()).exportAssetsTags = exportAssetsTags;
             }
-            if (ret.get(i).tag instanceof DefineButton2Tag) {
-                ((DefineButton2Tag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+            if (ret.get(i).getItem() instanceof DefineButton2Tag) {
+                ((DefineButton2Tag) ret.get(i).getItem()).exportAssetsTags = exportAssetsTags;
             }
             /*if (ret.get(i).tag instanceof DoInitActionTag) {
              //((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
              }*/
-            if (ret.get(i).tag instanceof ASMSource) {
-                ASMSource ass = (ASMSource) ret.get(i).tag;
+            if (ret.get(i).getItem() instanceof ASMSource) {
+                ASMSource ass = (ASMSource) ret.get(i).getItem();
                 if (ass.containsSource()) {
                     continue;
                 }
             }
-            if (ret.get(i).subItems.isEmpty()) {
+            if (ret.get(i).subNodes.isEmpty()) {
                 ret.remove(i);
             }
         }
@@ -1537,7 +1553,7 @@ public final class SWF {
     private HashMap<DirectValueActionItem, String> usageTypes = new HashMap<>();
     private ActionDeobfuscation deobfuscation = new ActionDeobfuscation();
 
-    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
+    private static void getVariables(ConstantPool constantPool, BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
@@ -1702,7 +1718,7 @@ public final class SWF {
     }
 
     private static void getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageType, ActionGraphSource code, int addr, String path) throws InterruptedException {
-        List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+        ActionLocalData localData = new ActionLocalData();
         getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<Integer>(), usageType, path);
     }
 

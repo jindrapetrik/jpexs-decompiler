@@ -42,6 +42,8 @@ public class FontPreviewDialog extends AppDialog {
         super();
         setModal(true);
         initComponents();
+        View.setWindowIcon(this);
+
         labelSample12.setFont(font.deriveFont(Font.PLAIN, 12));
         labelSample18.setFont(font.deriveFont(Font.PLAIN, 18));
         labelSample24.setFont(font.deriveFont(Font.PLAIN, 24));
@@ -118,6 +120,8 @@ public class FontPreviewDialog extends AppDialog {
         labelFontName = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/jpexs/decompiler/flash/gui/locales/FontPreviewDialog"); // NOI18N
+        setTitle(bundle.getString("fontPreview.dialog.title")); // NOI18N
         setPreferredSize(new java.awt.Dimension(1024, 512));
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentMoved(java.awt.event.ComponentEvent evt) {
@@ -231,8 +235,8 @@ public class FontPreviewDialog extends AppDialog {
             }
         });
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/jpexs/decompiler/flash/gui/locales/MainFrame"); // NOI18N
-        jLabel1.setText(bundle.getString("font.name")); // NOI18N
+        java.util.ResourceBundle bundle1 = java.util.ResourceBundle.getBundle("com/jpexs/decompiler/flash/gui/locales/MainFrame"); // NOI18N
+        jLabel1.setText(bundle1.getString("font.name")); // NOI18N
 
         labelFontName.setText("-");
 

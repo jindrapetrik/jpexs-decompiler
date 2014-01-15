@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.parser.script;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.AsciiToCharActionItem;
 import com.jpexs.decompiler.flash.action.model.CallActionItem;
@@ -1829,12 +1830,9 @@ public class ActionScriptParser {
     public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool) {
         ActionSourceGenerator gen = new ActionSourceGenerator(constantPool);
         List<Action> ret = new ArrayList<>();
-        List<Object> localDate = new ArrayList<>();
-        localDate.add(new HashMap<String, Integer>()); //registerVars
-        localDate.add(Boolean.FALSE); //inFunction
-        localDate.add(Boolean.FALSE); //inMethod
-        localDate.add((Integer) 0); //forInLevel
-        List<GraphSourceItem> srcList = gen.generate(localDate, tree);
+        SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
+                new HashMap<String, Integer>(), Boolean.FALSE, Boolean.FALSE, 0);
+         List<GraphSourceItem> srcList = gen.generate(localData, tree);
         for (GraphSourceItem s : srcList) {
             if (s instanceof Action) {
                 ret.add((Action) s);

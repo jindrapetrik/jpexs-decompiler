@@ -13,7 +13,7 @@
             <classpath refid="cp"/>
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg value="-Xmx1024m"/>
+            <jvmarg value="-Xmx3072m"/>
             <arg line="${RUNPARAMS}"/>
         </java>
     </target>

@@ -35,6 +35,8 @@ import java.util.Date;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -54,14 +56,51 @@ import javax.swing.SwingUtilities;
  */
 public class ErrorLogFrame extends AppFrame {
 
+    private static ErrorLogFrame instance;
+
     private JPanel logView = new JPanel();
     private JPanel logViewInner = new JPanel();
     private Handler handler;
     private ImageIcon expandIcon;
     private ImageIcon collapseIcon;
+    private ErrorState errorState = ErrorState.NO_ERROR;
 
     public Handler getHandler() {
         return handler;
+    }
+
+    public static ErrorLogFrame getInstance() {
+        if (instance == null) {
+            instance = new ErrorLogFrame();
+            View.execInEventDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    Logger logger = Logger.getLogger("");
+                    logger.addHandler(instance.getHandler());
+                }
+            });
+        }
+        return instance;
+    }
+
+    public static ErrorLogFrame createNewInstance() {
+        if (instance != null) {
+            View.execInEventDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    Logger logger = Logger.getLogger("");
+                    logger.removeHandler(instance.getHandler());
+                }
+            });
+            instance.setVisible(false);
+            instance.dispose();
+            instance = null;
+        }
+        return getInstance();
+    }
+
+    public ErrorState getErrorState() {
+        return errorState;
     }
 
     public ErrorLogFrame() {
@@ -98,9 +137,13 @@ public class ErrorLogFrame extends AppFrame {
 
         cnt.add(new JScrollPane(logView), BorderLayout.CENTER);
         handler = new Handler() {
+            SimpleFormatter formatter = new SimpleFormatter();
+            
             @Override
             public void publish(LogRecord record) {
-                log(record.getLevel(), record.getMessage(), record.getThrown());
+                if (getLevel().intValue() <= record.getLevel().intValue()) {
+                    log(record.getLevel(), formatter.formatMessage(record), record.getThrown());
+                }
             }
 
             @Override
@@ -111,12 +154,49 @@ public class ErrorLogFrame extends AppFrame {
             public void close() throws SecurityException {
             }
         };
+        handler.setLevel(Level.WARNING);
     }
 
+    public void clearErrorState() {
+        errorState = ErrorState.NO_ERROR;
+        MainFrame mainFrame = Main.getMainFrame();
+        if (mainFrame != null) {
+            mainFrame.getPanel().setErrorState(errorState);
+        }
+    }
+    
+    private void notifyMainFrame(Level level) {
+        boolean stateChanged = false;
+        if (level.intValue() >= Level.SEVERE.intValue()) {
+            if (errorState != ErrorState.ERROR) {
+                errorState = ErrorState.ERROR;
+                stateChanged = true;
+            }
+        } else if (level.intValue() >= Level.WARNING.intValue()) {
+            if (errorState != ErrorState.ERROR && errorState != ErrorState.WARNING) {
+                errorState = ErrorState.WARNING;
+                stateChanged = true;
+            }
+        } else if (level.intValue() >= Level.INFO.intValue()) {
+            if (errorState == ErrorState.NO_ERROR) {
+                errorState = ErrorState.INFO;
+                stateChanged = true;
+            }
+        }
+        if (stateChanged) {
+            MainFrame mainFrame = Main.getMainFrame();
+            if (mainFrame != null) {
+                mainFrame.getPanel().setErrorState(errorState);
+            }
+        }
+    }
+    
     private void log(final Level level, final String msg, final String detail) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                notifyMainFrame(level);
+                
                 JPanel pan = new JPanel();
                 pan.setBackground(Color.white);
                 pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
@@ -130,7 +210,6 @@ public class ErrorLogFrame extends AppFrame {
                     detailTextArea.setOpaque(false);
                     detailTextArea.setFont(new JLabel().getFont());
                     detailTextArea.setBackground(Color.white);
-                    //detailTextAre
                     detailComponent = detailTextArea;
                 }
                 JPanel header = new JPanel();
@@ -188,7 +267,6 @@ public class ErrorLogFrame extends AppFrame {
                 }
 
 
-
                 if (detailComponent != null) {
                     header.add(expandButton);
                 }
@@ -196,7 +274,6 @@ public class ErrorLogFrame extends AppFrame {
                 dateLabel.setPreferredSize(new Dimension(200, (int) dateLabel.getPreferredSize().getHeight()));
                 dateLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 header.add(dateLabel);
-
 
 
                 JLabel levelLabel = new JLabel(level.getName());

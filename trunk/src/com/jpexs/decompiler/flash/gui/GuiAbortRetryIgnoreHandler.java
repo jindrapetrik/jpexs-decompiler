@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.AppStrings;
 import javax.swing.JOptionPane;
 
 /**

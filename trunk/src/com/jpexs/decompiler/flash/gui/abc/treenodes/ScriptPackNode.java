@@ -14,38 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui;
+package com.jpexs.decompiler.flash.gui.abc.treenodes;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.TagNode;
-import com.jpexs.decompiler.flash.TreeNode;
-import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
-import java.util.List;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 
 /**
  *
  * @author JPEXS
  */
-public class SWFRoot implements TreeNode {
-
-    private SWF swf;
-    private String name;
-    public List<TagNode> list;
-    public ClassesListTreeModel classTreeModel;
-
-    public SWFRoot(SWF swf, String name, List<TagNode> list) {
-        this.swf = swf;
-        this.name = name;
-        this.list = list;
+public class ScriptPackNode extends TreeElement {
+    
+    public ScriptPackNode(String name, String path, ScriptPack item, TreeElement parent) {
+        super(name, path, item, parent);
     }
 
     @Override
-    public SWF getSwf() {
-        return swf;
+    public ScriptPack getItem() {
+        return (ScriptPack) item;
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
 }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
@@ -56,7 +57,7 @@ public class UnLoadMovieNumActionItem extends ActionItem {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         return toSourceMerge(localData, generator, new ActionPush(""), new AddActionItem(src, asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(0, true, false));
     }

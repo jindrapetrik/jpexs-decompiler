@@ -16,15 +16,13 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.TreeElementItem;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
  * Object which contains other objects
  *
  * @author JPEXS
  */
-public interface ContainerItem extends TreeElementItem {
+public interface ContainerItem extends TreeItem {
     
-    SWF getSwf();
 }

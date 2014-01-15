@@ -14,13 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.treeitems;
 
 /**
  *
  * @author JPEXS
  */
-public interface TreeNode {
+public interface TreeElementItem extends TreeItem {
     
-    public SWF getSwf();
 }

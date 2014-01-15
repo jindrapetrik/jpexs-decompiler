@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -95,7 +96,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
-    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return toSourceMerge(localData, generator, value, new ActionStoreRegister(register.number));
     }
 

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.swf5.ActionWith;
@@ -60,7 +61,7 @@ public class WithActionItem extends ActionItem {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         List<GraphSourceItem> data = generator.generate(localData, items);
         List<Action> dataA = new ArrayList<>();
         for (GraphSourceItem s : data) {

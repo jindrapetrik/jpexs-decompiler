@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -94,7 +95,7 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         if (value == null) {
             return toSourceMerge(localData, generator, name, new ActionDefineLocal2());
         } else {

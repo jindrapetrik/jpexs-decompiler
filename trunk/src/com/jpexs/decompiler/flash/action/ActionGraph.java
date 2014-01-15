@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
+import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
@@ -48,9 +50,7 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -72,8 +72,7 @@ public class ActionGraph extends Graph {
     public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
 
         ActionGraph g = new ActionGraph(code, registerNames, variables, functions, version);
-        List<Object> localData = new ArrayList<>();
-        localData.add(registerNames);
+        ActionLocalData localData = new ActionLocalData(registerNames);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
@@ -94,13 +93,8 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected void finalProcess(List<GraphTargetItem> list, int level, List<Object> localData) {
+    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
 
-        if (localData.isEmpty()) {
-            localData.add(new HashSet<Integer>()); //List of temporaryRegisters
-        }
-        @SuppressWarnings("unchecked")
-        Set<Integer> temporaryRegisters = (HashSet<Integer>) localData.get(0);
         List<GraphTargetItem> ret = Action.checkClass(list);
         if (ret != list) {
             list.clear();
@@ -253,7 +247,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(GraphSource code, BaseLocalData localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         if (!output.isEmpty()) {
             if (output.get(output.size() - 1) instanceof StoreRegisterActionItem) {
                 StoreRegisterActionItem str = (StoreRegisterActionItem) output.get(output.size() - 1);

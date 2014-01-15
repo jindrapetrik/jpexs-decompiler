@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
@@ -115,7 +116,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         List<GraphSourceItem> ret = new ArrayList<>();
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         HashMap<String, Integer> registerVars = asGenerator.getRegisterVars(localData);

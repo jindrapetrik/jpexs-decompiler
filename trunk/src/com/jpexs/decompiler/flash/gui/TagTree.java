@@ -16,11 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.FrameNode;
-import com.jpexs.decompiler.flash.PackageNode;
-import com.jpexs.decompiler.flash.TagNode;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
-import com.jpexs.decompiler.flash.gui.abc.TreeElement;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -49,11 +46,19 @@ import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
+import com.jpexs.decompiler.flash.treeitems.AS2PackageNodeItem;
+import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
+import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
+import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,16 +90,12 @@ public class TagTree extends JTree {
                     tree, value, sel,
                     expanded, leaf, row,
                     hasFocus);
-            Object val = value;
-            if (val instanceof TagNode) {
-                val = ((TagNode) val).tag;
-            }
-            TagType type = getTagType(val);
-            if (val instanceof SWFRoot) {
-                setIcon(View.getIcon("flash16"));
-            } else if (type != null) {
-                if (type == TagType.FOLDER && expanded) {
-                    type = TagType.FOLDER_OPEN;
+            TreeNode treeNode = (TreeNode) value;
+            TreeItem val = treeNode.getItem();
+            TreeNodeType type = getTreeNodeType(val);
+            if (type != null) {
+                if (type == TreeNodeType.FOLDER && expanded) {
+                    type = TreeNodeType.FOLDER_OPEN;
                 }
                 String tagTypeStr = type.toString().toLowerCase().replace("_", "");
                 setIcon(View.getIcon(tagTypeStr + "16"));
@@ -111,7 +112,15 @@ public class TagTree extends JTree {
             //setBackground(Color.green);
             setBackgroundNonSelectionColor(Color.white);
             //setBackgroundSelectionColor(Color.ORANGE);
-            //setFont(getFont().deriveFont(Font.BOLD));
+            
+            if (treeNode instanceof TreeNode) {
+                if (treeNode.getItem() instanceof Tag) {
+                    Tag tag = (Tag) treeNode.getItem();
+                    if (tag.isModified()) {
+                        setFont(getFont().deriveFont(Font.BOLD));
+                    }
+                }
+            }
             return this;
         }
     }
@@ -130,18 +139,18 @@ public class TagTree extends JTree {
         });
     }
 
-    public static TagType getTagType(Object t) {
+    public static TreeNodeType getTreeNodeType(TreeItem t) {
         if ((t instanceof DefineFontTag)
                 || (t instanceof DefineFont2Tag)
                 || (t instanceof DefineFont3Tag)
                 || (t instanceof DefineFont4Tag)
                 || (t instanceof DefineCompactedFont)) {
-            return TagType.FONT;
+            return TreeNodeType.FONT;
         }
         if ((t instanceof DefineTextTag)
                 || (t instanceof DefineText2Tag)
                 || (t instanceof DefineEditTextTag)) {
-            return TagType.TEXT;
+            return TreeNodeType.TEXT;
         }
 
         if ((t instanceof DefineBitsTag)
@@ -150,67 +159,69 @@ public class TagTree extends JTree {
                 || (t instanceof DefineBitsJPEG4Tag)
                 || (t instanceof DefineBitsLosslessTag)
                 || (t instanceof DefineBitsLossless2Tag)) {
-            return TagType.IMAGE;
+            return TreeNodeType.IMAGE;
         }
         if ((t instanceof DefineShapeTag)
                 || (t instanceof DefineShape2Tag)
                 || (t instanceof DefineShape3Tag)
                 || (t instanceof DefineShape4Tag)) {
-            return TagType.SHAPE;
+            return TreeNodeType.SHAPE;
         }
 
         if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
-            return TagType.MORPH_SHAPE;
+            return TreeNodeType.MORPH_SHAPE;
         }
 
         if (t instanceof DefineSpriteTag) {
-            return TagType.SPRITE;
+            return TreeNodeType.SPRITE;
         }
         if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
-            return TagType.BUTTON;
+            return TreeNodeType.BUTTON;
         }
         if (t instanceof ASMSource) {
-            return TagType.AS;
+            return TreeNodeType.AS;
         }
-        if (t instanceof TreeElement) {
-            TreeElement te = (TreeElement) t;
-            if (te.getItem() instanceof ScriptPack) {
-                return TagType.AS;
-            } else {
-                return TagType.PACKAGE;
-            }
+        if (t instanceof ScriptPack) {
+            return TreeNodeType.AS;
         }
-        if (t instanceof PackageNode) {
-            return TagType.PACKAGE;
+        if (t instanceof AS2PackageNodeItem) {
+            return TreeNodeType.PACKAGE;
         }
-        if (t instanceof FrameNode) {
-            return TagType.FRAME;
+        if (t instanceof AS3PackageNodeItem) {
+            return TreeNodeType.PACKAGE;
+        }
+        if (t instanceof FrameNodeItem) {
+            return TreeNodeType.FRAME;
         }
         if (t instanceof ShowFrameTag) {
-            return TagType.SHOW_FRAME;
+            return TreeNodeType.SHOW_FRAME;
         }
 
         if (t instanceof DefineVideoStreamTag) {
-            return TagType.MOVIE;
+            return TreeNodeType.MOVIE;
         }
 
         if ((t instanceof DefineSoundTag) || (t instanceof SoundStreamHeadTag) || (t instanceof SoundStreamHead2Tag)) {
-            return TagType.SOUND;
+            return TreeNodeType.SOUND;
         }
 
         if (t instanceof DefineBinaryDataTag) {
-            return TagType.BINARY_DATA;
+            return TreeNodeType.BINARY_DATA;
         }
 
-        return TagType.FOLDER;
+        if (t instanceof SWF) {
+            return TreeNodeType.FLASH;
+        }
+
+        return TreeNodeType.FOLDER;
     }
 
-    public List<Object> getTagsWithType(List<Object> list, TagType type) {
-        List<Object> ret = new ArrayList<>();
-        for (Object o : list) {
-            TagType ttype = getTagType(o);
+    public List<TreeElementItem> getTagsWithType(List<TreeElementItem> list, TreeNodeType type) {
+        List<TreeElementItem> ret = new ArrayList<>();
+        for (TreeElementItem item : list) {
+            TreeNodeType ttype = getTreeNodeType(item);
             if (type == ttype) {
-                ret.add(o);
+                ret.add(item);
             }
         }
         return ret;

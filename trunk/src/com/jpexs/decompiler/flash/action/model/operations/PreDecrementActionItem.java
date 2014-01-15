@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model.operations;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
@@ -48,7 +49,7 @@ public class PreDecrementActionItem extends UnaryOpItem {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         List<GraphSourceItem> ret = new ArrayList<>();
 

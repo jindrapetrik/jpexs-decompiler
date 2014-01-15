@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.model.BinaryOp;
@@ -206,11 +207,11 @@ public abstract class GraphTargetItem implements Serializable {
         return equals(target);
     }
 
-    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return new ArrayList<>();
     }
 
-    public List<GraphSourceItem> toSourceIgnoreReturnValue(List<Object> localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return toSource(localData, generator);
     }
 
@@ -220,7 +221,7 @@ public abstract class GraphTargetItem implements Serializable {
         return ret;
     }
 
-    protected List<GraphSourceItem> toSourceMerge(List<Object> localData, SourceGenerator gen, Object... tar) {
+    protected List<GraphSourceItem> toSourceMerge(SourceGeneratorLocalData localData, SourceGenerator gen, Object... tar) {
         List<GraphSourceItem> ret = new ArrayList<>();
         for (Object o : tar) {
             if (o instanceof GraphTargetItem) {

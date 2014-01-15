@@ -69,7 +69,7 @@ import java.util.logging.Logger;
  */
 public class ActionListReader {
 
-    private static final Logger log = Logger.getLogger(SWFInputStream.class.getName());
+    private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
 
     
     /**
@@ -241,7 +241,7 @@ public class ActionListReader {
 
         Stack<GraphTargetItem> stack = new Stack<>();
 
-        List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+        ActionLocalData localData = new ActionLocalData();
 
         int maxRecursionLevel = 0;
         for (int i = 0; i < actions.size(); i++) {
@@ -256,7 +256,7 @@ public class ActionListReader {
             }
         }
         
-        deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, actionMap, ip, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version, 0, maxRecursionLevel);
+        deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, actionMap, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version, 0, maxRecursionLevel);
 
         if (!retdups.isEmpty()) {
             for (int i = 0; i < ip; i++) {
@@ -585,7 +585,6 @@ public class ActionListReader {
         return true;
     }
     
-    @SuppressWarnings("unchecked")
     private static Action readActionListAtPos(List<DisassemblyListener> listeners, long containerSWFOffset, ConstantPool cpool,
             SWFInputStream sis, List<Action> actions, List<Long> nextOffsets,
             long ip, long startIp, long endIp, int version, String path, boolean indeterminate, List<Long> visitedContainers) throws IOException {
@@ -701,8 +700,7 @@ public class ActionListReader {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int pos, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {
+    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, ActionLocalData localData, Stack<GraphTargetItem> stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
@@ -710,17 +708,15 @@ public class ActionListReader {
             throw new TranslateException("deobfustaceActionListAtPosRecursive max recursion level reached.");
         }
         
-        pos = ip;
         Action a;
         Scanner sc = new Scanner(System.in);
         loopip:
-        while (((endip == -1) || (endip > ip)) && (a = actions.get(pos)) != null) {
+        while (((endip == -1) || (endip > ip)) && (a = actions.get(ip)) != null) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
             
             int actionLen = getTotalActionLength(a);
-            pos += actionLen;
             if (!visited.containsKey(ip)) {
                 visited.put(ip, 0);
             }
@@ -728,10 +724,7 @@ public class ActionListReader {
             curVisited++;
             visited.put(ip, curVisited);
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progress("Deobfuscating", pos, actions.size());
-            }
-            if ((ip < ret.size()) && (!(ret.get(ip) instanceof ActionNop))) {
-                a = ret.get(ip);
+                listeners.get(i).progress("Deobfuscating", ip, actions.size());
             }
             int info = a.actionLength + 1 + ((a.actionCode >= 0x80) ? 2 : 0);
 
@@ -747,10 +740,8 @@ public class ActionListReader {
                     atos = a.toString();
                 }
                 System.err.println("readActionListAtPos ip: " + (ip - startIp) + " (0x" + Helper.formatAddress(ip - startIp) + ") " + " action(len " + a.actionLength + "): " + atos + (a.isIgnored() ? " (ignored)" : "") + " stack:" + Helper.stackToString(stack, LocalData.create(cpool)) + " " + Helper.byteArrToString(a.getBytes(version)));
-                @SuppressWarnings("unchecked")
-                HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
                 System.err.print("variables: ");
-                for (Map.Entry<String, GraphTargetItem> v : vars.entrySet()) {
+                for (Map.Entry<String, GraphTargetItem> v : localData.variables.entrySet()) {
                     System.err.print("'" + v + "' = " + v.getValue().toString(LocalData.create(cpool)) + ", ");
                 }
                 System.err.println();
@@ -786,7 +777,7 @@ public class ActionListReader {
                         aif = (ActionIf) a;
 
                         GraphTargetItem top = stack.pop();
-                        int nip = pos + aif.getJumpOffset();
+                        int nip = ip + actionLen + aif.getJumpOffset();
 
                         if (decideBranch) {
                             System.out.print("newip " + nip + ", ");
@@ -794,8 +785,7 @@ public class ActionListReader {
                             String next = sc.next();
                             switch (next) {
                                 case "j":
-                                    newip = pos + aif.getJumpOffset();
-                                    pos = newip;
+                                    newip = nip;
                                     break;
                                 case "i":
                                     break;
@@ -808,7 +798,7 @@ public class ActionListReader {
                                 System.err.print("is compiletime -> ");
                             }
                             if (EcmaScript.toBoolean(top.getResult())) {
-                                newip = pos + aif.getJumpOffset();
+                                newip = nip;
                                 aif.jumpUsed = true;
                                 if (debugMode) {
                                     System.err.println("jump");
@@ -826,7 +816,7 @@ public class ActionListReader {
                             goaif = true;
                         }
                     } else if (a instanceof ActionJump) {
-                        newip = pos + ((ActionJump) a).getJumpOffset();
+                        newip = ip + actionLen + ((ActionJump) a).getJumpOffset();
                     } else if (!(a instanceof GraphSourceItemContainer)) {
                         //return in for..in,   TODO:Handle this better way
                         if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
@@ -838,11 +828,11 @@ public class ActionListReader {
                         a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
                     }
                 } catch (RuntimeException ex) {
-                    log.log(Level.SEVERE, "Disassembly exception", ex);
+                    logger.log(Level.SEVERE, "Disassembly exception", ex);
                     break;
                 }
 
-                HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
+                HashMap<String, GraphTargetItem> vars = localData.variables;
                 if (varname != null) {
                     GraphTargetItem varval = vars.get(varname);
                     if (varval != null && varval.isCompileTime() && indeterminate) {
@@ -876,20 +866,19 @@ public class ActionListReader {
                             output2s.add(new ArrayList<GraphTargetItem>());
                             continue;
                         }
-                        List<Object> localData2;
+                        ActionLocalData localData2;
                         List<GraphTargetItem> output2 = new ArrayList<>();
                         if ((cnt instanceof ActionDefineFunction) || (cnt instanceof ActionDefineFunction2)) {
-                            localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+                            localData2 = new ActionLocalData();
                         } else {
                             localData2 = localData;
                         }
-                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, actions, pos, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
+                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
                         output2s.add(output2);
                         endAddr += size;
                     }
-                    cnt.translateContainer(output2s, stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
+                    cnt.translateContainer(output2s, stack, output, localData.regNames, localData.variables, localData.functions);
                     ip = (int) endAddr;
-                    pos = ip;
                     continue;
                 }
             }
@@ -897,18 +886,12 @@ public class ActionListReader {
             if (a instanceof ActionEnd) {
                 break;
             }
-            if (newip > -1) {
-                ip = newip;
-            } else {
-                ip += info;
-            }
-            pos = ip;
             if (goaif) {
                 aif.ignoreUsed = true;
                 aif.jumpUsed = true;
                 indeterminate = true;
 
-                HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
+                HashMap<String, GraphTargetItem> vars = localData.variables;
                 boolean stateChanged = false;
                 if (decisionStates.containsKey(ip)) {
                     HashMap<String, GraphTargetItem> oldstate = decisionStates.get(ip);
@@ -933,8 +916,8 @@ public class ActionListReader {
 
                 if ((!stateChanged) && curVisited > 1) {
                     List<Integer> branches = new ArrayList<>();
-                    branches.add(pos + aif.getJumpOffset());
-                    branches.add(pos);
+                    branches.add(ip + actionLen + aif.getJumpOffset());
+                    branches.add(ip + actionLen);
                     for (int br : branches) {
                         int visc = 0;
                         if (visited.containsKey(br)) {
@@ -942,7 +925,6 @@ public class ActionListReader {
                         }
                         if (visc == 0) {//<curVisited){
                             ip = br;
-                            pos = br;
                             continue loopip;
                         }
                     }
@@ -951,28 +933,27 @@ public class ActionListReader {
 
                 @SuppressWarnings("unchecked")
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, actions, pos, pos + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
+                deobfustaceActionListAtPosRecursive(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, actions, ip + actionLen + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
             }
+
+            if (newip > -1) {
+                ip = newip;
+            } else {
+                ip += info;
+            }
+
             if (a.isExit()) {
                 break;
             }
         }
         for (DisassemblyListener listener : listeners) {
-            listener.progress("Deobfuscating", pos, actions.size());
+            listener.progress("Deobfuscating", ip, actions.size());
         }
     }
 
-    private static List<Object> prepareLocalBranch(List<Object> localData) {
-        @SuppressWarnings("unchecked")
-        HashMap<Integer, String> regNames = (HashMap<Integer, String>) localData.get(0);
-        @SuppressWarnings("unchecked")
-        HashMap<String, GraphTargetItem> variables = (HashMap<String, GraphTargetItem>) localData.get(1);
-        @SuppressWarnings("unchecked")
-        HashMap<String, GraphTargetItem> functions = (HashMap<String, GraphTargetItem>) localData.get(2);
-        List<Object> ret = new ArrayList<>();
-        ret.add(new HashMap<>(regNames));
-        ret.add(new HashMap<>(variables));
-        ret.add(new HashMap<>(functions));
-        return ret;
+    private static ActionLocalData prepareLocalBranch(ActionLocalData localData) {
+        
+        return new ActionLocalData(new HashMap<>(localData.regNames), 
+                new HashMap<>(localData.variables), new HashMap<>(localData.functions));
     }
 }

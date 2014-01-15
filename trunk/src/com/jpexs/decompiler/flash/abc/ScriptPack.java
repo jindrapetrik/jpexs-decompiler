@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
-import com.jpexs.decompiler.flash.TreeElementItem;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -52,6 +53,11 @@ public class ScriptPack implements TreeElementItem {
     public List<Integer> traitIndices;
     private ClassPath path;
 
+    @Override
+    public SWF getSwf() {
+        return abc.swf;
+    }
+            
     public ClassPath getPath() {
         return path;
     }
@@ -155,21 +161,12 @@ public class ScriptPack implements TreeElementItem {
         } catch (TimeoutException ex) {
             writer.continueMeasure();
             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
-            writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * Decompilation error").newLine();
-            writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(Configuration.decompilationTimeoutFile.get()) + ") was reached").newLine();
-            writer.appendNoHilight(" */").newLine();
-            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
+            Helper.appendTimeoutComment(writer, Configuration.decompilationTimeoutFile.get());
             return;
         } catch (ExecutionException ex) {
             writer.continueMeasure();
             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
-            writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * Decompilation error").newLine();
-            writer.appendNoHilight(" * Code may be obfuscated").newLine();
-            writer.appendNoHilight(" * Error type: " + ex.getClass().getSimpleName()).newLine();
-            writer.appendNoHilight(" */").newLine();
-            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
+            Helper.appendErrorComment(writer, ex);
             return;
         }
         writer.continueMeasure();

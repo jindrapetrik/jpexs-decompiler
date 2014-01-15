@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -127,7 +128,6 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
 
     public static void reloadUi() {
         Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
-        AppStrings.updateLanguage();
         DefaultSyntaxKit.reloadConfigs();
         Main.initLang();
         Main.reloadApp();

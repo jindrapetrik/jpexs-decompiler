@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
@@ -37,31 +38,31 @@ import java.util.List;
  */
 public interface SourceGenerator {
 
-    public List<GraphSourceItem> generate(List<Object> localData, AndItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, OrItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, IfItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, IfItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, TernarOpItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TernarOpItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, WhileItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, WhileItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, DoWhileItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DoWhileItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, ForItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, SwitchItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, NotItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NotItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, DuplicateItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DuplicateItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, BreakItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, BreakItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, ContinueItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ContinueItem item);
 
-    public List<GraphSourceItem> generate(List<Object> localData, List<GraphTargetItem> commands);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, List<GraphTargetItem> commands);
 
-    public List<GraphSourceItem> generate(List<Object> localData, CommaExpressionItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, CommaExpressionItem item);
 }

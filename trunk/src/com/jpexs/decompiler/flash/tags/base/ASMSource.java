@@ -17,9 +17,9 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
-import com.jpexs.decompiler.flash.TreeElementItem;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.graph.ExportMode;
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public interface ASMSource extends TreeElementItem {
+public interface ASMSource extends TreeItem {
 
     /**
      * Converts actions to ASM source

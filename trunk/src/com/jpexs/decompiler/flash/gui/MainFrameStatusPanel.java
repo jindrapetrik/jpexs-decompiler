@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import static com.jpexs.decompiler.flash.gui.ErrorState.WARNING;
 import com.jpexs.helpers.CancellableWorker;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -26,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -46,6 +48,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
     private JButton cancelButton = new JButton();
     private JButton errorNotificationButton;
 
+    private Icon currentIcon;
     private Timer blinkTimer;
     private int blinkPos;
 
@@ -126,44 +129,61 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
         cancelButton.setVisible(worker != null);
     }
 
-    public void clearErrorState() {
-        errorNotificationButton.setIcon(View.getIcon("okay16"));
-        errorNotificationButton.setToolTipText(translate("errors.none"));
-    }
-
-    public void setErrorState() {
+    public void setErrorState(ErrorState errorState) {
         if (errorNotificationButton == null) {
             // todo: honfika
             // why null?
             return;
         }
-        errorNotificationButton.setIcon(View.getIcon("error16"));
-        errorNotificationButton.setToolTipText(translate("errors.present"));
-        if (blinkTimer != null) {
-            blinkTimer.cancel();
+        switch (errorState) {
+            case NO_ERROR:
+                currentIcon = View.getIcon("okay16");
+                errorNotificationButton.setToolTipText(translate("errors.none"));
+                blinkPos = 0;
+                break;
+            case INFO:
+                currentIcon = View.getIcon("information16");
+                errorNotificationButton.setToolTipText(translate("errors.info"));
+                break;
+            case WARNING:
+                currentIcon = View.getIcon("warning16");
+                errorNotificationButton.setToolTipText(translate("errors.warning"));
+                break;
+            case ERROR:
+                currentIcon = View.getIcon("error16");
+                errorNotificationButton.setToolTipText(translate("errors.present"));
+                break;
         }
-        blinkTimer = new Timer();
-        blinkTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                View.execInEventDispatch(new Runnable() {
-                    @Override
-                    public void run() {
-                        blinkPos++;
-                        if ((blinkPos % 2) == 0 || (blinkPos >= 4)) {
-                            errorNotificationButton.setIcon(View.getIcon("error16"));
-                        } else {
-                            errorNotificationButton.setIcon(null);
-                            errorNotificationButton.setSize(16, 16);
-                        }
-                    }
-                });
-
-                if (blinkPos >= 4) {
-                    cancel();
-                }
+        
+        errorNotificationButton.setIcon(currentIcon);
+                
+        if (errorState != ErrorState.NO_ERROR) {
+            if (blinkTimer != null) {
+                blinkTimer.cancel();
             }
-        }, 500, 500);
+            blinkTimer = new Timer();
+            blinkTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    View.execInEventDispatch(new Runnable() {
+                        @Override
+                        public void run() {
+                            blinkPos++;
+                            if ((blinkPos % 2) == 0 || (blinkPos >= 4)) {
+                                errorNotificationButton.setIcon(currentIcon);
+                            } else {
+                                errorNotificationButton.setIcon(null);
+                                errorNotificationButton.setSize(16, 16);
+                            }
+                        }
+                    });
+
+                    if (blinkPos >= 4) {
+                        cancel();
+                    }
+                }
+            }, 500, 500);
+        }
     }
 
 }

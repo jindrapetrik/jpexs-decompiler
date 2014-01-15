@@ -16,6 +16,7 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -536,6 +537,19 @@ public class Helper {
         return timeStr;
     }
 
+    public static String formatFileSize(long fileSizeLong) {
+        double fileSize = fileSizeLong;
+        if (fileSize < 1024) {
+            return String.format("%d bytes", fileSizeLong) ;
+        }
+        fileSize /= 1024;
+        if (fileSize < 1024) {
+            return String.format("%.2f KB", fileSize) ;
+        }
+        fileSize /= 1024;
+        return String.format("%.2f MB", fileSize) ;
+    }
+    
     public static void freeMem() {
         Cache.clearAll();
         System.gc();
@@ -548,20 +562,28 @@ public class Helper {
         timeM %= 60;
 
         String timeStr = "";
+        String strAnd = AppStrings.translate("timeFormat.and");
+        String strHour = AppStrings.translate("timeFormat.hour");
+        String strHours = AppStrings.translate("timeFormat.hours");
+        String strMinute = AppStrings.translate("timeFormat.minute");
+        String strMinutes = AppStrings.translate("timeFormat.minutes");
+        String strSecond = AppStrings.translate("timeFormat.second");
+        String strSeconds = AppStrings.translate("timeFormat.seconds");
+        
         if (timeH > 0) {
-            timeStr += timeH + (timeH > 1 ? " hours" : " hour");
+            timeStr += timeH + " " + (timeH > 1 ? strHours : strHour);
         }
         if (timeM > 0) {
             if (timeStr.length() > 0) {
-                timeStr += " and ";
+                timeStr += " " + strAnd + " ";
             }
-            timeStr += timeM + (timeM > 1 ? " minutes" : " minute");
+            timeStr += timeM + " " + (timeM > 1 ? strMinutes : strMinute);
         }
         if (timeS > 0) {
             if (timeStr.length() > 0) {
-                timeStr += " and ";
+                timeStr += " " + strAnd + " ";
             }
-            timeStr += timeS + (timeS > 1 ? " seconds" : " second");
+            timeStr += timeS + " " + (timeS > 1 ? strSeconds : strSecond);
         }
 
         // (currently) used only in log, so no localization is required
@@ -686,5 +708,27 @@ public class Helper {
                 fos.flush();
             }
         }
+    }
+    
+    public static void appendTimeoutComment(GraphTextWriter writer, int timeout) {
+        writer.appendNoHilight("/*").newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(String.format(AppStrings.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
+        writer.appendNoHilight(" */").newLine();
+        writer.appendNoHilight("throw new IllegalOperationError(\"").
+                appendNoHilight(AppStrings.translate("decompilationError.timeout.description")).
+                appendNoHilight("\");").newLine();
+    }
+    
+    public static void appendErrorComment(GraphTextWriter writer, Throwable ex) {
+        writer.appendNoHilight("/*").newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.obfuscated")).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.errorType")).
+                appendNoHilight(": " + ex.getClass().getSimpleName()).newLine();
+        writer.appendNoHilight(" */").newLine();
+        writer.appendNoHilight("throw new IllegalOperationError(\"").
+                appendNoHilight(AppStrings.translate("decompilationError.error.description")).
+                appendNoHilight("\");").newLine();
     }
 }

@@ -14,24 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui;
+package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.TreeNode;
+import java.util.HashMap;
 
 /**
  *
  * @author JPEXS
  */
-public class TagTreeRoot implements TreeNode {
-    
-    @Override
-    public String toString() {
-        return "root";
-    }
+public class SourceGeneratorLocalData {
 
-    @Override
-    public SWF getSwf() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public HashMap<String, Integer> registerVars;
+    public Boolean inFunction;
+    public Boolean inMethod;
+    public Integer forInLevel;
+
+    public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Boolean inFunction, Boolean inMethod, Integer forInLevel) {
+        this.registerVars = registerVars;
+        this.inFunction = inFunction;
+        this.inMethod = inMethod;
+        this.forInLevel = forInLevel;
     }
 }

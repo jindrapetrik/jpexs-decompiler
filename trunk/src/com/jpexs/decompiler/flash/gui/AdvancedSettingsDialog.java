@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.lang.reflect.Field;
@@ -47,6 +48,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         String[] keys = new String[fields.size()];
         keys = fields.keySet().toArray(keys);
         Arrays.sort(keys);
+        
         for (String name : keys) {
             Field field = fields.get(name);
             DefaultTableModel model = (DefaultTableModel) configurationTable.getModel();
@@ -58,7 +60,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                 }
                 Object defaultValue = Configuration.getDefaultValue(field);
                 if (defaultValue != null) {
-                    description += " (default: " + defaultValue + ")";
+                    description += " (" + translate("default") + ": " + defaultValue + ")";
                 }
                 model.addRow(new Object[]{name, item.get(), description});
             } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -68,6 +70,34 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
     }
 
+    private DefaultTableModel getModel() {
+        return new javax.swing.table.DefaultTableModel(
+            new Object [][] { },
+            new String [] {
+                translate("advancedSettings.columns.name"), 
+                translate("advancedSettings.columns.value"), 
+                translate("advancedSettings.columns.description")
+            }
+        ) {
+            Class[] types = new Class [] {
+                String.class, Object.class, String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, true, false
+            };
+
+            @Override
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        };        
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -84,50 +114,30 @@ public class AdvancedSettingsDialog extends AppDialog {
         btnReset = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/jpexs/decompiler/flash/gui/locales/AdvancedSettingsDialog"); // NOI18N
+        setTitle(bundle.getString("advancedSettings.dialog.title")); // NOI18N
         setModal(true);
         setPreferredSize(new java.awt.Dimension(600, 400));
 
-        configurationTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Name", "Value", "Description"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Object.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, true, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+        configurationTable.setModel(getModel());
         jScrollPane1.setViewportView(configurationTable);
-        configurationTable.getColumnModel().getColumn(1).setCellEditor(configurationTable.getCellEditor());
 
-        btnOk.setText("OK");
+        java.util.ResourceBundle bundle1 = java.util.ResourceBundle.getBundle("com/jpexs/decompiler/flash/gui/locales/MainFrame"); // NOI18N
+        btnOk.setText(bundle1.getString("button.ok")); // NOI18N
         btnOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOkActionPerformed(evt);
             }
         });
 
-        btnCancel.setText("Cancel");
+        btnCancel.setText(bundle1.getString("button.cancel")); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
             }
         });
 
-        btnReset.setText("Reset");
+        btnReset.setText(bundle1.getString("button.reset")); // NOI18N
         btnReset.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnResetActionPerformed(evt);

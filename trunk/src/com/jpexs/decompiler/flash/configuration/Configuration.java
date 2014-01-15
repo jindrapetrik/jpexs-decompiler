@@ -49,6 +49,8 @@ public class Configuration {
      */
     private static List<Replacement> replacements = new ArrayList<>();
 
+    public static final Level logLevel;
+
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> openMultipleFiles = null;
     @ConfigurationDefaultBoolean(true)
@@ -83,6 +85,8 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> useRibbonInterface = null;
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> openFolderAfterFlaExport = null;
+    @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> useDetailedLogging = null;
 
     /**
      * Debug mode = throwing an error when comparing original file and
@@ -444,6 +448,11 @@ public class Configuration {
 
     static {
         setConfigurationFields();
+        if (useDetailedLogging.get() || debugMode.get()) {
+            logLevel = Level.CONFIG;
+        } else {
+            logLevel = Level.WARNING;
+        }
     }
     
     @SuppressWarnings("unchecked")

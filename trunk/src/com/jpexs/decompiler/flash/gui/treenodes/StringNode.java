@@ -14,22 +14,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.gui.treenodes;
+
+import com.jpexs.decompiler.flash.treeitems.StringItem;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 
 /**
  *
  * @author JPEXS
  */
-public class PackageNode implements TreeElementItem {
-
-    public String packageName;
-
-    public PackageNode(String packageName) {
-        this.packageName = packageName;
+public class StringNode extends TreeNode {
+    
+    public StringNode(StringItem item) {
+        super(item);
     }
 
     @Override
-    public String toString() {
-        return packageName;
+    public StringItem getItem() {
+        return (StringItem) item;
     }
+
 }

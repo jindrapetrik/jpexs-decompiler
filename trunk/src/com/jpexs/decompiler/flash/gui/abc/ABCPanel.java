@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -36,7 +37,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -117,41 +118,44 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
             TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-            ClassesListTreeModel clModel = ttm.getSwfRoot(mainPanel.getCurrentSwf()).classTreeModel;
-            List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
+            TreeNode scriptsNode = ttm.getSwfRoot(mainPanel.getCurrentSwf()).scriptsNode;
             found = new ArrayList<>();
-            final Pattern pat = regexp ?
-                Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0) :
-                Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
-            int pos = 0;
-            for (final MyEntry<ClassPath, ScriptPack> item : allpacks) {
-                pos++;
-                String workText = AppStrings.translate("work.searching");
-                String decAdd = "";
-                if (!decompiledTextArea.isCached(item.value)) {
-                    decAdd = ", " + AppStrings.translate("work.decompiling");
-                }
-                
-                try {
-                    CancellableWorker worker = new CancellableWorker() {
+            if (scriptsNode.getItem() instanceof ClassesListTreeModel) {
+                ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
+                List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
+                final Pattern pat = regexp ?
+                    Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0) :
+                    Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                int pos = 0;
+                for (final MyEntry<ClassPath, ScriptPack> item : allpacks) {
+                    pos++;
+                    String workText = AppStrings.translate("work.searching");
+                    String decAdd = "";
+                    if (!decompiledTextArea.isCached(item.value)) {
+                        decAdd = ", " + AppStrings.translate("work.decompiling");
+                    }
 
-                        @Override
-                        public Void doInBackground() throws Exception {
-                            decompiledTextArea.cacheScriptPack(item.value, swf.abcList);
-                            if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
-                                found.add(item.value);
-                                foundPath.add(item.key);
+                    try {
+                        CancellableWorker worker = new CancellableWorker() {
+
+                            @Override
+                            public Void doInBackground() throws Exception {
+                                decompiledTextArea.cacheScriptPack(item.value, swf.abcList);
+                                if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
+                                    found.add(item.value);
+                                    foundPath.add(item.key);
+                                }
+                                return null;
                             }
-                            return null;
-                        }
-                    };
-                    worker.execute();
-                    Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.key.toString() + "... ", worker);
-                    worker.get();
-                } catch (InterruptedException ex) {
-                    break;
-                } catch (ExecutionException ex) {
-                    Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        };
+                        worker.execute();
+                        Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.key.toString() + "... ", worker);
+                        worker.get();
+                    } catch (InterruptedException ex) {
+                        break;
+                    } catch (ExecutionException ex) {
+                        Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
 
@@ -527,16 +531,19 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
     public void hilightScript(SWF swf, String name) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        ClassesListTreeModel clModel = ttm.getSwfRoot(swf).classTreeModel;
-        ScriptPack pack = null;
-        for (MyEntry<ClassPath, ScriptPack> item : clModel.getList()) {
-            if (item.key.toString().equals(name)) {
-                pack = item.value;
-                break;
+        TreeNode scriptsNode = ttm.getSwfRoot(swf).scriptsNode;
+        if (scriptsNode.getItem() instanceof ClassesListTreeModel) {
+            ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
+            ScriptPack pack = null;
+            for (MyEntry<ClassPath, ScriptPack> item : clModel.getList()) {
+                if (item.key.toString().equals(name)) {
+                    pack = item.value;
+                    break;
+                }
             }
-        }
-        if (pack != null) {
-            hilightScript(pack);
+            if (pack != null) {
+                hilightScript(pack);
+            }
         }
     }
 

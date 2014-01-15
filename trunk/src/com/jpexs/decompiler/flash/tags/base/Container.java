@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public interface Container {
+public interface Container extends TreeItem {
 
     /**
      * Returns all sub-items

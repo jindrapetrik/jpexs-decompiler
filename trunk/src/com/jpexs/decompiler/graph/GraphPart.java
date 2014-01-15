@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class GraphPart implements Serializable {
         return time;
     }
 
-    private boolean leadsTo(List<Object> localData, Graph gr, GraphSource code, GraphPart part, List<GraphPart> visited, List<Loop> loops) throws InterruptedException {
+    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, List<GraphPart> visited, List<Loop> loops) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
@@ -125,7 +126,7 @@ public class GraphPart implements Serializable {
         return false;
     }
 
-    public boolean leadsTo(List<Object> localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops) throws InterruptedException {
+    public boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops) throws InterruptedException {
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }

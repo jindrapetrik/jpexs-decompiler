@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui.action;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.TagNode;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -39,6 +38,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Cache;
@@ -208,11 +208,11 @@ public class ActionPanel extends JPanel implements ActionListener {
         }
     }
 
-    private Map<String, ASMSource> getASMs(String path, List<TagNode> nodes) {
+    private Map<String, ASMSource> getASMs(String path, List<TreeNode> nodes) {
         Map<String, ASMSource> ret = new HashMap<>();
-        for (TagNode n : nodes) {
+        for (TreeNode n : nodes) {
             String subPath = path + "/" + n.toString();
-            if (n.tag instanceof ASMSource) {
+            if (n.getItem() instanceof ASMSource) {
                 //cacheScript((ASMSource) n.tag);
                 String npath = subPath;
                 int ppos = 1;
@@ -220,10 +220,10 @@ public class ActionPanel extends JPanel implements ActionListener {
                     ppos++;
                     npath = subPath + "[" + ppos + "]";
                 }
-                ret.put(subPath, (ASMSource) n.tag);
+                ret.put(subPath, (ASMSource) n.getItem());
             }
 
-            ret.putAll(getASMs(subPath, n.subItems));
+            ret.putAll(getASMs(subPath, n.subNodes));
         }
         return ret;
     }
@@ -232,7 +232,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         if ((txt != null) && (!txt.isEmpty())) {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
-            List<TagNode> list = SWF.createASTagList(mainPanel.getCurrentSwf().tags, null);
+            List<TreeNode> list = SWF.createASTagList(mainPanel.getCurrentSwf().tags, null);
             Map<String, ASMSource> asms = getASMs("", list);
             found = new ArrayList<>();
             Pattern pat = null;

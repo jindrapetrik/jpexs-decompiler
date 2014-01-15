@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -729,19 +731,10 @@ public class Action implements GraphSourceItem {
             Graph.graphToString(tree, writer, new LocalData());
         } else if (convertException instanceof TimeoutException) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
-            writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * Decompilation error").newLine();
-            writer.appendNoHilight(" * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached").newLine();
-            writer.appendNoHilight(" */").newLine();
-            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to timeout\");").newLine();
+            Helper.appendTimeoutComment(writer, Configuration.decompilationTimeoutFile.get());
         } else {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
-            writer.appendNoHilight("/*").newLine();
-            writer.appendNoHilight(" * Decompilation error").newLine();
-            writer.appendNoHilight(" * Code may be obfuscated").newLine();
-            writer.appendNoHilight(" * Error type: " + convertException.getClass().getSimpleName()).newLine();
-            writer.appendNoHilight(" */").newLine();
-            writer.appendNoHilight("throw new IllegalOperationError(\"Not decompiled due to error\");").newLine();
+            Helper.appendErrorComment(writer, convertException);
         }
         asm.getActionSourceSuffix(writer);
     }
@@ -765,9 +758,9 @@ public class Action implements GraphSourceItem {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
-        translate(stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2), staticOperation, path);
+    public void translate(BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
+        ActionLocalData aLocalData = (ActionLocalData) localData;
+        translate(stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
     }
 
     @Override
@@ -831,10 +824,7 @@ public class Action implements GraphSourceItem {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
         }
-        List<Object> localData = new ArrayList<>();
-        localData.add(registerNames);
-        localData.add(variables);
-        localData.add(functions);
+        ActionLocalData localData = new ActionLocalData(registerNames, variables, functions);
         List<GraphTargetItem> output = new ArrayList<>();
         int ip = start;
         boolean isWhile = false;
@@ -888,9 +878,10 @@ public class Action implements GraphSourceItem {
                         out = new ArrayList<>();
                         out.add(new CommentItem(new String[] {
                             "", 
-                            " * Decompilation error",
-                            " * Code may be obfuscated",
-                            " * Error type: " + ex2.getClass().getSimpleName(), 
+                            " * " + AppStrings.translate("decompilationError"),
+                            " * " + AppStrings.translate("decompilationError.obfuscated"),
+                            " * " + AppStrings.translate("decompilationError.errorType") + ": " + 
+                                ex2.getClass().getSimpleName(), 
                             ""}));
                     }
                     outs.add(out);
