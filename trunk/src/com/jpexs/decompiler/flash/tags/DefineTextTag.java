@@ -373,7 +373,7 @@ public class DefineTextTag extends TextTag implements DrawableTag {
                                 if (nextChar != null) {
                                     kerningAdjustment = font.getGlyphKerningAdjustment(tags, tr.glyphEntries[i].glyphIndex, font.charToGlyph(tags, nextChar));
                                 }
-                                advance = (int) Math.round(20.0 * Math.round((double) textHeight * (font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
+                                advance = (int) Math.round(font.getDivider() * Math.round((double) textHeight * (font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
                             } else {
                                 advance = (int) Math.round(20.0 * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), textHeight / 20, c, nextChar));
                             }
