@@ -16,13 +16,14 @@
  */
 package com.jpexs.decompiler.flash;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  *
  * @author JPEXS
  */
-public class SourceGeneratorLocalData {
+public class SourceGeneratorLocalData implements Serializable {
 
     public HashMap<String, Integer> registerVars;
     public Boolean inFunction;
