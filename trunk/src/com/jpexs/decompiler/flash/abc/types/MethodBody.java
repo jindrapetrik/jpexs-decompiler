@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
@@ -121,7 +122,7 @@ public class MethodBody implements Cloneable, Serializable {
             code.toASMSource(constants, trait, method_info[this.method_info], this, exportMode, writer);
         } else {
             if (!Configuration.decompile.get()) {
-                writer.appendNoHilight("//Decompilation skipped").newLine();
+                writer.appendNoHilight("//" + AppStrings.translate("decompilation.skipped")).newLine();
                 return;
             }
             int timeout = Configuration.decompilationTimeoutSingleMethod.get();
@@ -162,7 +163,7 @@ public class MethodBody implements Cloneable, Serializable {
             if (!Configuration.decompile.get()) {
                 writer.indent();
                 writer.startMethod(this.method_info);
-                writer.appendNoHilight("//Decompilation skipped").newLine();
+                writer.appendNoHilight("//" + AppStrings.translate("decompilation.skipped")).newLine();
                 writer.endMethod();
                 writer.unindent();
                 return writer;

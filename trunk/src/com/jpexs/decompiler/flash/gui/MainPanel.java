@@ -2147,7 +2147,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 } catch (CancellationException ex) {
                                     abcPanel.decompiledTextArea.setText("//" + AppStrings.translate("work.canceled"));
                                 } catch (Exception ex) {
-                                    abcPanel.decompiledTextArea.setText("//Decompilation error: " + ex);
+                                    abcPanel.decompiledTextArea.setText("//" + AppStrings.translate("decompilationError") + ": " + ex);
                                 }
                             }
                         });

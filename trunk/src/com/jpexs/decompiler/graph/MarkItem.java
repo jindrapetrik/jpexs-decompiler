@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -34,7 +35,7 @@ public class MarkItem extends GraphTargetItem {
 
     @Override
     protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("//decompiler mark:" + mark);
+        return writer.append("//" + AppStrings.translate("decompilerMark") + ":" + mark);
     }
 
     public String getMark() {

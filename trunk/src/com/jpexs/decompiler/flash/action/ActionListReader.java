@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
@@ -637,7 +638,7 @@ public class ActionListReader {
                 long pos = sis.getPos();
                 long length = pos + sis.available();
                 for (int i = 0; i < listeners.size(); i++) {
-                    listeners.get(i).progress("Reading", pos, length);
+                    listeners.get(i).progress(AppStrings.translate("disassemblingProgress.reading"), pos, length);
                 }
 
                 a.containerSWFOffset = containerSWFOffset;
@@ -724,7 +725,7 @@ public class ActionListReader {
             curVisited++;
             visited.put(ip, curVisited);
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progress("Deobfuscating", ip, actions.size());
+                listeners.get(i).progress(AppStrings.translate("disassemblingProgress.deobfuscating"), ip, actions.size());
             }
             int info = a.actionLength + 1 + ((a.actionCode >= 0x80) ? 2 : 0);
 
@@ -947,7 +948,7 @@ public class ActionListReader {
             }
         }
         for (DisassemblyListener listener : listeners) {
-            listener.progress("Deobfuscating", ip, actions.size());
+            listener.progress(AppStrings.translate("disassemblingProgress.deobfuscating"), ip, actions.size());
         }
     }
 

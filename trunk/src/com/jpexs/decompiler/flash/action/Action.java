@@ -435,7 +435,7 @@ public class Action implements GraphSourceItem {
         boolean lastPush = false;
         for (GraphSourceItem s : list) {
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progress("toString", pos + 2, list.size());
+                listeners.get(i).progress(AppStrings.translate("disassemblingProgress.toString"), pos + 2, list.size());
             }
             Action a = null;
             if (s instanceof Action) {

@@ -438,7 +438,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                         } catch (CancellationException ex) {
                             setEditorText("; " + AppStrings.translate("work.canceled"), "text/flasm");
                         } catch (Exception ex) {
-                            setDecompiledText("//Decompilation error: " + ex);
+                            setDecompiledText("//" + AppStrings.translate("decompilationError") + ": " + ex);
                         }
                     }
                 });
