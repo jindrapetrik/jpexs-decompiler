@@ -93,45 +93,74 @@ public class View {
 
                     //Restore default font for chinese characters
                     SubstanceLookAndFeel.setFontPolicy(new FontPolicy() {
+                        
+                        private final FontSet fontSet = new FontSet() {
+                            
+                            private FontUIResource controlFont; 
+                            private FontUIResource menuFont; 
+                            private FontUIResource titleFont; 
+                            private FontUIResource windowTitleFont; 
+                            private FontUIResource smallFont; 
+                            private FontUIResource messageFont; 
+                            
+                            @Override
+                            public FontUIResource getControlFont() {
+                                if (controlFont == null) {
+                                    FontUIResource f = fs.getControlFont();
+                                    controlFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                }
+                                return controlFont;
+                            }
+
+                            @Override
+                            public FontUIResource getMenuFont() {
+                                if (menuFont == null) {
+                                    FontUIResource f = fs.getMenuFont();
+                                    menuFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                }
+                                return menuFont;
+                            }
+
+                            @Override
+                            public FontUIResource getTitleFont() {
+                                if (titleFont == null) {
+                                    FontUIResource f = fs.getTitleFont();
+                                    titleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                }
+                                return titleFont;
+                            }
+
+                            @Override
+                            public FontUIResource getWindowTitleFont() {
+                                if (windowTitleFont == null) {
+                                    FontUIResource f = fs.getWindowTitleFont();
+                                    windowTitleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                }
+                                return windowTitleFont;
+                            }
+
+                            @Override
+                            public FontUIResource getSmallFont() {
+                                if (smallFont == null) {
+                                    FontUIResource f = fs.getSmallFont();
+                                    smallFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                }
+                                return smallFont;
+                            }
+
+                            @Override
+                            public FontUIResource getMessageFont() {
+                                if (messageFont == null) {
+                                    FontUIResource f = fs.getMessageFont();
+                                    messageFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                }
+                                return messageFont;
+                            }
+                        };
+                                
                         @Override
                         public FontSet getFontSet(String string, UIDefaults uid) {
-                            return new FontSet() {
-                                @Override
-                                public FontUIResource getControlFont() {
-                                    FontUIResource f = fs.getControlFont();
-                                    return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-
-                                @Override
-                                public FontUIResource getMenuFont() {
-                                    FontUIResource f = fs.getMenuFont();
-                                    return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-
-                                @Override
-                                public FontUIResource getTitleFont() {
-                                    FontUIResource f = fs.getTitleFont();
-                                    return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-
-                                @Override
-                                public FontUIResource getWindowTitleFont() {
-                                    FontUIResource f = fs.getWindowTitleFont();
-                                    return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-
-                                @Override
-                                public FontUIResource getSmallFont() {
-                                    FontUIResource f = fs.getSmallFont();
-                                    return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-
-                                @Override
-                                public FontUIResource getMessageFont() {
-                                    FontUIResource f = fs.getMessageFont();
-                                    return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
-                                }
-                            };
+                            return fontSet;
                         }
                     });
                 } catch (UnsupportedLookAndFeelException ex) {

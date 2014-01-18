@@ -42,6 +42,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -665,7 +666,16 @@ public class Main {
         Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
         AppStrings.updateLanguage();
         ErrorLogFrame.createNewInstance();
-                
+
+        try {
+            Class<?> cl = Class.forName("org.pushingpixels.substance.api.SubstanceLookAndFeel");
+            Field field = cl.getDeclaredField("LABEL_BUNDLE");
+            field.setAccessible(true);
+            field.set(null, null);
+        } catch (Throwable ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
         UIManager.put("OptionPane.noButtonText", AppStrings.translate("button.no"));
