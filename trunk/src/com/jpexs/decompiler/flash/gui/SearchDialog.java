@@ -24,12 +24,14 @@ import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 /**
@@ -44,7 +46,8 @@ public class SearchDialog extends AppDialog implements ActionListener {
     public JTextField searchField = new MyTextField();
     public JCheckBox ignoreCaseCheckBox = new JCheckBox(translate("checkbox.ignorecase"));
     public JCheckBox regexpCheckBox = new JCheckBox(translate("checkbox.regexp"));
-    public JCheckBox searchInTextsCheckBox = new JCheckBox(translate("checkbox.searchText"));
+    public JRadioButton searchInASRadioButton = new JRadioButton(translate("checkbox.searchAS"));
+    public JRadioButton searchInTextsRadioButton = new JRadioButton(translate("checkbox.searchText"));
     public boolean result = false;
 
     public SearchDialog() {
@@ -70,11 +73,19 @@ public class SearchDialog extends AppDialog implements ActionListener {
         JPanel checkPanel = new JPanel(new FlowLayout());
         checkPanel.add(ignoreCaseCheckBox);
         checkPanel.add(regexpCheckBox);
-        // todo: honfika: add checkbox when text search is implemented
-        //searchInTextsCheckBox.setSelected(true);
-        //checkPanel.add(searchInTextsCheckBox);
         cnt.add(checkPanel);
 
+        ButtonGroup group = new ButtonGroup();
+        group.add(searchInASRadioButton);
+        group.add(searchInTextsRadioButton);
+        
+        JPanel rbPanel = new JPanel(new FlowLayout());
+        searchInASRadioButton.setSelected(true);
+        searchInTextsRadioButton.setSelected(false);
+        rbPanel.add(searchInASRadioButton);
+        rbPanel.add(searchInTextsRadioButton);
+        cnt.add(rbPanel);
+        
         cnt.add(panButtons);
         getRootPane().setDefaultButton(okButton);
         View.centerScreen(this);

@@ -128,7 +128,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public String getText(List<Tag> tags) {
+    public String getText() {
         String ret = "";
         if (hasText) {
             ret = initialText;
@@ -141,14 +141,14 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public List<Integer> getFontIds(List<Tag> tags) {
+    public List<Integer> getFontIds() {
         List<Integer> ret = new ArrayList<>();
         ret.add(fontId);
         return ret;
     }
 
     @Override
-    public String getFormattedText(List<Tag> tags) {
+    public String getFormattedText() {
         String ret = "";
         ret += "[";
         String[] alignValues = {"left", "right", "center", "justify"};
@@ -171,7 +171,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text) throws ParseException {
+    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, String text) throws ParseException {
         try {
             TextLexer lexer = new TextLexer(new StringReader(text));
             ParsedSymbol s = null;

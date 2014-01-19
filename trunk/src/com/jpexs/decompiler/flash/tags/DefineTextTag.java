@@ -79,12 +79,12 @@ public class DefineTextTag extends TextTag implements DrawableTag {
     }
 
     @Override
-    public String getText(List<Tag> tags) {
+    public String getText() {
         FontTag fnt = null;
         String ret = "";
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasFont) {
-                for (Tag t : tags) {
+                for (Tag t : swf.tags) {
                     if (t instanceof FontTag) {
                         if (((FontTag) t).getFontId() == rec.fontId) {
                             fnt = ((FontTag) t);
@@ -98,13 +98,13 @@ public class DefineTextTag extends TextTag implements DrawableTag {
                     ret += "\r\n";
                 }
             }
-            ret += rec.getText(tags, fnt);
+            ret += rec.getText(swf.tags, fnt);
         }
         return ret;
     }
 
     @Override
-    public List<Integer> getFontIds(List<Tag> tags) {
+    public List<Integer> getFontIds() {
         List<Integer> ret = new ArrayList<>();
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasFont) {
@@ -115,7 +115,7 @@ public class DefineTextTag extends TextTag implements DrawableTag {
     }
 
     @Override
-    public String getFormattedText(List<Tag> tags) {
+    public String getFormattedText() {
         FontTag fnt = null;
         String ret = "";
         ret += "[\r\nxmin " + textBounds.Xmin + "\r\nymin " + textBounds.Ymin + "\r\nxmax " + textBounds.Xmax + "\r\nymax " + textBounds.Ymax;
@@ -137,7 +137,7 @@ public class DefineTextTag extends TextTag implements DrawableTag {
         for (TEXTRECORD rec : textRecords) {
             String params = "";
             if (rec.styleFlagsHasFont) {
-                for (Tag t : tags) {
+                for (Tag t : swf.tags) {
                     if (t instanceof FontTag) {
                         if (((FontTag) t).getFontId() == rec.fontId) {
                             fnt = ((FontTag) t);
@@ -163,14 +163,14 @@ public class DefineTextTag extends TextTag implements DrawableTag {
             if (fnt == null) {
                 ret += AppStrings.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId));
             } else {
-                ret += Helper.escapeString(rec.getText(tags, fnt)).replace("[", "\\[").replace("]", "\\]");
+                ret += Helper.escapeString(rec.getText(swf.tags, fnt)).replace("[", "\\[").replace("]", "\\]");
             }
         }
         return ret;
     }
 
     @Override
-    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text) throws ParseException {
+    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, String text) throws ParseException {
         List<TEXTRECORD> oldTextRecords = textRecords;
         try {
             TextLexer lexer = new TextLexer(new StringReader(text));
@@ -209,7 +209,7 @@ public class DefineTextTag extends TextTag implements DrawableTag {
                                 try {
                                     fontId = Integer.parseInt(paramValue);
 
-                                    for (Tag t : tags) {
+                                    for (Tag t : swf.tags) {
                                         if (t instanceof FontTag) {
                                             if (((FontTag) t).getFontId() == fontId) {
                                                 font = (FontTag) t;
@@ -353,6 +353,7 @@ public class DefineTextTag extends TextTag implements DrawableTag {
                         }
                         String txt = (String) s.values[0];
                         tr.glyphEntries = new GLYPHENTRY[txt.length()];
+                        List<Tag> tags = swf.tags;
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);
                             Character nextChar = null;

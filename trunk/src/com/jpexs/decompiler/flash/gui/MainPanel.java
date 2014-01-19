@@ -151,6 +151,7 @@ import java.util.Stack;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -187,7 +188,7 @@ import javax.swing.tree.TreeSelectionModel;
  *
  * @author JPEXS
  */
-public final class MainPanel extends JPanel implements ActionListener, TreeSelectionListener, Freed {
+public final class MainPanel extends JPanel implements ActionListener, TreeSelectionListener, SearchListener<TextTag>, Freed {
     
     private final MainFrame mainFrame;
     private final List<SWF> swfs;
@@ -224,6 +225,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String INTERNAL_VIEWER_CARD = "INTERNALVIEWER";
     private static final String SPLIT_PANE1 = "SPLITPANE1";
     private static final String WELCOME_PANEL = "WELCOMEPANEL";
+    private SearchPanel<TextTag> textSearchPanel;
     private final LineMarkedEditorPane textValue;
     private final JSplitPane splitPane1;
     private final JSplitPane splitPane2;
@@ -611,11 +613,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         add(statusPanel, BorderLayout.SOUTH);
 
         JPanel textTopPanel = new JPanel(new BorderLayout());
+        textSearchPanel = new SearchPanel<>(new FlowLayout(), this);
+        textTopPanel.add(textSearchPanel, BorderLayout.NORTH);
         textValue = new LineMarkedEditorPane();
         textTopPanel.add(new JScrollPane(textValue), BorderLayout.CENTER);
         textValue.setEditable(false);
         //textValue.setFont(UIManager.getFont("TextField.font"));
-
 
 
         JPanel textButtonsPanel = new JPanel();
@@ -1487,31 +1490,30 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     @Override
                     protected Void doInBackground() throws Exception {
                         boolean found = false;
-                        if (swf.isAS3) {
-                            if (abcPanel != null && abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
-                                found = true;
-                                View.execInEventDispatch(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        showDetail(DETAILCARDAS3NAVIGATOR);
-                                        showCard(CARDACTIONSCRIPT3PANEL);
-                                    }
-                                });
-                            }
-                        } else {
-                            if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
-                                found = true;
-                                View.execInEventDispatch(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        showCard(CARDACTIONSCRIPTPANEL);
-                                    }
-                                });
+                        if (searchDialog.searchInASRadioButton.isSelected()) {
+                            if (swf.isAS3) {
+                                if (abcPanel != null && abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                    found = true;
+                                    View.execInEventDispatch(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            showDetail(DETAILCARDAS3NAVIGATOR);
+                                            showCard(CARDACTIONSCRIPT3PANEL);
+                                        }
+                                    });
+                                }
                             } else {
+                                if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                    found = true;
+                                    View.execInEventDispatch(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            showCard(CARDACTIONSCRIPTPANEL);
+                                        }
+                                    });
+                                }
                             }
-                        }
-                        
-                        if (!found && searchDialog.searchInTextsCheckBox.isSelected()) {
+                        } else if (searchDialog.searchInTextsRadioButton.isSelected()) {
                             if (searchText(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected(), swf)) {
                                 found = true;
                             }
@@ -1529,9 +1531,40 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
     
     private boolean searchText(String txt, boolean ignoreCase, boolean regexp, SWF swf) {
+        if ((txt != null) && (!txt.isEmpty())) {
+            textSearchPanel.setOptions(ignoreCase, regexp);
+            List<TextTag> found = new ArrayList<>();
+            Pattern pat = null;
+            if (regexp) {
+                pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+            } else {
+                pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+            }
+            for (Tag tag : swf.tags) {
+                if (tag instanceof TextTag) {
+                    TextTag textTag = (TextTag) tag;
+                    if (pat.matcher(textTag.getFormattedText()).find()) {
+                        found.add(textTag);
+                    }
+                }
+            }
+            textSearchPanel.setSearchText(txt);
+            return textSearchPanel.setResults(found);
+        }
         return false;
     }
     
+    @Override
+    public void updateSearchPos(TextTag item) {
+        TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
+        TreePath tp = ttm.getTagPath(item);
+        tagTree.setSelectionPath(tp);
+        tagTree.scrollPathToVisible(tp);
+        textValue.setCaretPosition(0);
+
+        textSearchPanel.showQuickFindDialog(textValue);
+    }
+
     public void autoDeobfuscateChanged() {
         clearCache();
         if (abcPanel != null) {
@@ -1914,7 +1947,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     return true;
 
                 }
-            }, textTag.getSwf().tags, text)) {
+            }, text)) {
                 return true;
             }
         } catch (ParseException ex) {
@@ -2293,7 +2326,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 previewSplitPane.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewSplitPane.getWidth() / 2));
                 showDetailWithPreview(CARDTEXTPANEL);
                 textValue.setContentType("text/swf_text");
-                textValue.setText(textTag.getFormattedText(textTag.getSwf().tags));
+                textValue.setText(textTag.getFormattedText());
                 textValue.setCaretPosition(0);
             } else if (tagObj instanceof FontTag) {
                 showFontTag((FontTag) tagObj);

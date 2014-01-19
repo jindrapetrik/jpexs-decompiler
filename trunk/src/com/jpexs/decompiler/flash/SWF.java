@@ -1417,15 +1417,14 @@ public final class SWF implements TreeItem {
         for (final Tag t : tags) {
             if (t instanceof TextTag) {
                 final File file = new File(outdir + File.separator + ((TextTag) t).getCharacterId() + ".txt");
-                final List<Tag> ttags = this.tags;
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
                         try (FileOutputStream fos = new FileOutputStream(file)) {
                             if (formatted) {
-                                fos.write(Utf8Helper.getBytes(((TextTag) t).getFormattedText(ttags)));
+                                fos.write(Utf8Helper.getBytes(((TextTag) t).getFormattedText()));
                             } else {
-                                fos.write(Utf8Helper.getBytes(((TextTag) t).getText(ttags)));
+                                fos.write(Utf8Helper.getBytes(((TextTag) t).getText()));
                             }
                         }
                     }

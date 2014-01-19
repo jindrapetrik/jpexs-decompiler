@@ -127,8 +127,8 @@ public class FontPanel extends javax.swing.JPanel {
             for (Tag tag : swf.tags) {
                 if (tag instanceof TextTag) {
                     TextTag textTag = (TextTag) tag;
-                    if (textTag.getFontIds(swf.tags).contains(fontId)) {
-                        String text = textTag.getFormattedText(textTag.getSwf().tags);
+                    if (textTag.getFontIds().contains(fontId)) {
+                        String text = textTag.getFormattedText();
                         mainPanel.saveText(textTag, text);
                     }
                 }
