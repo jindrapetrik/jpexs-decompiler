@@ -79,7 +79,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     public int getCharacterId() {
         return buttonId;
     }
-    private long hdrSize;
+    private final long hdrSize;
 
     @Override
     public List<BUTTONRECORD> getRecords() {
@@ -214,7 +214,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         }
         return needed;
     }
-    private static Cache rectCache = Cache.getInstance(true);
+    private static final Cache rectCache = Cache.getInstance(true);
 
     @Override
     public RECT getRect(HashMap<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {

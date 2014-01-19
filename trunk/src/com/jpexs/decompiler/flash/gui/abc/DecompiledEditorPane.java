@@ -56,10 +56,10 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     public int lastTraitIndex = 0;
     private boolean ignoreCarret = false;
     private boolean reset = false;
-    private ABCPanel abcPanel;
+    private final ABCPanel abcPanel;
     private int classIndex = -1;
     private boolean isStatic = false;
-    private Cache cache = Cache.getInstance(true);
+    private final Cache cache = Cache.getInstance(true);
     private Trait currentTrait = null;
 
     public Trait getCurrentTrait() {

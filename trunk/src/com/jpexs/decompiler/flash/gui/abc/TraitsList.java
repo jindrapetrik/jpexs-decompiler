@@ -33,7 +33,7 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
     ABC abc;
     List<ABCContainerTag> abcTags;
     int classIndex = -1;
-    private ABCPanel abcPanel;
+    private final ABCPanel abcPanel;
     private boolean sorted = false;
 
     public void setSorted(boolean sorted) {

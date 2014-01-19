@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class LexBufferer implements LexListener {
 
-    private List<ParsedSymbol> items = new ArrayList<>();
+    private final List<ParsedSymbol> items = new ArrayList<>();
 
     @Override
     public void onLex(ParsedSymbol s) {

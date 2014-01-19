@@ -25,7 +25,7 @@ import java.io.InputStream;
  */
 public class ChunkedInputStream extends InputStream {
 
-    private InputStream is;
+    private final InputStream is;
     private int chunkPos = 0;
     private int chunkLen = 0;
     private boolean end = false;

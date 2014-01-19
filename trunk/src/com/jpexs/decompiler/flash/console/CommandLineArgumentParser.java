@@ -50,7 +50,7 @@ public class CommandLineArgumentParser {
     private static boolean commandLineMode = false;
 
     @SuppressWarnings("unchecked")
-    private static ConfigurationItem<Boolean>[] commandlineConfigBoolean = new ConfigurationItem[]{
+    private static final ConfigurationItem<Boolean>[] commandlineConfigBoolean = new ConfigurationItem[]{
         Configuration.decompile,
         Configuration.parallelSpeedUp,
         Configuration.internalFlashViewer,

@@ -83,7 +83,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_REMOVE_NON_SCRIPTS = "REMOVENONSCRIPTS";
     static final String ACTION_REFRESH_DECOMPILED = "REFRESHDECOMPILED";
 
-    private MainFrameClassic mainFrame;
+    private final MainFrameClassic mainFrame;
 
     private JCheckBoxMenuItem miAutoDeobfuscation;
     private JCheckBoxMenuItem miInternalViewer;

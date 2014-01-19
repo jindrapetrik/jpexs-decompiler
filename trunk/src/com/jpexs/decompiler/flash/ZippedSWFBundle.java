@@ -34,8 +34,8 @@ import java.util.zip.ZipInputStream;
  * @author JPEXS
  */
 public class ZippedSWFBundle implements SWFBundle {
-    protected Set<String> keySet=new HashSet<String>();
-    private Map<String,SWF> cachedSWFs=new HashMap<>();
+    protected Set<String> keySet=new HashSet<>();
+    private final Map<String,SWF> cachedSWFs=new HashMap<>();
     protected ReReadableInputStream is;
 
     

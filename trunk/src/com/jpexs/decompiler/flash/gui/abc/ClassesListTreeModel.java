@@ -86,7 +86,7 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
     private SWF swf;
     private Tree classTree;
     private List<MyEntry<ClassPath, ScriptPack>> list;
-    private List<TreeModelListener> listeners = new ArrayList<>();
+    private final List<TreeModelListener> listeners = new ArrayList<>();
 
     public List<MyEntry<ClassPath, ScriptPack>> getList() {
         return list;

@@ -25,8 +25,8 @@ import java.util.Stack;
  */
 public class NulWriter extends GraphTextWriter {
     
-    private Stack<LoopWithType> loopStack = new Stack<>();
-    private Stack<Boolean> stringAddedStack = new Stack<>();
+    private final Stack<LoopWithType> loopStack = new Stack<>();
+    private final Stack<Boolean> stringAddedStack = new Stack<>();
     private boolean stringAdded = false;
 
     public NulWriter() {

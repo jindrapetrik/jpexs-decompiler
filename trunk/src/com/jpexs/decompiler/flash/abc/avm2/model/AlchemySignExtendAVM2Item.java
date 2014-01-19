@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class AlchemySignExtendAVM2Item extends AVM2Item {
 
-    private String name;
+    private final String name;
 
     public AlchemySignExtendAVM2Item(GraphSourceItem instruction, GraphTargetItem value, String name) {
         super(instruction, PRECEDENCE_PRIMARY);

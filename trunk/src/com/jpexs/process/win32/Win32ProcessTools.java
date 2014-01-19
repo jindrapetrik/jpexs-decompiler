@@ -165,7 +165,7 @@ public class Win32ProcessTools extends ProcessTools {
         }
         return path;
     }
-    private static Map<String, Character> driveMappings = getDriveMappings();
+    private static final Map<String, Character> driveMappings = getDriveMappings();
 
     public static boolean drawIcon(BufferedImage ret, WinDef.HICON hIcon, int diFlags) {
 
@@ -534,13 +534,13 @@ public class Win32ProcessTools extends ProcessTools {
 
     private static class ProcessMemoryInputStream extends InputStream {
 
-        private List<MEMORY_BASIC_INFORMATION> pages;
+        private final List<MEMORY_BASIC_INFORMATION> pages;
         private int currentPage = 0;
         private int pagePos = 0;
-        private static int BUFFER_SIZE = 1024;
+        private static final int BUFFER_SIZE = 1024;
         private byte[] buf;
         private int bufPos;
-        private HANDLE hOtherProcess;
+        private final HANDLE hOtherProcess;
 
         public ProcessMemoryInputStream(List<MEMORY_BASIC_INFORMATION> pages, HANDLE hOtherProcess, int currentPage, int pagePos) {
             this.pages = pages;

@@ -30,8 +30,8 @@ import java.io.OutputStream;
  */
 public class DefineScalingGridTag extends Tag {
 
-    private int characterId;
-    private RECT splitter;
+    private final int characterId;
+    private final RECT splitter;
     public static final int ID = 78;
 
     public DefineScalingGridTag(SWF swf, byte[] data, int version, long pos) throws IOException {

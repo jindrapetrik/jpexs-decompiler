@@ -36,8 +36,8 @@ import java.util.List;
  */
 public class IfFrameLoadedActionItem extends ActionItem implements Block {
 
-    private List<GraphTargetItem> actions;
-    private GraphTargetItem frame;
+    private final List<GraphTargetItem> actions;
+    private final GraphTargetItem frame;
 
     public IfFrameLoadedActionItem(GraphTargetItem frame, List<GraphTargetItem> actions, GraphSourceItem instruction) {
         super(instruction, NOPRECEDENCE);

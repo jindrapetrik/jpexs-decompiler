@@ -25,7 +25,7 @@ import java.io.InputStream;
  */
 public class CacheInputStream extends InputStream {
 
-    private InputStream is;
+    private final InputStream is;
 
     @Override
     public int available() throws IOException {

@@ -40,9 +40,9 @@ public class SWFSearch {
 
     protected Searchable s;
     private boolean processed = false;
-    private Set<ProgressListener> listeners = new HashSet<>();
-    private List<ReReadableInputStream> swfStreams = new ArrayList<>();
-    private Map<Integer,SWF> cachedSWFs = new HashMap<Integer, SWF>();
+    private final Set<ProgressListener> listeners = new HashSet<>();
+    private final List<ReReadableInputStream> swfStreams = new ArrayList<>();
+    private final Map<Integer,SWF> cachedSWFs = new HashMap<>();
 
     public SWFSearch(Searchable s) {
         this.s = s;

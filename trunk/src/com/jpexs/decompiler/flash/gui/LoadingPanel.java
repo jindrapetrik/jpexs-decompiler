@@ -29,9 +29,9 @@ import javax.swing.JPanel;
 public class LoadingPanel extends JPanel {
 
     private int pos = 0;
-    private Image animationImage;
-    private int iconWidth;
-    private int iconHeight;
+    private final Image animationImage;
+    private final int iconWidth;
+    private final int iconHeight;
 
     /**
      * Constructor

@@ -25,10 +25,10 @@ import com.jpexs.decompiler.flash.tags.Tag;
  */
 public class FrameNodeItem implements TreeItem {
 
-    private SWF swf;
-    private int frame;
-    private Tag parent;
-    private boolean display;
+    private final SWF swf;
+    private final int frame;
+    private final Tag parent;
+    private final boolean display;
 
     public FrameNodeItem(SWF swf, int frame, Tag parent, boolean display) {
         this.swf = swf;

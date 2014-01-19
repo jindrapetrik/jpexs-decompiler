@@ -57,8 +57,8 @@ public class CacheAddr {
     public int fileName;
     public long val;
     public File rootPath;
-    private Map<Integer, RandomAccessFile> dataFiles;
-    private File externalFilesDir;
+    private final Map<Integer, RandomAccessFile> dataFiles;
+    private final File externalFilesDir;
 
     public CacheAddr(InputStream is, File rootPath, Map<Integer, RandomAccessFile> dataFiles, File externalFilesDir) throws IOException {
         this.dataFiles = dataFiles;

@@ -821,7 +821,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 + "</svg>";
         return ret;
     }
-    private static Cache cache = Cache.getInstance(false);
+    private static final Cache cache = Cache.getInstance(false);
 
     public static void clearShapeCache() {
         cache.clear();

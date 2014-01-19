@@ -26,7 +26,7 @@ import java.io.InputStream;
  */
 public class GFxInputStream extends InputStream {
 
-    private ReReadableInputStream is;
+    private final ReReadableInputStream is;
     private static final int MaxUInt7 = (1 << 7) - 1;
 
     public GFxInputStream(InputStream is) {

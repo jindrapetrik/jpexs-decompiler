@@ -25,9 +25,9 @@ import java.io.InputStream;
  */
 public class LimitedInputStream extends InputStream {
 
-    private InputStream is;
+    private final InputStream is;
     private long pos = 0;
-    private long limit;
+    private final long limit;
 
     public LimitedInputStream(InputStream is, long limit) {
         this.is = is;

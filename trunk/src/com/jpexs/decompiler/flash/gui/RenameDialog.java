@@ -39,10 +39,10 @@ public class RenameDialog extends AppDialog implements ActionListener {
     static final String ACTION_OK = "OK";
     static final String ACTION_CANCEL = "CANCEL";
 
-    private JRadioButton typeNumberRadioButton = new JRadioButton(translate("rename.type.typenumber"));
-    private JRadioButton randomWordRadioButton = new JRadioButton(translate("rename.type.randomword"));
-    private JButton okButton = new JButton(translate("button.ok"));
-    private JButton cancelButton = new JButton(translate("button.cancel"));
+    private final JRadioButton typeNumberRadioButton = new JRadioButton(translate("rename.type.typenumber"));
+    private final JRadioButton randomWordRadioButton = new JRadioButton(translate("rename.type.randomword"));
+    private final JButton okButton = new JButton(translate("button.ok"));
+    private final JButton cancelButton = new JButton(translate("button.cancel"));
     private boolean confirmed = false;
 
     public RenameType getRenameType() {

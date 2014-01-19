@@ -591,7 +591,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         }
         return ret;
     }
-    private List<String> constantPool;
+    private final List<String> constantPool;
 
     public ActionSourceGenerator(List<String> constantPool) {
         this.constantPool = constantPool;

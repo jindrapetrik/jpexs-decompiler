@@ -329,7 +329,7 @@ public class Main {
 
     private static class OpenFileWorker extends SwingWorker {
 
-        private SWFSourceInfo[] sourceInfos;
+        private final SWFSourceInfo[] sourceInfos;
         
         public OpenFileWorker(SWFSourceInfo sourceInfo) {
             this.sourceInfos = new SWFSourceInfo[] { sourceInfo };

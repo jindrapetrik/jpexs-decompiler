@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  */
 public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
     
-    private Writer writer;
+    private final Writer writer;
     private boolean newLine = true;
     private int indent;
     private int writtenBytes;

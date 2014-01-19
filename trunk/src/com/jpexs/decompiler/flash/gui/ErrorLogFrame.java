@@ -58,11 +58,11 @@ public class ErrorLogFrame extends AppFrame {
 
     private static ErrorLogFrame instance;
 
-    private JPanel logView = new JPanel();
+    private final JPanel logView = new JPanel();
     private JPanel logViewInner = new JPanel();
-    private Handler handler;
-    private ImageIcon expandIcon;
-    private ImageIcon collapseIcon;
+    private final Handler handler;
+    private final ImageIcon expandIcon;
+    private final ImageIcon collapseIcon;
     private ErrorState errorState = ErrorState.NO_ERROR;
 
     public Handler getHandler() {

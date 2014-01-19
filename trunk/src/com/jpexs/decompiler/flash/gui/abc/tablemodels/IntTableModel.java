@@ -22,7 +22,7 @@ import javax.swing.table.TableModel;
 
 public class IntTableModel implements TableModel {
 
-    private ABC abc;
+    private final ABC abc;
     private static final String[] columnNames = new String[]{"Index", "Value"};
     private static final Class[] classes = new Class[]{Long.class, Long.class};
 

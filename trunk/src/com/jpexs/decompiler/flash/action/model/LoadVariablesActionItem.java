@@ -32,9 +32,9 @@ import java.util.List;
  */
 public class LoadVariablesActionItem extends ActionItem {
 
-    private GraphTargetItem urlString;
-    private GraphTargetItem targetString;
-    private int method;
+    private final GraphTargetItem urlString;
+    private final GraphTargetItem targetString;
+    private final int method;
 
     @Override
     public List<GraphTargetItem> getAllSubItems() {

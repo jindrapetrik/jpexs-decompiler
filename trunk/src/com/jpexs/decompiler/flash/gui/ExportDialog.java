@@ -58,7 +58,7 @@ public class ExportDialog extends AppDialog {
     public static final int OPTION_MOVIES = 3;
     public static final int OPTION_SOUNDS = 4;
     public static final int OPTION_ACTIONSCRIPT = 5;
-    private JComboBox[] combos;
+    private final JComboBox[] combos;
 
     public int getOption(int index) {
         return combos[index].getSelectedIndex();

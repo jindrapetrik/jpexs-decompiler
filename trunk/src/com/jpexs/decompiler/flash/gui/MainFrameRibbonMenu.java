@@ -105,7 +105,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_REFRESH_DECOMPILED = "REFRESHDECOMPILED";
     static final String ACTION_CLEAR_RECENT_FILES = "CLEARRECENTFILES";
 
-    private MainFrameRibbon mainFrame;
+    private final MainFrameRibbon mainFrame;
 
     private JCheckBox miAutoDeobfuscation;
     private JCheckBox miInternalViewer;

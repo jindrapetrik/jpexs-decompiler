@@ -37,7 +37,7 @@ public enum ExportMode {
          }
     }
 
-    private int code;
+    private final int code;
 
     private ExportMode(int code) {
          this.code = code;

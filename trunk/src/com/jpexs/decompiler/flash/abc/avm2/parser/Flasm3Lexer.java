@@ -2589,7 +2589,7 @@ public final class Flasm3Lexer {
 
 
 
-    private Stack<ParsedSymbol> pushedBack=new Stack<>();
+    private final Stack<ParsedSymbol> pushedBack=new Stack<>();
 
 
     public void pushback(ParsedSymbol symb) {

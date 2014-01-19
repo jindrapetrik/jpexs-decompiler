@@ -25,7 +25,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
  */
 public class CommentItem extends GraphTargetItem {
 
-    private String[] commentLines;
+    private final String[] commentLines;
 
     public CommentItem(String comment) {
         super(null, NOPRECEDENCE);

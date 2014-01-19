@@ -53,14 +53,14 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
     
     private static final int SAMPLE_MAX_LENGTH = 50;
     
-    private JComboBox<String> sourceFont;
-    private JCheckBox[] rangeCheckboxes;
-    private String rangeNames[];
-    private JLabel[] rangeSamples;
-    private JTextField individualCharsField;
+    private final JComboBox<String> sourceFont;
+    private final JCheckBox[] rangeCheckboxes;
+    private final String rangeNames[];
+    private final JLabel[] rangeSamples;
+    private final JTextField individualCharsField;
     private boolean result = false;
     private JLabel individialSample;
-    private int style;
+    private final int style;
 
     public String getSelectedFont() {
         return sourceFont.getSelectedItem().toString();

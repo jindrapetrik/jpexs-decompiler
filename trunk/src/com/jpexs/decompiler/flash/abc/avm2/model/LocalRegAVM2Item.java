@@ -28,7 +28,7 @@ public class LocalRegAVM2Item extends AVM2Item {
 
     public int regIndex;
     public GraphTargetItem computedValue;
-    private Object computedResult;
+    private final Object computedResult;
     private boolean isCT = false;
 
     public LocalRegAVM2Item(AVM2Instruction instruction, int regIndex, GraphTargetItem computedValue) {

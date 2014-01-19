@@ -973,7 +973,7 @@ public final class SWF implements TreeItem {
         }
         return ret;
     }
-    private HashSet<EventListener> listeners = new HashSet<>();
+    private final HashSet<EventListener> listeners = new HashSet<>();
 
     public final void addEventListener(EventListener listener) {
         listeners.add(listener);
@@ -1547,12 +1547,12 @@ public final class SWF implements TreeItem {
     public void exportBinaryData(AbortRetryIgnoreHandler handler, String outdir) throws IOException {
         exportBinaryData(handler, outdir, tags);
     }
-    private HashMap<String, String> deobfuscated = new HashMap<>();
+    private final HashMap<String, String> deobfuscated = new HashMap<>();
     private List<MyEntry<DirectValueActionItem, ConstantPool>> allVariableNames = new ArrayList<>();
     private List<GraphSourceItem> allFunctions = new ArrayList<>();
     private HashMap<DirectValueActionItem, ConstantPool> allStrings = new HashMap<>();
-    private HashMap<DirectValueActionItem, String> usageTypes = new HashMap<>();
-    private ActionDeobfuscation deobfuscation = new ActionDeobfuscation();
+    private final HashMap<DirectValueActionItem, String> usageTypes = new HashMap<>();
+    private final ActionDeobfuscation deobfuscation = new ActionDeobfuscation();
 
     private static void getVariables(ConstantPool constantPool, BaseLocalData localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
         boolean debugMode = false;
@@ -2055,10 +2055,10 @@ public final class SWF implements TreeItem {
 
     private static class CachedImage implements Serializable {
 
-        private int[] data;
-        private int width;
-        private int height;
-        private int type;
+        private final int[] data;
+        private final int width;
+        private final int height;
+        private final int type;
         public static final long serialVersionUID = 1L;
 
         public CachedImage(BufferedImage img) {

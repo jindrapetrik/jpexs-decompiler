@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.configuration;
  */
 public class ConfigurationItem<T> {
     
-    private String name;
+    private final String name;
     protected boolean hasValue;
 
     private T value;

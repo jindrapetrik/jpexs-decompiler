@@ -48,17 +48,17 @@ public class DetailPanel extends JPanel implements ActionListener {
     public static final String METHOD_TRAIT_CARD = AppStrings.translate("abc.detail.methodtrait");
     public static final String UNSUPPORTED_TRAIT_CARD = AppStrings.translate("abc.detail.unsupported");
     public static final String SLOT_CONST_TRAIT_CARD = AppStrings.translate("abc.detail.slotconsttrait");
-    private JPanel innerPanel;
+    private final JPanel innerPanel;
     public JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
     public JButton editButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
     public JButton cancelButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
-    private HashMap<String, JComponent> cardMap = new HashMap<>();
+    private final HashMap<String, JComponent> cardMap = new HashMap<>();
     private String selectedCard;
-    private JLabel selectedLabel;
+    private final JLabel selectedLabel;
     private boolean editMode = false;
-    private JPanel buttonsPanel;
-    private ABCPanel abcPanel;
-    private JLabel traitNameLabel;
+    private final JPanel buttonsPanel;
+    private final ABCPanel abcPanel;
+    private final JLabel traitNameLabel;
 
     public DetailPanel(ABCPanel abcPanel) {
         this.abcPanel = abcPanel;

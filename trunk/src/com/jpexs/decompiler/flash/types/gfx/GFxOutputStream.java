@@ -62,7 +62,7 @@ public class GFxOutputStream extends OutputStream {
     public static final int MaxSInt20 = (1 << 19) - 1;
     public static final int MinSInt22 = -(1 << 21);
     public static final int MaxSInt22 = (1 << 21) - 1;
-    private OutputStream os;
+    private final OutputStream os;
     private long pos = 0;
 
     public GFxOutputStream(OutputStream os) {

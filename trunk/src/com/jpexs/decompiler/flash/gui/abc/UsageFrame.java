@@ -44,12 +44,12 @@ public class UsageFrame extends AppFrame implements ActionListener, MouseListene
     static final String ACTION_GOTO = "GOTO";
     static final String ACTION_CANCEL = "CANCEL";
 
-    private JButton gotoButton = new JButton(translate("button.goto"));
-    private JButton cancelButton = new JButton(translate("button.cancel"));
-    private JList usageList;
-    private UsageListModel usageListModel;
-    private ABC abc;
-    private ABCPanel abcPanel;
+    private final JButton gotoButton = new JButton(translate("button.goto"));
+    private final JButton cancelButton = new JButton(translate("button.cancel"));
+    private final JList usageList;
+    private final UsageListModel usageListModel;
+    private final ABC abc;
+    private final ABCPanel abcPanel;
 
     public UsageFrame(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, ABCPanel abcPanel) {
         this.abcPanel = abcPanel;

@@ -36,9 +36,9 @@ import java.util.logging.Logger;
  */
 public class Cache {
 
-    private Map<Object, File> cacheFiles;
-    private Map<Object, Object> cacheMemory;
-    private static List<Cache> instances = new ArrayList<>();
+    private final Map<Object, File> cacheFiles;
+    private final Map<Object, Object> cacheMemory;
+    private static final List<Cache> instances = new ArrayList<>();
     public static final int STORAGE_FILES = 1;
     public static final int STORAGE_MEMORY = 2;
 

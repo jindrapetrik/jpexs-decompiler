@@ -82,13 +82,13 @@ import java.util.zip.InflaterInputStream;
 public class SWFInputStream extends InputStream {
 
     private InputStream is;
-    private Stack<Integer> margedPos = new Stack<>();
+    private final Stack<Integer> margedPos = new Stack<>();
     private long pos;
     private int version;
     private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
-    private List<ProgressListener> listeners = new ArrayList<>();
+    private final List<ProgressListener> listeners = new ArrayList<>();
     private long percentMax;
-    private List<byte[]> buffered = new ArrayList<>();
+    private final List<byte[]> buffered = new ArrayList<>();
     private ByteArrayOutputStream buffer;
     private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = Configuration.deobfuscateUsePrevTagOnly.get();
 
@@ -598,9 +598,9 @@ public class SWFInputStream extends InputStream {
         private final Tag tag;
         private final int version;
         private final int level;
-        private boolean parallel;
-        private boolean skipUnusualTags;
-        private SWF swf;
+        private final boolean parallel;
+        private final boolean skipUnusualTags;
+        private final SWF swf;
 
         public TagResolutionTask(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags) {
             this.tag = tag;

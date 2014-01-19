@@ -60,11 +60,11 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
     static final String ACTION_SAVE = "SAVE";
     static final String ACTION_REFRESH = "REFRESH";
 
-    private JList<CacheEntry> list;
-    private JTextField searchField;
+    private final JList<CacheEntry> list;
+    private final JTextField searchField;
     private List<CacheImplementation> caches;
     private List<CacheEntry> entries;
-    private JProgressBar progressBar;
+    private final JProgressBar progressBar;
     JButton saveButton;
     JButton refreshButton;
     JButton openButton;

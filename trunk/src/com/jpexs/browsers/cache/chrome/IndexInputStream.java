@@ -25,7 +25,7 @@ import java.io.InputStream;
  */
 public class IndexInputStream extends InputStream {
 
-    private InputStream is;
+    private final InputStream is;
     public long pos = 0;
 
     public long getPos() {

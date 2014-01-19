@@ -35,7 +35,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
     /**
      * ActionScript 3 bytecodes
      */
-    private ABC abc;
+    private final ABC abc;
     public static final int ID = 72;
 
     @Override

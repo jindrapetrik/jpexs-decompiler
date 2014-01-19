@@ -26,7 +26,7 @@ import org.pushingpixels.flamingo.api.ribbon.JRibbonFrame;
  */
 public abstract class AppRibbonFrame extends JRibbonFrame {
 
-    private ResourceBundle resourceBundle;
+    private final ResourceBundle resourceBundle;
 
     public AppRibbonFrame() {
         if (getClass().equals(MainFrameRibbon.class)) {

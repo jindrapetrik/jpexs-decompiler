@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class TemporaryRegister extends GraphTargetItem {
 
-    private int regId;
+    private final int regId;
 
     public TemporaryRegister(int regId, GraphTargetItem value) {
         super(value.src, value.getPrecedence());

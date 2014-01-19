@@ -47,10 +47,10 @@ import javax.swing.tree.TreePath;
 
 public class TagTreeModel implements TreeModel {
 
-    private TagTreeRoot root = new TagTreeRoot();
-    private List<SWFRoot> swfs;
-    private Map<SWF, SWFRoot> swfToSwfRoot;
-    private MainFrame mainFrame;
+    private final TagTreeRoot root = new TagTreeRoot();
+    private final List<SWFRoot> swfs;
+    private final Map<SWF, SWFRoot> swfToSwfRoot;
+    private final MainFrame mainFrame;
 
     public TagTreeModel(MainFrame mainFrame, List<SWF> swfs) {
         this.mainFrame = mainFrame;

@@ -85,7 +85,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
         "<Space>"
     };
     
-    private SWF swf;
+    private final SWF swf;
     private long pos;
     private long hdrPos;
 

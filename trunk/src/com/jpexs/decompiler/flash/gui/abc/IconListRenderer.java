@@ -22,9 +22,9 @@ import javax.swing.*;
 
 public class IconListRenderer extends DefaultListCellRenderer {
 
-    private Icon constIcon;
-    private Icon functionIcon;
-    private Icon variableIcon;
+    private final Icon constIcon;
+    private final Icon functionIcon;
+    private final Icon variableIcon;
 
     private Icon loadIcon(String path) {
         ClassLoader cldr = this.getClass().getClassLoader();

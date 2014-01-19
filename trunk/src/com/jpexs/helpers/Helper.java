@@ -421,7 +421,7 @@ public class Helper {
         }
         return f;
     }
-    private static BitSet fileNameInvalidChars;
+    private static final BitSet fileNameInvalidChars;
     private static final List<String> invalidFilenamesParts;
 
     static {

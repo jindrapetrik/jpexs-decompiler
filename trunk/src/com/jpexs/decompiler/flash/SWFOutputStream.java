@@ -48,8 +48,8 @@ import java.util.zip.DeflaterOutputStream;
  */
 public class SWFOutputStream extends OutputStream {
 
-    private OutputStream os;
-    private int version;
+    private final OutputStream os;
+    private final int version;
     private long pos = 0;
     private int bitPos = 0;
     private int tempByte = 0;

@@ -26,8 +26,8 @@ import java.util.List;
  */
 public class GraphPath implements Serializable {
 
-    private List<Integer> keys = new ArrayList<>();
-    private List<Integer> vals = new ArrayList<>();
+    private final List<Integer> keys = new ArrayList<>();
+    private final List<Integer> vals = new ArrayList<>();
     public String rootName = "";
 
     public GraphPath(String rootName, List<Integer> keys, List<Integer> vals) {

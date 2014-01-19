@@ -170,7 +170,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
     public RGBA backgroundColor;
     // FIXME bug found in ecoDrive.swf, 
     private boolean bitmapCacheBug;
-    private int reserved;
+    private final int reserved;
     public static final int ID = 70;
 
     @Override

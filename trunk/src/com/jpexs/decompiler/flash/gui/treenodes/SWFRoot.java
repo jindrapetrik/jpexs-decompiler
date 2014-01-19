@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class SWFRoot extends TreeNode {
 
-    private String name;
+    private final String name;
     public List<TreeNode> list;
     public TreeNode scriptsNode;
 

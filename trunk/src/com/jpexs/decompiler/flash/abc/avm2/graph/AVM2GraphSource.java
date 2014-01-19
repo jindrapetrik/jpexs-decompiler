@@ -37,7 +37,7 @@ import java.util.Stack;
  */
 public class AVM2GraphSource extends GraphSource {
 
-    private AVM2Code code;
+    private final AVM2Code code;
     boolean isStatic;
     int classIndex;
     int scriptIndex;

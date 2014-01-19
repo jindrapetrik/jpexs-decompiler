@@ -30,7 +30,7 @@ import java.util.Set;
  * @author JPEXS
  */
 public class BinarySWFBundle implements SWFBundle {
-    private SWFSearch search;
+    private final SWFSearch search;
     public BinarySWFBundle(InputStream is){
         search=new SWFSearch(new StreamSearch(is));        
     }

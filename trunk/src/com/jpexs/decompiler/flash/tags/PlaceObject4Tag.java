@@ -170,7 +170,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
     public RGBA backgroundColor;
     // FIXME bug found in ecoDrive.swf, 
     private boolean bitmapCacheBug;
-    private int reserved;
+    private final int reserved;
     public static final int ID = 94;
     public byte[] amfData;  //TODO: Parse AMF data?
 

@@ -47,8 +47,8 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     private boolean executed = false;
     private String flash;
     private HANDLE pipe;
-    private static List<HANDLE> processes = new ArrayList<>();
-    private static List<HANDLE> pipes = new ArrayList<>();
+    private static final List<HANDLE> processes = new ArrayList<>();
+    private static final List<HANDLE> pipes = new ArrayList<>();
     private Component frame;
     private boolean stopped = true;
     private static final int CMD_PLAY = 1;

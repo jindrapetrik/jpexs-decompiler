@@ -23,7 +23,7 @@ import javax.swing.table.TableModel;
 
 public class MultinameTableModel implements TableModel {
 
-    private ABC abc;
+    private final ABC abc;
     private static final String[] columnNames = new String[]{"Index", "Kind", "Name", "Namespace", "NamespaceSet"};
     private static final Class[] classes = new Class[]{Long.class, String.class, String.class, String.class, String.class};
 

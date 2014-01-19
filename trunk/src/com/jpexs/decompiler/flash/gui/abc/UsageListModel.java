@@ -30,8 +30,8 @@ import javax.swing.DefaultListModel;
  */
 public class UsageListModel extends DefaultListModel<Object> {
 
-    private ABC abc;
-    private List<ABCContainerTag> abcTags;
+    private final ABC abc;
+    private final List<ABCContainerTag> abcTags;
 
     public UsageListModel(List<ABCContainerTag> abcTags, ABC abc) {
         this.abc = abc;

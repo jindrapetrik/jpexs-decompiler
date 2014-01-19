@@ -51,7 +51,7 @@ public class ScriptPack implements TreeElementItem {
     public ABC abc;
     public int scriptIndex;
     public List<Integer> traitIndices;
-    private ClassPath path;
+    private final ClassPath path;
 
     @Override
     public SWF getSwf() {

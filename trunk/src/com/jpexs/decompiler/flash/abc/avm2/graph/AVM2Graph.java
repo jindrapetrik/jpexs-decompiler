@@ -79,9 +79,9 @@ import java.util.Stack;
  */
 public class AVM2Graph extends Graph {
 
-    private AVM2Code avm2code;
-    private ABC abc;
-    private MethodBody body;
+    private final AVM2Code avm2code;
+    private final ABC abc;
+    private final MethodBody body;
 
     public AVM2Code getCode() {
         return avm2code;

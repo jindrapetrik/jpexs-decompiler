@@ -37,9 +37,9 @@ public class ModeFrame extends AppFrame implements ActionListener {
     static final String ACTION_PROXY = "PROXY";
     static final String ACTION_EXIT = "EXIT";
 
-    private JButton openButton = new JButton(translate("button.open"));
-    private JButton proxyButton = new JButton(translate("button.proxy"));
-    private JButton exitButton = new JButton(translate("button.exit"));
+    private final JButton openButton = new JButton(translate("button.open"));
+    private final JButton proxyButton = new JButton(translate("button.proxy"));
+    private final JButton exitButton = new JButton(translate("button.exit"));
 
     /**
      * Constructor

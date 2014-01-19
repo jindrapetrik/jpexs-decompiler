@@ -1045,12 +1045,12 @@ public final class ActionScriptLexer {
     public int yychar() {
         return yychar;
     }
-    private Stack<ParsedSymbol> pushedBack = new Stack<>();
+    private final Stack<ParsedSymbol> pushedBack = new Stack<>();
 
     public int yyline() {
         return yyline + 1;
     }
-    private List<LexListener> listeners = new ArrayList<>();
+    private final List<LexListener> listeners = new ArrayList<>();
 
     public void addListener(LexListener listener) {
         listeners.add(listener);

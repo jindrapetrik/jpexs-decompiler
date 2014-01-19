@@ -26,7 +26,7 @@ import java.io.OutputStream;
 
 public class FrameLabelTag extends Tag {
 
-    private String name;
+    private final String name;
     private boolean namedAnchor = false;
     public static final int ID = 43;
 

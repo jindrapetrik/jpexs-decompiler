@@ -37,7 +37,7 @@ public class Location {
     public int fileSize;
     public boolean isMetadata;
     public long hash;
-    private File rootDir;
+    private final File rootDir;
     public static final long eReservedMask = 0x4C000000L;
     public static final long eLocationSelectorMask = 0x30000000L;
     public static final int eLocationSelectorOffset = 28;
@@ -64,7 +64,7 @@ public class Location {
      #define BLOCK_SIZE_FOR_INDEX(idx)  ((idx) ? (256    << SIZE_SHIFT(idx)) : 0)
      #define BITMAP_SIZE_FOR_INDEX(idx) ((idx) ? (131072 >> SIZE_SHIFT(idx)) : 0)
      */
-    private Map<Integer, RandomAccessFile> dataFiles;
+    private final Map<Integer, RandomAccessFile> dataFiles;
 
     public InputStream getInputStream() throws IOException {
         String fileName = getFileName();

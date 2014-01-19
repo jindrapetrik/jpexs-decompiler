@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  */
 public class StreamSearch implements Searchable {
 
-    private ReReadableInputStream is;
+    private final ReReadableInputStream is;
 
     public StreamSearch(InputStream is) {
         this.is = new ReReadableInputStream(is);

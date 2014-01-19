@@ -36,13 +36,13 @@ import java.util.logging.Logger;
  */
 public class TraitsListItem {
 
-    private Type type;
-    private boolean isStatic;
-    private List<ABCContainerTag> abcTags;
-    private ABC abc;
-    private int classIndex;
-    private int index;
-    private int scriptIndex;
+    private final Type type;
+    private final boolean isStatic;
+    private final List<ABCContainerTag> abcTags;
+    private final ABC abc;
+    private final int classIndex;
+    private final int index;
+    private final int scriptIndex;
     public String STR_INSTANCE_INITIALIZER = AppStrings.translate("abc.traitslist.instanceinitializer");
     public String STR_CLASS_INITIALIZER = AppStrings.translate("abc.traitslist.classinitializer");
 

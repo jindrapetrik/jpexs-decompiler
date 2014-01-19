@@ -35,11 +35,11 @@ import java.util.logging.Logger;
  */
 public class ActionGraphSource extends GraphSource {
 
-    private List<Action> actions;
+    private final List<Action> actions;
     public int version;
-    private HashMap<Integer, String> registerNames;
-    private HashMap<String, GraphTargetItem> variables;
-    private HashMap<String, GraphTargetItem> functions;
+    private final HashMap<Integer, String> registerNames;
+    private final HashMap<String, GraphTargetItem> variables;
+    private final HashMap<String, GraphTargetItem> functions;
 
     public List<Action> getActions() {
         return actions;

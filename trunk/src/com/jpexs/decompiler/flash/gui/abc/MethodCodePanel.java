@@ -45,10 +45,10 @@ public class MethodCodePanel extends JPanel implements ActionListener {
     static final String ACTION_HEX = "HEX";
     static final String ACTION_HEX_ONLY = "HEXONLY";
 
-    private ASMSourceEditorPane sourceTextArea;
+    private final ASMSourceEditorPane sourceTextArea;
     public JPanel buttonsPanel;
-    private JToggleButton hexButton;
-    private JToggleButton hexOnlyButton;
+    private final JToggleButton hexButton;
+    private final JToggleButton hexOnlyButton;
 
     public void focusEditor() {
         sourceTextArea.requestFocusInWindow();

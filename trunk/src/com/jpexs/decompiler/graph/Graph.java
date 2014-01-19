@@ -55,7 +55,7 @@ public class Graph {
 
     public List<GraphPart> heads;
     protected GraphSource code;
-    private List<Integer> alternateEntries;
+    private final List<Integer> alternateEntries;
     public static final int SOP_USE_STATIC = 0;
     public static final int SOP_SKIP_STATIC = 1;
     public static final int SOP_REMOVE_STATIC = 2;

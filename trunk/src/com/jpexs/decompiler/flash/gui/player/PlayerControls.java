@@ -44,13 +44,13 @@ public class PlayerControls extends JPanel implements ActionListener {
     static final String ACTION_PAUSE = "PAUSE";
     static final String ACTION_STOP = "STOP";
 
-    private JButton pauseButton;
+    private final JButton pauseButton;
     private boolean paused = false;
-    private FlashDisplay display;
+    private final FlashDisplay display;
     private JProgressBar progress;
-    private Timer timer;
-    private JLabel timeLabel;
-    private JLabel totalTimeLabel;
+    private final Timer timer;
+    private final JLabel timeLabel;
+    private final JLabel totalTimeLabel;
     private static final Icon pauseIcon = View.getIcon("pause16");
     private static final Icon playIcon = View.getIcon("play16");
 

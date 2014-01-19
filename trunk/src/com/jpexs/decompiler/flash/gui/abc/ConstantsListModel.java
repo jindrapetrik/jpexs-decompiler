@@ -24,7 +24,7 @@ import javax.swing.event.ListDataListener;
 
 public class ConstantsListModel implements ListModel {
 
-    private ConstantPool constants;
+    private final ConstantPool constants;
     public static final int TYPE_UINT = 0;
     public static final int TYPE_INT = 1;
     public static final int TYPE_DOUBLE = 2;

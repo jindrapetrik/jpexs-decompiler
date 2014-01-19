@@ -25,8 +25,8 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class DefineRegisterActionItem extends ActionItem {
 
-    private String identifier;
-    private int register;
+    private final String identifier;
+    private final int register;
 
     public DefineRegisterActionItem(String identifier, int register) {
         super(null, PRECEDENCE_PRIMARY);

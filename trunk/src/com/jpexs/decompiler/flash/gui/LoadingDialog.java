@@ -36,7 +36,7 @@ import javax.swing.SwingConstants;
  */
 public class LoadingDialog extends AppDialog implements ImageObserver {
 
-    private JLabel detailLabel;
+    private final JLabel detailLabel;
     private LoadingPanel loadingPanel;
     JProgressBar progressBar = new JProgressBar(0, 100);
 

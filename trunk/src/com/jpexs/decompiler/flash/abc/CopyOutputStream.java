@@ -22,11 +22,11 @@ import java.io.OutputStream;
 
 public class CopyOutputStream extends OutputStream {
 
-    private OutputStream os;
-    private InputStream is;
+    private final OutputStream os;
+    private final InputStream is;
     private long pos = 0;
-    private int TEMPSIZE = 5;
-    private int[] temp = new int[TEMPSIZE];
+    private final int TEMPSIZE = 5;
+    private final int[] temp = new int[TEMPSIZE];
     private int tempPos = 0;
     public int ignoreFirst = 0;
 

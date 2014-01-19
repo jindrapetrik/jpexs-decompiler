@@ -22,7 +22,7 @@ import javax.swing.table.TableModel;
 
 public class NamespaceSetTableModel implements TableModel {
 
-    private ABC abc;
+    private final ABC abc;
     private static final String[] columnNames = new String[]{"Index", "NameSpaces"};
     private static final Class[] classes = new Class[]{Long.class, String.class, String.class};
 

@@ -46,7 +46,7 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
     static final String ACTION_OK = "OK";
     static final String ACTION_CANCEL = "CANCEL";
 
-    private static int modifiers[] = new int[]{
+    private static final int modifiers[] = new int[]{
         Namespace.KIND_PACKAGE,
         Namespace.KIND_PRIVATE,
         Namespace.KIND_PROTECTED,
@@ -55,17 +55,17 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
         Namespace.KIND_EXPLICIT,
         Namespace.KIND_STATIC_PROTECTED
     };
-    private static int types[] = new int[]{
+    private static final int types[] = new int[]{
         Trait.TRAIT_METHOD,
         Trait.TRAIT_GETTER,
         Trait.TRAIT_SETTER,
         Trait.TRAIT_CONST,
         Trait.TRAIT_SLOT
     };
-    private JComboBox<String> accessComboBox;
-    private JComboBox<String> typeComboBox;
-    private JCheckBox staticCheckbox;
-    private JTextField nameField;
+    private final JComboBox<String> accessComboBox;
+    private final JComboBox<String> typeComboBox;
+    private final JCheckBox staticCheckbox;
+    private final JTextField nameField;
 
     public boolean getStatic() {
         return staticCheckbox.isSelected();

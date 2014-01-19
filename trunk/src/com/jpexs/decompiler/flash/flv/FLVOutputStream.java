@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class FLVOutputStream extends OutputStream {
 
-    private OutputStream os;
+    private final OutputStream os;
     private int bitPos = 0;
     private int tempByte = 0;
     private long pos = 0;

@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class UnLoadMovieNumActionItem extends ActionItem {
 
-    private GraphTargetItem num;
+    private final GraphTargetItem num;
 
     @Override
     public List<GraphTargetItem> getAllSubItems() {

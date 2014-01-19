@@ -96,7 +96,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
         this.swf = swf;
     }
 
-    private static Object lockObject = new Object();
+    private static final Object lockObject = new Object();
     private static List<Integer> knownTagIds;
     private static List<Integer> requiredTagIds;
     

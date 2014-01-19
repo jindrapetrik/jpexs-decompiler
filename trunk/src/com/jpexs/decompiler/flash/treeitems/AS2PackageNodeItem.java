@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.SWF;
  */
 public class AS2PackageNodeItem implements TreeItem {
 
-    private SWF swf;
+    private final SWF swf;
     public String packageName;
 
     public AS2PackageNodeItem(String packageName, SWF swf) {

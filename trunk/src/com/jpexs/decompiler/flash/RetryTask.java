@@ -24,8 +24,8 @@ import java.io.IOException;
  */
 public class RetryTask {
 
-    private RunnableIOEx r;
-    private AbortRetryIgnoreHandler handler;
+    private final RunnableIOEx r;
+    private final AbortRetryIgnoreHandler handler;
     public Object result;
 
     public RetryTask(RunnableIOEx r, AbortRetryIgnoreHandler handler) {

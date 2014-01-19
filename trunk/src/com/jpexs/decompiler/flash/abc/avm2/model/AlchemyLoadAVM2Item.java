@@ -27,8 +27,8 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class AlchemyLoadAVM2Item extends AVM2Item {
 
-    private String name;
-    private GraphTargetItem ofs;
+    private final String name;
+    private final GraphTargetItem ofs;
 
     public AlchemyLoadAVM2Item(GraphSourceItem instruction, GraphTargetItem ofs, String name) {
         super(instruction, PRECEDENCE_PRIMARY);

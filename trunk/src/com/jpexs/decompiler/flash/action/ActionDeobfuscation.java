@@ -34,10 +34,10 @@ import java.util.regex.Pattern;
  */
 public class ActionDeobfuscation {
     
-    private Random rnd = new Random();
+    private final Random rnd = new Random();
     private final int DEFAULT_FOO_SIZE = 10;
     public HashSet<String> allVariableNamesStr = new HashSet<>();
-    private HashMap<String, Integer> typeCounts = new HashMap<>();
+    private final HashMap<String, Integer> typeCounts = new HashMap<>();
 
     public static final String[] reservedWords = {
         "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",

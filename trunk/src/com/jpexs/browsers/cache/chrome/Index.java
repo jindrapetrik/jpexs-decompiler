@@ -36,8 +36,8 @@ public class Index {
     CacheAddr table[];
     public static final int kIndexTablesize = 0x10000;
     public File rootDir;
-    private Map<Integer, RandomAccessFile> dataFiles;
-    private File externalFilesDir;
+    private final Map<Integer, RandomAccessFile> dataFiles;
+    private final File externalFilesDir;
 
     public void free() {
         for (RandomAccessFile r : dataFiles.values()) {

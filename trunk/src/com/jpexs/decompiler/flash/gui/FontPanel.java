@@ -36,7 +36,7 @@ import javax.swing.JOptionPane;
  */
 public class FontPanel extends javax.swing.JPanel {
 
-    private MainPanel mainPanel;
+    private final MainPanel mainPanel;
     private FontTag fontTag;
     
     /**

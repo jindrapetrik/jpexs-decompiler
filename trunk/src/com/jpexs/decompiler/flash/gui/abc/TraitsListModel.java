@@ -28,10 +28,10 @@ import javax.swing.event.ListDataListener;
 public final class TraitsListModel implements ListModel<Object> {
 
     private List<TraitsListItem> items;
-    private List<ABCContainerTag> abcTags;
-    private ABC abc;
-    private int classIndex;
-    private int scriptIndex;
+    private final List<ABCContainerTag> abcTags;
+    private final ABC abc;
+    private final int classIndex;
+    private final int scriptIndex;
 
     public void setSorted(boolean sorted) {
         if (sorted) {

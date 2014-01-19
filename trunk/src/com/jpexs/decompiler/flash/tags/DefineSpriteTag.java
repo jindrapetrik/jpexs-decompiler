@@ -101,7 +101,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
         }
         return ret;
     }
-    private static Cache rectCache = Cache.getInstance(true);
+    private static final Cache rectCache = Cache.getInstance(true);
 
     @Override
     public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {

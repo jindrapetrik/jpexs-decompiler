@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class MarkItem extends GraphTargetItem {
 
-    private String mark;
+    private final String mark;
 
     public MarkItem(String mark) {
         super(null, NOPRECEDENCE);

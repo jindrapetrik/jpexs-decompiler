@@ -42,8 +42,8 @@ import java.util.logging.Logger;
  */
 public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
 
-    private SWF swf;
-    private long pos;
+    private final SWF swf;
+    private final long pos;
 
     @Override
     public SWF getSwf() {

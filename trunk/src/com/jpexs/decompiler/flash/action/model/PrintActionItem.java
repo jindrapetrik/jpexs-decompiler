@@ -34,8 +34,8 @@ import java.util.List;
  */
 public class PrintActionItem extends ActionItem {
 
-    private GraphTargetItem target;
-    private GraphTargetItem boundingBox;
+    private final GraphTargetItem target;
+    private final GraphTargetItem boundingBox;
 
     @Override
     public List<GraphTargetItem> getAllSubItems() {

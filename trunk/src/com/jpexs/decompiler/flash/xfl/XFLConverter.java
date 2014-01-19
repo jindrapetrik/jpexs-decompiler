@@ -3041,7 +3041,7 @@ public class XFLConverter {
         private int lineSpacing = -1;
         private double letterSpacing = -1;
         private String alignment = null;
-        private List<Tag> tags;
+        private final List<Tag> tags;
         private boolean bold = false;
         private boolean italic = false;
         private boolean underline = false;

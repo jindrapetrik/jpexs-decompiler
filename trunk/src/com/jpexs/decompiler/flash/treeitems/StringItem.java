@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.SWF;
 public class StringItem implements TreeItem {
     
     public SWF swf;
-    private String str;
+    private final String str;
     
     public StringItem(String str, SWF swf) {
         this.swf = swf;

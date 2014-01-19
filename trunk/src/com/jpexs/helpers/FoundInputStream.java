@@ -26,7 +26,7 @@ import java.io.InputStream;
  */
 public class FoundInputStream extends ReReadableInputStream{
 
-    private long startPos;
+    private final long startPos;
     private boolean started=false;
     
     public FoundInputStream(long startPos,InputStream is) {

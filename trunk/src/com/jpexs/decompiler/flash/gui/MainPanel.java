@@ -189,24 +189,24 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public final class MainPanel extends JPanel implements ActionListener, TreeSelectionListener, Freed {
     
-    private MainFrame mainFrame;
-    private List<SWF> swfs;
+    private final MainFrame mainFrame;
+    private final List<SWF> swfs;
     private ABCPanel abcPanel;
     private ActionPanel actionPanel;
-    private JPanel welcomePanel;
-    private MainFrameStatusPanel statusPanel;
-    private MainFrameMenu mainMenu;
-    private FontPanel fontPanel;
-    private JProgressBar progressBar = new JProgressBar(0, 100);
+    private final JPanel welcomePanel;
+    private final MainFrameStatusPanel statusPanel;
+    private final MainFrameMenu mainMenu;
+    private final FontPanel fontPanel;
+    private final JProgressBar progressBar = new JProgressBar(0, 100);
     private DeobfuscationDialog deobfuscationDialog;
     public TagTree tagTree;
-    private FlashPlayerPanel flashPanel;
-    private JPanel contentPanel;
-    private JPanel displayPanel;
+    private final FlashPlayerPanel flashPanel;
+    private final JPanel contentPanel;
+    private final JPanel displayPanel;
     private ImagePanel imagePanel;
     private BinaryPanel binaryPanel;
-    private ImagePanel previewImagePanel;
-    private SWFPreviwPanel swfPreviewPanel;
+    private final ImagePanel previewImagePanel;
+    private final SWFPreviwPanel swfPreviewPanel;
     private boolean isWelcomeScreen = true;
     private static final String CARDFLASHPANEL = "Flash card";
     private static final String CARDSWFPREVIEWPANEL = "SWF card";
@@ -224,26 +224,26 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String INTERNAL_VIEWER_CARD = "INTERNALVIEWER";
     private static final String SPLIT_PANE1 = "SPLITPANE1";
     private static final String WELCOME_PANEL = "WELCOMEPANEL";
-    private LineMarkedEditorPane textValue;
-    private JSplitPane splitPane1;
-    private JSplitPane splitPane2;
+    private final LineMarkedEditorPane textValue;
+    private final JSplitPane splitPane1;
+    private final JSplitPane splitPane2;
     private boolean splitsInited = false;
     private JPanel detailPanel;
     private JTextField filterField = new MyTextField("");
     private JPanel searchPanel;
-    private JPanel displayWithPreview;
-    private JButton textSaveButton;
-    private JButton textEditButton;
-    private JButton textCancelButton;
-    private JPanel parametersPanel;
+    private final JPanel displayWithPreview;
+    private final JButton textSaveButton;
+    private final JButton textEditButton;
+    private final JButton textCancelButton;
+    private final JPanel parametersPanel;
     private JSplitPane previewSplitPane;
     private JButton imageReplaceButton;
     private JPanel imageButtonsPanel;
     private JButton binaryReplaceButton;
     private JPanel binaryButtonsPanel;
     private PlayerControls flashControls;
-    private ImagePanel internelViewerPanel;
-    private JPanel viewerCards;
+    private final ImagePanel internelViewerPanel;
+    private final JPanel viewerCards;
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
     private CancellableWorker setSourceWorker;
     public TreeNode oldNode;
@@ -541,7 +541,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     @Override
                     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
                         if (flavor.equals(DataFlavor.javaFileListFlavor)) {
-                            List<File> files = new ArrayList<>();
+                            List<File> files;
                             String tempDir = System.getProperty("java.io.tmpdir");
                             if (!tempDir.endsWith(File.separator)) {
                                 tempDir += File.separator;
@@ -2152,7 +2152,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
             final List<ABCContainerTag> abcList = scriptLeaf.abc.swf.abcList;
-            if (setSourceWorker != null && !setSourceWorker.isDone()) {
+            if (setSourceWorker != null) {
                 setSourceWorker.cancel(true);
                 setSourceWorker = null;
             }

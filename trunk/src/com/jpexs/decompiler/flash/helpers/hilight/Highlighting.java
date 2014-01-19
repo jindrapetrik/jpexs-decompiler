@@ -39,7 +39,7 @@ public class Highlighting implements Serializable {
      * Length of highlighted text
      */
     public int len;
-    private Map<String, String> properties;
+    private final Map<String, String> properties;
 
     public Long getPropertyLong(String key) {
         String dataStr = getPropertyString(key);

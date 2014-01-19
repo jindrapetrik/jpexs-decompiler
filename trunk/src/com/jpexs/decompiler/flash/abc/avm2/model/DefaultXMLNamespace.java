@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class DefaultXMLNamespace extends AVM2Item {
 
-    private GraphTargetItem ns;
+    private final GraphTargetItem ns;
 
     public DefaultXMLNamespace(AVM2Instruction instruction, GraphTargetItem ns) {
         super(instruction, NOPRECEDENCE);

@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class FSCommandActionItem extends ActionItem {
 
-    private String command;
+    private final String command;
 
     public FSCommandActionItem(GraphSourceItem instruction, String command) {
         super(instruction, PRECEDENCE_PRIMARY);

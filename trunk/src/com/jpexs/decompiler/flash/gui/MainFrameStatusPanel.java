@@ -41,11 +41,11 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
     
     static final String ACTION_SHOW_ERROR_LOG = "SHOWERRORLOG";
 
-    private MainPanel mainPanel;
+    private final MainPanel mainPanel;
     
-    private LoadingPanel loadingPanel = new LoadingPanel(20, 20);
-    private JLabel statusLabel = new JLabel("");
-    private JButton cancelButton = new JButton();
+    private final LoadingPanel loadingPanel = new LoadingPanel(20, 20);
+    private final JLabel statusLabel = new JLabel("");
+    private final JButton cancelButton = new JButton();
     private JButton errorNotificationButton;
 
     private Icon currentIcon;

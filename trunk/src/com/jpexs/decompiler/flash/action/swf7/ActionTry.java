@@ -48,7 +48,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     long trySize;
     long catchSize;
     long finallySize;
-    private int version;
+    private final int version;
 
     public ActionTry(boolean catchInRegisterFlag, boolean finallyBlockFlag, boolean catchBlockFlag, String catchName, int catchRegister, long trySize, long catchSize, long finallySize, int version) {
         super(0x8F, 0);

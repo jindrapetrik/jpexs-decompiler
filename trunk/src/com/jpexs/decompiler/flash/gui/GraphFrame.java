@@ -40,11 +40,11 @@ public class GraphFrame extends AppFrame {
         private static final int SPACE_BACKLINKS = 5;
         private static final int BLOCK_WIDTH = 200;
         private static final int BLOCK_HEIGHT = 20;
-        private HashMap<GraphPart, Point> partPos = new HashMap<>();
-        private Point size;
+        private final HashMap<GraphPart, Point> partPos = new HashMap<>();
+        private final Point size;
         private int backLinksLeft = 0;
         private int backLinksRight = 0;
-        private GraphPart head;
+        private final GraphPart head;
 
         public GraphPanel(Graph graph) throws InterruptedException {
             graph.init(null);

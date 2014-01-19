@@ -27,7 +27,7 @@ import java.util.Set;
  */
 public class IntegerValueItem extends GraphTargetItem {
 
-    private int intValue;
+    private final int intValue;
 
     public IntegerValueItem(GraphSourceItem src, int value) {
         super(src, PRECEDENCE_PRIMARY);

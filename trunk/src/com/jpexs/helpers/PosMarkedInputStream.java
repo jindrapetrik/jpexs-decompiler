@@ -26,7 +26,7 @@ import java.io.InputStream;
 public class PosMarkedInputStream extends InputStream {
 
     private long pos = 0;
-    private InputStream is;
+    private final InputStream is;
 
     public PosMarkedInputStream(InputStream is) {
         this.is = is;

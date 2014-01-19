@@ -24,9 +24,9 @@ import java.io.InputStream;
  */
 public class SWFSourceInfo {
 
-    private InputStream inputStream;
-    private String file;
-    private String fileTitle;
+    private final InputStream inputStream;
+    private final String file;
+    private final String fileTitle;
     
     public SWFSourceInfo(InputStream inputStream, String file, String fileTitle) {
         this.inputStream = inputStream;

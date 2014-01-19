@@ -33,15 +33,15 @@ import java.util.Stack;
  */
 public class HilightedTextWriter extends GraphTextWriter {
     
-    private StringBuilder sb = new StringBuilder();
-    private boolean hilight;
+    private final StringBuilder sb = new StringBuilder();
+    private final boolean hilight;
     private boolean newLine = true;
     private int indent = 0;
-    private Stack<GraphSourceItemPosition> offsets = new Stack<>();
+    private final Stack<GraphSourceItemPosition> offsets = new Stack<>();
     private boolean toStringCalled = false;
     private int newLineCount = 0;
 
-    private Stack<Highlighting> hilightStack = new Stack<>();
+    private final Stack<Highlighting> hilightStack = new Stack<>();
     public List<Highlighting> traitHilights = new ArrayList<>();
     public List<Highlighting> classHilights = new ArrayList<>();
     public List<Highlighting> methodHilights = new ArrayList<>();

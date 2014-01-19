@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  */
 public class RafInputStream extends InputStream {
 
-    private RandomAccessFile raf;
+    private final RandomAccessFile raf;
     private long pos = 0;
 
     public RafInputStream(RandomAccessFile raf) {

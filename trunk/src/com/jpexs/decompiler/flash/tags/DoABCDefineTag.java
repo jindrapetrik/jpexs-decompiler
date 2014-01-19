@@ -40,7 +40,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
     /**
      * ActionScript 3 bytecodes
      */
-    private ABC abc;
+    private final ABC abc;
     /**
      * A 32-bit flags value, which may contain the following bits set:
      * kDoAbcLazyInitializeFlag = 1: Indicates that the ABC block should not be

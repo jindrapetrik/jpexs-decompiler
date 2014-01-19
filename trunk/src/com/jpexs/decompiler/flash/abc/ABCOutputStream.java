@@ -24,7 +24,7 @@ import java.io.OutputStream;
 
 public class ABCOutputStream extends OutputStream {
 
-    private OutputStream os;
+    private final OutputStream os;
 
     public ABCOutputStream(OutputStream os) {
         this.os = os;

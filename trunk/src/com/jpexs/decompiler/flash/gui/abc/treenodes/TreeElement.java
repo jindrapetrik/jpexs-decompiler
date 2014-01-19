@@ -27,11 +27,11 @@ import javax.swing.tree.TreePath;
 
 public abstract class TreeElement extends TreeNode {
 
-    private SortedMap<String, TreeElement> branches;
-    private SortedMap<String, TreeElement> leafs;
-    private String name;
-    private String path;
-    private TreeElement parent;
+    private final SortedMap<String, TreeElement> branches;
+    private final SortedMap<String, TreeElement> leafs;
+    private final String name;
+    private final String path;
+    private final TreeElement parent;
 
     public TreeElement(String name, String path, TreeElementItem item, TreeElement parent) {
         super(item);

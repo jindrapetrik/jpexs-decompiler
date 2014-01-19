@@ -71,7 +71,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     public int fontId;
     public List<FontType> fonts;
     private List<SHAPE> shapeCache;
-    private static Cache imageCache = Cache.getInstance(false);
+    private static final Cache imageCache = Cache.getInstance(false);
 
     private static class SerializableImage implements Serializable {
 

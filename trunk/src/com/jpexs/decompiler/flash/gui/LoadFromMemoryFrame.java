@@ -90,13 +90,13 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
     private DefaultListModel<com.jpexs.process.Process> model;
     private DefaultTableModel resTableModel;
     private final JTable tableRes;
-    private JLabel stateLabel;
+    private final JLabel stateLabel;
     private boolean processing = false;
-    private JProgressBar progress;
+    private final JProgressBar progress;
 
     private class SelectProcessWorker extends SwingWorker<List<SwfInMemory>, Object> {
 
-        private List<com.jpexs.process.Process> procs;
+        private final List<com.jpexs.process.Process> procs;
 
         public SelectProcessWorker(List<com.jpexs.process.Process> procs) {
             this.procs = procs;

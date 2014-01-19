@@ -148,7 +148,7 @@ public class ActionScriptParser {
     public static final int REGISTER_PARENT = 5;
     public static final int REGISTER_GLOBAL = 6;
     private long uniqLast = 0;
-    private boolean debugMode = false;
+    private final boolean debugMode = false;
 
     private String uniqId() {
         uniqLast++;

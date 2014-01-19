@@ -66,7 +66,7 @@ public class ABC {
     public static final int MINORwithDECIMAL = 17;
     protected HashSet<EventListener> listeners = new HashSet<>();
     private static final Logger logger = Logger.getLogger(ABC.class.getName());
-    private AVM2Deobfuscation deobfuscation;
+    private final AVM2Deobfuscation deobfuscation;
     public SWF swf;
 
     public int addMethodBody(MethodBody body) {

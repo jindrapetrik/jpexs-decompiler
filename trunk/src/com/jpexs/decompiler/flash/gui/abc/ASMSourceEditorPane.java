@@ -52,7 +52,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     public int bodyIndex = -1;
     private List<Highlighting> disassembledHilights = new ArrayList<>();
     private List<Highlighting> specialHilights = new ArrayList<>();
-    private DecompiledEditorPane decompiledEditor;
+    private final DecompiledEditorPane decompiledEditor;
     private boolean ignoreCarret = false;
     private String name;
     private HilightedText textWithHex;

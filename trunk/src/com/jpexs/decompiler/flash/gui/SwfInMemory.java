@@ -38,7 +38,7 @@ public class SwfInMemory {
         this.process = process;
     }
     
-    private static ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(LoadFromMemoryFrame.class));
+    private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(LoadFromMemoryFrame.class));
 
     public String translate(String key) {
         return resourceBundle.getString(key);

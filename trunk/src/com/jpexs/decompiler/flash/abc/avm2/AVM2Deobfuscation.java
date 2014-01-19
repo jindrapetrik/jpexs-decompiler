@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  */
 public class AVM2Deobfuscation {
 
-    private static Random rnd = new Random();
+    private static final Random rnd = new Random();
     private static final int DEFAULT_FOO_SIZE = 10;
 
     public static final String[] reservedWords = {
@@ -45,8 +45,8 @@ public class AVM2Deobfuscation {
     public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
     public static final String FOO_JOIN_CHARACTERS = "aeiouy";
 
-    private ConstantPool constants;
-    private Map<String, Integer> usageTypesCount = new HashMap<>();
+    private final ConstantPool constants;
+    private final Map<String, Integer> usageTypesCount = new HashMap<>();
     
     public AVM2Deobfuscation(ConstantPool constants) {
         this.constants = constants;

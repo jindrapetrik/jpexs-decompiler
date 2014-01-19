@@ -29,7 +29,7 @@ public class ABCInputStream extends InputStream {
 
     private static final int CLASS_PROTECTED_NS = 8;
     private static final int ATTR_METADATA = 4;
-    private InputStream is;
+    private final InputStream is;
     private long bytesRead = 0;
     private ByteArrayOutputStream bufferOs = null;
     public static final boolean DEBUG_READ = false;

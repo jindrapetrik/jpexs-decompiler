@@ -34,9 +34,9 @@ import java.util.List;
  */
 public class LoadMovieNumActionItem extends ActionItem {
 
-    private GraphTargetItem urlString;
-    private GraphTargetItem num;
-    private int method;
+    private final GraphTargetItem urlString;
+    private final GraphTargetItem num;
+    private final int method;
 
     @Override
     public List<GraphTargetItem> getAllSubItems() {
