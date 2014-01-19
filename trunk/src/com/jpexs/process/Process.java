@@ -17,6 +17,7 @@
 package com.jpexs.process;
 
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.Searchable;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.Map;
@@ -25,7 +26,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public interface Process extends Comparable<Process> {
+public interface Process extends Comparable<Process>, Searchable{
 
     public String getFilePath();
 
@@ -38,7 +39,9 @@ public interface Process extends Comparable<Process> {
 
     public String getPid();
 
+    @Override
     public Map<Long, InputStream> search(byte[]... data);
 
+    @Override
     public Map<Long, InputStream> search(ProgressListener progListener, byte[]... data);
 }

@@ -343,6 +343,7 @@ public class Main {
         protected Object doInBackground() throws Exception {
             boolean first = true;
             for (SWFSourceInfo sourceInfo : sourceInfos) {
+                //TODO: Handle non SWF filetypes (SWC,ZIP,Binary search)
                 SWF swf = null;
                 try {
                     Main.startWork(AppStrings.translate("work.reading.swf") + "...");
@@ -574,6 +575,8 @@ public class Main {
             public boolean accept(File f) {
                 return (f.getName().toLowerCase().toLowerCase().endsWith(".swf"))
                         || (f.getName().toLowerCase().toLowerCase().endsWith(".gfx"))
+                        || (f.getName().toLowerCase().toLowerCase().endsWith(".swc"))
+                        || (f.getName().toLowerCase().toLowerCase().endsWith(".zip"))
                         || (f.isDirectory());
             }
 
@@ -595,6 +598,20 @@ public class Main {
             }
         };
         fc.addChoosableFileFilter(swfFilter);
+        
+        FileFilter swcFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase().endsWith(".swc")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.swc");
+            }
+        };
+        fc.addChoosableFileFilter(swcFilter);
+        
         FileFilter gfxFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -605,9 +622,37 @@ public class Main {
             public String getDescription() {
                 return AppStrings.translate("filter.gfx");
             }
-        };
+        };              
         fc.addChoosableFileFilter(gfxFilter);
-        fc.setAcceptAllFileFilterUsed(true);
+        
+                
+        FileFilter zipFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase().endsWith(".zip")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.zip");
+            }
+        };
+        fc.addChoosableFileFilter(zipFilter);
+        
+        FileFilter binaryFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return true;
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.binary");
+            }
+        };
+        fc.addChoosableFileFilter(binaryFilter);
+        
+        fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
         int returnVal = fc.showOpenDialog(f);
@@ -803,7 +848,7 @@ public class Main {
         }
 
         if (args.length == 0) {
-            initGui();
+            initGui();            
             showModeFrame();
         } else {
             String fileToOpen = CommandLineArgumentParser.parseArguments(args);
