@@ -75,6 +75,10 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
         return swf;
     }
 
+    public void setSwf(SWF swf) {
+        this.swf = swf;
+    }
+
     /**
      * Constructor
      *

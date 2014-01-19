@@ -159,6 +159,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -300,27 +301,36 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private void createContextMenu() {
         final JPopupMenu contextPopupMenu = new JPopupMenu();
+
         final JMenuItem removeMenuItem = new JMenuItem(translate("contextmenu.remove"));
         removeMenuItem.addActionListener(this);
         removeMenuItem.setActionCommand(ACTION_REMOVE_ITEM);
+        contextPopupMenu.add(removeMenuItem);
+
         final JMenuItem exportSelectionMenuItem = new JMenuItem(translate("menu.file.export.selection"));
         exportSelectionMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_SEL);
         exportSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(exportSelectionMenuItem);
+        
         final JMenuItem replaceImageSelectionMenuItem = new JMenuItem(translate("button.replace"));
         replaceImageSelectionMenuItem.setActionCommand(ACTION_REPLACE_IMAGE);
         replaceImageSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(replaceImageSelectionMenuItem);
+        
         final JMenuItem replaceBinarySelectionMenuItem = new JMenuItem(translate("button.replace"));
         replaceBinarySelectionMenuItem.setActionCommand(ACTION_REPLACE_BINARY);
         replaceBinarySelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(replaceBinarySelectionMenuItem);
+        
         final JMenuItem closeSelectionMenuItem = new JMenuItem(translate("contextmenu.closeSwf"));
         closeSelectionMenuItem.setActionCommand(ACTION_CLOSE_SWF);
         closeSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(closeSelectionMenuItem);
 
-        contextPopupMenu.add(removeMenuItem);
+        final JMenu moveTagMenu = new JMenu(translate("contextmenu.moveTag"));
+        moveTagMenu.addActionListener(this);
+        contextPopupMenu.add(moveTagMenu);
+
         tagTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -354,23 +364,44 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     replaceImageSelectionMenuItem.setVisible(false);
                     replaceBinarySelectionMenuItem.setVisible(false);
                     closeSelectionMenuItem.setVisible(false);
+                    moveTagMenu.setVisible(false);
                     
                     if (paths.length == 1) {
-                        Object tagObj = paths[0].getLastPathComponent();
+                        TreeNode treeNode = (TreeNode) paths[0].getLastPathComponent();
 
-                        if (tagObj instanceof TreeNode) {
-                            TreeItem tag = ((TreeNode) tagObj).getItem();
+                        TreeItem item = ((TreeNode) treeNode).getItem();
 
-                            if (tag instanceof ImageTag && ((ImageTag) tag).importSupported()) {
-                                replaceImageSelectionMenuItem.setVisible(true);
-                            }
-                            if (tag instanceof DefineBinaryDataTag) {
-                                replaceBinarySelectionMenuItem.setVisible(true);
-                            }
+                        if (item instanceof ImageTag && ((ImageTag) item).importSupported()) {
+                            replaceImageSelectionMenuItem.setVisible(true);
+                        }
+                        if (item instanceof DefineBinaryDataTag) {
+                            replaceBinarySelectionMenuItem.setVisible(true);
                         }
 
-                        if (tagObj instanceof SWFRoot) {
+                        if (treeNode instanceof SWFRoot) {
                             closeSelectionMenuItem.setVisible(true);
+                        }
+
+                        if (item instanceof Tag && swfs.size() > 1) {
+                            final Tag tag = (Tag) item;
+                            moveTagMenu.removeAll();
+                            for (final SWF targetSwf : swfs) {
+                                if (targetSwf != tag.getSwf()) {
+                                    JMenuItem swfItem = new JMenuItem(targetSwf.getShortFileName());
+                                    swfItem.addActionListener(new ActionListener() {
+
+                                        @Override
+                                        public void actionPerformed(ActionEvent ae) {
+                                            tag.getSwf().tags.remove(tag);
+                                            tag.setSwf(targetSwf);
+                                            targetSwf.tags.add(tag);
+                                            refreshTree();
+                                        }
+                                    });
+                                    moveTagMenu.add(swfItem);
+                                }
+                            }
+                            moveTagMenu.setVisible(true);
                         }
                     }
                     
