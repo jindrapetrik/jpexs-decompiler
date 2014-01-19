@@ -245,7 +245,6 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public LoadFromMemoryFrame(final MainFrame mainFrame) {
         setSize(800, 600);
         //setAlwaysOnTop(true);
@@ -291,7 +290,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         tableRes = new JTable(resTableModel);
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(resTableModel);
         tableRes.setRowSorter(sorter);
-        list = new JList(model);
+        list = new JList<>(model);
         list.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {

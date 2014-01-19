@@ -825,9 +825,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         swfs.add(swf);
         swf.abcList = abcList;
-        tagTree.setModel(new TagTreeModel(mainFrame, swfs));
-        
+
         boolean hasAbc = !abcList.isEmpty();
+        swf.isAS3 = hasAbc;
+                
+        tagTree.setModel(new TagTreeModel(mainFrame, swfs));
 
         if (hasAbc) {
             if (abcPanel == null) {
@@ -1448,11 +1450,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (searchDialog.result) {
             final String txt = searchDialog.searchField.getText();
             if (!txt.isEmpty()) {
-                if (abcPanel != null) {
-                    new CancellableWorker() {
-                        @Override
-                        protected Void doInBackground() throws Exception {
-                            if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                final SWF swf = getCurrentSwf();
+                
+                new CancellableWorker() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        boolean found = false;
+                        if (swf.isAS3) {
+                            if (abcPanel != null && abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                found = true;
                                 View.execInEventDispatch(new Runnable() {
                                     @Override
                                     public void run() {
@@ -1460,17 +1466,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                         showCard(CARDACTIONSCRIPT3PANEL);
                                     }
                                 });
-                            } else {
-                                View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                             }
-                            return null;
-                        }
-                    }.execute();
-                } else {
-                    new CancellableWorker() {
-                        @Override
-                        protected Void doInBackground() {
+                        } else {
                             if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                found = true;
                                 View.execInEventDispatch(new Runnable() {
                                     @Override
                                     public void run() {
@@ -1478,14 +1477,28 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                     }
                                 });
                             } else {
-                                View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                             }
-                            return null;
                         }
-                    }.execute();
-                }
+                        
+                        if (!found && searchDialog.searchInTextsCheckBox.isSelected()) {
+                            if (searchText(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected(), swf)) {
+                                found = true;
+                            }
+                        }
+                        
+                        if (!found) {
+                            View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        
+                        return null;
+                    }
+                }.execute();
             }
         }
+    }
+    
+    private boolean searchText(String txt, boolean ignoreCase, boolean regexp, SWF swf) {
+        return false;
     }
     
     public void autoDeobfuscateChanged() {

@@ -88,7 +88,6 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         return chars;
     }
 
-    @SuppressWarnings("unchecked")
     public FontEmbedDialog(String selectedFont, String selectedChars, int style) {
         setSize(900, 600);
         this.style = style;
@@ -99,7 +98,7 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));
 
         individialSample = new JLabel();
-        sourceFont = new JComboBox<>(new Vector(FontTag.fontNames));
+        sourceFont = new JComboBox<>(new Vector<>(FontTag.fontNames));
         sourceFont.setSelectedItem(selectedFont);
         cnt.add(sourceFont);
         JPanel rangesPanel = new JPanel();

@@ -25,7 +25,7 @@ import java.util.List;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 
-public final class TraitsListModel implements ListModel {
+public final class TraitsListModel implements ListModel<Object> {
 
     private List<TraitsListItem> items;
     private List<ABCContainerTag> abcTags;

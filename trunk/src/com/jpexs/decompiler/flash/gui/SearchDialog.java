@@ -44,6 +44,7 @@ public class SearchDialog extends AppDialog implements ActionListener {
     public JTextField searchField = new MyTextField();
     public JCheckBox ignoreCaseCheckBox = new JCheckBox(translate("checkbox.ignorecase"));
     public JCheckBox regexpCheckBox = new JCheckBox(translate("checkbox.regexp"));
+    public JCheckBox searchInTextsCheckBox = new JCheckBox(translate("checkbox.searchText"));
     public boolean result = false;
 
     public SearchDialog() {
@@ -65,10 +66,15 @@ public class SearchDialog extends AppDialog implements ActionListener {
         panField.add(new JLabel(translate("label.searchtext")));
         panField.add(searchField);
         cnt.add(panField);
+        
         JPanel checkPanel = new JPanel(new FlowLayout());
         checkPanel.add(ignoreCaseCheckBox);
         checkPanel.add(regexpCheckBox);
+        // todo: honfika: add checkbox when text search is implemented
+        //searchInTextsCheckBox.setSelected(true);
+        //checkPanel.add(searchInTextsCheckBox);
         cnt.add(checkPanel);
+
         cnt.add(panButtons);
         getRootPane().setDefaultButton(okButton);
         View.centerScreen(this);

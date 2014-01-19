@@ -55,29 +55,26 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         setBackground(Color.white);
     }
 
-    @SuppressWarnings("unchecked")
     public void clearABC() {
         this.abc = null;
         this.abcTags = null;
-        setModel(new DefaultListModel());
+        setModel(new DefaultListModel<>());
     }
 
-    @SuppressWarnings("unchecked")
     public void setABC(List<ABCContainerTag> abcTags, ABC abc) {
         this.abc = abc;
         this.abcTags = abcTags;
-        setModel(new DefaultListModel());
+        setModel(new DefaultListModel<>());
         setClassIndex(-1, -1);
     }
 
-    @SuppressWarnings("unchecked")
     public void setClassIndex(int classIndex, int scriptIndex) {
         if (classIndex >= abc.instance_info.length) {
             return;
         }
         this.classIndex = classIndex;
         if (classIndex == -1) {
-            setModel(new DefaultListModel());
+            setModel(new DefaultListModel<>());
         } else {
             if (abc != null) {
                 setModel(new TraitsListModel(abcTags, abc, classIndex, scriptIndex, sorted));

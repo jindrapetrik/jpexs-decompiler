@@ -28,7 +28,7 @@ import javax.swing.event.ListDataListener;
  *
  * @author JPEXS
  */
-public class SWFListModel implements ListModel {
+public class SWFListModel implements ListModel<Replacement> {
 
     private List<ListDataListener> listeners = new ArrayList<>();
     private List<Replacement> replacements;
@@ -150,7 +150,7 @@ public class SWFListModel implements ListModel {
      * @return Element on index
      */
     @Override
-    public Object getElementAt(int index) {
+    public Replacement getElementAt(int index) {
         return replacements.get(index);
     }
 

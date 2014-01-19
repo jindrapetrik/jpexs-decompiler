@@ -197,7 +197,6 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
 
     }
 
-    @SuppressWarnings("unchecked")
     private void filter() {
         String search = searchField.getText();
         List<CacheEntry> filtered = new ArrayList<>();
@@ -206,7 +205,7 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
                 filtered.add(en);
             }
         }
-        list.setListData(new Vector(filtered));
+        list.setListData(new Vector<>(filtered));
     }
 
     private static String entryToFileName(CacheEntry en) {

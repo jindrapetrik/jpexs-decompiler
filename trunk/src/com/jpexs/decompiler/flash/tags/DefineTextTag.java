@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -158,7 +159,12 @@ public class DefineTextTag extends TextTag implements DrawableTag {
             if (params.length() > 0) {
                 ret += "[" + params + "\r\n]";
             }
-            ret += Helper.escapeString(rec.getText(tags, fnt)).replace("[", "\\[").replace("]", "\\]");
+            
+            if (fnt == null) {
+                ret += AppStrings.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId));
+            } else {
+                ret += Helper.escapeString(rec.getText(tags, fnt)).replace("[", "\\[").replace("]", "\\]");
+            }
         }
         return ret;
     }

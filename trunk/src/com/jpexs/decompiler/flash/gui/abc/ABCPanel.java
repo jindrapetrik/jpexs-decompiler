@@ -82,7 +82,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     public TraitsList navigator;
     public ABC abc;
     public SWF swf;
-    public JComboBox abcComboBox;
+    public JComboBox<ABCContainerTag> abcComboBox;
     public int listIndex = -1;
     public DecompiledEditorPane decompiledTextArea;
     public JScrollPane decompiledScrollPane;
@@ -90,7 +90,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     //public JSplitPane splitPaneTreeVSNavigator;
     //public JSplitPane splitPaneTreeNavVSDecompiledDetail;
     private JTable constantTable;
-    public JComboBox constantTypeList;
+    public JComboBox<String> constantTypeList;
     public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
     public DetailPanel detailPanel;
@@ -266,7 +266,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         //colModel.getColumn(0).setMaxWidth(50);
     }
 
-    @SuppressWarnings("unchecked")
     public void clearSwf() {
         this.swf = null;
         this.abc = null;
@@ -275,7 +274,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         navigator.clearABC();
     }
     
-    @SuppressWarnings("unchecked")
     public void setSwf(SWF swf) {
         if (this.swf != swf) {
             this.swf = swf;
@@ -331,7 +329,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         Helper.emptyObject(this);
     }
 
-    @SuppressWarnings("unchecked")
     public ABCPanel(MainPanel mainPanel) {
         DefaultSyntaxKit.initKit();
 
@@ -392,7 +389,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
         JPanel pan2 = new JPanel();
         pan2.setLayout(new BorderLayout());
-        pan2.add((abcComboBox = new JComboBox(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()))), BorderLayout.NORTH);
+        pan2.add((abcComboBox = new JComboBox<>(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()))), BorderLayout.NORTH);
 
         navigator = new TraitsList(this);
 
@@ -468,7 +465,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         JPanel panConstants = new JPanel();
         panConstants.setLayout(new BorderLayout());
 
-        constantTypeList = new JComboBox(new Object[]{"UINT", "INT", "DOUBLE", "DECIMAL", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
+        constantTypeList = new JComboBox<>(new String[]{"UINT", "INT", "DOUBLE", "DECIMAL", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
         constantTable = new JTable();
         if (abc != null) {
             autoResizeColWidth(constantTable, new UIntTableModel(abc));

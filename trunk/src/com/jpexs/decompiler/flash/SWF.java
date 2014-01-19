@@ -219,6 +219,7 @@ public final class SWF implements TreeItem {
     public SWFSourceInfo sourceInfo;
     public String file;
     public String fileTitle;
+    public boolean isAS3;
     public HashMap<Integer, CharacterTag> characters;
     public List<ABCContainerTag> abcList;
     public JPEGTablesTag jtt;

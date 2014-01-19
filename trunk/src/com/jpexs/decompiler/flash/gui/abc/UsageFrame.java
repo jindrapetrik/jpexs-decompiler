@@ -51,7 +51,6 @@ public class UsageFrame extends AppFrame implements ActionListener, MouseListene
     private ABC abc;
     private ABCPanel abcPanel;
 
-    @SuppressWarnings("unchecked")
     public UsageFrame(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
         List<MultinameUsage> usages = abc.findMultinameUsage(multinameIndex);
@@ -60,7 +59,7 @@ public class UsageFrame extends AppFrame implements ActionListener, MouseListene
         for (MultinameUsage u : usages) {
             usageListModel.addElement(u);
         }
-        usageList = new JList(usageListModel);
+        usageList = new JList<>(usageListModel);
         usageList.setBackground(Color.white);
         gotoButton.setActionCommand(ACTION_GOTO);
         gotoButton.addActionListener(this);

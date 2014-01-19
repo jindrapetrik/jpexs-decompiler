@@ -56,7 +56,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     static final String ACTION_REMOVE = "REMOVE";
 
     private MainFrame mainFrame;
-    private JList swfList;
+    private JList<Replacement> swfList;
     private SWFListModel listModel;
     private JButton switchButton = new JButton(translate("proxy.start"));
     private boolean started = false;
@@ -87,12 +87,11 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     /**
      * Constructor
      */
-    @SuppressWarnings("unchecked")
     public ProxyFrame(final MainFrame mainFrame) {
 
         this.mainFrame = mainFrame;
         listModel = new SWFListModel(Configuration.getReplacements());
-        swfList = new JList(listModel);
+        swfList = new JList<>(listModel);
         swfList.addMouseListener(this);
         swfList.setFont(new Font("Monospaced", Font.PLAIN, 12));
         switchButton.addActionListener(this);
