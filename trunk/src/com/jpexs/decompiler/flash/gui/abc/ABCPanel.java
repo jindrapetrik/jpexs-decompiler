@@ -40,6 +40,8 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
+import com.jpexs.decompiler.flash.gui.SearchListener;
+import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.DecimalTableModel;
@@ -74,9 +76,8 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
-import jsyntaxpane.actions.DocumentSearchData;
 
-public class ABCPanel extends JPanel implements ItemListener, ActionListener, Freed {
+public class ABCPanel extends JPanel implements ItemListener, ActionListener, SearchListener<ABCPanelSearchResult>, Freed {
 
     private MainPanel mainPanel;
     public TraitsList navigator;
@@ -96,30 +97,18 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
     public DetailPanel detailPanel;
     public JPanel navPanel;
     public JTabbedPane tabbedPane;
-    public JPanel searchPanel;
-    public JLabel searchPos;
-    private List<ScriptPack> found = new ArrayList<>();
-    private List<ClassPath> foundPath = new ArrayList<>();
-    private int foundPos = 0;
-    private JLabel searchForLabel;
-    private String searchFor;
-    private boolean searchIgnoreCase;
-    private boolean searchRegexp;
+    public SearchPanel<ABCPanelSearchResult> searchPanel;
     private NewTraitDialog newTraitDialog;
     public JLabel scriptNameLabel;
 
     static final String ACTION_ADD_TRAIT = "ADDTRAIT";
-    static final String ACTION_SEARCH_CANCEL = "SEARCHCANCEL";
-    static final String ACTION_SEARCH_PREV = "SEARCHPREV";
-    static final String ACTION_SEARCH_NEXT = "SEARCHNEXT";
     
     public boolean search(String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
-            searchIgnoreCase = ignoreCase;
-            searchRegexp = regexp;
+            searchPanel.setOptions(ignoreCase, regexp);
             TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
             TreeNode scriptsNode = ttm.getSwfRoot(mainPanel.getCurrentSwf()).scriptsNode;
-            found = new ArrayList<>();
+            final List<ABCPanelSearchResult> found = new ArrayList<>();
             if (scriptsNode.getItem() instanceof ClassesListTreeModel) {
                 ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
                 List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
@@ -142,8 +131,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                             public Void doInBackground() throws Exception {
                                 decompiledTextArea.cacheScriptPack(item.value, swf.abcList);
                                 if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
-                                    found.add(item.value);
-                                    foundPath.add(item.key);
+                                    ABCPanelSearchResult searchResult = new ABCPanelSearchResult();
+                                    searchResult.scriptPack = item.value;
+                                    searchResult.classPath = item.key;
+                                    found.add(searchResult);
                                 }
                                 return null;
                             }
@@ -161,18 +152,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
             System.gc();
             Main.stopWork();
-            if (found.isEmpty()) {
-                searchPanel.setVisible(false);
-                return false;
-            } else {
-                foundPos = 0;
-                decompiledTextArea.setScript(found.get(foundPos), swf.abcList);
-                searchPanel.setVisible(true);
-                searchFor = txt;
-                updateSearchPos();
-                searchForLabel.setText(AppStrings.translate("search.info").replace("%text%", txt) + " ");
-            }
-            return true;
+            searchPanel.setSearchText(txt);
+            return searchPanel.setResults(found);
         }
         return false;
     }
@@ -337,7 +318,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
         decompiledTextArea = new DecompiledEditorPane(this);
 
-        searchPanel = new JPanel(new FlowLayout());
+        searchPanel = new SearchPanel<>(new FlowLayout(), this);
 
         decompiledScrollPane = new JScrollPane(decompiledTextArea);
 
@@ -411,29 +392,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         });
 
         Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
-
-        JButton prevSearchButton = new JButton(View.getIcon("prev16"));
-        prevSearchButton.setMargin(new Insets(3, 3, 3, 3));
-        prevSearchButton.addActionListener(this);
-        prevSearchButton.setActionCommand(ACTION_SEARCH_PREV);
-
-        JButton nextSearchButton = new JButton(View.getIcon("next16"));
-        nextSearchButton.setMargin(new Insets(3, 3, 3, 3));
-        nextSearchButton.addActionListener(this);
-        nextSearchButton.setActionCommand(ACTION_SEARCH_NEXT);
-        JButton cancelSearchButton = new JButton(View.getIcon("cancel16"));
-        cancelSearchButton.setMargin(new Insets(3, 3, 3, 3));
-        cancelSearchButton.addActionListener(this);
-        cancelSearchButton.setActionCommand(ACTION_SEARCH_CANCEL);
-        searchPos = new JLabel("0/0");
-        searchForLabel = new JLabel(AppStrings.translate("search.info").replace("%text%", "") + " ");
-        searchPanel.add(searchForLabel);
-        searchPanel.add(prevSearchButton);
-        searchPanel.add(new JLabel(AppStrings.translate("search.script") + " "));
-        searchPanel.add(searchPos);
-        searchPanel.add(nextSearchButton);
-        searchPanel.add(cancelSearchButton);
-        searchPanel.setVisible(false);
 
         /* splitPaneTreeVSNavigator = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
          treePanel,
@@ -557,23 +515,15 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
     }
 
-    public void updateSearchPos() {
-        searchPos.setText((foundPos + 1) + "/" + found.size());
-        ScriptPack pack = found.get(foundPos);
+    @Override
+    public void updateSearchPos(ABCPanelSearchResult item) {
+        ScriptPack pack = item.scriptPack;
         setAbc(pack.abc);
         decompiledTextArea.setScript(pack, swf.abcList);
-        hilightScript(found.get(foundPos));
+        hilightScript(pack);
         decompiledTextArea.setCaretPosition(0);
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                DocumentSearchData dsd = DocumentSearchData.getFromEditor(decompiledTextArea);
-                dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
-                dsd.showQuickFindDialogEx(decompiledTextArea, searchIgnoreCase, searchRegexp);
-            }
-        });
 
-
+        searchPanel.showQuickFindDialog(decompiledTextArea);
     }
 
     @Override
@@ -679,23 +629,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
                     decompiledTextArea.gotoTrait(traitId);
                 }
 
-                break;
-            case ACTION_SEARCH_CANCEL:
-                foundPos = 0;
-                searchPanel.setVisible(false);
-                found = new ArrayList<>();
-                searchFor = null;
-                break;
-            case ACTION_SEARCH_PREV:
-                foundPos--;
-                if (foundPos < 0) {
-                    foundPos += found.size();
-                }
-                updateSearchPos();
-                break;
-            case ACTION_SEARCH_NEXT:
-                foundPos = (foundPos + 1) % found.size();
-                updateSearchPos();
                 break;
         }
     }

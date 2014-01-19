@@ -2152,8 +2152,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
             final List<ABCContainerTag> abcList = scriptLeaf.abc.swf.abcList;
-            if (setSourceWorker != null) {
+            if (setSourceWorker != null && !setSourceWorker.isDone()) {
                 setSourceWorker.cancel(true);
+                setSourceWorker = null;
             }
             if (!Main.isWorking()) {
                 Main.startWork(AppStrings.translate("work.decompiling") + "...");

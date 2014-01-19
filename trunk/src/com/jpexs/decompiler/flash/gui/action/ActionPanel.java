@@ -31,6 +31,8 @@ import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
+import com.jpexs.decompiler.flash.gui.SearchListener;
+import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
@@ -71,18 +73,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
-import jsyntaxpane.actions.DocumentSearchData;
 
-public class ActionPanel extends JPanel implements ActionListener {
+public class ActionPanel extends JPanel implements ActionListener, SearchListener<ASMSource> {
 
-    static final String ACTION_SEARCH_PREV = "SEARCHPREV";
-    static final String ACTION_SEARCH_NEXT = "SEARCHNEXT";
-    static final String ACTION_SEARCH_CANCEL = "SEARCHCANCEL";
     static final String ACTION_GRAPH = "GRAPH";
     static final String ACTION_HEX = "HEX";
     static final String ACTION_HEX_ONLY = "HEXONLY";
@@ -121,14 +118,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     private HilightedText srcHexOnly;
     private String lastDecompiled = "";
     private ASMSource lastASM;
-    public JPanel searchPanel;
-    public JLabel searchPos;
-    private List<ASMSource> found = new ArrayList<>();
-    private int foundPos = 0;
-    private JLabel searchForLabel;
-    private String searchFor;
-    private boolean searchIgnoreCase;
-    private boolean searchRegexp;
+    public SearchPanel<ASMSource> searchPanel;
     private Cache cache = Cache.getInstance(true);
     private CancellableWorker setSourceWorker;
         
@@ -136,8 +126,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         lastCode = null;
         lastASM = null;
         lastDecompiled = null;
-        found = new ArrayList<>();
-        foundPos = 0;
+        searchPanel.clear();
         src = null;
         srcWithHex = null;
         srcNoHex = null;
@@ -230,11 +219,10 @@ public class ActionPanel extends JPanel implements ActionListener {
 
     public boolean search(String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
-            searchIgnoreCase = ignoreCase;
-            searchRegexp = regexp;
+            searchPanel.setOptions(ignoreCase, regexp);
             List<TreeNode> list = SWF.createASTagList(mainPanel.getCurrentSwf().tags, null);
             Map<String, ASMSource> asms = getASMs("", list);
-            found = new ArrayList<>();
+            List<ASMSource> found = new ArrayList<>();
             Pattern pat = null;
             if (regexp) {
                 pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
@@ -261,18 +249,8 @@ public class ActionPanel extends JPanel implements ActionListener {
             }
 
             Main.stopWork();
-            if (found.isEmpty()) {
-                searchPanel.setVisible(false);
-                return false;
-            } else {
-                foundPos = 0;
-                setSource(found.get(foundPos), true);
-                searchPanel.setVisible(true);
-                searchFor = txt;
-                updateSearchPos();
-                searchForLabel.setText(AppStrings.translate("search.info").replace("%text%", txt) + " ");
-            }
-            return true;
+            searchPanel.setSearchText(txt);
+            return searchPanel.setResults(found);
         }
         return false;
     }
@@ -385,6 +363,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     public void setSource(final ASMSource src, final boolean useCache) {
         if (setSourceWorker != null) {
             setSourceWorker.cancel(true);
+            setSourceWorker = null;
         }
 
         this.src = src;
@@ -460,29 +439,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         decompiledEditor = new LineMarkedEditorPane();
         decompiledEditor.setEditable(false);
 
-        searchPanel = new JPanel(new FlowLayout());
-
-        JButton prevSearchButton = new JButton(View.getIcon("prev16"));
-        prevSearchButton.setMargin(new Insets(3, 3, 3, 3));
-        prevSearchButton.addActionListener(this);
-        prevSearchButton.setActionCommand(ACTION_SEARCH_PREV);
-        JButton nextSearchButton = new JButton(View.getIcon("next16"));
-        nextSearchButton.setMargin(new Insets(3, 3, 3, 3));
-        nextSearchButton.addActionListener(this);
-        nextSearchButton.setActionCommand(ACTION_SEARCH_NEXT);
-        JButton cancelSearchButton = new JButton(View.getIcon("cancel16"));
-        cancelSearchButton.setMargin(new Insets(3, 3, 3, 3));
-        cancelSearchButton.addActionListener(this);
-        cancelSearchButton.setActionCommand(ACTION_SEARCH_CANCEL);
-        searchPos = new JLabel("0/0");
-        searchForLabel = new JLabel(AppStrings.translate("search.info").replace("%text%", ""));
-        searchPanel.add(searchForLabel);
-        searchPanel.add(prevSearchButton);
-        searchPanel.add(new JLabel("Script "));
-        searchPanel.add(searchPos);
-        searchPanel.add(nextSearchButton);
-        searchPanel.add(cancelSearchButton);
-
+        searchPanel = new SearchPanel<>(new FlowLayout(), this);
 
         JButton graphButton = new JButton(View.getIcon("graph16"));
         graphButton.setActionCommand(ACTION_GRAPH);
@@ -574,7 +531,6 @@ public class ActionPanel extends JPanel implements ActionListener {
         decPanel.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
         decPanel.add(searchPanel, BorderLayout.NORTH);
 
-        searchPanel.setVisible(false);
         JPanel panA = new JPanel();
         panA.setLayout(new BorderLayout());
         panA.add(decPanel, BorderLayout.CENTER);
@@ -741,23 +697,6 @@ public class ActionPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("SEARCHCANCEL")) {
-            foundPos = 0;
-            searchPanel.setVisible(false);
-            found = new ArrayList<>();
-            searchFor = null;
-        }
-        if (e.getActionCommand().equals("SEARCHPREV")) {
-            foundPos--;
-            if (foundPos < 0) {
-                foundPos += found.size();
-            }
-            updateSearchPos();
-        }
-        if (e.getActionCommand().equals("SEARCHNEXT")) {
-            foundPos = (foundPos + 1) % found.size();
-            updateSearchPos();
-        }
         switch (e.getActionCommand()) {
             case ACTION_GRAPH:
                 if (lastCode != null) {
@@ -834,23 +773,15 @@ public class ActionPanel extends JPanel implements ActionListener {
         return exportMode;
     }
     
-    public void updateSearchPos() {
-        searchPos.setText((foundPos + 1) + "/" + found.size());
-        setSource(found.get(foundPos), true);
+    @Override
+    public void updateSearchPos(ASMSource item) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        TreePath tp = ttm.getTagPath(found.get(foundPos));
+        TreePath tp = ttm.getTagPath(item);
         mainPanel.tagTree.setSelectionPath(tp);
         mainPanel.tagTree.scrollPathToVisible(tp);
         decompiledEditor.setCaretPosition(0);
-        java.util.Timer t = new java.util.Timer();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                DocumentSearchData dsd = DocumentSearchData.getFromEditor(decompiledEditor);
-                dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
-                dsd.showQuickFindDialogEx(decompiledEditor, searchIgnoreCase, searchRegexp);
-            }
-        });
+
+        searchPanel.showQuickFindDialog(decompiledEditor);
     }
 
     private void uncache(ASMSource pack) {
