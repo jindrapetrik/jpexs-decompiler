@@ -2222,7 +2222,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else if ((tagObj instanceof FontTag) && (mainMenu.isInternalFlashViewerSelected())) {
             Tag tag = (Tag) tagObj;
             showCard(CARDFLASHPANEL);
-            previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), tag.getSwf().characters, 50/*FIXME*/);
             showFontTag((FontTag) tagObj);
         } else if (tagObj instanceof FrameNodeItem && ((FrameNodeItem) tagObj).isDisplayed() && (mainMenu.isInternalFlashViewerSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);

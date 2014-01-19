@@ -54,8 +54,8 @@ public class SHAPE implements NeedsCharacters {
         return SHAPERECORD.shapeToSVG(shapeNum, null, null, numFillBits, numLineBits, shapeRecords);
     }
 
-    public BufferedImage toImage(int shapeNum, List<Tag> tags, Color defaultColor) {
-        return SHAPERECORD.shapeToImage(tags, shapeNum, null, null,/* numFillBits, numLineBits, */ shapeRecords, defaultColor);
+    public BufferedImage toImage(int shapeNum, List<Tag> tags, Color defaultColor, boolean putToCache) {
+        return SHAPERECORD.shapeToImage(tags, shapeNum, null, null,/* numFillBits, numLineBits, */ shapeRecords, defaultColor, putToCache);
     }
 
     public RECT getBounds() {

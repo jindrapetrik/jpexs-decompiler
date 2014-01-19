@@ -828,7 +828,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     }
 
     public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records) {
-        return shapeToImage(tags, shapeNum, fillStyles, lineStylesList, records, null);
+        return shapeToImage(tags, shapeNum, fillStyles, lineStylesList, records, null, true);
     }
 
     public static List<GeneralPath> shapeToPaths(List<Tag> tags, int shapeNum, List<SHAPERECORD> records) {
@@ -883,7 +883,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 if (pos >= shapes.size()) {
                     break loopy;
                 }
-                BufferedImage img = shapes.get(pos).toImage(1, new ArrayList<Tag>(), color);
+
+                BufferedImage img = shapes.get(pos).toImage(1, new ArrayList<Tag>(), color, false);
 
                 int w1 = img.getWidth();
                 int h1 = img.getHeight();
@@ -901,7 +902,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return ret;
     }
 
-    public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records, Color defaultColor) {
+    public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records, Color defaultColor, boolean putToCache) {
         String key = "shape_" + records.hashCode() + "_" + (defaultColor == null ? "null" : defaultColor.hashCode());
         if (cache.contains(key)) {
             return (BufferedImage) ((SerializableImage) cache.get(key)).getImage();
@@ -924,7 +925,11 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             }
             p.drawTo(tags, -rect.Xmin, -rect.Ymin, g, shapeNum);
         }
-        cache.put(key, new SerializableImage(ret));
+        
+        if (putToCache) {
+            cache.put(key, new SerializableImage(ret));
+        }
+    
         return ret;
     }
 

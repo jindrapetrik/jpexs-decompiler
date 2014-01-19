@@ -232,7 +232,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 rect.Xmin /= font.getDivider();
                 rect.Ymax /= font.getDivider();
                 rect.Ymin /= font.getDivider();
-                BufferedImage img = SHAPERECORD.shapeToImage(tags, 1, null, null, glyphs.get(entry.glyphIndex).shapeRecords, textColor);
+                BufferedImage img = SHAPERECORD.shapeToImage(tags, 1, null, null, glyphs.get(entry.glyphIndex).shapeRecords, textColor, true);
                 AffineTransform tr = new AffineTransform();
                 tr.setToIdentity();
                 float rat = textHeight / 1024f;
