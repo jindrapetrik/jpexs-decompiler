@@ -330,6 +330,34 @@ public class Helper {
         return ret;
     }
 
+    public static String joinStrings(List<String> arr, String formatString, String glue) {
+        String ret = "";
+        boolean first = true;
+        for (String s : arr) {
+            if (!first) {
+                ret += glue;
+            } else {
+                first = false;
+            }
+            ret += String.format(formatString, s);
+        }
+        return ret;
+    }
+
+    public static String joinStrings(String[] arr, String formatString, String glue) {
+        String ret = "";
+        boolean first = true;
+        for (String s : arr) {
+            if (!first) {
+                ret += glue;
+            } else {
+                first = false;
+            }
+            ret += String.format(formatString, s);
+        }
+        return ret;
+    }
+
     public static Object deepCopy(Object o) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

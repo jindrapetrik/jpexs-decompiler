@@ -571,19 +571,25 @@ public class Main {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
+            // todo: honfika: enalbe again after swf bundle imlpmented
+            //private String[] supportedExtensions = new String[] { ".swf", ".gfx", ".swc", ".zip" };
+            private String[] supportedExtensions = new String[] { ".swf", ".gfx" };
+            
             @Override
             public boolean accept(File f) {
                 String name = f.getName().toLowerCase();
-                return (name.endsWith(".swf"))
-                        || (name.endsWith(".gfx"))
-                        || (name.endsWith(".swc"))
-                        || (name.endsWith(".zip"))
-                        || (f.isDirectory());
+                for (String ext : supportedExtensions) {
+                    if (name.endsWith(ext)) {
+                        return true;
+                    }
+                }
+                return f.isDirectory();
             }
 
             @Override
             public String getDescription() {
-                return AppStrings.translate("filter.supported");
+                String exts = Helper.joinStrings(supportedExtensions, "*%s", "; ");
+                return AppStrings.translate("filter.supported") + " (" + exts + ")";
             }
         };
         fc.setFileFilter(allSupportedFilter);
@@ -611,7 +617,7 @@ public class Main {
                 return AppStrings.translate("filter.swc");
             }
         };
-        fc.addChoosableFileFilter(swcFilter);
+        // todo: honfika: enalbe again after swf bundle imlpmented fc.addChoosableFileFilter(swcFilter);
         
         FileFilter gfxFilter = new FileFilter() {
             @Override
@@ -638,7 +644,7 @@ public class Main {
                 return AppStrings.translate("filter.zip");
             }
         };
-        fc.addChoosableFileFilter(zipFilter);
+        // todo: honfika: enalbe again after swf bundle imlpmented fc.addChoosableFileFilter(zipFilter);
         
         FileFilter binaryFilter = new FileFilter() {
             @Override
@@ -651,7 +657,7 @@ public class Main {
                 return AppStrings.translate("filter.binary");
             }
         };
-        fc.addChoosableFileFilter(binaryFilter);
+        // todo: honfika: enalbe again after swf bundle imlpmented fc.addChoosableFileFilter(binaryFilter);
         
         fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();

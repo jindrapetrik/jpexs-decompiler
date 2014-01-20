@@ -197,31 +197,30 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         }
     }
 
-    private Map<String, ASMSource> getASMs(String path, List<TreeNode> nodes) {
-        Map<String, ASMSource> ret = new HashMap<>();
+    private void getASMs(String path, List<TreeNode> nodes, Map<String, ASMSource> result) {
         for (TreeNode n : nodes) {
             String subPath = path + "/" + n.toString();
             if (n.getItem() instanceof ASMSource) {
                 //cacheScript((ASMSource) n.tag);
                 String npath = subPath;
                 int ppos = 1;
-                while (ret.containsKey(npath)) {
+                while (result.containsKey(npath)) {
                     ppos++;
                     npath = subPath + "[" + ppos + "]";
                 }
-                ret.put(subPath, (ASMSource) n.getItem());
+                result.put(npath, (ASMSource) n.getItem());
             }
 
-            ret.putAll(getASMs(subPath, n.subNodes));
+            getASMs(subPath, n.subNodes, result);
         }
-        return ret;
     }
 
     public boolean search(String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
             List<TreeNode> list = SWF.createASTagList(mainPanel.getCurrentSwf().tags, null);
-            Map<String, ASMSource> asms = getASMs("", list);
+            Map<String, ASMSource> asms = new HashMap<>();
+            getASMs("", list, asms);
             List<ASMSource> found = new ArrayList<>();
             Pattern pat = null;
             if (regexp) {
