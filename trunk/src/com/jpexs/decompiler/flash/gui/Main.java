@@ -573,10 +573,11 @@ public class Main {
         FileFilter allSupportedFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase().toLowerCase().endsWith(".swf"))
-                        || (f.getName().toLowerCase().toLowerCase().endsWith(".gfx"))
-                        || (f.getName().toLowerCase().toLowerCase().endsWith(".swc"))
-                        || (f.getName().toLowerCase().toLowerCase().endsWith(".zip"))
+                String name = f.getName().toLowerCase();
+                return (name.endsWith(".swf"))
+                        || (name.endsWith(".gfx"))
+                        || (name.endsWith(".swc"))
+                        || (name.endsWith(".zip"))
                         || (f.isDirectory());
             }
 
