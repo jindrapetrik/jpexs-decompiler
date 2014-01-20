@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import java.awt.event.KeyEvent;
 import javax.swing.JEditorPane;
 import javax.swing.text.Document;
 import jsyntaxpane.SyntaxDocument;
@@ -49,6 +50,20 @@ public class UndoFixedEditorPane extends JEditorPane {
             super.setText(t);
             clearUndos();
         }
+    }
+
+    @Override
+    protected void processKeyEvent(KeyEvent ke) {
+        if (!isEditable()) {
+            // disable Ctrl-E: delete line
+            // and Ctrl-H: Search and replace
+            if ((ke.getKeyCode() == KeyEvent.VK_E && ke.isControlDown()) ||
+                (ke.getKeyCode() == KeyEvent.VK_H && ke.isControlDown())) {
+                return;
+            }
+        }
+        
+        super.processKeyEvent(ke);
     }
 
     public void clearUndos() {
