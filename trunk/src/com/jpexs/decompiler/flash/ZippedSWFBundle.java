@@ -17,8 +17,10 @@
 
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.helpers.LimitedInputStream;
+import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.ReReadableInputStream;
+import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -36,7 +38,7 @@ import java.util.zip.ZipInputStream;
  */
 public class ZippedSWFBundle implements SWFBundle {
     protected Set<String> keySet = new HashSet<>();
-    private final Map<String, ReReadableInputStream> cachedSWFs = new HashMap<>();
+    private final Map<String, SeekableInputStream> cachedSWFs = new HashMap<>();
     protected ReReadableInputStream is;
 
     
@@ -69,7 +71,7 @@ public class ZippedSWFBundle implements SWFBundle {
     }
 
     @Override
-    public ReReadableInputStream getSWF(String key) throws IOException {
+    public SeekableInputStream getSWF(String key) throws IOException {
         if(!keySet.contains(key)){
             return null;
         }
@@ -82,8 +84,8 @@ public class ZippedSWFBundle implements SWFBundle {
                 while((entry = zip.getNextEntry()) != null)
                 {
                     if(entry.getName().equals(key)){
-                        ReReadableInputStream ris = new ReReadableInputStream(zip);
-                        cachedSWFs.put(key, ris);
+                        MemoryInputStream mis = new MemoryInputStream(Helper.readStream(zip));
+                        cachedSWFs.put(key, mis);
                         break;
                     }
                     zip.closeEntry();
@@ -98,7 +100,7 @@ public class ZippedSWFBundle implements SWFBundle {
     }
 
     @Override
-    public Map<String, ReReadableInputStream> getAll() throws IOException {
+    public Map<String, SeekableInputStream> getAll() throws IOException {
         for(String key : getKeys()){ //cache everything first
             getSWF(key);
         }

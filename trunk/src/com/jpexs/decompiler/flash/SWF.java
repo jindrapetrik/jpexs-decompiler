@@ -220,6 +220,7 @@ public final class SWF implements TreeItem {
     public SWFList swfList;
     public String file;
     public String fileTitle;
+    public boolean readOnly;
     public boolean isAS3;
     public HashMap<Integer, CharacterTag> characters;
     public List<ABCContainerTag> abcList;

@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -227,7 +226,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String INTERNAL_VIEWER_CARD = "INTERNALVIEWER";
     private static final String SPLIT_PANE1 = "SPLITPANE1";
     private static final String WELCOME_PANEL = "WELCOMEPANEL";
-    private SearchPanel<TextTag> textSearchPanel;
+    private final SearchPanel<TextTag> textSearchPanel;
     private final LineMarkedEditorPane textValue;
     private final JSplitPane splitPane1;
     private final JSplitPane splitPane2;

@@ -410,6 +410,20 @@ public class Helper {
         return baos.toByteArray();
     }
 
+    public static byte[] readStream(InputStream is) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            byte[] buf = new byte[4096];
+            int cnt = 0;
+            while ((cnt = is.read(buf)) > 0) {
+                baos.write(buf, 0, cnt);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return baos.toByteArray();
+    }
+
     public static void writeFile(String file, byte[]... data) {
         try (FileOutputStream fos = new FileOutputStream(file)) {
             for (byte[] d : data) {

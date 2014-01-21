@@ -34,7 +34,6 @@ import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
-import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.Stopwatch;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import com.sun.jna.Platform;
@@ -233,7 +232,7 @@ public class Main {
         if (bundle != null) {
             result.isBundle = true;
             result.name = new File(sourceInfo.getFileTitleOrName()).getName();
-            for (Entry<String, ReReadableInputStream> streamEntry : bundle.getAll().entrySet()) {
+            for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
                 InputStream stream = streamEntry.getValue();
                 stream.reset();
                 SWF swf = new SWF(stream, new ProgressListener() {
@@ -244,6 +243,7 @@ public class Main {
                 }, Configuration.parallelSpeedUp.get());
                 swf.file = sourceInfo.getFile();
                 swf.fileTitle = streamEntry.getKey();
+                swf.readOnly = true;
                 result.add(swf);
             }
         } else {

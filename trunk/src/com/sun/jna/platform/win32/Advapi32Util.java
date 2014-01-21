@@ -854,7 +854,7 @@ public abstract class Advapi32Util {
     public static class EventLogRecord {
 
         private EVENTLOGRECORD _record = null;
-        private String _source;
+        private final String _source;
         private byte[] _data;
         private String[] _strings;
 

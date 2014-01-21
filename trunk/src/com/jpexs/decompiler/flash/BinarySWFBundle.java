@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.StreamSearch;
+import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -73,8 +74,8 @@ public class BinarySWFBundle implements SWFBundle {
     }
 
     @Override
-    public Map<String, ReReadableInputStream> getAll() {
-        Map<String, ReReadableInputStream> ret = new HashMap<>();
+    public Map<String, SeekableInputStream> getAll() {
+        Map<String, SeekableInputStream> ret = new HashMap<>();
         for(String key:getKeys()){
             ret.put(key, getSWF(key));
         }
