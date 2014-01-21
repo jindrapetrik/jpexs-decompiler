@@ -29,10 +29,10 @@ import java.util.logging.Logger;
  */
 public class StreamSearch implements Searchable {
 
-    private final ReReadableInputStream is;
+    private final MemoryInputStream is;
 
     public StreamSearch(InputStream is) {
-        this.is = new ReReadableInputStream(is);
+        this.is = new MemoryInputStream(Helper.readStream(is));
     }
 
     @Override
@@ -83,7 +83,8 @@ public class StreamSearch implements Searchable {
                             }
                         }
                         if (match) {
-                            InputStream fis = new FoundInputStream(pos + i, is);
+                            // todo: support > 2GB files
+                            InputStream fis = new MemoryInputStream(is.getAllRead(), (int) pos + i);
                             ret.put(pos + i, fis);
                             continue loopdata;
                         }

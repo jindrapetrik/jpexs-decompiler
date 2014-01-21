@@ -25,12 +25,34 @@ import java.io.IOException;
  */
 public class MemoryInputStream extends SeekableInputStream {
 
-    byte[] buffer;
-    long pos = 0;
-    int count = 0;
+    private final byte[] buffer;
+    private long pos = 0;
+    private int count = 0;
+    private int startPos = 0;
+    private int maxLength = -1;
 
     public MemoryInputStream(byte[] buffer) {
         this.buffer = buffer;
+    }
+
+    public MemoryInputStream(byte[] buffer, int startPos) throws IOException {
+        this.buffer = buffer;
+        if (startPos >= buffer.length) {
+            throw new IOException("Invalid startPos");
+        }
+        this.startPos = startPos;
+    }
+
+    public MemoryInputStream(byte[] buffer, int startPos, int maxLength) throws IOException {
+        this.buffer = buffer;
+        this.startPos = startPos;
+        if (startPos >= buffer.length) {
+            throw new IOException("Invalid startPos");
+        }
+        this.maxLength = maxLength;
+        if (startPos + maxLength >= buffer.length) {
+            throw new IOException("Invalid maxLength");
+        }
     }
 
     public int getCount() {
@@ -61,13 +83,20 @@ public class MemoryInputStream extends SeekableInputStream {
             count = (int) pos;
         }
         
-        if (pos < buffer.length) {
-            int ret = buffer[(int) pos] & 0xff;
+        if (pos < getLength()) {
+            int ret = buffer[(int) pos + startPos] & 0xff;
             pos++;
             return ret;
         }
 
         return -1;
+    }
+    
+    private int getLength() {
+        if (maxLength == -1) {
+            return buffer.length - startPos;
+        }
+        return maxLength;
     }
 
     @Override

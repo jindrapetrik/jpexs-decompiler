@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.helpers.LimitedInputStream;
+import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.PosMarkedInputStream;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.ReReadableInputStream;
@@ -39,8 +39,7 @@ public class SWFSearch {
     protected Searchable s;
     private boolean processed = false;
     private final Set<ProgressListener> listeners = new HashSet<>();
-    private final List<ReReadableInputStream> swfStreams = new ArrayList<>();
-    private final Map<Integer, ReReadableInputStream> cachedSWFs = new HashMap<>();
+    private final List<MemoryInputStream> swfStreams = new ArrayList<>();
 
     public SWFSearch(Searchable s) {
         this.s = s;
@@ -78,13 +77,12 @@ public class SWFSearch {
             setProgress(pos * 100 / ret.size());
             pos++;
             try {
-                ReReadableInputStream ris = (ReReadableInputStream) ret.get(addr);
-                ris.reset();
-                PosMarkedInputStream pmi = new PosMarkedInputStream(ris);
+                MemoryInputStream mis = (MemoryInputStream) ret.get(addr);
+                mis.reset();
+                PosMarkedInputStream pmi = new PosMarkedInputStream(mis);
                 SWF swf = new SWF(pmi, null, false, true);
                 long limit = pmi.getPos();
-                ris.seek(0);
-                ReReadableInputStream is = new ReReadableInputStream(new LimitedInputStream(ris, limit));
+                MemoryInputStream is = new MemoryInputStream(mis.getAllRead(), (int) (long) addr, (int) limit);
                 if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
                     swfStreams.add(is);
                 }
@@ -99,17 +97,14 @@ public class SWFSearch {
         processed = true;
     }
 
-    public ReReadableInputStream get(ProgressListener listener, int index) throws IOException {
+    public MemoryInputStream get(ProgressListener listener, int index) throws IOException {
         if(!processed){
             return null;
         }
-        if(index<0 || index>=swfStreams.size()){
+        if(index < 0 || index >= swfStreams.size()){
             return null;
         }
-        if(!cachedSWFs.containsKey(index)){
-            cachedSWFs.put(index, swfStreams.get(index));
-        }        
-        return cachedSWFs.get(index);
+        return swfStreams.get(index);
     }
 
     public int length() {

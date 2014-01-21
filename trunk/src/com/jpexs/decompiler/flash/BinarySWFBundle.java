@@ -53,7 +53,7 @@ public class BinarySWFBundle implements SWFBundle {
     }
 
     @Override
-    public ReReadableInputStream getSWF(String key) {
+    public SeekableInputStream getSWF(String key) {
         if(!key.startsWith("[")){
             return null;
         }
@@ -77,7 +77,7 @@ public class BinarySWFBundle implements SWFBundle {
     @Override
     public Map<String, SeekableInputStream> getAll() {
         Map<String, SeekableInputStream> ret = new HashMap<>();
-        for(String key:getKeys()){
+        for(String key : getKeys()){
             ret.put(key, getSWF(key));
         }
         return ret;
