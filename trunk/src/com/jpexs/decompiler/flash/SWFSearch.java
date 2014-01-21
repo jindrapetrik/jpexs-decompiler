@@ -78,12 +78,13 @@ public class SWFSearch {
             setProgress(pos * 100 / ret.size());
             pos++;
             try {
-                PosMarkedInputStream pmi = new PosMarkedInputStream(ret.get(addr));
-                ReReadableInputStream is = new ReReadableInputStream(pmi);
-                SWF swf = new SWF(is, null, false, true);
+                ReReadableInputStream ris = (ReReadableInputStream) ret.get(addr);
+                ris.reset();
+                PosMarkedInputStream pmi = new PosMarkedInputStream(ris);
+                SWF swf = new SWF(pmi, null, false, true);
                 long limit = pmi.getPos();
-                is.seek(0);
-                is = new ReReadableInputStream(new LimitedInputStream(is, limit));
+                ris.seek(0);
+                ReReadableInputStream is = new ReReadableInputStream(new LimitedInputStream(ris, limit));
                 if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
                     swfStreams.add(is);
                 }

@@ -83,7 +83,8 @@ public class StreamSearch implements Searchable {
                             }
                         }
                         if (match) {
-                            ret.put(pos+i, new FoundInputStream(pos+i,is));
+                            InputStream fis = new FoundInputStream(pos + i, is);
+                            ret.put(pos + i, fis);
                             continue loopdata;
                         }
                     }

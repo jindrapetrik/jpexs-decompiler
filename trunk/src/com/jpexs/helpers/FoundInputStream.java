@@ -27,9 +27,9 @@ import java.io.InputStream;
 public class FoundInputStream extends ReReadableInputStream{
 
     private final long startPos;
-    private boolean started=false;
+    private boolean started = false;
     
-    public FoundInputStream(long startPos,InputStream is) {
+    public FoundInputStream(long startPos, InputStream is) {
         super(is);
         this.startPos = startPos;
     }
@@ -47,11 +47,11 @@ public class FoundInputStream extends ReReadableInputStream{
     
     @Override
     public void seek(long pos) throws IOException {
-        super.seek(pos+startPos);
+        super.seek(pos + startPos);
     }
 
     @Override
     public long getPos() {
-        return super.getPos()-startPos;
+        return super.getPos() - startPos;
     }                       
 }

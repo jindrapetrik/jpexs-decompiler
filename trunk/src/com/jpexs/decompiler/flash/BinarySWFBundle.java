@@ -34,7 +34,8 @@ import java.util.Set;
 public class BinarySWFBundle implements SWFBundle {
     private final SWFSearch search;
     public BinarySWFBundle(InputStream is){
-        search = new SWFSearch(new StreamSearch(is));        
+        search = new SWFSearch(new StreamSearch(is));
+        search.process();
     }
 
     @Override
@@ -44,9 +45,9 @@ public class BinarySWFBundle implements SWFBundle {
 
     @Override
     public Set<String> getKeys() {
-        Set<String> ret=new HashSet<>();
-        for(int i=0;i<length();i++){
-            ret.add("["+i+"]");
+        Set<String> ret = new HashSet<>();
+        for(int i = 0; i < length(); i++){
+            ret.add("[" + i + "]");
         }
         return ret;
     }

@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public interface Process extends Comparable<Process>, Searchable{
+public interface Process extends Comparable<Process>, Searchable {
 
     public String getFilePath();
 
