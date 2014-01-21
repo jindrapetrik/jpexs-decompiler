@@ -34,9 +34,10 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class SWC extends ZippedSWFBundle {
 
-    public SWC(InputStream is) {
+    public SWC(InputStream is) throws IOException {
         super(is);
         keySet.clear();
+        this.is.reset();
         ZipInputStream zip = new ZipInputStream(this.is);
         ZipEntry entry;
         try {

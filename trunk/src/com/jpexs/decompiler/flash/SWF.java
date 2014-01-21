@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
+import com.jpexs.decompiler.flash.gui.SWFList;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -216,7 +217,7 @@ public final class SWF implements TreeItem {
      */
     public boolean gfx = false;
 
-    public SWFSourceInfo sourceInfo;
+    public SWFList swfList;
     public String file;
     public String fileTitle;
     public boolean isAS3;

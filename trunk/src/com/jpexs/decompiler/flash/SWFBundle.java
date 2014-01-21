@@ -17,6 +17,9 @@
 
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.helpers.ReReadableInputStream;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,9 +28,10 @@ import java.util.Set;
  * @author JPEXS
  */
 public interface SWFBundle {
+
     public int length();
     public Set<String> getKeys();
-    public SWF getSWF(String key);
-    public Map<String,SWF> getAll();
+    public ReReadableInputStream getSWF(String key) throws IOException;
+    public Map<String, ReReadableInputStream> getAll() throws IOException;
     public String getExtension();
 }

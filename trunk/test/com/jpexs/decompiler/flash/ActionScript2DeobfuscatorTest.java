@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -38,7 +39,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
     @BeforeClass
     public void init() throws IOException, InterruptedException {
         Configuration.autoDeobfuscate.set(true);
-        swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
+        swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }
 
     @Test

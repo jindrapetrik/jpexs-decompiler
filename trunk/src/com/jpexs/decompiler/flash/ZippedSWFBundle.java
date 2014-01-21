@@ -17,6 +17,7 @@
 
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.helpers.LimitedInputStream;
 import com.jpexs.helpers.ReReadableInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,17 +35,17 @@ import java.util.zip.ZipInputStream;
  * @author JPEXS
  */
 public class ZippedSWFBundle implements SWFBundle {
-    protected Set<String> keySet=new HashSet<>();
-    private final Map<String,SWF> cachedSWFs=new HashMap<>();
+    protected Set<String> keySet = new HashSet<>();
+    private final Map<String, ReReadableInputStream> cachedSWFs = new HashMap<>();
     protected ReReadableInputStream is;
 
     
     public ZippedSWFBundle(InputStream is){
         this.is = new ReReadableInputStream(is);
-        ZipInputStream zip=new ZipInputStream(this.is);
-            ZipEntry entry;
+        ZipInputStream zip = new ZipInputStream(this.is);
+        ZipEntry entry;
         try {
-            while((entry = zip.getNextEntry())!=null)
+            while((entry = zip.getNextEntry()) != null)
             {
                 if(entry.getName().toLowerCase().endsWith(".swf")
                 || entry.getName().toLowerCase().endsWith(".gfx")){
@@ -68,27 +69,24 @@ public class ZippedSWFBundle implements SWFBundle {
     }
 
     @Override
-    public SWF getSWF(String key) {
+    public ReReadableInputStream getSWF(String key) throws IOException {
         if(!keySet.contains(key)){
             return null;
         }
         if(!cachedSWFs.containsKey(key)){
             
-            ZipInputStream zip=new ZipInputStream(this.is);
+            this.is.reset();
+            ZipInputStream zip = new ZipInputStream(this.is);
             ZipEntry entry;
             try {
-                while((entry = zip.getNextEntry())!=null)
+                while((entry = zip.getNextEntry()) != null)
                 {
                     if(entry.getName().equals(key)){
-                        try {
-                            cachedSWFs.put(key, new SWF(zip, null,false));
-                        } catch (IOException ex) {
-                            Logger.getLogger(ZippedSWFBundle.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(ZippedSWFBundle.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                        ReReadableInputStream ris = new ReReadableInputStream(zip);
+                        cachedSWFs.put(key, ris);
                         break;
                     }
+                    zip.closeEntry();
                 }
             } catch (IOException ex) {
                 Logger.getLogger(ZippedSWFBundle.class.getName()).log(Level.SEVERE, null, ex);
@@ -100,8 +98,8 @@ public class ZippedSWFBundle implements SWFBundle {
     }
 
     @Override
-    public Map<String, SWF> getAll() {
-        for(String key:getKeys()){ //cache everything first
+    public Map<String, ReReadableInputStream> getAll() throws IOException {
+        for(String key : getKeys()){ //cache everything first
             getSWF(key);
         }
         return cachedSWFs;
@@ -111,5 +109,4 @@ public class ZippedSWFBundle implements SWFBundle {
     public String getExtension() {
         return "zip";
     }
-    
 }

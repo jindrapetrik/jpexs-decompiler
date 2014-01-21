@@ -51,6 +51,11 @@ public class MemoryInputStream extends SeekableInputStream {
     }
 
     @Override
+    public synchronized void reset() throws IOException {
+        seek(0);
+    }
+    
+    @Override
     public int read() throws IOException {
         if (pos > count) {
             count = (int) pos;

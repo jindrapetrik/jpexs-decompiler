@@ -29,8 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -42,7 +40,7 @@ public class SWFSearch {
     private boolean processed = false;
     private final Set<ProgressListener> listeners = new HashSet<>();
     private final List<ReReadableInputStream> swfStreams = new ArrayList<>();
-    private final Map<Integer,SWF> cachedSWFs = new HashMap<>();
+    private final Map<Integer, ReReadableInputStream> cachedSWFs = new HashMap<>();
 
     public SWFSearch(Searchable s) {
         this.s = s;
@@ -100,7 +98,7 @@ public class SWFSearch {
         processed = true;
     }
 
-    public SWF get(ProgressListener listener,int index) throws IOException {
+    public ReReadableInputStream get(ProgressListener listener, int index) throws IOException {
         if(!processed){
             return null;
         }
@@ -108,12 +106,7 @@ public class SWFSearch {
             return null;
         }
         if(!cachedSWFs.containsKey(index)){
-            try {
-                cachedSWFs.put(index, new SWF(swfStreams.get(index), listener, false));
-            } catch (InterruptedException ex) {
-                Logger.getLogger(SWFSearch.class.getName()).log(Level.SEVERE, null, ex);
-                return null;
-            }
+            cachedSWFs.put(index, swfStreams.get(index));
         }        
         return cachedSWFs.get(index);
     }

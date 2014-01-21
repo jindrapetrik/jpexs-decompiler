@@ -107,7 +107,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
             TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-            TreeNode scriptsNode = ttm.getSwfRoot(mainPanel.getCurrentSwf()).scriptsNode;
+            TreeNode scriptsNode = ttm.getSwfNode(mainPanel.getCurrentSwf()).scriptsNode;
             final List<ABCPanelSearchResult> found = new ArrayList<>();
             if (scriptsNode.getItem() instanceof ClassesListTreeModel) {
                 ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
@@ -486,7 +486,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
     public void hilightScript(SWF swf, String name) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        TreeNode scriptsNode = ttm.getSwfRoot(swf).scriptsNode;
+        TreeNode scriptsNode = ttm.getSwfNode(swf).scriptsNode;
         if (scriptsNode.getItem() instanceof ClassesListTreeModel) {
             ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
             ScriptPack pack = null;

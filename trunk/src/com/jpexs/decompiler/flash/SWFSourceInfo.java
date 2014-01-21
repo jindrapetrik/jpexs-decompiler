@@ -16,6 +16,13 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.helpers.Helper;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -46,4 +53,40 @@ public class SWFSourceInfo {
         return fileTitle;
     }
 
+    /**
+     * Get title of the file
+     *
+     * @return file title
+     */
+    public String getFileTitleOrName() {
+        if (fileTitle != null) {
+            return fileTitle;
+        }
+        return file;
+    }
+
+    public boolean isBundle() {
+        if (inputStream == null) {
+            String extension = Helper.getExtension(new File(file));
+            return !(extension.equals(".swf") || extension.equals(".gfx"));
+        }
+        return false;
+    }
+    
+    public SWFBundle getBundle() throws IOException {
+        if (!isBundle()) {
+            return null;
+        }
+
+        String extension = Helper.getExtension(new File(file));
+        InputStream is = new BufferedInputStream(new FileInputStream(file));
+        switch (extension) {
+            case ".swc":
+                return new SWC(is);
+            case ".zip":
+                return new ZippedSWFBundle(is);
+            default:
+                return new BinarySWFBundle(is);
+        }
+    }
 }

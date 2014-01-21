@@ -17,6 +17,7 @@
 
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.StreamSearch;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +33,7 @@ import java.util.Set;
 public class BinarySWFBundle implements SWFBundle {
     private final SWFSearch search;
     public BinarySWFBundle(InputStream is){
-        search=new SWFSearch(new StreamSearch(is));        
+        search = new SWFSearch(new StreamSearch(is));        
     }
 
     @Override
@@ -50,7 +51,7 @@ public class BinarySWFBundle implements SWFBundle {
     }
 
     @Override
-    public SWF getSWF(String key) {
+    public ReReadableInputStream getSWF(String key) {
         if(!key.startsWith("[")){
             return null;
         }
@@ -59,7 +60,7 @@ public class BinarySWFBundle implements SWFBundle {
         }
         key = key.substring(1,key.length()-1);
         try{
-            int index=Integer.parseInt(key);
+            int index = Integer.parseInt(key);
             if(index<0 || index>=length()){
                 return null;
             }
@@ -72,8 +73,8 @@ public class BinarySWFBundle implements SWFBundle {
     }
 
     @Override
-    public Map<String, SWF> getAll() {
-        Map<String,SWF> ret=new HashMap<>();
+    public Map<String, ReReadableInputStream> getAll() {
+        Map<String, ReReadableInputStream> ret = new HashMap<>();
         for(String key:getKeys()){
             ret.put(key, getSWF(key));
         }
@@ -84,5 +85,4 @@ public class BinarySWFBundle implements SWFBundle {
     public String getExtension() {
         return "bin";
     }
-    
 }

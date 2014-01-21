@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
@@ -28,6 +29,8 @@ import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Kernel32;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -580,17 +583,22 @@ public class CommandLineArgumentParser {
         if (args.size() < 2) {
             badArguments();
         }
+        
         try {
-            InputStream fis = new FileInputStream(args.remove());
-            OutputStream fos = new FileOutputStream(args.remove());
-            if (SWF.fws2cws(fis, fos)) {
-                System.out.println("OK");
-            } else {
-                System.err.println("FAIL");
+            try (InputStream fis = new BufferedInputStream(new FileInputStream(args.remove()));
+                OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.remove()))) {
+                if (SWF.fws2cws(fis, fos)) {
+                    System.out.println("OK");
+                } else {
+                    System.err.println("FAIL");
+                }
+            } catch (FileNotFoundException ex) {
+                System.err.println("File not found.");
             }
-        } catch (FileNotFoundException ex) {
-            System.err.println("File not found.");
+        } catch (IOException ex) {
+            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         System.exit(0);
     }
 
@@ -600,18 +608,22 @@ public class CommandLineArgumentParser {
         }
 
         try {
-            InputStream fis = new FileInputStream(args.remove());
-            OutputStream fos = new FileOutputStream(args.remove());
-            if (SWF.decompress(fis, fos)) {
-                System.out.println("OK");
-                System.exit(0);
-            } else {
-                System.err.println("FAIL");
-                System.exit(1);
+            try (InputStream fis = new BufferedInputStream(new FileInputStream(args.remove()));
+                OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.remove()))) {
+                if (SWF.decompress(fis, fos)) {
+                    System.out.println("OK");
+                    System.exit(0);
+                } else {
+                    System.err.println("FAIL");
+                    System.exit(1);
+                }
+            } catch (FileNotFoundException ex) {
+                System.err.println("File not found.");
             }
-        } catch (FileNotFoundException ex) {
-            System.err.println("File not found.");
+        } catch (IOException ex) {
+            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         System.exit(0);
     }
 
@@ -634,19 +646,24 @@ public class CommandLineArgumentParser {
                 badArguments();
                 return;
         }
+
         try {
-            InputStream fis = new FileInputStream(args.remove());
-            OutputStream fos = new FileOutputStream(args.remove());
-            if (SWF.renameInvalidIdentifiers(renameType, fis, fos)) {
-                System.out.println("OK");
-                System.exit(0);
-            } else {
-                System.err.println("FAIL");
-                System.exit(1);
+            try (InputStream fis = new BufferedInputStream(new FileInputStream(args.remove()));
+                OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.remove()))) {
+                if (SWF.renameInvalidIdentifiers(renameType, fis, fos)) {
+                    System.out.println("OK");
+                    System.exit(0);
+                } else {
+                    System.err.println("FAIL");
+                    System.exit(1);
+                }
+            } catch (FileNotFoundException ex) {
+                System.err.println("File not found.");
             }
-        } catch (FileNotFoundException ex) {
-            System.err.println("File not found.");
+        } catch (IOException ex) {
+            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         System.exit(0);
     }
 
@@ -657,7 +674,8 @@ public class CommandLineArgumentParser {
         try {
             Configuration.dumpTags.set(true);
             Configuration.parallelSpeedUp.set(false);
-            SWF swf = Main.parseSWF(args.remove());
+            SWFSourceInfo sourceInfo = new SWFSourceInfo(null, args.remove(), null);
+            Main.parseSWF(sourceInfo);
         } catch (Exception ex) {
             Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);

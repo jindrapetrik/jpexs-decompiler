@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LimitedInputStream;
@@ -195,7 +196,8 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 return;
             }
             str.mark(Integer.MAX_VALUE);
-            Main.openFile(str, swf.process + " [" + (index + 1) + "]");
+            SWFSourceInfo sourceInfo = new SWFSourceInfo(str, null, swf.process + " [" + (index + 1) + "]");
+            Main.openFile(sourceInfo);
         }
     }
 

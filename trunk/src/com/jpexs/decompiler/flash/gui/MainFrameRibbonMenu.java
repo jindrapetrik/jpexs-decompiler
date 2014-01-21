@@ -646,7 +646,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 Main.openFileDialog();
                 break;
             case ACTION_CLOSE:
-                Main.closeFile(mainFrame.panel.getCurrentSwf());
+                Main.closeFile(mainFrame.panel.getCurrentSwfList());
                 break;
             case ACTION_CLOSE_ALL:
                 Main.closeAll();

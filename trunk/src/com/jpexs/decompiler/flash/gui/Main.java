@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -33,6 +34,7 @@ import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.Stopwatch;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import com.sun.jna.Platform;
@@ -207,28 +209,19 @@ public class Main {
         });
     }
 
-    public static SWF parseSWF(String file) throws Exception {
-        SWFSourceInfo sourceInfo = new SWFSourceInfo(null, file, null);
-        return parseSWF(sourceInfo);
-    }
-
-    public static SWF parseSWF(SWFSourceInfo sourceInfo) throws Exception {
-        SWF locswf;
+    public static SWFList parseSWF(SWFSourceInfo sourceInfo) throws Exception {
+        SWFList result = new SWFList();
     
         InputStream inputStream = sourceInfo.getInputStream();
+        SWFBundle bundle = null;
         if (inputStream == null) {
-            inputStream = new FileInputStream(sourceInfo.getFile());
+            inputStream = new BufferedInputStream(new FileInputStream(sourceInfo.getFile()));
+            bundle = sourceInfo.getBundle();
             logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
-        } else if (inputStream instanceof SeekableInputStream) {
+        } else if (inputStream instanceof SeekableInputStream 
+                || inputStream instanceof BufferedInputStream) {
             try {
-                ((SeekableInputStream) inputStream).seek(0);
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
-            logger.log(Level.INFO, "Load stream: {0}", sourceInfo.getFileTitle());
-        } else if (inputStream instanceof BufferedInputStream) {
-            try {
-                ((BufferedInputStream) inputStream).reset();
+                inputStream.reset();
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
@@ -236,12 +229,28 @@ public class Main {
         }
         
         Stopwatch sw = Stopwatch.startNew();
-        locswf = new SWF(inputStream, new ProgressListener() {
-            @Override
-            public void progress(int p) {
-                startWork(AppStrings.translate("work.reading.swf"), p);
+        if (bundle != null) {
+            result.isBundle = true;
+            result.name = sourceInfo.getFileTitleOrName();
+            for (ReReadableInputStream stream : bundle.getAll().values()) {
+                stream.reset();
+                SWF swf = new SWF(stream, new ProgressListener() {
+                    @Override
+                    public void progress(int p) {
+                        startWork(AppStrings.translate("work.reading.swf"), p);
+                    }
+                }, Configuration.parallelSpeedUp.get());
+                result.add(swf);
             }
-        }, Configuration.parallelSpeedUp.get());
+        } else {
+            SWF swf = new SWF(inputStream, new ProgressListener() {
+                @Override
+                public void progress(int p) {
+                    startWork(AppStrings.translate("work.reading.swf"), p);
+                }
+            }, Configuration.parallelSpeedUp.get());
+            result.add(swf);
+        }
         
         if (inputStream instanceof FileInputStream) {
             logger.log(Level.INFO, "File loaded in {0} seconds.", (sw.getElapsedMilliseconds() / 1000));
@@ -250,37 +259,40 @@ public class Main {
             logger.log(Level.INFO, "Stream loaded in {0} seconds.", (sw.getElapsedMilliseconds() / 1000));
         }
 
-        logger.log(Level.INFO, "");
-        logger.log(Level.INFO, "== File information ==");
-        logger.log(Level.INFO, "Size: {0}", Helper.formatFileSize(locswf.fileSize));
-        logger.log(Level.INFO, "Flash version: {0}", locswf.version);
-        int width = (locswf.displayRect.Xmax - locswf.displayRect.Xmin) / 20;
-        int height = (locswf.displayRect.Ymax - locswf.displayRect.Ymin) / 20;
-        logger.log(Level.INFO, "Width: {0}", width);
-        logger.log(Level.INFO, "Height: {0}", height);
+        result.sourceInfo = sourceInfo;
+        for (SWF swf : result) {
+            logger.log(Level.INFO, "");
+            logger.log(Level.INFO, "== File information ==");
+            logger.log(Level.INFO, "Size: {0}", Helper.formatFileSize(swf.fileSize));
+            logger.log(Level.INFO, "Flash version: {0}", swf.version);
+            int width = (swf.displayRect.Xmax - swf.displayRect.Xmin) / 20;
+            int height = (swf.displayRect.Ymax - swf.displayRect.Ymin) / 20;
+            logger.log(Level.INFO, "Width: {0}", width);
+            logger.log(Level.INFO, "Height: {0}", height);
+
+            swf.swfList = result;
+            swf.file = sourceInfo.getFile();
+            swf.fileTitle = sourceInfo.getFileTitle();
+            swf.addEventListener(new EventListener() {
+                @Override
+                public void handleEvent(String event, Object data) {
+                    if (event.equals("exporting")) {
+                        startWork((String) data);
+                    }
+                    if (event.equals("getVariables")) {
+                        startWork(AppStrings.translate("work.gettingvariables") + "..." + (String) data);
+                    }
+                    if (event.equals("deobfuscate")) {
+                        startWork(AppStrings.translate("work.deobfuscating") + "..." + (String) data);
+                    }
+                    if (event.equals("rename")) {
+                        startWork(AppStrings.translate("work.renaming") + "..." + (String) data);
+                    }
+                }
+            });
+        }
         
-        locswf.sourceInfo = sourceInfo;
-        locswf.file = sourceInfo.getFile();
-        locswf.fileTitle = sourceInfo.getFileTitle();
-        locswf.addEventListener(new EventListener() {
-            @Override
-            public void handleEvent(String event, Object data) {
-                if (event.equals("exporting")) {
-                    startWork((String) data);
-                }
-                if (event.equals("getVariables")) {
-                    startWork(AppStrings.translate("work.gettingvariables") + "..." + (String) data);
-                }
-                if (event.equals("deobfuscate")) {
-                    startWork(AppStrings.translate("work.deobfuscating") + "..." + (String) data);
-                }
-                if (event.equals("rename")) {
-                    startWork(AppStrings.translate("work.renaming") + "..." + (String) data);
-                }
-            }
-        });
-        //}
-        return locswf;
+        return result;
     }
 
     public static void saveFile(SWF swf, String outfile) throws IOException {
@@ -342,12 +354,11 @@ public class Main {
         @Override
         protected Object doInBackground() throws Exception {
             boolean first = true;
-            for (SWFSourceInfo sourceInfo : sourceInfos) {
-                //TODO: Handle non SWF filetypes (SWC,ZIP,Binary search)
-                SWF swf = null;
+            for (final SWFSourceInfo sourceInfo : sourceInfos) {
+                SWFList swfs = null;
                 try {
                     Main.startWork(AppStrings.translate("work.reading.swf") + "...");
-                    swf = parseSWF(sourceInfo);
+                    swfs = parseSWF(sourceInfo);
                 } catch (OutOfMemoryError ex) {
                     logger.log(Level.SEVERE, null, ex);
                     View.showMessageDialog(null, "Cannot load SWF file. Out of memory.");
@@ -356,7 +367,7 @@ public class Main {
                     View.showMessageDialog(null, "Cannot load SWF file.");
                 }
 
-                final SWF swf1 = swf;
+                final SWFList swfs1 = swfs;
                 final boolean first1 = first;
                 first = false;
                 try {
@@ -365,7 +376,7 @@ public class Main {
                         @Override
                         public void run() {
                             ensureMainFrame();
-                            mainFrame.getPanel().load(swf1, first1);
+                            mainFrame.getPanel().load(swfs1, first1);
                         }
                     });
 
@@ -482,12 +493,7 @@ public class Main {
         return OpenFileResult.OK;
     }
     
-    public static OpenFileResult openFile(InputStream is, String fileTitle) {
-        SWFSourceInfo sourceInfo = new SWFSourceInfo(is, null, fileTitle);
-        return openFile(sourceInfo);
-    }
-
-    public static void closeFile(SWF swf) {
+    public static void closeFile(SWFList swf) {
        sourceInfos.remove(swf.sourceInfo);
        mainFrame.getPanel().close(swf);
     }
@@ -571,9 +577,7 @@ public class Main {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
-            // todo: honfika: enalbe again after swf bundle imlpmented
-            //private String[] supportedExtensions = new String[] { ".swf", ".gfx", ".swc", ".zip" };
-            private String[] supportedExtensions = new String[] { ".swf", ".gfx" };
+            private final String[] supportedExtensions = new String[] { ".swf", ".gfx", ".swc", ".zip" };
             
             @Override
             public boolean accept(File f) {
@@ -617,7 +621,7 @@ public class Main {
                 return AppStrings.translate("filter.swc");
             }
         };
-        // todo: honfika: enalbe again after swf bundle imlpmented fc.addChoosableFileFilter(swcFilter);
+        fc.addChoosableFileFilter(swcFilter);
         
         FileFilter gfxFilter = new FileFilter() {
             @Override
@@ -644,7 +648,7 @@ public class Main {
                 return AppStrings.translate("filter.zip");
             }
         };
-        // todo: honfika: enalbe again after swf bundle imlpmented fc.addChoosableFileFilter(zipFilter);
+        fc.addChoosableFileFilter(zipFilter);
         
         FileFilter binaryFilter = new FileFilter() {
             @Override
@@ -657,7 +661,7 @@ public class Main {
                 return AppStrings.translate("filter.binary");
             }
         };
-        // todo: honfika: enalbe again after swf bundle imlpmented fc.addChoosableFileFilter(binaryFilter);
+        fc.addChoosableFileFilter(binaryFilter);
         
         fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();

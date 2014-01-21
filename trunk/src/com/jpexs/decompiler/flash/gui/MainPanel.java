@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -37,7 +38,8 @@ import com.jpexs.decompiler.flash.gui.abc.treenodes.TreeElement;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
-import com.jpexs.decompiler.flash.gui.treenodes.SWFRoot;
+import com.jpexs.decompiler.flash.gui.treenodes.SWFBundleNode;
+import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -191,7 +193,7 @@ import javax.swing.tree.TreeSelectionModel;
 public final class MainPanel extends JPanel implements ActionListener, TreeSelectionListener, SearchListener<TextTag>, Freed {
     
     private final MainFrame mainFrame;
-    private final List<SWF> swfs;
+    private final List<SWFList> swfs;
     private ABCPanel abcPanel;
     private ActionPanel actionPanel;
     private final JPanel welcomePanel;
@@ -380,27 +382,29 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             replaceBinarySelectionMenuItem.setVisible(true);
                         }
 
-                        if (treeNode instanceof SWFRoot) {
+                        if (treeNode instanceof SWFNode) {
                             closeSelectionMenuItem.setVisible(true);
                         }
 
                         if (item instanceof Tag && swfs.size() > 1) {
                             final Tag tag = (Tag) item;
                             moveTagMenu.removeAll();
-                            for (final SWF targetSwf : swfs) {
-                                if (targetSwf != tag.getSwf()) {
-                                    JMenuItem swfItem = new JMenuItem(targetSwf.getShortFileName());
-                                    swfItem.addActionListener(new ActionListener() {
+                            for (SWFList targetSwfList : swfs) {
+                                for (final SWF targetSwf : targetSwfList) {
+                                    if (targetSwf != tag.getSwf()) {
+                                        JMenuItem swfItem = new JMenuItem(targetSwf.getShortFileName());
+                                        swfItem.addActionListener(new ActionListener() {
 
-                                        @Override
-                                        public void actionPerformed(ActionEvent ae) {
-                                            tag.getSwf().tags.remove(tag);
-                                            tag.setSwf(targetSwf);
-                                            targetSwf.tags.add(tag);
-                                            refreshTree();
-                                        }
-                                    });
-                                    moveTagMenu.add(swfItem);
+                                            @Override
+                                            public void actionPerformed(ActionEvent ae) {
+                                                tag.getSwf().tags.remove(tag);
+                                                tag.setSwf(targetSwf);
+                                                targetSwf.tags.add(tag);
+                                                refreshTree();
+                                            }
+                                        });
+                                        moveTagMenu.add(swfItem);
+                                    }
                                 }
                             }
                             moveTagMenu.setVisible(true);
@@ -850,68 +854,72 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         enableDrop(true);
     }
     
-    public void load(SWF swf, boolean first) {
-        List<ContainerItem> objs = new ArrayList<>();
-        objs.addAll(swf.tags);
+    public void load(SWFList newSwfs, boolean first) {
+        swfs.add(newSwfs);
 
-        ArrayList<ABCContainerTag> abcList = new ArrayList<>();
-        getActionScript3(objs, abcList);
+        for (SWF swf : newSwfs) {
+            List<ContainerItem> objs = new ArrayList<>();
+            objs.addAll(swf.tags);
 
-        swfs.add(swf);
-        swf.abcList = abcList;
+            ArrayList<ABCContainerTag> abcList = new ArrayList<>();
+            getActionScript3(objs, abcList);
 
-        boolean hasAbc = !abcList.isEmpty();
-        swf.isAS3 = hasAbc;
-                
-        tagTree.setModel(new TagTreeModel(mainFrame, swfs));
+            swf.abcList = abcList;
 
-        if (hasAbc) {
-            if (abcPanel == null) {
-                abcPanel = new ABCPanel(this);
-                displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
-                detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
-            }
-            abcPanel.setSwf(swf);
-        } else {
-            if (actionPanel == null) {
-                actionPanel = new ActionPanel(this);
-                displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
-            }
-        }
+            boolean hasAbc = !abcList.isEmpty();
+            swf.isAS3 = hasAbc;
 
-        expandSwfRoots();
+            tagTree.setModel(new TagTreeModel(mainFrame, swfs));
 
-        for (Tag t : swf.tags) {
-            if (t instanceof JPEGTablesTag) {
-                swf.jtt = (JPEGTablesTag) t;
-            }
-        }
-
-        List<ContainerItem> list2 = new ArrayList<>();
-        list2.addAll(swf.tags);
-        swf.characters = new HashMap<>();
-        parseCharacters(swf, list2);
-
-        if (Configuration.autoRenameIdentifiers.get()) {
-            try {
-                swf.deobfuscateIdentifiers(RenameType.TYPENUMBER);
-                swf.assignClassesToSymbols();
-                clearCache();
-                if (abcPanel != null) {
-                    abcPanel.reload();
+            if (hasAbc) {
+                if (abcPanel == null) {
+                    abcPanel = new ABCPanel(this);
+                    displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
+                    detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
                 }
-                updateClassesList();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                abcPanel.setSwf(swf);
+            } else {
+                if (actionPanel == null) {
+                    actionPanel = new ActionPanel(this);
+                    displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
+                }
             }
-        }
 
-        showDetail(DETAILCARDEMPTYPANEL);
-        showCard(CARDEMPTYPANEL);
-        updateUi(swf);
+            expandSwfNodes();
 
-        if (first && Configuration.gotoMainClassOnStartup.get()) {
-            gotoDocumentClass(swf);
+            for (Tag t : swf.tags) {
+                if (t instanceof JPEGTablesTag) {
+                    swf.jtt = (JPEGTablesTag) t;
+                }
+            }
+
+            List<ContainerItem> list2 = new ArrayList<>();
+            list2.addAll(swf.tags);
+            swf.characters = new HashMap<>();
+            parseCharacters(swf, list2);
+
+            if (Configuration.autoRenameIdentifiers.get()) {
+                try {
+                    swf.deobfuscateIdentifiers(RenameType.TYPENUMBER);
+                    swf.assignClassesToSymbols();
+                    clearCache();
+                    if (abcPanel != null) {
+                        abcPanel.reload();
+                    }
+                    updateClassesList();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            showDetail(DETAILCARDEMPTYPANEL);
+            showCard(CARDEMPTYPANEL);
+            updateUi(swf);
+
+            if (first && Configuration.gotoMainClassOnStartup.get()) {
+                gotoDocumentClass(swf);
+            }
+            first = false;
         }
     }
 
@@ -946,8 +954,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (swfs.isEmpty()) {
             mainMenu.updateComponets(null, null);
         } else {
-            SWF swf = swfs.get(0);
-            updateUi(swf);
+            SWFList swfList = swfs.get(0);
+            updateUi(swfList.get(0));
         }
     }
     
@@ -965,10 +973,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         updateTagTree();
     }
 
-    public void close(SWF swf) {
-        swfs.remove(swf);
-        if (abcPanel != null && abcPanel.swf == swf) {
-            abcPanel.clearSwf();
+    public void close(SWFList swfList) {
+        swfs.remove(swfList);
+        if (abcPanel != null) {
+            for (SWF swf : swfList) {
+                if (abcPanel.swf == swf) {
+                    abcPanel.clearSwf();
+                }
+            }
         }
         if (actionPanel != null) {
             actionPanel.clearSource();
@@ -981,7 +993,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     
     private void updateTagTree() {
         tagTree.setModel(new TagTreeModel(mainFrame, swfs));
-        expandSwfRoots();
+        expandSwfNodes();
     }
 
     public void enableDrop(boolean value) {
@@ -1007,7 +1019,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void updateClassesList() {
-        List<TreeNode> nodes = getASTagNode(tagTree);
+        List<TreeNode> nodes = getASTreeNodes(tagTree);
         boolean updateNeeded = false;
         for (TreeNode n : nodes) {
             if (n.getItem() instanceof ClassesListTreeModel) {
@@ -1029,7 +1041,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void doFilter() {
-        List<TreeNode> nodes = getASTagNode(tagTree);
+        List<TreeNode> nodes = getASTreeNodes(tagTree);
         boolean updateNeeded = false;
         for (TreeNode n : nodes) {
             if (n.getItem() instanceof ClassesListTreeModel) {
@@ -1295,16 +1307,26 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return ret;
     }
 
-    public List<TreeNode> getASTagNode(TagTree tree) {
+    public List<TreeNode> getASTreeNodes(TagTree tree) {
         List<TreeNode> result = new ArrayList<>();
         TagTreeModel tm = (TagTreeModel) tree.getModel();
         if (tm == null) {
             return result;
         }
         TreeNode root = tm.getRoot();
-        for (int j = 0; j < tm.getChildCount(root); j++) {
-            SWFRoot swfRoot = (SWFRoot) tm.getChild(root, j);
-            result.add(swfRoot.scriptsNode);
+        for (int i = 0; i < tm.getChildCount(root); i++) {
+            // first level node can be SWFNode and SWFBundleNode
+            TreeNode node = tm.getChild(root, i);
+            if (node instanceof SWFBundleNode) {
+                for (int j = 0; j < tm.getChildCount(node); j++) {
+                    // child of SWFBundleNode should be SWFNode
+                    SWFNode swfNode = (SWFNode) tm.getChild(node, j);
+                    result.add(swfNode.scriptsNode);
+                }
+            } else if (node instanceof SWFNode) {
+                SWFNode swfNode = (SWFNode) tm.getChild(root, i);
+                result.add(swfNode.scriptsNode);
+            }
         }
         return result;
     }
@@ -1348,78 +1370,89 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         List<File> ret = new ArrayList<>();
         List<TreeNode> sel = getAllSelected(tagTree);
 
-        for (SWF swf : swfs) {
-            List<ScriptPack> tlsList = new ArrayList<>();
-            List<Tag> images = new ArrayList<>();
-            List<Tag> shapes = new ArrayList<>();
-            List<Tag> movies = new ArrayList<>();
-            List<Tag> sounds = new ArrayList<>();
-            List<Tag> texts = new ArrayList<>();
-            List<TreeNode> actionNodes = new ArrayList<>();
-            List<Tag> binaryData = new ArrayList<>();
-            for (TreeNode d : sel) {
-                if (d.getItem().getSwf() != swf) {
-                    continue;
+        for (SWFList swfList : swfs) {
+            for (SWF swf : swfList) {
+                List<ScriptPack> tlsList = new ArrayList<>();
+                List<Tag> images = new ArrayList<>();
+                List<Tag> shapes = new ArrayList<>();
+                List<Tag> movies = new ArrayList<>();
+                List<Tag> sounds = new ArrayList<>();
+                List<Tag> texts = new ArrayList<>();
+                List<TreeNode> actionNodes = new ArrayList<>();
+                List<Tag> binaryData = new ArrayList<>();
+                for (TreeNode d : sel) {
+                    if (d.getItem().getSwf() != swf) {
+                        continue;
+                    }
+                    if (d instanceof ContainerNode) {
+                        ContainerNode n = (ContainerNode) d;
+                        TreeNodeType nodeType = TagTree.getTreeNodeType(n.getItem());
+                        if (nodeType == TreeNodeType.IMAGE) {
+                            images.add((Tag) n.getItem());
+                        }
+                        if (nodeType == TreeNodeType.SHAPE) {
+                            shapes.add((Tag) n.getItem());
+                        }
+                        if (nodeType == TreeNodeType.AS) {
+                            actionNodes.add(n);
+                        }
+                        if (nodeType == TreeNodeType.MOVIE) {
+                            movies.add((Tag) n.getItem());
+                        }
+                        if (nodeType == TreeNodeType.SOUND) {
+                            sounds.add((Tag) n.getItem());
+                        }
+                        if (nodeType == TreeNodeType.BINARY_DATA) {
+                            binaryData.add((Tag) n.getItem());
+                        }
+                        if (nodeType == TreeNodeType.TEXT) {
+                            texts.add((Tag) n.getItem());
+                        }
+                    }
+                    if (d instanceof TreeElement) {
+                        if (((TreeElement) d).isLeaf()) {
+                            TreeElement treeElement = (TreeElement) d;
+                            tlsList.add((ScriptPack) treeElement.getItem());
+                        }
+                    }
                 }
-                if (d instanceof ContainerNode) {
-                    ContainerNode n = (ContainerNode) d;
-                    TreeNodeType nodeType = TagTree.getTreeNodeType(n.getItem());
-                    if (nodeType == TreeNodeType.IMAGE) {
-                        images.add((Tag) n.getItem());
+                ret.addAll(swf.exportImages(handler, selFile + File.separator + "images", images));
+                ret.addAll(SWF.exportShapes(handler, selFile + File.separator + "shapes", shapes));
+                ret.addAll(swf.exportTexts(handler, selFile + File.separator + "texts", texts, isFormatted));
+                ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies));
+                ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav));
+                ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData));
+                List<ABCContainerTag> abcList = swf.abcList;
+                if (abcPanel != null) {
+                    for (int i = 0; i < tlsList.size(); i++) {
+                        ScriptPack tls = tlsList.get(i);
+                        Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
+                        ret.add(tls.export(selFile, abcList, exportMode, Configuration.parallelSpeedUp.get()));
                     }
-                    if (nodeType == TreeNodeType.SHAPE) {
-                        shapes.add((Tag) n.getItem());
+                } else {
+                    List<TreeNode> allNodes = new ArrayList<>();
+                    List<TreeNode> asNodes = getASTreeNodes(tagTree);
+                    for (TreeNode asn : asNodes) {
+                        allNodes.add(asn);
+                        TagNode.setExport(allNodes, false);
+                        TagNode.setExport(actionNodes, true);
+                        ret.addAll(TagNode.exportNodeAS(handler, allNodes, selFile, exportMode, null));
                     }
-                    if (nodeType == TreeNodeType.AS) {
-                        actionNodes.add(n);
-                    }
-                    if (nodeType == TreeNodeType.MOVIE) {
-                        movies.add((Tag) n.getItem());
-                    }
-                    if (nodeType == TreeNodeType.SOUND) {
-                        sounds.add((Tag) n.getItem());
-                    }
-                    if (nodeType == TreeNodeType.BINARY_DATA) {
-                        binaryData.add((Tag) n.getItem());
-                    }
-                    if (nodeType == TreeNodeType.TEXT) {
-                        texts.add((Tag) n.getItem());
-                    }
-                }
-                if (d instanceof TreeElement) {
-                    if (((TreeElement) d).isLeaf()) {
-                        TreeElement treeElement = (TreeElement) d;
-                        tlsList.add((ScriptPack) treeElement.getItem());
-                    }
-                }
-            }
-            ret.addAll(swf.exportImages(handler, selFile + File.separator + "images", images));
-            ret.addAll(SWF.exportShapes(handler, selFile + File.separator + "shapes", shapes));
-            ret.addAll(swf.exportTexts(handler, selFile + File.separator + "texts", texts, isFormatted));
-            ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies));
-            ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav));
-            ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData));
-            List<ABCContainerTag> abcList = swf.abcList;
-            if (abcPanel != null) {
-                for (int i = 0; i < tlsList.size(); i++) {
-                    ScriptPack tls = tlsList.get(i);
-                    Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
-                    ret.add(tls.export(selFile, abcList, exportMode, Configuration.parallelSpeedUp.get()));
-                }
-            } else {
-                List<TreeNode> allNodes = new ArrayList<>();
-                List<TreeNode> asNodes = getASTagNode(tagTree);
-                for (TreeNode asn : asNodes) {
-                    allNodes.add(asn);
-                    TagNode.setExport(allNodes, false);
-                    TagNode.setExport(actionNodes, true);
-                    ret.addAll(TagNode.exportNodeAS(handler, allNodes, selFile, exportMode, null));
                 }
             }
         }
         return ret;
     }
 
+    public SWFList getCurrentSwfList() {
+        SWF swf = getCurrentSwf();
+        if (swf == null) {
+            return null;
+        }
+        
+        return swf.swfList;
+    }
+    
     public SWF getCurrentSwf() {
         if (swfs == null || swfs.isEmpty()) {
             return null;
@@ -1427,7 +1460,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         
         TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
         if (treeNode == null) {
-            return swfs.get(0);
+            return swfs.get(0).get(0);
         }
         
         return treeNode.getItem().getSwf();
@@ -2089,7 +2122,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 break;
             case ACTION_CLOSE_SWF:
                 {
-                    Main.closeFile(getCurrentSwf());
+                    Main.closeFile(getCurrentSwfList());
                 }
         }
         if (Main.isWorking()) {
@@ -2136,9 +2169,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         TreeNode treeNode = (TreeNode) e.getPath().getLastPathComponent();
-        SWF swf = treeNode.getItem().getSwf();
-        if (swfs.contains(swf)) {
-            updateUi(swf);
+        TreeItem treeItem = treeNode.getItem();
+        if (!(treeItem instanceof SWFList)) {
+            SWF swf = treeItem.getSwf();
+            if (swfs.contains(swf.swfList)) {
+                updateUi(swf);
+            } else {
+                updateUi();
+            }
         } else {
             updateUi();
         }
@@ -2244,9 +2282,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
 
-        if (treeNode instanceof SWFRoot) {
-            SWFRoot swfRoot = (SWFRoot) treeNode;
-            SWF swf = swfRoot.getItem();
+        if (treeNode instanceof SWFNode) {
+            SWFNode swfNode = (SWFNode) treeNode;
+            SWF swf = swfNode.getItem();
             if (mainMenu.isInternalFlashViewerSelected()) {
                 showCard(CARDSWFPREVIEWPANEL);
                 swfPreviewPanel.load(swf);
@@ -2373,9 +2411,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             int frameCount = 1;
             int frameRate = swf.frameRate;
             HashMap<Integer, VideoFrameTag> videoFrames = new HashMap<>();
-            DefineVideoStreamTag vs = null;
             if (tagObj instanceof DefineVideoStreamTag) {
-                vs = (DefineVideoStreamTag) tagObj;
+                DefineVideoStreamTag vs = (DefineVideoStreamTag) tagObj;
                 swf.populateVideoFrames(vs.getCharacterId(), swf.tags, videoFrames);
                 frameCount = videoFrames.size();
             }
@@ -2736,11 +2773,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         tagTree.setModel(new TagTreeModel(mainFrame, swfs));
 
-        expandSwfRoots();
+        expandSwfNodes();
         expandTreeNodes(tagTree, expandedNodes);
     }
     
-    public void expandSwfRoots() {
+    public void expandSwfNodes() {
         TreeModel model = tagTree.getModel();
         Object node = model.getRoot();
         int childCount = model.getChildCount(node);

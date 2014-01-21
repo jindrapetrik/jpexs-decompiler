@@ -9,6 +9,7 @@ import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -22,7 +23,7 @@ public class AS2Generator {
 
     public static void main(String[] args) throws Exception {
         Configuration.autoDeobfuscate.set(false);
-        SWF swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
+        SWF swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
         DoABCDefineTag tag = null;
         DoActionTag doa = null;
         int frame = 0;

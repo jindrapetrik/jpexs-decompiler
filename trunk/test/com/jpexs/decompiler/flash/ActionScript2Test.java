@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import static org.testng.Assert.*;
@@ -39,7 +40,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
         Configuration.autoDeobfuscate.set(false);
         Configuration.decompile.set(true);
         Configuration.registerNameFormat.set("_loc%d_");
-        swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
+        swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }
 
     private void compareSrc(int frame, String expectedResult) {
