@@ -448,10 +448,11 @@ public final class SWF implements TreeItem {
     }
 
     public String getShortFileName() {
-        if (file == null) {
+        String title = getFileTitle();
+        if (title == null) {
             return "";
         }
-        return new File(file).getName();
+        return new File(title).getName();
     }
 
     private void findFileAttributes() {

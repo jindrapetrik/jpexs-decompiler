@@ -53,6 +53,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -231,8 +232,9 @@ public class Main {
         Stopwatch sw = Stopwatch.startNew();
         if (bundle != null) {
             result.isBundle = true;
-            result.name = sourceInfo.getFileTitleOrName();
-            for (ReReadableInputStream stream : bundle.getAll().values()) {
+            result.name = new File(sourceInfo.getFileTitleOrName()).getName();
+            for (Entry<String, ReReadableInputStream> streamEntry : bundle.getAll().entrySet()) {
+                InputStream stream = streamEntry.getValue();
                 stream.reset();
                 SWF swf = new SWF(stream, new ProgressListener() {
                     @Override
@@ -240,6 +242,8 @@ public class Main {
                         startWork(AppStrings.translate("work.reading.swf"), p);
                     }
                 }, Configuration.parallelSpeedUp.get());
+                swf.file = sourceInfo.getFile();
+                swf.fileTitle = streamEntry.getKey();
                 result.add(swf);
             }
         } else {
@@ -249,6 +253,8 @@ public class Main {
                     startWork(AppStrings.translate("work.reading.swf"), p);
                 }
             }, Configuration.parallelSpeedUp.get());
+            swf.file = sourceInfo.getFile();
+            swf.fileTitle = sourceInfo.getFileTitle();
             result.add(swf);
         }
         
@@ -271,8 +277,6 @@ public class Main {
             logger.log(Level.INFO, "Height: {0}", height);
 
             swf.swfList = result;
-            swf.file = sourceInfo.getFile();
-            swf.fileTitle = sourceInfo.getFileTitle();
             swf.addEventListener(new EventListener() {
                 @Override
                 public void handleEvent(String event, Object data) {

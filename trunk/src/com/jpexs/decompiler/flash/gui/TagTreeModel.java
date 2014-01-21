@@ -76,7 +76,7 @@ public class TagTreeModel implements TreeModel {
         List<ContainerItem> objs = new ArrayList<>();
         objs.addAll(swf.tags);
         ClassesListTreeModel classTreeModel = new ClassesListTreeModel(swf);
-        SWFNode swfNode = new SWFNode(swf, new File(swf.getFileTitle()).getName());
+        SWFNode swfNode = new SWFNode(swf, swf.getShortFileName());
         swfNode.list = createTagList(objs, null, swf, swfNode, classTreeModel);
         swfToSwfNode.put(swf, swfNode);
         return swfNode;
