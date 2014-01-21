@@ -51,7 +51,7 @@ public class MemoryInputStream extends SeekableInputStream {
         }
         this.maxLength = maxLength;
         if (startPos + maxLength >= buffer.length) {
-            throw new IOException("Invalid maxLength");
+            this.maxLength = buffer.length - startPos - 1;
         }
     }
 

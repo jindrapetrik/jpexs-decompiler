@@ -46,8 +46,8 @@ public class BinarySWFBundle implements SWFBundle {
     @Override
     public Set<String> getKeys() {
         Set<String> ret = new HashSet<>();
-        for(int i = 0; i < length(); i++){
-            ret.add("[" + i + "]");
+        for (Long address : search.getAddresses()) {
+            ret.add("[" + address + "]");
         }
         return ret;
     }
@@ -60,16 +60,11 @@ public class BinarySWFBundle implements SWFBundle {
         if(!key.endsWith("]")){
             return null;
         }
-        key = key.substring(1,key.length()-1);
-        try{
-            int index = Integer.parseInt(key);
-            if(index<0 || index>=length()){
-                return null;
-            }
-            return search.get(null, index);
-        }catch(IOException iex){
-            return null;
-        }catch(NumberFormatException nfe){
+        key = key.substring(1, key.length() - 1);
+        try {
+            int address = Integer.parseInt(key);
+            return search.get(null, address);
+        } catch(IOException | NumberFormatException iex){
             return null;
         }
     }

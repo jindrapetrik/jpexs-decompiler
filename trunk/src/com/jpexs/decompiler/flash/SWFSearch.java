@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.PosMarkedInputStream;
 import com.jpexs.helpers.ProgressListener;
-import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.Searchable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +38,7 @@ public class SWFSearch {
     protected Searchable s;
     private boolean processed = false;
     private final Set<ProgressListener> listeners = new HashSet<>();
-    private final List<MemoryInputStream> swfStreams = new ArrayList<>();
+    private final Map<Long, MemoryInputStream> swfStreams = new HashMap<>();
 
     public SWFSearch(Searchable s) {
         this.s = s;
@@ -84,7 +83,7 @@ public class SWFSearch {
                 long limit = pmi.getPos();
                 MemoryInputStream is = new MemoryInputStream(mis.getAllRead(), (int) (long) addr, (int) limit);
                 if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
-                    swfStreams.add(is);
+                    swfStreams.put(addr, is);
                 }
 
             } catch (OutOfMemoryError ome) {
@@ -97,16 +96,20 @@ public class SWFSearch {
         processed = true;
     }
 
-    public MemoryInputStream get(ProgressListener listener, int index) throws IOException {
+    public MemoryInputStream get(ProgressListener listener, long address) throws IOException {
         if(!processed){
             return null;
         }
-        if(index < 0 || index >= swfStreams.size()){
+        if (!swfStreams.containsKey(address)) {
             return null;
         }
-        return swfStreams.get(index);
+        return swfStreams.get(address);
     }
 
+    public Set<Long> getAddresses() {
+        return swfStreams.keySet();
+    }
+    
     public int length() {
         if (!processed) {
             return 0;
