@@ -38,7 +38,7 @@ public class FontPanel extends javax.swing.JPanel {
 
     private final MainPanel mainPanel;
     private FontTag fontTag;
-    
+
     /**
      * Creates new form FontPanel
      */
@@ -70,7 +70,7 @@ public class FontPanel extends javax.swing.JPanel {
             fontIsItalicCheckBox.setEnabled(false);
         }
     }
-    
+
     private String translate(String key) {
         return mainPanel.translate(key);
     }
@@ -121,7 +121,7 @@ public class FontPanel extends javax.swing.JPanel {
             f.addCharacter(swf.tags, c, fontSelection.getSelectedItem().toString());
             oldchars += c;
         }
-        
+
         int fontId = ft.getFontId();
         if (updateTextsCheckBox.isSelected()) {
             for (Tag tag : swf.tags) {
@@ -154,7 +154,7 @@ public class FontPanel extends javax.swing.JPanel {
             fontDisplayNameTextArea.setText(fontNameTag.fontName);
             fontCopyrightTextArea.setText(fontNameTag.fontCopyright);
         }
-        
+
         fontIsBoldCheckBox.setSelected(ft.isBold());
         fontIsItalicCheckBox.setSelected(ft.isItalic());
         fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : "" + ft.getDescent());
@@ -174,7 +174,7 @@ public class FontPanel extends javax.swing.JPanel {
         }
         setEditable(false);
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

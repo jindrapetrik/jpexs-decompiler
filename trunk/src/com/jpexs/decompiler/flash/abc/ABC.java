@@ -241,8 +241,8 @@ public class ABC {
             if (instance_info[i].name_index != 0) {
                 constants.getMultiname(instance_info[i].name_index).name_index = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(instance_info[i].name_index).name_index, true, renameType);
                 if (constants.getMultiname(instance_info[i].name_index).namespace_index != 0) {
-                    constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index =
-                            deobfuscation.deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index, renameType);
+                    constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index
+                            = deobfuscation.deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index, renameType);
                 }
             }
             if (instance_info[i].super_index != 0) {
@@ -344,7 +344,6 @@ public class ABC {
             constants.addDouble(ais.readDouble());
         }
 
-
         //constant decimal
         if (minor_version >= MINORwithDECIMAL) {
             int constant_decimal_pool_count = ais.readU30();
@@ -397,10 +396,6 @@ public class ABC {
             }
         }
 
-
-
-
-
         //constant multiname
         int constant_multiname_pool_count = ais.readU30();
         constants.constant_multiname = new ArrayList<>(constant_multiname_pool_count);
@@ -410,7 +405,6 @@ public class ABC {
         for (int i = 1; i < constant_multiname_pool_count; i++) { //index 0 not used. Values 1..n-1
             constants.addMultiname(ais.readMultiname());
         }
-
 
         //method info
         int methods_count = ais.readU30();
@@ -647,7 +641,6 @@ public class ABC {
                 //break;
             }
         }
-
 
         return null;
     }

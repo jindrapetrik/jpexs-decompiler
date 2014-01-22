@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class ContextMenuTools {
-    
+
     public static String getAppDir() {
         String path = Utf8Helper.urlDecode(ContextMenuTools.class.getProtectionDomain().getCodeSource().getLocation().getPath());
         String appDir = new File(path).getParentFile().getAbsolutePath();
@@ -72,17 +72,17 @@ public class ContextMenuTools {
 
         String exeName32 = "ffdec.exe";
         String exeName64 = "ffdec64.exe";
-        
+
         if (add) {
             String exeName = Platform.is64Bit() ? exeName64 : exeName32;
             return addToContextMenu(add, fromCommandLine, exeName);
         } else {
             // remove both 32 and 64 bit references
-            return addToContextMenu(add, fromCommandLine, exeName32) && 
-                    addToContextMenu(add, fromCommandLine, exeName64);
+            return addToContextMenu(add, fromCommandLine, exeName32)
+                    && addToContextMenu(add, fromCommandLine, exeName64);
         }
     }
-    
+
     private static boolean addToContextMenu(boolean add, boolean fromCommandLine, String exeName) {
         final String extensions[] = new String[]{"swf", "gfx"};
 
@@ -120,7 +120,7 @@ public class ContextMenuTools {
                         Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName);
                         Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName, "", "Flash Movie");
                     }
-                
+
                     if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell")) {
                         Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell");
                     }
@@ -220,7 +220,7 @@ public class ContextMenuTools {
         }
         return false;
     }
-    
+
     private static void registryDeleteKey(WinReg.HKEY hKey, String keyName) {
         boolean exists = Advapi32Util.registryKeyExists(hKey, keyName);
         if (exists) {

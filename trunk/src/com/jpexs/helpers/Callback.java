@@ -21,7 +21,7 @@ package com.jpexs.helpers;
  *
  * @author JPEXS
  */
-public abstract class Callback<T>  {
+public abstract class Callback<T> {
 
     public abstract void call(T arg1);
 }

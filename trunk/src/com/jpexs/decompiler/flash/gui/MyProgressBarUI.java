@@ -67,7 +67,6 @@ public class MyProgressBarUI extends SubstanceProgressBarUI {
              displayTimeline.setEase(new Spline(0.4f));
              AnimationConfigurationManager.getInstance().configureTimeline(
              displayTimeline);*/
-
             boolean isInCellRenderer = (SwingUtilities.getAncestorOfClass(
                     CellRendererPane.class, progressBar) != null);
             if (false) {//currValue > 0 && !isInCellRenderer && Math.abs(pixelDelta) > 5) {

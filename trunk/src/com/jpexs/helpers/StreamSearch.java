@@ -57,12 +57,13 @@ public class StreamSearch implements Searchable {
             byte buf[] = new byte[4096];
             byte last[] = null;
             int cnt = 0;
-            long pos=0;
+            long pos = 0;
             while ((cnt = is.read(buf)) > 0) {
 
                 for (int i = -maxFindLen + 1; i < cnt; i++) {
 
-                    loopdata:for (byte onedata[] : data) {
+                    loopdata:
+                    for (byte onedata[] : data) {
                         boolean match = true;
                         for (int d = 0; d < onedata.length; d++) {
                             byte b;
@@ -93,8 +94,6 @@ public class StreamSearch implements Searchable {
                 }
                 pos = pos + cnt;
             }
-
-           
 
         } catch (IOException ex) {
             Logger.getLogger(StreamSearch.class.getName()).log(Level.SEVERE, null, ex);

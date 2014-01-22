@@ -175,8 +175,7 @@ public class SWFInputStream extends InputStream {
         if (is instanceof SeekableInputStream) {
             SeekableInputStream sis = (SeekableInputStream) is;
             sis.seek(pos);
-        }
-        else {
+        } else {
             throw new IOException("Underlying stream is not a SeekableInputStream");
         }
     }

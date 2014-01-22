@@ -23,6 +23,6 @@ import com.jpexs.decompiler.flash.SWF;
  * @author JPEXS
  */
 public interface TreeItem {
-    
+
     public SWF getSwf();
 }

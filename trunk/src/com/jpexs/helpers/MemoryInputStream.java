@@ -76,13 +76,13 @@ public class MemoryInputStream extends SeekableInputStream {
     public synchronized void reset() throws IOException {
         seek(0);
     }
-    
+
     @Override
     public int read() throws IOException {
         if (pos > count) {
             count = (int) pos;
         }
-        
+
         if (pos < getLength()) {
             int ret = buffer[(int) pos + startPos] & 0xff;
             pos++;
@@ -91,7 +91,7 @@ public class MemoryInputStream extends SeekableInputStream {
 
         return -1;
     }
-    
+
     private int getLength() {
         if (maxLength == -1) {
             return buffer.length - startPos;

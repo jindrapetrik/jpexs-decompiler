@@ -79,7 +79,6 @@ public abstract class Trait implements Serializable {
                 nsname = "";
             }
 
-
             if ((!nsname.isEmpty()) && (!nsname.equals("-"))) {
             } else {
                 if (ns != null) {

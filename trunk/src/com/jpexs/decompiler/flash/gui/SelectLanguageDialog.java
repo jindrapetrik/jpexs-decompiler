@@ -53,7 +53,6 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         cnt1.setLayout(new BorderLayout());
         cnt1.add(cnt, BorderLayout.CENTER);
 
-
         String currentLanguage = Configuration.locale.get(Locale.getDefault().getLanguage());
         boolean found = false;
         int enIndex = 0;
@@ -138,11 +137,11 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
             }
         });
     }
-    
+
     public static String[] getAvailableLanguages() {
         return languages;
     }
-    
+
     public String display() {
         setVisible(true);
         return languageCode;

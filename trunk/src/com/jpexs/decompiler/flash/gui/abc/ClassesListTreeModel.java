@@ -95,18 +95,18 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
     public ClassesListTreeModel(SWF swf) {
         this(swf, null);
     }
-    
+
     public ClassesListTreeModel(SWF swf, String filter) {
         this.swf = swf;
         this.list = swf.getAS3Packs();
         setFilter(filter);
     }
-    
+
     @Override
     public SWF getSwf() {
         return swf;
     }
-            
+
     public final void update() {
         this.list = swf.getAS3Packs();
         TreeModelEvent event = new TreeModelEvent(this, new TreePath(classTree.getRoot()));
@@ -114,7 +114,7 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
             listener.treeStructureChanged(event);
         }
     }
-    
+
     public final void setFilter(String filter) {
         classTree = new Tree();
         filter = (filter == null || filter.isEmpty()) ? null : filter.toLowerCase();

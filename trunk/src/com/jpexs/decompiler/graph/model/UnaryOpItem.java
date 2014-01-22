@@ -46,7 +46,7 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
                 value.toString(writer, localData);
             }
         } else {
-            writer.append("null");            
+            writer.append("null");
         }
         return writer;
     }

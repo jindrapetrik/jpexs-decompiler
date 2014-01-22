@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  * @author JPEXS
  */
 public class ActionDeobfuscation {
-    
+
     private final Random rnd = new Random();
     private final int DEFAULT_FOO_SIZE = 10;
     public HashSet<String> allVariableNamesStr = new HashSet<>();

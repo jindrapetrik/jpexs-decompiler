@@ -72,10 +72,10 @@ public class ActionListReader {
 
     private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
 
-    
     /**
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
+     *
      * @param listeners
      * @param containerSWFOffset
      * @param mis
@@ -107,9 +107,11 @@ public class ActionListReader {
         }
         return new ArrayList<>();
     }
+
     /**
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
+     *
      * @param listeners
      * @param containerSWFOffset
      * @param mis
@@ -130,7 +132,7 @@ public class ActionListReader {
         // List of the actions. N. item contains the action which starts in offset N.
         List<Action> actionMap = new ArrayList<>();
         List<Long> nextOffsets = new ArrayList<>();
-        Action entryAction = readActionListAtPos(listeners, containerSWFOffset, cpool, 
+        Action entryAction = readActionListAtPos(listeners, containerSWFOffset, cpool,
                 sis, actionMap, nextOffsets,
                 ip, ip, endIp, version, path, false, new ArrayList<Long>());
 
@@ -203,10 +205,10 @@ public class ActionListReader {
         return actions;
     }
 
-    
     /**
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
+     *
      * @param listeners
      * @param containerSWFOffset
      * @param actions
@@ -220,7 +222,7 @@ public class ActionListReader {
         if (actions.isEmpty()) {
             return actions;
         }
-        
+
         Action lastAction = actions.get(actions.size() - 1);
         int endIp = (int) lastAction.getAddress();
 
@@ -237,7 +239,7 @@ public class ActionListReader {
         for (Action a : actions) {
             actionMap.set((int) a.getAddress(), a);
         }
-        
+
         ConstantPool cpool = new ConstantPool();
 
         Stack<GraphTargetItem> stack = new Stack<>();
@@ -256,7 +258,7 @@ public class ActionListReader {
                 aif.jumpUsed = false;
             }
         }
-        
+
         deobfustaceActionListAtPosRecursive(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, actionMap, ip, retdups, ip, endIp, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>(), version, 0, maxRecursionLevel);
 
         if (!retdups.isEmpty()) {
@@ -508,7 +510,7 @@ public class ActionListReader {
         for (int i = 0; i < actions.size(); i++) {
             Action a = actions.get(i);
             if (a instanceof ActionJump) {
-                ActionJump aJump = (ActionJump)a;
+                ActionJump aJump = (ActionJump) a;
                 if (aJump.getJumpOffset() == 0) {
                     if (removeAction(actions, i, version, false)) {
                         i--;
@@ -520,20 +522,21 @@ public class ActionListReader {
 
     /**
      * Removes an action from the action list, and updates all references
+     *
      * @param actions
-     * @param index 
+     * @param index
      */
     public static boolean removeAction(List<Action> actions, int index, int version, boolean removeWhenLast) {
-        
+
         if (index < 0 || actions.size() <= index) {
             return false;
         }
-        
+
         long startIp = actions.get(0).getAddress();
         Action lastAction = actions.get(actions.size() - 1);
         int lastIdx = (int) lastAction.getAddress();
         long endAddress = lastAction.getAddress() + getTotalActionLength(lastAction);
-        
+
         List<Action> actionMap = new ArrayList<>(lastIdx);
         for (int i = 0; i <= lastIdx; i++) {
             actionMap.add(null);
@@ -541,13 +544,13 @@ public class ActionListReader {
         for (Action a : actions) {
             actionMap.set((int) a.getAddress(), a);
         }
-        
+
         Map<Action, List<Action>> containerLastActions = new HashMap<>();
         getContainerLastActions(actionMap, containerLastActions);
 
         Map<Action, Action> jumps = new HashMap<>();
         getJumps(actions, jumps);
-        
+
         Action prevAction = index > 0 ? actions.get(index - 1) : null;
         Action nextAction = index + 1 < actions.size() ? actions.get(index + 1) : null;
         Action actionToRemove = actions.get(index);
@@ -574,7 +577,7 @@ public class ActionListReader {
         if (jumps.containsKey(actionToRemove)) {
             jumps.remove(actionToRemove);
         }
-        
+
         actions.remove(index);
 
         updateAddresses(actions, startIp, version);
@@ -582,10 +585,10 @@ public class ActionListReader {
         updateActionStores(actions, jumps);
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
-        
+
         return true;
     }
-    
+
     private static Action readActionListAtPos(List<DisassemblyListener> listeners, long containerSWFOffset, ConstantPool cpool,
             SWFInputStream sis, List<Action> actions, List<Long> nextOffsets,
             long ip, long startIp, long endIp, int version, String path, boolean indeterminate, List<Long> visitedContainers) throws IOException {
@@ -708,7 +711,7 @@ public class ActionListReader {
         if (recursionLevel > maxRecursionLevel + 1) {
             throw new TranslateException("deobfustaceActionListAtPosRecursive max recursion level reached.");
         }
-        
+
         Action a;
         Scanner sc = new Scanner(System.in);
         loopip:
@@ -716,7 +719,7 @@ public class ActionListReader {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
-            
+
             int actionLen = getTotalActionLength(a);
             if (!visited.containsKey(ip)) {
                 visited.put(ip, 0);
@@ -953,8 +956,8 @@ public class ActionListReader {
     }
 
     private static ActionLocalData prepareLocalBranch(ActionLocalData localData) {
-        
-        return new ActionLocalData(new HashMap<>(localData.regNames), 
+
+        return new ActionLocalData(new HashMap<>(localData.regNames),
                 new HashMap<>(localData.variables), new HashMap<>(localData.functions));
     }
 }

@@ -25,9 +25,9 @@ public class LoopWithType {
 
     public static int LOOP_TYPE_LOOP = 0;
     public static int LOOP_TYPE_SWITCH = 1;
-    
+
     public long loopId;
     public int type;
     public boolean used;
-    
+
 }

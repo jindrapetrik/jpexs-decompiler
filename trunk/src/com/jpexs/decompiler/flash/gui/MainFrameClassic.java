@@ -35,7 +35,7 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
 
     public MainPanel panel;
     private MainFrameMenu mainMenu;
-    
+
     public MainFrameClassic() {
         super();
 
@@ -128,9 +128,9 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
         super.setVisible(b);
         panel.setVisible(b);
     }
-    
+
     @Override
     public MainPanel getPanel() {
         return panel;
     }
- }
+}

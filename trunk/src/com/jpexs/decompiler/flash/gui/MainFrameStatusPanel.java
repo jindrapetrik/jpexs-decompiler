@@ -38,11 +38,11 @@ import javax.swing.border.BevelBorder;
  * @author JPEXS
  */
 public class MainFrameStatusPanel extends JPanel implements ActionListener {
-    
+
     static final String ACTION_SHOW_ERROR_LOG = "SHOWERRORLOG";
 
     private final MainPanel mainPanel;
-    
+
     private final LoadingPanel loadingPanel = new LoadingPanel(20, 20);
     private final JLabel statusLabel = new JLabel("");
     private final JButton cancelButton = new JButton();
@@ -58,7 +58,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
         this.mainPanel = mainPanel;
         createStatusPanel();
     }
-    
+
     private void createStatusPanel() {
         JPanel statusLeftPanel = new JPanel();
         statusLeftPanel.setLayout(new BoxLayout(statusLeftPanel, BoxLayout.X_AXIS));
@@ -109,7 +109,7 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
                 break;
         }
     }
-    
+
     private String translate(String key) {
         return mainPanel.translate(key);
     }
@@ -154,9 +154,9 @@ public class MainFrameStatusPanel extends JPanel implements ActionListener {
                 errorNotificationButton.setToolTipText(translate("errors.present"));
                 break;
         }
-        
+
         errorNotificationButton.setIcon(currentIcon);
-                
+
         if (errorState != ErrorState.NO_ERROR) {
             if (blinkTimer != null) {
                 blinkTimer.cancel();

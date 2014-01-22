@@ -490,7 +490,6 @@ public class XFLConverter {
         int startEdgeX = 0;
         int startEdgeY = 0;
 
-
         LINESTYLEARRAY actualLinestyles = lineStyles;
         int strokeStyleOrig = 0;
         fillStyleCount = fillStyles.fillStyles.length;
@@ -1788,8 +1787,6 @@ public class XFLConverter {
                             clipActions = po.getClipActions();
                         }
 
-
-
                     }
                 }
             }
@@ -2069,7 +2066,6 @@ public class XFLConverter {
                 }
             }
 
-
             boolean hasClipDepth = false;
             for (Tag t : timelineTags) {
                 if (t instanceof PlaceObjectTypeTag) {
@@ -2216,7 +2212,6 @@ public class XFLConverter {
             } else if (tag instanceof DefineText2Tag) {
                 textRecords = ((DefineText2Tag) tag).textRecords;
             }
-
 
             looprec:
             for (TEXTRECORD rec : textRecords) {
@@ -2839,7 +2834,6 @@ public class XFLConverter {
                 }
             }, handler).run();
 
-
         } else {
 
             if (!outDir.exists()) {
@@ -2956,7 +2950,7 @@ public class XFLConverter {
         double b, c, h, s;
         b = (24872168661075.0 * a11 * a11 - 151430415740925.0 * a12 + 341095051289483.0 * a12 * a12 - 15302094789450.0 * a13 + 82428663495404.0 * a12 * a13
                 - 4592294873812.0 * a13 * a13 + 43556251470.0 * Math.sqrt(216225 * a11 * a11 + 332369 * a12 * a12 - 397828 * a12 * a13 + 281684 * a13 * a13
-                - 930 * a11 * (287 * a12 + 178 * a13)) + 2384730956550.0 * a12 * a41 + 240977870700.0 * a13 * a41
+                        - 930 * a11 * (287 * a12 + 178 * a13)) + 2384730956550.0 * a12 * a41 + 240977870700.0 * a13 * a41
                 - 685925220 * Math.sqrt(216225 * a11 * a11 + 332369 * a12 * a12 - 397828 * a12 * a13 + 281684 * a13 * a13 - 930 * a11 * (287 * a12 + 178 * a13))
                 * a41 + 465 * a11 * (466201717582.0 * a12 + 55756962908.0 * a13 + 764132175 * (-127 + 2 * a41)))
                 / (391687695450.0 * a11 * a11 + 5371575610858.0 * a12 * a12 + 1298089188904.0 * a12 * a13 - 72319604312.0 * a13 * a13
@@ -2968,10 +2962,10 @@ public class XFLConverter {
                 - 930 * a11 * (287 * a12 + 178 * a13))) / (500. * (a12 - a13))) + Math.PI/*+ Pi*C(1)*/);
         s = (1543 * (-103355550 * a11 * a11 - 158872382 * a12 * a12 + 190161784 * a12 * a13 - 134644952 * a13 * a13
                 + 1661845 * a12 * Math.sqrt(216225 * a11 * a11 + 332369 * a12 * a12 - 397828 * a12 * a13 + 281684 * a13 * a13
-                - 930 * a11 * (287 * a12 + 178 * a13)) + 167930 * a13
+                        - 930 * a11 * (287 * a12 + 178 * a13)) + 167930 * a13
                 * Math.sqrt(216225 * a11 * a11 + 332369 * a12 * a12 - 397828 * a12 * a13 + 281684 * a13 * a13 - 930 * a11 * (287 * a12 + 178 * a13))
                 + 465 * a11 * (274372 * a12 + 170168 * a13 + 1065 * Math.sqrt(216225 * a11 * a11 + 332369 * a12 * a12 - 397828 * a12 * a13
-                + 281684 * a13 * a13 - 930 * a11 * (287 * a12 + 178 * a13)))))
+                        + 281684 * a13 * a13 - 930 * a11 * (287 * a12 + 178 * a13)))))
                 / (195843847725.0 * a11 * a11 + 2685787805429.0 * a12 * a12 + 649044594452.0 * a12 * a13 - 36159802156.0 * a13 * a13
                 + 930 * a11 * (1835439833 * a12 + 219515602 * a13));
 
@@ -3014,7 +3008,6 @@ public class XFLConverter {
              reader.setEntityResolver(tparser);
              html = "<html>" + html + "</html>";
              reader.parse(new InputSource(new StringReader(html)));*/
-
         } catch (SAXException | IOException e) {
             Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error while converting HTML", e);
         }

@@ -83,7 +83,7 @@ public class CallMethodActionItem extends ActionItem {
             }
             arguments.get(t).toStringNL(writer, localData);
         }
-        
+
         return writer.append(")");
     }
 

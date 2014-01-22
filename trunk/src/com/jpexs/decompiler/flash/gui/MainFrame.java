@@ -21,10 +21,14 @@ package com.jpexs.decompiler.flash.gui;
  * @author JPEXS
  */
 public interface MainFrame {
-    
+
     public void setTitle(String string);
+
     public String translate(String key);
+
     public MainPanel getPanel();
+
     public boolean isVisible();
+
     public void setVisible(boolean b);
 }

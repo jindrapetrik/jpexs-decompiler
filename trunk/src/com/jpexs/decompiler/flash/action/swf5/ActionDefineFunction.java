@@ -99,7 +99,6 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
             sos.writeUI16(0);
             sos.close();
 
-
             baos2.write(surroundWithAction(baos.toByteArray(), version));
         } catch (IOException e) {
         }
@@ -120,7 +119,6 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
             //byte[] codeBytes = Action.actionsToBytes(code, false, version);
             sos.writeUI16(codeSize); //codeBytes.length);
             sos.close();
-
 
             baos2.write(surroundWithAction(baos.toByteArray(), version));
             //baos2.write(codeBytes);

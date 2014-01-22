@@ -102,7 +102,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public JLabel scriptNameLabel;
 
     static final String ACTION_ADD_TRAIT = "ADDTRAIT";
-    
+
     public boolean search(String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
@@ -112,9 +112,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             if (scriptsNode.getItem() instanceof ClassesListTreeModel) {
                 ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode.getItem();
                 List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
-                final Pattern pat = regexp ?
-                    Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0) :
-                    Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                final Pattern pat = regexp
+                        ? Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0)
+                        : Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
                 int pos = 0;
                 for (final MyEntry<ClassPath, ScriptPack> item : allpacks) {
                     pos++;
@@ -207,7 +207,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             }
         });
 
-
         return table;
     }
 
@@ -254,7 +253,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         abcComboBox.setModel(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()));
         navigator.clearABC();
     }
-    
+
     public void setSwf(SWF swf) {
         if (this.swf != swf) {
             this.swf = swf;
@@ -268,7 +267,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             navigator.setABC(swf.abcList, abc);
         }
     }
-    
+
     public void switchAbc(int index) {
         listIndex = index;
 
@@ -291,7 +290,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         } catch (InterruptedException ex) {
             Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-
 
         splitPane.setDividerLocation(Configuration.guiAvm2SplitPaneDividerLocation.get(splitPane.getWidth() * 1 / 2));
 
@@ -334,7 +332,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         newTraitButton.setToolTipText(AppStrings.translate("button.addtrait"));
         iconsPanel.add(newTraitButton);
 
-
         scriptNameLabel = new JLabel("-");
         scriptNameLabel.setAlignmentX(0);
         iconsPanel.setAlignmentX(0);
@@ -367,13 +364,11 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         decompiledTextArea.setContentType("text/actionscript");
         decompiledTextArea.setFont(new Font("Monospaced", Font.PLAIN, decompiledTextArea.getFont().getSize()));
 
-
         JPanel pan2 = new JPanel();
         pan2.setLayout(new BorderLayout());
         pan2.add((abcComboBox = new JComboBox<>(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()))), BorderLayout.NORTH);
 
         navigator = new TraitsList(this);
-
 
         navPanel = new JPanel(new BorderLayout());
         JPanel navIconsPanel = new JPanel();

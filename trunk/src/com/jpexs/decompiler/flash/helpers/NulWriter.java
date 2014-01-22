@@ -24,7 +24,7 @@ import java.util.Stack;
  * @author JPEXS
  */
 public class NulWriter extends GraphTextWriter {
-    
+
     private final Stack<LoopWithType> loopStack = new Stack<>();
     private final Stack<Boolean> stringAddedStack = new Stack<>();
     private boolean stringAdded = false;
@@ -38,22 +38,22 @@ public class NulWriter extends GraphTextWriter {
         loop.type = loopType;
         loopStack.add(loop);
     }
-    
-    public LoopWithType endLoop(long loopId)  {
+
+    public LoopWithType endLoop(long loopId) {
         LoopWithType loopIdInStack = loopStack.pop();
         if (loopId != loopIdInStack.loopId) {
             throw new Error("LoopId mismatch");
         }
         return loopIdInStack;
     }
-    
+
     public long getLoop() {
         if (loopStack.isEmpty()) {
             return -1;
         }
         return loopStack.peek().loopId;
     }
-    
+
     public long getNonSwitchLoop() {
         if (loopStack.isEmpty()) {
             return -1;
@@ -84,7 +84,7 @@ public class NulWriter extends GraphTextWriter {
             loop = loopStack.get(pos);
             pos--;
         } while ((pos >= 0) && (loop.loopId != loopId));
-        
+
         if (loop.loopId == loopId) {
             loop.used = true;
         }
@@ -95,13 +95,13 @@ public class NulWriter extends GraphTextWriter {
         stringAdded = true;
         return this;
     }
-    
+
     @Override
     public NulWriter hilightSpecial(String text, String type, int index) {
         stringAdded = true;
         return this;
     }
-    
+
     @Override
     public NulWriter append(String str) {
         stringAdded = true;
@@ -130,7 +130,7 @@ public class NulWriter extends GraphTextWriter {
         stringAddedStack.add(stringAdded);
         stringAdded = false;
     }
-    
+
     public boolean getMark() {
         boolean result = stringAdded;
         stringAdded = stringAddedStack.pop() || result;

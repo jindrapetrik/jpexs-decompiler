@@ -236,7 +236,7 @@ public class Helper {
         }
         return sb.toString();
     }
-    
+
     public static int getLineCount(String s) {
         if (s.endsWith("\r\n")) {
             s = s.substring(0, s.length() - 2);
@@ -382,7 +382,8 @@ public class Helper {
         return ret;
     }
 
-    public static ByteArrayInputStream getInputStream(byte[]... data) {
+    public static ByteArrayInputStream getInputStream(byte[]  
+        ... data) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
@@ -424,7 +425,8 @@ public class Helper {
         return baos.toByteArray();
     }
 
-    public static void writeFile(String file, byte[]... data) {
+    public static void writeFile(String file, byte[]  
+        ... data) {
         try (FileOutputStream fos = new FileOutputStream(file)) {
             for (byte[] d : data) {
                 fos.write(d);
@@ -437,11 +439,9 @@ public class Helper {
     //public static String stripComments(String str) {
     //    return str.replaceAll("<ffdec:hex>[^\r\n]*</ffdec:hex>\r?\n", "");
     //}
-
     //public static String hexToComments(String str) {
     //    return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
     //}
-
     public static String stackToString(Stack<GraphTargetItem> stack, LocalData localData) throws InterruptedException {
         String ret = "[";
         for (int i = stack.size() - 1; i >= 0; i--) {
@@ -582,16 +582,16 @@ public class Helper {
     public static String formatFileSize(long fileSizeLong) {
         double fileSize = fileSizeLong;
         if (fileSize < 1024) {
-            return String.format("%d bytes", fileSizeLong) ;
+            return String.format("%d bytes", fileSizeLong);
         }
         fileSize /= 1024;
         if (fileSize < 1024) {
-            return String.format("%.2f KB", fileSize) ;
+            return String.format("%.2f KB", fileSize);
         }
         fileSize /= 1024;
-        return String.format("%.2f MB", fileSize) ;
+        return String.format("%.2f MB", fileSize);
     }
-    
+
     public static void freeMem() {
         Cache.clearAll();
         System.gc();
@@ -611,7 +611,7 @@ public class Helper {
         String strMinutes = AppStrings.translate("timeFormat.minutes");
         String strSecond = AppStrings.translate("timeFormat.second");
         String strSeconds = AppStrings.translate("timeFormat.seconds");
-        
+
         if (timeH > 0) {
             timeStr += timeH + " " + (timeH > 1 ? strHours : strHour);
         }
@@ -636,7 +636,7 @@ public class Helper {
         writer.appendNoHilight("#hexdata").newLine().newLine();
         return byteArrayToHex(writer, data, 8, 8, false, false);
     }
-    
+
     public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize, boolean addChars, boolean showAddress) {
 
         /* // hex data from decompiled actions
@@ -649,32 +649,31 @@ public class Helper {
          result.append(";").append(line).append(nl);
          }
          }*/
-
         int rowCount = data.length / bytesPerRow;
         if (data.length % bytesPerRow > 0) {
             rowCount++;
         }
-        
+
         long address = 0;
         for (int row = 0; row < rowCount; row++) {
             if (row > 0) {
                 writer.newLine();
             }
-            
+
             if (showAddress) {
                 writer.appendNoHilight("0x" + String.format("%08x ", address));
             }
-            
+
             for (int i = 0; i < bytesPerRow; i++) {
                 int idx = row * bytesPerRow + i;
                 if (data.length > idx) {
-                    if (i> 0 && i % groupSize == 0) {
+                    if (i > 0 && i % groupSize == 0) {
                         writer.appendNoHilight(" ");
                     }
                     writer.appendNoHilight(String.format("%02x ", data[idx]));
                 } else {
                     if (addChars) {
-                        if (i> 0 && i % groupSize == 0) {
+                        if (i > 0 && i % groupSize == 0) {
                             writer.appendNoHilight(" ");
                         }
                         writer.appendNoHilight("   ");
@@ -682,7 +681,7 @@ public class Helper {
                 }
                 address += bytesPerRow;
             }
-            
+
             if (addChars) {
                 writer.appendNoHilight("  ");
                 for (int i = 0; i < bytesPerRow; i++) {
@@ -690,11 +689,11 @@ public class Helper {
                     if (data.length == idx) {
                         break;
                     }
-                    if (i> 0 && i % groupSize == 0) {
+                    if (i > 0 && i % groupSize == 0) {
                         writer.appendNoHilight(" ");
                     }
                     byte ch = data[idx];
-                    if (ch >=0 && ch < 32) {
+                    if (ch >= 0 && ch < 32) {
                         ch = '.';
                     }
                     writer.appendNoHilight((char) ch + "");
@@ -705,7 +704,7 @@ public class Helper {
         writer.newLine();
         return writer;
     }
-    
+
     public static String byteArrayToHex(byte[] data, int bytesPerRow) {
         HilightedTextWriter writer = new HilightedTextWriter(false);
         byteArrayToHex(writer, data, bytesPerRow, 8, true, true);
@@ -751,23 +750,23 @@ public class Helper {
             }
         }
     }
-    
+
     /*
      * Get the extension of a file.
-     */  
+     */
     public static String getExtension(String fileName) {
         return getExtension(new File(fileName));
     }
 
     /*
      * Get the extension of a file.
-     */  
+     */
     public static String getExtension(File f) {
         String ext = null;
         String s = f.getName();
         int i = s.lastIndexOf('.');
 
-        if (i > 0 &&  i < s.length() - 1) {
+        if (i > 0 && i < s.length() - 1) {
             ext = s.substring(i).toLowerCase();
         }
         return ext;
@@ -782,7 +781,7 @@ public class Helper {
                 appendNoHilight(AppStrings.translate("decompilationError.timeout.description")).
                 appendNoHilight("\");").newLine();
     }
-    
+
     public static void appendErrorComment(GraphTextWriter writer, Throwable ex) {
         writer.appendNoHilight("/*").newLine();
         writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();

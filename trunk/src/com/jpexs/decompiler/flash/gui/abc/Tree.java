@@ -24,7 +24,7 @@ import java.util.StringTokenizer;
 public class Tree {
 
     private final TreeElement ROOT = new AS3PackageNode("", "", null, null);
-    
+
     public void add(String name, String path, ScriptPack item) {
         StringTokenizer st = new StringTokenizer(path, ".");
         TreeElement parent = ROOT;

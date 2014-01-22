@@ -47,11 +47,11 @@ public class AVM2Deobfuscation {
 
     private final ConstantPool constants;
     private final Map<String, Integer> usageTypesCount = new HashMap<>();
-    
+
     public AVM2Deobfuscation(ConstantPool constants) {
         this.constants = constants;
     }
-    
+
     private static boolean isReserved(String s) {
         for (String rw : reservedWords) {
             if (rw.equals(s.trim())) {
@@ -151,7 +151,7 @@ public class AVM2Deobfuscation {
         deobfuscated.put(orig, ret);
         return ret;
     }
-    
+
     public int deobfuscatePackageName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex, RenameType renameType) {
         if (strIndex <= 0) {
             return strIndex;

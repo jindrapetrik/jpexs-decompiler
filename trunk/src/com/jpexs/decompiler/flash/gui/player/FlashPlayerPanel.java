@@ -226,7 +226,7 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         }
         String exePath = appDir + "lib\\FlashPlayer.exe";
         File f = new File(exePath);
-        if(!f.exists()) {
+        if (!f.exists()) {
             return;
         }
 
@@ -267,12 +267,12 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         if (!executed) {
             execute();
             /*
-            //How about commenting this out? Will it work? Let's try...
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }*/
+             //How about commenting this out? Will it work? Let's try...
+             try {
+             Thread.sleep(1000);
+             } catch (InterruptedException ex) {
+             Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
+             }*/
         }
         if (bgColor != null) {
             setBackground(bgColor);
@@ -283,7 +283,7 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
             Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PLAY}, 1, ibr, null);
             Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) flash.getBytes().length}, 1, ibr, null);
             Kernel32.INSTANCE.WriteFile(pipe, flash.getBytes(), flash.getBytes().length, ibr, null);
-        }        
+        }
         stopped = false;
         specialPlaying = false;
         specialPosition = 0;

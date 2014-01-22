@@ -99,7 +99,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
     private JMenuItem exportAllCommandButton;
     private JMenuItem exportFlaCommandButton;
     private JMenuItem exportSelectionCommandButton;
-    
+
     private JMenuItem reloadCommandButton;
     private JMenuItem renameinvalidCommandButton;
     private JMenuItem globalrenameCommandButton;
@@ -117,7 +117,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
     public boolean isInternalFlashViewerSelected() {
         return miInternalViewer.isSelected();
     }
-    
+
     private String translate(String key) {
         return mainFrame.translate(key);
     }
@@ -176,8 +176,6 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
         menuExportAll.setIcon(View.getIcon("export16"));
         menuExportSel.setIcon(View.getIcon("exportsel16"));
 
-
-
         menuFile.add(miOpen);
         menuFile.add(miSave);
         menuFile.add(miSaveAs);
@@ -212,7 +210,6 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
         miRenameIdentifiers.setActionCommand(ACTION_RENAME_IDENTIFIERS);
         miRenameIdentifiers.addActionListener(this);
 
-
         menuDeobfuscation.add(miRenameOneIdentifier);
         menuDeobfuscation.add(miRenameIdentifiers);
         menuDeobfuscation.add(miDeobfuscation);
@@ -241,7 +238,6 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
         miParallelSpeedUp.setSelected(Configuration.parallelSpeedUp.get());
         miParallelSpeedUp.setActionCommand(ACTION_PARALLEL_SPEED_UP);
         miParallelSpeedUp.addActionListener(this);
-
 
         menuTools.add(miProxy);
 
@@ -286,7 +282,6 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
         miAssociate.addActionListener(this);
         miAssociate.setSelected(ContextMenuTools.isAddedToContextMenu());
 
-
         JMenuItem miLanguage = new JMenuItem(translate("menu.settings.language"));
         miLanguage.setActionCommand(ACTION_SET_LANGUAGE);
         miLanguage.addActionListener(this);
@@ -325,7 +320,6 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
         miHomepage.setIcon(View.getIcon("homepage16"));
         miHomepage.addActionListener(this);
 
-
         menuHelp.add(miCheckUpdates);
         menuHelp.add(miHelpUs);
         menuHelp.add(miHomepage);
@@ -333,34 +327,34 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
         menuBar.add(menuHelp);
 
         mainFrame.setJMenuBar(menuBar);
-        
+
         //if (hasAbc) {
         menuTools.add(miGotoDocumentClass);
         //}
     }
-    
+
     @Override
     public void updateComponets(SWF swf, List<ABCContainerTag> abcList) {
         boolean swfLoaded = swf != null;
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
-                
+
         /*saveCommandButton.setEnabled(swfLoaded);
-        saveasCommandButton.setEnabled(swfLoaded);
-        saveasexeCommandButton.setEnabled(swfLoaded);
-        exportAllCommandButton.setEnabled(swfLoaded);
-        exportFlaCommandButton.setEnabled(swfLoaded);
-        exportSelectionCommandButton.setEnabled(swfLoaded);
-        reloadCommandButton.setEnabled(swfLoaded);
+         saveasCommandButton.setEnabled(swfLoaded);
+         saveasexeCommandButton.setEnabled(swfLoaded);
+         exportAllCommandButton.setEnabled(swfLoaded);
+         exportFlaCommandButton.setEnabled(swfLoaded);
+         exportSelectionCommandButton.setEnabled(swfLoaded);
+         reloadCommandButton.setEnabled(swfLoaded);
 
-        renameinvalidCommandButton.setEnabled(swfLoaded);
-        globalrenameCommandButton.setEnabled(swfLoaded);
-        deobfuscationCommandButton.setEnabled(swfLoaded);
-        searchCommandButton.setEnabled(swfLoaded);
+         renameinvalidCommandButton.setEnabled(swfLoaded);
+         globalrenameCommandButton.setEnabled(swfLoaded);
+         deobfuscationCommandButton.setEnabled(swfLoaded);
+         searchCommandButton.setEnabled(swfLoaded);
 
-        gotoDocumentClassCommandButton.setEnabled(hasAbc);
-        deobfuscationCommandButton.setEnabled(hasAbc);*/
+         gotoDocumentClassCommandButton.setEnabled(hasAbc);
+         deobfuscationCommandButton.setEnabled(hasAbc);*/
     }
-    
+
     private void saveAs(SWF swf, SaveFileMode mode) {
         if (Main.saveFileDialog(swf, mode)) {
             swf.fileTitle = null;
@@ -368,7 +362,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
             saveCommandButton.setEnabled(mainFrame.panel.getCurrentSwf() != null);
         }
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -482,33 +476,30 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
                     Main.setSubLimiter(((JCheckBoxMenuItem) e.getSource()).getState());
                 }
                 break;
-            case ACTION_SAVE:
-                {
-                    SWF swf = mainFrame.panel.getCurrentSwf();
-                    if (swf.file == null) {
-                        saveAs(swf, SaveFileMode.SAVEAS);
-                    } else {
-                        try {
-                            Main.saveFile(swf, swf.file);
-                        } catch (IOException ex) {
-                            Logger.getLogger(MainFrameClassicMenu.class.getName()).log(Level.SEVERE, null, ex);
-                            View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                        }
+            case ACTION_SAVE: {
+                SWF swf = mainFrame.panel.getCurrentSwf();
+                if (swf.file == null) {
+                    saveAs(swf, SaveFileMode.SAVEAS);
+                } else {
+                    try {
+                        Main.saveFile(swf, swf.file);
+                    } catch (IOException ex) {
+                        Logger.getLogger(MainFrameClassicMenu.class.getName()).log(Level.SEVERE, null, ex);
+                        View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
-                break;
-            case ACTION_SAVE_AS:
-                {
-                    SWF swf = mainFrame.panel.getCurrentSwf();
-                    saveAs(swf, SaveFileMode.SAVEAS);
-                }
-                break;
-            case ACTION_SAVE_AS_EXE:
-                {
-                    SWF swf = mainFrame.panel.getCurrentSwf();
-                    saveAs(swf, SaveFileMode.EXE);
-                }
-                break;
+            }
+            break;
+            case ACTION_SAVE_AS: {
+                SWF swf = mainFrame.panel.getCurrentSwf();
+                saveAs(swf, SaveFileMode.SAVEAS);
+            }
+            break;
+            case ACTION_SAVE_AS_EXE: {
+                SWF swf = mainFrame.panel.getCurrentSwf();
+                saveAs(swf, SaveFileMode.EXE);
+            }
+            break;
             case ACTION_OPEN:
                 Main.openFileDialog();
                 break;

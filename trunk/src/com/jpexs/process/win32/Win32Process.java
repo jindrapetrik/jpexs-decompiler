@@ -81,12 +81,14 @@ public class Win32Process implements Process {
     }
 
     @Override
-    public Map<Long, InputStream> search(byte[]... data) {
+    public Map<Long, InputStream> search(byte[]  
+        ... data) {
         return search(null, data);
     }
 
     @Override
-    public Map<Long, InputStream> search(ProgressListener progListener, byte[]... data) {
+    public Map<Long, InputStream> search(ProgressListener progListener, byte[]  
+        ... data) {
         return Win32ProcessTools.findBytesInProcessMemory(progListener, th32ProcessID, data);
     }
 }

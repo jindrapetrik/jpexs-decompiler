@@ -93,16 +93,16 @@ public class View {
 
                     //Restore default font for chinese characters
                     SubstanceLookAndFeel.setFontPolicy(new FontPolicy() {
-                        
+
                         private final FontSet fontSet = new FontSet() {
-                            
-                            private FontUIResource controlFont; 
-                            private FontUIResource menuFont; 
-                            private FontUIResource titleFont; 
-                            private FontUIResource windowTitleFont; 
-                            private FontUIResource smallFont; 
-                            private FontUIResource messageFont; 
-                            
+
+                            private FontUIResource controlFont;
+                            private FontUIResource menuFont;
+                            private FontUIResource titleFont;
+                            private FontUIResource windowTitleFont;
+                            private FontUIResource smallFont;
+                            private FontUIResource messageFont;
+
                             @Override
                             public FontUIResource getControlFont() {
                                 if (controlFont == null) {
@@ -157,7 +157,7 @@ public class View {
                                 return messageFont;
                             }
                         };
-                                
+
                         @Override
                         public FontSet getFontSet(String string, UIDefaults uid) {
                             return fontSet;
@@ -169,10 +169,7 @@ public class View {
             }
         });
 
-
         UIManager.put(SubstanceLookAndFeel.TABBED_PANE_CONTENT_BORDER_KIND, SubstanceConstants.TabContentPaneBorderKind.SINGLE_FULL);
-
-
 
         JFrame.setDefaultLookAndFeelDecorated(true);
         JDialog.setDefaultLookAndFeelDecorated(true);
@@ -212,7 +209,7 @@ public class View {
         centerScreen(f, 0); // todo, set screen to the currently active screen instead of the first screen in a multi screen setup, (maybe by using the screen where the main window is now classic or ribbon?)
     }
 
-    public static void centerScreen(Window f,int screen) {
+    public static void centerScreen(Window f, int screen) {
 
         GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] allDevices = env.getScreenDevices();

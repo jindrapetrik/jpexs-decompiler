@@ -30,19 +30,20 @@ public class SwfInMemory {
     public int version;
     public long fileSize;
     public com.jpexs.process.Process process;
-    
+
     public SwfInMemory(ReReadableInputStream is, int version, long fileSize, com.jpexs.process.Process process) {
         this.is = is;
         this.version = version;
         this.fileSize = fileSize;
         this.process = process;
     }
-    
+
     private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(LoadFromMemoryFrame.class));
 
     public String translate(String key) {
         return resourceBundle.getString(key);
     }
+
     @Override
     public String toString() {
         String p = translate("swfitem").replace("%version%", "" + version).replace("%size%", "" + fileSize);

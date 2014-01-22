@@ -33,15 +33,15 @@ import java.util.concurrent.TimeoutException;
  * @author JPEXS
  */
 public abstract class CancellableWorker<T> implements RunnableFuture<T> {
-    
+
     private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
     private static List<CancellableWorker> workers = Collections.synchronizedList(new ArrayList<CancellableWorker>());
     private final FutureTask<T> future;
-    
+
     public CancellableWorker() {
         super();
-        Callable<T> callable =
-                new Callable<T>() {
+        Callable<T> callable
+                = new Callable<T>() {
                     @Override
                     public T call() throws Exception {
                         return doInBackground();
@@ -49,11 +49,11 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
                 };
 
         future = new FutureTask<T>(callable) {
-                       @Override
-                       protected void done() {
-                           workerDone();
-                       }
-                   };
+            @Override
+            protected void done() {
+                workerDone();
+            }
+        };
     }
 
     protected abstract T doInBackground() throws Exception;
@@ -66,7 +66,7 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     protected void done() {
     }
-    
+
     public final void execute() {
         THREAD_POOL.execute(this);
     }
@@ -93,7 +93,7 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     @Override
     public final T get(long timeout, TimeUnit unit) throws InterruptedException,
-        ExecutionException, TimeoutException {
+            ExecutionException, TimeoutException {
         return future.get(timeout, unit);
     }
 
@@ -117,7 +117,7 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
             worker.cancel(true);
         }
     }
-    
+
     public static void cancelBackgroundThreads() {
         List<CancellableWorker> oldWorkers = workers;
         workers = new ArrayList<>();

@@ -547,7 +547,7 @@ public class Action implements GraphSourceItem {
                             fixBranch = 1;
                         }
                     }
-                    
+
                     if (fixBranch > -1) {
                         writer.appendNoHilight("FFDec_DeobfuscatePop").newLine();
                         if (fixBranch == 0) { //jump                               
@@ -712,7 +712,7 @@ public class Action implements GraphSourceItem {
                 @Override
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
-                    List<GraphTargetItem> tree =  actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
+                    List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
                     Graph.graphToString(tree, new NulWriter(), new LocalData());
                     return tree;
                 }
@@ -876,12 +876,12 @@ public class Action implements GraphSourceItem {
                             System.gc();
                         }
                         out = new ArrayList<>();
-                        out.add(new CommentItem(new String[] {
-                            "", 
+                        out.add(new CommentItem(new String[]{
+                            "",
                             " * " + AppStrings.translate("decompilationError"),
                             " * " + AppStrings.translate("decompilationError.obfuscated"),
-                            " * " + AppStrings.translate("decompilationError.errorType") + ": " + 
-                                ex2.getClass().getSimpleName(), 
+                            " * " + AppStrings.translate("decompilationError.errorType") + ": "
+                            + ex2.getClass().getSimpleName(),
                             ""}));
                     }
                     outs.add(out);
@@ -1196,7 +1196,7 @@ public class Action implements GraphSourceItem {
         List<Action> ret = actions;
         if (true) {
             //return ret;
-            }
+        }
         String s = null;
         try {
             HilightedTextWriter writer = new HilightedTextWriter(false);

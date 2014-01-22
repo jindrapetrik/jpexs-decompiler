@@ -21,5 +21,6 @@ package com.jpexs.decompiler.flash.gui;
  * @author JPEXS
  */
 public enum ErrorState {
+
     NO_ERROR, INFO, WARNING, ERROR
 }

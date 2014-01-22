@@ -395,7 +395,6 @@ public class ActionScriptParser {
          globalClassTypeStr.add("_global");
          globalClassTypeStr.addAll(nameStr);*/
 
-
         ParsedSymbol s = null;
         FunctionActionItem constr = null;
         List<GraphTargetItem> staticFunctions = new ArrayList<>();
@@ -797,8 +796,6 @@ public class ActionScriptParser {
                 GraphTargetItem url2 = (expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.COMMA);
                 GraphTargetItem targetOrNum = (expression(registerVars, inFunction, inMethod, true));
-
-
 
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
@@ -1832,7 +1829,7 @@ public class ActionScriptParser {
         List<Action> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<String, Integer>(), Boolean.FALSE, Boolean.FALSE, 0);
-         List<GraphSourceItem> srcList = gen.generate(localData, tree);
+        List<GraphSourceItem> srcList = gen.generate(localData, tree);
         for (GraphSourceItem s : srcList) {
             if (s instanceof Action) {
                 ret.add((Action) s);

@@ -58,9 +58,6 @@ public class MORPHGRADIENT {
         ret.gradientRecords = new GRADRECORD[gradientRecords.length];
         for (int m = 0; m < gradientRecords.length; m++) {
 
-
-
-
             int gratio = (gradientRecords[m].startRatio + (gradientRecords[m].endRatio - gradientRecords[m].startRatio) * ratio / 65535);
             ret.gradientRecords[m] = new GRADRECORD();
             ret.gradientRecords[m].colorA = morphColor(gradientRecords[m].startColor, gradientRecords[m].endColor, ratio);

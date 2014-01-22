@@ -50,9 +50,9 @@ import java.util.logging.Logger;
 public class CheckResources {
 
     public static void checkResources() {
-        Class[] classes = new Class[] { 
-            AboutDialog.class, 
-            AdvancedSettingsDialog.class, 
+        Class[] classes = new Class[]{
+            AboutDialog.class,
+            AdvancedSettingsDialog.class,
             ErrorLogFrame.class,
             ExportDialog.class,
             FontEmbedDialog.class,
@@ -70,8 +70,7 @@ public class CheckResources {
             ProxyFrame.class,
             DeobfuscationDialog.class,
             NewTraitDialog.class,
-            UsageFrame.class,
-        };
+            UsageFrame.class,};
         for (Class clazz : classes) {
             checkResources(clazz);
         }
@@ -117,7 +116,7 @@ public class CheckResources {
             Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private static String getResourcePath(Class cls, String lang) {
         String name = cls.getName();
         if (name.startsWith("com.jpexs.decompiler.flash.gui.")) {

@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
  * @author JPEXS
  */
 public class FrameNode extends TreeNode {
-    
+
     public FrameNode(FrameNodeItem item) {
         super(item);
     }

@@ -32,7 +32,7 @@ import java.util.Stack;
  * @author JPEXS
  */
 public class HilightedTextWriter extends GraphTextWriter {
-    
+
     private final StringBuilder sb = new StringBuilder();
     private final boolean hilight;
     private boolean newLine = true;
@@ -47,7 +47,7 @@ public class HilightedTextWriter extends GraphTextWriter {
     public List<Highlighting> methodHilights = new ArrayList<>();
     public List<Highlighting> instructionHilights = new ArrayList<>();
     public List<Highlighting> specialHilights = new ArrayList<>();
-    
+
     public HilightedTextWriter(boolean hilight) {
         this.hilight = hilight;
     }
@@ -76,13 +76,13 @@ public class HilightedTextWriter extends GraphTextWriter {
         offsets.add(itemPos);
         return this;
     }
-    
+
     @Override
     public HilightedTextWriter endOffset() {
         offsets.pop();
         return this;
     }
-    
+
     /**
      * Highlights specified text as method by adding special tags
      *
@@ -95,12 +95,12 @@ public class HilightedTextWriter extends GraphTextWriter {
         data.put("index", Long.toString(index));
         return start(data, HilightType.METHOD);
     }
-    
+
     @Override
     public HilightedTextWriter endMethod() {
         return end(HilightType.METHOD);
     }
-    
+
     /**
      * Highlights specified text as class by adding special tags
      *
@@ -113,12 +113,12 @@ public class HilightedTextWriter extends GraphTextWriter {
         data.put("index", Long.toString(index));
         return start(data, HilightType.CLASS);
     }
-    
+
     @Override
-    public HilightedTextWriter endClass() { 
+    public HilightedTextWriter endClass() {
         return end(HilightType.CLASS);
     }
-    
+
     /**
      * Highlights specified text as trait by adding special tags
      *
@@ -131,17 +131,17 @@ public class HilightedTextWriter extends GraphTextWriter {
         data.put("index", Long.toString(index));
         return start(data, HilightType.TRAIT);
     }
-    
+
     @Override
     public HilightedTextWriter endTrait() {
         return end(HilightType.TRAIT);
     }
-    
+
     @Override
     public HilightedTextWriter hilightSpecial(String text, String type) {
         return hilightSpecial(text, type, 0);
     }
-    
+
     @Override
     public HilightedTextWriter hilightSpecial(String text, String type, int index) {
         Map<String, String> data = new HashMap<>();
@@ -151,7 +151,7 @@ public class HilightedTextWriter extends GraphTextWriter {
         appendNoHilight(text);
         return end(HilightType.SPECIAL);
     }
-    
+
     @Override
     public HilightedTextWriter append(String str) {
         GraphSourceItemPosition itemPos = offsets.peek();
@@ -229,17 +229,17 @@ public class HilightedTextWriter extends GraphTextWriter {
         }
         return this;
     }
-    
+
     @Override
     public int getLength() {
         return sb.length();
     }
-    
+
     @Override
     public int getIndent() {
         return indent;
     }
-    
+
     @Override
     public String toString() {
         if (toStringCalled) {
@@ -255,7 +255,7 @@ public class HilightedTextWriter extends GraphTextWriter {
         toStringCalled = true;
         return sb.toString();
     }
-    
+
     private HilightedTextWriter start(Map<String, String> data, HilightType type) {
         if (hilight) {
             Highlighting h = new Highlighting(sb.length() - newLineCount, data, type, null);
@@ -263,16 +263,16 @@ public class HilightedTextWriter extends GraphTextWriter {
         }
         return this;
     }
-    
+
     private HilightedTextWriter end(HilightType expectedType) {
         if (hilight) {
             Highlighting h = hilightStack.pop();
             h.len = sb.length() - newLineCount - h.startPos;
-            
+
             if (!expectedType.equals(h.type)) {
                 throw new Error("Hilighting mismatch.");
             }
-            
+
             switch (h.type) {
                 case CLASS:
                     classHilights.add(h);
@@ -293,7 +293,7 @@ public class HilightedTextWriter extends GraphTextWriter {
         }
         return this;
     }
-    
+
     private void appendToSb(String str) {
         if (newLine) {
             newLine = false;
@@ -301,7 +301,7 @@ public class HilightedTextWriter extends GraphTextWriter {
         }
         sb.append(str);
     }
-    
+
     private void appendIndent() {
         for (int i = 0; i < indent; i++) {
             appendNoHilight(INDENT_STRING);

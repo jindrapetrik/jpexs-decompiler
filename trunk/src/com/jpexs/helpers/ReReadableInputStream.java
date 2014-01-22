@@ -62,7 +62,7 @@ public class ReReadableInputStream extends SeekableInputStream {
     public synchronized void reset() throws IOException {
         seek(0);
     }
-    
+
     @Override
     public int read() throws IOException {
         if (pos < count) {

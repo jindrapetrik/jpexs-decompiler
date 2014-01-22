@@ -23,5 +23,6 @@ package com.jpexs.decompiler.flash.helpers;
 public interface Freed {
 
     public boolean isFreeing();
+
     public void free();
 }

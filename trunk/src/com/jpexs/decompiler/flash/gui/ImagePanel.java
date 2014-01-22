@@ -40,7 +40,7 @@ import javax.swing.JPanel;
 public final class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
 
     static final String ACTION_SELECT_COLOR = "SELECTCOLOR";
-    
+
     public JLabel label = new JLabel();
     public DrawableTag drawable;
     private Timer timer;

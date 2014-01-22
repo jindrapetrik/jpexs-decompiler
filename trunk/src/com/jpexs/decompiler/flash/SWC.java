@@ -75,6 +75,5 @@ public class SWC extends ZippedSWFBundle {
     public String getExtension() {
         return "swc";
     }
-    
-    
+
 }

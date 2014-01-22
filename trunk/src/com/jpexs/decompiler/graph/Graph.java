@@ -449,8 +449,6 @@ public class Graph {
             return null;
         }
 
-
-
         Set<GraphPart> s = new HashSet<>(parts); //unique
         parts = new ArrayList<>(s); //make local copy
 
@@ -617,7 +615,6 @@ public class Graph {
         finalProcessAll(ret, 0, new FinalProcessLocalData());
         return ret;
 
-
     }
 
     public void finalProcessStack(Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
@@ -689,8 +686,6 @@ public class Graph {
         }
 
         //Same continues in onTrue and onFalse gets continue on parent level
-
-
     }
 
     protected List<GraphPart> getLoopsContinuesPreAndBreaks(List<Loop> loops) {
@@ -938,7 +933,7 @@ public class Graph {
         if (recursionLevel > allParts.size() + 1) {
             throw new TranslateException("markLevels max recursion level reached.");
         }
-        
+
         if (debugMode) {
             System.err.println("markLevels " + part);
         }
@@ -966,7 +961,6 @@ public class Graph {
             }
         }
 
-
         if (visited.contains(part)) {
             part.level = 0;
         } else {
@@ -984,7 +978,6 @@ public class Graph {
                 break;
             }
         }
-
 
         List<GraphPart> nextParts = checkPrecoNextParts(part);
         if (nextParts == null) {
@@ -1188,7 +1181,6 @@ public class Graph {
         if (part.nextParts.size() > 2) {
             GraphPart next = getNextCommonPart(localData, part, loops);
 
-
             for (GraphPart p : part.nextParts) {
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 if (next != null) {
@@ -1384,7 +1376,6 @@ public class Graph {
         //try {
         boolean debugMode = false;
 
-
         if (debugMode) {
             System.err.println("PART " + part + " nextsize:" + part.nextParts.size());
         }
@@ -1401,11 +1392,6 @@ public class Graph {
          break;
          }
          }*/
-
-
-
-
-
         if (part == null) {
             return ret;
         }
@@ -1479,8 +1465,6 @@ public class Graph {
             }
         }
 
-
-
         if (stopPart.contains(part)) {
             if (currentLoop != null) {
                 currentLoop.phase = 0;
@@ -1541,7 +1525,6 @@ public class Graph {
          part.nextParts.remove(0);
          }
          }*/
-
         if (parseNext) {
             List<GraphTargetItem> retCheck = check(code, localData, allParts, stack, parent, part, stopPart, loops, output, currentLoop, staticOperation, path);
             if (retCheck != null) {
@@ -1666,9 +1649,7 @@ public class Graph {
         }
 //********************************END PART DECOMPILING
 
-
         if (parseNext) {
-
 
             if (false && part.nextParts.size() > 2) {//alchemy direct switch
                 GraphPart next = getMostCommonPart(localData, part.nextParts, loops);
@@ -1843,7 +1824,6 @@ public class Graph {
                 if (loopItem.commands.get(0) instanceof IfItem) {
                     IfItem ifi = (IfItem) loopItem.commands.get(0);
 
-
                     List<GraphTargetItem> bodyBranch = null;
                     boolean inverted = false;
                     boolean breakpos2 = false;
@@ -1907,7 +1887,6 @@ public class Graph {
                 }
             }
 
-
             //Loop with condition at the end (Do..While)
             if (!loopTypeFound && (!loopItem.commands.isEmpty())) {
                 if (loopItem.commands.get(loopItem.commands.size() - 1) instanceof IfItem) {
@@ -1941,7 +1920,6 @@ public class Graph {
                         }
 
                         checkContinueAtTheEnd(bodyBranch, currentLoop);
-
 
                         List<GraphTargetItem> commands = new ArrayList<>();
 

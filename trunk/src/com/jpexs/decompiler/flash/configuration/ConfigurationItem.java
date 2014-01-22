@@ -21,7 +21,7 @@ package com.jpexs.decompiler.flash.configuration;
  * @author JPEXS
  */
 public class ConfigurationItem<T> {
-    
+
     private final String name;
     protected boolean hasValue;
 
@@ -48,7 +48,7 @@ public class ConfigurationItem<T> {
     public String getName() {
         return name;
     }
-    
+
     public T get() {
         if (!hasValue) {
             return defaultValue;

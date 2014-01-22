@@ -34,9 +34,9 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
     /**
      * Constant value representing an invalid HANDLE.
      */
-    HANDLE INVALID_HANDLE_VALUE =
-            new HANDLE(Pointer.createConstant(Pointer.SIZE == 8
-            ? -1 : 0xFFFFFFFFL));
+    HANDLE INVALID_HANDLE_VALUE
+            = new HANDLE(Pointer.createConstant(Pointer.SIZE == 8
+                            ? -1 : 0xFFFFFFFFL));
     /**
      * Maximum computer name length. The value is 15 on Mac, 31 on everything
      * else.
@@ -201,7 +201,8 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
             read();
         }
         /**
-         * <p>The difference between the Windows epoch (1601-01-01 00:00:00) and
+         * <p>
+         * The difference between the Windows epoch (1601-01-01 00:00:00) and
          * the Unix epoch (1970-01-01 00:00:00) in milliseconds:
          * 11644473600000L. (Use your favorite spreadsheet program to verify the
          * correctness of this value. By the way, did you notice that you can
@@ -211,12 +212,12 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
         private static final long EPOCH_DIFF = 11644473600000L;
 
         /**
-         * <p>Converts a Windows FILETIME into a {@link Date}. The Windows
-         * FILETIME structure holds a date and time associated with a file. The
-         * structure identifies a 64-bit integer specifying the number of
-         * 100-nanosecond intervals which have passed since January 1, 1601.
-         * This 64-bit value is split into the two double words stored in the
-         * structure.</p>
+         * <p>
+         * Converts a Windows FILETIME into a {@link Date}. The Windows FILETIME
+         * structure holds a date and time associated with a file. The structure
+         * identifies a 64-bit integer specifying the number of 100-nanosecond
+         * intervals which have passed since January 1, 1601. This 64-bit value
+         * is split into the two double words stored in the structure.</p>
          *
          * @param high The higher double word of the FILETIME structure.
          * @param low The lower double word of the FILETIME structure.
@@ -230,7 +231,8 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
         }
 
         /**
-         * <p>Converts a {@link Date} into a filetime.</p>
+         * <p>
+         * Converts a {@link Date} into a filetime.</p>
          *
          * @param date The date to be converted
          * @return The filetime

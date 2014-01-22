@@ -867,7 +867,6 @@ public class AVM2Code implements Serializable {
         writer.appendNoHilight(body.max_scope_depth);
         writer.newLine();
 
-
         List<Long> offsets = new ArrayList<>();
         for (int e = 0; e < body.exceptions.length; e++) {
             writer.appendNoHilight("try");
@@ -917,7 +916,7 @@ public class AVM2Code implements Serializable {
         int ip = 0;
         int largeLimit = 20000;
         boolean markOffsets = code.size() <= largeLimit;
-        
+
         if (exportMode == ExportMode.HEX) {
             Helper.byteArrayToHexWithHeader(writer, getBytes());
         } else {
@@ -1430,7 +1429,6 @@ public class AVM2Code implements Serializable {
         int regCount = getRegisterCount();
 
         //try {
-
         list = AVM2Graph.translateViaGraph(path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs);
 
         if (initTraits != null) {
@@ -1553,7 +1551,6 @@ public class AVM2Code implements Serializable {
                 ex.target -= byteCount;
             }
         }
-
 
         for (int i = 0; i < pos; i++) {
             if (code.get(i).definition instanceof LookupSwitchIns) {
@@ -2242,7 +2239,6 @@ public class AVM2Code implements Serializable {
             getReachableIps(code, branches.get(i), r);
         }
 
-
         int commonLevel;
         Map<Integer, Integer> levelMap = new HashMap<>();
         for (List<Integer> first : reachable) {
@@ -2481,15 +2477,12 @@ public class AVM2Code implements Serializable {
                  }*/
             }
 
-
-
             if (((AVM2Instruction) ins).definition instanceof NewFunctionIns) {
                 stack.push(new BooleanAVM2Item(null, true));
             } else {
                 localData.ip = ip;
                 ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, path);
             }
-
 
             if (ins.definition instanceof SetLocalTypeIns) {
                 SetLocalTypeIns slt = (SetLocalTypeIns) ins.definition;
@@ -2507,13 +2500,12 @@ public class AVM2Code implements Serializable {
                 break;
             }
 
-
             if (ins.isBranch() || ins.isJump()) {
                 List<Integer> branches = ins.getBranches(code);
                 if (((AVM2Instruction) ins).definition instanceof IfTypeIns
-                        && (!(((AVM2Instruction) ins).definition instanceof JumpIns)) 
-                        && (!stack.isEmpty()) 
-                        && (stack.peek().isCompileTime()) 
+                        && (!(((AVM2Instruction) ins).definition instanceof JumpIns))
+                        && (!stack.isEmpty())
+                        && (stack.peek().isCompileTime())
                         && (!stack.peek().hasSideEffect())) {
                     boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
                     if (debugMode) {

@@ -65,7 +65,7 @@ public class GraphPart implements Serializable {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
-        
+
         GraphPart tpart = gr.checkPart(null, localData, this, null);
         if (tpart == null) {
             return false;

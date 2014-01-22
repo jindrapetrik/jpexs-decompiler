@@ -44,13 +44,11 @@ public class IconListRenderer extends DefaultListCellRenderer {
             boolean isSelected, boolean cellHasFocus) {
 
         // Get the renderer component from parent class
-
-        JLabel label =
-                (JLabel) super.getListCellRendererComponent(list,
-                value, index, isSelected, cellHasFocus);
+        JLabel label
+                = (JLabel) super.getListCellRendererComponent(list,
+                        value, index, isSelected, cellHasFocus);
 
         // Get icon to use for the list item value
-
         TraitsListItem tli = (TraitsListItem) value;
 
         if (tli.getType() == TraitsListItem.Type.CONST) {

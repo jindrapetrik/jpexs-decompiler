@@ -21,7 +21,7 @@ package com.jpexs.decompiler.flash.gui;
  * @author JPEXS
  */
 public enum OpenFileResult {
-    
+
     OK,
     NOT_FOUND,
     ERROR

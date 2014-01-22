@@ -25,7 +25,7 @@ import java.util.List;
  * @author JPEXS
  */
 public interface MainFrameMenu {
-    
+
     public boolean isInternalFlashViewerSelected();
 
     public void updateComponets(SWF swf, List<ABCContainerTag> abcList);

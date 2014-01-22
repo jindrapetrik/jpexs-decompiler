@@ -25,7 +25,7 @@ import javax.swing.table.TableCellRenderer;
  * @author JPEXS
  */
 public class EachRowRendererEditor extends JTable {
-    
+
     private static final long serialVersionUID = 1L;
     private Class editingClass;
 
@@ -58,7 +58,6 @@ public class EachRowRendererEditor extends JTable {
     //  This method is also invoked by the editor when the value in the editor
     //  component is saved in the TableModel. The class was saved when the
     //  editor was invoked so the proper class can be created.
-
     @Override
     public Class getColumnClass(int column) {
         return editingClass != null ? editingClass : super.getColumnClass(column);

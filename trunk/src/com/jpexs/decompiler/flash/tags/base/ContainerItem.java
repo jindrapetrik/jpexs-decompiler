@@ -24,5 +24,5 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
  * @author JPEXS
  */
 public interface ContainerItem extends TreeItem {
-    
+
 }

@@ -52,7 +52,6 @@ public class AboutDialog extends AppDialog {
         setSize(new Dimension(300, 320));
         setTitle(translate("dialog.title"));
 
-
         Container cnt = getContentPane();
         JPanel cp = new JPanel();
         cp.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
@@ -90,7 +89,6 @@ public class AboutDialog extends AppDialog {
         verLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(verLabel);
 
-
         JLabel byLabel = new JLabel(translate("by"));
         byLabel.setAlignmentX(0.5f);
         byLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -104,17 +102,11 @@ public class AboutDialog extends AppDialog {
         authorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(authorLabel);
 
-
-
-
         JLabel dateLabel = new JLabel("2010-2014");
         dateLabel.setAlignmentX(0.5f);
         //dateLabel.setPreferredSize(new Dimension(300, 10));
         dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(dateLabel);
-
-
-
 
         JLabel transAuthorLabel = new JLabel(translate("translation.author.label"));
         transAuthorLabel.setAlignmentX(0.5f);
@@ -126,7 +118,6 @@ public class AboutDialog extends AppDialog {
         transAuthor.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(transAuthorLabel);
         cp.add(transAuthor);
-
 
         JLabel contributorsLabel = new JLabel(translate("contributors"));
         contributorsLabel.setAlignmentX(0.5f);

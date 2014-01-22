@@ -174,9 +174,7 @@ public class Win32ProcessTools extends ProcessTools {
 
         WinDef.HBITMAP bitmap = Gdi32.INSTANCE.CreateCompatibleBitmap(hdcScreen, ret.getWidth(), ret.getHeight());
 
-
         WinNT.HANDLE hbmOld = Gdi32.INSTANCE.SelectObject(hdcMem, bitmap);
-
 
         WinNT.HANDLE hBrush = Gdi32.INSTANCE.CreateSolidBrush(new WinDef.DWORD(0xffffff));
         WinDef.RECT rect = new WinDef.RECT();
@@ -187,13 +185,11 @@ public class Win32ProcessTools extends ProcessTools {
         User32.INSTANCE.FillRect(hdcMem, rect, hBrush);
         Gdi32.INSTANCE.DeleteObject(hBrush);
 
-
         boolean ok = User32.INSTANCE.DrawIconEx(hdcMem, 0, 0, hIcon, ret.getWidth(), ret.getHeight(), new WinDef.UINT(0), new WinDef.HBRUSH(Pointer.NULL), diFlags);
 
         if (!ok) {
             return false;
         }
-
 
         for (int x = 0; x < ret.getWidth(); x++) {
             for (int y = 0; y < ret.getHeight(); y++) {
@@ -274,7 +270,6 @@ public class Win32ProcessTools extends ProcessTools {
         drawIcon(mask, hIcon, User32.DI_MASK);
         applyMask(ret, mask);
 
-
         return ret;
     }
 
@@ -304,7 +299,6 @@ public class Win32ProcessTools extends ProcessTools {
             icon = new WinDef.HICON(iconsSmall.getPointer(0));
         }
 
-
         BufferedImage ic = iconToImage(icon);
 
         User32.INSTANCE.DestroyIcon(icon);
@@ -333,7 +327,6 @@ public class Win32ProcessTools extends ProcessTools {
                 if (tempProcess == null) {
                     continue;
                 }
-
 
                 try {
                     int rn = Psapi.INSTANCE.GetProcessImageFileNameW(tempProcess, outputnames, 1024);

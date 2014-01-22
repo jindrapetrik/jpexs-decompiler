@@ -40,7 +40,7 @@ public class UndoFixedEditorPane extends JEditorPane {
         if (getText() != t) {
             // OK to check reference equals, because the string object should be the same
             super.setText(null);
-            if(t.length() > Configuration.syntaxHighlightLimit.get()){
+            if (t.length() > Configuration.syntaxHighlightLimit.get()) {
                 setContentType("text/plain");
             } else {
                 if (!getContentType().equals(contentType)) {
@@ -57,12 +57,12 @@ public class UndoFixedEditorPane extends JEditorPane {
         if (!isEditable()) {
             // disable Ctrl-E: delete line
             // and Ctrl-H: Search and replace
-            if ((ke.getKeyCode() == KeyEvent.VK_E && ke.isControlDown()) ||
-                (ke.getKeyCode() == KeyEvent.VK_H && ke.isControlDown())) {
+            if ((ke.getKeyCode() == KeyEvent.VK_E && ke.isControlDown())
+                    || (ke.getKeyCode() == KeyEvent.VK_H && ke.isControlDown())) {
                 return;
             }
         }
-        
+
         super.processKeyEvent(ke);
     }
 

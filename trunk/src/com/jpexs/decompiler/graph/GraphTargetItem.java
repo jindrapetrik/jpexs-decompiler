@@ -90,7 +90,7 @@ public abstract class GraphTargetItem implements Serializable {
     public GraphTextWriter toStringSemicoloned(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.startOffset(src, pos);
         appendTo(writer, localData);
-        if (needsSemicolon()) { 
+        if (needsSemicolon()) {
             writer.append(";");
         }
         writer.endOffset();
@@ -120,7 +120,7 @@ public abstract class GraphTargetItem implements Serializable {
         toString(writer, localData);
         return writer.toString();
     }
-    
+
     public int getPrecedence() {
         return precedence;
     }

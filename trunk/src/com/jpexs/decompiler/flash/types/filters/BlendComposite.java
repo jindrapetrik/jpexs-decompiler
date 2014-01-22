@@ -82,7 +82,8 @@ public final class BlendComposite implements Composite {
     }
 
     /**
-     * <p>Returns the blending mode of this composite.</p>
+     * <p>
+     * Returns the blending mode of this composite.</p>
      *
      * @return the blending mode used by this object
      */
@@ -161,7 +162,6 @@ public final class BlendComposite implements Composite {
             int[] dstPixel = new int[4];
             int[] srcPixels = new int[width];
             int[] dstPixels = new int[width];
-
 
             for (int y = 0; y < height; y++) {
                 src.getDataElements(0, y, width, 1, srcPixels);

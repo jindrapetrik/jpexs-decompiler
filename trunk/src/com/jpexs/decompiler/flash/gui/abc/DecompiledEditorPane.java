@@ -420,8 +420,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             }
         }
 
-
-
         setCaretPosition(0);
     }
 

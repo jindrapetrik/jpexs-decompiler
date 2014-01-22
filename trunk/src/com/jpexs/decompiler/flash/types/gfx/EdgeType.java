@@ -380,8 +380,6 @@ public class EdgeType {
                     maxV = ay;
                 }
 
-
-
                 if (minV >= GFxOutputStream.MinSInt5 && maxV <= GFxOutputStream.MaxSInt5) {
                     sos.writeUI8(((cx << 4) | Edge_C5));
                     sos.writeUI8((((cx >> 4) & m1) | ((cy << 1) & m6) | (ax << 6)));

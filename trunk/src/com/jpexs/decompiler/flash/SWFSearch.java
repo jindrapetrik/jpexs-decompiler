@@ -63,12 +63,12 @@ public class SWFSearch {
             public void progress(int p) {
                 setProgress(p);
             }
-        }, 
-           "FWS".getBytes(),    //Uncompressed Flash
-           "CWS".getBytes(),    //ZLib compressed Flash
-           "ZWS".getBytes(),    //LZMA compressed Flash
-           "GFX".getBytes(),    //Uncompressed ScaleForm GFx
-           "CFX".getBytes());   //Compressed ScaleForm GFx
+        },
+                "FWS".getBytes(), //Uncompressed Flash
+                "CWS".getBytes(), //ZLib compressed Flash
+                "ZWS".getBytes(), //LZMA compressed Flash
+                "GFX".getBytes(), //Uncompressed ScaleForm GFx
+                "CFX".getBytes());   //Compressed ScaleForm GFx
         int pos = 0;
         for (Long addr : ret.keySet()) {
             setProgress(pos * 100 / ret.size());
@@ -95,7 +95,7 @@ public class SWFSearch {
     }
 
     public MemoryInputStream get(ProgressListener listener, long address) throws IOException {
-        if(!processed){
+        if (!processed) {
             return null;
         }
         if (!swfStreams.containsKey(address)) {
@@ -107,7 +107,7 @@ public class SWFSearch {
     public Set<Long> getAddresses() {
         return swfStreams.keySet();
     }
-    
+
     public int length() {
         if (!processed) {
             return 0;

@@ -36,7 +36,7 @@ public class AS2PackageNodeItem implements TreeItem {
     public SWF getSwf() {
         return swf;
     }
-            
+
     @Override
     public String toString() {
         return packageName;

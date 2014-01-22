@@ -50,9 +50,9 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
 
     private static final String ACTION_OK = "OK";
     private static final String ACTION_CANCEL = "CANCEL";
-    
+
     private static final int SAMPLE_MAX_LENGTH = 50;
-    
+
     private final JComboBox<String> sourceFont;
     private final JCheckBox[] rangeCheckboxes;
     private final String rangeNames[];
@@ -120,7 +120,6 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
             rangesPanel.add(rangeRowPanel);
         }
         cnt.add(new JScrollPane(rangesPanel));
-
 
         JPanel specialPanel = new JPanel();
         specialPanel.setLayout(new BoxLayout(specialPanel, BoxLayout.X_AXIS));

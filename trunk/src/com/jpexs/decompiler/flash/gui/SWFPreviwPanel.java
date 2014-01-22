@@ -71,7 +71,6 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
             }
         }.start();
 
-
     }
 
     public void stop() {

@@ -121,7 +121,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     public SearchPanel<ASMSource> searchPanel;
     private Cache cache = Cache.getInstance(true);
     private CancellableWorker setSourceWorker;
-        
+
     public void clearSource() {
         lastCode = null;
         lastASM = null;
@@ -265,7 +265,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             }
         });
     }
-    
+
     private void setEditorText(final String text, final String contentType) {
         View.execInEventDispatch(new Runnable() {
 
@@ -277,7 +277,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             }
         });
     }
-    
+
     private void setText(final HilightedText text, final String contentType) {
         View.execInEventDispatch(new Runnable() {
 
@@ -318,7 +318,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         asm.removeDisassemblyListener(listener);
         return new HilightedText(writer);
     }
-    
+
     public void setHex(ExportMode exportMode) {
         if (exportMode != ExportMode.HEX) {
             if (exportMode == ExportMode.PCODE) {
@@ -362,7 +362,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         };
         return listener;
     }
-    
+
     public void setSource(final ASMSource src, final boolean useCache) {
         if (setSourceWorker != null) {
             setSourceWorker.cancel(true);
@@ -371,7 +371,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
 
         this.src = src;
         final ASMSource asm = (ASMSource) src;
-        
+
         CancellableWorker worker = new CancellableWorker() {
 
             @Override
@@ -482,7 +482,6 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         panB.add(asmLabel, BorderLayout.NORTH);
         panB.add(panCode, BorderLayout.CENTER);
 
-
         JPanel buttonsPan = new JPanel();
         buttonsPan.setLayout(new FlowLayout());
         buttonsPan.add(editButton);
@@ -492,7 +491,6 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         editButton.setMargin(new Insets(3, 3, 3, 10));
         saveButton.setMargin(new Insets(3, 3, 3, 10));
         cancelButton.setMargin(new Insets(3, 3, 3, 10));
-
 
         JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.add(editDecompiledButton);
@@ -517,7 +515,6 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         saveButton.setVisible(false);
         cancelButton.setVisible(false);
 
-
         saveDecompiledButton.addActionListener(this);
         saveDecompiledButton.setActionCommand(ACTION_SAVE_DECOMPILED);
         editDecompiledButton.addActionListener(this);
@@ -539,7 +536,6 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         panA.add(decButtonsPan, BorderLayout.SOUTH);
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-
 
         setLayout(new BorderLayout());
         add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB), BorderLayout.CENTER);
@@ -767,11 +763,11 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     }
 
     private ExportMode getExportMode() {
-        ExportMode exportMode = hexOnlyButton.isSelected() ? ExportMode.HEX :
-                (hexButton.isSelected() ? ExportMode.PCODEWITHHEX : ExportMode.PCODE);
+        ExportMode exportMode = hexOnlyButton.isSelected() ? ExportMode.HEX
+                : (hexButton.isSelected() ? ExportMode.PCODEWITHHEX : ExportMode.PCODE);
         return exportMode;
     }
-    
+
     @Override
     public void updateSearchPos(ASMSource item) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();

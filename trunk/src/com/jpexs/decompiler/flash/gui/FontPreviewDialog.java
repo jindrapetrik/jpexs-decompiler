@@ -65,7 +65,7 @@ public class FontPreviewDialog extends AppDialog {
         setText((String) comboBoxSampleTexts.getSelectedItem());
         labelFontName.setText(font.getFontName());
     }
-    
+
     private void setText(String text) {
         labelSample12.setText(text);
         labelSample18.setText(text);

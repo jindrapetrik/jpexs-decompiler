@@ -103,13 +103,13 @@ public class Highlighting implements Serializable {
                 return ret;
             }
         }
-        
+
         if (Configuration.debugMode.get()) {
             if (ret != null) {
                 System.out.println("Highlight found: " + ret.hilightedText);
             }
         }
-        
+
         return ret;
     }
 
@@ -122,7 +122,7 @@ public class Highlighting implements Serializable {
     public String toString() {
         return startPos + "-" + (startPos + len) + " type:" + type;
     }
-    
+
     /**
      *
      * @param startPos Starting position

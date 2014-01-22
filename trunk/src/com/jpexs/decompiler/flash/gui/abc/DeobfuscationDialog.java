@@ -76,8 +76,6 @@ public class DeobfuscationDialog extends AppDialog implements ActionListener {
         codeProcessingLevel.setAlignmentX(Component.CENTER_ALIGNMENT);
         //codeProcessingLevel.setSize(300, 200);
 
-
-
         //codeProcessingLevel.setBounds(30, 25, getWidth() - 60, 125);
         codeProcessingLevel.setAlignmentX(0.5f);
         add(codeProcessingLevel);

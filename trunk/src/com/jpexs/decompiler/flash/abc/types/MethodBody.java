@@ -57,7 +57,7 @@ public class MethodBody implements Cloneable, Serializable {
     public Traits traits = new Traits();
     public transient List<GraphTargetItem> convertedItems;
     public transient Exception convertException;
-    
+
     public List<Integer> getExceptionEntries() {
         List<Integer> ret = new ArrayList<>();
         for (ABCException e : exceptions) {
@@ -143,7 +143,7 @@ public class MethodBody implements Cloneable, Serializable {
                     callable.call();
                 }
             } catch (InterruptedException ex) {
-                 throw ex;
+                throw ex;
             } catch (Exception ex) {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
                 convertException = ex;

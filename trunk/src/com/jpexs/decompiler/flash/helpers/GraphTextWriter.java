@@ -24,7 +24,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
  * @author JPEXS
  */
 public class GraphTextWriter {
-    
+
     public static final String INDENT_STRING = "   ";
     public static final String NEW_LINE = "\r\n";
     protected long startTime;
@@ -47,11 +47,11 @@ public class GraphTextWriter {
     public GraphTextWriter startOffset(GraphSourceItem src, int pos) {
         return this;
     }
-    
+
     public GraphTextWriter endOffset() {
         return this;
     }
-    
+
     /**
      * Highlights specified text as method
      *
@@ -61,11 +61,11 @@ public class GraphTextWriter {
     public GraphTextWriter startMethod(long index) {
         return this;
     }
-    
+
     public GraphTextWriter endMethod() {
         return this;
     }
-    
+
     /**
      * Highlights specified text as class
      *
@@ -75,11 +75,11 @@ public class GraphTextWriter {
     public GraphTextWriter startClass(long index) {
         return this;
     }
-    
-    public GraphTextWriter endClass() { 
+
+    public GraphTextWriter endClass() {
         return this;
     }
-    
+
     /**
      * Highlights specified text as trait
      *
@@ -89,19 +89,19 @@ public class GraphTextWriter {
     public GraphTextWriter startTrait(long index) {
         return this;
     }
-    
+
     public GraphTextWriter endTrait() {
         return this;
     }
-    
+
     public GraphTextWriter hilightSpecial(String text, String type) {
         return this;
     }
-    
+
     public GraphTextWriter hilightSpecial(String text, String type, int index) {
         return this;
     }
-    
+
     public static String hilighOffset(String text, long offset) {
         return "";
     }
@@ -137,24 +137,24 @@ public class GraphTextWriter {
     public GraphTextWriter stripSemicolon() {
         return this;
     }
-    
+
     public int getLength() {
         return 0;
     }
-    
+
     public int getIndent() {
         return 0;
     }
-    
+
     public void suspendMeasure() {
         suspendTime = System.currentTimeMillis();
     }
-    
+
     public void continueMeasure() {
         long time = System.currentTimeMillis();
         startTime += time - suspendTime;
     }
-    
+
     @Override
     public String toString() {
         return "";

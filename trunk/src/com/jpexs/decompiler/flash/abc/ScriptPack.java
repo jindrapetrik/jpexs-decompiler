@@ -57,7 +57,7 @@ public class ScriptPack implements TreeElementItem {
     public SWF getSwf() {
         return abc.swf;
     }
-            
+
     public ClassPath getPath() {
         return path;
     }
@@ -134,7 +134,7 @@ public class ScriptPack implements TreeElementItem {
             }
         }
     }
-    
+
     public void appendTo(GraphTextWriter writer, List<ABCContainerTag> abcList, Trait[] traits, ExportMode exportMode, boolean parallel) throws InterruptedException {
         for (int t : traitIndices) {
             Trait trait = traits[t];
@@ -173,7 +173,7 @@ public class ScriptPack implements TreeElementItem {
 
         appendTo(writer, abcList, traits, exportMode, parallel);
     }
-    
+
     public File export(String directory, List<ABCContainerTag> abcList, ExportMode exportMode, boolean parallel) throws IOException {
         String scriptName = getPathScriptName();
         String packageName = getPathPackage();

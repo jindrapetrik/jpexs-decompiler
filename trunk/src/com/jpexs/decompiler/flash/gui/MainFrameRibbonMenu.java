@@ -121,7 +121,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     private JCommandButton exportAllCommandButton;
     private JCommandButton exportFlaCommandButton;
     private JCommandButton exportSelectionCommandButton;
-    
+
     private JCommandButton reloadCommandButton;
     private JCommandButton renameinvalidCommandButton;
     private JCommandButton globalrenameCommandButton;
@@ -135,7 +135,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     RibbonApplicationMenuEntryPrimary exportSelMenu;
     RibbonApplicationMenuEntryPrimary closeFileMenu;
     RibbonApplicationMenuEntryPrimary closeAllFilesMenu;
-        
+
     public MainFrameRibbonMenu(MainFrameRibbon mainFrame, JRibbon ribbon, boolean externalFlashPlayerUnavailable) {
         this.mainFrame = mainFrame;
 
@@ -155,7 +155,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     public boolean isInternalFlashViewerSelected() {
         return miInternalViewer.isSelected();
     }
-    
+
     private String translate(String key) {
         return mainFrame.translate(key);
     }
@@ -192,38 +192,38 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         openFileMenu.setRolloverCallback(new RibbonApplicationMenuEntryPrimary.PrimaryRolloverCallback() {
             @Override
             public void menuEntryActivated(JPanel targetPanel) {
-               targetPanel.removeAll();
-               JCommandButtonPanel openHistoryPanel = new JCommandButtonPanel(CommandButtonDisplayState.MEDIUM);
-               String groupName = translate("menu.recentFiles");
-               openHistoryPanel.addButtonGroup(groupName);
-               List<String> recentFiles = Configuration.getRecentFiles();
-               int j = 0;
-               for (int i = recentFiles.size() - 1; i >= 0; i--) {
-                  String path = recentFiles.get(i); 
-                  RecentFilesButton historyButton = new RecentFilesButton(j + "    " + path, null);
-                  historyButton.fileName = path;
-                  historyButton.addActionListener(new ActionListener() {
+                targetPanel.removeAll();
+                JCommandButtonPanel openHistoryPanel = new JCommandButtonPanel(CommandButtonDisplayState.MEDIUM);
+                String groupName = translate("menu.recentFiles");
+                openHistoryPanel.addButtonGroup(groupName);
+                List<String> recentFiles = Configuration.getRecentFiles();
+                int j = 0;
+                for (int i = recentFiles.size() - 1; i >= 0; i--) {
+                    String path = recentFiles.get(i);
+                    RecentFilesButton historyButton = new RecentFilesButton(j + "    " + path, null);
+                    historyButton.fileName = path;
+                    historyButton.addActionListener(new ActionListener() {
 
-                      @Override
-                      public void actionPerformed(ActionEvent ae) {
-                          RecentFilesButton source = (RecentFilesButton) ae.getSource();
-                          if (Main.openFile(source.fileName, null) == OpenFileResult.NOT_FOUND) {
-                              if (View.showConfirmDialog(null, translate("message.confirm.recentFileNotFound"), translate("message.confirm"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
-                                  Configuration.removeRecentFile(source.fileName);
-                              }
-                          }
-                      }
-                  });
-                  j++;
-                  historyButton.setHorizontalAlignment(SwingUtilities.LEFT);
-                  openHistoryPanel.addButtonToLastGroup(historyButton);
-               }
-               openHistoryPanel.setMaxButtonColumns(1);
-               targetPanel.setLayout(new BorderLayout());
-               targetPanel.add(openHistoryPanel, BorderLayout.CENTER);
+                        @Override
+                        public void actionPerformed(ActionEvent ae) {
+                            RecentFilesButton source = (RecentFilesButton) ae.getSource();
+                            if (Main.openFile(source.fileName, null) == OpenFileResult.NOT_FOUND) {
+                                if (View.showConfirmDialog(null, translate("message.confirm.recentFileNotFound"), translate("message.confirm"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+                                    Configuration.removeRecentFile(source.fileName);
+                                }
+                            }
+                        }
+                    });
+                    j++;
+                    historyButton.setHorizontalAlignment(SwingUtilities.LEFT);
+                    openHistoryPanel.addButtonToLastGroup(historyButton);
+                }
+                openHistoryPanel.setMaxButtonColumns(1);
+                targetPanel.setLayout(new BorderLayout());
+                targetPanel.add(openHistoryPanel, BorderLayout.CENTER);
             }
         });
-        
+
         RibbonApplicationMenuEntryFooter exitMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon("exit32"), translate("menu.file.exit"), new ActionRedirector(this, "EXIT"));
 
         mainMenu.addMenuEntry(openFileMenu);
@@ -248,7 +248,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         resizePolicies.add(new IconRibbonBandResizePolicy(ribbonBand.getControlPanel()));
         return resizePolicies;
     }
-    
+
     private List<RibbonBandResizePolicy> getIconBandResizePolicies(JRibbonBand ribbonBand) {
         List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
         resizePolicies.add(new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(ribbonBand.getControlPanel()) {
@@ -264,7 +264,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         resizePolicies.add(new IconRibbonBandResizePolicy(ribbonBand.getControlPanel()));
         return resizePolicies;
     }
-    
+
     private RibbonTask createFileRibbonTask() {
         JRibbonBand editBand = new JRibbonBand(translate("menu.general"), null);
         editBand.setResizePolicies(getResizePolicies(editBand));
@@ -301,10 +301,10 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
 
         return new RibbonTask(translate("menu.file"), editBand, exportBand);
     }
-    
+
     private RibbonTask createToolsRibbonTask() {
         //----------------------------------------- TOOLS -----------------------------------
-        
+
         JRibbonBand toolsBand = new JRibbonBand(translate("menu.tools"), null);
         toolsBand.setResizePolicies(getResizePolicies(toolsBand));
 
@@ -354,10 +354,10 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
 
         return new RibbonTask(translate("menu.tools"), toolsBand, deobfuscationBand, otherToolsBand);
     }
-    
+
     private RibbonTask createSettingsRibbonTask(boolean externalFlashPlayerUnavailable) {
         //----------------------------------------- SETTINGS -----------------------------------
-        
+
         JRibbonBand settingsBand = new JRibbonBand(translate("menu.settings"), null);
         settingsBand.setResizePolicies(getResizePolicies(settingsBand));
 
@@ -428,10 +428,10 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         JCommandButton advancedSettingsCommandButton = new JCommandButton(fixCommandTitle(translate("menu.advancedsettings.advancedsettings")), View.getResizableIcon("settings32"));
         assignListener(advancedSettingsCommandButton, ACTION_ADVANCED_SETTINGS);
         advancedSettingsBand.addCommandButton(advancedSettingsCommandButton, RibbonElementPriority.TOP);
-        
+
         return new RibbonTask(translate("menu.settings"), settingsBand, languageBand, advancedSettingsBand);
     }
-    
+
     private RibbonTask createHelpRibbonTask() {
         //----------------------------------------- HELP -----------------------------------
 
@@ -453,7 +453,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         helpBand.addCommandButton(helpUsUpdatesCommandButton, RibbonElementPriority.TOP);
         return new RibbonTask(translate("menu.help"), helpBand);
     }
-    
+
     private RibbonTask createDebugRibbonTask() {
         //----------------------------------------- DEBUG -----------------------------------
 
@@ -475,7 +475,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     public void updateComponets(SWF swf, List<ABCContainerTag> abcList) {
         boolean swfLoaded = swf != null;
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
-                
+
         exportAllMenu.setEnabled(swfLoaded);
         exportFlaMenu.setEnabled(swfLoaded);
         exportSelMenu.setEnabled(swfLoaded);
@@ -498,7 +498,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         gotoDocumentClassCommandButton.setEnabled(hasAbc);
         deobfuscationCommandButton.setEnabled(hasAbc);
     }
-    
+
     private void saveAs(SWF swf, SaveFileMode mode) {
         if (Main.saveFileDialog(swf, mode)) {
             swf.fileTitle = null;
@@ -506,7 +506,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
             saveCommandButton.setEnabled(mainFrame.panel.getCurrentSwf() != null);
         }
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -623,33 +623,30 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                     Main.setSubLimiter(((JCheckBoxMenuItem) e.getSource()).getState());
                 }
                 break;
-            case ACTION_SAVE:
-                {
-                    SWF swf = mainFrame.panel.getCurrentSwf();
-                    if (swf.file == null) {
-                        saveAs(swf, SaveFileMode.SAVEAS);
-                    } else {
-                        try {
-                            Main.saveFile(swf, swf.file);
-                        } catch (IOException ex) {
-                            Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, null, ex);
-                            View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                        }
+            case ACTION_SAVE: {
+                SWF swf = mainFrame.panel.getCurrentSwf();
+                if (swf.file == null) {
+                    saveAs(swf, SaveFileMode.SAVEAS);
+                } else {
+                    try {
+                        Main.saveFile(swf, swf.file);
+                    } catch (IOException ex) {
+                        Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, null, ex);
+                        View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
-                break;
-            case ACTION_SAVE_AS:
-                {
-                    SWF swf = mainFrame.panel.getCurrentSwf();
-                    saveAs(swf, SaveFileMode.SAVEAS);
-                }
-                break;
-            case ACTION_SAVE_AS_EXE:
-                {
-                    SWF swf = mainFrame.panel.getCurrentSwf();
-                    saveAs(swf, SaveFileMode.EXE);
-                }
-                break;
+            }
+            break;
+            case ACTION_SAVE_AS: {
+                SWF swf = mainFrame.panel.getCurrentSwf();
+                saveAs(swf, SaveFileMode.SAVEAS);
+            }
+            break;
+            case ACTION_SAVE_AS_EXE: {
+                SWF swf = mainFrame.panel.getCurrentSwf();
+                saveAs(swf, SaveFileMode.EXE);
+            }
+            break;
             case ACTION_OPEN:
                 Main.openFileDialog();
                 break;

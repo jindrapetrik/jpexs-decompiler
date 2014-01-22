@@ -155,7 +155,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
                 .getBorderPainter(commandButton);
         BufferedImage fullAlphaBackground = RibbonApplicationMenuButtonBackgroundDelegate
                 .getFullAlphaBackground(b, fillPainter, borderPainter,
-                commandButton.getWidth(), commandButton.getHeight());
+                        commandButton.getWidth(), commandButton.getHeight());
         g2d.drawImage(fullAlphaBackground, 0, 0, null);
 
         // Paint the icon
@@ -165,7 +165,6 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
          iw.setPreferredSize(b.getSize());
          iw.setDimension(b.getSize());                    
          }*/
-
 
         if (icon != null) {
             int iconWidth = icon.getIconWidth();

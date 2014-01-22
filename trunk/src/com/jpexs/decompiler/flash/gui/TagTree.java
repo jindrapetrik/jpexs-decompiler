@@ -112,7 +112,7 @@ public class TagTree extends JTree {
             //setBackground(Color.green);
             setBackgroundNonSelectionColor(Color.white);
             //setBackgroundSelectionColor(Color.ORANGE);
-            
+
             if (treeNode instanceof TreeNode) {
                 if (treeNode.getItem() instanceof Tag) {
                     Tag tag = (Tag) treeNode.getItem();

@@ -32,13 +32,13 @@ public class SWFSourceInfo {
     private final InputStream inputStream;
     private final String file;
     private final String fileTitle;
-    
+
     public SWFSourceInfo(InputStream inputStream, String file, String fileTitle) {
         this.inputStream = inputStream;
         this.file = file;
         this.fileTitle = fileTitle;
     }
-    
+
     public InputStream getInputStream() {
         return inputStream;
     }
@@ -70,7 +70,7 @@ public class SWFSourceInfo {
         }
         return false;
     }
-    
+
     public SWFBundle getBundle() throws IOException {
         if (!isBundle()) {
             return null;

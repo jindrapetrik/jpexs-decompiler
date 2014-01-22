@@ -85,7 +85,7 @@ public class NewMethodActionItem extends ActionItem {
             }
             arguments.get(t).toString(writer, localData);
         }
-        return writer.append(")");        
+        return writer.append(")");
     }
 
     @Override

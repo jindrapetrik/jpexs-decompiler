@@ -133,7 +133,6 @@ public class DefineFont2Tag extends FontTag {
                 }
                 sos.write(baGlyphShapes);
 
-
                 for (int i = 0; i < numGlyphs; i++) {
                     if (fontFlagsWideCodes) {
                         sos.writeUI16(codeTable.get(i));
@@ -373,7 +372,6 @@ public class DefineFont2Tag extends FontTag {
         } else {
             glyphShapeTable.set(pos, shp);
         }
-
 
         if (fontFlagsHasLayout) {
             Font fnt = new Font(fontName, fontStyle, 1024);

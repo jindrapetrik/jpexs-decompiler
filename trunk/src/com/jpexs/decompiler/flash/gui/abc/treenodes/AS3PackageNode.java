@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
  * @author JPEXS
  */
 public class AS3PackageNode extends TreeElement {
-    
+
     public AS3PackageNode(String name, String path, AS3PackageNodeItem item, TreeElement parent) {
         super(name, path, item, parent);
     }

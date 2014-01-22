@@ -21,5 +21,5 @@ package com.jpexs.decompiler.flash;
  * @author JPEXS
  */
 public abstract class BaseLocalData {
-    
+
 }

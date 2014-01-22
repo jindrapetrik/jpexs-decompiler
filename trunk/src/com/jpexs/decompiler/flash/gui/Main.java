@@ -144,7 +144,7 @@ public class Main {
         addTrayIcon();
         switchProxy();
     }
-    
+
     public static void showProxy() {
         if (proxyFrame == null) {
             proxyFrame = new ProxyFrame(mainFrame);
@@ -211,14 +211,14 @@ public class Main {
 
     public static SWFList parseSWF(SWFSourceInfo sourceInfo) throws Exception {
         SWFList result = new SWFList();
-    
+
         InputStream inputStream = sourceInfo.getInputStream();
         SWFBundle bundle = null;
         if (inputStream == null) {
             inputStream = new BufferedInputStream(new FileInputStream(sourceInfo.getFile()));
             bundle = sourceInfo.getBundle();
             logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
-        } else if (inputStream instanceof SeekableInputStream 
+        } else if (inputStream instanceof SeekableInputStream
                 || inputStream instanceof BufferedInputStream) {
             try {
                 inputStream.reset();
@@ -227,7 +227,7 @@ public class Main {
             }
             logger.log(Level.INFO, "Load stream: {0}", sourceInfo.getFileTitle());
         }
-        
+
         Stopwatch sw = Stopwatch.startNew();
         if (bundle != null) {
             result.isBundle = true;
@@ -256,7 +256,7 @@ public class Main {
             swf.fileTitle = sourceInfo.getFileTitle();
             result.add(swf);
         }
-        
+
         if (inputStream instanceof FileInputStream) {
             logger.log(Level.INFO, "File loaded in {0} seconds.", (sw.getElapsedMilliseconds() / 1000));
             inputStream.close();
@@ -294,14 +294,14 @@ public class Main {
                 }
             });
         }
-        
+
         return result;
     }
 
     public static void saveFile(SWF swf, String outfile) throws IOException {
         saveFile(swf, outfile, SaveFileMode.SAVE);
     }
-    
+
     public static void saveFile(SWF swf, String outfile, SaveFileMode mode) throws IOException {
         if (mode == SaveFileMode.SAVEAS) {
             swf.file = outfile;
@@ -311,9 +311,9 @@ public class Main {
         FileOutputStream fos = new FileOutputStream(tmpFile);
         if (mode == SaveFileMode.EXE) {
             InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
-            byte [] buffer = new byte[4096];
+            byte[] buffer = new byte[4096];
             int bytesRead = 0;
-            while((bytesRead = exeStream.read(buffer)) != -1) {
+            while ((bytesRead = exeStream.read(buffer)) != -1) {
                 fos.write(buffer, 0, bytesRead);
             }
             int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
@@ -345,9 +345,9 @@ public class Main {
     private static class OpenFileWorker extends SwingWorker {
 
         private final SWFSourceInfo[] sourceInfos;
-        
+
         public OpenFileWorker(SWFSourceInfo sourceInfo) {
-            this.sourceInfos = new SWFSourceInfo[] { sourceInfo };
+            this.sourceInfos = new SWFSourceInfo[]{sourceInfo};
         }
 
         public OpenFileWorker(SWFSourceInfo[] sourceInfos) {
@@ -468,9 +468,9 @@ public class Main {
     }
 
     public static OpenFileResult openFile(SWFSourceInfo sourceInfo) {
-        return openFile(new SWFSourceInfo[] { sourceInfo });
+        return openFile(new SWFSourceInfo[]{sourceInfo});
     }
-    
+
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos) {
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
             sourceInfos.clear();
@@ -495,17 +495,17 @@ public class Main {
         sourceInfos.addAll(Arrays.asList(newSourceInfos));
         return OpenFileResult.OK;
     }
-    
+
     public static void closeFile(SWFList swf) {
-       sourceInfos.remove(swf.sourceInfo);
-       mainFrame.getPanel().close(swf);
+        sourceInfos.remove(swf.sourceInfo);
+        mainFrame.getPanel().close(swf);
     }
-    
+
     public static void closeAll() {
-       sourceInfos.clear();
-       mainFrame.getPanel().closeAll();
+        sourceInfos.clear();
+        mainFrame.getPanel().closeAll();
     }
-    
+
     public static boolean saveFileDialog(SWF swf, final SaveFileMode mode) {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
@@ -589,8 +589,8 @@ public class Main {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
-            private final String[] supportedExtensions = new String[] { ".swf", ".gfx", ".swc", ".zip" };
-            
+            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip"};
+
             @Override
             public boolean accept(File f) {
                 String name = f.getName().toLowerCase();
@@ -621,7 +621,7 @@ public class Main {
             }
         };
         fc.addChoosableFileFilter(swfFilter);
-        
+
         FileFilter swcFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -634,7 +634,7 @@ public class Main {
             }
         };
         fc.addChoosableFileFilter(swcFilter);
-        
+
         FileFilter gfxFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -645,10 +645,9 @@ public class Main {
             public String getDescription() {
                 return AppStrings.translate("filter.gfx");
             }
-        };              
+        };
         fc.addChoosableFileFilter(gfxFilter);
-        
-                
+
         FileFilter zipFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -661,7 +660,7 @@ public class Main {
             }
         };
         fc.addChoosableFileFilter(zipFilter);
-        
+
         FileFilter binaryFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -674,7 +673,7 @@ public class Main {
             }
         };
         fc.addChoosableFileFilter(binaryFilter);
-        
+
         fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
@@ -743,7 +742,7 @@ public class Main {
         } catch (Throwable ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
         UIManager.put("OptionPane.noButtonText", AppStrings.translate("button.no"));
@@ -871,7 +870,7 @@ public class Main {
         }
 
         if (args.length == 0) {
-            initGui();            
+            initGui();
             showModeFrame();
         } else {
             String fileToOpen = CommandLineArgumentParser.parseArguments(args);
@@ -926,7 +925,6 @@ public class Main {
             trayIcon.setImageAutoSize(true);
             PopupMenu trayPopup = new PopupMenu();
 
-
             ActionListener trayListener = new ActionListener() {
                 /**
                  * Invoked when an action occurs.
@@ -944,7 +942,6 @@ public class Main {
                     }
                 }
             };
-
 
             MenuItem showMenuItem = new MenuItem(AppStrings.translate("proxy.show"));
             showMenuItem.setActionCommand("SHOW");
@@ -1102,10 +1099,10 @@ public class Main {
             fileTxt.close();
             logger.removeHandler(fileTxt);
         }
-        
+
         String fileName;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
-        
+
         try {
             fileName = Configuration.getFFDecHome() + File.separator + "logs" + File.separator;
             if (Configuration.useDetailedLogging.get()) {
@@ -1122,13 +1119,12 @@ public class Main {
             logger.log(Level.SEVERE, null, ex);
         }
 
-                
         Formatter formatterTxt = new LogFormatter();
         fileTxt.setFormatter(formatterTxt);
         logger.addHandler(fileTxt);
 
         ErrorLogFrame.getInstance().clearErrorState();
-        
+
         sdf = new SimpleDateFormat("yyyy-MM-dd");
         logger.log(Level.INFO, "Date: {0}", sdf.format(new Date()));
         logger.log(Level.INFO, ApplicationInfo.applicationVerName);

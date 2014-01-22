@@ -70,7 +70,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], exportMode, writer);
         return new HilightedText(writer);
     }
-    
+
     public void setHex(ExportMode exportMode, boolean force) {
         if (this.exportMode == exportMode & !force) {
             return;
@@ -250,7 +250,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         bodyIndex = -1;
         setCaretPosition(0);
     }
-    
+
     public void selectInstruction(int pos) {
         String text = getText();
         int lineCnt = 1;

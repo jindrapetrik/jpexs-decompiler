@@ -56,7 +56,7 @@ public class ForItem extends LoopItem implements Block {
     @Override
     protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (writer instanceof NulWriter) {
-            ((NulWriter)writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
+            ((NulWriter) writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
         }
         if (labelUsed) {
             writer.append("loop" + loop.id + ":").newLine();
@@ -101,7 +101,7 @@ public class ForItem extends LoopItem implements Block {
         writer.unindent();
         writer.append("}");
         if (writer instanceof NulWriter) {
-            LoopWithType loopOjb = ((NulWriter)writer).endLoop(loop.id);
+            LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
             labelUsed = loopOjb.used;
         }
         return writer;

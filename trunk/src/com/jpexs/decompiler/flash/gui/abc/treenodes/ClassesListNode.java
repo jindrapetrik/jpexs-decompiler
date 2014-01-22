@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.treenodes.TreeNode;
  * @author JPEXS
  */
 public class ClassesListNode extends TreeNode {
-    
+
     public ClassesListNode(ClassesListTreeModel item) {
         super(item);
     }

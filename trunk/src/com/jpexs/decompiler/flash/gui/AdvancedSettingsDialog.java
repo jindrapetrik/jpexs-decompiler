@@ -41,14 +41,14 @@ public class AdvancedSettingsDialog extends AppDialog {
         View.centerScreen(this);
         View.setWindowIcon(this);
         pack();
-        
+
         configurationTable.setCellEditor(configurationTable.getDefaultEditor(null));
-        
+
         Map<String, Field> fields = Configuration.getConfigurationFields();
         String[] keys = new String[fields.size()];
         keys = fields.keySet().toArray(keys);
         Arrays.sort(keys);
-        
+
         for (String name : keys) {
             Field field = fields.get(name);
             DefaultTableModel model = (DefaultTableModel) configurationTable.getModel();
@@ -72,32 +72,32 @@ public class AdvancedSettingsDialog extends AppDialog {
 
     private DefaultTableModel getModel() {
         return new javax.swing.table.DefaultTableModel(
-            new Object [][] { },
-            new String [] {
-                translate("advancedSettings.columns.name"), 
-                translate("advancedSettings.columns.value"), 
-                translate("advancedSettings.columns.description")
-            }
+                new Object[][]{},
+                new String[]{
+                    translate("advancedSettings.columns.name"),
+                    translate("advancedSettings.columns.value"),
+                    translate("advancedSettings.columns.description")
+                }
         ) {
-            Class[] types = new Class [] {
+            Class[] types = new Class[]{
                 String.class, Object.class, String.class
             };
-            boolean[] canEdit = new boolean [] {
+            boolean[] canEdit = new boolean[]{
                 false, true, false
             };
 
             @Override
             public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
+                return types[columnIndex];
             }
 
             @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
-        };        
+        };
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -224,7 +224,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
         Configuration.saveConfig();
         setVisible(false);
-        showRestartConfirmDialod();       
+        showRestartConfirmDialod();
     }//GEN-LAST:event_btnResetActionPerformed
 
     private void showRestartConfirmDialod() {
@@ -232,7 +232,7 @@ public class AdvancedSettingsDialog extends AppDialog {
             SelectLanguageDialog.reloadUi();
         }
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnOk;

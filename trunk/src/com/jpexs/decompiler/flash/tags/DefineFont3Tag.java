@@ -208,7 +208,6 @@ public class DefineFont3Tag extends FontTag {
                 }
                 sos.write(baGlyphShapes);
 
-
                 for (int i = 0; i < numGlyphs; i++) {
                     if (fontFlagsWideCodes) {
                         sos.writeUI16(codeTable.get(i));

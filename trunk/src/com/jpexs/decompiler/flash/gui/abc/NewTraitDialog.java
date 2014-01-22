@@ -107,16 +107,13 @@ public class NewTraitDialog extends AppDialog implements ActionListener {
             accessStrings[i] = (pref.isEmpty() ? "" : pref + " ") + "(" + name + ")";
         }
 
-
         //optionsPanel.add(new JLabel(translate("label.access")));
         accessComboBox = new JComboBox<>(accessStrings);
         optionsPanel.add(accessComboBox);
 
         optionsPanel.add(typeComboBox);
 
-
         //optionsPanel.add(new JLabel(translate("label.name")));
-
         nameField = new JTextField();
         nameField.setPreferredSize(new Dimension(300, nameField.getPreferredSize().height));
         optionsPanel.add(nameField);

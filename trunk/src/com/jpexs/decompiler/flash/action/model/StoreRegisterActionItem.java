@@ -77,7 +77,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
             if (define) {
                 writer.append("var ");
             }
-            writer.append(register.translate() + " = "); 
+            writer.append(register.translate() + " = ");
             value.toString(writer, localData);
         }
         return writer;

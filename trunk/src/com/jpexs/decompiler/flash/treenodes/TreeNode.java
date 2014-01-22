@@ -25,7 +25,7 @@ import java.util.List;
  * @author JPEXS
  */
 public abstract class TreeNode {
-    
+
     protected TreeItem item;
     public boolean export = false;
     public List<TreeNode> subNodes;
@@ -34,7 +34,7 @@ public abstract class TreeNode {
         this.item = item;
         this.subNodes = new ArrayList<>();
     }
-    
+
     public TreeItem getItem() {
         return item;
     }

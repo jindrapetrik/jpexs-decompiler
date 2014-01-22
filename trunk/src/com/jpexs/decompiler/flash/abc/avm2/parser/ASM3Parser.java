@@ -104,7 +104,6 @@ public class ASM3Parser {
 
         ParsedSymbol symb = lexer.lex();
 
-
         int flags = 0;
         while (symb.type == ParsedSymbol.TYPE_KEYWORD_FLAG) {
             symb = lexer.lex();
@@ -481,7 +480,6 @@ public class ASM3Parser {
         List<ABCException> exceptions = new ArrayList<>();
         List<Integer> exceptionIndices = new ArrayList<>();
         int offset = 0;
-
 
         Flasm3Lexer lexer = new Flasm3Lexer(reader);
 

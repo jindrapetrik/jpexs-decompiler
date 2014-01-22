@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.treeitems.AS2PackageNodeItem;
  * @author JPEXS
  */
 public class AS2PackageNode extends TreeNode {
-    
+
     public AS2PackageNode(AS2PackageNodeItem item) {
         super(item);
     }

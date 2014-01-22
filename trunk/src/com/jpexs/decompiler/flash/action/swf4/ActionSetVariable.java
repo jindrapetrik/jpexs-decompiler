@@ -112,7 +112,6 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
                     ((SetVariableActionItem) ret).setValue(sr);
                 }
 
-
                 variables.put("__register" + sr.register.number, new TemporaryRegister(sr.register.number, ret));
                 return;
             }

@@ -298,7 +298,6 @@ public class ActionSourceGenerator implements SourceGenerator {
 
         ret.addAll(toActionList(item.switchedObject.toSource(localData, this)));
 
-
         boolean firstCase = true;
         List<List<ActionIf>> caseIfs = new ArrayList<>();
         List<List<Action>> caseCmds = new ArrayList<>();
@@ -647,11 +646,8 @@ public class ActionSourceGenerator implements SourceGenerator {
         globalClassTypeStr.add("_global");
         globalClassTypeStr.addAll(nameStr);
 
-
         ParsedSymbol s = null;
         List<Action> constr = new ArrayList<>();
-
-
 
         if (constructor == null) {
             List<Action> val = new ArrayList<>();

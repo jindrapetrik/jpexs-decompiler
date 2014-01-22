@@ -49,7 +49,7 @@ public class BreakItem extends GraphTargetItem {
             }
         }
         if (labelRequired) {
-            writer.append(" loop" + loopId);            
+            writer.append(" loop" + loopId);
         }
         return writer;
     }

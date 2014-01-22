@@ -23,9 +23,9 @@ import java.util.HashSet;
  * @author JPEXS
  */
 public class FinalProcessLocalData {
-    
+
     public final HashSet<Integer> temporaryRegisters;
-    
+
     public FinalProcessLocalData() {
         temporaryRegisters = new HashSet<>();
     }

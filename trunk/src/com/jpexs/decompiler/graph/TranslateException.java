@@ -21,7 +21,7 @@ package com.jpexs.decompiler.graph;
  * @author JPEXS
  */
 public class TranslateException extends RuntimeException {
-    
+
     public TranslateException(String s) {
         super(s);
     }

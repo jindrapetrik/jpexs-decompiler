@@ -27,25 +27,25 @@ public class Stopwatch {
     private long startTime, elapsedTime;
     private boolean running;
     public Date startDate, endDate;
-    
+
     public static Stopwatch startNew() {
         Stopwatch sw = new Stopwatch();
         sw.start();
         return sw;
     }
-    
+
     public void start() {
         running = true;
         startDate = new Date();
         startTime = System.nanoTime();
     }
-    
+
     public void stop() {
         elapsedTime = System.nanoTime() - startTime;
         endDate = new Date();
         running = false;
     }
-    
+
     public long getElapsedNanoseconds() {
         if (running) {
             return System.nanoTime() - startTime;

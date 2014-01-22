@@ -103,6 +103,5 @@ public class HttpResponseInfo {
         }
 
         //TODO: Read SSL info
-
     }
 }

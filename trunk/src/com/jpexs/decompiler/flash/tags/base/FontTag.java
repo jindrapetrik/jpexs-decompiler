@@ -98,13 +98,13 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     public static String[] fontNamesArray;
 
     public static List<String> fontNames;
-    
+
     public static String defaultFontName;
-    
+
     static {
         reload();
     }
-    
+
     public boolean hasLayout() {
         return false;
     }
@@ -154,7 +154,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         }
         return defaultFontName;
     }
-    
+
     public static void shiftGlyphIndices(int fontId, int startIndex, List<Tag> tags) {
         List<TEXTRECORD> textRecords = new ArrayList<>();
         for (Tag t : tags) {
@@ -217,9 +217,9 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
             return "Arial";
         }
         //Fallback to DIALOG
-        return "Dialog"; 
+        return "Dialog";
     }
-    
+
     public static String isFontInstalled(String fontName) {
         if (fontNames.contains(fontName)) {
             return fontName;

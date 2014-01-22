@@ -46,7 +46,6 @@ public class GraphPath implements Serializable {
             return false;
         }
 
-
         List<Integer> otherKeys = new ArrayList<>(p.keys);
         List<Integer> otherVals = new ArrayList<>(p.vals);
 

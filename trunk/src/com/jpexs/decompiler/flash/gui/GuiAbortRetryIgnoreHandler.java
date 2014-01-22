@@ -39,5 +39,5 @@ public class GuiAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
         // there are no non-static field in this class, so return the original instance
         return this;
     }
-    
+
 }

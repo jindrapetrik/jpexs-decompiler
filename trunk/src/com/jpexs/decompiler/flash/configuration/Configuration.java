@@ -127,7 +127,8 @@ public class Configuration {
     @ConfigurationDescription("Decompilation timeout in seconds for a single file")
     public static final ConfigurationItem<Integer> decompilationTimeoutFile = null;
     /**
-     * Using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices
+     * Using parameter names in decompiling may cause problems because official
+     * programs like Flash CS 5.5 inserts wrong parameter names indices
      */
     @ConfigurationDefaultBoolean(false)
     @ConfigurationDescription("Using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices")
@@ -159,7 +160,7 @@ public class Configuration {
     public static final ConfigurationItem<Integer> maxRecentFileCount = null;
     public static final ConfigurationItem<String> recentFiles = null;
     public static final ConfigurationItem<String> fontPairing = null;
-    
+
     public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
 
     @ConfigurationDefaultInt(1000)
@@ -197,7 +198,7 @@ public class Configuration {
     public static final ConfigurationItem<Integer> guiFontPreviewPosX = null;
     @ConfigurationName("gui.fontPreviewWindow.posY")
     public static final ConfigurationItem<Integer> guiFontPreviewPosY = null;
-    
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
@@ -284,13 +285,13 @@ public class Configuration {
         }
         return Arrays.asList(files.split("::"));
     }
-    
+
     public static void addRecentFile(String path) {
         List<String> recentFilesArray = new ArrayList<>(getRecentFiles());
         int idx = recentFilesArray.indexOf(path);
         if (idx != -1) {
             recentFilesArray.remove(idx);
-        }        
+        }
         recentFilesArray.add(path);
         while (recentFilesArray.size() >= maxRecentFileCount.get()) {
             recentFilesArray.remove(0);
@@ -303,10 +304,10 @@ public class Configuration {
         int idx = recentFilesArray.indexOf(path);
         if (idx != -1) {
             recentFilesArray.remove(idx);
-        }        
+        }
         recentFiles.set(Helper.joinStrings(recentFilesArray, "::"));
     }
-    
+
     public static Map<String, String> getFontPairs() {
         String fonts = fontPairing.get();
         if (fonts == null) {
@@ -320,7 +321,7 @@ public class Configuration {
         }
         return result;
     }
-    
+
     public static void addFontPair(String fileName, int fontId, String fontName, String systemFontName) {
         String key = fileName + "_" + fontId + "_" + fontName;
         Map<String, String> fontPairs = getFontPairs();
@@ -337,7 +338,7 @@ public class Configuration {
         }
         fontPairing.set(sb.toString());
     }
-    
+
     /**
      * Saves replacements to file for future use
      */
@@ -409,7 +410,7 @@ public class Configuration {
         return config;
     }
 
-     private static void saveToFile(String file, String replacementsFile) {
+    private static void saveToFile(String file, String replacementsFile) {
         HashMap<String, Object> config = new HashMap<>();
         for (Entry<String, Field> entry : getConfigurationFields().entrySet()) {
             try {
@@ -454,7 +455,7 @@ public class Configuration {
             logLevel = Level.WARNING;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public static void setConfigurationFields() {
         try {
@@ -472,7 +473,7 @@ public class Configuration {
                 if (config.containsKey(name)) {
                     value = config.get(name);
                 }
-                
+
                 if (value != null) {
                     field.set(null, new ConfigurationItem(name, defaultValue, value));
                 } else {
@@ -486,7 +487,7 @@ public class Configuration {
             Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static Object getDefaultValue(Field field) {
         Object defaultValue = null;
         ConfigurationDefaultBoolean aBool = (ConfigurationDefaultBoolean) field.getAnnotation(ConfigurationDefaultBoolean.class);
@@ -503,7 +504,7 @@ public class Configuration {
         }
         return defaultValue;
     }
-    
+
     public static String getDescription(Field field) {
         ConfigurationDescription a = (ConfigurationDescription) field.getAnnotation(ConfigurationDescription.class);
         if (a != null) {
@@ -511,7 +512,7 @@ public class Configuration {
         }
         return null;
     }
-    
+
     public static Map<String, Field> getConfigurationFields() {
         Field[] fields = Configuration.class.getFields();
         Map<String, Field> result = new HashMap<>();

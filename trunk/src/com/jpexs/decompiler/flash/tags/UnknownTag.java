@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.SWF;
  * @author JPEXS
  */
 public class UnknownTag extends Tag {
-    
+
     public UnknownTag(SWF swf, int id, byte[] data, long pos) {
         super(swf, id, "Unknown", data, pos);
     }

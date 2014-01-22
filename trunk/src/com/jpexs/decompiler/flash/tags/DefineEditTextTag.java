@@ -204,169 +204,169 @@ public class DefineEditTextTag extends TextTag {
                     case PARAMETER:
                         String paramName = (String) s.values[0];
                         String paramValue = (String) s.values[1];
-                switch (paramName) {
-                    case "xmin":
-                        try {
-                            bounds.Xmin = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid xmin value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "ymin":
-                        try {
-                            bounds.Ymin = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid ymin value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "xmax":
-                        try {
-                            bounds.Xmax = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid xmax value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "ymax":
-                        try {
-                            bounds.Ymax = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid ymax value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "wordwrap":
-                        if (paramValue.equals("1")) {
-                            wordWrap = true;
-                        }
-                        break;
-                    case "multiline":
-                        if (paramValue.equals("1")) {
-                            multiline = true;
-                        }
-                        break;
-                    case "password":
-                        if (paramValue.equals("1")) {
-                            password = true;
-                        }
-                        break;
-                    case "readonly":
-                        if (paramValue.equals("1")) {
-                            readOnly = true;
-                        }
-                        break;
-                    case "autosize":
-                        if (paramValue.equals("1")) {
-                            autoSize = true;
-                        }
-                        break;
-                    case "noselect":
-                        if (paramValue.equals("1")) {
-                            noSelect = true;
-                        }
-                        break;
-                    case "border":
-                        if (paramValue.equals("1")) {
-                            border = true;
-                        }
-                        break;
-                    case "wasstatic":
-                        if (paramValue.equals("1")) {
-                            wasStatic = true;
-                        }
-                        break;
-                    case "html":
-                        if (paramValue.equals("1")) {
-                            html = true;
-                        }
-                        break;
-                    case "useoutlines":
-                        if (paramValue.equals("1")) {
-                            useOutlines = true;
-                        }
-                        break;
-                    case "font":
-                        try {
-                            fontId = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException ne) {
-                            throw new ParseException("Invalid font value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "fontclass":
-                        fontClass = paramValue;
-                        break;
-                    case "height":
-                        try {
-                            fontHeight = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException ne) {
-                            throw new ParseException("Invalid height value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "color":
-                        Matcher m = Pattern.compile("#([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])").matcher(paramValue);
-                        if (m.matches()) {
-                            textColor = new RGBA(Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16), Integer.parseInt(m.group(4), 16), Integer.parseInt(m.group(1), 16));
-                        } else {
-                            throw new ParseException("Invalid color. Valid format is #aarrggbb.", lexer.yyline());
-                        }
-                        break;
-                    case "maxlength":
-                        try {
-                            maxLength = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException ne) {
-                            throw new ParseException("Invalid maxLength value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "align":
-                        switch (paramValue) {
-                            case "left":
-                                align = 0;
+                        switch (paramName) {
+                            case "xmin":
+                                try {
+                                    bounds.Xmin = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid xmin value. Number expected.", lexer.yyline());
+                                }
                                 break;
-                            case "right":
-                                align = 1;
+                            case "ymin":
+                                try {
+                                    bounds.Ymin = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid ymin value. Number expected.", lexer.yyline());
+                                }
                                 break;
-                            case "center":
-                                align = 2;
+                            case "xmax":
+                                try {
+                                    bounds.Xmax = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid xmax value. Number expected.", lexer.yyline());
+                                }
                                 break;
-                            case "justify":
-                                align = 3;
+                            case "ymax":
+                                try {
+                                    bounds.Ymax = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid ymax value. Number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "wordwrap":
+                                if (paramValue.equals("1")) {
+                                    wordWrap = true;
+                                }
+                                break;
+                            case "multiline":
+                                if (paramValue.equals("1")) {
+                                    multiline = true;
+                                }
+                                break;
+                            case "password":
+                                if (paramValue.equals("1")) {
+                                    password = true;
+                                }
+                                break;
+                            case "readonly":
+                                if (paramValue.equals("1")) {
+                                    readOnly = true;
+                                }
+                                break;
+                            case "autosize":
+                                if (paramValue.equals("1")) {
+                                    autoSize = true;
+                                }
+                                break;
+                            case "noselect":
+                                if (paramValue.equals("1")) {
+                                    noSelect = true;
+                                }
+                                break;
+                            case "border":
+                                if (paramValue.equals("1")) {
+                                    border = true;
+                                }
+                                break;
+                            case "wasstatic":
+                                if (paramValue.equals("1")) {
+                                    wasStatic = true;
+                                }
+                                break;
+                            case "html":
+                                if (paramValue.equals("1")) {
+                                    html = true;
+                                }
+                                break;
+                            case "useoutlines":
+                                if (paramValue.equals("1")) {
+                                    useOutlines = true;
+                                }
+                                break;
+                            case "font":
+                                try {
+                                    fontId = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException ne) {
+                                    throw new ParseException("Invalid font value. Number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "fontclass":
+                                fontClass = paramValue;
+                                break;
+                            case "height":
+                                try {
+                                    fontHeight = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException ne) {
+                                    throw new ParseException("Invalid height value. Number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "color":
+                                Matcher m = Pattern.compile("#([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])").matcher(paramValue);
+                                if (m.matches()) {
+                                    textColor = new RGBA(Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16), Integer.parseInt(m.group(4), 16), Integer.parseInt(m.group(1), 16));
+                                } else {
+                                    throw new ParseException("Invalid color. Valid format is #aarrggbb.", lexer.yyline());
+                                }
+                                break;
+                            case "maxlength":
+                                try {
+                                    maxLength = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException ne) {
+                                    throw new ParseException("Invalid maxLength value. Number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "align":
+                                switch (paramValue) {
+                                    case "left":
+                                        align = 0;
+                                        break;
+                                    case "right":
+                                        align = 1;
+                                        break;
+                                    case "center":
+                                        align = 2;
+                                        break;
+                                    case "justify":
+                                        align = 3;
+                                        break;
+                                    default:
+                                        throw new ParseException("Invalid align value. Expected one of: left,right,center or justify.", lexer.yyline());
+                                }
+                                break;
+                            case "leftmargin":
+                                try {
+                                    leftMargin = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException ne) {
+                                    throw new ParseException("Invalid leftmargin value. Number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "rightmargin":
+                                try {
+                                    rightMargin = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException ne) {
+                                    throw new ParseException("Invalid rightmargin value. Number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "indent":
+                                try {
+                                    indent = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException ne) {
+                                    throw new ParseException("Invalid indent value. Number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "leading":
+                                try {
+                                    leading = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException ne) {
+                                    throw new ParseException("Invalid leading value. Number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "variablename":
+                                variableName = paramValue;
                                 break;
                             default:
-                                throw new ParseException("Invalid align value. Expected one of: left,right,center or justify.", lexer.yyline());
+                                throw new ParseException("Unrecognized parameter name", lexer.yyline());
                         }
-                        break;
-                    case "leftmargin":
-                        try {
-                            leftMargin = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException ne) {
-                            throw new ParseException("Invalid leftmargin value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "rightmargin":
-                        try {
-                            rightMargin = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException ne) {
-                            throw new ParseException("Invalid rightmargin value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "indent":
-                        try {
-                            indent = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException ne) {
-                            throw new ParseException("Invalid indent value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "leading":
-                        try {
-                            leading = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException ne) {
-                            throw new ParseException("Invalid leading value. Number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "variablename":
-                        variableName = paramValue;
-                        break;
-                    default:
-                        throw new ParseException("Unrecognized parameter name", lexer.yyline());
-                }
                         break;
                     case TEXT:
                         text += (String) s.values[0];

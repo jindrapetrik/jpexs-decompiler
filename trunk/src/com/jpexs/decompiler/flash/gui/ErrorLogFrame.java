@@ -138,7 +138,7 @@ public class ErrorLogFrame extends AppFrame {
         cnt.add(new JScrollPane(logView), BorderLayout.CENTER);
         handler = new Handler() {
             SimpleFormatter formatter = new SimpleFormatter();
-            
+
             @Override
             public void publish(LogRecord record) {
                 if (getLevel().intValue() <= record.getLevel().intValue()) {
@@ -164,7 +164,7 @@ public class ErrorLogFrame extends AppFrame {
             mainFrame.getPanel().setErrorState(errorState);
         }
     }
-    
+
     private void notifyMainFrame(Level level) {
         boolean stateChanged = false;
         if (level.intValue() >= Level.SEVERE.intValue()) {
@@ -190,13 +190,13 @@ public class ErrorLogFrame extends AppFrame {
             }
         }
     }
-    
+
     private void log(final Level level, final String msg, final String detail) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 notifyMainFrame(level);
-                
+
                 JPanel pan = new JPanel();
                 pan.setBackground(Color.white);
                 pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
@@ -253,7 +253,6 @@ public class ErrorLogFrame extends AppFrame {
                     scrollPane = null;
                 }
 
-
                 if (detailComponent != null) {
                     expandButton.addActionListener(new ActionListener() {
                         @Override
@@ -266,7 +265,6 @@ public class ErrorLogFrame extends AppFrame {
                     });
                 }
 
-
                 if (detailComponent != null) {
                     header.add(expandButton);
                 }
@@ -274,7 +272,6 @@ public class ErrorLogFrame extends AppFrame {
                 dateLabel.setPreferredSize(new Dimension(200, (int) dateLabel.getPreferredSize().getHeight()));
                 dateLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 header.add(dateLabel);
-
 
                 JLabel levelLabel = new JLabel(level.getName());
                 levelLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -300,7 +297,6 @@ public class ErrorLogFrame extends AppFrame {
                 repaint();
             }
         });
-
 
     }
 

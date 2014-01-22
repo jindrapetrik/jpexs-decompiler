@@ -29,7 +29,7 @@ public class CommentItem extends GraphTargetItem {
 
     public CommentItem(String comment) {
         super(null, NOPRECEDENCE);
-        this.commentLines = new String[] { comment };
+        this.commentLines = new String[]{comment};
     }
 
     public CommentItem(String[] commentLines) {

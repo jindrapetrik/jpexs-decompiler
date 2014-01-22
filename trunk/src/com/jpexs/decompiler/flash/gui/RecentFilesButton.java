@@ -26,9 +26,9 @@ import org.pushingpixels.flamingo.api.common.icon.ResizableIcon;
 public class RecentFilesButton extends JCommandButton {
 
     public String fileName;
-    
+
     public RecentFilesButton(String title, ResizableIcon icon) {
         super(title, icon);
     }
-    
+
 }

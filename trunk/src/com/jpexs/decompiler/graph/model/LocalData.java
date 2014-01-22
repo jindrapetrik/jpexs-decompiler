@@ -31,7 +31,7 @@ public class LocalData {
     public com.jpexs.decompiler.flash.abc.avm2.ConstantPool constantsAvm2;
     public HashMap<Integer, String> localRegNames;
     public List<String> fullyQualifiedNames;
- 
+
     public static LocalData create(ConstantPool constants) {
         LocalData localData = new LocalData();
         localData.constants = constants;

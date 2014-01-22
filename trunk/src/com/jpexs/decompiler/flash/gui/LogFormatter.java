@@ -38,8 +38,9 @@ public class LogFormatter extends Formatter {
     public String format(LogRecord record) {
         StringBuilder buf = new StringBuilder(180);
 
-        if (dateFormat == null)
+        if (dateFormat == null) {
             dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
+        }
 
         buf.append(dateFormat.format(new Date(record.getMillis())));
         buf.append(" > ");

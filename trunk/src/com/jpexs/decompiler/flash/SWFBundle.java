@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -29,8 +28,12 @@ import java.util.Set;
 public interface SWFBundle {
 
     public int length();
+
     public Set<String> getKeys();
+
     public SeekableInputStream getSWF(String key) throws IOException;
+
     public Map<String, SeekableInputStream> getAll() throws IOException;
+
     public String getExtension();
 }

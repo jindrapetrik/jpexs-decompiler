@@ -32,7 +32,7 @@ public final class BinaryPanel extends JPanel implements ActionListener, Compone
 
     public LineMarkedEditorPane hexEditor = new LineMarkedEditorPane();
     private byte[] data;
-    
+
     public BinaryPanel() {
         super(new BorderLayout());
 
@@ -68,7 +68,7 @@ public final class BinaryPanel extends JPanel implements ActionListener, Compone
     public void componentResized(ComponentEvent e) {
         setBinaryData(data);
     }
-    
+
     @Override
     public void componentMoved(ComponentEvent ce) {
     }

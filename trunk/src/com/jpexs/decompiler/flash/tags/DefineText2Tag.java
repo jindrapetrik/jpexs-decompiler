@@ -198,125 +198,125 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
                                 throw new ParseException("Invalid color. Valid format is #aarrggbb.", lexer.yyline());
                             }
                         }
-                switch (paramName) {
-                    case "font":
-                        try {
-                            fontId = Integer.parseInt(paramValue);
+                        switch (paramName) {
+                            case "font":
+                                try {
+                                    fontId = Integer.parseInt(paramValue);
 
-                            for (Tag t : swf.tags) {
-                                if (t instanceof FontTag) {
-                                    if (((FontTag) t).getFontId() == fontId) {
-                                        font = (FontTag) t;
-                                        fontName = font.getSystemFontName();
-                                        break;
+                                    for (Tag t : swf.tags) {
+                                        if (t instanceof FontTag) {
+                                            if (((FontTag) t).getFontId() == fontId) {
+                                                font = (FontTag) t;
+                                                fontName = font.getSystemFontName();
+                                                break;
+                                            }
+                                        }
                                     }
+                                    if (font == null) {
+                                        throw new ParseException("Font not found", lexer.yyline());
+                                    }
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid font id - number expected.", lexer.yyline());
                                 }
-                            }
-                            if (font == null) {
-                                throw new ParseException("Font not found", lexer.yyline());
-                            }
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid font id - number expected.", lexer.yyline());
+                                break;
+                            case "height":
+                                try {
+                                    textHeight = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid font height - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "x":
+                                try {
+                                    x = Integer.parseInt(paramValue);
+                                    currentX = x;
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid x position - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "y":
+                                try {
+                                    y = Integer.parseInt(paramValue);
+                                    currentY = y;
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid y position - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "xmin":
+                                try {
+                                    textBounds.Xmin = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid xmin position - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "xmax":
+                                try {
+                                    textBounds.Xmax = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid xmax position - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "ymin":
+                                try {
+                                    textBounds.Ymin = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid ymin position - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "ymax":
+                                try {
+                                    textBounds.Ymax = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid ymax position - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "scalex":
+                                try {
+                                    textMatrix.scaleX = Integer.parseInt(paramValue);
+                                    textMatrix.hasScale = true;
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid scalex value - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "scaley":
+                                try {
+                                    textMatrix.scaleY = Integer.parseInt(paramValue);
+                                    textMatrix.hasScale = true;
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid scalex value - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "rotateskew0":
+                                try {
+                                    textMatrix.rotateSkew0 = Integer.parseInt(paramValue);
+                                    textMatrix.hasRotate = true;
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid rotateskew0 value - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "rotateskew1":
+                                try {
+                                    textMatrix.rotateSkew1 = Integer.parseInt(paramValue);
+                                    textMatrix.hasRotate = true;
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid rotateskew1 value - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "translatex":
+                                try {
+                                    textMatrix.translateX = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid translatex value - number expected.", lexer.yyline());
+                                }
+                                break;
+                            case "translatey":
+                                try {
+                                    textMatrix.translateY = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new ParseException("Invalid translatey value - number expected.", lexer.yyline());
+                                }
+                                break;
                         }
-                        break;
-                    case "height":
-                        try {
-                            textHeight = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid font height - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "x":
-                        try {
-                            x = Integer.parseInt(paramValue);
-                            currentX = x;
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid x position - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "y":
-                        try {
-                            y = Integer.parseInt(paramValue);
-                            currentY = y;
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid y position - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "xmin":
-                        try {
-                            textBounds.Xmin = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid xmin position - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "xmax":
-                        try {
-                            textBounds.Xmax = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid xmax position - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "ymin":
-                        try {
-                            textBounds.Ymin = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid ymin position - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "ymax":
-                        try {
-                            textBounds.Ymax = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid ymax position - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "scalex":
-                        try {
-                            textMatrix.scaleX = Integer.parseInt(paramValue);
-                            textMatrix.hasScale = true;
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid scalex value - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "scaley":
-                        try {
-                            textMatrix.scaleY = Integer.parseInt(paramValue);
-                            textMatrix.hasScale = true;
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid scalex value - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "rotateskew0":
-                        try {
-                            textMatrix.rotateSkew0 = Integer.parseInt(paramValue);
-                            textMatrix.hasRotate = true;
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid rotateskew0 value - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "rotateskew1":
-                        try {
-                            textMatrix.rotateSkew1 = Integer.parseInt(paramValue);
-                            textMatrix.hasRotate = true;
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid rotateskew1 value - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "translatex":
-                        try {
-                            textMatrix.translateX = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid translatex value - number expected.", lexer.yyline());
-                        }
-                        break;
-                    case "translatey":
-                        try {
-                            textMatrix.translateY = Integer.parseInt(paramValue);
-                        } catch (NumberFormatException nfe) {
-                            throw new ParseException("Invalid translatey value - number expected.", lexer.yyline());
-                        }
-                        break;
-                }
                         break;
                     case TEXT:
                         if (font == null) {

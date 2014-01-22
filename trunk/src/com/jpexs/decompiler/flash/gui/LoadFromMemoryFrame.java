@@ -164,14 +164,13 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
     private void addResultRow(SwfInMemory swf) {
         if (swf != null) {
             com.jpexs.process.Process process = swf.process;
-            resTableModel.addRow(new Object[] {swf.version, swf.fileSize, process.getPid(), process.getFileName()});
-        }
-        else {
+            resTableModel.addRow(new Object[]{swf.version, swf.fileSize, process.getPid(), process.getFileName()});
+        } else {
             String notFound = translate("notfound");
-            resTableModel.addRow(new Object[] {notFound, 0, "", ""});
+            resTableModel.addRow(new Object[]{notFound, 0, "", ""});
         }
     }
-    
+
     private void refreshList() {
         model.clear();
         processlist = ProcessTools.listProcesses();
@@ -385,8 +384,6 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         statePanel.add(progress);
         progress.setVisible(false);
         rightPanel.add(statePanel, BorderLayout.NORTH);
-
-
 
         cnt.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel), BorderLayout.CENTER);
         View.setWindowIcon(this);

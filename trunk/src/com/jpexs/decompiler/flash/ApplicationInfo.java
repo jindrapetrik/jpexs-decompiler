@@ -24,7 +24,7 @@ import java.util.Properties;
  * @author JPEXS
  */
 public class ApplicationInfo {
-    
+
     public static final String APPLICATION_NAME = "JPEXS Free Flash Decompiler";
     public static final String SHORT_APPLICATION_NAME = "FFDec";
     public static final String VENDOR = "JPEXS";
@@ -40,7 +40,7 @@ public class ApplicationInfo {
     static {
         loadProperties();
     }
-    
+
     private static void loadProperties() {
         Properties prop = new Properties();
         try {

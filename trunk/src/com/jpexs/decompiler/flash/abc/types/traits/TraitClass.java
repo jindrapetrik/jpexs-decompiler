@@ -46,7 +46,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     public int slot_id;
     public int class_info;
     private static final String[] builtInClasses = {"ArgumentError", "arguments", "Array", "Boolean", "Class", "Date", "DefinitionError", "Error", "EvalError", "Function", "int", "JSON", "Math", "Namespace", "Number", "Object", "QName", "RangeError", "ReferenceError", "RegExp", "SecurityError", "String", "SyntaxError", "TypeError", "uint", "URIError", "VerifyError", "XML", "XMLList"};
-    
+
     private boolean classInitializerIsEmpty;
 
     @Override
@@ -298,7 +298,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
     private List<String> getImportsUsages(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
         //constructor
 
-
         String packageName = abc.instance_info[class_info].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
 
         parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(abc.instance_info[class_info].name_index), packageName, fullyQualifiedNames);
@@ -318,7 +317,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         //instance
         parseImportsUsagesFromTraits(abcTags, abc, abc.instance_info[class_info].instance_traits, imports, uses, packageName, fullyQualifiedNames);
-
 
         //instance initializer
         parseImportsUsagesFromMethodInfo(abcTags, abc, abc.instance_info[class_info].iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<Integer>());

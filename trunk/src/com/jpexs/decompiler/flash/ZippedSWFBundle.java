@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.Helper;
@@ -37,20 +36,19 @@ import java.util.zip.ZipInputStream;
  * @author JPEXS
  */
 public class ZippedSWFBundle implements SWFBundle {
+
     protected Set<String> keySet = new HashSet<>();
     private final Map<String, SeekableInputStream> cachedSWFs = new HashMap<>();
     protected ReReadableInputStream is;
 
-    
-    public ZippedSWFBundle(InputStream is){
+    public ZippedSWFBundle(InputStream is) {
         this.is = new ReReadableInputStream(is);
         ZipInputStream zip = new ZipInputStream(this.is);
         ZipEntry entry;
         try {
-            while((entry = zip.getNextEntry()) != null)
-            {
-                if(entry.getName().toLowerCase().endsWith(".swf")
-                || entry.getName().toLowerCase().endsWith(".gfx")){
+            while ((entry = zip.getNextEntry()) != null) {
+                if (entry.getName().toLowerCase().endsWith(".swf")
+                        || entry.getName().toLowerCase().endsWith(".gfx")) {
                     keySet.add(entry.getName());
                 }
                 //streamMap.put(, is)
@@ -59,7 +57,7 @@ public class ZippedSWFBundle implements SWFBundle {
             Logger.getLogger(ZippedSWFBundle.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @Override
     public int length() {
         return keySet.size();
@@ -72,18 +70,17 @@ public class ZippedSWFBundle implements SWFBundle {
 
     @Override
     public SeekableInputStream getSWF(String key) throws IOException {
-        if(!keySet.contains(key)){
+        if (!keySet.contains(key)) {
             return null;
         }
-        if(!cachedSWFs.containsKey(key)){
-            
+        if (!cachedSWFs.containsKey(key)) {
+
             this.is.reset();
             ZipInputStream zip = new ZipInputStream(this.is);
             ZipEntry entry;
             try {
-                while((entry = zip.getNextEntry()) != null)
-                {
-                    if(entry.getName().equals(key)){
+                while ((entry = zip.getNextEntry()) != null) {
+                    if (entry.getName().equals(key)) {
                         MemoryInputStream mis = new MemoryInputStream(Helper.readStream(zip));
                         cachedSWFs.put(key, mis);
                         break;
@@ -93,15 +90,14 @@ public class ZippedSWFBundle implements SWFBundle {
             } catch (IOException ex) {
                 Logger.getLogger(ZippedSWFBundle.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            
+
         }
         return cachedSWFs.get(key);
     }
 
     @Override
     public Map<String, SeekableInputStream> getAll() throws IOException {
-        for(String key : getKeys()){ //cache everything first
+        for (String key : getKeys()) { //cache everything first
             getSWF(key);
         }
         return cachedSWFs;

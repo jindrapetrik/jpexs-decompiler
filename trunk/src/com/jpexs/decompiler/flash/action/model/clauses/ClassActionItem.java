@@ -202,7 +202,6 @@ public class ClassActionItem extends ActionItem implements Block {
             writer.append(";").newLine();
         }
 
-
         for (GraphTargetItem f : functions) {
             f.toString(writer, localData).newLine();
         }

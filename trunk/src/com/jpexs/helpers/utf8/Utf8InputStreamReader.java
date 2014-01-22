@@ -24,7 +24,7 @@ import java.io.InputStreamReader;
  * @author JPEXS
  */
 public class Utf8InputStreamReader extends InputStreamReader {
-    
+
     public Utf8InputStreamReader(InputStream in) {
         super(in, Utf8Helper.charset);
     }

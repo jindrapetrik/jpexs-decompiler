@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
  * @author JPEXS
  */
 public class ScriptPackNode extends TreeElement {
-    
+
     public ScriptPackNode(String name, String path, ScriptPack item, TreeElement parent) {
         super(name, path, item, parent);
     }

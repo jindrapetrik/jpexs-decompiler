@@ -84,7 +84,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
         null,
         "<Space>"
     };
-    
+
     private final SWF swf;
     private long pos;
     private long hdrPos;
@@ -205,12 +205,12 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = actionBytes;
     }
-    
+
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
         return Helper.byteArrayToHexWithHeader(writer, actionBytes);
     }
-    
+
     List<DisassemblyListener> listeners = new ArrayList<>();
 
     @Override

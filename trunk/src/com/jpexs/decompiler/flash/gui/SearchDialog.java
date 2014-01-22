@@ -69,7 +69,7 @@ public class SearchDialog extends AppDialog implements ActionListener {
         panField.add(new JLabel(translate("label.searchtext")));
         panField.add(searchField);
         cnt.add(panField);
-        
+
         JPanel checkPanel = new JPanel(new FlowLayout());
         checkPanel.add(ignoreCaseCheckBox);
         checkPanel.add(regexpCheckBox);
@@ -78,14 +78,14 @@ public class SearchDialog extends AppDialog implements ActionListener {
         ButtonGroup group = new ButtonGroup();
         group.add(searchInASRadioButton);
         group.add(searchInTextsRadioButton);
-        
+
         JPanel rbPanel = new JPanel(new FlowLayout());
         searchInASRadioButton.setSelected(true);
         searchInTextsRadioButton.setSelected(false);
         rbPanel.add(searchInASRadioButton);
         rbPanel.add(searchInTextsRadioButton);
         cnt.add(rbPanel);
-        
+
         cnt.add(panButtons);
         getRootPane().setDefaultButton(okButton);
         View.centerScreen(this);

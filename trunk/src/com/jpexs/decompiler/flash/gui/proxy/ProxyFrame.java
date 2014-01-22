@@ -100,7 +100,6 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         cnt.setLayout(new BorderLayout());
         cnt.add(new JScrollPane(swfList), BorderLayout.CENTER);
 
-
         portField.setPreferredSize(new Dimension(80, portField.getPreferredSize().height));
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
@@ -111,7 +110,6 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
         JPanel buttonsPanel23 = new JPanel();
         buttonsPanel23.setLayout(new BoxLayout(buttonsPanel23, BoxLayout.Y_AXIS));
-
 
         JPanel buttonsPanel2 = new JPanel();
         buttonsPanel2.setLayout(new FlowLayout());
@@ -131,7 +129,6 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         removeButton.setActionCommand(ACTION_REMOVE);
         removeButton.addActionListener(this);
         buttonsPanel2.add(removeButton);
-
 
         JPanel buttonsPanel3 = new JPanel();
         buttonsPanel3.setLayout(new FlowLayout());
@@ -388,10 +385,10 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
      * hides the {@code Window}. If the {@code Window} and/or its owner are not
      * yet displayable, both are made displayable. The {@code Window} will be
      * validated prior to being made visible. If the {@code Window} is already
-     * visible, this will bring the {@code Window} to the front.<p> If
-     * {@code false}, hides this {@code Window}, its subcomponents, and all of
-     * its owned children. The {@code Window} and its subcomponents can be made
-     * visible again with a call to {@code #setVisible(true)}.
+     * visible, this will bring the {@code Window} to the front.<p>
+     * If {@code false}, hides this {@code Window}, its subcomponents, and all
+     * of its owned children. The {@code Window} and its subcomponents can be
+     * made visible again with a call to {@code #setVisible(true)}.
      * @see java.awt.Component#isDisplayable
      * @see java.awt.Component#setVisible
      * @see java.awt.Window#toFront

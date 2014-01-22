@@ -141,7 +141,6 @@ public class Filtering {
                             g += ((color >> 8) & 0xff);
                             b += ((color) & 0xff);
 
-
                         }
                         hits++;
                     }
@@ -342,7 +341,6 @@ public class Filtering {
             gg.fill(new Rectangle(256, 1));
             int[] gradientPixels = getRGB(gradient, 0, 0, gradient.getWidth(), gradient.getHeight());
 
-
             double angleRad = angle / 180 * Math.PI;
             double moveX = (distance * Math.cos(angleRad));
             double moveY = (distance * Math.sin(angleRad));
@@ -366,15 +364,10 @@ public class Filtering {
             Color colorAlpha = new Color(0, 0, 0, 0);
             shadow = moveRGB(width, height, shadow, moveX, moveY, inner ? colorFirst : colorAlpha);
 
-
-
-
             setRGB(retImg, 0, 0, width, height, shadow);
-
 
             retImg = blur(retImg, blurX, blurY, iterations, inner ? srcPixels : revPixels);//new BoxBlurFilter(blurX, blurY, iterations, inner ? srcPixels : revPixels).filter(ret);
             shadow = getRGB(retImg, 0, 0, width, height);
-
 
             for (int i = 0; i < shadow.length; i++) {
                 int a = (shadow[i] >> 24) & 0xff;
@@ -389,9 +382,6 @@ public class Filtering {
                 int shadA = (shadow[i] >> 24) & 0xff;
                 shadow[i] = (shadow[i] & 0x00ffffff) + (Math.min(srcA, shadA) << 24);
             }
-
-
-
 
             setRGB(retImg, 0, 0, width, height, shadow);
         }

@@ -71,7 +71,6 @@ public class ActionPush extends Action {
             }
         }
 
-
     }
 
     public ActionPush(int actionLength, SWFInputStream sis, int version) throws IOException {

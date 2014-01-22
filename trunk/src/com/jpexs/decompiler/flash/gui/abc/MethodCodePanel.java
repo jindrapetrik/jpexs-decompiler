@@ -156,11 +156,11 @@ public class MethodCodePanel extends JPanel implements ActionListener {
     }
 
     private ExportMode getExportMode() {
-        ExportMode exportMode = hexOnlyButton.isSelected() ? ExportMode.HEX :
-                (hexButton.isSelected() ? ExportMode.PCODEWITHHEX : ExportMode.PCODE);
+        ExportMode exportMode = hexOnlyButton.isSelected() ? ExportMode.HEX
+                : (hexButton.isSelected() ? ExportMode.PCODEWITHHEX : ExportMode.PCODE);
         return exportMode;
     }
-    
+
     public void setEditMode(boolean val) {
         ExportMode exportMode = getExportMode();
         if (val) {

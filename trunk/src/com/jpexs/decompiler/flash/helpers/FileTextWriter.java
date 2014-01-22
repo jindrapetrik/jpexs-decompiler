@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
-    
+
     private final Writer writer;
     private boolean newLine = true;
     private int indent;
@@ -45,13 +45,13 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
         writeToFile(text);
         return this;
     }
-    
+
     @Override
     public FileTextWriter hilightSpecial(String text, String type, int index) {
         writeToFile(text);
         return this;
     }
-    
+
     @Override
     public FileTextWriter append(String str) {
         writeToFile(str);
@@ -99,12 +99,12 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
     public int getLength() {
         return writtenBytes;
     }
-    
+
     @Override
     public int getIndent() {
         return indent;
     }
-    
+
     private void writeToFile(String str) {
         if (newLine) {
             newLine = false;
@@ -117,7 +117,7 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
             Logger.getLogger(FileTextWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void appendIndent() {
         for (int i = 0; i < indent; i++) {
             writeToFile(INDENT_STRING);

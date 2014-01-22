@@ -29,7 +29,7 @@ public class ActionLocalData extends BaseLocalData {
     public final HashMap<Integer, String> regNames;
     public final HashMap<String, GraphTargetItem> variables;
     public final HashMap<String, GraphTargetItem> functions;
-    
+
     public ActionLocalData() {
         regNames = new HashMap<>();
         variables = new HashMap<>();

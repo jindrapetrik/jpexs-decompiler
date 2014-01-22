@@ -210,7 +210,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                         }
                     }
 
-
                     float[] focRadFractions = new float[ratiosFocRad.size()];
                     for (int i = 0; i < ratiosFocRad.size(); i++) {
                         focRadFractions[i] = ratiosFocRad.get(i);
@@ -240,7 +239,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                         cm = CycleMethod.REPEAT;
                     }
 
-
                     g.setPaint(new RadialGradientPaint(new Point(0, 0), 16384, new Point((int) (fillStyle0.focalGradient.focalPoint * 16384), 0), focRadFractions, focRadColors, cm));
                     g.fill(new Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
                     g.setTransform(oldAf);
@@ -260,8 +258,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                             colorsRad.add(new Color(fillStyle0.gradient.gradientRecords[i].color.red, fillStyle0.gradient.gradientRecords[i].color.green, fillStyle0.gradient.gradientRecords[i].color.blue));
                         }
                     }
-
-
 
                     float[] ratiosRadAr = new float[ratiosRad.size()];
                     for (int i = 0; i < ratiosRad.size(); i++) {
@@ -313,8 +309,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                         }
                     }
 
-
-
                     float[] ratiosAr = new float[ratios.size()];
                     for (int i = 0; i < ratios.size(); i++) {
                         ratiosAr[i] = ratios.get(i);
@@ -337,7 +331,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     } else if (fillStyle0.gradient.spreadMode == GRADIENT.SPREAD_REPEAT_MODE) {
                         cmLin = CycleMethod.REPEAT;
                     }
-
 
                     g.setPaint(new LinearGradientPaint(new Point(-16384, 0), new Point(16384, 0), ratiosAr, colorsArr, cmLin));
                     g.fill(new Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
@@ -507,7 +500,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     paths.add(path);
                 }
                 path = new Path();
-
 
                 if (scr.stateNewStyles) {
                     fillStyles = scr.fillStyles;
@@ -859,12 +851,10 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         maxw /= 20;
         maxh /= 20;
 
-
         int cols = (int) Math.ceil(Math.sqrt(shapes.size()));
         int pos = 0;
         int w2 = prevWidth / cols;
         int h2 = prevHeight / cols;
-
 
         int mh = maxh * w2 / maxw;
         int mw;
@@ -925,11 +915,11 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             }
             p.drawTo(tags, -rect.Xmin, -rect.Ymin, g, shapeNum);
         }
-        
+
         if (putToCache) {
             cache.put(key, new SerializableImage(ret));
         }
-    
+
         return ret;
     }
 
@@ -1053,7 +1043,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             init = new StyleChangeRecord();
             retList.add(0, init);
         }
-
 
         retList.add(new EndShapeRecord());
         init.stateFillStyle0 = true;

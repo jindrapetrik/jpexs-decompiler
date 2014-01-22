@@ -32,20 +32,22 @@ public enum ExportMode {
     private static final Map<Integer, ExportMode> lookup = new HashMap<>();
 
     static {
-         for(ExportMode s : EnumSet.allOf(ExportMode.class)) {
-             lookup.put(s.getCode(), s);
-         }
+        for (ExportMode s : EnumSet.allOf(ExportMode.class)) {
+            lookup.put(s.getCode(), s);
+        }
     }
 
     private final int code;
 
     private ExportMode(int code) {
-         this.code = code;
+        this.code = code;
     }
 
-    public int getCode() { return code; }
+    public int getCode() {
+        return code;
+    }
 
-    public static ExportMode get(int code) { 
-         return lookup.get(code); 
+    public static ExportMode get(int code) {
+        return lookup.get(code);
     }
 }

@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AppStrings;
@@ -36,12 +35,13 @@ import jsyntaxpane.actions.DocumentSearchData;
  * @author JPEXS
  */
 public class SearchPanel<E> extends JPanel implements ActionListener {
+
     static final String ACTION_SEARCH_PREV = "SEARCHPREV";
     static final String ACTION_SEARCH_NEXT = "SEARCHNEXT";
     static final String ACTION_SEARCH_CANCEL = "SEARCHCANCEL";
 
     private final SearchListener<E> listener;
-    
+
     private final JLabel searchPos;
     private int foundPos = 0;
     private final JLabel searchForLabel;
@@ -54,7 +54,7 @@ public class SearchPanel<E> extends JPanel implements ActionListener {
         super(lm);
 
         this.listener = listener;
-        
+
         JButton prevSearchButton = new JButton(View.getIcon("prev16"));
         prevSearchButton.setMargin(new Insets(3, 3, 3, 3));
         prevSearchButton.addActionListener(this);
@@ -77,7 +77,7 @@ public class SearchPanel<E> extends JPanel implements ActionListener {
         add(cancelSearchButton);
         setVisible(false);
     }
-    
+
     public void showQuickFindDialog(JTextComponent editor) {
         DocumentSearchData dsd = DocumentSearchData.getFromEditor(editor);
         dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
@@ -88,7 +88,7 @@ public class SearchPanel<E> extends JPanel implements ActionListener {
         searchFor = txt;
         searchForLabel.setText(AppStrings.translate("search.info").replace("%text%", txt) + " ");
     }
-    
+
     public boolean setResults(List<E> results) {
         found = results;
         if (found.isEmpty()) {
@@ -100,22 +100,22 @@ public class SearchPanel<E> extends JPanel implements ActionListener {
             return true;
         }
     }
-    
+
     public void setOptions(boolean ignoreCase, boolean regExp) {
         searchIgnoreCase = ignoreCase;
         searchRegexp = regExp;
     }
-    
+
     public void setPos(int pos) {
         foundPos = pos;
         doUpdate();
     }
-    
+
     public void clear() {
         foundPos = 0;
         found.clear();
     }
-    
+
     private void doUpdate() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -125,7 +125,7 @@ public class SearchPanel<E> extends JPanel implements ActionListener {
             }
         });
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {

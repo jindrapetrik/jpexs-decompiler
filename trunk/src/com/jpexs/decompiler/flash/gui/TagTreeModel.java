@@ -80,7 +80,7 @@ public class TagTreeModel implements TreeModel {
         swfToSwfNode.put(swf, swfNode);
         return swfNode;
     }
-    
+
     private String translate(String key) {
         return mainFrame.translate(key);
     }
@@ -152,13 +152,11 @@ public class TagTreeModel implements TreeModel {
         StringNode soundsNode = new StringNode(new StringItem(translate("node.sounds"), swf));
         soundsNode.subNodes.addAll(sounds);
 
-
         StringNode binaryDataNode = new StringNode(new StringItem(translate("node.binaryData"), swf));
         binaryDataNode.subNodes.addAll(binaryData);
 
         StringNode fontsNode = new StringNode(new StringItem(translate("node.fonts"), swf));
         fontsNode.subNodes.addAll(fonts);
-
 
         StringNode spritesNode = new StringNode(new StringItem(translate("node.sprites"), swf));
         spritesNode.subNodes.addAll(sprites);
@@ -240,7 +238,7 @@ public class TagTreeModel implements TreeModel {
                 if (obj == it) {
                     return newPath;
                 }
-            }   
+            }
             if (n instanceof TreeNode) {
                 TreeNode nd = (TreeNode) n;
                 if (nd.getItem() == obj) {
@@ -339,7 +337,7 @@ public class TagTreeModel implements TreeModel {
                 return clt.getIndexOfChild(clt.getRoot(), child);
             }
             return parentNode.subNodes.indexOf(child);
-        } 
+        }
     }
 
     @Override

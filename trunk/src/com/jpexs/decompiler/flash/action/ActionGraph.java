@@ -301,8 +301,6 @@ public class ActionGraph extends Graph {
                 GraphPart defaultPart = part; //21-21
                 //caseBodyParts.add(defaultPart);
 
-
-
                 List<GraphPart> defaultAndLastPart = new ArrayList<>();
                 defaultAndLastPart.add(defaultPart);
                 defaultAndLastPart.add(caseBodyParts.get(caseBodyParts.size() - 1));
@@ -313,7 +311,6 @@ public class ActionGraph extends Graph {
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 stopPart2.add(defaultPart2);
                 defaultCommands = printGraph(localData, stack, allParts, null, defaultPart, stopPart2, loops, staticOperation, path);
-
 
                 List<GraphPart> loopContinues = new ArrayList<>();
                 for (Loop l : loops) {
@@ -352,7 +349,6 @@ public class ActionGraph extends Graph {
                     defaultPart = defaultPart2;
                 }
 
-
                 List<GraphTargetItem> caseValues = new ArrayList<>();
                 for (int i = 0; i < caseBodyParts.size(); i++) {
                     if (caseValuesMap.containsKey(i)) {
@@ -364,8 +360,6 @@ public class ActionGraph extends Graph {
 
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
                 GraphPart next = null;
-
-
 
                 next = breakPart;
 
@@ -383,9 +377,6 @@ public class ActionGraph extends Graph {
                     }
                     valuesMapping.add(caseBodies.indexOf(cur));
                 }
-
-
-
 
                 if (defaultPart == breakPart) {
                     defaultPart = null;

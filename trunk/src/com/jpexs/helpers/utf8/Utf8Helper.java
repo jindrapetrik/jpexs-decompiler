@@ -25,7 +25,7 @@ import java.nio.charset.Charset;
  * @author JPEXS
  */
 public class Utf8Helper {
-  
+
     public static Charset charset = Charset.forName("UTF-8");
 
     public static String urlDecode(String s) {
@@ -35,7 +35,7 @@ public class Utf8Helper {
             throw new Error(ex);
         }
     }
-    
+
     public static byte[] getBytes(String string) {
         return string.getBytes(charset);
     }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.StreamSearch;
@@ -31,8 +30,10 @@ import java.util.Set;
  * @author JPEXS
  */
 public class BinarySWFBundle implements SWFBundle {
+
     private final SWFSearch search;
-    public BinarySWFBundle(InputStream is){
+
+    public BinarySWFBundle(InputStream is) {
         search = new SWFSearch(new StreamSearch(is));
         search.process();
     }
@@ -53,17 +54,17 @@ public class BinarySWFBundle implements SWFBundle {
 
     @Override
     public SeekableInputStream getSWF(String key) {
-        if(!key.startsWith("[")){
+        if (!key.startsWith("[")) {
             return null;
         }
-        if(!key.endsWith("]")){
+        if (!key.endsWith("]")) {
             return null;
         }
         key = key.substring(1, key.length() - 1);
         try {
             int address = Integer.parseInt(key);
             return search.get(null, address);
-        } catch(IOException | NumberFormatException iex){
+        } catch (IOException | NumberFormatException iex) {
             return null;
         }
     }
@@ -71,7 +72,7 @@ public class BinarySWFBundle implements SWFBundle {
     @Override
     public Map<String, SeekableInputStream> getAll() {
         Map<String, SeekableInputStream> ret = new HashMap<>();
-        for(String key : getKeys()){
+        for (String key : getKeys()) {
             ret.put(key, getSWF(key));
         }
         return ret;

@@ -24,7 +24,7 @@ import java.io.PrintWriter;
  * @author JPEXS
  */
 public class Utf8PrintWriter extends PrintWriter {
-    
+
     public Utf8PrintWriter(OutputStream out) {
         super(new Utf8OutputStreamWriter(out));
     }

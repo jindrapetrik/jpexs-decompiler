@@ -50,7 +50,7 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
 
     public MainPanel panel;
     private MainFrameMenu mainMenu;
-    
+
     public MainFrameRibbon() {
         super();
 
@@ -170,53 +170,53 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
                     mbutton.setIcon(View.getResizableIcon("buttonicon_256"));
                     mbutton.setDisplayState(new CommandButtonDisplayState(
                             "My Ribbon Application Menu Button", mbutton.getSize().width) {
-                        @Override
-                        public CommandButtonLayoutManager createLayoutManager(
-                                AbstractCommandButton commandButton) {
-                            return new CommandButtonLayoutManager() {
                                 @Override
-                                public int getPreferredIconSize() {
-                                    return mbutton.getSize().width;
-                                }
-
-                                @Override
-                                public CommandButtonLayoutManager.CommandButtonLayoutInfo getLayoutInfo(
-                                        AbstractCommandButton commandButton, Graphics g) {
-                                    CommandButtonLayoutManager.CommandButtonLayoutInfo result = new CommandButtonLayoutManager.CommandButtonLayoutInfo();
-                                    result.actionClickArea = new Rectangle(0, 0, 0, 0);
-                                    result.popupClickArea = new Rectangle(0, 0, commandButton
-                                            .getWidth(), commandButton.getHeight());
-                                    result.popupActionRect = new Rectangle(0, 0, 0, 0);
-                                    ResizableIcon icon = commandButton.getIcon();
-                                    icon.setDimension(new Dimension(commandButton.getWidth(), commandButton.getHeight()));
-                                    result.iconRect = new Rectangle(
-                                            0,
-                                            0,
-                                            commandButton.getWidth(), commandButton.getHeight());
-                                    result.isTextInActionArea = false;
-                                    return result;
-                                }
-
-                                @Override
-                                public Dimension getPreferredSize(
+                                public CommandButtonLayoutManager createLayoutManager(
                                         AbstractCommandButton commandButton) {
-                                    return new Dimension(40, 40);
-                                }
+                                            return new CommandButtonLayoutManager() {
+                                                @Override
+                                                public int getPreferredIconSize() {
+                                                    return mbutton.getSize().width;
+                                                }
 
-                                @Override
-                                public void propertyChange(PropertyChangeEvent evt) {
-                                }
+                                                @Override
+                                                public CommandButtonLayoutManager.CommandButtonLayoutInfo getLayoutInfo(
+                                                        AbstractCommandButton commandButton, Graphics g) {
+                                                            CommandButtonLayoutManager.CommandButtonLayoutInfo result = new CommandButtonLayoutManager.CommandButtonLayoutInfo();
+                                                            result.actionClickArea = new Rectangle(0, 0, 0, 0);
+                                                            result.popupClickArea = new Rectangle(0, 0, commandButton
+                                                                    .getWidth(), commandButton.getHeight());
+                                                            result.popupActionRect = new Rectangle(0, 0, 0, 0);
+                                                            ResizableIcon icon = commandButton.getIcon();
+                                                            icon.setDimension(new Dimension(commandButton.getWidth(), commandButton.getHeight()));
+                                                            result.iconRect = new Rectangle(
+                                                                    0,
+                                                                    0,
+                                                                    commandButton.getWidth(), commandButton.getHeight());
+                                                            result.isTextInActionArea = false;
+                                                            return result;
+                                                        }
 
-                                @Override
-                                public Point getKeyTipAnchorCenterPoint(
-                                        AbstractCommandButton commandButton) {
-                                    // dead center
-                                    return new Point(commandButton.getWidth() / 2,
-                                            commandButton.getHeight() / 2);
-                                }
-                            };
-                        }
-                    });
+                                                        @Override
+                                                        public Dimension getPreferredSize(
+                                                                AbstractCommandButton commandButton) {
+                                                                    return new Dimension(40, 40);
+                                                                }
+
+                                                                @Override
+                                                                public void propertyChange(PropertyChangeEvent evt) {
+                                                                }
+
+                                                                @Override
+                                                                public Point getKeyTipAnchorCenterPoint(
+                                                                        AbstractCommandButton commandButton) {
+                                                                            // dead center
+                                                                            return new Point(commandButton.getWidth() / 2,
+                                                                                    commandButton.getHeight() / 2);
+                                                                        }
+                                            };
+                                        }
+                            });
 
                     MyRibbonApplicationMenuButtonUI mui = (MyRibbonApplicationMenuButtonUI) mbutton.getUI();
                     mui.setHoverIcon(View.getResizableIcon("buttonicon_hover_256"));
@@ -225,7 +225,7 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
                 }
             }
         });
-            
+
         panel.setVisible(b);
     }
 
@@ -233,4 +233,4 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
     public MainPanel getPanel() {
         return panel;
     }
- }
+}

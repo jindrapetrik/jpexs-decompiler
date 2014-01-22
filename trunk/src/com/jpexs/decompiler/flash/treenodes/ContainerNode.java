@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
  * @author JPEXS
  */
 public class ContainerNode extends TreeNode {
-    
+
     public ContainerNode(ContainerItem item) {
         super(item);
     }

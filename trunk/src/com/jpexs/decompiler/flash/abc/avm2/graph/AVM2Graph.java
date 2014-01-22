@@ -208,7 +208,6 @@ public class AVM2Graph extends Graph {
             int endpos = code.adr2pos(this.avm2code.fixAddrAfterDebugLine(catchedExceptions.get(0).end));
             int endposStartBlock = code.adr2pos(catchedExceptions.get(0).end);
 
-
             List<List<GraphTargetItem>> catchedCommands = new ArrayList<>();
             if (this.avm2code.code.get(endpos).definition instanceof JumpIns) {
                 int afterCatchAddr = this.avm2code.pos2adr(endpos + 1) + this.avm2code.code.get(endpos).operands[0];
@@ -220,7 +219,6 @@ public class AVM2Graph extends Graph {
                         return t.avm2code.fixAddrAfterDebugLine(o1.target) - t.avm2code.fixAddrAfterDebugLine(o2.target);
                     }
                 });
-
 
                 List<GraphTargetItem> finallyCommands = new ArrayList<>();
                 int returnPos = afterCatchPos;
@@ -447,7 +445,6 @@ public class AVM2Graph extends Graph {
 
             GraphPart switchLoc = part.nextParts.get(reversed ? 0 : 1).nextParts.get(0);
 
-
             while ((this.avm2code.code.get(part.nextParts.get(reversed ? 1 : 0).end).definition instanceof IfStrictNeIns)
                     || (this.avm2code.code.get(part.nextParts.get(reversed ? 1 : 0).end).definition instanceof IfStrictEqIns)) {
                 part = part.nextParts.get(reversed ? 1 : 0);
@@ -641,7 +638,6 @@ public class AVM2Graph extends Graph {
             return ret;
         }
 
-
         int pos = next.start;
         int addr = this.avm2code.fixAddrAfterDebugLine(avm2code.pos2adr(pos));
         for (int e = 0; e < body.exceptions.length; e++) {
@@ -733,8 +729,6 @@ public class AVM2Graph extends Graph {
 
          }
          }*/
-
-
         List<GraphTargetItem> ret = avm2code.clearTemporaryRegisters(list);
         if (ret != list) {
             list.clear();

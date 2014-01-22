@@ -209,7 +209,6 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         FontType font = fonts.get(0);
         SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, fontStyle, 20 * font.nominalSize, character);
 
-
         int code = (int) character;
         int pos = -1;
         boolean exists = false;
@@ -448,6 +447,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
              kr.fontKerningCode2 = ft.kerning.get(i).char2;
              ret.fontKerningTable[i] = kr;
              }*/
+
             return ret;
         } catch (IOException ex) {
             Logger.getLogger(DefineCompactedFont.class.getName()).log(Level.SEVERE, null, ex);

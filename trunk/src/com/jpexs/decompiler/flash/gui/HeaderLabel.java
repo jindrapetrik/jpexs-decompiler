@@ -61,7 +61,6 @@ public class HeaderLabel extends JLabel {
          return false;
          }
          });*/
-
     }
 
     @Override

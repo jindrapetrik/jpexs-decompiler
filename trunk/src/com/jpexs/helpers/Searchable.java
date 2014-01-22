@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.helpers;
 
 import java.io.InputStream;
@@ -25,12 +24,16 @@ import java.util.Map;
  * @author JPEXS
  */
 public interface Searchable {
+
     /**
      * Searches for byte sequences
+     *
      * @param data
      * @return Map Position=>Input stream
      */
-    public Map<Long, InputStream> search(byte[]... data);
+    public Map<Long, InputStream> search(byte[] 
+
+    ... data);
 
     /**
      * Searches for byte sequences with progress listener
@@ -38,5 +41,7 @@ public interface Searchable {
      * @param data
      * @return Map Position=>Input stream
      */
-    public Map<Long, InputStream> search(ProgressListener progListener, byte[]... data);
+    public Map<Long, InputStream> search(ProgressListener progListener, byte[] 
+
+... data);
 }

@@ -300,7 +300,6 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         List<GraphTargetItem> finallyCommands = contents.get(2);
         output.add(new TryActionItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
 
-
     }
 
     @Override

@@ -62,7 +62,7 @@ public class SwitchItem extends LoopItem implements Block {
     @Override
     protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (writer instanceof NulWriter) {
-            ((NulWriter)writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_SWITCH);
+            ((NulWriter) writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_SWITCH);
         }
         if (labelUsed) {
             writer.append("loopswitch" + loop.id + ":").newLine();
@@ -104,7 +104,7 @@ public class SwitchItem extends LoopItem implements Block {
         writer.unindent();
         writer.append("}").newLine();
         if (writer instanceof NulWriter) {
-            LoopWithType loopOjb = ((NulWriter)writer).endLoop(loop.id);
+            LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
             labelUsed = loopOjb.used;
         }
         return writer;

@@ -190,7 +190,7 @@ import javax.swing.tree.TreeSelectionModel;
  * @author JPEXS
  */
 public final class MainPanel extends JPanel implements ActionListener, TreeSelectionListener, SearchListener<TextTag>, Freed {
-    
+
     private final MainFrame mainFrame;
     private final List<SWFList> swfs;
     private ABCPanel abcPanel;
@@ -261,7 +261,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String ACTION_CANCEL_TEXT = "CANCELTEXT";
     private static final String ACTION_SAVE_TEXT = "SAVETEXT";
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
-    
+
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
     public void setPercent(int percent) {
@@ -314,17 +314,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         exportSelectionMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_SEL);
         exportSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(exportSelectionMenuItem);
-        
+
         final JMenuItem replaceImageSelectionMenuItem = new JMenuItem(translate("button.replace"));
         replaceImageSelectionMenuItem.setActionCommand(ACTION_REPLACE_IMAGE);
         replaceImageSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(replaceImageSelectionMenuItem);
-        
+
         final JMenuItem replaceBinarySelectionMenuItem = new JMenuItem(translate("button.replace"));
         replaceBinarySelectionMenuItem.setActionCommand(ACTION_REPLACE_BINARY);
         replaceBinarySelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(replaceBinarySelectionMenuItem);
-        
+
         final JMenuItem closeSelectionMenuItem = new JMenuItem(translate("contextmenu.closeSwf"));
         closeSelectionMenuItem.setActionCommand(ACTION_CLOSE_SWF);
         closeSelectionMenuItem.addActionListener(this);
@@ -368,7 +368,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     replaceBinarySelectionMenuItem.setVisible(false);
                     closeSelectionMenuItem.setVisible(false);
                     moveTagMenu.setVisible(false);
-                    
+
                     if (paths.length == 1) {
                         TreeNode treeNode = (TreeNode) paths[0].getLastPathComponent();
 
@@ -409,7 +409,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             moveTagMenu.setVisible(true);
                         }
                     }
-                    
+
                     removeMenuItem.setVisible(allSelectedIsTag);
                     exportSelectionMenuItem.setEnabled(hasExportableNodes());
                     contextPopupMenu.show(e.getComponent(), e.getX(), e.getY());
@@ -417,7 +417,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         });
     }
-    
+
     private JPanel createWelcomePanel() {
         JPanel welcomePanel = new JPanel();
         welcomePanel.setLayout(new BoxLayout(welcomePanel, BoxLayout.Y_AXIS));
@@ -471,7 +471,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         imagesCard.add(imageButtonsPanel, BorderLayout.SOUTH);
         return imagesCard;
     }
-    
+
     private JPanel createBinaryCard() {
         JPanel binaryCard = new JPanel(new BorderLayout());
         binaryPanel = new BinaryPanel();
@@ -487,19 +487,19 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         binaryCard.add(binaryButtonsPanel, BorderLayout.SOUTH);
         return binaryCard;
     }
-    
+
     private void showHideImageReplaceButton(boolean show) {
         imageReplaceButton.setVisible(show);
         setImageButtonPanelVisibility();
     }
-    
+
     private void setImageButtonPanelVisibility() {
         // hide button panel when no button is visible
         // now there is only one button, later add here the other buttons
         boolean visible = imageReplaceButton.isVisible();
         imageButtonsPanel.setVisible(visible);
     }
-    
+
     public String translate(String key) {
         return mainFrame.translate(key);
     }
@@ -510,9 +510,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         this.mainFrame = mainFrame;
         this.mainMenu = mainMenu;
         this.flashPanel = flashPanel;
-        
+
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
-        
+
         setLayout(new BorderLayout());
         swfs = new ArrayList<>();
 
@@ -611,7 +611,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         });
 
         createContextMenu();
-        
+
         statusPanel = new MainFrameStatusPanel(this);
         add(statusPanel, BorderLayout.SOUTH);
 
@@ -623,10 +623,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         textValue.setEditable(false);
         //textValue.setFont(UIManager.getFont("TextField.font"));
 
-
         JPanel textButtonsPanel = new JPanel();
         textButtonsPanel.setLayout(new FlowLayout());
-
 
         textSaveButton = new JButton(translate("button.save"), View.getIcon("save16"));
         textSaveButton.setMargin(new Insets(3, 3, 3, 10));
@@ -659,9 +657,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         fontPanel = new FontPanel(this);
         displayWithPreview.add(fontPanel, CARDFONTPANEL);
 
-
         Component leftComponent;
-
 
         displayPanel = new JPanel(new CardLayout());
 
@@ -687,7 +683,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
             }
         });
-        
+
         JPanel pan = new JPanel(new BorderLayout());
         JLabel prevLabel = new HeaderLabel(translate("swfpreview"));
         prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -755,7 +751,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         swfPreviewPanel = new SWFPreviwPanel();
         displayPanel.add(swfPreviewPanel, CARDSWFPREVIEWPANEL);
 
-
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
         CardLayout cl = (CardLayout) (displayPanel.getLayout());
         cl.show(displayPanel, CARDEMPTYPANEL);
@@ -807,7 +802,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, pan1, detailPanel);
         splitPane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, displayPanel);
 
-
         welcomePanel = createWelcomePanel();
         add(welcomePanel, BorderLayout.CENTER);
 
@@ -835,7 +829,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         contentPanel.add(splitPane1, SPLIT_PANE1);
         add(contentPanel);
         cl3.show(contentPanel, WELCOME_PANEL);
-        
+
         tagTree.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -848,11 +842,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         detailPanel.setVisible(false);
 
         updateUi();
-        
+
         //Opening files with drag&drop to main window
         enableDrop(true);
     }
-    
+
     public void load(SWFList newSwfs, boolean first) {
         swfs.add(newSwfs);
 
@@ -927,7 +921,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
 
         List<ABCContainerTag> abcList = swf.abcList;
-        
+
         boolean hasAbc = !abcList.isEmpty();
 
         if (hasAbc) {
@@ -939,21 +933,21 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             cl.show(contentPanel, SPLIT_PANE1);
             isWelcomeScreen = false;
         }
-        
+
         mainMenu.updateComponets(swf, abcList);
     }
-    
+
     private void updateUi() {
         if (!isWelcomeScreen && swfs.isEmpty()) {
             CardLayout cl = (CardLayout) (contentPanel.getLayout());
             cl.show(contentPanel, WELCOME_PANEL);
             isWelcomeScreen = true;
         }
-        
+
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
         mainMenu.updateComponets(null, null);
     }
-    
+
     public void closeAll() {
         swfs.clear();
         oldNode = null;
@@ -985,7 +979,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         updateUi();
         updateTagTree();
     }
-    
+
     private void updateTagTree() {
         tagTree.setModel(new TagTreeModel(mainFrame, swfs));
         expandSwfNodes();
@@ -1022,9 +1016,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 updateNeeded = true;
             }
         }
-    
+
         refreshTree();
-        
+
         if (updateNeeded) {
             View.execInEventDispatch(new Runnable() {
                 @Override
@@ -1044,7 +1038,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 updateNeeded = true;
             }
         }
-        
+
         if (updateNeeded) {
             View.execInEventDispatch(new Runnable() {
                 @Override
@@ -1083,7 +1077,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     splitsInited = true;
                 }
             });
-
 
         }
     }
@@ -1338,7 +1331,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (d instanceof ContainerNode) {
                 ContainerNode n = (ContainerNode) d;
                 TreeNodeType nodeType = TagTree.getTreeNodeType(n.getItem());
-                if (nodeType == TreeNodeType.IMAGE 
+                if (nodeType == TreeNodeType.IMAGE
                         || nodeType == TreeNodeType.SHAPE
                         || nodeType == TreeNodeType.AS
                         || nodeType == TreeNodeType.MOVIE
@@ -1356,12 +1349,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         return false;
     }
-    
+
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
         final ExportMode exportMode = ExportMode.get(export.getOption(ExportDialog.OPTION_ACTIONSCRIPT));
         final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
         final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
-        
+
         List<File> ret = new ArrayList<>();
         List<TreeNode> sel = getAllSelected(tagTree);
 
@@ -1444,27 +1437,27 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (swf == null) {
             return null;
         }
-        
+
         return swf.swfList;
     }
-    
+
     public SWF getCurrentSwf() {
         if (swfs == null || swfs.isEmpty()) {
             return null;
         }
-        
+
         TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
         if (treeNode == null) {
             return swfs.get(0).get(0);
         }
-        
+
         if (treeNode instanceof SWFBundleNode) {
             return null;
         }
-        
+
         return treeNode.getItem().getSwf();
     }
-    
+
     private void clearCache() {
         if (abcPanel != null) {
             abcPanel.decompiledTextArea.clearScriptCache();
@@ -1507,7 +1500,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         reload(true);
         updateClassesList();
     }
-    
+
     public void searchAs() {
         if (searchDialog == null) {
             searchDialog = new SearchDialog();
@@ -1517,7 +1510,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             final String txt = searchDialog.searchField.getText();
             if (!txt.isEmpty()) {
                 final SWF swf = getCurrentSwf();
-                
+
                 new CancellableWorker() {
                     @Override
                     protected Void doInBackground() throws Exception {
@@ -1550,18 +1543,18 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 found = true;
                             }
                         }
-                        
+
                         if (!found) {
                             View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                         }
-                        
+
                         return null;
                     }
                 }.execute();
             }
         }
     }
-    
+
     private boolean searchText(String txt, boolean ignoreCase, boolean regexp, SWF swf) {
         if ((txt != null) && (!txt.isEmpty())) {
             textSearchPanel.setOptions(ignoreCase, regexp);
@@ -1585,7 +1578,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         return false;
     }
-    
+
     @Override
     public void updateSearchPos(TextTag item) {
         TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
@@ -1605,7 +1598,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         reload(true);
         updateClassesList();
     }
-    
+
     public void renameOneIdentifier(final SWF swf) {
         if (swf.fileAttributes.actionScript3) {
             final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
@@ -1653,7 +1646,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-    
+
     public void exportFla(final SWF swf) {
         JFileChooser fc = new JFileChooser();
         String selDir = Configuration.lastOpenDir.get();
@@ -1735,7 +1728,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }.execute();
         }
     }
-    
+
     public void export(final boolean onlySel) {
         final ExportDialog export = new ExportDialog();
         export.setVisible(true);
@@ -1795,7 +1788,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-    
+
     public void restoreControlFlow(final boolean all) {
         Main.startWork(translate("work.restoringControlFlow"));
         if ((!all) || confirmExperimental()) {
@@ -1834,7 +1827,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }.execute();
         }
     }
-    
+
     public void renameIdentifiers(final SWF swf) {
         if (confirmExperimental()) {
             final RenameType renameType = new RenameDialog().display();
@@ -1876,7 +1869,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-    
+
     public void deobfuscate() {
         if (deobfuscationDialog == null) {
             deobfuscationDialog = new DeobfuscationDialog();
@@ -1938,7 +1931,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }.execute();
         }
     }
-    
+
     public void removeNonScripts(SWF swf) {
         List<Tag> tags = new ArrayList<>(swf.tags);
         for (Tag tag : tags) {
@@ -1950,7 +1943,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         showCard(CARDEMPTYPANEL);
         refreshTree();
     }
-    
+
     public void refreshDecompiled() {
         clearCache();
         if (abcPanel != null) {
@@ -1959,7 +1952,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         reload(true);
         updateClassesList();
     }
-    
+
     public boolean saveText(TextTag textTag, String text) {
         try {
             if (textTag.setFormattedText(new MissingCharacterHandler() {
@@ -1987,7 +1980,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         return false;
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -1998,72 +1991,36 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     reload(true);
                 }
                 break;
-            case ACTION_REPLACE_IMAGE:
-                {
-                    Object tagObj = tagTree.getLastSelectedPathComponent();
-                    if (tagObj == null) {
-                        return;
-                    }
-
-                    TreeItem item = null;
-                    if (tagObj instanceof TreeNode) {
-                        item = ((TreeNode) tagObj).getItem();
-                    }
-                    if (item instanceof ImageTag) {
-                        ImageTag it = (ImageTag) item;
-                        if (it.importSupported()) {
-                            JFileChooser fc = new JFileChooser();
-                            fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
-                            fc.setFileFilter(new FileFilter() {
-                                @Override
-                                public boolean accept(File f) {
-                                    return (f.getName().toLowerCase().endsWith(".jpg"))
-                                            || (f.getName().toLowerCase().endsWith(".jpeg"))
-                                            || (f.getName().toLowerCase().endsWith(".gif"))
-                                            || (f.getName().toLowerCase().endsWith(".png"))
-                                            || (f.isDirectory());
-                                }
-
-                                @Override
-                                public String getDescription() {
-                                    return translate("filter.images");
-                                }
-                            });
-                            JFrame f = new JFrame();
-                            View.setWindowIcon(f);
-                            int returnVal = fc.showOpenDialog(f);
-                            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                                Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
-                                File selfile = Helper.fixDialogFile(fc.getSelectedFile());
-                                byte[] data = Helper.readFile(selfile.getAbsolutePath());
-                                try {
-                                    it.setImage(data);
-                                    it.getSwf().clearImageCache();
-                                } catch (IOException ex) {
-                                    Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Invalid image", ex);
-                                    View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                                }
-                                reload(true);
-                            }
-                        }
-                    }
+            case ACTION_REPLACE_IMAGE: {
+                Object tagObj = tagTree.getLastSelectedPathComponent();
+                if (tagObj == null) {
+                    return;
                 }
-                break;
-            case ACTION_REPLACE_BINARY:
-                {
-                    Object tagObj = tagTree.getLastSelectedPathComponent();
-                    if (tagObj == null) {
-                        return;
-                    }
 
-                    TreeItem item = null;
-                    if (tagObj instanceof TreeNode) {
-                        item = ((TreeNode) tagObj).getItem();
-                    }
-                    if (tagObj instanceof DefineBinaryDataTag) {
-                        DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
+                TreeItem item = null;
+                if (tagObj instanceof TreeNode) {
+                    item = ((TreeNode) tagObj).getItem();
+                }
+                if (item instanceof ImageTag) {
+                    ImageTag it = (ImageTag) item;
+                    if (it.importSupported()) {
                         JFileChooser fc = new JFileChooser();
                         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+                        fc.setFileFilter(new FileFilter() {
+                            @Override
+                            public boolean accept(File f) {
+                                return (f.getName().toLowerCase().endsWith(".jpg"))
+                                        || (f.getName().toLowerCase().endsWith(".jpeg"))
+                                        || (f.getName().toLowerCase().endsWith(".gif"))
+                                        || (f.getName().toLowerCase().endsWith(".png"))
+                                        || (f.isDirectory());
+                            }
+
+                            @Override
+                            public String getDescription() {
+                                return translate("filter.images");
+                            }
+                        });
                         JFrame f = new JFrame();
                         View.setWindowIcon(f);
                         int returnVal = fc.showOpenDialog(f);
@@ -2071,12 +2028,46 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
                             File selfile = Helper.fixDialogFile(fc.getSelectedFile());
                             byte[] data = Helper.readFile(selfile.getAbsolutePath());
-                            bt.binaryData = data;
+                            try {
+                                it.setImage(data);
+                                it.getSwf().clearImageCache();
+                            } catch (IOException ex) {
+                                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Invalid image", ex);
+                                View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                            }
                             reload(true);
                         }
                     }
                 }
-                break;
+            }
+            break;
+            case ACTION_REPLACE_BINARY: {
+                Object tagObj = tagTree.getLastSelectedPathComponent();
+                if (tagObj == null) {
+                    return;
+                }
+
+                TreeItem item = null;
+                if (tagObj instanceof TreeNode) {
+                    item = ((TreeNode) tagObj).getItem();
+                }
+                if (tagObj instanceof DefineBinaryDataTag) {
+                    DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
+                    JFileChooser fc = new JFileChooser();
+                    fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+                    JFrame f = new JFrame();
+                    View.setWindowIcon(f);
+                    int returnVal = fc.showOpenDialog(f);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                        File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                        byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                        bt.binaryData = data;
+                        reload(true);
+                    }
+                }
+            }
+            break;
             case ACTION_REMOVE_ITEM:
                 List<TreeNode> sel = getSelected(tagTree);
 
@@ -2119,10 +2110,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }
                 }
                 break;
-            case ACTION_CLOSE_SWF:
-                {
-                    Main.closeFile(getCurrentSwfList());
-                }
+            case ACTION_CLOSE_SWF: {
+                Main.closeFile(getCurrentSwfList());
+            }
         }
         if (Main.isWorking()) {
             return;
@@ -2210,7 +2200,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         oldNode = treeNode;
 
-        TreeItem  tagObj = treeNode.getItem();
+        TreeItem tagObj = treeNode.getItem();
 
         oldTag = tagObj;
 
@@ -2272,14 +2262,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 setSourceWorker = worker;
                 Main.startWork(translate("work.decompiling") + "...", worker);
             }
-            
+
             showDetail(DETAILCARDAS3NAVIGATOR);
             showCard(CARDACTIONSCRIPT3PANEL);
             return;
         } else {
             showDetail(DETAILCARDEMPTYPANEL);
         }
-
 
         if (treeNode instanceof SWFNode) {
             SWFNode swfNode = (SWFNode) treeNode;
@@ -2356,7 +2345,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             createAndShowTempSwf(tagObj);
-            
+
             if (tagObj instanceof TextTag) {
                 TextTag textTag = (TextTag) tagObj;
                 parametersPanel.setVisible(true);
@@ -2375,7 +2364,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showCard(CARDEMPTYPANEL);
         }
     }
-    
+
     private void createAndShowTempSwf(Object tagObj) {
         SWF swf;
         try {
@@ -2386,7 +2375,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             tempFile.deleteOnExit();
 
             Color backgroundColor = View.swfBackgroundColor;
-            
+
             if (tagObj instanceof FontTag) { //Fonts are always black on white
                 backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
             }
@@ -2596,7 +2585,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         List<Action> actions;
                         DoActionTag doa;
 
-
                         doa = new DoActionTag(null, new byte[]{}, SWF.DEFAULT_VERSION, 0);
                         actions = ASMParser.parse(0, 0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
@@ -2616,7 +2604,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         doa.setActions(actions, SWF.DEFAULT_VERSION);
                         sos2.writeTag(doa);
                         sos2.writeTag(new ShowFrameTag(null));
-
 
                         actions = ASMParser.parse(0, 0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
@@ -2689,14 +2676,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         sos2.writeTag(doa);
                         sos2.writeTag(new ShowFrameTag(null));
 
-
                         actions = ASMParser.parse(0, 0, false,
                                 "StopSounds\n"
                                 + "Stop", SWF.DEFAULT_VERSION, false);
                         doa.setActions(actions, SWF.DEFAULT_VERSION);
                         sos2.writeTag(doa);
                         sos2.writeTag(new ShowFrameTag(null));
-
 
                         sos2.writeTag(new ShowFrameTag(null));
                         if (flashPanel != null) {
@@ -2728,7 +2713,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         sos2.writeTag(new ShowFrameTag(null));
                     }
 
-
                 }//not showframe
 
                 sos2.writeTag(new EndTag(null));
@@ -2743,7 +2727,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 sos.write(data);
                 fos.flush();
             }
-            
+
             showCard(CARDFLASHPANEL);
             if (flashPanel != null) {
                 flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
@@ -2775,14 +2759,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         expandSwfNodes();
         expandTreeNodes(tagTree, expandedNodes);
     }
-    
+
     public void expandSwfNodes() {
         TreeModel model = tagTree.getModel();
         Object node = model.getRoot();
         int childCount = model.getChildCount(node);
         for (int j = 0; j < childCount; j++) {
             Object child = model.getChild(node, j);
-            tagTree.expandPath(new TreePath(new Object[] {node, child}));
+            tagTree.expandPath(new TreePath(new Object[]{node, child}));
         }
     }
 
@@ -2854,7 +2838,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     private boolean isFreeing;
-    
+
     @Override
     public boolean isFreeing() {
         return isFreeing;

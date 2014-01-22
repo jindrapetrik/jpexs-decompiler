@@ -187,7 +187,6 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
             sos.writeUI16(codeSize);//codeBytes.length);
             sos.close();
 
-
             baos2.write(surroundWithAction(baos.toByteArray(), version));
             //baos2.write(codeBytes);
         } catch (IOException e) {

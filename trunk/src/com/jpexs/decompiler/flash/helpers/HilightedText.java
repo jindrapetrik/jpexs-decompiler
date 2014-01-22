@@ -59,7 +59,7 @@ public class HilightedText implements Serializable {
         this.instructionHilights = writer.instructionHilights;
         this.specialHilights = writer.specialHilights;
     }
-    
+
     public HilightedText(String text) {
         this.text = text;
         this.traitHilights = new ArrayList<>();

@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  * @author JPEXS
  */
 public class LicenseUpdater {
-    
+
     public static void updateLicense() {
         updateLicenseInDir(new File(".\\src\\"));
     }

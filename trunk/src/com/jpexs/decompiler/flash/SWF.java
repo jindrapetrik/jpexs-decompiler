@@ -226,7 +226,7 @@ public final class SWF implements TreeItem {
     public List<ABCContainerTag> abcList;
     public JPEGTablesTag jtt;
     public Map<Integer, String> sourceFontsMap = new HashMap<>();
-            
+
     /**
      * Gets all tags with specified id
      *
@@ -351,19 +351,19 @@ public final class SWF implements TreeItem {
         is.read(hdr);
         String shdr = new String(hdr, Utf8Helper.charset);
         if (!Arrays.asList(
-                "FWS",  //Uncompressed Flash
-                "CWS",  //ZLib compressed Flash
-                "ZWS",  //LZMA compressed Flash
-                "GFX",  //Uncompressed ScaleForm GFx
-                "CFX"   //Compressed ScaleForm GFx
-                ).contains(shdr)) {
+                "FWS", //Uncompressed Flash
+                "CWS", //ZLib compressed Flash
+                "ZWS", //LZMA compressed Flash
+                "GFX", //Uncompressed ScaleForm GFx
+                "CFX" //Compressed ScaleForm GFx
+        ).contains(shdr)) {
             throw new IOException("Invalid SWF file");
         }
         version = is.read();
         SWFInputStream sis = new SWFInputStream(is, version, 4);
         fileSize = sis.readUI32();
 
-        if(hdr[1] == 'F' && hdr[2] == 'X'){
+        if (hdr[1] == 'F' && hdr[2] == 'X') {
             gfx = true;
         }
         if (hdr[0] == 'C') {
@@ -400,7 +400,6 @@ public final class SWF implements TreeItem {
             lzma = true;
         }
 
-
         if (listener != null) {
             sis.addPercentListener(listener);
         }
@@ -421,7 +420,7 @@ public final class SWF implements TreeItem {
         } else {
             boolean hasNonUnknownTag = false;
             for (Tag tag : tags) {
-                if(tag.getData(version).length > 0 && Tag.getRequiredTags().contains(tag.getId())) {
+                if (tag.getData(version).length > 0 && Tag.getRequiredTags().contains(tag.getId())) {
                     hasNonUnknownTag = true;
                 }
             }
@@ -435,7 +434,7 @@ public final class SWF implements TreeItem {
     public SWF getSwf() {
         return this;
     }
-            
+
     /**
      * Get title of the file
      *
@@ -547,56 +546,54 @@ public final class SWF implements TreeItem {
             fis.read(hdr);
             String shdr = new String(hdr, Utf8Helper.charset);
             switch (shdr) {
-                case "CWS":
-                    {
-                        int version = fis.read();
-                        SWFInputStream sis = new SWFInputStream(fis, version, 4);
-                        long fileSize = sis.readUI32();
-                        SWFOutputStream sos = new SWFOutputStream(fos, version);
+                case "CWS": {
+                    int version = fis.read();
+                    SWFInputStream sis = new SWFInputStream(fis, version, 4);
+                    long fileSize = sis.readUI32();
+                    SWFOutputStream sos = new SWFOutputStream(fos, version);
+                    sos.write(Utf8Helper.getBytes("FWS"));
+                    sos.writeUI8(version);
+                    sos.writeUI32(fileSize);
+                    InflaterInputStream iis = new InflaterInputStream(fis);
+                    int i;
+                    try {
+                        while ((i = iis.read()) != -1) {
+                            fos.write(i);
+                        }
+                    } catch (EOFException ex) {
+                    }
+                    fis.close();
+                    fos.close();
+                    break;
+                }
+                case "ZWS": {
+                    int version = fis.read();
+                    SWFInputStream sis = new SWFInputStream(fis, version, 4);
+                    long fileSize = sis.readUI32();
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    sis.readUI32();
+                    int propertiesSize = 5;
+                    byte[] lzmaProperties = new byte[propertiesSize];
+                    if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
+                        throw new IOException("LZMA:input .lzma file is too short");
+                    }
+                    SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
+                    if (!decoder.SetDecoderProperties(lzmaProperties)) {
+                        throw new IOException("LZMA:Incorrect stream properties");
+                    }
+                    if (!decoder.Code(sis, baos, fileSize - 8)) {
+                        throw new IOException("LZMA:Error in data stream");
+                    }
+                    try (SWFOutputStream sos = new SWFOutputStream(fos, version)) {
                         sos.write(Utf8Helper.getBytes("FWS"));
-                        sos.writeUI8(version);
+                        sos.write(version);
                         sos.writeUI32(fileSize);
-                        InflaterInputStream iis = new InflaterInputStream(fis);
-                        int i;
-                        try {
-                            while ((i = iis.read()) != -1) {
-                                fos.write(i);
-                            }
-                        } catch (EOFException ex) {
-                        }
-                        fis.close();
-                        fos.close();
-                        break;
+                        sos.write(baos.toByteArray());
                     }
-                case "ZWS":
-                    {
-                        int version = fis.read();
-                        SWFInputStream sis = new SWFInputStream(fis, version, 4);
-                        long fileSize = sis.readUI32();
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        sis.readUI32();
-                        int propertiesSize = 5;
-                        byte[] lzmaProperties = new byte[propertiesSize];
-                        if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
-                            throw new IOException("LZMA:input .lzma file is too short");
-                        }
-                        SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
-                        if (!decoder.SetDecoderProperties(lzmaProperties)) {
-                            throw new IOException("LZMA:Incorrect stream properties");
-                        }
-                        if (!decoder.Code(sis, baos, fileSize - 8)) {
-                            throw new IOException("LZMA:Error in data stream");
-                        }
-                        try (SWFOutputStream sos = new SWFOutputStream(fos, version)) {
-                            sos.write(Utf8Helper.getBytes("FWS"));
-                            sos.write(version);
-                            sos.writeUI32(fileSize);
-                            sos.write(baos.toByteArray());
-                        }
-                        fis.close();
-                        fos.close();
-                        break;
-                    }
+                    fis.close();
+                    fos.close();
+                    break;
+                }
                 default:
                     return false;
             }
@@ -620,7 +617,7 @@ public final class SWF implements TreeItem {
         }
         return true;
     }
-    
+
     public boolean exportAS3Class(String className, String outdir, ExportMode exportMode, boolean parallel) throws Exception {
         List<ABCContainerTag> abcTags = new ArrayList<>();
 
@@ -801,7 +798,7 @@ public final class SWF implements TreeItem {
                 }
             }
         }
-        
+
         return ret;
     }
 
@@ -1140,7 +1137,6 @@ public final class SWF implements TreeItem {
         writeLE(chunks, subChunk1DataBytes.length, 4);
         chunks.write(subChunk1DataBytes);
 
-
         chunks.write(Utf8Helper.getBytes("data"));
         writeLE(chunks, pcmData.length, 4);
         chunks.write(pcmData);
@@ -1172,7 +1168,6 @@ public final class SWF implements TreeItem {
             if (t instanceof DefineSoundTag) {
                 id = ((DefineSoundTag) t).soundId;
             }
-
 
             if (t instanceof DefineSoundTag) {
                 final DefineSoundTag st = (DefineSoundTag) t;
@@ -1287,9 +1282,7 @@ public final class SWF implements TreeItem {
             return new byte[0];
         }
 
-
         //double ms = 1000.0f / ((float) frameRate);
-
         ByteArrayOutputStream fos = new ByteArrayOutputStream();
         //CopyOutputStream cos = new CopyOutputStream(fos, new FileInputStream("f:\\trunk\\testdata\\xfl\\xfl\\_obj\\streamvideo 7.flv"));
         OutputStream tos = fos;
@@ -1877,7 +1870,6 @@ public final class SWF implements TreeItem {
                             }
                         }
 
-
                         List<GraphTargetItem> vars = new ArrayList<>();
                         for (MyEntry<GraphTargetItem, GraphTargetItem> item : cti.vars) {
                             vars.add(item.key);
@@ -1904,7 +1896,6 @@ public final class SWF implements TreeItem {
                         name = ift.name;
                     }
                 }
-
 
                 if (name != null) {
                     int pos = 0;
@@ -2095,8 +2086,6 @@ public final class SWF implements TreeItem {
         ret.Xmax = rect.Xmax;
         ret.Ymin = rect.Ymin;
         ret.Ymax = rect.Ymax;
-
-
 
         if (ret.Xmax <= 0) {
             ret.Xmax = ret.getWidth();
@@ -2298,7 +2287,6 @@ public final class SWF implements TreeItem {
         while (stopFrame >= totalFrameCount) {
             stopFrame -= totalFrameCount;
         }
-
 
         HashMap<Integer, CharacterTag> characters = new HashMap<>();
         for (Tag t : allTags) {

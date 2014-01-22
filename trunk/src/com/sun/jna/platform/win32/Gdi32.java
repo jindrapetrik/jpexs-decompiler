@@ -20,8 +20,7 @@ import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.win32.W32APIOptions;
 
 /**
- * Definition (incomplete) of
- * <code>gdi32.dll</code>.
+ * Definition (incomplete) of <code>gdi32.dll</code>.
  */
 public interface Gdi32 extends StdCallLibrary {
 

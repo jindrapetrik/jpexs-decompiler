@@ -19,9 +19,8 @@ import com.sun.jna.win32.W32APIOptions;
 
 // TODO: Auto-generated Javadoc
 /**
- * Interface definitions for
- * <code>kernel32.dll</code>. Includes additional alternate mappings from
- * {@link WinNT} which make use of NIO buffers.
+ * Interface definitions for <code>kernel32.dll</code>. Includes additional
+ * alternate mappings from {@link WinNT} which make use of NIO buffers.
  */
 public interface Kernel32 extends WinNT {
 
@@ -120,7 +119,7 @@ public interface Kernel32 extends WinNT {
     public static final int PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
     public static final int PROCESS_MODE_BACKGROUND_END = 0x00200000;
     public static final int REALTIME_PRIORITY_CLASS = 0x00000100;
-        
+
 //	__out
 //	HANDLE
 //	WINAPI
@@ -184,7 +183,7 @@ public interface Kernel32 extends WinNT {
     HANDLE GetCurrentProcess();
 
     int SetProcessAffinityMask(HANDLE hProcess, int mask);
-    
+
     int SetPriorityClass(HANDLE hProcess, int dwPriorityClass);
 
     /**

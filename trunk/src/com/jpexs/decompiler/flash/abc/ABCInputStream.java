@@ -247,7 +247,6 @@ public class ABCInputStream extends InputStream {
         int flags = read();
 
         //// 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional (16=ignore_rest, 32=explicit,) 64=setsdxns, 128=has_paramnames
-
         ValueKind[] optional = new ValueKind[0];
         if ((flags & 8) == 8) { //if has_optional
             int optional_count = readU30();

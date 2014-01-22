@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.helpers;
  * @author JPEXS
  */
 public enum HilightType {
-    
+
     TRAIT, CLASS, METHOD, OFFSET, SPECIAL
-    
+
 }

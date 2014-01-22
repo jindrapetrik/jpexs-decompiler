@@ -159,7 +159,7 @@ public class DefineTextTag extends TextTag implements DrawableTag {
             if (params.length() > 0) {
                 ret += "[" + params + "\r\n]";
             }
-            
+
             if (fnt == null) {
                 ret += AppStrings.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId));
             } else {

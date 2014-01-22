@@ -182,7 +182,6 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
                 }
                 filter();
 
-
                 return null;
             }
 
@@ -194,7 +193,6 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
                 progressBar.setVisible(false);
             }
         }.execute();
-
 
     }
 

@@ -39,7 +39,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
     public ABC abc;
     public List<String> fullyQualifiedNames;
     public ConstantPool constants;
-    public MethodInfo[] methodInfo; 
+    public MethodInfo[] methodInfo;
     public int methodIndex;
 
     public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<String> fullyQualifiedNames, ConstantPool constants, MethodInfo[] methodInfo, int methodIndex) {
@@ -52,7 +52,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         this.abc = abc;
         this.fullyQualifiedNames = fullyQualifiedNames;
         this.constants = constants;
-        this.methodInfo = methodInfo; 
+        this.methodInfo = methodInfo;
         this.methodIndex = methodIndex;
     }
 

@@ -23,22 +23,22 @@ import com.jpexs.decompiler.flash.SWF;
  * @author JPEXS
  */
 public class StringItem implements TreeItem {
-    
+
     public SWF swf;
     private final String str;
-    
+
     public StringItem(String str, SWF swf) {
         this.swf = swf;
         this.str = str;
-    } 
+    }
 
     @Override
     public SWF getSwf() {
         return swf;
     }
-            
+
     @Override
     public String toString() {
         return str;
-    } 
+    }
 }

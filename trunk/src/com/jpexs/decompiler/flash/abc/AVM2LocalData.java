@@ -33,7 +33,7 @@ import java.util.Stack;
  * @author JPEXS
  */
 public class AVM2LocalData extends BaseLocalData {
-    
+
     public Boolean isStatic;
     public Integer classIndex;
     public HashMap<Integer, GraphTargetItem> localRegs;
@@ -52,11 +52,11 @@ public class AVM2LocalData extends BaseLocalData {
     public Integer ip;
     public HashMap<Integer, List<Integer>> refs;
     public AVM2Code code;
-    
+
     public AVM2LocalData() {
-        
+
     }
-    
+
     public AVM2LocalData(AVM2LocalData localData) {
         isStatic = localData.isStatic;
         classIndex = localData.classIndex;

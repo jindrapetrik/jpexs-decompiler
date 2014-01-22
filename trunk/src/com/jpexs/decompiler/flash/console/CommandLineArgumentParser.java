@@ -121,6 +121,7 @@ public class CommandLineArgumentParser {
 
     /**
      * Parses the console arguments
+     *
      * @return path to the file which should be opened or null
      */
     public static String parseArguments(String[] arguments) throws IOException {
@@ -202,7 +203,7 @@ public class CommandLineArgumentParser {
         } else {
             badArguments();
         }
-        
+
         return null;
     }
 
@@ -280,7 +281,7 @@ public class CommandLineArgumentParser {
                 return ExportMode.SOURCE;
         }
     }
-    
+
     private static void parseConfig(Queue<String> args) {
         if (args.isEmpty()) {
             System.err.println("Config values expected");
@@ -319,7 +320,7 @@ public class CommandLineArgumentParser {
                 errorMode = AbortRetryIgnoreHandler.IGNORE;
                 break;
         }
-        
+
         return new ConsoleAbortRetryIgnoreHandler(errorMode, retryCount);
     }
 
@@ -583,10 +584,10 @@ public class CommandLineArgumentParser {
         if (args.size() < 2) {
             badArguments();
         }
-        
+
         try {
             try (InputStream fis = new BufferedInputStream(new FileInputStream(args.remove()));
-                OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.remove()))) {
+                    OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.remove()))) {
                 if (SWF.fws2cws(fis, fos)) {
                     System.out.println("OK");
                 } else {
@@ -598,7 +599,7 @@ public class CommandLineArgumentParser {
         } catch (IOException ex) {
             Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         System.exit(0);
     }
 
@@ -609,7 +610,7 @@ public class CommandLineArgumentParser {
 
         try {
             try (InputStream fis = new BufferedInputStream(new FileInputStream(args.remove()));
-                OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.remove()))) {
+                    OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.remove()))) {
                 if (SWF.decompress(fis, fos)) {
                     System.out.println("OK");
                     System.exit(0);
@@ -649,7 +650,7 @@ public class CommandLineArgumentParser {
 
         try {
             try (InputStream fis = new BufferedInputStream(new FileInputStream(args.remove()));
-                OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.remove()))) {
+                    OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.remove()))) {
                 if (SWF.renameInvalidIdentifiers(renameType, fis, fos)) {
                     System.out.println("OK");
                     System.exit(0);
