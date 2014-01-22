@@ -24,4 +24,5 @@ package com.jpexs.decompiler.flash.types.shaperecords;
 public class SVGRenderingContext {
 
     public int patternCount = 0;
+    public boolean wasMoveTo;
 }

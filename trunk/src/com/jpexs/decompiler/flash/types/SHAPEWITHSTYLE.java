@@ -50,10 +50,12 @@ public class SHAPEWITHSTYLE implements NeedsCharacters {
      * Converts shape to SVG
      *
      * @param shapeNum Type of DefineShape
+     * @param tags
+     * @param bounds
      * @return String with XML representation of this shape (SVG)
      */
-    public String toSVG(int shapeNum, List<Tag> tags) {
-        return SHAPERECORD.shapeToSVG(tags, shapeNum, fillStyles, lineStyles, numFillBits, numLineBits, shapeRecords);
+    public String toSVG(int shapeNum, List<Tag> tags, RECT bounds) {
+        return SHAPERECORD.shapeToSVG(tags, shapeNum, fillStyles, lineStyles, numFillBits, numLineBits, shapeRecords, bounds);
     }
 
     public BufferedImage toImage(int shapeNum, List<Tag> tags) {

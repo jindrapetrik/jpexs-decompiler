@@ -39,8 +39,12 @@ public class CurvedEdgeRecord extends SHAPERECORD {
     }
 
     @Override
-    public String toSWG(int oldX, int oldY) {
-        return "Q " + SWF.twipToPixel(oldX + controlDeltaX) + " " + SWF.twipToPixel(oldY + controlDeltaY) + " " + SWF.twipToPixel(oldX + controlDeltaX + anchorDeltaX) + " " + SWF.twipToPixel(oldY + controlDeltaY + anchorDeltaY);
+    public String toSVG(int oldX, int oldY, SVGRenderingContext context) {
+        String result = "";
+        if (!context.wasMoveTo) {
+            result = "M " + SWF.twipToPixel(oldX) + " " + SWF.twipToPixel(oldY) + " ";
+        }
+        return result + "Q " + SWF.twipToPixel(oldX + controlDeltaX) + " " + SWF.twipToPixel(oldY + controlDeltaY) + " " + SWF.twipToPixel(oldX + controlDeltaX + anchorDeltaX) + " " + SWF.twipToPixel(oldY + controlDeltaY + anchorDeltaY);
 
     }
 

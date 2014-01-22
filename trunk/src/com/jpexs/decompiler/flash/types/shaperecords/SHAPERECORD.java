@@ -55,6 +55,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -101,7 +102,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         public Point start;
         public Point end;
 
-        public void draw(int startX, int startY, Graphics2D g, int shapeNum) {
+        private void draw(int startX, int startY, Graphics2D g, int shapeNum) {
             AffineTransform oldAf = g.getTransform();
             AffineTransform trans20 = AffineTransform.getScaleInstance(1 / DESCALE, 1 / DESCALE);
             boolean ok = false;
@@ -161,7 +162,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             g.setClip(null);
         }
 
-        public void fill(List<Tag> tags, int startX, int startY, Graphics2D g, int shapeNum) {
+        private void fill(List<Tag> tags, int startX, int startY, Graphics2D g, int shapeNum) {
             if (fillStyle0 == null) {
                 return;
             }
@@ -480,8 +481,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             String points = "";
             int x = 0;
             int y = 0;
+            context.wasMoveTo = false;
             for (SHAPERECORD r : edges) {
-                points += " " + r.toSWG(x, y);
+                points += " " + r.toSVG(x, y, context);
                 x = r.changeX(x);
                 y = r.changeY(y);
             }
@@ -490,7 +492,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         }
     }
 
-    public abstract String toSWG(int oldX, int oldY);
+    public abstract String toSVG(int oldX, int oldY, SVGRenderingContext context);
 
     public abstract int changeX(int x);
 
@@ -849,22 +851,25 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
      * @param records
      * @return Shape converted to SVG
      */
-    public static String shapeToSVG(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, int numFillBits, int numLineBits, List<SHAPERECORD> records) {
+    public static String shapeToSVG(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, int numFillBits, int numLineBits, List<SHAPERECORD> records, RECT bounds) {
         String ret = "";
-        RECT bounds = new RECT();
-        List<Path> paths = getPaths(bounds, shapeNum, fillStyles, lineStylesList, /*numFillBits, numLineBits,*/ records);
+        RECT rect = new RECT();
+        List<Path> paths = getPaths(rect, shapeNum, fillStyles, lineStylesList, /*numFillBits, numLineBits,*/ records);
         ret = "";
         SVGRenderingContext context = new SVGRenderingContext();
+        ret += "<g id=\"1\" transform=\"matrix(1, 0, 0, 1, " 
+                + SWF.twipToPixel(-bounds.Xmin) + ", " + SWF.twipToPixel(-bounds.Ymin) + ")\">\n";
         for (Path p : paths) {
-            ret += p.toSVG(tags, shapeNum, context);
+            ret += p.toSVG(tags, shapeNum, context) + "\n";
         }
+        ret += "</g>\n";
         ret = "<?xml version='1.0' encoding='UTF-8' ?> \n"
                 + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n"
-                + "<svg width=\"" + (int) Math.ceil(SWF.twipToPixel(bounds.Xmax)) + "\"\n"
-                + "     height=\"" + (int) Math.ceil(SWF.twipToPixel(bounds.Ymax)) + "\"\n"
-                + "     viewBox=\"0 0 " + (int) Math.ceil(SWF.twipToPixel(bounds.Xmax)) + " " + (int) Math.ceil(SWF.twipToPixel(bounds.Ymax) + 50) + "\"\n"
+                + "<svg width=\"" + (int) Math.ceil(SWF.twipToPixel(bounds.Xmax - bounds.Xmin)) + "\"\n"
+                + "     height=\"" + (int) Math.ceil(SWF.twipToPixel(bounds.Ymax - bounds.Ymin)) + "\"\n"
+                + "     viewBox=\"0 0 " + (int) Math.ceil(SWF.twipToPixel(bounds.Xmax - bounds.Xmin)) + " " + (int) Math.ceil(SWF.twipToPixel(bounds.Ymax - bounds.Ymin)) + "\"\n"
                 + "     xmlns=\"http://www.w3.org/2000/svg\"\n"
-                + "     xmlns:xlink=\"http://www.w3.org/1999/xlink\">" + ret + ""
+                + "     xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n" + ret + ""
                 + "</svg>";
         return ret;
     }

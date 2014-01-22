@@ -31,7 +31,7 @@ public class EndShapeRecord extends SHAPERECORD {
     }
 
     @Override
-    public String toSWG(int oldX, int oldY) {
+    public String toSVG(int oldX, int oldY, SVGRenderingContext context) {
         return "";
     }
 

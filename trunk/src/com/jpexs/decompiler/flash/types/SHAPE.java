@@ -51,7 +51,7 @@ public class SHAPE implements NeedsCharacters {
      * @return String with XML representation of this shape (SVG)
      */
     public String toSVG(int shapeNum, List<Tag> tags) {
-        return SHAPERECORD.shapeToSVG(tags, shapeNum, null, null, numFillBits, numLineBits, shapeRecords);
+        return SHAPERECORD.shapeToSVG(tags, shapeNum, null, null, numFillBits, numLineBits, shapeRecords, new RECT());
     }
 
     public BufferedImage toImage(int shapeNum, List<Tag> tags, Color defaultColor, boolean putToCache) {
