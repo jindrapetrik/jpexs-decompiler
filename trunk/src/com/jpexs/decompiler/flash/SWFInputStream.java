@@ -171,7 +171,7 @@ public class SWFInputStream extends InputStream {
      *
      * @param pos Number of bytes
      */
-    public void seek(int pos) throws IOException {
+    public void seek(long pos) throws IOException {
         if (is instanceof SeekableInputStream) {
             SeekableInputStream sis = (SeekableInputStream) is;
             sis.seek(pos);

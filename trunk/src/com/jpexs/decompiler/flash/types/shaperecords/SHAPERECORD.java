@@ -188,7 +188,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                         btrans.preConcatenate(AffineTransform.getTranslateInstance(startX / DESCALE, startY / DESCALE));
                         g.setTransform(btrans);
                         BufferedImage img = image.getImage(tags);
-                        g.setPaint(new TexturePaint(img, new Rectangle(img.getWidth(), img.getHeight())));
+                        if (img != null) {
+                            g.setPaint(new TexturePaint(img, new Rectangle(img.getWidth(), img.getHeight())));
+                        }
                         g.fill(new Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
                         g.setTransform(oldAf);
                         g.setClip(null);
