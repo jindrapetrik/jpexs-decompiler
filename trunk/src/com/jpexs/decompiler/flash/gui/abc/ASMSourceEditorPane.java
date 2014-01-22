@@ -122,9 +122,8 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         }
         if (h2 != null) {
             ignoreCarret = true;
-            try {
+            if (h2.startPos <= getDocument().getLength()) {
                 setCaretPosition(h2.startPos);
-            } catch (IllegalArgumentException iex) {
             }
             getCaret().setVisible(true);
             ignoreCarret = false;
@@ -138,9 +137,8 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         Highlighting h2 = Highlighting.search(disassembledHilights, "offset", "" + offset);
         if (h2 != null) {
             ignoreCarret = true;
-            try {
+            if (h2.startPos <= getDocument().getLength()) {
                 setCaretPosition(h2.startPos);
-            } catch (IllegalArgumentException iex) {
             }
             getCaret().setVisible(true);
             ignoreCarret = false;

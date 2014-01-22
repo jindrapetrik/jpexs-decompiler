@@ -944,18 +944,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
     
     private void updateUi() {
-        if (!isWelcomeScreen) {
+        if (!isWelcomeScreen && swfs.isEmpty()) {
             CardLayout cl = (CardLayout) (contentPanel.getLayout());
             cl.show(contentPanel, WELCOME_PANEL);
             isWelcomeScreen = true;
         }
         
-        if (swfs.isEmpty()) {
-            mainMenu.updateComponets(null, null);
-        } else {
-            SWFList swfList = swfs.get(0);
-            updateUi(swfList.get(0));
-        }
+        mainFrame.setTitle(ApplicationInfo.applicationVerName);
+        mainMenu.updateComponets(null, null);
     }
     
     public void closeAll() {
@@ -1460,6 +1456,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
         if (treeNode == null) {
             return swfs.get(0).get(0);
+        }
+        
+        if (treeNode instanceof SWFBundleNode) {
+            return null;
         }
         
         return treeNode.getItem().getSwf();

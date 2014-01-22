@@ -499,6 +499,14 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         deobfuscationCommandButton.setEnabled(hasAbc);
     }
     
+    private void saveAs(SWF swf, SaveFileMode mode) {
+        if (Main.saveFileDialog(swf, mode)) {
+            swf.fileTitle = null;
+            mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
+            saveCommandButton.setEnabled(mainFrame.panel.getCurrentSwf() != null);
+        }
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -616,30 +624,30 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 }
                 break;
             case ACTION_SAVE:
-                try {
+                {
                     SWF swf = mainFrame.panel.getCurrentSwf();
-                    Main.saveFile(swf, swf.file);
-                } catch (IOException ex) {
-                    Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, null, ex);
-                    View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    if (swf.file == null) {
+                        saveAs(swf, SaveFileMode.SAVEAS);
+                    } else {
+                        try {
+                            Main.saveFile(swf, swf.file);
+                        } catch (IOException ex) {
+                            Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, null, ex);
+                            View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
                 }
                 break;
             case ACTION_SAVE_AS:
                 {
                     SWF swf = mainFrame.panel.getCurrentSwf();
-                    if (Main.saveFileDialog(swf)) {
-                        mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
-                        saveCommandButton.setEnabled(mainFrame.panel.getCurrentSwf() != null);
-                    }
+                    saveAs(swf, SaveFileMode.SAVEAS);
                 }
                 break;
             case ACTION_SAVE_AS_EXE:
                 {
                     SWF swf = mainFrame.panel.getCurrentSwf();
-                    if (Main.saveFileDialog(swf, ".exe")) {
-                        mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
-                        saveCommandButton.setEnabled(mainFrame.panel.getCurrentSwf() != null);
-                    }
+                    saveAs(swf, SaveFileMode.EXE);
                 }
                 break;
             case ACTION_OPEN:

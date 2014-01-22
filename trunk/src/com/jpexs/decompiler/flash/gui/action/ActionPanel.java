@@ -278,27 +278,31 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         });
     }
     
-    private void setText(HilightedText text, String contentType) {
-        int pos = editor.getCaretPosition();
-        Highlighting lastH = null;
-        for (Highlighting h : disassembledHilights) {
-            if (pos < h.startPos) {
-                break;
+    private void setText(final HilightedText text, final String contentType) {
+        View.execInEventDispatch(new Runnable() {
+
+            @Override
+            public void run() {
+                int pos = editor.getCaretPosition();
+                Highlighting lastH = null;
+                for (Highlighting h : disassembledHilights) {
+                    if (pos < h.startPos) {
+                        break;
+                    }
+                    lastH = h;
+                }
+                String offset = lastH == null ? "0" : lastH.getPropertyString("offset");
+                disassembledHilights = text.instructionHilights;
+                String stripped = text.text;
+                setEditorText(stripped, contentType);
+                Highlighting h = Highlighting.search(disassembledHilights, "offset", offset);
+                if (h != null) {
+                    if (h.startPos <= editor.getDocument().getLength()) {
+                        editor.setCaretPosition(h.startPos);
+                    }
+                }
             }
-            lastH = h;
-        }
-        String offset = lastH == null ? "0" : lastH.getPropertyString("offset");
-        // getting hilights is fast now
-        // setEditorText("; " + AppStrings.translate("work.gettinghilights") + "...", "text/flasm");
-        disassembledHilights = text.instructionHilights;
-        String stripped = text.text;
-        setEditorText(stripped, contentType);
-        Highlighting h = Highlighting.search(disassembledHilights, "offset", offset);
-        if (h != null) {
-            if (h.startPos <= editor.getText().length()) {
-                editor.setCaretPosition(h.startPos);
-            }
-        }
+        });
     }
 
     private HilightedText getHilightedText(ExportMode exportMode) {
@@ -479,7 +483,6 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         panB.add(panCode, BorderLayout.CENTER);
 
 
-
         JPanel buttonsPan = new JPanel();
         buttonsPan.setLayout(new FlowLayout());
         buttonsPan.add(editButton);
@@ -515,7 +518,6 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         cancelButton.setVisible(false);
 
 
-
         saveDecompiledButton.addActionListener(this);
         saveDecompiledButton.setActionCommand(ACTION_SAVE_DECOMPILED);
         editDecompiledButton.addActionListener(this);
@@ -537,10 +539,6 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         panA.add(decButtonsPan, BorderLayout.SOUTH);
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-
-
-
-
 
 
         setLayout(new BorderLayout());
@@ -578,7 +576,9 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 Highlighting h2 = Highlighting.search(decompiledHilights, "offset", ofs);
                 if (h2 != null) {
                     ignoreCarret = true;
-                    decompiledEditor.setCaretPosition(h2.startPos);
+                    if (h2.startPos <= decompiledEditor.getDocument().getLength()) {
+                        decompiledEditor.setCaretPosition(h2.startPos);
+                    }
                     decompiledEditor.getCaret().setVisible(true);
                     ignoreCarret = false;
 

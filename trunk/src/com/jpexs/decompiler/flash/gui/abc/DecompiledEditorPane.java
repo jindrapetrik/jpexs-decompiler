@@ -112,10 +112,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         for (Highlighting h : allh) {
             if (h.getPropertyString("subtype").equals(type) && ((long) h.getPropertyLong("index") == index)) {
                 ignoreCarret = true;
-                try {
+                if (h.startPos <= getDocument().getLength()) {
                     setCaretPosition(h.startPos);
-                } catch (IllegalArgumentException ie) {
-                    //ignored
                 }
                 getCaret().setVisible(true);
                 ignoreCarret = false;
@@ -134,10 +132,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 Highlighting h2 = Highlighting.search(highlights, "offset", "" + offset, h.startPos, h.startPos + h.len);
                 if (h2 != null) {
                     ignoreCarret = true;
-                    try {
+                    if (h2.startPos <= getDocument().getLength()) {
                         setCaretPosition(h2.startPos);
-                    } catch (IllegalArgumentException ie) {
-                        //ignored
                     }
                     getCaret().setVisible(true);
                     ignoreCarret = false;
@@ -405,19 +401,18 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (tc != null) {
             Highlighting th = Highlighting.search(traitHighlights, "index", "" + traitId, tc.startPos, tc.startPos + tc.len);
             if (th != null) {
-                try {
-                    ignoreCarret = true;
-                    setCaretPosition(th.startPos + th.len - 1);
-                    ignoreCarret = false;
-                } catch (IllegalArgumentException iae) {
+                ignoreCarret = true;
+                int startPos = th.startPos + th.len - 1;
+                if (startPos <= getDocument().getLength()) {
+                    setCaretPosition(startPos);
                 }
+                ignoreCarret = false;
                 final int pos = th.startPos;
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        try {
+                        if (pos <= getDocument().getLength()) {
                             setCaretPosition(pos);
-                        } catch (IllegalArgumentException iae) {
                         }
                     }
                 }, 100);

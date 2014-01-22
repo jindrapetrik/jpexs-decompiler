@@ -241,7 +241,6 @@ public class Main {
                         startWork(AppStrings.translate("work.reading.swf"), p);
                     }
                 }, Configuration.parallelSpeedUp.get());
-                swf.file = sourceInfo.getFile();
                 swf.fileTitle = streamEntry.getKey();
                 swf.readOnly = true;
                 result.add(swf);
@@ -300,17 +299,17 @@ public class Main {
     }
 
     public static void saveFile(SWF swf, String outfile) throws IOException {
-        saveFile(swf, outfile, ".swf");
+        saveFile(swf, outfile, SaveFileMode.SAVE);
     }
     
-    public static void saveFile(SWF swf, String outfile, String extension) throws IOException {
-        if (extension.equals(".swf")) {
+    public static void saveFile(SWF swf, String outfile, SaveFileMode mode) throws IOException {
+        if (mode == SaveFileMode.SAVEAS) {
             swf.file = outfile;
         }
         File outfileF = new File(outfile);
         File tmpFile = new File(outfile + ".tmp");
         FileOutputStream fos = new FileOutputStream(tmpFile);
-        if (extension.equals(".exe")) {
+        if (mode == SaveFileMode.EXE) {
             InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
             byte [] buffer = new byte[4096];
             int bytesRead = 0;
@@ -507,13 +506,22 @@ public class Main {
        mainFrame.getPanel().closeAll();
     }
     
-    public static boolean saveFileDialog(SWF swf) {
-        return saveFileDialog(swf, ".swf");
-    }
-    
-    public static boolean saveFileDialog(SWF swf, final String extension) {
+    public static boolean saveFileDialog(SWF swf, final SaveFileMode mode) {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
+        String ext = ".swf";
+        switch (mode) {
+            case SAVE:
+            case SAVEAS:
+                if (swf.file != null) {
+                    ext = Helper.getExtension(swf.file);
+                }
+                break;
+            case EXE:
+                ext = ".exe";
+                break;
+        }
+        final String extension = ext;
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -567,7 +575,7 @@ public class Main {
                     }
                     swf.gfx = true;
                 }
-                Main.saveFile(swf, fileName, extension);
+                Main.saveFile(swf, fileName, mode);
                 Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
                 return true;
             } catch (IOException ex) {

@@ -17,7 +17,6 @@
 
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.StreamSearch;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.IOException;

@@ -208,6 +208,7 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         selProcesses = list.getSelectedValuesList();
         if (!selProcesses.isEmpty()) {
             processing = true;
+            tableRes.setEnabled(false);
             resTableModel.getDataVector().removeAllElements();
             resTableModel.fireTableDataChanged();
             foundIs = null;
