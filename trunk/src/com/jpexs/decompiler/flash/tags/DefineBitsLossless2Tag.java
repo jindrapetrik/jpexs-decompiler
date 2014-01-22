@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.InflaterInputStream;
@@ -162,6 +163,11 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     @Override
     public String getImageFormat() {
         return "png";
+    }
+
+    @Override
+    public InputStream getImageData() {
+        return null;
     }
 
     @Override

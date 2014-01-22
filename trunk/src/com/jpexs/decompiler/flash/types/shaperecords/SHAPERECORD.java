@@ -54,7 +54,9 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -62,12 +64,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  *
@@ -410,13 +414,60 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             return fillStyle0 == p.fillStyle0 && ((useLineStyle2 && (p.lineStyle2 == lineStyle2)) || ((!useLineStyle2) && (p.lineStyle == lineStyle)));
         }
 
-        public String toSVG(int shapeNum) {
+        public String toSVG(List<Tag> tags, int shapeNum, SVGRenderingContext context) {
             String ret = "";
             String params = "";
             String f = "";
             if (fillStyle0 != null) {
-                if (fillStyle0.fillStyleType == FILLSTYLE.SOLID) {
-                    f = " fill=\"" + ((shapeNum >= 3) ? fillStyle0.colorA.toHexRGB() : fillStyle0.color.toHexRGB()) + "\"";
+                switch (fillStyle0.fillStyleType) {
+                    case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
+                    case FILLSTYLE.REPEATING_BITMAP:
+                    case FILLSTYLE.CLIPPED_BITMAP:
+                    case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
+                        ImageTag image = null;
+                        for (Tag t : tags) {
+                            if (t instanceof ImageTag) {
+                                ImageTag i = (ImageTag) t;
+                                if (i.getCharacterId() == fillStyle0.bitmapId) {
+                                    image = i;
+                                    break;
+                                }
+                            }
+                        }
+                        if (image != null) {
+                            BufferedImage img = image.getImage(tags);
+                            if (img != null) {
+                                int width = img.getWidth();
+                                int height = img.getHeight();
+                                context.patternCount++;
+                                String patternId = "PatternID_" + context.patternCount;
+                                String format = image.getImageFormat();
+                                InputStream imageStream = image.getImageData();
+                                byte[] imageData;
+                                if (imageStream != null) {
+                                    imageData = Helper.readStream(image.getImageData());
+                                } else {
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                    try {
+                                        ImageIO.write(img, format.toUpperCase(Locale.ENGLISH), baos);
+                                    } catch (IOException ex) {
+                                    }
+                                    imageData = baos.toByteArray();
+                                }
+                                String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
+                                ret += "<pattern id=\"" + patternId + "\" patternUnits=\"userSpaceOnUse\" overflow=\"visible\" "
+                                        + "width=\"" + width + "\" height=\"" + height + "\" "
+                                        + "viewBox=\"0 0 " + width + " " + height + "\" patternTransform=\"matrix(1, 0, 0, 1, 0, 0)\">\n" 
+                                        + "<image width=\"" + width + "\" height=\"" + height + "\"\n" 
+                                        + "xlink:href=\"data:image/" + format + ";base64," + base64ImgData + "\"></image>\n" 
+                                        + "</pattern>";
+                                params += " style=\"fill:url(#" + patternId + ")\"";
+                            }
+                        }
+                        break;
+                    case FILLSTYLE.SOLID:
+                        f = " fill=\"" + ((shapeNum >= 3) ? fillStyle0.colorA.toHexRGB() : fillStyle0.color.toHexRGB()) + "\"";
+                        break;
                 }
             }
             params += f;
@@ -789,6 +840,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     /**
      * Convert shape to SVG
      *
+     * @param tags
      * @param shapeNum
      * @param fillStyles
      * @param lineStylesList
@@ -797,13 +849,14 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
      * @param records
      * @return Shape converted to SVG
      */
-    public static String shapeToSVG(int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, int numFillBits, int numLineBits, List<SHAPERECORD> records) {
+    public static String shapeToSVG(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, int numFillBits, int numLineBits, List<SHAPERECORD> records) {
         String ret = "";
         RECT bounds = new RECT();
         List<Path> paths = getPaths(bounds, shapeNum, fillStyles, lineStylesList, /*numFillBits, numLineBits,*/ records);
         ret = "";
+        SVGRenderingContext context = new SVGRenderingContext();
         for (Path p : paths) {
-            ret += p.toSVG(shapeNum);
+            ret += p.toSVG(tags, shapeNum, context);
         }
         ret = "<?xml version='1.0' encoding='UTF-8' ?> \n"
                 + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n"

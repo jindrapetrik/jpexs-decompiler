@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -46,12 +47,17 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
+    public InputStream getImageData() {
+        if (SWF.hasErrorHeader(imageData)) {
+            return new ByteArrayInputStream(imageData, 4, imageData.length - 4);
+        }
+        return new ByteArrayInputStream(imageData);
+    }
+
+    @Override
     public BufferedImage getImage(List<Tag> tags) {
         try {
-            if (SWF.hasErrorHeader(imageData)) {
-                return ImageIO.read(new ByteArrayInputStream(imageData, 4, imageData.length - 4));
-            }
-            return ImageIO.read(new ByteArrayInputStream(imageData));
+            return ImageIO.read(getImageData());
         } catch (IOException ex) {
         }
         return null;

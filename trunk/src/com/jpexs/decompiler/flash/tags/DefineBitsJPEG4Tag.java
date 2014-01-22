@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,9 +74,14 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     }
 
     @Override
+    public InputStream getImageData() {
+        return new ByteArrayInputStream(imageData);
+    }
+
+    @Override
     public BufferedImage getImage(List<Tag> tags) {
         try {
-            BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
+            BufferedImage img = ImageIO.read(getImageData());
             if (bitmapAlphaData.length == 0) {
                 return img;
             }

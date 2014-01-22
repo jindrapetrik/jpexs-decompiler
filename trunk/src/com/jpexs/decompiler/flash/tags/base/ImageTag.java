@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -32,6 +33,8 @@ public abstract class ImageTag extends CharacterTag {
     public ImageTag(SWF swf, int id, String name, byte[] data, long pos) {
         super(swf, id, name, data, pos);
     }
+
+    public abstract InputStream getImageData();
 
     public abstract BufferedImage getImage(List<Tag> tags);
 

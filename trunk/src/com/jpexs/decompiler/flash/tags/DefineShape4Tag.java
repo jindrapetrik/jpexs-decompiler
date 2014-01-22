@@ -67,7 +67,7 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
 
     @Override
     public String toSVG() {
-        return shapes.toSVG(4);
+        return shapes.toSVG(4, swf.tags);
     }
 
     @Override
