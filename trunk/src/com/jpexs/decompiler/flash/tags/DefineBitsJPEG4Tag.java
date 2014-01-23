@@ -75,13 +75,13 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     @Override
     public InputStream getImageData() {
-        return new ByteArrayInputStream(imageData);
+        return null;
     }
 
     @Override
     public BufferedImage getImage(List<Tag> tags) {
         try {
-            BufferedImage img = ImageIO.read(getImageData());
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
             if (bitmapAlphaData.length == 0) {
                 return img;
             }

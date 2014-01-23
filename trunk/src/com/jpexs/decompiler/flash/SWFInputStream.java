@@ -2180,9 +2180,10 @@ public class SWFInputStream extends InputStream {
         do {
             rec = readSHAPERECORD(fillBits, lineBits, shapeNum);
             if (rec instanceof StyleChangeRecord) {
-                if (((StyleChangeRecord) rec).stateNewStyles) {
-                    fillBits = ((StyleChangeRecord) rec).numFillBits;
-                    lineBits = ((StyleChangeRecord) rec).numLineBits;
+                StyleChangeRecord scRec = (StyleChangeRecord) rec;
+                if (scRec.stateNewStyles) {
+                    fillBits = scRec.numFillBits;
+                    lineBits = scRec.numLineBits;
                 }
             }
             ret.add(rec);

@@ -69,16 +69,19 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     @Override
     public InputStream getImageData() {
-        if (SWF.hasErrorHeader(imageData)) {
-            return new ByteArrayInputStream(imageData, 4, imageData.length - 4);
-        }
-        return new ByteArrayInputStream(imageData);
+        return null;
     }
 
     @Override
     public BufferedImage getImage(List<Tag> tags) {
         try {
-            BufferedImage img = ImageIO.read(getImageData());
+            InputStream stream;
+            if (SWF.hasErrorHeader(imageData)) {
+                stream = new ByteArrayInputStream(imageData, 4, imageData.length - 4);
+            } else {
+                stream = new ByteArrayInputStream(imageData);
+            }
+            BufferedImage img = ImageIO.read(stream);
             if (bitmapAlphaData.length == 0) {
                 return img;
             }
