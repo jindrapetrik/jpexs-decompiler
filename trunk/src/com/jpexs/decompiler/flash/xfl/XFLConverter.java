@@ -395,12 +395,12 @@ public class XFLConverter {
         ret += "tx=\"" + (((float) m.translateX) / 20.0) + "\" ";
         ret += "ty=\"" + (((float) m.translateY) / 20.0) + "\" ";
         if (m.hasScale) {
-            ret += "a=\"" + m.toFloat(m.scaleX) + "\" ";
-            ret += "d=\"" + m.toFloat(m.scaleY) + "\" ";
+            ret += "a=\"" + m.getScaleXFloat() + "\" ";
+            ret += "d=\"" + m.getScaleYFloat() + "\" ";
         }
         if (m.hasRotate) {
-            ret += "b=\"" + m.toFloat(m.rotateSkew0) + "\" ";
-            ret += "c=\"" + m.toFloat(m.rotateSkew1) + "\" ";
+            ret += "b=\"" + m.getRotateSkew0Float() + "\" ";
+            ret += "c=\"" + m.getRotateSkew1Float() + "\" ";
         }
         ret += "/>";
         return ret;

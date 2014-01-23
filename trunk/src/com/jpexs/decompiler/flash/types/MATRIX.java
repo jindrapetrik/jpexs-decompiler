@@ -85,7 +85,7 @@ public class MATRIX implements Serializable {
         return "[MATRIX scale:" + getScaleXFloat() + "," + getScaleYFloat() + ", rotate:" + getRotateSkew0Float() + "," + getRotateSkew1Float() + ", translate:" + translateX + "," + translateY + "]";
     }
 
-    public float toFloat(int i) {
+    private float toFloat(int i) {
         return ((float) i) / (1 << 16);
     }
 
@@ -148,6 +148,8 @@ public class MATRIX implements Serializable {
         ret.scaleY = (m.hasScale ? m.scaleY : 1) * (this.hasScale ? this.scaleY : 1);
         ret.rotateSkew0 = m.rotateSkew0 + this.rotateSkew0;
         ret.rotateSkew1 = m.rotateSkew1 + this.rotateSkew1;
+        ret.hasScale = true;
+        ret.hasRotate = true;
         return ret;
     }
 

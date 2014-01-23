@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -455,12 +456,34 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                                     imageData = baos.toByteArray();
                                 }
                                 String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
+                                float translateX = 0;
+                                float translateY = 0;
+                                float rotateSkew0 = 0;
+                                float rotateSkew1 = 0;
+                                float scaleX = 1;
+                                float scaleY = 1;
+                                if (fillStyle0.bitmapMatrix != null) {
+                                    MATRIX matrix = fillStyle0.bitmapMatrix;
+                                    translateX = SWF.twipToPixel(matrix.translateX);
+                                    translateY = SWF.twipToPixel(matrix.translateY);
+                                    if (matrix.hasRotate) {
+                                        rotateSkew0 = matrix.getRotateSkew0Float();
+                                        rotateSkew1 = matrix.getRotateSkew1Float();
+                                    }
+                                    if (matrix.hasScale) {
+                                        scaleX = SWF.twipToPixel((int) matrix.getScaleXFloat());
+                                        scaleY = SWF.twipToPixel((int) matrix.getScaleYFloat());
+                                    }
+                                }
+                                
                                 ret += "<pattern id=\"" + patternId + "\" patternUnits=\"userSpaceOnUse\" overflow=\"visible\" "
                                         + "width=\"" + width + "\" height=\"" + height + "\" "
-                                        + "viewBox=\"0 0 " + width + " " + height + "\" patternTransform=\"matrix(1, 0, 0, 1, 0, 0)\">\n" 
+                                        + "viewBox=\"0 0 " + width + " " + height + "\" "
+                                        + "patternTransform=\"matrix(" + scaleX + ", " + rotateSkew0 
+                                        + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")\">\n" 
                                         + "<image width=\"" + width + "\" height=\"" + height + "\"\n" 
                                         + "xlink:href=\"data:image/" + format + ";base64," + base64ImgData + "\"></image>\n" 
-                                        + "</pattern>";
+                                        + "</pattern>\n";
                                 params += " style=\"fill:url(#" + patternId + ")\"";
                             }
                         }
@@ -739,7 +762,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             }
         }
         List<Path> subpath;
-  
         List<Path> edges;
         Point k2;
         Point k1;
