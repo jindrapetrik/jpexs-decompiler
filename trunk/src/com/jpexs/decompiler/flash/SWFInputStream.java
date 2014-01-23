@@ -2064,7 +2064,7 @@ public class SWFInputStream extends InputStream {
      * @return SHAPERECORD value
      * @throws IOException
      */
-    public SHAPERECORD readSHAPERECORD(int fillBits, int lineBits, int shapeNum) throws IOException {
+    private SHAPERECORD readSHAPERECORD(int fillBits, int lineBits, int shapeNum) throws IOException {
         SHAPERECORD ret;
         int typeFlag = (int) readUB(1);
         if (typeFlag == 0) {
@@ -2174,7 +2174,7 @@ public class SWFInputStream extends InputStream {
      * @return SHAPERECORDs array
      * @throws IOException
      */
-    public List<SHAPERECORD> readSHAPERECORDS(int shapeNum, int fillBits, int lineBits) throws IOException {
+    private List<SHAPERECORD> readSHAPERECORDS(int shapeNum, int fillBits, int lineBits) throws IOException {
         List<SHAPERECORD> ret = new ArrayList<>();
         SHAPERECORD rec;
         do {

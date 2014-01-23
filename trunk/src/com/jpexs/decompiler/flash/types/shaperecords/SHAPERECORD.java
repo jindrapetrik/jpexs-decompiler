@@ -469,6 +469,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                         f = " fill=\"" + ((shapeNum >= 3) ? fillStyle0.colorA.toHexRGB() : fillStyle0.color.toHexRGB()) + "\"";
                         break;
                 }
+            } else {
+                f = " fill=\"none\"";
             }
             params += f;
             if ((!useLineStyle2) && lineStyle != null) {
@@ -737,6 +739,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             }
         }
         List<Path> subpath;
+  
         List<Path> edges;
         Point k2;
         Point k1;

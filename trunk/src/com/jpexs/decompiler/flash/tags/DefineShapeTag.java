@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -28,6 +29,7 @@ import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +71,25 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
         shapes = sis.readSHAPEWITHSTYLE(1);
     }
 
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeUI16(shapeId);
+            sos.writeRECT(shapeBounds);
+            sos.writeSHAPEWITHSTYLE(shapes, 1);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
+    
     @Override
     public int getCharacterId() {
         return shapeId;

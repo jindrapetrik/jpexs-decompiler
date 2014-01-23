@@ -1250,7 +1250,7 @@ public class SWFOutputStream extends OutputStream {
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
-    public void writeSHAPERECORDS(List<SHAPERECORD> value, int fillBits, int lineBits, int shapeNum) throws IOException {
+    private void writeSHAPERECORDS(List<SHAPERECORD> value, int fillBits, int lineBits, int shapeNum) throws IOException {
         for (SHAPERECORD sh : value) {
             if (sh instanceof CurvedEdgeRecord) {
                 CurvedEdgeRecord cer = (CurvedEdgeRecord) sh;

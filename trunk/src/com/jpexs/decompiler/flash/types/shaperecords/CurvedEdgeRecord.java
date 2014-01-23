@@ -45,7 +45,6 @@ public class CurvedEdgeRecord extends SHAPERECORD {
             result = "M " + SWF.twipToPixel(oldX) + " " + SWF.twipToPixel(oldY) + " ";
         }
         return result + "Q " + SWF.twipToPixel(oldX + controlDeltaX) + " " + SWF.twipToPixel(oldY + controlDeltaY) + " " + SWF.twipToPixel(oldX + controlDeltaX + anchorDeltaX) + " " + SWF.twipToPixel(oldY + controlDeltaY + anchorDeltaY);
-
     }
 
     @Override
