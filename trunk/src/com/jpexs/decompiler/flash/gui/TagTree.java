@@ -212,6 +212,21 @@ public class TagTree extends JTree {
         if (t instanceof SWF) {
             return TreeNodeType.FLASH;
         }
+        
+        if(t instanceof SWFList) {
+            SWFList slist = (SWFList)t;
+            if(slist.name!=null){
+                if(slist.name.toLowerCase().endsWith(".zip")){
+                    return TreeNodeType.BUNDLE_ZIP;
+                }
+                if(slist.name.toLowerCase().endsWith(".swc")){
+                    return TreeNodeType.BUNDLE_SWC;
+                }
+                else{
+                    return TreeNodeType.BUNDLE_BINARY;
+                }
+            }
+        }
 
         return TreeNodeType.FOLDER;
     }

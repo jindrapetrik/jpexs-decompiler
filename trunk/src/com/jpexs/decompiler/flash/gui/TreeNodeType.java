@@ -38,5 +38,8 @@ public enum TreeNodeType {
     SOUND,
     BINARY_DATA,
     FOLDER,
-    FOLDER_OPEN
+    FOLDER_OPEN,
+    BUNDLE_ZIP,
+    BUNDLE_SWC,
+    BUNDLE_BINARY
 }

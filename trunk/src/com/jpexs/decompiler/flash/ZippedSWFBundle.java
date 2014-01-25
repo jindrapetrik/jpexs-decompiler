@@ -48,7 +48,7 @@ public class ZippedSWFBundle implements SWFBundle {
         try {
             while ((entry = zip.getNextEntry()) != null) {
                 if (entry.getName().toLowerCase().endsWith(".swf")
-                        || entry.getName().toLowerCase().endsWith(".gfx")) {
+                        || entry.getName().toLowerCase().endsWith(".gfx")) {                    
                     keySet.add(entry.getName());
                 }
                 //streamMap.put(, is)
