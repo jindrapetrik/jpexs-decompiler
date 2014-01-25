@@ -934,7 +934,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             isWelcomeScreen = false;
         }
 
-        mainMenu.updateComponets(swf, abcList);
+        mainMenu.updateComponents(swf, abcList);
     }
 
     private void updateUi() {
@@ -945,7 +945,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
-        mainMenu.updateComponets(null, null);
+        mainMenu.updateComponents(null, null);
     }
 
     public void closeAll() {

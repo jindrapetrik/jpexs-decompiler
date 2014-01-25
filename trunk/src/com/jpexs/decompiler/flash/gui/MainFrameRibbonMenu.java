@@ -472,7 +472,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     }
 
     @Override
-    public void updateComponets(SWF swf, List<ABCContainerTag> abcList) {
+    public void updateComponents(SWF swf, List<ABCContainerTag> abcList) {
         boolean swfLoaded = swf != null;
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
 
@@ -482,7 +482,8 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         closeFileMenu.setEnabled(swfLoaded);
         closeAllFilesMenu.setEnabled(swfLoaded);
 
-        saveCommandButton.setEnabled(swfLoaded);
+        boolean isBundle = swfLoaded && (swf.swfList!=null ) && swf.swfList.isBundle;
+        saveCommandButton.setEnabled(swfLoaded && !isBundle);
         saveasCommandButton.setEnabled(swfLoaded);
         saveasexeCommandButton.setEnabled(swfLoaded);
         exportAllCommandButton.setEnabled(swfLoaded);

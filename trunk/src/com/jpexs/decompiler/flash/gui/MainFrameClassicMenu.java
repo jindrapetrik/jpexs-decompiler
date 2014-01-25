@@ -334,7 +334,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
     }
 
     @Override
-    public void updateComponets(SWF swf, List<ABCContainerTag> abcList) {
+    public void updateComponents(SWF swf, List<ABCContainerTag> abcList) {
         boolean swfLoaded = swf != null;
         boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
 
