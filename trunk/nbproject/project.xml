@@ -113,6 +113,11 @@
             </export>
             <export>
                 <type>folder</type>
+                <location>locales</location>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
                 <location>build/test</location>
                 <build-target>build</build-target>
             </export>
@@ -155,6 +160,7 @@
                 <built-to>build</built-to>
                 <built-to>javadoc</built-to>
                 <built-to>reports</built-to>
+                <built-to>locales</built-to>
                 <source-level>1.7</source-level>
             </compilation-unit>
             <compilation-unit>
