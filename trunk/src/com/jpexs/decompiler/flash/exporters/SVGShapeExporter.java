@@ -132,7 +132,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     }
 
     @Override
-    public void beginGradientFill(int type, List<RGB> colors, List<Integer> ratios, MATRIX matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void beginGradientFill(int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
                 ? _svg.createElement("linearGradient")
@@ -151,7 +151,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     }
 
     @Override
-    public void beginBitmapFill(int bitmapId, MATRIX matrix, boolean repeat, boolean smooth) {
+    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth) {
         finalizePath();
         ImageTag image = null;
         for (Tag t : swf.tags) {
@@ -184,24 +184,6 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                     imageData = baos.toByteArray();
                 }
                 String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
-                float translateX = 0;
-                float translateY = 0;
-                float rotateSkew0 = 0;
-                float rotateSkew1 = 0;
-                float scaleX = 1;
-                float scaleY = 1;
-                if (matrix != null) {
-                    translateX = SWF.twipToPixel(matrix.translateX);
-                    translateY = SWF.twipToPixel(matrix.translateY);
-                    if (matrix.hasRotate) {
-                        rotateSkew0 = matrix.getRotateSkew0Float();
-                        rotateSkew1 = matrix.getRotateSkew1Float();
-                    }
-                    if (matrix.hasScale) {
-                        scaleX = SWF.twipToPixel((int) matrix.getScaleXFloat());
-                        scaleY = SWF.twipToPixel((int) matrix.getScaleYFloat());
-                    }
-                }
                 path.setAttribute("style", "fill:url(#" + patternId + ")");
                 Element pattern = _svg.createElement("pattern");
                 pattern.setAttribute("id", patternId);
@@ -210,8 +192,16 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 pattern.setAttribute("width", "" + width);
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
-                pattern.setAttribute("patternTransform", "matrix(" + scaleX + ", " + rotateSkew0
-                        + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
+                if (matrix != null) {
+                    double translateX = roundPixels400(matrix.translateX);
+                    double translateY = roundPixels400(matrix.translateY);
+                    double rotateSkew0 = roundPixels400(matrix.rotateSkew0);
+                    double rotateSkew1 = roundPixels400(matrix.rotateSkew1);
+                    double scaleX = roundPixels400(matrix.scaleX);
+                    double scaleY = roundPixels400(matrix.scaleY);
+                    pattern.setAttribute("patternTransform", "matrix(" + scaleX + ", " + rotateSkew0
+                            + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
+                }
                 Element imageElement = _svg.createElement("image");
                 imageElement.setAttribute("width", "" + width);
                 imageElement.setAttribute("height", "" + height);
@@ -262,7 +252,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     }
 
     @Override
-    public void lineGradientStyle(int type, List<RGB> colors, List<Integer> ratios, MATRIX matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void lineGradientStyle(int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         path.removeAttribute("stroke-opacity");
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
                 ? _svg.createElement("linearGradient")
@@ -290,7 +280,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         super.finalizePath();
     }
 
-    protected void populateGradientElement(Element gradient, int type, List<RGB> colors, List<Integer> ratios, MATRIX matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    protected void populateGradientElement(Element gradient, int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         gradient.setAttribute("gradientUnits", "userSpaceOnUse");
         if (type == FILLSTYLE.LINEAR_GRADIENT) {
             gradient.setAttribute("x1", "-819.2");
@@ -319,26 +309,18 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             gradient.setAttribute("color-interpolation", "linearRGB");
         }
         if (matrix != null) {
-            float translateX = SWF.twipToPixel(matrix.translateX);
-            float translateY = SWF.twipToPixel(matrix.translateY);
-            float rotateSkew0 = 0;
-            float rotateSkew1 = 0;
-            float scaleX = 1;
-            float scaleY = 1;
-            if (matrix.hasRotate) {
-                rotateSkew0 = matrix.getRotateSkew0Float();
-                rotateSkew1 = matrix.getRotateSkew1Float();
-            }
-            if (matrix.hasScale) {
-                scaleX = SWF.twipToPixel((int) matrix.getScaleXFloat());
-                scaleY = SWF.twipToPixel((int) matrix.getScaleYFloat());
-            }
+            double translateX = roundPixels400(matrix.translateX);
+            double translateY = roundPixels400(matrix.translateY);
+            double rotateSkew0 = roundPixels400(matrix.rotateSkew0);
+            double rotateSkew1 = roundPixels400(matrix.rotateSkew1);
+            double scaleX = roundPixels400(matrix.scaleX);
+            double scaleY = roundPixels400(matrix.scaleY);
             gradient.setAttribute("gradientTransform", "matrix(" + scaleX + ", " + rotateSkew0
                     + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
         }
         for (int i = 0; i < colors.size(); i++) {
             Element gradientEntry = _svg.createElement("stop");
-            gradient.setAttribute("offset", Double.toString(ratios.get(i) / 255));
+            gradientEntry.setAttribute("offset", Double.toString(ratios.get(i) / 255));
             RGB color = colors.get(i);
             //if(colors.get(i) != 0) { 
             gradientEntry.setAttribute("stop-color", color.toHexRGB());

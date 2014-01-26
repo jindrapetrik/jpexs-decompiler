@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
-import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGB;
 import java.util.List;
 
@@ -68,12 +67,12 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     }
 
     @Override
-    public void beginGradientFill(int type, List<RGB> colors, List<Integer> ratios, MATRIX matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void beginGradientFill(int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
     }
 
     @Override
-    public void beginBitmapFill(int bitmapId, MATRIX matrix, boolean repeat, boolean smooth) {
+    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth) {
         finalizePath();
     }
 
@@ -88,7 +87,7 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     }
 
     @Override
-    public void lineGradientStyle(int type, List<RGB> colors, List<Integer> ratios, MATRIX matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void lineGradientStyle(int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
     }
 
     @Override
@@ -124,9 +123,5 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     protected void finalizePath() {
         pathData = "";
         currentDrawCommand = "";
-    }
-
-    protected double roundPixels20(double pixels) {
-        return Math.round(pixels * 100) / 100.0;
     }
 }

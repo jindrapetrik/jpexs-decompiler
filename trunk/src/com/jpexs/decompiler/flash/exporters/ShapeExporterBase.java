@@ -259,7 +259,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     fillStyleIdx = e.getFillStyleIdx();
                     pos = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
                     try {
-                        MATRIX matrix;
+                        Matrix matrix;
                         FILLSTYLE fillStyle = _fillStyles.get(fillStyleIdx - 1);
                         switch (fillStyle.fillStyleType) {
                             case FILLSTYLE.SOLID:
@@ -273,9 +273,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                 List<RGB> colors = new ArrayList<>();
                                 List<Integer> ratios = new ArrayList<>();
                                 GRADRECORD gradientRecord;
-                                matrix = new MATRIX(fillStyle.gradientMatrix);
-                                matrix.translateX /= 20;
-                                matrix.translateY /= 20;
+                                matrix = new Matrix(fillStyle.gradientMatrix);
                                 for (int gri = 0; gri < fillStyle.gradient.gradientRecords.length; gri++) {
                                     gradientRecord = fillStyle.gradient.gradientRecords[gri];
                                     colors.add(gradientRecord.color);
@@ -294,11 +292,11 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                             case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
                             case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
                                 // Bitmap fill
-                                MATRIX m = fillStyle.bitmapMatrix;
+                                matrix = new Matrix(fillStyle.bitmapMatrix);
                                 //matrix = new MATRIX(m.scaleX / 20.0, m.scaleY / 20.0, m.getRotation(), m.translateX / 20.0, m.translateY / 20.0);
                                 beginBitmapFill(
                                         fillStyle.bitmapId,
-                                        m,
+                                        matrix,
                                         (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP),
                                         (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.CLIPPED_BITMAP)
                                 );
@@ -391,9 +389,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                     List<RGB> colors = new ArrayList<>();
                                     List<Integer> ratios = new ArrayList<>();
                                     GRADRECORD gradientRecord;
-                                    MATRIX matrix = new MATRIX(fillStyle.gradientMatrix);
-                                    matrix.translateX /= 20;
-                                    matrix.translateY /= 20;
+                                    Matrix matrix = new Matrix(fillStyle.gradientMatrix);
                                     for (int gri = 0; gri < fillStyle.gradient.gradientRecords.length; gri++) {
                                         gradientRecord = fillStyle.gradient.gradientRecords[gri];
                                         colors.add(gradientRecord.color);
@@ -532,7 +528,11 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    private double roundPixels400(double pixels) {
+    protected double roundPixels20(double pixels) {
+        return Math.round(pixels * 100) / 100.0;
+    }
+
+    protected double roundPixels400(double pixels) {
         return Math.round(pixels * 10000) / 10000.0;
     }
 }
