@@ -20,9 +20,8 @@ package com.jpexs.decompiler.flash.types;
  *
  * @author JPEXS
  */
-public class LINESTYLE2 {
+public class LINESTYLE2 extends LINESTYLE {
 
-    public int width;
     public int startCapStyle;
     public int joinStyle;
     public static final int ROUND_JOIN = 0;
@@ -38,6 +37,5 @@ public class LINESTYLE2 {
     public static final int NO_CAP = 1;
     public static final int SQUARE_CAP = 2;
     public int miterLimitFactor;
-    public RGBA color;
     public FILLSTYLE fillType;
 }

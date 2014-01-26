@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
@@ -110,7 +111,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 if (lineStyle2 == null) {
                     ok = false;
                 } else if (!lineStyle2.hasFillFlag) {
-                    g.setPaint(new Color(lineStyle2.color.red, lineStyle2.color.green, lineStyle2.color.blue, lineStyle2.color.alpha));
+                    RGBA color = (RGBA) lineStyle2.color;
+                    g.setPaint(new Color(color.red, color.green, color.blue, color.alpha));
                     int capStyle = 0;
                     switch (lineStyle2.startCapStyle) {
                         case LINESTYLE2.NO_CAP:
@@ -149,7 +151,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     if (shapeNum == 1 || shapeNum == 2) {
                         g.setPaint(lineStyle.color.toColor());
                     } else /*shapeNum == 3*/ {
-                        g.setPaint(lineStyle.colorA.toColor());
+                        g.setPaint(lineStyle.color.toColor());
                     }
                     g.setStroke(new BasicStroke(lineStyle.width / DESCALE, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     ok = true;
@@ -203,17 +205,20 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     break;
                 case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
 
+                    FOCALGRADIENT focalGradient = (FOCALGRADIENT) fillStyle0.gradient; 
                     List<Color> colorsFocRad = new ArrayList<>();
                     List<Float> ratiosFocRad = new ArrayList<>();
-                    for (int i = 0; i < fillStyle0.focalGradient.gradientRecords.length; i++) {
-                        if ((i > 0) && (fillStyle0.focalGradient.gradientRecords[i - 1].ratio == fillStyle0.focalGradient.gradientRecords[i].ratio)) {
+                    for (int i = 0; i < focalGradient.gradientRecords.length; i++) {
+                        if ((i > 0) && (focalGradient.gradientRecords[i - 1].ratio == focalGradient.gradientRecords[i].ratio)) {
                             continue;
                         }
-                        ratiosFocRad.add(fillStyle0.focalGradient.gradientRecords[i].getRatioFloat());
+                        ratiosFocRad.add(focalGradient.gradientRecords[i].getRatioFloat());
+                        RGB color = focalGradient.gradientRecords[i].color;
                         if (shapeNum >= 3) {
-                            colorsFocRad.add(new Color(fillStyle0.focalGradient.gradientRecords[i].colorA.red, fillStyle0.focalGradient.gradientRecords[i].colorA.green, fillStyle0.focalGradient.gradientRecords[i].colorA.blue, fillStyle0.focalGradient.gradientRecords[i].colorA.alpha));
+                            RGBA colorA = (RGBA) color;
+                            colorsFocRad.add(new Color(colorA.red, colorA.green, colorA.blue, colorA.alpha));
                         } else {
-                            colorsFocRad.add(new Color(fillStyle0.focalGradient.gradientRecords[i].color.red, fillStyle0.focalGradient.gradientRecords[i].color.green, fillStyle0.focalGradient.gradientRecords[i].color.blue));
+                            colorsFocRad.add(new Color(color.red, color.green, color.blue));
                         }
                     }
 
@@ -223,9 +228,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     }
                     Color[] focRadColors = colorsFocRad.toArray(new Color[colorsFocRad.size()]);
 
-                    RGB focEndColor = fillStyle0.focalGradient.gradientRecords[fillStyle0.focalGradient.gradientRecords.length - 1].color;
-                    RGBA focEndColorA = fillStyle0.focalGradient.gradientRecords[fillStyle0.focalGradient.gradientRecords.length - 1].colorA;
+                    RGB focEndColor = focalGradient.gradientRecords[focalGradient.gradientRecords.length - 1].color;
                     if (shapeNum >= 3) {
+                        RGBA focEndColorA = (RGBA) focEndColor;
                         g.setPaint(new Color(focEndColorA.red, focEndColorA.green, focEndColorA.blue, focEndColorA.alpha));
                     } else {
                         g.setPaint(new Color(focEndColor.red, focEndColor.green, focEndColor.blue));
@@ -238,15 +243,15 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     focTrans.preConcatenate(AffineTransform.getTranslateInstance(startX / DESCALE, startY / DESCALE));
                     g.setTransform(focTrans);
                     CycleMethod cm = CycleMethod.NO_CYCLE;
-                    if (fillStyle0.focalGradient.spreadMode == GRADIENT.SPREAD_PAD_MODE) {
+                    if (fillStyle0.gradient.spreadMode == GRADIENT.SPREAD_PAD_MODE) {
                         cm = CycleMethod.NO_CYCLE;
-                    } else if (fillStyle0.focalGradient.spreadMode == GRADIENT.SPREAD_REFLECT_MODE) {
+                    } else if (focalGradient.spreadMode == GRADIENT.SPREAD_REFLECT_MODE) {
                         cm = CycleMethod.REFLECT;
-                    } else if (fillStyle0.focalGradient.spreadMode == GRADIENT.SPREAD_REPEAT_MODE) {
+                    } else if (focalGradient.spreadMode == GRADIENT.SPREAD_REPEAT_MODE) {
                         cm = CycleMethod.REPEAT;
                     }
 
-                    g.setPaint(new RadialGradientPaint(new Point(0, 0), 16384, new Point((int) (fillStyle0.focalGradient.focalPoint * 16384), 0), focRadFractions, focRadColors, cm));
+                    g.setPaint(new RadialGradientPaint(new Point(0, 0), 16384, new Point((int) (focalGradient.focalPoint * 16384), 0), focRadFractions, focRadColors, cm));
                     g.fill(new Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
                     g.setTransform(oldAf);
                     g.setClip(null);
@@ -259,10 +264,12 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                             continue;
                         }
                         ratiosRad.add(fillStyle0.gradient.gradientRecords[i].getRatioFloat());
+                        RGB color = fillStyle0.gradient.gradientRecords[i].color;
                         if (shapeNum >= 3) {
-                            colorsRad.add(new Color(fillStyle0.gradient.gradientRecords[i].colorA.red, fillStyle0.gradient.gradientRecords[i].colorA.green, fillStyle0.gradient.gradientRecords[i].colorA.blue, fillStyle0.gradient.gradientRecords[i].colorA.alpha));
+                            RGBA colorA = (RGBA) color;
+                            colorsRad.add(new Color(colorA.red, colorA.green, colorA.blue, colorA.alpha));
                         } else {
-                            colorsRad.add(new Color(fillStyle0.gradient.gradientRecords[i].color.red, fillStyle0.gradient.gradientRecords[i].color.green, fillStyle0.gradient.gradientRecords[i].color.blue));
+                            colorsRad.add(new Color(color.red, color.green, color.blue));
                         }
                     }
 
@@ -273,8 +280,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     Color[] colorsRadArr = colorsRad.toArray(new Color[colorsRad.size()]);
 
                     RGB endColor = fillStyle0.gradient.gradientRecords[fillStyle0.gradient.gradientRecords.length - 1].color;
-                    RGBA endColorA = fillStyle0.gradient.gradientRecords[fillStyle0.gradient.gradientRecords.length - 1].colorA;
                     if (shapeNum >= 3) {
+                        RGBA endColorA = (RGBA) endColor;
                         g.setPaint(new Color(endColorA.red, endColorA.green, endColorA.blue, endColorA.alpha));
                     } else {
                         g.setPaint(new Color(endColor.red, endColor.green, endColor.blue));
@@ -309,10 +316,12 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                             continue;
                         }
                         ratios.add(fillStyle0.gradient.gradientRecords[i].getRatioFloat());
+                        RGB color = fillStyle0.gradient.gradientRecords[i].color;
                         if (shapeNum >= 3) {
-                            colors.add(new Color(fillStyle0.gradient.gradientRecords[i].colorA.red, fillStyle0.gradient.gradientRecords[i].colorA.green, fillStyle0.gradient.gradientRecords[i].colorA.blue, fillStyle0.gradient.gradientRecords[i].colorA.alpha));
+                            RGBA colorA = (RGBA) color;
+                            colors.add(new Color(colorA.red, colorA.green, colorA.blue, colorA.alpha));
                         } else {
-                            colors.add(new Color(fillStyle0.gradient.gradientRecords[i].color.red, fillStyle0.gradient.gradientRecords[i].color.green, fillStyle0.gradient.gradientRecords[i].color.blue));
+                            colors.add(new Color(color.red, color.green, color.blue));
                         }
                     }
 
@@ -347,10 +356,12 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     return;
                 case FILLSTYLE.SOLID:
                     Color c = null;
+                    RGB color = fillStyle0.color;
                     if (shapeNum >= 3) {
-                        c = new Color(fillStyle0.colorA.red, fillStyle0.colorA.green, fillStyle0.colorA.blue, fillStyle0.colorA.alpha);
+                        RGBA colorA = (RGBA) color;
+                        c = new Color(colorA.red, colorA.green, colorA.blue, colorA.alpha);
                     } else {
-                        c = new Color(fillStyle0.color.red, fillStyle0.color.green, fillStyle0.color.blue);
+                        c = new Color(color.red, color.green, color.blue);
                     }
                     g.setPaint(c);
                     ok = true;
@@ -489,7 +500,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                         }
                         break;
                     case FILLSTYLE.SOLID:
-                        f = " fill=\"" + ((shapeNum >= 3) ? fillStyle0.colorA.toHexRGB() : fillStyle0.color.toHexRGB()) + "\"";
+                        f = " fill=\"" + fillStyle0.color.toHexRGB() + "\"";
                         break;
                 }
             } else {
@@ -497,7 +508,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             }
             params += f;
             if ((!useLineStyle2) && lineStyle != null) {
-                params += " stroke=\"" + ((shapeNum >= 3) ? lineStyle.colorA.toHexRGB() : lineStyle.color.toHexRGB()) + "\"";
+                params += " stroke=\"" + lineStyle.color.toHexRGB() + "\"";
             }
             if (useLineStyle2 && lineStyle2 != null) {
                 params += " stroke-width=\"" + SWF.twipToPixel(lineStyle2.width) + "\"" + (lineStyle2.color != null ? " stroke=\"" + lineStyle2.color.toHexRGB() + "\"" : "");
@@ -613,7 +624,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                         if (scr.lineStyle == 0) {
                             path.lineStyle2 = null;
                         } else {
-                            path.lineStyle2 = lineStylesList.lineStyles2[scr.lineStyle - 1];
+                            path.lineStyle2 = (LINESTYLE2) lineStylesList.lineStyles[scr.lineStyle - 1];
                         }
                     } else {
                         path.useLineStyle2 = false;
@@ -995,7 +1006,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 p.fillStyle0 = new FILLSTYLE();
                 p.fillStyle0.fillStyleType = FILLSTYLE.SOLID;
                 p.fillStyle0.color = new RGB(defaultColor);
-                p.fillStyle0.colorA = new RGBA(defaultColor);
             }
             p.drawTo(tags, -rect.Xmin, -rect.Ymin, g, shapeNum);
         }

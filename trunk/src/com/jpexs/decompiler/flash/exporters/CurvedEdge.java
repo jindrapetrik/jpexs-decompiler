@@ -14,13 +14,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.types;
+package com.jpexs.decompiler.flash.exporters;
 
 /**
  *
  * @author JPEXS
  */
-public class FOCALGRADIENT extends GRADIENT {
+public class CurvedEdge extends StraightEdge implements IEdge {
 
-    public float focalPoint;
+    private Point control;
+
+    CurvedEdge(Point from, Point control, Point to, int lineStyleIdx, int fillStyleIdx) {
+        super(from, to, lineStyleIdx, fillStyleIdx);
+        this.control = control;
+    }
+
+    public Point getControl() {
+        return control;
+    }
+
+    @Override
+    public IEdge reverseWithNewFillStyle(int newFillStyleIdx) {
+        return new CurvedEdge(to, control, from, lineStyleIdx, newFillStyleIdx);
+    }
 }

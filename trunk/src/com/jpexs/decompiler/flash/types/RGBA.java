@@ -23,20 +23,8 @@ import java.awt.Color;
  *
  * @author JPEXS
  */
-public class RGBA {
+public class RGBA extends RGB {
 
-    /**
-     * Red color value
-     */
-    public int red;
-    /**
-     * Green color value
-     */
-    public int green;
-    /**
-     * Blue color value
-     */
-    public int blue;
     /**
      * Alpha value defining opacity
      */
@@ -44,22 +32,6 @@ public class RGBA {
 
     public float getAlphaFloat() {
         return ((float) alpha) / 255.0f;
-    }
-
-    public String toHexRGB() {
-        String rh = Integer.toHexString(red);
-        if (rh.length() < 2) {
-            rh = "0" + rh;
-        }
-        String gh = Integer.toHexString(green);
-        if (gh.length() < 2) {
-            gh = "0" + gh;
-        }
-        String bh = Integer.toHexString(blue);
-        if (bh.length() < 2) {
-            bh = "0" + bh;
-        }
-        return "#" + rh + gh + bh;
     }
 
     public String toHexARGB() {
@@ -83,22 +55,19 @@ public class RGBA {
     }
 
     public RGBA(int red, int green, int blue, int alpha) {
-        this.red = red;
-        this.green = green;
-        this.blue = blue;
+        super(red, green, blue);
         this.alpha = alpha;
     }
 
     public RGBA(Color color) {
-        this.red = color.getRed();
-        this.green = color.getGreen();
-        this.blue = color.getBlue();
+        super(color);
         this.alpha = color.getAlpha();
     }
 
     public RGBA() {
     }
 
+    @Override
     public Color toColor() {
         return new Color(red, green, blue, alpha);
     }

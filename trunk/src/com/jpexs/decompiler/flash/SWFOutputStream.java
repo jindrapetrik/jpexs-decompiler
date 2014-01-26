@@ -1035,7 +1035,7 @@ public class SWFOutputStream extends OutputStream {
         writeUI8(value.fillStyleType);
         if (value.fillStyleType == FILLSTYLE.SOLID) {
             if (shapeNum >= 3) {
-                writeRGBA(value.colorA);
+                writeRGBA((RGBA) value.color);
             } else if (shapeNum == 1 || shapeNum == 2) {
                 writeRGB(value.color);
             }
@@ -1050,7 +1050,7 @@ public class SWFOutputStream extends OutputStream {
             writeGRADIENT(value.gradient, shapeNum);
         }
         if (value.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
-            writeFOCALGRADIENT(value.focalGradient, shapeNum);
+            writeFOCALGRADIENT((FOCALGRADIENT) value.gradient, shapeNum);
         }
 
         if ((value.fillStyleType == FILLSTYLE.REPEATING_BITMAP)
@@ -1095,7 +1095,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeFOCALGRADIENT(FOCALGRADIENT value, int shapeNum) throws IOException {
         writeUB(2, value.spreadMode);
-        writeUB(2, value.interPolationMode);
+        writeUB(2, value.interpolationMode);
         writeUB(4, value.gradientRecords.length);
         for (int i = 0; i < value.gradientRecords.length; i++) {
             writeGRADRECORD(value.gradientRecords[i], shapeNum);
@@ -1112,7 +1112,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeGRADIENT(GRADIENT value, int shapeNum) throws IOException {
         writeUB(2, value.spreadMode);
-        writeUB(2, value.interPolationMode);
+        writeUB(2, value.interpolationMode);
         writeUB(4, value.gradientRecords.length);
         for (int i = 0; i < value.gradientRecords.length; i++) {
             writeGRADRECORD(value.gradientRecords[i], shapeNum);
@@ -1131,7 +1131,7 @@ public class SWFOutputStream extends OutputStream {
         if (shapeNum == 1 || shapeNum == 2) {
             writeRGB(value.color);
         } else if (shapeNum == 3) {
-            writeRGBA(value.colorA);
+            writeRGBA((RGBA) value.color);
         }
     }
 
@@ -1147,7 +1147,7 @@ public class SWFOutputStream extends OutputStream {
         if (shapeNum == 1 || shapeNum == 2) {
             writeRGB(value.color);
         } else if (shapeNum == 3) {
-            writeRGBA(value.colorA);
+            writeRGBA((RGBA) value.color);
         }
     }
 
@@ -1173,7 +1173,7 @@ public class SWFOutputStream extends OutputStream {
             writeUI16(value.miterLimitFactor);
         }
         if (!value.hasFillFlag) {
-            writeRGBA(value.color);
+            writeRGBA((RGBA) value.color);
         } else {
             writeFILLSTYLE(value.fillType, shapeNum);
         }
@@ -1200,7 +1200,7 @@ public class SWFOutputStream extends OutputStream {
                 writeLINESTYLE(value.lineStyles[i], shapeNum);
             }
         } else if (shapeNum == 4) {
-            lineStyleCount = value.lineStyles2.length;
+            lineStyleCount = value.lineStyles.length;
             if (lineStyleCount >= 0xff) {
                 writeUI8(0xff);
                 writeUI16(lineStyleCount);
@@ -1208,7 +1208,7 @@ public class SWFOutputStream extends OutputStream {
                 writeUI8(lineStyleCount);
             }
             for (int i = 0; i < lineStyleCount; i++) {
-                writeLINESTYLE2(value.lineStyles2[i], shapeNum);
+                writeLINESTYLE2((LINESTYLE2) value.lineStyles[i], shapeNum);
             }
         }
     }

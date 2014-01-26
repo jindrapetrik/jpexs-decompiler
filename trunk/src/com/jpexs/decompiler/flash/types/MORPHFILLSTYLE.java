@@ -81,7 +81,7 @@ public class MORPHFILLSTYLE implements NeedsCharacters {
             ret.bitmapMatrix = morphMatrix(startBitmapMatrix, endBitmapMatrix, ratio);
         }
         if (startColor != null) {
-            ret.colorA = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
+            ret.color = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
         }
         ret.fillStyleType = fillStyleType;
         if (gradient != null) {
@@ -97,7 +97,7 @@ public class MORPHFILLSTYLE implements NeedsCharacters {
         FILLSTYLE ret = new FILLSTYLE();
         ret.bitmapId = bitmapId;
         ret.bitmapMatrix = startBitmapMatrix;
-        ret.colorA = startColor;
+        ret.color = startColor;
         ret.fillStyleType = fillStyleType;
         if (gradient != null) {
             ret.gradient = gradient.getStartGradient();
@@ -110,7 +110,7 @@ public class MORPHFILLSTYLE implements NeedsCharacters {
         FILLSTYLE ret = new FILLSTYLE();
         ret.bitmapId = bitmapId;
         ret.bitmapMatrix = endBitmapMatrix;
-        ret.colorA = endColor;
+        ret.color = endColor;
         ret.fillStyleType = fillStyleType;
         if (gradient != null) {
             ret.gradient = gradient.getEndGradient();

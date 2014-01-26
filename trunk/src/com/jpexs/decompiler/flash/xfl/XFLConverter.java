@@ -64,6 +64,7 @@ import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
@@ -200,8 +201,8 @@ public class XFLConverter {
     public static String convertLineStyle(LINESTYLE ls, int shapeNum) {
         return "<SolidStroke weight=\"" + (((float) ls.width) / 20.0) + "\">"
                 + "<fill>"
-                + "<SolidColor color=\"" + (shapeNum == 3 ? ls.colorA.toHexRGB() : ls.color.toHexRGB()) + "\""
-                + (shapeNum == 3 ? " alpha=\"" + ls.colorA.getAlphaFloat() + "\"" : "")
+                + "<SolidColor color=\"" + ls.color.toHexRGB() + "\""
+                + (shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "")
                 + " />"
                 + "</fill>"
                 + "</SolidStroke>";
@@ -251,8 +252,9 @@ public class XFLConverter {
         ret += "<fill>";
 
         if (!ls.hasFillFlag) {
-            ret += "<SolidColor color=\"" + ls.color.toHexRGB() + "\""
-                    + (ls.color.getAlphaFloat() != 1 ? " alpha=\"" + ls.color.getAlphaFloat() + "\"" : "")
+            RGBA color = (RGBA) ls.color;
+            ret += "<SolidColor color=\"" + color.toHexRGB() + "\""
+                    + (color.getAlphaFloat() != 1 ? " alpha=\"" + color.getAlphaFloat() + "\"" : "")
                     + " />";
         } else {
             ret += convertFillStyle(null/* FIXME */, characters, ls.fillType, shapeNum);
@@ -275,14 +277,10 @@ public class XFLConverter {
         switch (fs.fillStyleType) {
             case FILLSTYLE.SOLID:
                 ret += "<SolidColor color=\"";
-                if (shapeNum >= 3) {
-                    ret += fs.colorA.toHexRGB();
-                } else {
-                    ret += fs.color.toHexRGB();
-                }
+                ret += fs.color.toHexRGB();
                 ret += "\"";
                 if (shapeNum >= 3) {
-                    ret += " alpha=\"" + fs.colorA.getAlphaFloat() + "\"";
+                    ret += " alpha=\"" + ((RGBA) fs.color).getAlphaFloat() + "\"";
                 }
                 ret += " />";
                 break;
@@ -322,7 +320,7 @@ public class XFLConverter {
                     ret += "<RadialGradient";
                     ret += " focalPointRatio=\"";
                     if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
-                        ret += fs.focalGradient.focalPoint;
+                        ret += ((FOCALGRADIENT) fs.gradient).focalPoint;
                     } else {
                         ret += "0";
                     }
@@ -331,13 +329,13 @@ public class XFLConverter {
 
                 int interpolationMode;
                 if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
-                    interpolationMode = fs.focalGradient.interPolationMode;
+                    interpolationMode = fs.gradient.interpolationMode;
                 } else {
-                    interpolationMode = fs.gradient.interPolationMode;
+                    interpolationMode = fs.gradient.interpolationMode;
                 }
                 int spreadMode;
                 if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
-                    spreadMode = fs.focalGradient.spreadMode;
+                    spreadMode = fs.gradient.spreadMode;
                 } else {
                     spreadMode = fs.gradient.spreadMode;
                 }
@@ -361,15 +359,15 @@ public class XFLConverter {
                 ret += "<matrix>" + convertMatrix(fs.gradientMatrix) + "</matrix>";
                 GRADRECORD[] records;
                 if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
-                    records = fs.focalGradient.gradientRecords;
+                    records = fs.gradient.gradientRecords;
                 } else {
                     records = fs.gradient.gradientRecords;
                 }
                 for (GRADRECORD rec : records) {
                     ret += "<GradientEntry";
-                    ret += " color=\"" + (shapeNum >= 3 ? rec.colorA.toHexRGB() : rec.color.toHexRGB()) + "\"";
+                    ret += " color=\"" + (shapeNum >= 3 ? rec.color.toHexRGB() : rec.color.toHexRGB()) + "\"";
                     if (shapeNum >= 3) {
-                        ret += " alpha=\"" + rec.colorA.getAlphaFloat() + "\"";
+                        ret += " alpha=\"" + ((RGBA) rec.color).getAlphaFloat() + "\"";
                     }
                     ret += " ratio=\"" + rec.getRatioFloat() + "\"";
                     ret += " />";
@@ -453,10 +451,10 @@ public class XFLConverter {
             }
         }
         if (lineStyles != null) {
-            if ((shapeNum == 4) && (lineStyles.lineStyles2 != null)) { //(shapeNum == 4) {
-                for (int l = 0; l < lineStyles.lineStyles2.length; l++) {
+            if ((shapeNum == 4) && (lineStyles.lineStyles != null)) { //(shapeNum == 4) {
+                for (int l = 0; l < lineStyles.lineStyles.length; l++) {
                     strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                    strokesStr += convertLineStyle(characters, lineStyles.lineStyles2[l], shapeNum);
+                    strokesStr += convertLineStyle(characters, (LINESTYLE2) lineStyles.lineStyles[l], shapeNum);
                     strokesStr += "</StrokeStyle>";
                     lineStyleCount++;
                 }
@@ -511,15 +509,10 @@ public class XFLConverter {
                             if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                                 if (shapeNum == 4) {
                                     if (strokeStyleOrig > 0) {
-                                        if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
-                                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
-                                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
-                                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
-                                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
-                                                            empty = true;
-                                                        }
-                                                    }
-                                                }
+                                        if (!((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
+                                            RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].color;
+                                            if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
+                                                empty = true;
                                             }
                                         }
                                     }
@@ -565,9 +558,9 @@ public class XFLConverter {
 
                     lineStyleCount = 0;
                     if (shapeNum == 4) {
-                        for (int l = 0; l < scr.lineStyles.lineStyles2.length; l++) {
+                        for (int l = 0; l < scr.lineStyles.lineStyles.length; l++) {
                             strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                            strokesStr += convertLineStyle(characters, scr.lineStyles.lineStyles2[l], shapeNum);
+                            strokesStr += convertLineStyle(characters, (LINESTYLE2) scr.lineStyles.lineStyles[l], shapeNum);
                             strokesStr += "</StrokeStyle>";
                             lineStyleCount++;
                         }
@@ -630,15 +623,10 @@ public class XFLConverter {
                         if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                             if (shapeNum == 4) {
                                 if (strokeStyleOrig > 0) {
-                                    if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
-                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
-                                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
-                                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
-                                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
-                                                        empty = true;
-                                                    }
-                                                }
-                                            }
+                                    if (!((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
+                                        RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].color;
+                                        if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
+                                            empty = true;
                                         }
                                     }
                                 }
@@ -678,15 +666,10 @@ public class XFLConverter {
                 if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                     if (shapeNum == 4) {
                         if (strokeStyleOrig > 0) {
-                            if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
-                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
-                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
-                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
-                                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
-                                                empty = true;
-                                            }
-                                        }
-                                    }
+                            if (!((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
+                                RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].color;
+                                if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
+                                    empty = true;
                                 }
                             }
                         }

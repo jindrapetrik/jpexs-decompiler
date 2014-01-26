@@ -482,7 +482,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         closeFileMenu.setEnabled(swfLoaded);
         closeAllFilesMenu.setEnabled(swfLoaded);
 
-        boolean isBundle = swfLoaded && (swf.swfList!=null ) && swf.swfList.isBundle;
+        boolean isBundle = swfLoaded && (swf.swfList != null) && swf.swfList.isBundle;
         saveCommandButton.setEnabled(swfLoaded && !isBundle);
         saveasCommandButton.setEnabled(swfLoaded);
         saveasexeCommandButton.setEnabled(swfLoaded);

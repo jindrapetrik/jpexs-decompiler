@@ -29,21 +29,21 @@ public class MORPHLINESTYLE {
 
     public LINESTYLE getStartLineStyle() {
         LINESTYLE ret = new LINESTYLE();
-        ret.colorA = startColor;
+        ret.color = startColor;
         ret.width = startWidth;
         return ret;
     }
 
     public LINESTYLE getLineStyleAt(int ratio) {
         LINESTYLE ret = new LINESTYLE();
-        ret.colorA = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
+        ret.color = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
         ret.width = startWidth + (endWidth - startWidth) * ratio / 65535;
         return ret;
     }
 
     public LINESTYLE getEndLineStyle() {
         LINESTYLE ret = new LINESTYLE();
-        ret.colorA = endColor;
+        ret.color = endColor;
         ret.width = endWidth;
         return ret;
     }

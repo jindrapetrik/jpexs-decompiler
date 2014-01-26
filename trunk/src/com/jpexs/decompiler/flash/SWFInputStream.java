@@ -1871,7 +1871,7 @@ public class SWFInputStream extends InputStream {
         GRADRECORD ret = new GRADRECORD();
         ret.ratio = readUI8();
         if (shapeNum >= 3) {
-            ret.colorA = readRGBA();
+            ret.color = readRGBA();
         } else {
             ret.color = readRGB();
         }
@@ -1888,7 +1888,7 @@ public class SWFInputStream extends InputStream {
     public GRADIENT readGRADIENT(int shapeNum) throws IOException {
         GRADIENT ret = new GRADIENT();
         ret.spreadMode = (int) readUB(2);
-        ret.interPolationMode = (int) readUB(2);
+        ret.interpolationMode = (int) readUB(2);
         int numGradients = (int) readUB(4);
         ret.gradientRecords = new GRADRECORD[numGradients];
         for (int i = 0; i < numGradients; i++) {
@@ -1908,7 +1908,7 @@ public class SWFInputStream extends InputStream {
     public FOCALGRADIENT readFOCALGRADIENT(int shapeNum) throws IOException {
         FOCALGRADIENT ret = new FOCALGRADIENT();
         ret.spreadMode = (int) readUB(2);
-        ret.interPolationMode = (int) readUB(2);
+        ret.interpolationMode = (int) readUB(2);
         int numGradients = (int) readUB(4);
         ret.gradientRecords = new GRADRECORD[numGradients];
         for (int i = 0; i < numGradients; i++) {
@@ -1930,7 +1930,7 @@ public class SWFInputStream extends InputStream {
         ret.fillStyleType = readUI8();
         if (ret.fillStyleType == FILLSTYLE.SOLID) {
             if (shapeNum >= 3) {
-                ret.colorA = readRGBA();
+                ret.color = readRGBA();
             } else {
                 ret.color = readRGB();
             }
@@ -1945,7 +1945,7 @@ public class SWFInputStream extends InputStream {
             ret.gradient = readGRADIENT(shapeNum);
         }
         if (ret.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
-            ret.focalGradient = readFOCALGRADIENT(shapeNum);
+            ret.gradient = readFOCALGRADIENT(shapeNum);
         }
 
         if ((ret.fillStyleType == FILLSTYLE.REPEATING_BITMAP)
@@ -1993,7 +1993,7 @@ public class SWFInputStream extends InputStream {
             ret.color = readRGB();
         }
         if (shapeNum == 3) {
-            ret.colorA = readRGBA();
+            ret.color = readRGBA();
         }
         return ret;
     }
@@ -2047,9 +2047,9 @@ public class SWFInputStream extends InputStream {
                 ret.lineStyles[i] = readLINESTYLE(shapeNum);
             }
         } else if (shapeNum == 4) {
-            ret.lineStyles2 = new LINESTYLE2[lineStyleCount];
+            ret.lineStyles = new LINESTYLE2[lineStyleCount];
             for (int i = 0; i < lineStyleCount; i++) {
-                ret.lineStyles2[i] = readLINESTYLE2(shapeNum);
+                ret.lineStyles[i] = readLINESTYLE2(shapeNum);
             }
         }
         return ret;

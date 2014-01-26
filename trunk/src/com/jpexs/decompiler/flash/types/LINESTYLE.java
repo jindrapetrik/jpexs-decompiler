@@ -24,5 +24,4 @@ public class LINESTYLE {
 
     public int width;
     public RGB color;
-    public RGBA colorA;
 }

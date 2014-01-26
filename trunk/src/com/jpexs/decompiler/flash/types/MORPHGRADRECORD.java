@@ -30,14 +30,14 @@ public class MORPHGRADRECORD {
     public GRADRECORD getStartRecord() {
         GRADRECORD ret = new GRADRECORD();
         ret.ratio = startRatio;
-        ret.colorA = startColor;
+        ret.color = startColor;
         return ret;
     }
 
     public GRADRECORD getEndRecord() {
         GRADRECORD ret = new GRADRECORD();
         ret.ratio = endRatio;
-        ret.colorA = endColor;
+        ret.color = endColor;
         return ret;
     }
 }

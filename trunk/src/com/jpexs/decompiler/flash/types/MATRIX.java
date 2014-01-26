@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.SWF;
 import java.awt.Point;
 import java.io.Serializable;
 
@@ -155,5 +156,13 @@ public class MATRIX implements Serializable {
 
     public boolean isEmpty() {
         return (translateX == 0) && (translateY == 0) && (!hasRotate) && (!hasScale);
+    }
+    
+    public double getRotation() {
+        float x = getRotateSkew1Float();
+        float y = SWF.twipToPixel((int) getScaleYFloat());
+        double rotation = ((180 / Math.PI) * Math.atan2(y, x) - 90);
+        if(rotation < 0) { rotation = 360 + rotation; }
+        return rotation;
     }
 }

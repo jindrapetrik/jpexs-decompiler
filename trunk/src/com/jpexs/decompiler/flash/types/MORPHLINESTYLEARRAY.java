@@ -34,9 +34,9 @@ public class MORPHLINESTYLEARRAY {
             }
         }
         if (shapeNum == 2) {
-            ret.lineStyles2 = new LINESTYLE2[lineStyles2.length];
+            ret.lineStyles = new LINESTYLE2[lineStyles2.length];
             for (int m = 0; m < lineStyles2.length; m++) {
-                ret.lineStyles2[m] = lineStyles2[m].getLineStyle2At(ratio);
+                ret.lineStyles[m] = lineStyles2[m].getLineStyle2At(ratio);
             }
         }
         return ret;
@@ -51,9 +51,9 @@ public class MORPHLINESTYLEARRAY {
             }
         }
         if (shapeNum == 2) {
-            ret.lineStyles2 = new LINESTYLE2[lineStyles2.length];
+            ret.lineStyles = new LINESTYLE2[lineStyles2.length];
             for (int m = 0; m < lineStyles2.length; m++) {
-                ret.lineStyles2[m] = lineStyles2[m].getStartLineStyle2();
+                ret.lineStyles[m] = lineStyles2[m].getStartLineStyle2();
             }
         }
         return ret;
@@ -68,9 +68,9 @@ public class MORPHLINESTYLEARRAY {
             }
         }
         if (shapeNum == 2) {
-            ret.lineStyles2 = new LINESTYLE2[lineStyles2.length];
+            ret.lineStyles = new LINESTYLE2[lineStyles2.length];
             for (int m = 0; m < lineStyles2.length; m++) {
-                ret.lineStyles2[m] = lineStyles2[m].getEndLineStyle2();
+                ret.lineStyles[m] = lineStyles2[m].getEndLineStyle2();
             }
         }
         return ret;

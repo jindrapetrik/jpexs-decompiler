@@ -37,10 +37,8 @@ public class FILLSTYLE implements NeedsCharacters {
     public static final int NON_SMOOTHED_CLIPPED_BITMAP = 0x43;
     public boolean inShape3;
     public RGB color;
-    public RGBA colorA; //Shape3
     public MATRIX gradientMatrix;
     public GRADIENT gradient;
-    public FOCALGRADIENT focalGradient;
     public int bitmapId;
     public MATRIX bitmapMatrix;
 

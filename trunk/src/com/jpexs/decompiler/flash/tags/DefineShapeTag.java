@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.exporters.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -97,7 +98,10 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
 
     @Override
     public String toSVG() {
-        return shapes.toSVG(1, swf.tags, shapeBounds);
+        SVGShapeExporter exporter = new SVGShapeExporter(swf, this);
+        exporter.export();
+        return exporter.getSVG();
+        //return shapes.toSVG(1, swf.tags, shapeBounds);
     }
 
     @Override

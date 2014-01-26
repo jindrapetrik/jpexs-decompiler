@@ -14,13 +14,34 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.types;
+package com.jpexs.decompiler.flash.exporters;
 
 /**
  *
  * @author JPEXS
  */
-public class FOCALGRADIENT extends GRADIENT {
+public class Point {
 
-    public float focalPoint;
+    public double x;
+    public double y;
+
+    Point(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int hashCode() {
+        long bits = Double.doubleToLongBits(x);
+        bits ^= Double.doubleToLongBits(y) * 31;
+        return (((int) bits) ^ ((int) (bits >> 32)));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Point) {
+            Point pt = (Point) obj;
+            return (x == pt.x) && (y == pt.y);
+        }
+        return super.equals(obj);
+    }
 }
