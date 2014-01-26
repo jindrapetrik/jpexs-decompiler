@@ -425,110 +425,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         public boolean sameStyle(Path p) {
             return fillStyle0 == p.fillStyle0 && ((useLineStyle2 && (p.lineStyle2 == lineStyle2)) || ((!useLineStyle2) && (p.lineStyle == lineStyle)));
         }
-
-        public String toSVG(List<Tag> tags, int shapeNum, SVGRenderingContext context) {
-            String ret = "";
-            String params = "";
-            String f = "";
-            if (fillStyle0 != null) {
-                switch (fillStyle0.fillStyleType) {
-                    case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
-                    case FILLSTYLE.REPEATING_BITMAP:
-                    case FILLSTYLE.CLIPPED_BITMAP:
-                    case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
-                        ImageTag image = null;
-                        for (Tag t : tags) {
-                            if (t instanceof ImageTag) {
-                                ImageTag i = (ImageTag) t;
-                                if (i.getCharacterId() == fillStyle0.bitmapId) {
-                                    image = i;
-                                    break;
-                                }
-                            }
-                        }
-                        if (image != null) {
-                            BufferedImage img = image.getImage(tags);
-                            if (img != null) {
-                                int width = img.getWidth();
-                                int height = img.getHeight();
-                                context.patternCount++;
-                                String patternId = "PatternID_" + context.patternCount;
-                                String format = image.getImageFormat();
-                                InputStream imageStream = image.getImageData();
-                                byte[] imageData;
-                                if (imageStream != null) {
-                                    imageData = Helper.readStream(image.getImageData());
-                                } else {
-                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                    try {
-                                        ImageIO.write(img, format.toUpperCase(Locale.ENGLISH), baos);
-                                    } catch (IOException ex) {
-                                    }
-                                    imageData = baos.toByteArray();
-                                }
-                                String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
-                                float translateX = 0;
-                                float translateY = 0;
-                                float rotateSkew0 = 0;
-                                float rotateSkew1 = 0;
-                                float scaleX = 1;
-                                float scaleY = 1;
-                                if (fillStyle0.bitmapMatrix != null) {
-                                    MATRIX matrix = fillStyle0.bitmapMatrix;
-                                    translateX = SWF.twipToPixel(matrix.translateX);
-                                    translateY = SWF.twipToPixel(matrix.translateY);
-                                    if (matrix.hasRotate) {
-                                        rotateSkew0 = matrix.getRotateSkew0Float();
-                                        rotateSkew1 = matrix.getRotateSkew1Float();
-                                    }
-                                    if (matrix.hasScale) {
-                                        scaleX = SWF.twipToPixel((int) matrix.getScaleXFloat());
-                                        scaleY = SWF.twipToPixel((int) matrix.getScaleYFloat());
-                                    }
-                                }
-                                
-                                ret += "<pattern id=\"" + patternId + "\" patternUnits=\"userSpaceOnUse\" overflow=\"visible\" "
-                                        + "width=\"" + width + "\" height=\"" + height + "\" "
-                                        + "viewBox=\"0 0 " + width + " " + height + "\" "
-                                        + "patternTransform=\"matrix(" + scaleX + ", " + rotateSkew0 
-                                        + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")\">\n" 
-                                        + "<image width=\"" + width + "\" height=\"" + height + "\"\n" 
-                                        + "xlink:href=\"data:image/" + format + ";base64," + base64ImgData + "\"></image>\n" 
-                                        + "</pattern>\n";
-                                params += " style=\"fill:url(#" + patternId + ")\"";
-                            }
-                        }
-                        break;
-                    case FILLSTYLE.SOLID:
-                        f = " fill=\"" + fillStyle0.color.toHexRGB() + "\"";
-                        break;
-                }
-            } else {
-                f = " fill=\"none\"";
-            }
-            params += f;
-            if ((!useLineStyle2) && lineStyle != null) {
-                params += " stroke=\"" + lineStyle.color.toHexRGB() + "\"";
-            }
-            if (useLineStyle2 && lineStyle2 != null) {
-                params += " stroke-width=\"" + SWF.twipToPixel(lineStyle2.width) + "\"" + (lineStyle2.color != null ? " stroke=\"" + lineStyle2.color.toHexRGB() + "\"" : "");
-            }
-            String points = "";
-            int x = 0;
-            int y = 0;
-            context.wasMoveTo = false;
-            for (SHAPERECORD r : edges) {
-                points += " " + r.toSVG(x, y, context);
-                x = r.changeX(x);
-                y = r.changeY(y);
-            }
-            ret += "<path" + params + " d=\"" + points + "\"/>";
-            return ret;
-        }
     }
-
-    public abstract String toSVG(int oldX, int oldY, SVGRenderingContext context);
-
+        
     public abstract int changeX(int x);
 
     public abstract int changeY(int y);
@@ -874,40 +772,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return ret;
     }
 
-    /**
-     * Convert shape to SVG
-     *
-     * @param tags
-     * @param shapeNum
-     * @param fillStyles
-     * @param lineStylesList
-     * @param numFillBits
-     * @param numLineBits
-     * @param records
-     * @return Shape converted to SVG
-     */
-    public static String shapeToSVG(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, int numFillBits, int numLineBits, List<SHAPERECORD> records, RECT bounds) {
-        String ret = "";
-        RECT rect = new RECT();
-        List<Path> paths = getPaths(rect, shapeNum, fillStyles, lineStylesList, /*numFillBits, numLineBits,*/ records);
-        ret = "";
-        SVGRenderingContext context = new SVGRenderingContext();
-        ret += "<g id=\"1\" transform=\"matrix(1, 0, 0, 1, " 
-                + SWF.twipToPixel(-bounds.Xmin) + ", " + SWF.twipToPixel(-bounds.Ymin) + ")\">\n";
-        for (Path p : paths) {
-            ret += p.toSVG(tags, shapeNum, context) + "\n";
-        }
-        ret += "</g>\n";
-        ret = "<?xml version='1.0' encoding='UTF-8' ?> \n"
-                + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n"
-                + "<svg width=\"" + (int) Math.ceil(SWF.twipToPixel(bounds.Xmax - bounds.Xmin)) + "\"\n"
-                + "     height=\"" + (int) Math.ceil(SWF.twipToPixel(bounds.Ymax - bounds.Ymin)) + "\"\n"
-                + "     viewBox=\"0 0 " + (int) Math.ceil(SWF.twipToPixel(bounds.Xmax - bounds.Xmin)) + " " + (int) Math.ceil(SWF.twipToPixel(bounds.Ymax - bounds.Ymin)) + "\"\n"
-                + "     xmlns=\"http://www.w3.org/2000/svg\"\n"
-                + "     xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n" + ret + ""
-                + "</svg>";
-        return ret;
-    }
     private static final Cache cache = Cache.getInstance(false);
 
     public static void clearShapeCache() {

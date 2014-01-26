@@ -64,17 +64,6 @@ public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     }
 
     @Override
-    public String toSVG(int oldX, int oldY, SVGRenderingContext context) {
-        if (stateMoveTo) {
-            if ((!context.wasMoveTo) || ((moveDeltaX != oldX) || (moveDeltaY != oldY))) {
-                context.wasMoveTo = true;
-                return "M " + SWF.twipToPixel(moveDeltaX) + " " + SWF.twipToPixel(moveDeltaY);
-            }
-        }
-        return "";
-    }
-
-    @Override
     public int changeX(int x) {
         if (stateMoveTo) {
             return moveDeltaX;

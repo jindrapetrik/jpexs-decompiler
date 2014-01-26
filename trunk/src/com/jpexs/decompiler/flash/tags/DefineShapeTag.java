@@ -101,7 +101,6 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
         SVGShapeExporter exporter = new SVGShapeExporter(swf, this);
         exporter.export();
         return exporter.getSVG();
-        //return shapes.toSVG(1, swf.tags, shapeBounds);
     }
 
     @Override

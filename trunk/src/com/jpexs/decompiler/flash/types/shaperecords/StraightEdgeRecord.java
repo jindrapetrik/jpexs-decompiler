@@ -39,21 +39,6 @@ public class StraightEdgeRecord extends SHAPERECORD {
     }
 
     @Override
-    public String toSVG(int oldX, int oldY, SVGRenderingContext context) {
-        String result = "";
-        if (!context.wasMoveTo) {
-            result = "M " + SWF.twipToPixel(oldX) + " " + SWF.twipToPixel(oldY) + " ";
-        }
-        if (generalLineFlag) {
-            return result + "L " + SWF.twipToPixel(oldX + deltaX) + " " + SWF.twipToPixel(oldY + deltaY);
-        } else if (vertLineFlag) {
-            return result + "V " + SWF.twipToPixel(oldY + deltaY);
-        } else {
-            return result + "H " + SWF.twipToPixel(oldX + deltaX);
-        }
-    }
-
-    @Override
     public int changeX(int x) {
         if (generalLineFlag) {
             return x + deltaX;
