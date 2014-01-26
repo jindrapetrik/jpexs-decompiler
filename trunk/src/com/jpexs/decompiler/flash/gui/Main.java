@@ -453,7 +453,7 @@ public class Main {
         try {
             File file = new File(swfFile);
             if (!file.exists()) {
-                View.showMessageDialog(null, "File not found", "Error", JOptionPane.ERROR_MESSAGE);
+                View.showMessageDialog(null, AppStrings.translate("open.error.fileNotFound"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
                 return OpenFileResult.NOT_FOUND;
             }
             swfFile = file.getCanonicalPath();
@@ -462,7 +462,7 @@ public class Main {
             OpenFileResult openResult = openFile(sourceInfo);
             return openResult;
         } catch (IOException ex) {
-            View.showMessageDialog(null, "Cannot open file", "Error", JOptionPane.ERROR_MESSAGE);
+            View.showMessageDialog(null, AppStrings.translate("open.error.cannotOpen"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
             return OpenFileResult.ERROR;
         }
     }

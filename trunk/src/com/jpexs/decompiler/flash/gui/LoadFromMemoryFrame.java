@@ -285,10 +285,10 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
                 return false;
             }
         };
-        resTableModel.addColumn("Version");
-        resTableModel.addColumn("FileSize");
-        resTableModel.addColumn("PID");
-        resTableModel.addColumn("ProcessName");
+        resTableModel.addColumn(translate("column.version"));
+        resTableModel.addColumn(translate("column.fileSize"));
+        resTableModel.addColumn(translate("column.pid"));
+        resTableModel.addColumn(translate("column.processName"));
         tableRes = new JTable(resTableModel);
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(resTableModel);
         tableRes.setRowSorter(sorter);
