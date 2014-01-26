@@ -19,11 +19,8 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
-import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
-import com.jpexs.decompiler.flash.types.MATRIX;
-import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
@@ -44,9 +41,9 @@ import java.util.Map;
  */
 public abstract class ShapeExporterBase implements IShapeExporter {
 
-    private final ShapeTag tag;
+    protected final ShapeTag tag;
 
-    private static final double unitDivisor = 20;
+    protected static final double unitDivisor = 20;
 
     protected List<FILLSTYLE> _fillStyles;
     protected List<LINESTYLE> _lineStyles;
@@ -57,7 +54,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     protected Map<Integer, List<IEdge>> currentLineEdgeMap;
     private int numGroups;
     protected Map<String, List<IEdge>> coordMap;
-    private Rectangle bounds = new Rectangle(Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+    private final Rectangle bounds = new Rectangle(Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
 
     private boolean edgeMapsCreated;
 
@@ -270,18 +267,11 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                             case FILLSTYLE.RADIAL_GRADIENT:
                             case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
                                 // Gradient fill
-                                List<RGB> colors = new ArrayList<>();
-                                List<Integer> ratios = new ArrayList<>();
-                                GRADRECORD gradientRecord;
                                 matrix = new Matrix(fillStyle.gradientMatrix);
-                                for (int gri = 0; gri < fillStyle.gradient.gradientRecords.length; gri++) {
-                                    gradientRecord = fillStyle.gradient.gradientRecords[gri];
-                                    colors.add(gradientRecord.color);
-                                    ratios.add(gradientRecord.ratio);
-                                }
                                 beginGradientFill(
                                         fillStyle.fillStyleType,
-                                        colors, ratios, matrix,
+                                        fillStyle.gradient.gradientRecords, 
+                                        matrix,
                                         fillStyle.gradient.spreadMode,
                                         fillStyle.gradient.interpolationMode,
                                         (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0
@@ -369,7 +359,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                             hasFillFlag = lineStyle2.hasFillFlag;
                         }
                         lineStyle(
-                                lineStyle.width / 20.0,
+                                lineStyle.width / unitDivisor,
                                 lineStyle.color,
                                 pixelHintingFlag,
                                 scaleMode,
@@ -386,18 +376,11 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                 case FILLSTYLE.RADIAL_GRADIENT:
                                 case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
                                     // Gradient fill
-                                    List<RGB> colors = new ArrayList<>();
-                                    List<Integer> ratios = new ArrayList<>();
-                                    GRADRECORD gradientRecord;
                                     Matrix matrix = new Matrix(fillStyle.gradientMatrix);
-                                    for (int gri = 0; gri < fillStyle.gradient.gradientRecords.length; gri++) {
-                                        gradientRecord = fillStyle.gradient.gradientRecords[gri];
-                                        colors.add(gradientRecord.color);
-                                        ratios.add(gradientRecord.ratio);
-                                    }
                                     lineGradientStyle(
                                             fillStyle.fillStyleType,
-                                            colors, ratios, matrix,
+                                            fillStyle.gradient.gradientRecords,
+                                            matrix,
                                             fillStyle.gradient.spreadMode,
                                             fillStyle.gradient.interpolationMode,
                                             (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0

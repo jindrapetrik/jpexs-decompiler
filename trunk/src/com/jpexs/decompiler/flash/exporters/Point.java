@@ -30,6 +30,7 @@ public class Point {
         this.y = y;
     }
 
+    @Override
     public int hashCode() {
         long bits = Double.doubleToLongBits(x);
         bits ^= Double.doubleToLongBits(y) * 31;

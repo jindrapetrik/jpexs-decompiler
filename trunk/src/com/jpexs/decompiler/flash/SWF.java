@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
@@ -2078,6 +2079,7 @@ public final class SWF implements TreeItem {
     public void clearImageCache() {
         cache.clear();
         SHAPERECORD.clearShapeCache();
+        BitmapExporter.clearShapeCache();
     }
 
     public static RECT fixRect(RECT rect) {

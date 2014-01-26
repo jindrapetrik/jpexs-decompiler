@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGB;
-import java.util.List;
 
 /**
  *
@@ -67,7 +67,7 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     }
 
     @Override
-    public void beginGradientFill(int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
     }
 
@@ -87,7 +87,7 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     }
 
     @Override
-    public void lineGradientStyle(int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
     }
 
     @Override

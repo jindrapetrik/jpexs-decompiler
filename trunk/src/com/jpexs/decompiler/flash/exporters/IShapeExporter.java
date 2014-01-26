@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
+import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGB;
-import java.util.List;
 
 /**
  *
@@ -39,7 +39,7 @@ public interface IShapeExporter {
 
     public void beginFill(RGB color);
 
-    public void beginGradientFill(int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio);
+    public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio);
 
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth);
 
@@ -47,7 +47,7 @@ public interface IShapeExporter {
 
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit);
 
-    public void lineGradientStyle(int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio);
+    public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio);
 
     public void moveTo(double x, double y);
 

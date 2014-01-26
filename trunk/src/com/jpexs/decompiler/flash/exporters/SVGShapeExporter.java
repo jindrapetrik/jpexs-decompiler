@@ -22,8 +22,8 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
+import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
-import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.Helper;
@@ -68,7 +68,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     protected Element path;
     protected List<Element> gradients;
     protected int lastPatternId;
-    private SWF swf;
+    private final SWF swf;
 
     public SVGShapeExporter(SWF swf, ShapeTag tag) {
         super(tag);
@@ -132,12 +132,12 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     }
 
     @Override
-    public void beginGradientFill(int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
                 ? _svg.createElement("linearGradient")
                 : _svg.createElement("radialGradient");
-        populateGradientElement(gradient, type, colors, ratios, matrix, spreadMethod, interpolationMethod, focalPointRatio);
+        populateGradientElement(gradient, type, gradientRecords, matrix, spreadMethod, interpolationMethod, focalPointRatio);
         int id = gradients.indexOf(gradient);
         if (id < 0) {
             // todo: filter same gradients
@@ -252,12 +252,12 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     }
 
     @Override
-    public void lineGradientStyle(int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         path.removeAttribute("stroke-opacity");
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
                 ? _svg.createElement("linearGradient")
                 : _svg.createElement("radialGradient");
-        populateGradientElement(gradient, type, colors, ratios, matrix, spreadMethod, interpolationMethod, focalPointRatio);
+        populateGradientElement(gradient, type, gradientRecords, matrix, spreadMethod, interpolationMethod, focalPointRatio);
         int id = gradients.indexOf(gradient);
         if (id < 0) {
             // todo: filter same gradients
@@ -280,7 +280,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         super.finalizePath();
     }
 
-    protected void populateGradientElement(Element gradient, int type, List<RGB> colors, List<Integer> ratios, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    protected void populateGradientElement(Element gradient, int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         gradient.setAttribute("gradientUnits", "userSpaceOnUse");
         if (type == FILLSTYLE.LINEAR_GRADIENT) {
             gradient.setAttribute("x1", "-819.2");
@@ -318,10 +318,11 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             gradient.setAttribute("gradientTransform", "matrix(" + scaleX + ", " + rotateSkew0
                     + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
         }
-        for (int i = 0; i < colors.size(); i++) {
+        for (int i = 0; i < gradientRecords.length; i++) {
+            GRADRECORD record = gradientRecords[i];
             Element gradientEntry = _svg.createElement("stop");
-            gradientEntry.setAttribute("offset", Double.toString(ratios.get(i) / 255));
-            RGB color = colors.get(i);
+            gradientEntry.setAttribute("offset", Double.toString(record.ratio / 255));
+            RGB color = record.color;
             //if(colors.get(i) != 0) { 
             gradientEntry.setAttribute("stop-color", color.toHexRGB());
             //}

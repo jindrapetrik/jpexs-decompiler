@@ -29,7 +29,6 @@ import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
-import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -56,24 +55,16 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-import javax.xml.bind.DatatypeConverter;
 
 /**
  *
@@ -95,8 +86,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
 
         public boolean used = false;
         public LINESTYLE lineStyle;
-        public LINESTYLE2 lineStyle2;
-        public boolean useLineStyle2;
         public FILLSTYLE fillStyle0;
         public FILLSTYLE fillStyle1;
         public List<SHAPERECORD> edges = new ArrayList<>();
@@ -108,6 +97,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             AffineTransform trans20 = AffineTransform.getScaleInstance(1 / DESCALE, 1 / DESCALE);
             boolean ok = false;
             if (shapeNum == 4) {
+                LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;
                 if (lineStyle2 == null) {
                     ok = false;
                 } else if (!lineStyle2.hasFillFlag) {
@@ -148,11 +138,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 if (lineStyle == null) {
                     ok = false;
                 } else {
-                    if (shapeNum == 1 || shapeNum == 2) {
-                        g.setPaint(lineStyle.color.toColor());
-                    } else /*shapeNum == 3*/ {
-                        g.setPaint(lineStyle.color.toColor());
-                    }
+                    g.setPaint(lineStyle.color.toColor());
                     g.setStroke(new BasicStroke(lineStyle.width / DESCALE, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     ok = true;
                 }
@@ -352,7 +338,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     g.fill(new Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
                     g.setTransform(oldAf);
                     g.setClip(null);
-                    ok = true;
                     return;
                 case FILLSTYLE.SOLID:
                     Color c = null;
@@ -423,7 +408,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         }
 
         public boolean sameStyle(Path p) {
-            return fillStyle0 == p.fillStyle0 && ((useLineStyle2 && (p.lineStyle2 == lineStyle2)) || ((!useLineStyle2) && (p.lineStyle == lineStyle)));
+            return fillStyle0 == p.fillStyle0 && p.lineStyle == lineStyle;
         }
     }
         
@@ -479,7 +464,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         FILLSTYLE lastFillStyle0 = null;
         FILLSTYLE lastFillStyle1 = null;
         LINESTYLE lastLineStyle = null;
-        LINESTYLE2 lastLineStyle2 = null;
         for (SHAPERECORD r : records) {
             if (r instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) r;
@@ -518,14 +502,12 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 lastFillStyle1 = path.fillStyle1;
                 if (scr.stateLineStyle) {
                     if (shapeNum >= 4) {
-                        path.useLineStyle2 = true;
                         if (scr.lineStyle == 0) {
-                            path.lineStyle2 = null;
+                            path.lineStyle = null;
                         } else {
-                            path.lineStyle2 = (LINESTYLE2) lineStylesList.lineStyles[scr.lineStyle - 1];
+                            path.lineStyle = lineStylesList.lineStyles[scr.lineStyle - 1];
                         }
                     } else {
-                        path.useLineStyle2 = false;
                         if (scr.lineStyle == 0) {
                             path.lineStyle = null;
                         } else {
@@ -533,15 +515,10 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                         }
                     }
                 } else {
-                    if (shapeNum >= 4) {
-                        path.lineStyle2 = lastLineStyle2;
-                    } else {
-                        path.lineStyle = lastLineStyle;
-                    }
+                    path.lineStyle = lastLineStyle;
                 }
 
                 lastLineStyle = path.lineStyle;
-                lastLineStyle2 = path.lineStyle2;
                 if (started && (!scr.stateMoveTo)) {
                     scr.stateMoveTo = true;
                     scr.moveDeltaX = x;
@@ -591,8 +568,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 boolean flip = true;
                 f.fillStyle0 = p.fillStyle1;
                 f.lineStyle = p.lineStyle;
-                f.lineStyle2 = p.lineStyle2;
-                f.useLineStyle2 = p.useLineStyle2;
                 f.edges = new ArrayList<>();
                 f.start = p.end;
                 f.end = p.start;
@@ -742,7 +717,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                             onepath = new Path();
                             onepath.fillStyle0 = p.fillStyle0;
                             onepath.lineStyle = p.lineStyle;
-                            onepath.lineStyle2 = p.lineStyle2;
                         }
                         if (onepath.start == null) {
                             onepath.start = p.start;
@@ -866,7 +840,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         for (Path p : paths) {
-            if ((p.fillStyle0 == null) && (p.lineStyle == null) && (p.lineStyle2 == null) && (defaultColor != null)) {
+            if ((p.fillStyle0 == null) && (p.lineStyle == null) && (defaultColor != null)) {
                 p.fillStyle0 = new FILLSTYLE();
                 p.fillStyle0.fillStyleType = FILLSTYLE.SOLID;
                 p.fillStyle0.color = new RGB(defaultColor);
@@ -1070,33 +1044,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         double x = p0.getX() + ((p1.getX() - p0.getX()) * ratio);
         double y = p0.getY() + ((p1.getY() - p0.getY()) * ratio);
         return new Point2D.Double(x, y);
-    }
-
-    private static class SerializableImage implements Serializable {
-
-        transient BufferedImage image;
-
-        public BufferedImage getImage() {
-            return image;
-        }
-
-        public void setImage(BufferedImage image) {
-            this.image = image;
-        }
-
-        public SerializableImage(BufferedImage image) {
-            this.image = image;
-        }
-
-        private void writeObject(ObjectOutputStream out) throws IOException {
-            out.defaultWriteObject();
-            ImageIO.write(image, "png", out);
-        }
-
-        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-            in.defaultReadObject();
-            image = ImageIO.read(in);
-        }
     }
 
     public static SHAPE resizeSHAPE(SHAPE shp, int multiplier) {

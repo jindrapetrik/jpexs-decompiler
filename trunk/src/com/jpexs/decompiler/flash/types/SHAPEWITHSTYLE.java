@@ -47,6 +47,7 @@ public class SHAPEWITHSTYLE implements NeedsCharacters {
     }
 
     public BufferedImage toImage(int shapeNum, List<Tag> tags) {
+        // todo: honfika: remove this method
         return SHAPERECORD.shapeToImage(tags, shapeNum, fillStyles, lineStyles, /*numFillBits, numLineBits,*/ shapeRecords);
     }
 

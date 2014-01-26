@@ -34,6 +34,7 @@ public class Rectangle {
         this.yMax = yMax;
     }
 
+    @Override
     public int hashCode() {
         long bits = Double.doubleToLongBits(xMin);
         bits += Double.doubleToLongBits(yMin) * 37;

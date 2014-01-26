@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -71,7 +72,9 @@ public class DefineShape2Tag extends CharacterTag implements BoundedTag, ShapeTa
 
     @Override
     public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
-        return shapes.toImage(2, tags);
+        BitmapExporter exporter = new BitmapExporter(swf, this);
+        exporter.export();
+        return exporter.getImage();
     }
 
     @Override
