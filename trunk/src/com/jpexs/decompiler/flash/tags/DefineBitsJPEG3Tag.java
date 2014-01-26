@@ -44,10 +44,9 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public void setImage(byte[] data) {
-        imageData = data;
+    public void setImage(byte[] data) throws IOException {
         if (ImageTag.getImageFormat(data).equals("jpg")) {
-            BufferedImage image = getImage(new ArrayList<Tag>());
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
             byte[] ba = new byte[image.getWidth() * image.getHeight()];
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
@@ -56,6 +55,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         } else {
             bitmapAlphaData = new byte[0];
         }
+        imageData = data;
     }
 
     @Override

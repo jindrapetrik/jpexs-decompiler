@@ -2029,8 +2029,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             File selfile = Helper.fixDialogFile(fc.getSelectedFile());
                             byte[] data = Helper.readFile(selfile.getAbsolutePath());
                             try {
-                                it.setImage(data);
-                                it.getSwf().clearImageCache();
+                                SWF swf = it.getSwf();
+                                if (it instanceof DefineBitsTag) {
+                                    DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, it.getOriginalData(), swf.version, it.getPos(), it.getCharacterId(), data);
+                                    swf.tags.set(swf.tags.indexOf(it), jpeg2Tag);
+                                    refreshTree();
+                                } else {
+                                    it.setImage(data);
+                                }
+                                swf.clearImageCache();
                             } catch (IOException ex) {
                                 Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Invalid image", ex);
                                 View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);

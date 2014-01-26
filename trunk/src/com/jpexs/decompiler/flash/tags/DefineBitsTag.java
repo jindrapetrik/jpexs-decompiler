@@ -43,7 +43,8 @@ public class DefineBitsTag extends ImageTag {
 
     @Override
     public boolean importSupported() {
-        return false;
+        // importing a new image will replace the current DefineBitsTag with a new DefineBitsJPEG2Tag
+        return true;
     }
 
     public DefineBitsTag(SWF swf, byte[] data, int version, long pos) throws IOException {
@@ -74,7 +75,7 @@ public class DefineBitsTag extends ImageTag {
         getJPEGTables(tags);
         if ((jtt != null)) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                byte[] jttdata = jtt.getData(10);
+                byte[] jttdata = jtt.getData(swf.version);
                 if (jttdata.length != 0) {
                     baos.write(jttdata, SWF.hasErrorHeader(jttdata) ? 4 : 0, jttdata.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
                     baos.write(jpegData, SWF.hasErrorHeader(jpegData) ? 6 : 2, jpegData.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
