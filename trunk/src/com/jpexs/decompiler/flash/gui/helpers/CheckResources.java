@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.gui.AdvancedSettingsDialog;
 import com.jpexs.decompiler.flash.gui.ErrorLogFrame;
 import com.jpexs.decompiler.flash.gui.ExportDialog;
 import com.jpexs.decompiler.flash.gui.FontEmbedDialog;
+import com.jpexs.decompiler.flash.gui.FontPreviewDialog;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.LoadFromCacheFrame;
 import com.jpexs.decompiler.flash.gui.LoadFromMemoryFrame;
@@ -38,6 +39,7 @@ import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
@@ -49,13 +51,14 @@ import java.util.logging.Logger;
  */
 public class CheckResources {
 
-    public static void checkResources() {
+    public static void checkResources(PrintStream stream) {
         Class[] classes = new Class[]{
             AboutDialog.class,
             AdvancedSettingsDialog.class,
             ErrorLogFrame.class,
             ExportDialog.class,
             FontEmbedDialog.class,
+            FontPreviewDialog.class,
             GraphFrame.class,
             // GraphTreeFrame.class, // empty
             LoadFromCacheFrame.class,
@@ -72,19 +75,18 @@ public class CheckResources {
             NewTraitDialog.class,
             UsageFrame.class,};
         for (Class clazz : classes) {
-            checkResources(clazz);
+            checkResources(clazz, stream);
         }
-        System.exit(0);
     }
 
-    public static void checkResources(Class clazz) {
+    public static void checkResources(Class clazz, PrintStream stream) {
         try {
             Properties prop = new Properties();
             String[] languages = SelectLanguageDialog.getAvailableLanguages();
             String resourcePath = getResourcePath(clazz, null);
             InputStream is = CheckResources.class.getResourceAsStream(resourcePath);
             if (is == null) {
-                System.out.println("Resource file not found: " + resourcePath);
+                stream.println("Resource file not found: " + resourcePath);
                 return;
             }
             prop.load(is);
@@ -98,7 +100,7 @@ public class CheckResources {
                 resourcePath = getResourcePath(clazz, lang);
                 is = CheckResources.class.getResourceAsStream(resourcePath);
                 if (is == null) {
-                    System.out.println(lang + ": Resource file not found: " + resourcePath);
+                    stream.println(lang + ": Resource file not found: " + resourcePath);
                     continue;
                 }
                 prop2.load(is);
@@ -106,7 +108,7 @@ public class CheckResources {
                 for (Object key : keys) {
                     String value = prop2.getProperty((String) key);
                     if (value == null) {
-                        System.out.println(lang + ": Property not found in resource file: " + clazz.getSimpleName() + ", property: " + key);
+                        stream.println(lang + ": Property not found in resource file: " + clazz.getSimpleName() + ", property: " + key);
                     }
                 }
             }

@@ -20,14 +20,21 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import com.jpexs.process.ProcessTools;
 import com.sun.jna.Platform;
 import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +44,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -104,6 +113,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_REMOVE_NON_SCRIPTS = "REMOVENONSCRIPTS";
     static final String ACTION_REFRESH_DECOMPILED = "REFRESHDECOMPILED";
     static final String ACTION_CLEAR_RECENT_FILES = "CLEARRECENTFILES";
+    static final String ACTION_CHECK_RESOURCES = "CHECKRESOURCES";
 
     private final MainFrameRibbon mainFrame;
 
@@ -466,8 +476,12 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         JCommandButton refreshDecompiledCommandButton = new JCommandButton(fixCommandTitle("Refresh decompiled script"), View.getResizableIcon("update16"));
         assignListener(refreshDecompiledCommandButton, ACTION_REFRESH_DECOMPILED);
 
+        JCommandButton checkResourcesCommandButton = new JCommandButton(fixCommandTitle("Check resources"), View.getResizableIcon("update16"));
+        assignListener(checkResourcesCommandButton, ACTION_CHECK_RESOURCES);
+
         debugBand.addCommandButton(removeNonScriptsCommandButton, RibbonElementPriority.MEDIUM);
         debugBand.addCommandButton(refreshDecompiledCommandButton, RibbonElementPriority.MEDIUM);
+        debugBand.addCommandButton(checkResourcesCommandButton, RibbonElementPriority.MEDIUM);
         return new RibbonTask("Debug", debugBand);
     }
 
@@ -713,6 +727,31 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 break;
             case ACTION_REFRESH_DECOMPILED:
                 mainFrame.panel.refreshDecompiled();
+                break;
+            case ACTION_CHECK_RESOURCES:
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                PrintStream stream = new PrintStream(os);
+                CheckResources.checkResources(stream);
+                final String str = new String(os.toByteArray(), Utf8Helper.charset);
+                JDialog dialog = new JDialog() {
+
+                    @Override
+                    public void setVisible(boolean bln) {
+                        setSize(new Dimension(800, 600));
+                        Container cnt = getContentPane();
+                        cnt.setLayout(new BorderLayout());
+                        ScrollPane scrollPane = new ScrollPane();
+                        JEditorPane editor = new JEditorPane();
+                        editor.setEditable(false);
+                        editor.setText(str);
+                        scrollPane.add(editor);
+                        this.add(scrollPane, BorderLayout.CENTER);
+                        this.setModal(true);
+                        View.centerScreen(this);
+                        super.setVisible(bln);
+                    }
+                };
+                dialog.setVisible(true);
                 break;
         }
     }
