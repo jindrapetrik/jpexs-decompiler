@@ -971,6 +971,17 @@ public final class SWF implements TreeItem {
         }
         return ret;
     }
+    
+    public static void getTagsFromTreeNodes(List<TreeNode> treeNodes, List<Tag> result) {
+        for (TreeNode treeNode : treeNodes) {
+            TreeItem treeItem = treeNode.getItem();
+            if (treeItem instanceof Tag) {
+                result.add((Tag) treeItem);
+            }
+            getTagsFromTreeNodes(treeNode.subNodes, result);
+        }
+    }
+    
     private final HashSet<EventListener> listeners = new HashSet<>();
 
     public final void addEventListener(EventListener listener) {

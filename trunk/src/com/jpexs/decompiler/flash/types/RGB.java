@@ -72,4 +72,9 @@ public class RGB {
         this.green = color.getGreen();
         this.blue = color.getBlue();
     }
+
+    @Override
+    public String toString() {
+        return "[RGB red:" + red + ", green:" + green + ", blue:" + blue + "]";
+    }
 }

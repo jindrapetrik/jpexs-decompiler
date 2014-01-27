@@ -26,17 +26,15 @@ import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.gui.treenodes.StringNode;
 import com.jpexs.decompiler.flash.gui.treenodes.TagTreeRoot;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
-import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
 import com.jpexs.decompiler.flash.treeitems.StringItem;
 import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.flash.treenodes.ContainerNode;
 import com.jpexs.decompiler.flash.treenodes.FrameNode;
+import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,11 +70,9 @@ public class TagTreeModel implements TreeModel {
     }
 
     private SWFNode createSwfNode(SWF swf) {
-        List<ContainerItem> objs = new ArrayList<>();
-        objs.addAll(swf.tags);
         ClassesListTreeModel classTreeModel = new ClassesListTreeModel(swf);
         SWFNode swfNode = new SWFNode(swf, swf.getShortFileName());
-        swfNode.list = createTagList(objs, null, swf, swfNode, classTreeModel);
+        swfNode.list = createTagList(swf.tags, null, swf, swfNode, classTreeModel);
         swfToSwfNode.put(swf, swfNode);
         return swfNode;
     }
@@ -85,36 +81,49 @@ public class TagTreeModel implements TreeModel {
         return mainFrame.translate(key);
     }
 
-    public List<TreeNode> getTagNodesWithType(List<? extends ContainerItem> list, TreeNodeType type, Tag parent, boolean display) {
-        List<TreeNode> ret = new ArrayList<>();
-        int frameCnt = 0;
-        for (ContainerItem o : list) {
-            TreeNodeType ttype = TagTree.getTreeNodeType(o);
-            if (ttype == TreeNodeType.SHOW_FRAME && type == TreeNodeType.FRAME) {
-                frameCnt++;
-                ret.add(new FrameNode(new FrameNodeItem(o.getSwf(), frameCnt, parent, display)));
-            } else if (type == ttype) {
-                ret.add(new ContainerNode(o));
-            }
-        }
-        return ret;
-    }
-
-    private List<TreeNode> createTagList(List<ContainerItem> list, Tag parent, SWF swf, SWFNode swfNode, ClassesListTreeModel classTreeModel) {
+    private List<TreeNode> createTagList(List<Tag> list, Tag parent, SWF swf, SWFNode swfNode, ClassesListTreeModel classTreeModel) {
         boolean hasAbc = swf.abcList != null && !swf.abcList.isEmpty();
 
         List<TreeNode> ret = new ArrayList<>();
-        List<TreeNode> frames = getTagNodesWithType(list, TreeNodeType.FRAME, parent, true);
-        List<TreeNode> shapes = getTagNodesWithType(list, TreeNodeType.SHAPE, parent, true);
-        List<TreeNode> morphShapes = getTagNodesWithType(list, TreeNodeType.MORPH_SHAPE, parent, true);
-        List<TreeNode> sprites = getTagNodesWithType(list, TreeNodeType.SPRITE, parent, true);
-        List<TreeNode> buttons = getTagNodesWithType(list, TreeNodeType.BUTTON, parent, true);
-        List<TreeNode> images = getTagNodesWithType(list, TreeNodeType.IMAGE, parent, true);
-        List<TreeNode> fonts = getTagNodesWithType(list, TreeNodeType.FONT, parent, true);
-        List<TreeNode> texts = getTagNodesWithType(list, TreeNodeType.TEXT, parent, true);
-        List<TreeNode> movies = getTagNodesWithType(list, TreeNodeType.MOVIE, parent, true);
-        List<TreeNode> sounds = getTagNodesWithType(list, TreeNodeType.SOUND, parent, true);
-        List<TreeNode> binaryData = getTagNodesWithType(list, TreeNodeType.BINARY_DATA, parent, true);
+        List<TreeNode> frames = new ArrayList<>();
+        List<TreeNode> shapes = new ArrayList<>();
+        List<TreeNode> morphShapes = new ArrayList<>();
+        List<TreeNode> sprites = new ArrayList<>();
+        List<TreeNode> buttons = new ArrayList<>();
+        List<TreeNode> images = new ArrayList<>();
+        List<TreeNode> fonts = new ArrayList<>();
+        List<TreeNode> texts = new ArrayList<>();
+        List<TreeNode> movies = new ArrayList<>();
+        List<TreeNode> sounds = new ArrayList<>();
+        List<TreeNode> binaryData = new ArrayList<>();
+        List<TreeNode> others = new ArrayList<>();
+        
+        List<TreeNode> actionScript = SWF.createASTagList(list, null);
+        List<Tag> actionScriptTags = new ArrayList<>();
+        SWF.getTagsFromTreeNodes(actionScript, actionScriptTags);
+        
+        int frameCnt = 0;
+        for (Tag t : list) {
+            TreeNodeType ttype = TagTree.getTreeNodeType(t);
+            switch (ttype) {
+                case SHOW_FRAME: frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true))); break;
+                case SHAPE: shapes.add(new TagNode(t)); break;
+                case MORPH_SHAPE: morphShapes.add(new TagNode(t)); break;
+                case SPRITE: sprites.add(new TagNode(t)); break;
+                case BUTTON: buttons.add(new TagNode(t)); break;
+                case IMAGE: images.add(new TagNode(t)); break;
+                case FONT: fonts.add(new TagNode(t)); break;
+                case TEXT: texts.add(new TagNode(t)); break;
+                case MOVIE: movies.add(new TagNode(t)); break;
+                case SOUND: sounds.add(new TagNode(t)); break;
+                case BINARY_DATA: binaryData.add(new TagNode(t)); break;
+                default:
+                    if (!actionScriptTags.contains(t)) {
+                        others.add(new TagNode(t)); 
+                    }
+                    break;
+            }
+        }
 
         for (int i = 0; i < sounds.size(); i++) {
             if (sounds.get(i).getItem() instanceof SoundStreamHeadTypeTag) {
@@ -129,17 +138,9 @@ public class TagTreeModel implements TreeModel {
 
         for (TreeNode n : sprites) {
             Tag tag = n.getItem() instanceof Tag ? (Tag) n.getItem() : null;
-            n.subNodes = getTagNodesWithType(((DefineSpriteTag) n.getItem()).subTags, TreeNodeType.FRAME, tag, true);
+            n.subNodes = createSubTagList(((DefineSpriteTag) n.getItem()).subTags, tag, swf, actionScriptTags);
         }
 
-        List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
-        for (ContainerItem t : list) {
-            if (t instanceof ExportAssetsTag) {
-                exportAssetsTags.add((ExportAssetsTag) t);
-            }
-        }
-
-        List<TreeNode> actionScript = SWF.createASTagList(list, null);
         StringNode textsNode = new StringNode(new StringItem(translate("node.texts"), swf));
         textsNode.subNodes.addAll(texts);
 
@@ -172,6 +173,9 @@ public class TagTreeModel implements TreeModel {
 
         StringNode framesNode = new StringNode(new StringItem(translate("node.frames"), swf));
         framesNode.subNodes.addAll(frames);
+
+        StringNode otherNode = new StringNode(new StringItem(translate("node.others"), swf));
+        otherNode.subNodes.addAll(others);
 
         TreeNode actionScriptNode;
         if (hasAbc) {
@@ -215,9 +219,41 @@ public class TagTreeModel implements TreeModel {
         if (!framesNode.subNodes.isEmpty()) {
             ret.add(framesNode);
         }
+        if (!otherNode.subNodes.isEmpty()) {
+            ret.add(otherNode);
+        }
 
         if ((!actionScriptNode.subNodes.isEmpty()) || hasAbc) {
             ret.add(actionScriptNode);
+        }
+
+        return ret;
+    }
+
+    private List<TreeNode> createSubTagList(List<Tag> list, Tag parent, SWF swf, List<Tag> actionScriptTags) {
+        List<TreeNode> ret = new ArrayList<>();
+        List<TreeNode> frames = new ArrayList<>();
+        List<TreeNode> others = new ArrayList<>();
+        
+        int frameCnt = 0;
+        for (Tag t : list) {
+            TreeNodeType ttype = TagTree.getTreeNodeType(t);
+            switch (ttype) {
+                case SHOW_FRAME: frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true))); break;
+                default:
+                    if (!actionScriptTags.contains(t)) {
+                        others.add(new TagNode(t)); 
+                    }
+                    break;
+            }
+        }
+
+        ret.addAll(frames);
+
+        if (!others.isEmpty()) {
+            StringNode otherNode = new StringNode(new StringItem(translate("node.others"), swf));
+            otherNode.subNodes.addAll(others);
+            ret.add(otherNode);
         }
 
         return ret;

@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFBundleNode;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.helpers.Freed;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -140,6 +141,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -158,6 +160,7 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -207,6 +210,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private final JPanel displayPanel;
     private ImagePanel imagePanel;
     private BinaryPanel binaryPanel;
+    private JEditorPane genericTagPropertiesEditorPane;
     private final ImagePanel previewImagePanel;
     private final SWFPreviwPanel swfPreviewPanel;
     private boolean isWelcomeScreen = true;
@@ -215,6 +219,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String CARDDRAWPREVIEWPANEL = "Draw card";
     private static final String CARDIMAGEPANEL = "Image card";
     private static final String CARDBINARYPANEL = "Binary card";
+    private static final String CARDGENEICTAGPANEL = "Generic tag card";
     private static final String CARDEMPTYPANEL = "Empty card";
     private static final String CARDACTIONSCRIPTPANEL = "ActionScript card";
     private static final String CARDACTIONSCRIPT3PANEL = "ActionScript3 card";
@@ -488,6 +493,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return binaryCard;
     }
 
+    private JPanel createGenericTagCard() {
+        JPanel genericTagCard = new JPanel(new BorderLayout());
+        genericTagPropertiesEditorPane = new JEditorPane();
+        genericTagPropertiesEditorPane.setEditable(false);
+        genericTagCard.add(genericTagPropertiesEditorPane, BorderLayout.CENTER);
+
+        return genericTagCard;
+    }
+
     private void showHideImageReplaceButton(boolean show) {
         imageReplaceButton.setVisible(show);
         setImageButtonPanelVisibility();
@@ -730,6 +744,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         displayPanel.add(createImagesCard(), CARDIMAGEPANEL);
         displayPanel.add(createBinaryCard(), CARDBINARYPANEL);
+        displayPanel.add(createGenericTagCard(), CARDGENEICTAGPANEL);
 
         JPanel shapesCard = new JPanel(new BorderLayout());
 
@@ -2368,11 +2383,29 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 parametersPanel.setVisible(false);
             }
 
+        } else if (tagObj instanceof Tag) {
+            showCard(CARDGENEICTAGPANEL);
+            showGenericTag((Tag) tagObj);
         } else {
             showCard(CARDEMPTYPANEL);
         }
     }
 
+    private void showGenericTag(Tag tag) {
+        StringBuilder sb = new StringBuilder();
+        Field[] fields = tag.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                sb.append(field.getName()).append(": ").append(field.get(tag));
+                sb.append(GraphTextWriter.NEW_LINE);
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        genericTagPropertiesEditorPane.setText(sb.toString());
+    }
+    
     private void createAndShowTempSwf(Object tagObj) {
         SWF swf;
         try {
@@ -2473,7 +2506,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             }
                         }
                         if (t instanceof CharacterTag) {
-                            doneCharacters.add(((CharacterTag) t).getCharacterId());
+                            int characterId = ((CharacterTag) t).getCharacterId();
+                            if (!doneCharacters.contains(characterId)) {
+                                doneCharacters.add(((CharacterTag) t).getCharacterId());
+                            }
                         }
                         sos2.writeTag(classicTag(t));
 
@@ -2728,7 +2764,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
 
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                SWFOutputStream sos = new SWFOutputStream(fos, 10);
+                SWFOutputStream sos = new SWFOutputStream(fos, Math.max(10, swf.version));
                 sos.write("FWS".getBytes());
                 sos.write(swf.version);
                 sos.writeUI32(sos.getPos() + data.length + 4);

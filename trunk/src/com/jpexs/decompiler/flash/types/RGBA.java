@@ -71,4 +71,9 @@ public class RGBA extends RGB {
     public Color toColor() {
         return new Color(red, green, blue, alpha);
     }
+
+    @Override
+    public String toString() {
+        return "[RGB red:" + red + ", green:" + green + ", blue:" + blue + ", alpha:" + alpha + "]";
+    }
 }
