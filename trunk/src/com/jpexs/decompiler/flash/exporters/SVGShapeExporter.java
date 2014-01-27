@@ -69,6 +69,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     protected List<Element> gradients;
     protected int lastPatternId;
     private final SWF swf;
+    private double maxLineWidth;
 
     public SVGShapeExporter(SWF swf, SHAPE shape) {
         super(shape);
@@ -114,6 +115,10 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     @Override
     public void endShape(double xMin, double yMin, double xMax, double yMax) {
+        xMin -= maxLineWidth;
+        xMax += maxLineWidth;
+        yMin -= maxLineWidth;
+        yMax += maxLineWidth;
         _svgG.setAttribute("transform", "matrix(1, 0, 0, 1, "
                 + roundPixels20(-xMin) + ", " + roundPixels20(-yMin) + ")");
     }
@@ -215,6 +220,9 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
+        if (thickness > maxLineWidth) {
+            maxLineWidth = thickness;
+        }
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", color.toHexRGB());
         path.setAttribute("stroke-width", Double.toString(thickness == 0 ? 1 : thickness));

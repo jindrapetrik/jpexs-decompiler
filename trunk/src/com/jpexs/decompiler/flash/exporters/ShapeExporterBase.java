@@ -230,20 +230,30 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private void calculateBound(IEdge edge) {
         Point from = edge.getFrom();
         Point to = edge.getTo();
-        if (from.x < bounds.xMin) {
-            bounds.xMin = from.x;
-        }
-        if (from.x > bounds.xMax) {
-            bounds.xMax = from.x;
-        }
-        if (to.y < bounds.yMin) {
-            bounds.yMin = to.y;
-        }
-        if (to.y > bounds.yMax) {
-            bounds.yMax = to.y;
+        calculateBound(from);
+        calculateBound(to);
+        if (edge instanceof CurvedEdge) {
+            CurvedEdge curvedEdge = (CurvedEdge) edge;
+            Point control = curvedEdge.getControl();
+            calculateBound(control);
         }
     }
 
+    private void calculateBound(Point point) {
+        if (point.x < bounds.xMin) {
+            bounds.xMin = point.x;
+        }
+        if (point.x > bounds.xMax) {
+            bounds.xMax = point.x;
+        }
+        if (point.y < bounds.yMin) {
+            bounds.yMin = point.y;
+        }
+        if (point.y > bounds.yMax) {
+            bounds.yMax = point.y;
+        }
+    }
+    
     protected void exportFillPath(int groupIndex) {
         List<IEdge> path = createPathFromEdgeMap(fillEdgeMaps.get(groupIndex));
         Point pos = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);

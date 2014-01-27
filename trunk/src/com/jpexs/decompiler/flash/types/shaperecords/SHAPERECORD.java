@@ -87,6 +87,25 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     min_x = x;
                 }
             }
+            if (r instanceof CurvedEdgeRecord) {
+                CurvedEdgeRecord curverEdge = (CurvedEdgeRecord) r;
+                int x2 = x + curverEdge.controlDeltaX;
+                int y2 = y + curverEdge.controlDeltaY;
+                if (x2 > max_x) {
+                    max_x = x2;
+                }
+                if (y2 > max_y) {
+                    max_y = y2;
+                }
+                if (started) {
+                    if (y2 < min_y) {
+                        min_y = y2;
+                    }
+                    if (x2 < min_x) {
+                        min_x = x2;
+                    }
+                }
+            }
         }
         return new RECT(min_x, max_x, min_y, max_y);
     }

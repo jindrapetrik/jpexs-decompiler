@@ -22,10 +22,12 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.Cache;
 import java.awt.BasicStroke;
@@ -101,10 +103,20 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
             return;
         }
         RECT bounds = SHAPERECORD.getBounds(records);
-        xMin = bounds.Xmin / unitDivisor - 1;
-        yMin = bounds.Ymin / unitDivisor - 1;
+        int maxLineWidthTwips = 0;
+        if (shape instanceof SHAPEWITHSTYLE) {
+            SHAPEWITHSTYLE shapeWithStyle = (SHAPEWITHSTYLE) shape;
+            for (LINESTYLE lineStyle : shapeWithStyle.lineStyles.lineStyles) {
+                if (lineStyle.width > maxLineWidthTwips) {
+                    maxLineWidthTwips = lineStyle.width;
+                }
+            }
+        }
+        double maxLineWidth = maxLineWidthTwips / unitDivisor / 2;
+        xMin = bounds.Xmin / unitDivisor - maxLineWidth;
+        yMin = bounds.Ymin / unitDivisor - maxLineWidth;
         image = new BufferedImage(
-                (int) (bounds.getWidth() / unitDivisor + 3), (int) (bounds.getHeight() / unitDivisor + 3), BufferedImage.TYPE_INT_ARGB);
+            (int) (bounds.getWidth() / unitDivisor + 2 + maxLineWidth), (int) (bounds.getHeight() / unitDivisor + 2 + maxLineWidth), BufferedImage.TYPE_INT_ARGB);
         graphics = (Graphics2D) image.getGraphics();
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
