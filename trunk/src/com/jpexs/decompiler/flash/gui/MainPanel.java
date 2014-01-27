@@ -2033,6 +2033,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 if (it instanceof DefineBitsTag) {
                                     DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, it.getOriginalData(), swf.version, it.getPos(), it.getCharacterId(), data);
                                     swf.tags.set(swf.tags.indexOf(it), jpeg2Tag);
+                                    showCard(CARDEMPTYPANEL);
                                     refreshTree();
                                 } else {
                                     it.setImage(data);
