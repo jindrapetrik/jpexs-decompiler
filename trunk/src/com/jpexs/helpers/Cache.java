@@ -16,12 +16,15 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.types.shaperecords.SerializableImage;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +50,7 @@ public class Cache {
         instances.add(instance);
         return instance;
     }
+
     private static int storageType = STORAGE_FILES;
 
     public static void clearAll() {
@@ -126,7 +130,11 @@ public class Cache {
             File f = cacheFiles.get(key);
             try (FileInputStream fis = new FileInputStream(f)) {
                 ObjectInputStream ois = new ObjectInputStream(fis);
-                return ois.readObject();
+                Object item = ois.readObject();
+                if (item instanceof SerializableImage) {
+                    item = ((SerializableImage) item).getImage();
+                }
+                return item;
             } catch (IOException | ClassNotFoundException ex) {
                 Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -157,7 +165,17 @@ public class Cache {
                 return;
             }
             try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(temp))) {
-                oos.writeObject(value);
+                if (value instanceof Serializable) {
+                    oos.writeObject(value);
+                } else {
+                    if (value instanceof BufferedImage) {
+                        value = new SerializableImage((BufferedImage) value);
+                        oos.writeObject(value);
+                    } else {
+                        // Object serialization not supported
+                        return;
+                    }
+                }
                 oos.flush();
 
                 cacheFiles.put(key, temp);

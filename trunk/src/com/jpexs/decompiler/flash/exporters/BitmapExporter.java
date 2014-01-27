@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
-import com.jpexs.decompiler.flash.types.shaperecords.SerializableImage;
 import com.jpexs.helpers.Cache;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -98,7 +97,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         List<SHAPERECORD> records = shape.shapeRecords;
         String key = "shape_" + records.hashCode() + "_" + (defaultColor == null ? "null" : defaultColor.hashCode());
         if (cache.contains(key)) {
-            image = (BufferedImage) ((SerializableImage) cache.get(key)).getImage();
+            image = (BufferedImage) cache.get(key);
             return;
         }
         RECT bounds = SHAPERECORD.getBounds(records);
@@ -113,7 +112,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         defaultStroke = graphics.getStroke();
         super.export();
         if (putToCache) {
-            cache.put(key, new SerializableImage(image));
+            cache.put(key, image);
         }
     }
 

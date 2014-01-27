@@ -104,7 +104,6 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
-import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.decompiler.flash.types.sound.AdpcmDecoder;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -135,7 +134,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EmptyStackException;
@@ -2042,41 +2040,16 @@ public final class SWF implements TreeItem {
         XFLConverter.convertSWF(handler, this, swfName, outfile, false, generator, generatorVerName, generatorVersion, parallel);
     }
 
-    public static float twipToPixel(int twip) {
-        return ((float) twip) / 20.0f;
-    }
-
-    private static class CachedImage implements Serializable {
-
-        private final int[] data;
-        private final int width;
-        private final int height;
-        private final int type;
-        public static final long serialVersionUID = 1L;
-
-        public CachedImage(BufferedImage img) {
-            width = img.getWidth();
-            height = img.getHeight();
-            type = img.getType();
-            data = Filtering.getRGB(img, 0, 0, width, height);
-        }
-
-        public BufferedImage getImage() {
-            BufferedImage ret = new BufferedImage(width, height, type);
-            Filtering.setRGB(ret, 0, 0, width, height, data);
-            return ret;
-        }
-    }
-
     public static AffineTransform matrixToTransform(MATRIX mat) {
         return new AffineTransform(mat.getScaleXFloat(), mat.getRotateSkew0Float(),
                 mat.getRotateSkew1Float(), mat.getScaleYFloat(),
                 mat.translateX, mat.translateY);
     }
-    private static Cache cache = Cache.getInstance(false);
+    
+    private static Cache frameCache = Cache.getInstance(false);
 
     public void clearImageCache() {
-        cache.clear();
+        frameCache.clear();
         BitmapExporter.clearShapeCache();
     }
 
@@ -2121,11 +2094,9 @@ public final class SWF implements TreeItem {
         displayRect = fixRect(displayRect);
 
         String key = "frame_" + frame + "_" + containerId;
-        if (cache.contains(key)) {
-            CachedImage ciret = ((CachedImage) cache.get(key));
-            if (ciret != null) {
-                return ciret.getImage();
-            }
+        if (frameCache.contains(key)) {
+            BufferedImage ciret = ((BufferedImage) frameCache.get(key));
+            return ciret;
         }
         float unzoom = 20;
         BufferedImage ret = new BufferedImage((int) (displayRect.Xmax / unzoom), (int) (displayRect.Ymax / unzoom), BufferedImage.TYPE_INT_ARGB);
@@ -2240,7 +2211,7 @@ public final class SWF implements TreeItem {
         g.setTransform(AffineTransform.getScaleInstance(1, 1));
         /*g.setPaint(Color.yellow);
          g.draw(new Rectangle(ret.getWidth()-1,ret.getHeight()-1));*/
-        cache.put(key, new CachedImage(ret));
+        frameCache.put(key, ret);
 
         /*try {
          ImageIO.write(ret, "png", new File("tst_id_" + containerId + "_time_" + System.currentTimeMillis() + ".png"));
@@ -2262,12 +2233,12 @@ public final class SWF implements TreeItem {
     public static void framesToImage(int containerId, List<BufferedImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited) {
         for (int i = startFrame; i <= stopFrame; i++) {
             String key = "frame_" + i + "_" + containerId;
-            if (cache.contains(key)) {
-                CachedImage g = (CachedImage) cache.get(key);
+            if (frameCache.contains(key)) {
+                BufferedImage g = (BufferedImage) frameCache.get(key);
                 if (g == null) {
                     break;
                 }
-                ret.add(g.getImage());
+                ret.add(g);
                 startFrame++;
             } else {
                 break;
