@@ -382,7 +382,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         path = new GeneralPath();
     }
 
-    public static AffineTransform matrixToTransform(Matrix mat) {
+    private static AffineTransform matrixToTransform(Matrix mat) {
         AffineTransform transform = new AffineTransform(mat.scaleX, mat.rotateSkew0,
                 mat.rotateSkew1, mat.scaleY,
                 mat.translateX, mat.translateY);
