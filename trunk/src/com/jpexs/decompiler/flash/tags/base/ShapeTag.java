@@ -16,10 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
-import java.awt.geom.GeneralPath;
-import java.util.List;
 
 /**
  *
@@ -32,6 +29,4 @@ public interface ShapeTag extends DrawableTag {
     public String toSVG();
 
     public int getShapeNum();
-
-    public List<GeneralPath> getPaths(List<Tag> tags);
 }

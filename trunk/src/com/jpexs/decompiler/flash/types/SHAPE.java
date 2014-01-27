@@ -16,11 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types;
 
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
-import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,10 +39,6 @@ public class SHAPE implements NeedsCharacters {
             ret.addAll(r.getNeededCharacters());
         }
         return ret;
-    }
-
-    public BufferedImage toImage(int shapeNum, List<Tag> tags, Color defaultColor, boolean putToCache) {
-        return SHAPERECORD.shapeToImage(tags, shapeNum, null, null,/* numFillBits, numLineBits, */ shapeRecords, defaultColor, putToCache);
     }
 
     public RECT getBounds() {

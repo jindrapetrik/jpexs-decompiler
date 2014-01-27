@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
@@ -29,13 +30,13 @@ import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import java.awt.Point;
-import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -187,11 +188,6 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
         return 2;
     }
 
-    //@Override
-    public List<GeneralPath> getPaths(List<Tag> tags) {
-        return null; //FIXME
-    }
-
     @Override
     public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
@@ -262,7 +258,12 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
             cer.anchorDeltaY = cer1.anchorDeltaY + (cer2.anchorDeltaY - cer1.anchorDeltaY) * frame / 65535;
             finalRecords.add(cer);
         }
-        return SHAPERECORD.shapeToImage(tags, 4, fillStyles, lineStyles, finalRecords);
+        SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
+        shape.fillStyles = fillStyles;
+        shape.lineStyles = lineStyles;
+        shape.shapeRecords = finalRecords;
+        // shapeNum: 4
+        return BitmapExporter.export(swf, shape, null, true);
     }
 
     @Override

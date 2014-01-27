@@ -19,13 +19,13 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -70,8 +70,8 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     protected int lastPatternId;
     private final SWF swf;
 
-    public SVGShapeExporter(SWF swf, ShapeTag tag) {
-        super(tag);
+    public SVGShapeExporter(SWF swf, SHAPE shape) {
+        super(shape);
         this.swf = swf;
     }
 

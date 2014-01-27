@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.SHAPE;
 
 /**
  *
@@ -32,8 +32,8 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     protected String currentDrawCommand = "";
     protected String pathData;
 
-    public DefaultSVGShapeExporter(ShapeTag tag) {
-        super(tag);
+    public DefaultSVGShapeExporter(SHAPE shape) {
+        super(shape);
     }
 
     @Override

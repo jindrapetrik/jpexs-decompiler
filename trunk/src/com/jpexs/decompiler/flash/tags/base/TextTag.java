@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -191,7 +192,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         return att;
     }
 
-    public static BufferedImage staticTextToImage(List<Tag> tags, HashMap<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText) {
+    public static BufferedImage staticTextToImage(SWF swf, HashMap<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText) {
         int fixX = -textBounds.Xmin;
         int fixY = -textBounds.Ymin;
         BufferedImage ret = new BufferedImage(textBounds.getWidth() / 20, textBounds.getHeight() / 20, BufferedImage.TYPE_INT_ARGB);
@@ -232,7 +233,8 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 rect.Xmin /= font.getDivider();
                 rect.Ymax /= font.getDivider();
                 rect.Ymin /= font.getDivider();
-                BufferedImage img = SHAPERECORD.shapeToImage(tags, 1, null, null, glyphs.get(entry.glyphIndex).shapeRecords, textColor, true);
+                // shapeNum: 1
+                BufferedImage img = BitmapExporter.export(swf, glyphs.get(entry.glyphIndex), textColor, true);
                 AffineTransform tr = new AffineTransform();
                 tr.setToIdentity();
                 float rat = textHeight / 1024f;

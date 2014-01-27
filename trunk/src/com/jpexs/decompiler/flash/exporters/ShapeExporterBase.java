@@ -16,12 +16,13 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -41,7 +42,7 @@ import java.util.Map;
  */
 public abstract class ShapeExporterBase implements IShapeExporter {
 
-    protected final ShapeTag tag;
+    protected final SHAPE shape;
 
     protected static final double unitDivisor = 20;
 
@@ -58,12 +59,15 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     private boolean edgeMapsCreated;
 
-    public ShapeExporterBase(ShapeTag tag) {
-        this.tag = tag;
+    public ShapeExporterBase(SHAPE shape) {
+        this.shape = shape;
         _fillStyles = new ArrayList<>();
-        _fillStyles.addAll(Arrays.asList(tag.getShapes().fillStyles.fillStyles));
         _lineStyles = new ArrayList<>();
-        _lineStyles.addAll(Arrays.asList(tag.getShapes().lineStyles.lineStyles));
+        if (shape instanceof SHAPEWITHSTYLE) {
+            SHAPEWITHSTYLE shapeWithStyle = (SHAPEWITHSTYLE) shape;
+            _fillStyles.addAll(Arrays.asList(shapeWithStyle.fillStyles.fillStyles));
+            _lineStyles.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
+        }
     }
 
     public void export() {
@@ -100,7 +104,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             lineEdgeMaps = new ArrayList<>();
             currentFillEdgeMap = new HashMap<>();
             currentLineEdgeMap = new HashMap<>();
-            List<SHAPERECORD> records = tag.getShapes().shapeRecords;
+            List<SHAPERECORD> records = shape.shapeRecords;
             for (int i = 0; i < records.size(); i++) {
                 SHAPERECORD shapeRecord = records.get(i);
                 if (shapeRecord instanceof StyleChangeRecord) {

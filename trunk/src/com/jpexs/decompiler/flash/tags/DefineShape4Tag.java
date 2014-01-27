@@ -25,9 +25,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
-import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import java.awt.Point;
-import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -69,14 +67,14 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
 
     @Override
     public String toSVG() {
-        SVGShapeExporter exporter = new SVGShapeExporter(swf, this);
+        SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes());
         exporter.export();
         return exporter.getSVG();
     }
 
     @Override
     public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
-        BitmapExporter exporter = new BitmapExporter(swf, this);
+        BitmapExporter exporter = new BitmapExporter(swf, getShapes());
         exporter.export();
         return exporter.getImage();
     }
@@ -102,11 +100,6 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
         usesNonScalingStrokes = sis.readUB(1) == 1;
         usesScalingStrokes = sis.readUB(1) == 1;
         shapes = sis.readSHAPEWITHSTYLE(4);
-    }
-
-    @Override
-    public List<GeneralPath> getPaths(List<Tag> tags) {
-        return SHAPERECORD.shapeToPaths(tags, 4, shapes.shapeRecords);
     }
 
     @Override

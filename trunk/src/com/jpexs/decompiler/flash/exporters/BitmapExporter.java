@@ -19,13 +19,13 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SerializableImage;
 import com.jpexs.helpers.Cache;
@@ -56,6 +56,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private BufferedImage image;
     private Graphics2D graphics;
     private final Color defaultColor;
+    private final boolean putToCache;
     private double xMin;
     private double yMin;
     private final SWF swf;
@@ -67,19 +68,34 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private Stroke lineStroke;
     private Stroke defaultStroke;
 
-    public BitmapExporter(SWF swf, ShapeTag tag) {
-        this(swf, tag, null);
+    public static BufferedImage export(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
+        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, putToCache);
+        exporter.export();
+        return exporter.getImage();
+    }
+    
+    public BitmapExporter(SWF swf, SHAPE shape) {
+        this(swf, shape, null, true);
     }
 
-    public BitmapExporter(SWF swf, ShapeTag tag, Color defaultColor) {
-        super(tag);
-        this.defaultColor = defaultColor;
+    public BitmapExporter(SWF swf, SHAPE shape, boolean putToCache) {
+        this(swf, shape, null, putToCache);
+    }
+
+    public BitmapExporter(SWF swf, SHAPE shape, Color defaultColor) {
+        this(swf, shape, defaultColor, true);
+    }
+
+    public BitmapExporter(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
+        super(shape);
         this.swf = swf;
+        this.defaultColor = defaultColor;
+        this.putToCache = putToCache;
     }
 
     @Override
     public void export() {
-        List<SHAPERECORD> records = tag.getShapes().shapeRecords;
+        List<SHAPERECORD> records = shape.shapeRecords;
         String key = "shape_" + records.hashCode() + "_" + (defaultColor == null ? "null" : defaultColor.hashCode());
         if (cache.contains(key)) {
             image = (BufferedImage) ((SerializableImage) cache.get(key)).getImage();
@@ -96,7 +112,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         defaultStroke = graphics.getStroke();
         super.export();
-        cache.put(key, new SerializableImage(image));
+        if (putToCache) {
+            cache.put(key, new SerializableImage(image));
+        }
     }
 
     public BufferedImage getImage() {

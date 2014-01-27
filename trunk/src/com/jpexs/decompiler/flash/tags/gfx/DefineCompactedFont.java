@@ -161,7 +161,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         if (size / cols < 30) {
             size = cols * 30;
         }
-        BufferedImage ret = SHAPERECORD.shapeListToImage(shapes, size, size, Color.black);
+        BufferedImage ret = SHAPERECORD.shapeListToImage(swf, shapes, size, size, Color.black);
         imageCache.put("font" + fontId, new SerializableImage(ret));
         return ret;
     }

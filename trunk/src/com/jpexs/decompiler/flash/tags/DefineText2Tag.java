@@ -489,7 +489,7 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
 
     @Override
     public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
-        return staticTextToImage(tags, characters, textRecords, textBounds, 2);
+        return staticTextToImage(swf, characters, textRecords, textBounds, 2);
     }
 
     @Override

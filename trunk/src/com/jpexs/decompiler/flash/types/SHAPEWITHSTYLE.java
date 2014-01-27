@@ -16,42 +16,27 @@
  */
 package com.jpexs.decompiler.flash.types;
 
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
-import java.awt.image.BufferedImage;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  *
  * @author JPEXS
  */
-public class SHAPEWITHSTYLE implements NeedsCharacters {
+public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters {
 
     public FILLSTYLEARRAY fillStyles;
     public LINESTYLEARRAY lineStyles;
-    public int numFillBits;
-    public int numLineBits;
-    public List<SHAPERECORD> shapeRecords;
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<>();
+        Set<Integer> ret = new HashSet<>();
         ret.addAll(fillStyles.getNeededCharacters());
         for (SHAPERECORD r : shapeRecords) {
             ret.addAll(r.getNeededCharacters());
         }
         return ret;
-    }
-
-    public BufferedImage toImage(int shapeNum, List<Tag> tags) {
-        // todo: honfika: remove this method
-        return SHAPERECORD.shapeToImage(tags, shapeNum, fillStyles, lineStyles, /*numFillBits, numLineBits,*/ shapeRecords);
-    }
-
-    public RECT getBounds() {
-        return SHAPERECORD.getBounds(shapeRecords);
     }
 }

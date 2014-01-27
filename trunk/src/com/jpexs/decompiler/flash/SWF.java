@@ -105,7 +105,6 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.filters.Filtering;
-import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.sound.AdpcmDecoder;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -2078,7 +2077,6 @@ public final class SWF implements TreeItem {
 
     public void clearImageCache() {
         cache.clear();
-        SHAPERECORD.clearShapeCache();
         BitmapExporter.clearShapeCache();
     }
 
