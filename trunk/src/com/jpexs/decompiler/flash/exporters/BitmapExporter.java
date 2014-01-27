@@ -169,7 +169,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                 }
 
                 fillPathPaint = null;
-                fillPaint = new LinearGradientPaint(new java.awt.Point(-16384 / 20, 0), new java.awt.Point(16384 / 20, 0), ratiosArr, colorsArr, cm);
+                fillPaint = new LinearGradientPaint(new java.awt.Point(-16384, 0), new java.awt.Point(16384, 0), ratiosArr, colorsArr, cm);
                 fillTransform = matrixToTransform(matrix);
             }
             break;
@@ -201,7 +201,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
 
                 Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
                 fillPathPaint = endColor;
-                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384 / 20, ratiosArr, colorsArr, cm);
+                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);
                 fillTransform = matrixToTransform(matrix);
             }
             break;
@@ -233,7 +233,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
 
                 Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
                 fillPathPaint = endColor;
-                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384 / 20, new java.awt.Point((int) (focalPointRatio * 16384 / 20), 0), ratiosArr, colorsArr, cm);
+                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm);
                 fillTransform = matrixToTransform(matrix);
             }
             break;
@@ -257,8 +257,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
             BufferedImage img = image.getImage(swf.tags);
             if (img != null) {
                 fillPaint = new TexturePaint(img, new java.awt.Rectangle(img.getWidth(), img.getHeight()));
+                matrix.translateX -= xMin;
+                matrix.translateY -= yMin;
                 fillTransform = matrixToTransform(matrix);
-                fillTransform.concatenate(AffineTransform.getScaleInstance(1 / unitDivisor, 1 / unitDivisor));
             }
         }
     }
@@ -337,7 +338,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                     graphics.setTransform(fillTransform);
 
                     graphics.setPaint(fillPaint);
-                    graphics.fill(new java.awt.Rectangle(-16384 / 20 * maxRepeat, -16384 / 20 * maxRepeat, 16384 / 20 * 2 * maxRepeat, 16384 / 20 * 2 * maxRepeat));
+                    graphics.fill(new java.awt.Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
                     graphics.setTransform(oldAf);
                     graphics.setClip(null);
                 } else if (fillPaint instanceof TexturePaint) {
@@ -346,7 +347,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                     graphics.setTransform(fillTransform);
 
                     graphics.setPaint(fillPaint);
-                    graphics.fill(new java.awt.Rectangle(-16384 / 20 * maxRepeat, -16384 / 20 * maxRepeat, 16384 / 20 * 2 * maxRepeat, 16384 / 20 * 2 * maxRepeat));
+                    graphics.fill(new java.awt.Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
                     graphics.setTransform(oldAf);
                     graphics.setClip(null);
                 } else {
@@ -364,8 +365,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     }
 
     public static AffineTransform matrixToTransform(Matrix mat) {
-        return new AffineTransform(mat.scaleX, mat.rotateSkew0,
+        AffineTransform transform = new AffineTransform(mat.scaleX, mat.rotateSkew0,
                 mat.rotateSkew1, mat.scaleY,
                 mat.translateX, mat.translateY);
+        return transform;
     }
 }

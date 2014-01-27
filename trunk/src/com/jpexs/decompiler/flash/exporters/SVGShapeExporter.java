@@ -309,6 +309,10 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             gradient.setAttribute("color-interpolation", "linearRGB");
         }
         if (matrix != null) {
+            matrix.rotateSkew0 *= unitDivisor;
+            matrix.rotateSkew1 *= unitDivisor;
+            matrix.scaleX *= unitDivisor;
+            matrix.scaleY *= unitDivisor;
             double translateX = roundPixels400(matrix.translateX);
             double translateY = roundPixels400(matrix.translateY);
             double rotateSkew0 = roundPixels400(matrix.rotateSkew0);
@@ -321,7 +325,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         for (int i = 0; i < gradientRecords.length; i++) {
             GRADRECORD record = gradientRecords[i];
             Element gradientEntry = _svg.createElement("stop");
-            gradientEntry.setAttribute("offset", Double.toString(record.ratio / 255));
+            gradientEntry.setAttribute("offset", Double.toString(record.ratio / 255.0));
             RGB color = record.color;
             //if(colors.get(i) != 0) { 
             gradientEntry.setAttribute("stop-color", color.toHexRGB());

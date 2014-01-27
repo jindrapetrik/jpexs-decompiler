@@ -38,12 +38,12 @@ public class Matrix {
         translateX = matrix.translateX / 20.0;
         translateY = matrix.translateY / 20.0;
         if (matrix.hasScale) {
-            scaleX = matrix.getScaleXFloat();
-            scaleY = matrix.getScaleYFloat();
+            scaleX = matrix.getScaleXFloat() / 20.0;
+            scaleY = matrix.getScaleYFloat() / 20.0;
         }
         if (matrix.hasRotate) {
-            rotateSkew0 = matrix.getRotateSkew0Float();
-            rotateSkew1 = matrix.getRotateSkew1Float();
+            rotateSkew0 = matrix.getRotateSkew0Float() / 20.0;
+            rotateSkew1 = matrix.getRotateSkew1Float() / 20.0;
         }
     }
 }
