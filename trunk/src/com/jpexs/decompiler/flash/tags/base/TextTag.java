@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -26,6 +27,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -33,7 +35,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,7 +101,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         List<Integer> allLeftMargins = new ArrayList<>();
         List<Integer> allLetterSpacings = new ArrayList<>();
         FontMetrics fontMetrics;
-        BufferedImage bi = new BufferedImage(5, 5, BufferedImage.TYPE_INT_RGB);
+        SerializableImage bi = new SerializableImage(5, 5, SerializableImage.TYPE_INT_RGB);
         Font aFont = null;
         int currentLeftMargin;
         for (int r = 0; r < list.size(); r++) {
@@ -192,10 +193,12 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         return att;
     }
 
-    public static BufferedImage staticTextToImage(SWF swf, HashMap<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText) {
-        int fixX = -textBounds.Xmin;
-        int fixY = -textBounds.Ymin;
-        BufferedImage ret = new BufferedImage(textBounds.getWidth() / 20, textBounds.getHeight() / 20, BufferedImage.TYPE_INT_ARGB);
+    public static SerializableImage staticTextToImage(SWF swf, HashMap<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, Matrix matrix, int numText) {
+        float unzoom = 20;
+        double fixX = -textBounds.Xmin / unzoom;
+        double fixY = -textBounds.Ymin / unzoom;
+        matrix.translate(-fixX, -fixY);
+        SerializableImage ret = new SerializableImage(textBounds.getWidth() / 20, textBounds.getHeight() / 20, SerializableImage.TYPE_INT_ARGB);
 
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
@@ -228,20 +231,16 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
             }
 
             for (GLYPHENTRY entry : rec.glyphEntries) {
-                RECT rect = SHAPERECORD.getBounds(glyphs.get(entry.glyphIndex).shapeRecords);
-                rect.Xmax /= font.getDivider();
-                rect.Xmin /= font.getDivider();
-                rect.Ymax /= font.getDivider();
-                rect.Ymin /= font.getDivider();
                 // shapeNum: 1
-                BufferedImage img = BitmapExporter.export(swf, glyphs.get(entry.glyphIndex), textColor, true);
+                Matrix matrix2 = new Matrix();
+                SerializableImage img = BitmapExporter.export(swf, glyphs.get(entry.glyphIndex), textColor, true, matrix2);
                 AffineTransform tr = new AffineTransform();
                 tr.setToIdentity();
                 float rat = textHeight / 1024f;
-                tr.scale(1 / 20f, 1 / 20f);
-                tr.translate(x + fixX, y + rat * rect.Ymin + fixY);
+                tr.translate(x / unzoom + matrix2.translateX + fixX, y / unzoom + rat * matrix2.translateY + fixY);
+                tr.scale(1.0 / font.getDivider(), 1.0 / font.getDivider());
                 tr.scale(rat, rat);
-                g.drawImage(img, tr, null);
+                g.drawImage(img.getBufferedImage(), tr, null);
                 x += entry.glyphAdvance;
             }
         }

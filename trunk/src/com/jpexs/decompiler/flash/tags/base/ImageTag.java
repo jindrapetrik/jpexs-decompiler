@@ -18,8 +18,8 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -36,7 +36,7 @@ public abstract class ImageTag extends CharacterTag {
 
     public abstract InputStream getImageData();
 
-    public abstract BufferedImage getImage(List<Tag> tags);
+    public abstract SerializableImage getImage(List<Tag> tags);
 
     public abstract void setImage(byte[] data) throws IOException;
 

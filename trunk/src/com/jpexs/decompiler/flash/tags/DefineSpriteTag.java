@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
@@ -30,9 +31,9 @@ import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -101,7 +102,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
         }
         return ret;
     }
-    private static final Cache rectCache = Cache.getInstance(true);
+    private static final Cache<RECT> rectCache = Cache.getInstance(true);
 
     @Override
     public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
@@ -271,9 +272,9 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public SerializableImage toImage(int frame, List<Tag> tags, Matrix matrix, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         if (visited.contains(spriteId)) {
-            return new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+            return new SerializableImage(1, 1, SerializableImage.TYPE_4BYTE_ABGR);
         }
         /* 
          rect.Xmax=displayRect.Xmin+rect.getWidth();
@@ -284,7 +285,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
          SWF.fixRect(rect);*/
         RECT rect = getRect(characters, visited);
         visited.push(spriteId);
-        BufferedImage ret = SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited);
+        SerializableImage ret = SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited);
         visited.pop();
         return ret;
     }

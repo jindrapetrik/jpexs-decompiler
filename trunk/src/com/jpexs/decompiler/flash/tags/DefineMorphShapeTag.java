@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
@@ -36,8 +37,8 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -176,7 +177,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public SerializableImage toImage(int frame, List<Tag> tags, Matrix matrix, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(frame);
         LINESTYLEARRAY lineStyles = morphLineStyles.getLineStylesAt(getShapeNum(), frame);
@@ -250,7 +251,10 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
         shape.lineStyles = lineStyles;
         shape.shapeRecords = finalRecords;
         // shapeNum: 3
-        return BitmapExporter.export(swf, shape, null, true);
+        // todo: Currently the generated image is not cached, because the cache 
+        // key contains the hashCode of the finalRecord object, and it is always 
+        // recreated
+        return BitmapExporter.export(swf, shape, null, false);
     }
 
     @Override

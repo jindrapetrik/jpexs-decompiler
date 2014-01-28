@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -169,7 +169,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             }
         }
         if (image != null) {
-            BufferedImage img = image.getImage(swf.tags);
+            SerializableImage img = image.getImage(swf.tags);
             if (img != null) {
                 int width = img.getWidth();
                 int height = img.getHeight();
@@ -183,7 +183,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 } else {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     try {
-                        ImageIO.write(img, format.toUpperCase(Locale.ENGLISH), baos);
+                        ImageIO.write(img.getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
                     } catch (IOException ex) {
                     }
                     imageData = baos.toByteArray();

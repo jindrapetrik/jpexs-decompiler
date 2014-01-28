@@ -19,14 +19,15 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -37,8 +38,8 @@ import java.util.Stack;
 public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTag {
 
     public int shapeId;
-    public RECT shapeBounds;
-    public RECT edgeBounds;
+    private RECT shapeBounds;
+    private RECT edgeBounds;
     public boolean usesFillWindingRule;
     public boolean usesNonScalingStrokes;
     public boolean usesScalingStrokes;
@@ -73,9 +74,10 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public SerializableImage toImage(int frame, List<Tag> tags, Matrix matrix, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         BitmapExporter exporter = new BitmapExporter(swf, getShapes());
         exporter.export();
+        matrix.translate(exporter.deltaX, exporter.deltaY);
         return exporter.getImage();
     }
 

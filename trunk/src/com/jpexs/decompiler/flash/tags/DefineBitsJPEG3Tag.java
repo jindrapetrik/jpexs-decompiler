@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     @Override
     public void setImage(byte[] data) throws IOException {
         if (ImageTag.getImageFormat(data).equals("jpg")) {
-            BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
+            SerializableImage image = new SerializableImage(ImageIO.read(new ByteArrayInputStream(data)));
             byte[] ba = new byte[image.getWidth() * image.getHeight()];
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
@@ -72,7 +72,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public BufferedImage getImage(List<Tag> tags) {
+    public SerializableImage getImage(List<Tag> tags) {
         try {
             InputStream stream;
             if (SWF.hasErrorHeader(imageData)) {
@@ -80,11 +80,11 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             } else {
                 stream = new ByteArrayInputStream(imageData);
             }
-            BufferedImage img = ImageIO.read(stream);
+            SerializableImage img = new SerializableImage(ImageIO.read(stream));
             if (bitmapAlphaData.length == 0) {
                 return img;
             }
-            BufferedImage img2 = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+            SerializableImage img2 = new SerializableImage(img.getWidth(), img.getHeight(), SerializableImage.TYPE_INT_ARGB_PRE);
             for (int y = 0; y < img.getHeight(); y++) {
                 for (int x = 0; x < img.getWidth(); x++) {
                     int val = img.getRGB(x, y);

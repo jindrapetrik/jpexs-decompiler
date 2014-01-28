@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.RGBA;
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 
 /**
  * Glow filter
@@ -67,7 +67,7 @@ public class GLOWFILTER extends FILTER {
     }
 
     @Override
-    public BufferedImage apply(BufferedImage src) {
+    public SerializableImage apply(SerializableImage src) {
         return Filtering.glow(src, (int) blurX, (int) blurY, strength, glowColor.toColor(), innerGlow, knockout, passes);
     }
 }

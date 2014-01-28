@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -31,7 +32,6 @@ import java.awt.Shape;
 import java.awt.font.GlyphVector;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -114,13 +114,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         CurvedEdgeRecord ret = new CurvedEdgeRecord();
         ret.controlDeltaX = ser.deltaX / 2;
         ret.controlDeltaY = ser.deltaY / 2;
-        ret.anchorDeltaX = ser.deltaX / 2;
-        ret.anchorDeltaY = ser.deltaY / 2;
+        ret.anchorDeltaX = ser.deltaX - ret.controlDeltaX;
+        ret.anchorDeltaY = ser.deltaY - ret.controlDeltaY;
         return ret;
     }
 
-    public static BufferedImage shapeListToImage(SWF swf, List<SHAPE> shapes, int prevWidth, int prevHeight, Color color) {
-        BufferedImage ret = new BufferedImage(prevWidth, prevHeight, BufferedImage.TYPE_INT_ARGB);
+    public static SerializableImage shapeListToImage(SWF swf, List<SHAPE> shapes, int prevWidth, int prevHeight, Color color) {
+        SerializableImage ret = new SerializableImage(prevWidth, prevHeight, SerializableImage.TYPE_INT_ARGB);
         Graphics g = ret.getGraphics();
 
         int maxw = 0;
@@ -161,7 +161,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 }
 
                 // shapeNum: 1
-                BufferedImage img = BitmapExporter.export(swf, shapes.get(pos), color, false);
+                SerializableImage img = BitmapExporter.export(swf, shapes.get(pos), color, false);
 
                 int w1 = img.getWidth();
                 int h1 = img.getHeight();
@@ -170,7 +170,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 int h = Math.round(ratio * h1);
                 int px = x * w2 + w2 / 2 - w / 2;
                 int py = y * h2 + w2 - h;
-                g.drawImage(img, px, py, px + w, py + h, 0, 0, w1, h1, null);
+                g.drawImage(img.getBufferedImage(), px, py, px + w, py + h, 0, 0, w1, h1, null);
                 pos++;
             }
         }

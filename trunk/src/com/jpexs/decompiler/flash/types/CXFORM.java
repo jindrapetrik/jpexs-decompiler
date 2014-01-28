@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.filters.Filtering;
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 
 /**
  * Defines a transform that can be applied to the color space of a graphic
@@ -61,7 +61,7 @@ public class CXFORM {
      */
     public int blueAddTerm;
 
-    public BufferedImage apply(BufferedImage src) {
+    public SerializableImage apply(SerializableImage src) {
         return Filtering.colorEffect(src, hasAddTerms ? redAddTerm : 0, hasAddTerms ? greenAddTerm : 0, hasAddTerms ? blueAddTerm : 0, 0, hasMultTerms ? redMultTerm : 255, hasMultTerms ? greenMultTerm : 255, hasMultTerms ? blueMultTerm : 255, 1);
     }
 }

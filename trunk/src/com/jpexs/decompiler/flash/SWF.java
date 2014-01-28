@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
@@ -116,15 +117,14 @@ import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -1531,7 +1531,7 @@ public final class SWF implements TreeItem {
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
-                        ImageIO.write(((ImageTag) t).getImage(ttags), ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH), file);
+                        ImageIO.write(((ImageTag) t).getImage(ttags).getBufferedImage(), ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH), file);
                     }
                 }, handler).run();
                 ret.add(file);
@@ -2057,7 +2057,7 @@ public final class SWF implements TreeItem {
                 mat.translateX, mat.translateY);
     }
     
-    private static Cache frameCache = Cache.getInstance(false);
+    private static Cache<SerializableImage> frameCache = Cache.getInstance(false);
 
     public void clearImageCache() {
         frameCache.clear();
@@ -2097,20 +2097,20 @@ public final class SWF implements TreeItem {
         return ret;
     }
 
-    public static BufferedImage frameToImage(int containerId, int maxDepth, HashMap<Integer, Layer> layers, Color backgroundColor, HashMap<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited) {
-        int fixX = 0;
-        int fixY = 0;
-        fixX = -displayRect.Xmin / 20;
-        fixY = -displayRect.Ymin / 20;
+    public static SerializableImage frameToImage(int containerId, int maxDepth, HashMap<Integer, Layer> layers, Color backgroundColor, HashMap<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited) {
+        float unzoom = 20;
+        double fixX = 0;
+        double fixY = 0;
+        fixX = -displayRect.Xmin / unzoom;
+        fixY = -displayRect.Ymin / unzoom;
         displayRect = fixRect(displayRect);
 
         String key = "frame_" + frame + "_" + containerId;
         if (frameCache.contains(key)) {
-            BufferedImage ciret = ((BufferedImage) frameCache.get(key));
+            SerializableImage ciret = ((SerializableImage) frameCache.get(key));
             return ciret;
         }
-        float unzoom = 20;
-        BufferedImage ret = new BufferedImage((int) (displayRect.Xmax / unzoom), (int) (displayRect.Ymax / unzoom), BufferedImage.TYPE_INT_ARGB);
+        SerializableImage ret = new SerializableImage((int) (displayRect.getWidth() / unzoom), (int) (displayRect.getHeight() / unzoom), SerializableImage.TYPE_INT_ARGB);
 
         Graphics2D g = (Graphics2D) ret.getGraphics();
         g.setPaint(backgroundColor);
@@ -2131,19 +2131,16 @@ public final class SWF implements TreeItem {
                 continue;
             }
             CharacterTag character = characters.get(layer.characterId);
-            MATRIX mat = new MATRIX(layer.matrix);
-            mat.translateX /= 20;
-            mat.translateY /= 20;
-            mat.translateX += fixX;
-            mat.translateY += fixY;
+            Matrix mat = new Matrix(layer.matrix);
+            mat.translate(fixX, fixY);
 
-            AffineTransform trans = matrixToTransform(mat);
-
-            //trans.translate(transX, transY);
-            g.setTransform(trans);
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
-                BufferedImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, displayRect, characters, visited);
+                SerializableImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, mat, characters, visited);
+                /*if (character instanceof BoundedTag) {
+                    BoundedTag bounded = (BoundedTag) character;
+                    RECT rect = bounded.getRect(characters, visited);
+                }*/
                 if (layer.filters != null) {
                     for (FILTER filter : layer.filters) {
                         img = filter.apply(img);
@@ -2156,7 +2153,6 @@ public final class SWF implements TreeItem {
                 if (layer.colorTransFormAlpha != null) {
                     img = layer.colorTransFormAlpha.apply(img);
                 }
-                Point imgPos = drawable.getImagePos(layer.ratio < 0 ? 0 : layer.ratio, characters, visited);
                 switch (layer.blendMode) {
                     case 0:
                     case 1:
@@ -2206,8 +2202,12 @@ public final class SWF implements TreeItem {
                         break;
                 }
 
-                g.drawImage(img, imgPos.x, imgPos.y, null);
+                AffineTransform trans = mat.toTransform();
+                g.setTransform(trans);
+                g.drawImage(img.getBufferedImage(), 0, 0, null);
             } else if (character instanceof BoundedTag) {
+                AffineTransform trans = mat.toTransform();
+                g.setTransform(trans);
                 BoundedTag b = (BoundedTag) character;
                 g.setPaint(new Color(255, 255, 255, 128));
                 g.setComposite(BlendComposite.Invert);
@@ -2232,20 +2232,20 @@ public final class SWF implements TreeItem {
         return ret;
     }
 
-    public static BufferedImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited) {
-        List<BufferedImage> ret = new ArrayList<>();
+    public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited) {
+        List<SerializableImage> ret = new ArrayList<>();
         framesToImage(containerId, ret, frame, frame, allTags, controlTags, displayRect, totalFrameCount, visited);
         if (ret.isEmpty()) {
-            return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+            return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
         return ret.get(0);
     }
 
-    public static void framesToImage(int containerId, List<BufferedImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited) {
+    public static void framesToImage(int containerId, List<SerializableImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited) {
         for (int i = startFrame; i <= stopFrame; i++) {
             String key = "frame_" + i + "_" + containerId;
             if (frameCache.contains(key)) {
-                BufferedImage g = (BufferedImage) frameCache.get(key);
+                SerializableImage g = (SerializableImage) frameCache.get(key);
                 if (g == null) {
                     break;
                 }

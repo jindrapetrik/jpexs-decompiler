@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -40,24 +41,20 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 /**
@@ -71,34 +68,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     public int fontId;
     public List<FontType> fonts;
     private List<SHAPE> shapeCache;
-    private static final Cache imageCache = Cache.getInstance(false);
-
-    private static class SerializableImage implements Serializable {
-
-        transient BufferedImage image;
-
-        public BufferedImage getImage() {
-            return image;
-        }
-
-        public void setImage(BufferedImage image) {
-            this.image = image;
-        }
-
-        public SerializableImage(BufferedImage image) {
-            this.image = image;
-        }
-
-        private void writeObject(ObjectOutputStream out) throws IOException {
-            out.defaultWriteObject();
-            ImageIO.write(image, "png", out);
-        }
-
-        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-            in.defaultReadObject();
-            image = ImageIO.read(in);
-        }
-    }
+    private static final Cache<SerializableImage> imageCache = Cache.getInstance(false);
 
     /**
      * Gets data bytes
@@ -148,9 +118,9 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public SerializableImage toImage(int frame, List<Tag> tags, Matrix matrix, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         if (imageCache.contains("font" + fontId)) {
-            return ((SerializableImage) imageCache.get("font" + fontId)).getImage();
+            return ((SerializableImage) imageCache.get("font" + fontId));
         }
         List<SHAPE> shapes = new ArrayList<>();
         for (int i = 0; i < shapeCache.size(); i++) {
@@ -161,8 +131,8 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         if (size / cols < 30) {
             size = cols * 30;
         }
-        BufferedImage ret = SHAPERECORD.shapeListToImage(swf, shapes, size, size, Color.black);
-        imageCache.put("font" + fontId, new SerializableImage(ret));
+        SerializableImage ret = SHAPERECORD.shapeListToImage(swf, shapes, size, size, Color.black);
+        imageCache.put("font" + fontId, ret);
         return ret;
     }
 

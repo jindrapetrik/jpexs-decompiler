@@ -20,8 +20,8 @@ import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -41,7 +41,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
     ImagePanel pan;
     Timer timer;
     int frame = 1;
-    List<BufferedImage> frameImages = new ArrayList<>();
+    List<SerializableImage> frameImages = new ArrayList<>();
     JLabel buffering = new JLabel(AppStrings.translate("work.buffering") + "...");
 
     public SWFPreviwPanel() {

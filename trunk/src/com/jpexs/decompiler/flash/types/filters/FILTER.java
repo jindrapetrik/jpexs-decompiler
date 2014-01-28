@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 
 /**
  * Bitmap filter
@@ -39,7 +39,7 @@ public class FILTER {
         this.id = id;
     }
 
-    public BufferedImage apply(BufferedImage src) {
+    public SerializableImage apply(SerializableImage src) {
         return src;
     }
 }

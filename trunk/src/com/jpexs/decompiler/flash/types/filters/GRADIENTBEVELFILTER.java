@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,7 +83,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
     }
 
     @Override
-    public BufferedImage apply(BufferedImage src) {
+    public SerializableImage apply(SerializableImage src) {
         List<Color> colors = new ArrayList<>();
         List<Float> ratios = new ArrayList<>();
         for (int i = 0; i < gradientColors.length; i++) {

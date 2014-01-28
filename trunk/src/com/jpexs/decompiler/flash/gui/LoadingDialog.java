@@ -83,7 +83,7 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
         JLabel loadingLabel = new JLabel(translate("loadingpleasewait"));
         //loadingLabel.setBounds(0, 30, 150, 20);
         loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        detailLabel = new JLabel("H", JLabel.CENTER);
+        detailLabel = new JLabel("", JLabel.CENTER);
         detailLabel.setPreferredSize(new Dimension(loadingLabel.getPreferredSize()));
         detailLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //detailLabel.setBounds(0, 45, 150, 20);

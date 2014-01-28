@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 
 /**
  * Blur filter based on a sub-pixel precise median filter
@@ -43,7 +43,7 @@ public class BLURFILTER extends FILTER {
     }
 
     @Override
-    public BufferedImage apply(BufferedImage src) {
+    public SerializableImage apply(SerializableImage src) {
         return Filtering.blur(src, (int) blurX, (int) blurY, passes);
     }
 }

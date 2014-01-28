@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.RGBA;
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 
 /**
  * Drop shadow filter based on the same median filter as the blur filter
@@ -75,7 +75,7 @@ public class DROPSHADOWFILTER extends FILTER {
     }
 
     @Override
-    public BufferedImage apply(BufferedImage src) {
+    public SerializableImage apply(SerializableImage src) {
         return Filtering.dropShadow(src, (int) blurX, (int) blurY, (int) (angle * 180 / Math.PI), distance, dropShadowColor.toColor(), innerShadow, passes, strength, knockout);
     }
 }

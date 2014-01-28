@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 
 /**
  * Applies a color transformation on the pixels of a display list object
@@ -38,7 +38,7 @@ public class COLORMATRIXFILTER extends FILTER {
     }
 
     @Override
-    public BufferedImage apply(BufferedImage src) {
+    public SerializableImage apply(SerializableImage src) {
         float[][] matrix2 = new float[4][4];
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {

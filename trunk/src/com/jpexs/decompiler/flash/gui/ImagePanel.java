@@ -18,13 +18,14 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -120,20 +121,23 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         }
         percent = 0;
         if (drawable.getNumFrames() == 1) {
-            setImage(drawable.toImage(0, swf.tags, swf.displayRect, characters, new Stack<Integer>()));
+            Matrix mat = new Matrix();
+            mat.translateX = swf.displayRect.Xmin;
+            mat.translateY = swf.displayRect.Ymin;
+            setImage(drawable.toImage(0, swf.tags, mat, characters, new Stack<Integer>()));
             return;
         }
         play();
     }
 
-    public void setImage(Image image) {
+    public void setImage(SerializableImage image) {
         setBackground(View.swfBackgroundColor);
         if (timer != null) {
             timer.cancel();
         }
         drawable = null;
         loaded = true;
-        ImageIcon icon = new ImageIcon(image);
+        ImageIcon icon = new ImageIcon(image.getBufferedImage());
         label.setIcon(icon);
     }
 
@@ -171,7 +175,10 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         }
         int nframe = percent * drawable.getNumFrames() / 100;
         if (nframe != frame) {
-            ImageIcon icon = new ImageIcon(drawable.toImage(nframe, swf.tags, swf.displayRect, characters, new Stack<Integer>()));
+            Matrix mat = new Matrix();
+            mat.translateX = swf.displayRect.Xmin;
+            mat.translateY = swf.displayRect.Ymin;
+            ImageIcon icon = new ImageIcon(drawable.toImage(nframe, swf.tags, mat, characters, new Stack<Integer>()).getBufferedImage());
             label.setIcon(icon);
         }
     }

@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -71,7 +71,7 @@ public class DefineBitsTag extends ImageTag {
     }
 
     @Override
-    public BufferedImage getImage(List<Tag> tags) {
+    public SerializableImage getImage(List<Tag> tags) {
         getJPEGTables(tags);
         if ((jtt != null)) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -82,7 +82,7 @@ public class DefineBitsTag extends ImageTag {
                 } else {
                     baos.write(jpegData, 0, jpegData.length);
                 }
-                return ImageIO.read(new ByteArrayInputStream(baos.toByteArray()));
+                return new SerializableImage(ImageIO.read(new ByteArrayInputStream(baos.toByteArray())));
             } catch (IOException ex) {
                 return null;
             }

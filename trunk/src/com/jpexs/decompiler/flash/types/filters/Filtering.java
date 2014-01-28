@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -25,7 +26,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BandCombineOp;
-import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
@@ -215,15 +215,15 @@ public class Filtering {
         }
     }
 
-    public static BufferedImage blur(BufferedImage src, int hRadius, int vRadius, int iterations) {
+    public static SerializableImage blur(SerializableImage src, int hRadius, int vRadius, int iterations) {
         return blur(src, hRadius, vRadius, iterations, null);
     }
 
-    private static BufferedImage blur(BufferedImage src, int hRadius, int vRadius, int iterations, int[] mask) {
+    private static SerializableImage blur(SerializableImage src, int hRadius, int vRadius, int iterations, int[] mask) {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        BufferedImage dst = new BufferedImage(width, height, src.getType());
+        SerializableImage dst = new SerializableImage(width, height, src.getType());
 
         int[] inPixels = getRGB(src, 0, 0, width, height);
         premultiply(inPixels);
@@ -237,7 +237,7 @@ public class Filtering {
         return dst;
     }
 
-    public static BufferedImage bevel(BufferedImage src, int blurX, int blurY, float strength, int type, Color highlightColor, Color shadowColor, float angle, float distance, boolean knockout, int iterations) {
+    public static SerializableImage bevel(SerializableImage src, int blurX, int blurY, float strength, int type, Color highlightColor, Color shadowColor, float angle, float distance, boolean knockout, int iterations) {
         return gradientBevel(src, new Color[]{
             highlightColor,
             new Color(highlightColor.getRed(), highlightColor.getGreen(), highlightColor.getBlue(), 0),
@@ -246,22 +246,22 @@ public class Filtering {
         }, new float[]{0, 127f / 255f, 128f / 255f, 1}, blurX, blurY, strength, type, angle, distance, knockout, iterations);
     }
 
-    public static BufferedImage gradientBevel(BufferedImage src, Color[] colors, float[] ratios, int blurX, int blurY, float strength, int type, float angle, float distance, boolean knockout, int iterations) {
+    public static SerializableImage gradientBevel(SerializableImage src, Color[] colors, float[] ratios, int blurX, int blurY, float strength, int type, float angle, float distance, boolean knockout, int iterations) {
         int width = src.getWidth();
         int height = src.getHeight();
-        BufferedImage retImg = new BufferedImage(width, height, src.getType());
+        SerializableImage retImg = new SerializableImage(width, height, src.getType());
         if (type == FULL) {
-            BufferedImage partIn = gradientBevel(src, colors, ratios, blurX, blurY, strength, INNER, angle, distance, true, iterations);
-            BufferedImage partOut = gradientBevel(src, colors, ratios, blurX, blurY, strength, OUTER, angle, distance, true, iterations);
+            SerializableImage partIn = gradientBevel(src, colors, ratios, blurX, blurY, strength, INNER, angle, distance, true, iterations);
+            SerializableImage partOut = gradientBevel(src, colors, ratios, blurX, blurY, strength, OUTER, angle, distance, true, iterations);
             Graphics2D g = (Graphics2D) retImg.getGraphics();
-            g.drawImage(partIn, 0, 0, null);
+            g.drawImage(partIn.getBufferedImage(), 0, 0, null);
             g.setComposite(AlphaComposite.SrcOver);
-            g.drawImage(partOut, 0, 0, null);
+            g.drawImage(partOut.getBufferedImage(), 0, 0, null);
         } else {
             boolean inner = type == INNER;
 
             int[] srcPixels = getRGB(src, 0, 0, width, height);
-            BufferedImage gradient = new BufferedImage(512, 1, BufferedImage.TYPE_INT_ARGB);
+            SerializableImage gradient = new SerializableImage(512, 1, SerializableImage.TYPE_INT_ARGB);
             Graphics2D gg = (Graphics2D) gradient.getGraphics();
             Point pnt1 = new Point(0, 0);
             Point pnt2 = new Point(512, 0);
@@ -269,8 +269,8 @@ public class Filtering {
             gg.fill(new Rectangle(512, 1));
             int[] gradientPixels = getRGB(gradient, 0, 0, gradient.getWidth(), gradient.getHeight());
 
-            BufferedImage hilightIm = dropShadow(src, blurX, blurY, angle, distance, Color.black, inner, iterations, strength, true);//new DropShadowFilter(blurX, blurY, strength, inner ? highlightColor : shadowColor, angle, distance, inner, true, iterations).filter(src);
-            BufferedImage shadowIm = dropShadow(src, blurX, blurY, angle + 180, distance, Color.black, inner, iterations, strength, true); //new DropShadowFilter(blurX, blurY, strength, inner ? shadowColor : highlightColor, angle + 180, distance, inner, true, iterations).filter(src);
+            SerializableImage hilightIm = dropShadow(src, blurX, blurY, angle, distance, Color.black, inner, iterations, strength, true);//new DropShadowFilter(blurX, blurY, strength, inner ? highlightColor : shadowColor, angle, distance, inner, true, iterations).filter(src);
+            SerializableImage shadowIm = dropShadow(src, blurX, blurY, angle + 180, distance, Color.black, inner, iterations, strength, true); //new DropShadowFilter(blurX, blurY, strength, inner ? shadowColor : highlightColor, angle + 180, distance, inner, true, iterations).filter(src);
             int[] hilight = getRGB(hilightIm, 0, 0, width, height);
             int[] shadow = getRGB(shadowIm, 0, 0, width, height);
             for (int i = 0; i < srcPixels.length; i++) {
@@ -307,35 +307,35 @@ public class Filtering {
         if (!knockout) {
             Graphics2D g = (Graphics2D) retImg.getGraphics();
             g.setComposite(AlphaComposite.DstOver);
-            g.drawImage(src, 0, 0, null);
+            g.drawImage(src.getBufferedImage(), 0, 0, null);
         }
         return retImg;
     }
 
-    public static BufferedImage glow(BufferedImage src, int blurX, int blurY, float strength, Color color, boolean inner, boolean knockout, int iterations) {
+    public static SerializableImage glow(SerializableImage src, int blurX, int blurY, float strength, Color color, boolean inner, boolean knockout, int iterations) {
         return dropShadow(src, blurX, blurY, 45, 0, color, inner, iterations, strength, knockout);
     }
 
-    public static BufferedImage dropShadow(BufferedImage src, int blurX, int blurY, float angle, double distance, Color color, boolean inner, int iterations, float strength, boolean knockout) {
+    public static SerializableImage dropShadow(SerializableImage src, int blurX, int blurY, float angle, double distance, Color color, boolean inner, int iterations, float strength, boolean knockout) {
         return gradientGlow(src, blurX, blurY, angle, distance, new Color[]{new Color(color.getRed(), color.getGreen(), color.getBlue(), 0), color}, new float[]{0, 1}, inner ? INNER : OUTER, iterations, strength, knockout);
     }
 
-    public static BufferedImage gradientGlow(BufferedImage src, int blurX, int blurY, float angle, double distance, Color[] colors, float[] ratios, int type, int iterations, float strength, boolean knockout) {
+    public static SerializableImage gradientGlow(SerializableImage src, int blurX, int blurY, float angle, double distance, Color[] colors, float[] ratios, int type, int iterations, float strength, boolean knockout) {
         int width = src.getWidth();
         int height = src.getHeight();
-        BufferedImage retImg = new BufferedImage(width, height, src.getType());
+        SerializableImage retImg = new SerializableImage(width, height, src.getType());
 
         if (type == FULL) {
-            BufferedImage partIn = gradientGlow(src, blurX, blurY, angle, distance, colors, ratios, INNER, iterations, strength, true);
-            BufferedImage partOut = gradientGlow(src, blurX, blurY, angle, distance, colors, ratios, OUTER, iterations, strength, true);
+            SerializableImage partIn = gradientGlow(src, blurX, blurY, angle, distance, colors, ratios, INNER, iterations, strength, true);
+            SerializableImage partOut = gradientGlow(src, blurX, blurY, angle, distance, colors, ratios, OUTER, iterations, strength, true);
             Graphics2D g = (Graphics2D) retImg.getGraphics();
-            g.drawImage(partIn, 0, 0, null);
+            g.drawImage(partIn.getBufferedImage(), 0, 0, null);
             g.setComposite(AlphaComposite.SrcOver);
-            g.drawImage(partOut, 0, 0, null);
+            g.drawImage(partOut.getBufferedImage(), 0, 0, null);
         } else {
             boolean inner = type == INNER;
 
-            BufferedImage gradient = new BufferedImage(256, 1, BufferedImage.TYPE_INT_ARGB);
+            SerializableImage gradient = new SerializableImage(256, 1, SerializableImage.TYPE_INT_ARGB);
             Graphics2D gg = (Graphics2D) gradient.getGraphics();
             gg.setPaint(new LinearGradientPaint(new Point(0, 0), new Point(256, 0), ratios, colors));
             gg.fill(new Rectangle(256, 1));
@@ -389,23 +389,23 @@ public class Filtering {
             Graphics2D g = (Graphics2D) retImg.getGraphics();
             //g.setComposite(inner ? AlphaComposite.DstOver : AlphaComposite.SrcOver);
             g.setComposite(AlphaComposite.DstOver);
-            g.drawImage(src, 0, 0, null);
+            g.drawImage(src.getBufferedImage(), 0, 0, null);
         }
 
         return retImg;
     }
 
-    public static int[] getRGB(BufferedImage image, int x, int y, int width, int height) {
+    public static int[] getRGB(SerializableImage image, int x, int y, int width, int height) {
         int type = image.getType();
-        if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
+        if (type == SerializableImage.TYPE_INT_ARGB || type == SerializableImage.TYPE_INT_RGB) {
             return (int[]) image.getRaster().getDataElements(x, y, width, height, null);
         }
         return image.getRGB(x, y, width, height, null, 0, width);
     }
 
-    public static void setRGB(BufferedImage image, int x, int y, int width, int height, int[] pixels) {
+    public static void setRGB(SerializableImage image, int x, int y, int width, int height, int[] pixels) {
         int type = image.getType();
-        if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
+        if (type == SerializableImage.TYPE_INT_ARGB || type == SerializableImage.TYPE_INT_RGB) {
             image.getRaster().setDataElements(x, y, width, height, pixels);
         } else {
             image.setRGB(x, y, width, height, pixels, 0, width);
@@ -413,9 +413,9 @@ public class Filtering {
     }
 
     private static int[] moveRGB(int width, int height, int[] rgb, double deltaX, double deltaY, Color fill) {
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        SerializableImage img = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
         setRGB(img, 0, 0, width, height, rgb);
-        BufferedImage retImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        SerializableImage retImg = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) retImg.getGraphics();
         g.setPaint(fill);
         g.fillRect(0, 0, width, height);
@@ -425,23 +425,23 @@ public class Filtering {
 
         g.setTransform(AffineTransform.getTranslateInstance(deltaX, deltaY));
         g.setComposite(AlphaComposite.Src);
-        g.drawImage(img, 0, 0, null);
+        g.drawImage(img.getBufferedImage(), 0, 0, null);
         return getRGB(retImg, 0, 0, width, height);
     }
 
-    public static BufferedImage convolution(BufferedImage src, float[] matrix, int w, int h) {
-        BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
+    public static SerializableImage convolution(SerializableImage src, float[] matrix, int w, int h) {
+        SerializableImage dst = new SerializableImage(src.getWidth(), src.getHeight(), src.getType());
         BufferedImageOp op = new ConvolveOp(new Kernel(w, h, matrix), ConvolveOp.EDGE_ZERO_FILL, new RenderingHints(null));
-        op.filter(src, dst);
+        op.filter(src.getBufferedImage(), dst.getBufferedImage());
         return dst;
     }
 
-    public static BufferedImage colorMatrix(BufferedImage src, float[][] matrix) {
+    public static SerializableImage colorMatrix(SerializableImage src, float[][] matrix) {
         BandCombineOp changeColors = new BandCombineOp(matrix, new RenderingHints(null));
         Raster sourceRaster = src.getRaster();
         WritableRaster displayRaster = sourceRaster.createCompatibleWritableRaster();
         changeColors.filter(sourceRaster, displayRaster);
-        return new BufferedImage(src.getColorModel(), displayRaster, true, null);
+        return new SerializableImage(src.getColorModel(), displayRaster, true, null);
     }
 
     private static int cut(double val) {
@@ -455,10 +455,10 @@ public class Filtering {
         return i;
     }
 
-    public static BufferedImage colorEffect(BufferedImage src,
+    public static SerializableImage colorEffect(SerializableImage src,
             int redAddTerm, int greenAddTerm, int blueAddTerm, int alphaAddTerm,
             int redMultTerm, int greenMultTerm, int blueMultTerm, int alphaMultTerm) {
-        BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
+        SerializableImage dst = new SerializableImage(src.getWidth(), src.getHeight(), src.getType());
         int rgb[] = getRGB(src, 0, 0, src.getWidth(), src.getHeight());
         for (int i = 0; i < rgb.length; i++) {
             int a = (rgb[i] >> 24) & 0xff;

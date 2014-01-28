@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.types.MATRIX;
+import java.awt.geom.AffineTransform;
 
 /**
  *
@@ -32,6 +33,8 @@ public class Matrix {
     public double translateY;
 
     public Matrix() {
+        scaleX = 1;
+        scaleY = 1;
     }
 
     public Matrix(MATRIX matrix) {
@@ -45,5 +48,29 @@ public class Matrix {
             rotateSkew0 = matrix.getRotateSkew0Float() / 20.0;
             rotateSkew1 = matrix.getRotateSkew1Float() / 20.0;
         }
+    }
+
+    @Override
+    public Matrix clone() {
+        Matrix mat = new Matrix();
+        mat.translateX = translateX;
+        mat.translateY = translateY;
+        mat.scaleX = scaleX;
+        mat.scaleY = scaleY;
+        mat.rotateSkew0 = rotateSkew0;
+        mat.rotateSkew1 = rotateSkew1;
+        return mat;
+    }
+
+    public void translate(double x, double y) {
+        translateX += x;
+        translateY += y;
+    }
+    
+    public AffineTransform toTransform() {
+        AffineTransform transform = new AffineTransform(scaleX, rotateSkew0,
+                rotateSkew1, scaleY,
+                translateX, translateY);
+        return transform;
     }
 }

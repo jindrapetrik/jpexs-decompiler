@@ -25,8 +25,8 @@ import com.jpexs.decompiler.flash.types.BITMAPDATA;
 import com.jpexs.decompiler.flash.types.COLORMAPDATA;
 import com.jpexs.decompiler.flash.types.PIX24;
 import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     @Override
     public void setImage(byte[] data) throws IOException {
-        BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
+        SerializableImage image = new SerializableImage(ImageIO.read(new ByteArrayInputStream(data)));
         bitmapFormat = FORMAT_24BIT_RGB;
         bitmapWidth = image.getWidth();
         bitmapHeight = image.getHeight();
@@ -92,8 +92,8 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public BufferedImage getImage(List<Tag> tags) {
-        BufferedImage bi = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_RGB);
+    public SerializableImage getImage(List<Tag> tags) {
+        SerializableImage bi = new SerializableImage(bitmapWidth, bitmapHeight, SerializableImage.TYPE_INT_RGB);
         COLORMAPDATA colorMapData = null;
         BITMAPDATA bitmapData = null;
         if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {

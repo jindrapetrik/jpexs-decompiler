@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.RGBA;
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 
 /**
  * Two-dimensional discrete convolution filter.
@@ -67,7 +67,7 @@ public class CONVOLUTIONFILTER extends FILTER {
     }
 
     @Override
-    public BufferedImage apply(BufferedImage src) {
+    public SerializableImage apply(SerializableImage src) {
         int height = matrix.length;
         int width = matrix[0].length;
         float[] matrix2 = new float[width * height];

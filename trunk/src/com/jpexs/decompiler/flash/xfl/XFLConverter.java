@@ -92,10 +92,10 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.graph.ExportMode;
+import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -1273,10 +1273,10 @@ public class XFLConverter {
             } else if (symbol instanceof ImageTag) {
                 ImageTag imageTag = (ImageTag) symbol;
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                BufferedImage image = imageTag.getImage(tags);
+                SerializableImage image = imageTag.getImage(tags);
                 String format = imageTag.getImageFormat();
                 try {
-                    ImageIO.write(image, format.toUpperCase(), baos);
+                    ImageIO.write(image.getBufferedImage(), format.toUpperCase(), baos);
                 } catch (IOException ex) {
                     Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }

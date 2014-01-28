@@ -16,8 +16,6 @@
  */
 package com.jpexs.helpers;
 
-import com.jpexs.decompiler.flash.types.shaperecords.SerializableImage;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,16 +35,16 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class Cache {
+public class Cache<E> {
 
     private final Map<Object, File> cacheFiles;
-    private final Map<Object, Object> cacheMemory;
+    private final Map<Object, E> cacheMemory;
     private static final List<Cache> instances = new ArrayList<>();
     public static final int STORAGE_FILES = 1;
     public static final int STORAGE_MEMORY = 2;
 
-    public static Cache getInstance(boolean weak) {
-        Cache instance = new Cache(weak);
+    public static <E> Cache<E> getInstance(boolean weak) {
+        Cache<E> instance = new Cache<>(weak);
         instances.add(instance);
         return instance;
     }
@@ -122,7 +120,7 @@ public class Cache {
 
     }
 
-    public Object get(Object key) {
+    public E get(Object key) {
         if (storageType == STORAGE_FILES) {
             if (!cacheFiles.containsKey(key)) {
                 return null;
@@ -130,10 +128,8 @@ public class Cache {
             File f = cacheFiles.get(key);
             try (FileInputStream fis = new FileInputStream(f)) {
                 ObjectInputStream ois = new ObjectInputStream(fis);
-                Object item = ois.readObject();
-                if (item instanceof SerializableImage) {
-                    item = ((SerializableImage) item).getImage();
-                }
+                @SuppressWarnings("unchecked")
+                E item = (E) ois.readObject();
                 return item;
             } catch (IOException | ClassNotFoundException ex) {
                 Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
@@ -148,7 +144,7 @@ public class Cache {
         return null;
     }
 
-    public void put(Object key, Object value) {
+    public void put(Object key, E value) {
         if (storageType == STORAGE_FILES) {
             File temp = null;
             try {
@@ -168,13 +164,8 @@ public class Cache {
                 if (value instanceof Serializable) {
                     oos.writeObject(value);
                 } else {
-                    if (value instanceof BufferedImage) {
-                        value = new SerializableImage((BufferedImage) value);
-                        oos.writeObject(value);
-                    } else {
-                        // Object serialization not supported
-                        return;
-                    }
+                    // Object serialization not supported
+                    return;
                 }
                 oos.flush();
 

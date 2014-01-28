@@ -119,7 +119,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     private String lastDecompiled = "";
     private ASMSource lastASM;
     public SearchPanel<ASMSource> searchPanel;
-    private Cache cache = Cache.getInstance(true);
+    private Cache<CachedScript> cache = Cache.getInstance(true);
     private CancellableWorker setSourceWorker;
 
     public void clearSource() {

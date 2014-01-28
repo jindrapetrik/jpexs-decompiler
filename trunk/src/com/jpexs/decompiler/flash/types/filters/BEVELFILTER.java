@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.RGBA;
-import java.awt.image.BufferedImage;
+import com.jpexs.helpers.SerializableImage;
 
 /**
  * The Bevel filter creates a smooth bevel on display list objects.
@@ -83,7 +83,7 @@ public class BEVELFILTER extends FILTER {
     }
 
     @Override
-    public BufferedImage apply(BufferedImage src) {
+    public SerializableImage apply(SerializableImage src) {
         int type = Filtering.INNER;
         if (onTop && !innerShadow) {
             type = Filtering.FULL;

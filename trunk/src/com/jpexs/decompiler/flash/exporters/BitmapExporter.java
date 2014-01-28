@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -42,9 +43,13 @@ import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -52,14 +57,16 @@ import java.util.List;
  */
 public class BitmapExporter extends ShapeExporterBase implements IShapeExporter {
 
-    private static final Cache cache = Cache.getInstance(false);
+    private static final Cache<SerializableImage> cache = Cache.getInstance(false);
+    private static final Cache<Double> cacheDeltaX = Cache.getInstance(false);
+    private static final Cache<Double> cacheDeltaY = Cache.getInstance(false);
 
-    private BufferedImage image;
+    private SerializableImage image;
     private Graphics2D graphics;
     private final Color defaultColor;
     private final boolean putToCache;
-    private double xMin;
-    private double yMin;
+    public double deltaX;
+    public double deltaY;
     private final SWF swf;
     private GeneralPath path;
     private Paint fillPathPaint;
@@ -69,9 +76,18 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private Stroke lineStroke;
     private Stroke defaultStroke;
 
-    public static BufferedImage export(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
+    static int imageid = 0;
+    
+    public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
+        return export(swf, shape, defaultColor, putToCache, null);
+    }
+    
+    public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache, Matrix matrix) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, putToCache);
         exporter.export();
+        if (matrix != null) {
+            matrix.translate(exporter.deltaX, exporter.deltaY);
+        }
         return exporter.getImage();
     }
     
@@ -99,7 +115,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         List<SHAPERECORD> records = shape.shapeRecords;
         String key = "shape_" + records.hashCode() + "_" + (defaultColor == null ? "null" : defaultColor.hashCode());
         if (cache.contains(key)) {
-            image = (BufferedImage) cache.get(key);
+            image = (SerializableImage) cache.get(key);
+            deltaX = (double) cacheDeltaX.get(key);
+            deltaY = (double) cacheDeltaY.get(key);
             return;
         }
         RECT bounds = SHAPERECORD.getBounds(records);
@@ -113,22 +131,29 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
             }
         }
         double maxLineWidth = maxLineWidthTwips / unitDivisor / 2;
-        xMin = bounds.Xmin / unitDivisor - maxLineWidth;
-        yMin = bounds.Ymin / unitDivisor - maxLineWidth;
-        image = new BufferedImage(
-            (int) (bounds.getWidth() / unitDivisor + 2 + maxLineWidth), (int) (bounds.getHeight() / unitDivisor + 2 + maxLineWidth), BufferedImage.TYPE_INT_ARGB);
+        deltaX = bounds.Xmin / unitDivisor - maxLineWidth;
+        deltaY = bounds.Ymin / unitDivisor - maxLineWidth;
+        image = new SerializableImage(
+            (int) (bounds.getWidth() / unitDivisor + 2 + maxLineWidth), (int) (bounds.getHeight() / unitDivisor + 2 + maxLineWidth), SerializableImage.TYPE_INT_ARGB);
         graphics = (Graphics2D) image.getGraphics();
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         defaultStroke = graphics.getStroke();
         super.export();
+        try {
+            ImageIO.write(image.getBufferedImage(), "png", new File("c:\\10\\imageid" + imageid ++ + ".png"));
+        } catch (IOException ex) {
+            Logger.getLogger(BitmapExporter.class.getName()).log(Level.SEVERE, null, ex);
+        }
         if (putToCache) {
             cache.put(key, image);
+            cacheDeltaX.put(key, deltaX);
+            cacheDeltaY.put(key, deltaY);
         }
     }
 
-    public BufferedImage getImage() {
+    public SerializableImage getImage() {
         return image;
     }
 
@@ -199,7 +224,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
 
                 fillPathPaint = null;
                 fillPaint = new LinearGradientPaint(new java.awt.Point(-16384, 0), new java.awt.Point(16384, 0), ratiosArr, colorsArr, cm);
-                fillTransform = matrixToTransform(matrix);
+                matrix.translateX -= deltaX;
+                matrix.translateY -= deltaY;
+                fillTransform = matrix.toTransform();
             }
             break;
             case FILLSTYLE.RADIAL_GRADIENT: {
@@ -231,7 +258,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                 Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
                 fillPathPaint = endColor;
                 fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);
-                fillTransform = matrixToTransform(matrix);
+                matrix.translateX -= deltaX;
+                matrix.translateY -= deltaY;
+                fillTransform = matrix.toTransform();
             }
             break;
             case FILLSTYLE.FOCAL_RADIAL_GRADIENT: {
@@ -263,7 +292,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                 Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
                 fillPathPaint = endColor;
                 fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm);
-                fillTransform = matrixToTransform(matrix);
+                matrix.translateX -= deltaX;
+                matrix.translateY -= deltaY;
+                fillTransform = matrix.toTransform();
             }
             break;
         }
@@ -283,12 +314,12 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
             }
         }
         if (image != null) {
-            BufferedImage img = image.getImage(swf.tags);
+            SerializableImage img = image.getImage(swf.tags);
             if (img != null) {
-                fillPaint = new TexturePaint(img, new java.awt.Rectangle(img.getWidth(), img.getHeight()));
-                matrix.translateX -= xMin;
-                matrix.translateY -= yMin;
-                fillTransform = matrixToTransform(matrix);
+                fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
+                matrix.translateX -= deltaX;
+                matrix.translateY -= deltaY;
+                fillTransform = matrix.toTransform();
             }
         }
     }
@@ -340,17 +371,17 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
 
     @Override
     public void moveTo(double x, double y) {
-        path.moveTo(x - xMin, y - yMin);
+        path.moveTo(x - deltaX, y - deltaY);
     }
 
     @Override
     public void lineTo(double x, double y) {
-        path.lineTo(x - xMin, y - yMin);
+        path.lineTo(x - deltaX, y - deltaY);
     }
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
-        path.quadTo(controlX - xMin, controlY - yMin, anchorX - xMin, anchorY - yMin);
+        path.quadTo(controlX - deltaX, controlY - deltaY, anchorX - deltaX, anchorY - deltaY);
     }
 
     protected void finalizePath() {
@@ -391,12 +422,8 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
             }
         }
         path = new GeneralPath();
-    }
-
-    private static AffineTransform matrixToTransform(Matrix mat) {
-        AffineTransform transform = new AffineTransform(mat.scaleX, mat.rotateSkew0,
-                mat.rotateSkew1, mat.scaleY,
-                mat.translateX, mat.translateY);
-        return transform;
+        lineStroke = null;
+        lineColor = null;
+        fillPaint = null;
     }
 }
