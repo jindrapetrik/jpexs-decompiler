@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
@@ -31,7 +33,6 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -150,19 +151,19 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
             if (m != null) {
                 AffineTransform trans = SWF.matrixToTransform(m);
 
-                Point topleft = new Point();
-                trans.transform(new Point(r.Xmin, r.Ymin), topleft);
-                Point topright = new Point();
-                trans.transform(new Point(r.Xmax, r.Ymin), topright);
-                Point bottomright = new Point();
-                trans.transform(new Point(r.Xmax, r.Ymax), bottomright);
-                Point bottomleft = new Point();
-                trans.transform(new Point(r.Xmin, r.Ymax), bottomleft);
+                java.awt.Point topleft = new java.awt.Point();
+                trans.transform(new java.awt.Point(r.Xmin, r.Ymin), topleft);
+                java.awt.Point topright = new java.awt.Point();
+                trans.transform(new java.awt.Point(r.Xmax, r.Ymin), topright);
+                java.awt.Point bottomright = new java.awt.Point();
+                trans.transform(new java.awt.Point(r.Xmax, r.Ymax), bottomright);
+                java.awt.Point bottomleft = new java.awt.Point();
+                trans.transform(new java.awt.Point(r.Xmin, r.Ymax), bottomleft);
 
-                r.Xmin = Math.min(Math.min(Math.min(topleft.x, topright.x), bottomleft.x), bottomright.x);
-                r.Ymin = Math.min(Math.min(Math.min(topleft.y, topright.y), bottomleft.y), bottomright.y);
-                r.Xmax = Math.max(Math.max(Math.max(topleft.x, topright.x), bottomleft.x), bottomright.x);
-                r.Ymax = Math.max(Math.max(Math.max(topleft.y, topright.y), bottomleft.y), bottomright.y);
+                r.Xmin = (int) Math.min(Math.min(Math.min(topleft.x, topright.x), bottomleft.x), bottomright.x);
+                r.Ymin = (int) Math.min(Math.min(Math.min(topleft.y, topright.y), bottomleft.y), bottomright.y);
+                r.Xmax = (int) Math.max(Math.max(Math.max(topleft.x, topright.x), bottomleft.x), bottomright.x);
+                r.Ymax = (int) Math.max(Math.max(Math.max(topleft.y, topright.y), bottomleft.y), bottomright.y);
 
             }
             ret.Xmin = Math.min(r.Xmin, ret.Xmin);
@@ -271,7 +272,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
         if (visited.contains(spriteId)) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_4BYTE_ABGR);
         }
@@ -284,7 +285,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
          SWF.fixRect(rect);*/
         RECT rect = getRect(characters, visited);
         visited.push(spriteId);
-        SerializableImage ret = SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited);
+        SerializableImage ret = SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited, transformation);
         visited.pop();
         return ret;
     }

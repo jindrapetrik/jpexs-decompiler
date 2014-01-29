@@ -22,6 +22,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -34,7 +36,6 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
-import java.awt.Point;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -242,7 +243,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
         if (visited.contains(buttonId)) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_4BYTE_ABGR);
         }
@@ -266,7 +267,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         visited.pop();
         RECT displayRect = getRect(characters, visited);
         visited.push(buttonId);
-        SerializableImage ret = SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited);
+        SerializableImage ret = SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited, transformation);
 
         return ret;
     }
@@ -274,7 +275,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     @Override
     public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         RECT r = getRect(characters, visited);
-        return new Point(r.Xmin / 20, r.Ymin / 20);
+        return new Point(r.Xmin / SWF.unitDivisor, r.Ymin / SWF.unitDivisor);
     }
 
     @Override

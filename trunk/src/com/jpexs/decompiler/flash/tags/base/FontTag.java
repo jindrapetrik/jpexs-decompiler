@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
@@ -29,7 +31,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
@@ -60,7 +61,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract int charToGlyph(List<Tag> tags, char c);
 
-    public abstract int getGlyphAdvance(int glyphIndex);
+    public abstract double getGlyphAdvance(int glyphIndex);
 
     public abstract int getGlyphKerningAdjustment(List<Tag> tags, int glyphIndex, int nextGlyphIndex);
 
@@ -246,7 +247,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
         return SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), 500, 500, Color.black);
     }
 

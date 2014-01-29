@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.geom.AffineTransform;
 
@@ -32,21 +33,27 @@ public class Matrix {
     public double translateX;
     public double translateY;
 
+    public static Matrix getScaleInstance(double scale) {
+        Matrix mat = new Matrix();
+        mat.scale(scale);
+        return mat;
+    }
+    
     public Matrix() {
         scaleX = 1;
         scaleY = 1;
     }
 
     public Matrix(MATRIX matrix) {
-        translateX = matrix.translateX / 20.0;
-        translateY = matrix.translateY / 20.0;
+        translateX = matrix.translateX / SWF.unitDivisor;
+        translateY = matrix.translateY / SWF.unitDivisor;
         if (matrix.hasScale) {
-            scaleX = matrix.getScaleXFloat() / 20.0;
-            scaleY = matrix.getScaleYFloat() / 20.0;
+            scaleX = matrix.getScaleXFloat() / SWF.unitDivisor;
+            scaleY = matrix.getScaleYFloat() / SWF.unitDivisor;
         }
         if (matrix.hasRotate) {
-            rotateSkew0 = matrix.getRotateSkew0Float() / 20.0;
-            rotateSkew1 = matrix.getRotateSkew1Float() / 20.0;
+            rotateSkew0 = matrix.getRotateSkew0Float() / SWF.unitDivisor;
+            rotateSkew1 = matrix.getRotateSkew1Float() / SWF.unitDivisor;
         }
     }
 
@@ -65,6 +72,13 @@ public class Matrix {
     public void translate(double x, double y) {
         translateX += x;
         translateY += y;
+    }
+    
+    public void scale(double factor) {
+        scaleX *= factor;
+        scaleY *= factor;
+        rotateSkew0 *= factor;
+        rotateSkew1 *= factor;
     }
     
     public AffineTransform toTransform() {

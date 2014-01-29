@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -34,7 +36,6 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Point;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -376,7 +377,7 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
                                 }
                                 advance = (int) Math.round(font.getDivider() * Math.round((double) textHeight * (font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
                             } else {
-                                advance = (int) Math.round(20.0 * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), textHeight / 20, c, nextChar));
+                                advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor), c, nextChar));
                             }
                             tr.glyphEntries[i].glyphAdvance = advance;
 
@@ -488,8 +489,8 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
-        return staticTextToImage(swf, characters, textRecords, textBounds, 2);
+    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+        return staticTextToImage(swf, characters, textRecords, textBounds, 2, transformation);
     }
 
     @Override

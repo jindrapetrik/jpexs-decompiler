@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -2364,7 +2365,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 rect = ((DefineSpriteTag) fn.getParent()).getRect(swf.characters, new Stack<Integer>());
                 totalFrameCount = ((DefineSpriteTag) fn.getParent()).frameCount;
             }
-            previewImagePanel.setImage(SWF.frameToImage(containerId, fn.getFrame() - 1, swf.tags, controlTags, rect, totalFrameCount, new Stack<Integer>()));
+            previewImagePanel.setImage(SWF.frameToImage(containerId, fn.getFrame() - 1, swf.tags, controlTags, rect, totalFrameCount, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor)));
         } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             createAndShowTempSwf(tagObj);

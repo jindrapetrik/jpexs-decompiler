@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
@@ -37,7 +39,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Point;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -189,7 +190,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(frame);
         LINESTYLEARRAY lineStyles = morphLineStyles.getLineStylesAt(getShapeNum(), frame);
@@ -272,8 +273,8 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     @Override
     public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(
-                (startBounds.Xmin + (endBounds.Xmin - startBounds.Xmin) * frame / 65535) / 20,
-                (startBounds.Ymin + (endBounds.Ymin - startBounds.Ymin) * frame / 65535) / 20);
+                (startBounds.Xmin + (endBounds.Xmin - startBounds.Xmin) * frame / 65535) / SWF.unitDivisor,
+                (startBounds.Ymin + (endBounds.Ymin - startBounds.Ymin) * frame / 65535) / SWF.unitDivisor);
     }
 
     @Override

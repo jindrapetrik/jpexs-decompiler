@@ -125,6 +125,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -224,6 +225,7 @@ public final class SWF implements TreeItem {
     public List<ABCContainerTag> abcList;
     public JPEGTablesTag jtt;
     public Map<Integer, String> sourceFontsMap = new HashMap<>();
+    public static final double unitDivisor = 20;
 
     /**
      * Gets all tags with specified id
@@ -2097,20 +2099,22 @@ public final class SWF implements TreeItem {
         return ret;
     }
 
-    public static SerializableImage frameToImage(int containerId, int maxDepth, HashMap<Integer, Layer> layers, Color backgroundColor, HashMap<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited) {
-        float unzoom = 20;
-        double fixX = 0;
-        double fixY = 0;
-        fixX = -displayRect.Xmin / unzoom;
-        fixY = -displayRect.Ymin / unzoom;
-        displayRect = fixRect(displayRect);
-
+    public static SerializableImage frameToImage(int containerId, int maxDepth, HashMap<Integer, Layer> layers, Color backgroundColor, HashMap<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited, Matrix transformation) {
         String key = "frame_" + frame + "_" + containerId;
         if (frameCache.contains(key)) {
             SerializableImage ciret = ((SerializableImage) frameCache.get(key));
             return ciret;
         }
+
+        float unzoom = (float) SWF.unitDivisor;
+        double fixX = -displayRect.Xmin / unzoom;
+        double fixY = -displayRect.Ymin / unzoom;
+        double width = displayRect.getWidth() / unzoom;
+        double height = displayRect.getHeight() / unzoom;
+        displayRect = fixRect(displayRect);
+
         SerializableImage ret = new SerializableImage((int) (displayRect.getWidth() / unzoom), (int) (displayRect.getHeight() / unzoom), SerializableImage.TYPE_INT_ARGB);
+        ret.bounds = new Rectangle2D.Double(-fixX, -fixY, width, height);
 
         Graphics2D g = (Graphics2D) ret.getGraphics();
         g.setPaint(backgroundColor);
@@ -2132,11 +2136,19 @@ public final class SWF implements TreeItem {
             }
             CharacterTag character = characters.get(layer.characterId);
             Matrix mat = new Matrix(layer.matrix);
+            /*if (firstLevel) {
+                mat.scale(unzoom);
+            }*/
             mat.translate(fixX, fixY);
 
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
-                SerializableImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited);
+                SerializableImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, transformation);
+                try {
+                    ImageIO.write(img.getBufferedImage(), "png", new File("C:\\10\\4.png"));
+                } catch (IOException ex) {
+                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
                 /*if (character instanceof BoundedTag) {
                     BoundedTag bounded = (BoundedTag) character;
@@ -2213,10 +2225,11 @@ public final class SWF implements TreeItem {
                 g.setPaint(new Color(255, 255, 255, 128));
                 g.setComposite(BlendComposite.Invert);
                 RECT r = b.getRect(characters, visited);
-                g.drawString(character.toString(), (r.Xmin) / 20 + 3, (r.Ymin) / 20 + 15);
-                g.draw(new Rectangle(r.Xmin / 20, r.Ymin / 20, r.getWidth() / 20, r.getHeight() / 20));
-                g.drawLine(r.Xmin / 20, r.Ymin / 20, r.Xmax / 20, r.Ymax / 20);
-                g.drawLine(r.Xmax / 20, r.Ymin / 20, r.Xmin / 20, r.Ymax / 20);
+                int div = (int) unzoom;
+                g.drawString(character.toString(), r.Xmin / div + 3, r.Ymin / div + 15);
+                g.draw(new Rectangle(r.Xmin / div, r.Ymin / div, r.getWidth() / div, r.getHeight() / div));
+                g.drawLine(r.Xmin / div, r.Ymin / div, r.Xmax / div, r.Ymax / div);
+                g.drawLine(r.Xmax / div, r.Ymin / div, r.Xmin / div, r.Ymax / div);
                 g.setComposite(AlphaComposite.Dst);
             }
         }
@@ -2233,16 +2246,16 @@ public final class SWF implements TreeItem {
         return ret;
     }
 
-    public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited) {
+    public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
         List<SerializableImage> ret = new ArrayList<>();
-        framesToImage(containerId, ret, frame, frame, allTags, controlTags, displayRect, totalFrameCount, visited);
+        framesToImage(containerId, ret, frame, frame, allTags, controlTags, displayRect, totalFrameCount, visited, transformation);
         if (ret.isEmpty()) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
         return ret.get(0);
     }
 
-    public static void framesToImage(int containerId, List<SerializableImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited) {
+    public static void framesToImage(int containerId, List<SerializableImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
         for (int i = startFrame; i <= stopFrame; i++) {
             String key = "frame_" + i + "_" + containerId;
             if (frameCache.contains(key)) {
@@ -2363,7 +2376,7 @@ public final class SWF implements TreeItem {
                     break;
                 }
                 if ((f >= startFrame) && (f <= stopFrame)) {
-                    ret.add(frameToImage(containerId, maxDepth, layers, backgroundColor, characters, f, allTags, controlTags, displayRect, visited));
+                    ret.add(frameToImage(containerId, maxDepth, layers, backgroundColor, characters, f, allTags, controlTags, displayRect, visited, transformation));
                 }
                 f++;
             }

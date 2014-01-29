@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -120,7 +121,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
 
                 if (!font.hasLayout()) {
                     String fontName = FontTag.getFontNameWithFallback(font.getFontName());
-                    aFont = new Font(fontName, font.getFontStyle(), textHeight / 20);
+                    aFont = new Font(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor));
                     fontMetrics = bi.getGraphics().getFontMetrics(aFont);
                     LineMetrics lm = fontMetrics.getLineMetrics("A", bi.getGraphics());
                     ascent = lm.getAscent();
@@ -128,9 +129,9 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                     leading = lm.getLeading();
                     lineDistance = ascent + descent;
                 } else {
-                    leading = ((double) font.getLeading() * textHeight / 1024.0 / font.getDivider() / 20.0);
-                    ascent = ((double) font.getAscent() * textHeight / 1024.0 / font.getDivider() / 20.0);
-                    descent = ((double) font.getDescent() * textHeight / 1024.0 / font.getDivider() / 20.0);
+                    leading = ((double) font.getLeading() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);
+                    ascent = ((double) font.getAscent() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);
+                    descent = ((double) font.getDescent() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);
                     lineDistance = ascent + descent;
                 }
 
@@ -143,9 +144,9 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
             if (rec.styleFlagsHasYOffset) {
                 if (!firstLine) {
                     top += lineDistance;
-                    int topint = 20 * (int) Math.round(top);
+                    int topint = (int) Math.round(SWF.unitDivisor * top);
                     lineSpacing = rec.yOffset - topint;
-                    top += ((double) lineSpacing) / 20;
+                    top += lineSpacing / SWF.unitDivisor;
                 } else {
                     top = ascent - 2.0; //I don't know why, but there are always 2 pixels
                 }
@@ -175,9 +176,9 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                     if (nextEntry != null) {
                         kerningAdjustment = font.getGlyphKerningAdjustment(tags, entry.glyphIndex, nextEntry.glyphIndex);
                     }
-                    defaultAdvance = (int) Math.round((double) 20.0 * textHeight * (font.getGlyphAdvance(entry.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0));
+                    defaultAdvance = (int) Math.round(SWF.unitDivisor * textHeight * (font.getGlyphAdvance(entry.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0));
                 } else {
-                    defaultAdvance = (int) Math.round(20.0 * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(tags, entry.glyphIndex), nextEntry == null ? null : font.glyphToChar(tags, nextEntry.glyphIndex)));
+                    defaultAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(tags, entry.glyphIndex), nextEntry == null ? null : font.glyphToChar(tags, nextEntry.glyphIndex)));
                 }
                 letterSpacing = adv - defaultAdvance;
                 x += adv;
@@ -193,8 +194,8 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         return att;
     }
 
-    public static SerializableImage staticTextToImage(SWF swf, HashMap<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText) {
-        float unzoom = 20;
+    public static SerializableImage staticTextToImage(SWF swf, HashMap<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText, Matrix transformation) {
+        double unzoom = SWF.unitDivisor;
         double fixX = -textBounds.Xmin / unzoom;
         double fixY = -textBounds.Ymin / unzoom;
         double width = textBounds.getWidth() / unzoom;

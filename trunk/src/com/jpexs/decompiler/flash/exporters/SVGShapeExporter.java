@@ -317,10 +317,10 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             gradient.setAttribute("color-interpolation", "linearRGB");
         }
         if (matrix != null) {
-            matrix.rotateSkew0 *= unitDivisor;
-            matrix.rotateSkew1 *= unitDivisor;
-            matrix.scaleX *= unitDivisor;
-            matrix.scaleY *= unitDivisor;
+            matrix.rotateSkew0 *= SWF.unitDivisor;
+            matrix.rotateSkew1 *= SWF.unitDivisor;
+            matrix.scaleX *= SWF.unitDivisor;
+            matrix.scaleY *= SWF.unitDivisor;
             double translateX = roundPixels400(matrix.translateX);
             double translateY = roundPixels400(matrix.translateY);
             double rotateSkew0 = roundPixels400(matrix.rotateSkew0);

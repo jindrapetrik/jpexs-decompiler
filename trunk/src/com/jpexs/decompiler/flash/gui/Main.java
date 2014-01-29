@@ -270,8 +270,8 @@ public class Main {
             logger.log(Level.INFO, "== File information ==");
             logger.log(Level.INFO, "Size: {0}", Helper.formatFileSize(swf.fileSize));
             logger.log(Level.INFO, "Flash version: {0}", swf.version);
-            int width = (swf.displayRect.Xmax - swf.displayRect.Xmin) / 20;
-            int height = (swf.displayRect.Ymax - swf.displayRect.Ymin) / 20;
+            int width = (int) ((swf.displayRect.Xmax - swf.displayRect.Xmin) / SWF.unitDivisor);
+            int height = (int) ((swf.displayRect.Ymax - swf.displayRect.Ymin) / SWF.unitDivisor);
             logger.log(Level.INFO, "Width: {0}", width);
             logger.log(Level.INFO, "Height: {0}", height);
 

@@ -134,8 +134,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 maxh = r.getHeight();
             }
         }
-        maxw /= 20;
-        maxh /= 20;
+        maxw /= SWF.unitDivisor;
+        maxh /= SWF.unitDivisor;
 
         int cols = (int) Math.ceil(Math.sqrt(shapes.size()));
         int pos = 0;
@@ -369,7 +369,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return new Point2D.Double(x, y);
     }
 
-    public static SHAPE resizeSHAPE(SHAPE shp, int multiplier) {
+    public static SHAPE resizeSHAPE(SHAPE shp, double multiplier) {
         SHAPE ret = new SHAPE();
         ret.numFillBits = shp.numFillBits;
         ret.numLineBits = shp.numLineBits;
@@ -378,22 +378,22 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             SHAPERECORD c = (SHAPERECORD) Helper.deepCopy(r);
             if (c instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) c;
-                scr.moveDeltaX = (multiplier * scr.moveDeltaX);
-                scr.moveDeltaY = (multiplier * scr.moveDeltaY);
+                scr.moveDeltaX = (int) (multiplier * scr.moveDeltaX);
+                scr.moveDeltaY = (int) (multiplier * scr.moveDeltaY);
                 scr.calculateBits();
             }
             if (c instanceof CurvedEdgeRecord) {
                 CurvedEdgeRecord cer = (CurvedEdgeRecord) c;
-                cer.controlDeltaX = (multiplier * cer.controlDeltaX);
-                cer.controlDeltaY = (multiplier * cer.controlDeltaY);
-                cer.anchorDeltaX = (multiplier * cer.anchorDeltaX);
-                cer.anchorDeltaY = (multiplier * cer.anchorDeltaY);
+                cer.controlDeltaX = (int) (multiplier * cer.controlDeltaX);
+                cer.controlDeltaY = (int) (multiplier * cer.controlDeltaY);
+                cer.anchorDeltaX = (int) (multiplier * cer.anchorDeltaX);
+                cer.anchorDeltaY = (int) (multiplier * cer.anchorDeltaY);
                 cer.calculateBits();
             }
             if (c instanceof StraightEdgeRecord) {
                 StraightEdgeRecord ser = (StraightEdgeRecord) c;
-                ser.deltaX = (multiplier * ser.deltaX);
-                ser.deltaY = (multiplier * ser.deltaY);
+                ser.deltaX = (int) (multiplier * ser.deltaX);
+                ser.deltaY = (int) (multiplier * ser.deltaY);
                 ser.calculateBits();
             }
             recs.add(c);

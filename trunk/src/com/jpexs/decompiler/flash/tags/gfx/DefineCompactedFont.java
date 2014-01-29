@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -43,7 +45,6 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Point;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -117,13 +118,13 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
         if (imageCache.contains("font" + fontId)) {
             return ((SerializableImage) imageCache.get("font" + fontId));
         }
         List<SHAPE> shapes = new ArrayList<>();
         for (int i = 0; i < shapeCache.size(); i++) {
-            shapes.add(SHAPERECORD.resizeSHAPE(shapeCache.get(i), 20));
+            shapes.add(SHAPERECORD.resizeSHAPE(shapeCache.get(i), SWF.unitDivisor));
         }
         int cols = (int) Math.ceil(Math.sqrt(shapes.size()));
         int size = 500;
@@ -176,7 +177,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     public void addCharacter(List<Tag> tags, char character, String fontName) {
         int fontStyle = getFontStyle();
         FontType font = fonts.get(0);
-        SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, fontStyle, 20 * font.nominalSize, character);
+        SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, fontStyle, (int) (SWF.unitDivisor * font.nominalSize), character);
 
         int code = (int) character;
         int pos = -1;
@@ -229,7 +230,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public int getGlyphAdvance(int glyphIndex) {
+    public double getGlyphAdvance(int glyphIndex) {
         return fonts.get(0).glyphInfo.get(glyphIndex).advanceX;
     }
 

@@ -74,7 +74,7 @@ public class DefineFont2Tag extends FontTag {
     }
 
     @Override
-    public int getGlyphAdvance(int glyphIndex) {
+    public double getGlyphAdvance(int glyphIndex) {
         if (fontFlagsHasLayout) {
             return fontAdvanceTable.get(glyphIndex);
         } else {

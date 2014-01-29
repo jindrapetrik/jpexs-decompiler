@@ -124,7 +124,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             Matrix mat = new Matrix();
             mat.translateX = swf.displayRect.Xmin;
             mat.translateY = swf.displayRect.Ymin;
-            SerializableImage img = drawable.toImage(0, swf.tags, characters, new Stack<Integer>());
+            SerializableImage img = drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
             mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
             setImage(img);
             return;
@@ -180,7 +180,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             Matrix mat = new Matrix();
             mat.translateX = swf.displayRect.Xmin;
             mat.translateY = swf.displayRect.Ymin;
-            SerializableImage img = drawable.toImage(nframe, swf.tags, characters, new Stack<Integer>());
+            SerializableImage img = drawable.toImage(nframe, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
             mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
             ImageIcon icon = new ImageIcon(img.getBufferedImage());
             label.setIcon(icon);

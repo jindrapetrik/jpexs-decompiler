@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.helpers.SerializableImage;
@@ -66,7 +67,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
             @Override
             public void run() {
                 buffering.setVisible(true);
-                SWF.framesToImage(0, frameImages, 0, swf.frameCount - 1, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>());
+                SWF.framesToImage(0, frameImages, 0, swf.frameCount - 1, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
                 buffering.setVisible(false);
             }
         }.start();

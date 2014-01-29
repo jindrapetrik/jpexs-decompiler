@@ -48,7 +48,7 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public int getGlyphAdvance(int glyphIndex) {
+    public double getGlyphAdvance(int glyphIndex) {
         return -1;
     }
 

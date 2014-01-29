@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
@@ -43,8 +44,6 @@ import java.util.Map;
 public abstract class ShapeExporterBase implements IShapeExporter {
 
     protected final SHAPE shape;
-
-    protected static final double unitDivisor = 20;
 
     protected List<FILLSTYLE> _fillStyles;
     protected List<LINESTYLE> _lineStyles;
@@ -155,20 +154,20 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         }
                     }
                     if (styleChangeRecord.stateMoveTo) {
-                        xPos = styleChangeRecord.moveDeltaX / unitDivisor;
-                        yPos = styleChangeRecord.moveDeltaY / unitDivisor;
+                        xPos = styleChangeRecord.moveDeltaX / SWF.unitDivisor;
+                        yPos = styleChangeRecord.moveDeltaY / SWF.unitDivisor;
                     }
                 } else if (shapeRecord instanceof StraightEdgeRecord) {
                     StraightEdgeRecord straightEdgeRecord = (StraightEdgeRecord) shapeRecord;
                     from = new Point(roundPixels400(xPos), roundPixels400(yPos));
                     if (straightEdgeRecord.generalLineFlag) {
-                        xPos += straightEdgeRecord.deltaX / unitDivisor;
-                        yPos += straightEdgeRecord.deltaY / unitDivisor;
+                        xPos += straightEdgeRecord.deltaX / SWF.unitDivisor;
+                        yPos += straightEdgeRecord.deltaY / SWF.unitDivisor;
                     } else {
                         if (straightEdgeRecord.vertLineFlag) {
-                            yPos += straightEdgeRecord.deltaY / unitDivisor;
+                            yPos += straightEdgeRecord.deltaY / SWF.unitDivisor;
                         } else {
-                            xPos += straightEdgeRecord.deltaX / unitDivisor;
+                            xPos += straightEdgeRecord.deltaX / SWF.unitDivisor;
                         }
                     }
                     to = new Point(roundPixels400(xPos), roundPixels400(yPos));
@@ -176,10 +175,10 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 } else if (shapeRecord instanceof CurvedEdgeRecord) {
                     CurvedEdgeRecord curvedEdgeRecord = (CurvedEdgeRecord) shapeRecord;
                     from = new Point(roundPixels400(xPos), roundPixels400(yPos));
-                    double xPosControl = xPos + curvedEdgeRecord.controlDeltaX / unitDivisor;
-                    double yPosControl = yPos + curvedEdgeRecord.controlDeltaY / unitDivisor;
-                    xPos = xPosControl + curvedEdgeRecord.anchorDeltaX / unitDivisor;
-                    yPos = yPosControl + curvedEdgeRecord.anchorDeltaY / unitDivisor;
+                    double xPosControl = xPos + curvedEdgeRecord.controlDeltaX / SWF.unitDivisor;
+                    double yPosControl = yPos + curvedEdgeRecord.controlDeltaY / SWF.unitDivisor;
+                    xPos = xPosControl + curvedEdgeRecord.anchorDeltaX / SWF.unitDivisor;
+                    yPos = yPosControl + curvedEdgeRecord.anchorDeltaY / SWF.unitDivisor;
                     control = new Point(xPosControl, yPosControl);
                     to = new Point(roundPixels400(xPos), roundPixels400(yPos));
                     subPath.add(new CurvedEdge(from, control, to, currentLineStyleIdx, currentFillStyleIdx1));
@@ -297,7 +296,6 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                             case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
                                 // Bitmap fill
                                 matrix = new Matrix(fillStyle.bitmapMatrix);
-                                //matrix = new MATRIX(m.scaleX / 20.0, m.scaleY / 20.0, m.getRotation(), m.translateX / 20.0, m.translateY / 20.0);
                                 beginBitmapFill(
                                         fillStyle.bitmapId,
                                         matrix,
@@ -373,7 +371,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                             hasFillFlag = lineStyle2.hasFillFlag;
                         }
                         lineStyle(
-                                lineStyle.width / unitDivisor,
+                                lineStyle.width / SWF.unitDivisor,
                                 lineStyle.color,
                                 pixelHintingFlag,
                                 scaleMode,

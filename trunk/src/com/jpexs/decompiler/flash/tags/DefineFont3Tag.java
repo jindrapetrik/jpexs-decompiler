@@ -73,9 +73,9 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public int getGlyphAdvance(int glyphIndex) {
+    public double getGlyphAdvance(int glyphIndex) {
         if (fontFlagsHasLayout) {
-            return fontAdvanceTable.get(glyphIndex) / 20;
+            return fontAdvanceTable.get(glyphIndex) / SWF.unitDivisor;
         } else {
             return -1;
         }

@@ -77,25 +77,19 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
 
     static int imageid = 0;
     
+    public static SerializableImage export(SWF swf, SHAPE shape) {
+        BitmapExporter exporter = new BitmapExporter(swf, shape, null, true);
+        exporter.export();
+        return exporter.getImage();
+    }
+    
     public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, putToCache);
         exporter.export();
         return exporter.getImage();
     }
     
-    public BitmapExporter(SWF swf, SHAPE shape) {
-        this(swf, shape, null, true);
-    }
-
-    public BitmapExporter(SWF swf, SHAPE shape, boolean putToCache) {
-        this(swf, shape, null, putToCache);
-    }
-
-    public BitmapExporter(SWF swf, SHAPE shape, Color defaultColor) {
-        this(swf, shape, defaultColor, true);
-    }
-
-    public BitmapExporter(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
+    private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
         super(shape);
         this.swf = swf;
         this.defaultColor = defaultColor;
@@ -120,11 +114,11 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                 }
             }
         }
-        double maxLineWidth = maxLineWidthTwips / unitDivisor / 2;
-        deltaX = bounds.Xmin / unitDivisor - maxLineWidth;
-        deltaY = bounds.Ymin / unitDivisor - maxLineWidth;
-        double width = bounds.getWidth() / unitDivisor + 2 * (maxLineWidth + 1);
-        double height = bounds.getHeight() / unitDivisor + 2 * (maxLineWidth + 1);
+        double maxLineWidth = maxLineWidthTwips / SWF.unitDivisor / 2;
+        deltaX = bounds.Xmin / SWF.unitDivisor - maxLineWidth;
+        deltaY = bounds.Ymin / SWF.unitDivisor - maxLineWidth;
+        double width = bounds.getWidth() / SWF.unitDivisor + 2 * (maxLineWidth + 1);
+        double height = bounds.getHeight() / SWF.unitDivisor + 2 * (maxLineWidth + 1);
         image = new SerializableImage((int) width, (int) height, SerializableImage.TYPE_INT_ARGB);
         graphics = (Graphics2D) image.getGraphics();
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
