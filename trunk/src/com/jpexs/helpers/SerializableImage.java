@@ -69,11 +69,11 @@ public class SerializableImage implements Serializable {
     }
 
     public BufferedImage getBufferedImage() {
-        try {
+        /*try {
             ImageIO.write(image, "png", new File("c:\\10\\x\\imageid" + String.format("%03d", imageid++) + ".png"));
         } catch (IOException ex) {
             Logger.getLogger(BitmapExporter.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
         return image;
     }
     

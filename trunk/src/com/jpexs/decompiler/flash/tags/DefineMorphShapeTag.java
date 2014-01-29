@@ -187,10 +187,11 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
             SHAPERECORD edge1 = startEdges.shapeRecords.get(startIndex);
             SHAPERECORD edge2 = endEdges.shapeRecords.get(startIndex);
             if (edge1 instanceof StyleChangeRecord || edge2 instanceof StyleChangeRecord) {
-                StyleChangeRecord scr1 = (StyleChangeRecord) startEdges.shapeRecords.get(startIndex);
-                StyleChangeRecord scr2 = (StyleChangeRecord) startEdges.shapeRecords.get(startIndex);
+                StyleChangeRecord scr1 = (StyleChangeRecord) edge1;
+                StyleChangeRecord scr2 = (StyleChangeRecord) edge2;
                 StyleChangeRecord scr = (StyleChangeRecord) scr1.clone();
-                if (scr1.stateMoveTo) {
+                if (scr1.stateMoveTo || scr2.stateMoveTo) {
+                    scr.stateMoveTo = true;
                     scr.moveDeltaX = scr1.moveDeltaX + (scr2.moveDeltaX - scr1.moveDeltaX) * frame / 65535;
                     scr.moveDeltaY = scr1.moveDeltaY + (scr2.moveDeltaY - scr1.moveDeltaY) * frame / 65535;
                 }
@@ -249,7 +250,6 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
                 finalRecords.add(ser);
             }
         }
-        finalRecords.add(new EndShapeRecord());
         SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
         shape.fillStyles = fillStyles;
         shape.lineStyles = lineStyles;
