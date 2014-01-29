@@ -115,10 +115,10 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     @Override
     public void endShape(double xMin, double yMin, double xMax, double yMax) {
-        xMin -= maxLineWidth;
-        xMax += maxLineWidth;
-        yMin -= maxLineWidth;
-        yMax += maxLineWidth;
+        xMin /= SWF.unitDivisor;
+        yMin /= SWF.unitDivisor;
+        xMin -= maxLineWidth / SWF.unitDivisor;
+        yMin -= maxLineWidth / SWF.unitDivisor;
         _svgG.setAttribute("transform", "matrix(1, 0, 0, 1, "
                 + roundPixels20(-xMin) + ", " + roundPixels20(-yMin) + ")");
     }
@@ -198,12 +198,12 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
                 if (matrix != null) {
-                    double translateX = roundPixels400(matrix.translateX);
-                    double translateY = roundPixels400(matrix.translateY);
-                    double rotateSkew0 = roundPixels400(matrix.rotateSkew0);
-                    double rotateSkew1 = roundPixels400(matrix.rotateSkew1);
-                    double scaleX = roundPixels400(matrix.scaleX);
-                    double scaleY = roundPixels400(matrix.scaleY);
+                    double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
+                    double translateY = roundPixels400(matrix.translateY / SWF.unitDivisor);
+                    double rotateSkew0 = roundPixels400(matrix.rotateSkew0 / SWF.unitDivisor);
+                    double rotateSkew1 = roundPixels400(matrix.rotateSkew1 / SWF.unitDivisor);
+                    double scaleX = roundPixels400(matrix.scaleX / SWF.unitDivisor);
+                    double scaleY = roundPixels400(matrix.scaleY / SWF.unitDivisor);
                     pattern.setAttribute("patternTransform", "matrix(" + scaleX + ", " + rotateSkew0
                             + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
                 }
@@ -223,6 +223,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         if (thickness > maxLineWidth) {
             maxLineWidth = thickness;
         }
+        thickness /= SWF.unitDivisor;
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", color.toHexRGB());
         path.setAttribute("stroke-width", Double.toString(thickness == 0 ? 1 : thickness));
@@ -317,12 +318,8 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             gradient.setAttribute("color-interpolation", "linearRGB");
         }
         if (matrix != null) {
-            matrix.rotateSkew0 *= SWF.unitDivisor;
-            matrix.rotateSkew1 *= SWF.unitDivisor;
-            matrix.scaleX *= SWF.unitDivisor;
-            matrix.scaleY *= SWF.unitDivisor;
-            double translateX = roundPixels400(matrix.translateX);
-            double translateY = roundPixels400(matrix.translateY);
+            double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
+            double translateY = roundPixels400(matrix.translateY / SWF.unitDivisor);
             double rotateSkew0 = roundPixels400(matrix.rotateSkew0);
             double rotateSkew1 = roundPixels400(matrix.rotateSkew1);
             double scaleX = roundPixels400(matrix.scaleX);

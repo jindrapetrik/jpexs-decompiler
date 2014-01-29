@@ -68,7 +68,6 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     public int fontId;
     public List<FontType> fonts;
     private List<SHAPE> shapeCache;
-    private static final Cache<SerializableImage> imageCache = Cache.getInstance(false);
 
     /**
      * Gets data bytes
@@ -119,9 +118,6 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
 
     @Override
     public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
-        if (imageCache.contains("font" + fontId)) {
-            return ((SerializableImage) imageCache.get("font" + fontId));
-        }
         List<SHAPE> shapes = new ArrayList<>();
         for (int i = 0; i < shapeCache.size(); i++) {
             shapes.add(SHAPERECORD.resizeSHAPE(shapeCache.get(i), SWF.unitDivisor));
@@ -132,7 +128,6 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
             size = cols * 30;
         }
         SerializableImage ret = SHAPERECORD.shapeListToImage(swf, shapes, size, size, Color.black);
-        imageCache.put("font" + fontId, ret);
         return ret;
     }
 
@@ -210,7 +205,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
             font.glyphs.set(pos, new GlyphType(shp.shapeRecords));
             shapeCache.set(pos, font.glyphs.get(pos).toSHAPE());
         }
-        imageCache.remove("font" + fontId);
+        SWF.clearImageCache();
     }
 
     @Override

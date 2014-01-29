@@ -44,13 +44,8 @@ import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 
 /**
  *
@@ -58,12 +53,9 @@ import javax.imageio.ImageIO;
  */
 public class BitmapExporter extends ShapeExporterBase implements IShapeExporter {
 
-    private static final Cache<SerializableImage> cache = Cache.getInstance(false);
-
     private SerializableImage image;
     private Graphics2D graphics;
     private final Color defaultColor;
-    private final boolean putToCache;
     private double deltaX;
     private double deltaY;
     private final SWF swf;
@@ -74,36 +66,28 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private Color lineColor;
     private Stroke lineStroke;
     private Stroke defaultStroke;
-
-    static int imageid = 0;
     
     public static SerializableImage export(SWF swf, SHAPE shape) {
-        BitmapExporter exporter = new BitmapExporter(swf, shape, null, true);
+        BitmapExporter exporter = new BitmapExporter(swf, shape, null);
         exporter.export();
         return exporter.getImage();
     }
     
     public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
-        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, putToCache);
+        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor);
         exporter.export();
         return exporter.getImage();
     }
     
-    private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
+    private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor) {
         super(shape);
         this.swf = swf;
         this.defaultColor = defaultColor;
-        this.putToCache = putToCache;
     }
 
     @Override
     public void export() {
         List<SHAPERECORD> records = shape.shapeRecords;
-        String key = "shape_" + records.hashCode() + "_" + (defaultColor == null ? "null" : defaultColor.hashCode());
-        if (cache.contains(key)) {
-            image = (SerializableImage) cache.get(key);
-            return;
-        }
         RECT bounds = SHAPERECORD.getBounds(records);
         int maxLineWidthTwips = 0;
         if (shape instanceof SHAPEWITHSTYLE) {
@@ -126,23 +110,11 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         defaultStroke = graphics.getStroke();
         super.export();
-        try {
-            ImageIO.write(image.getBufferedImage(), "png", new File("c:\\10\\imageid" + imageid ++ + ".png"));
-        } catch (IOException ex) {
-            Logger.getLogger(BitmapExporter.class.getName()).log(Level.SEVERE, null, ex);
-        }
         image.bounds = new Rectangle2D.Double(deltaX, deltaY, width, height);
-        if (putToCache) {
-            cache.put(key, image);
-        }
     }
 
     public SerializableImage getImage() {
         return image;
-    }
-
-    public static void clearShapeCache() {
-        cache.clear();
     }
 
     @Override
@@ -179,6 +151,12 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     @Override
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
+        matrix.translateX /= SWF.unitDivisor;
+        matrix.translateY /= SWF.unitDivisor;
+        matrix.scaleX /= SWF.unitDivisor;
+        matrix.scaleY /= SWF.unitDivisor;
+        matrix.rotateSkew0 /= SWF.unitDivisor;
+        matrix.rotateSkew1 /= SWF.unitDivisor;
         switch (type) {
             case FILLSTYLE.LINEAR_GRADIENT: {
                 List<Color> colors = new ArrayList<>();
@@ -287,6 +265,12 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth) {
         finalizePath();
+        matrix.translateX /= SWF.unitDivisor;
+        matrix.translateY /= SWF.unitDivisor;
+        matrix.scaleX /= SWF.unitDivisor;
+        matrix.scaleY /= SWF.unitDivisor;
+        matrix.rotateSkew0 /= SWF.unitDivisor;
+        matrix.rotateSkew1 /= SWF.unitDivisor;
         ImageTag image = null;
         for (Tag t : swf.tags) {
             if (t instanceof ImageTag) {
@@ -317,6 +301,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
+        thickness /= SWF.unitDivisor;
         lineColor = color.toColor();
         int capStyle = BasicStroke.CAP_ROUND;
         switch (startCaps) {
@@ -355,17 +340,18 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
 
     @Override
     public void moveTo(double x, double y) {
-        path.moveTo(x - deltaX, y - deltaY);
+        path.moveTo(x / SWF.unitDivisor - deltaX, y / SWF.unitDivisor - deltaY);
     }
 
     @Override
     public void lineTo(double x, double y) {
-        path.lineTo(x - deltaX, y - deltaY);
+        path.lineTo(x / SWF.unitDivisor - deltaX, y / SWF.unitDivisor - deltaY);
     }
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
-        path.quadTo(controlX - deltaX, controlY - deltaY, anchorX - deltaX, anchorY - deltaY);
+        path.quadTo(controlX / SWF.unitDivisor - deltaX, controlY / SWF.unitDivisor - deltaY, 
+                anchorX / SWF.unitDivisor - deltaX, anchorY / SWF.unitDivisor - deltaY);
     }
 
     protected void finalizePath() {

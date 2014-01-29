@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -124,7 +125,12 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             Matrix mat = new Matrix();
             mat.translateX = swf.displayRect.Xmin;
             mat.translateY = swf.displayRect.Ymin;
-            SerializableImage img = drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+            String key = "drawable_0_" + drawable.hashCode();
+            SerializableImage img = SWF.getFromCache(key);
+            if (img == null) {
+                img = drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+                SWF.putToCache(key, img);
+            }
             mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
             setImage(img);
             return;
@@ -180,7 +186,12 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             Matrix mat = new Matrix();
             mat.translateX = swf.displayRect.Xmin;
             mat.translateY = swf.displayRect.Ymin;
-            SerializableImage img = drawable.toImage(nframe, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+            String key = "drawable_" + nframe + "_" + drawable.hashCode();
+            SerializableImage img = SWF.getFromCache(key);
+            if (img == null) {
+                img = drawable.toImage(nframe, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+                SWF.putToCache(key, img);
+            }
             mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
             ImageIcon icon = new ImageIcon(img.getBufferedImage());
             label.setIcon(icon);

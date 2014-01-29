@@ -17,17 +17,21 @@
 
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
@@ -41,6 +45,7 @@ public class SerializableImage implements Serializable {
     public static int TYPE_INT_ARGB_PRE = BufferedImage.TYPE_INT_ARGB_PRE;
     public static int TYPE_4BYTE_ABGR = BufferedImage.TYPE_4BYTE_ABGR;
 
+    static int imageid = 0;
     private BufferedImage image;
     public Rectangle2D bounds = new Rectangle2D.Double();
 
@@ -64,6 +69,11 @@ public class SerializableImage implements Serializable {
     }
 
     public BufferedImage getBufferedImage() {
+        /*try {
+            ImageIO.write(image, "png", new File("c:\\10\\x\\imageid" + String.format("%03d", imageid++) + ".png"));
+        } catch (IOException ex) {
+            Logger.getLogger(BitmapExporter.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
         return image;
     }
     

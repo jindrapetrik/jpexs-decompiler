@@ -2061,9 +2061,19 @@ public final class SWF implements TreeItem {
     
     private static Cache<SerializableImage> frameCache = Cache.getInstance(false);
 
-    public void clearImageCache() {
+    public static SerializableImage getFromCache(String key) {
+        if (frameCache.contains(key)) {
+            return (SerializableImage) SWF.frameCache.get(key);
+        }
+        return null;
+    }
+    
+    public static void putToCache(String key, SerializableImage img) {
+        frameCache.put(key, img);
+    }
+    
+    public static void clearImageCache() {
         frameCache.clear();
-        BitmapExporter.clearShapeCache();
     }
 
     public static RECT fixRect(RECT rect) {
@@ -2107,14 +2117,14 @@ public final class SWF implements TreeItem {
         }
 
         float unzoom = (float) SWF.unitDivisor;
-        double fixX = -displayRect.Xmin / unzoom;
-        double fixY = -displayRect.Ymin / unzoom;
-        double width = displayRect.getWidth() / unzoom;
-        double height = displayRect.getHeight() / unzoom;
+        int fixX = -displayRect.Xmin;
+        int fixY = -displayRect.Ymin;
+        int width = displayRect.getWidth();
+        int height = displayRect.getHeight();
         displayRect = fixRect(displayRect);
 
-        SerializableImage ret = new SerializableImage((int) (displayRect.getWidth() / unzoom), (int) (displayRect.getHeight() / unzoom), SerializableImage.TYPE_INT_ARGB);
-        ret.bounds = new Rectangle2D.Double(-fixX, -fixY, width, height);
+        SerializableImage ret = new SerializableImage((int) (width / unzoom), (int) (height / unzoom), SerializableImage.TYPE_INT_ARGB);
+        ret.bounds = new Rectangle2D.Double(-fixX / unzoom, -fixY / unzoom, width / unzoom, height / unzoom);
 
         Graphics2D g = (Graphics2D) ret.getGraphics();
         g.setPaint(backgroundColor);
@@ -2144,12 +2154,7 @@ public final class SWF implements TreeItem {
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
                 SerializableImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, transformation);
-                try {
-                    ImageIO.write(img.getBufferedImage(), "png", new File("C:\\10\\4.png"));
-                } catch (IOException ex) {
-                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
+                mat.translate(img.bounds.getMinX() * unzoom, img.bounds.getMinY() * unzoom);
                 /*if (character instanceof BoundedTag) {
                     BoundedTag bounded = (BoundedTag) character;
                     RECT rect = bounded.getRect(characters, visited);
@@ -2215,10 +2220,14 @@ public final class SWF implements TreeItem {
                         break;
                 }
 
+                mat.translateX /= unzoom;
+                mat.translateY /= unzoom;
                 AffineTransform trans = mat.toTransform();
                 g.setTransform(trans);
                 g.drawImage(img.getBufferedImage(), 0, 0, null);
             } else if (character instanceof BoundedTag) {
+                mat.translateX /= unzoom;
+                mat.translateY /= unzoom;
                 AffineTransform trans = mat.toTransform();
                 g.setTransform(trans);
                 BoundedTag b = (BoundedTag) character;

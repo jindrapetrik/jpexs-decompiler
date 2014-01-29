@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
@@ -154,33 +153,33 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         }
                     }
                     if (styleChangeRecord.stateMoveTo) {
-                        xPos = styleChangeRecord.moveDeltaX / SWF.unitDivisor;
-                        yPos = styleChangeRecord.moveDeltaY / SWF.unitDivisor;
+                        xPos = styleChangeRecord.moveDeltaX;
+                        yPos = styleChangeRecord.moveDeltaY;
                     }
                 } else if (shapeRecord instanceof StraightEdgeRecord) {
                     StraightEdgeRecord straightEdgeRecord = (StraightEdgeRecord) shapeRecord;
-                    from = new Point(roundPixels400(xPos), roundPixels400(yPos));
+                    from = new Point(xPos, yPos);
                     if (straightEdgeRecord.generalLineFlag) {
-                        xPos += straightEdgeRecord.deltaX / SWF.unitDivisor;
-                        yPos += straightEdgeRecord.deltaY / SWF.unitDivisor;
+                        xPos += straightEdgeRecord.deltaX;
+                        yPos += straightEdgeRecord.deltaY;
                     } else {
                         if (straightEdgeRecord.vertLineFlag) {
-                            yPos += straightEdgeRecord.deltaY / SWF.unitDivisor;
+                            yPos += straightEdgeRecord.deltaY;
                         } else {
-                            xPos += straightEdgeRecord.deltaX / SWF.unitDivisor;
+                            xPos += straightEdgeRecord.deltaX;
                         }
                     }
-                    to = new Point(roundPixels400(xPos), roundPixels400(yPos));
+                    to = new Point(xPos, yPos);
                     subPath.add(new StraightEdge(from, to, currentLineStyleIdx, currentFillStyleIdx1));
                 } else if (shapeRecord instanceof CurvedEdgeRecord) {
                     CurvedEdgeRecord curvedEdgeRecord = (CurvedEdgeRecord) shapeRecord;
-                    from = new Point(roundPixels400(xPos), roundPixels400(yPos));
-                    double xPosControl = xPos + curvedEdgeRecord.controlDeltaX / SWF.unitDivisor;
-                    double yPosControl = yPos + curvedEdgeRecord.controlDeltaY / SWF.unitDivisor;
-                    xPos = xPosControl + curvedEdgeRecord.anchorDeltaX / SWF.unitDivisor;
-                    yPos = yPosControl + curvedEdgeRecord.anchorDeltaY / SWF.unitDivisor;
+                    from = new Point(xPos, yPos);
+                    double xPosControl = xPos + curvedEdgeRecord.controlDeltaX;
+                    double yPosControl = yPos + curvedEdgeRecord.controlDeltaY;
+                    xPos = xPosControl + curvedEdgeRecord.anchorDeltaX;
+                    yPos = yPosControl + curvedEdgeRecord.anchorDeltaY;
                     control = new Point(xPosControl, yPosControl);
-                    to = new Point(roundPixels400(xPos), roundPixels400(yPos));
+                    to = new Point(xPos, yPos);
                     subPath.add(new CurvedEdge(from, control, to, currentLineStyleIdx, currentFillStyleIdx1));
                 } else if (shapeRecord instanceof EndShapeRecord) {
                     // We're done. Process the last subpath, if any
@@ -371,7 +370,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                             hasFillFlag = lineStyle2.hasFillFlag;
                         }
                         lineStyle(
-                                lineStyle.width / SWF.unitDivisor,
+                                lineStyle.width,
                                 lineStyle.color,
                                 pixelHintingFlag,
                                 scaleMode,
@@ -521,13 +520,5 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         for (int i = 0; i < v2.size(); i++) {
             v1.add(v2.get(i));
         }
-    }
-
-    protected double roundPixels20(double pixels) {
-        return Math.round(pixels * 100) / 100.0;
-    }
-
-    protected double roundPixels400(double pixels) {
-        return Math.round(pixels * 10000) / 10000.0;
     }
 }

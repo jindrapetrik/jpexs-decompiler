@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
@@ -94,8 +95,8 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     public void moveTo(double x, double y) {
         currentDrawCommand = "";
         pathData += "M"
-                + roundPixels20(x) + " "
-                + roundPixels20(y) + " ";
+                + roundPixels20(x / SWF.unitDivisor) + " "
+                + roundPixels20(y / SWF.unitDivisor) + " ";
     }
 
     @Override
@@ -104,8 +105,8 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
             currentDrawCommand = DRAW_COMMAND_L;
             pathData += "L";
         }
-        pathData += roundPixels20(x) + " "
-                + roundPixels20(y) + " ";
+        pathData += roundPixels20(x / SWF.unitDivisor) + " "
+                + roundPixels20(y / SWF.unitDivisor) + " ";
     }
 
     @Override
@@ -114,14 +115,22 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
             currentDrawCommand = DRAW_COMMAND_Q;
             pathData += "Q";
         }
-        pathData += roundPixels20(controlX) + " "
-                + roundPixels20(controlY) + " "
-                + roundPixels20(anchorX) + " "
-                + roundPixels20(anchorY) + " ";
+        pathData += roundPixels20(controlX / SWF.unitDivisor) + " "
+                + roundPixels20(controlY / SWF.unitDivisor) + " "
+                + roundPixels20(anchorX / SWF.unitDivisor) + " "
+                + roundPixels20(anchorY / SWF.unitDivisor) + " ";
     }
 
     protected void finalizePath() {
         pathData = "";
         currentDrawCommand = "";
+    }
+
+    protected double roundPixels20(double pixels) {
+        return Math.round(pixels * 100) / 100.0;
+    }
+
+    protected double roundPixels400(double pixels) {
+        return Math.round(pixels * 10000) / 10000.0;
     }
 }

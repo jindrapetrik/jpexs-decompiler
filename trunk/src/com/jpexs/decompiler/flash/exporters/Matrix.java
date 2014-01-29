@@ -45,15 +45,18 @@ public class Matrix {
     }
 
     public Matrix(MATRIX matrix) {
-        translateX = matrix.translateX / SWF.unitDivisor;
-        translateY = matrix.translateY / SWF.unitDivisor;
+        translateX = matrix.translateX;
+        translateY = matrix.translateY;
         if (matrix.hasScale) {
-            scaleX = matrix.getScaleXFloat() / SWF.unitDivisor;
-            scaleY = matrix.getScaleYFloat() / SWF.unitDivisor;
+            scaleX = matrix.getScaleXFloat();
+            scaleY = matrix.getScaleYFloat();
+        } else {
+            scaleX = 1;
+            scaleY = 1;
         }
         if (matrix.hasRotate) {
-            rotateSkew0 = matrix.getRotateSkew0Float() / SWF.unitDivisor;
-            rotateSkew1 = matrix.getRotateSkew1Float() / SWF.unitDivisor;
+            rotateSkew0 = matrix.getRotateSkew0Float();
+            rotateSkew1 = matrix.getRotateSkew1Float();
         }
     }
 
