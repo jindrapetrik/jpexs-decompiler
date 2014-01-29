@@ -129,12 +129,10 @@ public class SerializableImage implements Serializable {
     }
     
     private void writeObject(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
         ImageIO.write(image, "png", out);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
         image = ImageIO.read(in);
     }
 }
