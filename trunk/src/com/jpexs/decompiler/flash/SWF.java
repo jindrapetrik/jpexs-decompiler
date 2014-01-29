@@ -2136,7 +2136,8 @@ public final class SWF implements TreeItem {
 
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
-                SerializableImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, mat, characters, visited);
+                SerializableImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited);
+                mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
                 /*if (character instanceof BoundedTag) {
                     BoundedTag bounded = (BoundedTag) character;
                     RECT rect = bounded.getRect(characters, visited);

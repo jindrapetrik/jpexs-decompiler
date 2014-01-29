@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Point;
@@ -30,7 +29,7 @@ import java.util.Stack;
  */
 public interface DrawableTag {
 
-    public SerializableImage toImage(int frame, List<Tag> tags, Matrix matrix, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited);
+    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited);
 
     public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited);
 

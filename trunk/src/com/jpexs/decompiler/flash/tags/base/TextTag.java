@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
-import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -35,6 +34,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -193,12 +193,14 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         return att;
     }
 
-    public static SerializableImage staticTextToImage(SWF swf, HashMap<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, Matrix matrix, int numText) {
+    public static SerializableImage staticTextToImage(SWF swf, HashMap<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText) {
         float unzoom = 20;
         double fixX = -textBounds.Xmin / unzoom;
         double fixY = -textBounds.Ymin / unzoom;
-        matrix.translate(-fixX, -fixY);
-        SerializableImage ret = new SerializableImage(textBounds.getWidth() / 20, textBounds.getHeight() / 20, SerializableImage.TYPE_INT_ARGB);
+        double width = textBounds.getWidth() / unzoom;
+        double height = textBounds.getHeight() / unzoom;
+        SerializableImage ret = new SerializableImage((int) width, (int) height, SerializableImage.TYPE_INT_ARGB);
+        ret.bounds = new Rectangle2D.Double(-fixX, -fixY, width, height);
 
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
@@ -232,16 +234,15 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
 
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 // shapeNum: 1
-                Matrix matrix2 = new Matrix();
-                SerializableImage img = BitmapExporter.export(swf, glyphs.get(entry.glyphIndex), textColor, true, matrix2);
+                SHAPE shape = glyphs.get(entry.glyphIndex);
+                SerializableImage img = BitmapExporter.export(swf, shape, textColor, true);
                 AffineTransform tr = new AffineTransform();
-                tr.setToIdentity();
-                float rat = textHeight / 1024f;
-                tr.translate(x / unzoom + matrix2.translateX + fixX, y / unzoom + rat * matrix2.translateY + fixY);
+                double rat = (double) textHeight / 1000.0;
+                tr.translate(x / unzoom + img.bounds.getMinX() * rat + fixX, y / unzoom + img.bounds.getMinY() * rat + fixY);
                 tr.scale(1.0 / font.getDivider(), 1.0 / font.getDivider());
                 tr.scale(rat, rat);
                 g.drawImage(img.getBufferedImage(), tr, null);
-                x += entry.glyphAdvance;
+                x += (int) entry.glyphAdvance;
             }
         }
         return ret;

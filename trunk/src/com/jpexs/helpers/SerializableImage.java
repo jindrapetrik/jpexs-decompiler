@@ -18,26 +18,16 @@
 package com.jpexs.helpers;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.ImageCapabilities;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.ImageObserver;
 import java.awt.image.IndexColorModel;
-import java.awt.image.Raster;
-import java.awt.image.RenderedImage;
-import java.awt.image.SampleModel;
-import java.awt.image.TileObserver;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Hashtable;
-import java.util.Vector;
 import javax.imageio.ImageIO;
 
 /**
@@ -52,6 +42,7 @@ public class SerializableImage implements Serializable {
     public static int TYPE_4BYTE_ABGR = BufferedImage.TYPE_4BYTE_ABGR;
 
     private BufferedImage image;
+    public Rectangle2D bounds = new Rectangle2D.Double();
 
     public SerializableImage() {
     }

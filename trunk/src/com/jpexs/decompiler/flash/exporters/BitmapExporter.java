@@ -43,6 +43,7 @@ import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,15 +59,13 @@ import javax.imageio.ImageIO;
 public class BitmapExporter extends ShapeExporterBase implements IShapeExporter {
 
     private static final Cache<SerializableImage> cache = Cache.getInstance(false);
-    private static final Cache<Double> cacheDeltaX = Cache.getInstance(false);
-    private static final Cache<Double> cacheDeltaY = Cache.getInstance(false);
 
     private SerializableImage image;
     private Graphics2D graphics;
     private final Color defaultColor;
     private final boolean putToCache;
-    public double deltaX;
-    public double deltaY;
+    private double deltaX;
+    private double deltaY;
     private final SWF swf;
     private GeneralPath path;
     private Paint fillPathPaint;
@@ -79,15 +78,8 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     static int imageid = 0;
     
     public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
-        return export(swf, shape, defaultColor, putToCache, null);
-    }
-    
-    public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache, Matrix matrix) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, putToCache);
         exporter.export();
-        if (matrix != null) {
-            matrix.translate(exporter.deltaX, exporter.deltaY);
-        }
         return exporter.getImage();
     }
     
@@ -116,8 +108,6 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         String key = "shape_" + records.hashCode() + "_" + (defaultColor == null ? "null" : defaultColor.hashCode());
         if (cache.contains(key)) {
             image = (SerializableImage) cache.get(key);
-            deltaX = (double) cacheDeltaX.get(key);
-            deltaY = (double) cacheDeltaY.get(key);
             return;
         }
         RECT bounds = SHAPERECORD.getBounds(records);
@@ -133,8 +123,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         double maxLineWidth = maxLineWidthTwips / unitDivisor / 2;
         deltaX = bounds.Xmin / unitDivisor - maxLineWidth;
         deltaY = bounds.Ymin / unitDivisor - maxLineWidth;
-        image = new SerializableImage(
-            (int) (bounds.getWidth() / unitDivisor + 2 + maxLineWidth), (int) (bounds.getHeight() / unitDivisor + 2 + maxLineWidth), SerializableImage.TYPE_INT_ARGB);
+        double width = bounds.getWidth() / unitDivisor + 2 * (maxLineWidth + 1);
+        double height = bounds.getHeight() / unitDivisor + 2 * (maxLineWidth + 1);
+        image = new SerializableImage((int) width, (int) height, SerializableImage.TYPE_INT_ARGB);
         graphics = (Graphics2D) image.getGraphics();
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -146,10 +137,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         } catch (IOException ex) {
             Logger.getLogger(BitmapExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
+        image.bounds = new Rectangle2D.Double(deltaX, deltaY, width, height);
         if (putToCache) {
             cache.put(key, image);
-            cacheDeltaX.put(key, deltaX);
-            cacheDeltaY.put(key, deltaY);
         }
     }
 
