@@ -22,14 +22,14 @@ package com.jpexs.decompiler.flash.exporters;
  */
 public class CurvedEdge extends StraightEdge implements IEdge {
 
-    private final Point control;
+    private final PointInt control;
 
-    CurvedEdge(Point from, Point control, Point to, int lineStyleIdx, int fillStyleIdx) {
+    CurvedEdge(PointInt from, PointInt control, PointInt to, int lineStyleIdx, int fillStyleIdx) {
         super(from, to, lineStyleIdx, fillStyleIdx);
         this.control = control;
     }
 
-    public Point getControl() {
+    public PointInt getControl() {
         return control;
     }
 

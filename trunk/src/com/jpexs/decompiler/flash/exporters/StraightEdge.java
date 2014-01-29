@@ -22,12 +22,12 @@ package com.jpexs.decompiler.flash.exporters;
  */
 public class StraightEdge implements IEdge {
 
-    protected final Point from;
-    protected final Point to;
+    protected final PointInt from;
+    protected final PointInt to;
     protected final int lineStyleIdx;
     private final int fillStyleIdx;
 
-    StraightEdge(Point from, Point to, int lineStyleIdx, int fillStyleIdx) {
+    StraightEdge(PointInt from, PointInt to, int lineStyleIdx, int fillStyleIdx) {
         this.from = from;
         this.to = to;
         this.lineStyleIdx = lineStyleIdx;
@@ -35,12 +35,12 @@ public class StraightEdge implements IEdge {
     }
 
     @Override
-    public Point getFrom() {
+    public PointInt getFrom() {
         return from;
     }
 
     @Override
-    public Point getTo() {
+    public PointInt getTo() {
         return to;
     }
 

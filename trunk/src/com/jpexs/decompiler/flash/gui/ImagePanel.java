@@ -47,7 +47,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
     public DrawableTag drawable;
     private Timer timer;
     private int percent;
-    private int frame;
+    private int frame = -1;
     private SWF swf;
     private HashMap<Integer, CharacterTag> characters;
     private int frameRate;
@@ -195,6 +195,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
             ImageIcon icon = new ImageIcon(img.getBufferedImage());
             label.setIcon(icon);
+            frame = nframe;
         }
     }
 

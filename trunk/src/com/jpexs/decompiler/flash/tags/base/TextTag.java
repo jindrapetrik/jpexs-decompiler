@@ -238,7 +238,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 SHAPE shape = glyphs.get(entry.glyphIndex);
                 SerializableImage img = BitmapExporter.export(swf, shape, textColor, true);
                 AffineTransform tr = new AffineTransform();
-                double rat = (double) textHeight / 1000.0;
+                double rat = textHeight / 1024.0;
                 tr.translate(x / unzoom + img.bounds.getMinX() * rat + fixX, y / unzoom + img.bounds.getMinY() * rat + fixY);
                 tr.scale(1.0 / font.getDivider(), 1.0 / font.getDivider());
                 tr.scale(rat, rat);

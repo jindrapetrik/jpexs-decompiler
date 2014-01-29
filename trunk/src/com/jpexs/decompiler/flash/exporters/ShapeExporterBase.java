@@ -86,11 +86,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     protected void createEdgeMaps() {
         if (!edgeMapsCreated) {
-            double xPos = 0;
-            double yPos = 0;
-            Point from;
-            Point to;
-            Point control;
+            int xPos = 0;
+            int yPos = 0;
             int fillStyleIdxOffset = 0;
             int lineStyleIdxOffset = 0;
             int currentFillStyleIdx0 = 0;
@@ -158,7 +155,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     }
                 } else if (shapeRecord instanceof StraightEdgeRecord) {
                     StraightEdgeRecord straightEdgeRecord = (StraightEdgeRecord) shapeRecord;
-                    from = new Point(xPos, yPos);
+                    PointInt from = new PointInt(xPos, yPos);
                     if (straightEdgeRecord.generalLineFlag) {
                         xPos += straightEdgeRecord.deltaX;
                         yPos += straightEdgeRecord.deltaY;
@@ -169,17 +166,17 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                             xPos += straightEdgeRecord.deltaX;
                         }
                     }
-                    to = new Point(xPos, yPos);
+                    PointInt to = new PointInt(xPos, yPos);
                     subPath.add(new StraightEdge(from, to, currentLineStyleIdx, currentFillStyleIdx1));
                 } else if (shapeRecord instanceof CurvedEdgeRecord) {
                     CurvedEdgeRecord curvedEdgeRecord = (CurvedEdgeRecord) shapeRecord;
-                    from = new Point(xPos, yPos);
-                    double xPosControl = xPos + curvedEdgeRecord.controlDeltaX;
-                    double yPosControl = yPos + curvedEdgeRecord.controlDeltaY;
+                    PointInt from = new PointInt(xPos, yPos);
+                    int xPosControl = xPos + curvedEdgeRecord.controlDeltaX;
+                    int yPosControl = yPos + curvedEdgeRecord.controlDeltaY;
                     xPos = xPosControl + curvedEdgeRecord.anchorDeltaX;
                     yPos = yPosControl + curvedEdgeRecord.anchorDeltaY;
-                    control = new Point(xPosControl, yPosControl);
-                    to = new Point(xPos, yPos);
+                    PointInt control = new PointInt(xPosControl, yPosControl);
+                    PointInt to = new PointInt(xPos, yPos);
                     subPath.add(new CurvedEdge(from, control, to, currentLineStyleIdx, currentFillStyleIdx1));
                 } else if (shapeRecord instanceof EndShapeRecord) {
                     // We're done. Process the last subpath, if any
@@ -226,18 +223,18 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     }
 
     private void calculateBound(IEdge edge) {
-        Point from = edge.getFrom();
-        Point to = edge.getTo();
+        PointInt from = edge.getFrom();
+        PointInt to = edge.getTo();
         calculateBound(from);
         calculateBound(to);
         if (edge instanceof CurvedEdge) {
             CurvedEdge curvedEdge = (CurvedEdge) edge;
-            Point control = curvedEdge.getControl();
+            PointInt control = curvedEdge.getControl();
             calculateBound(control);
         }
     }
 
-    private void calculateBound(Point point) {
+    private void calculateBound(PointInt point) {
         if (point.x < bounds.xMin) {
             bounds.xMin = point.x;
         }
@@ -254,7 +251,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     
     protected void exportFillPath(int groupIndex) {
         List<IEdge> path = createPathFromEdgeMap(fillEdgeMaps.get(groupIndex));
-        Point pos = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
         int fillStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
             beginFills();
@@ -266,7 +263,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         endFill();
                     }
                     fillStyleIdx = e.getFillStyleIdx();
-                    pos = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
                     try {
                         Matrix matrix;
                         FILLSTYLE fillStyle = _fillStyles.get(fillStyleIdx - 1);
@@ -329,7 +326,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     protected void exportLinePath(int groupIndex) {
         List<IEdge> path = createPathFromEdgeMap(lineEdgeMaps.get(groupIndex));
-        Point pos = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
         int lineStyleIdx = Integer.MAX_VALUE;
         LINESTYLE lineStyle;
         if (path.size() > 0) {
@@ -339,7 +336,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 calculateBound(e);
                 if (lineStyleIdx != e.getLineStyleIdx()) {
                     lineStyleIdx = e.getLineStyleIdx();
-                    pos = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
                     try {
                         lineStyle = _lineStyles.get(lineStyleIdx - 1);
                     } catch (Exception ex) {
@@ -467,7 +464,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     protected void createCoordMap(List<IEdge> path) {
         coordMap = new HashMap<>();
         for (int i = 0; i < path.size(); i++) {
-            Point from = path.get(i).getFrom();
+            PointInt from = path.get(i).getFrom();
             String key = from.x + "_" + from.y;
             List<IEdge> coordMapArray = coordMap.get(key);
             if (coordMapArray == null) {

@@ -14,21 +14,36 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.jpexs.decompiler.flash.exporters;
 
 /**
  *
  * @author JPEXS
  */
-public interface IEdge {
+public class PointInt {
+    
+    public int x;
+    public int y;
 
-    public PointInt getFrom();
+    public PointInt(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 
-    public PointInt getTo();
+    @Override
+    public int hashCode() {
+        long bits = Double.doubleToLongBits(x);
+        bits ^= Double.doubleToLongBits(y) * 31;
+        return (((int) bits) ^ ((int) (bits >> 32)));
+    }
 
-    public int getLineStyleIdx();
-
-    public int getFillStyleIdx();
-
-    public IEdge reverseWithNewFillStyle(int newFillStyleIdx);
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PointInt) {
+            PointInt pt = (PointInt) obj;
+            return (x == pt.x) && (y == pt.y);
+        }
+        return super.equals(obj);
+    }
 }
