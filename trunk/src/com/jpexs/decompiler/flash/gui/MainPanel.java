@@ -104,6 +104,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -2579,19 +2580,20 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (tagObj instanceof FontTag) {
 
                         int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().size();
+                        countGlyphs = Math.min(SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW, countGlyphs);
                         int fontId = ((FontTag) tagObj).getFontId();
-                        int sloupcu = (int) Math.ceil(Math.sqrt(countGlyphs));
-                        int radku = (int) Math.ceil(((float) countGlyphs) / ((float) sloupcu));
+                        int cols = (int) Math.ceil(Math.sqrt(countGlyphs));
+                        int rows = (int) Math.ceil(((float) countGlyphs) / ((float) cols));
                         int x = 0;
                         int y = 1;
                         for (int f = 0; f < countGlyphs; f++) {
-                            if (x >= sloupcu) {
+                            if (x >= cols) {
                                 x = 0;
                                 y++;
                             }
                             List<TEXTRECORD> rec = new ArrayList<>();
                             TEXTRECORD tr = new TEXTRECORD();
-                            int textHeight = height / radku;
+                            int textHeight = height / rows;
                             tr.fontId = fontId;
                             tr.styleFlagsHasFont = true;
                             tr.textHeight = textHeight;
@@ -2602,8 +2604,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             tr.glyphEntries[0].glyphAdvance = 0;
                             tr.glyphEntries[0].glyphIndex = f;
                             rec.add(tr);
-                            mat.translateX = x * width / sloupcu;
-                            mat.translateY = y * height / radku;
+                            mat.translateX = x * width / cols;
+                            mat.translateY = y * height / rows;
                             sos2.writeTag(new DefineTextTag(null, 999 + f, new RECT(0, width, 0, height), new MATRIX(), rec));
                             sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
                             x++;

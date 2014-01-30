@@ -45,6 +45,8 @@ import javax.swing.JPanel;
  */
 public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Serializable {
 
+    public static final int MAX_CHARACTERS_IN_FONT_PREVIEW = 400;
+    
     public abstract void calculateBits();
 
     @Override
@@ -137,7 +139,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         maxw /= SWF.unitDivisor;
         maxh /= SWF.unitDivisor;
 
-        int shapeCount = Math.min(400, shapes.size());
+        int shapeCount = Math.min(MAX_CHARACTERS_IN_FONT_PREVIEW, shapes.size());
         int cols = (int) Math.ceil(Math.sqrt(shapeCount));
         int pos = 0;
         int w2 = prevWidth / cols;
