@@ -186,8 +186,8 @@ public class FontEmbedDialog extends AppDialog implements ActionListener {
                 if (f.canDisplay(codes[c])) {
                     if (avail < SAMPLE_MAX_LENGTH) {
                         sample += "" + (char) codes[c];
-                        avail++;
                     }
+                    avail++;
                 }
             }
             rangeSamples[i].setText(sample);

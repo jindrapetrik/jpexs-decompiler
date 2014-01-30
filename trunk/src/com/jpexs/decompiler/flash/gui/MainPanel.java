@@ -2132,6 +2132,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (saveText(textTag, textValue.getText())) {
                         setEditText(false);
                     }
+                    SWF.clearImageCache();
                 }
                 break;
             case ACTION_CLOSE_SWF: {

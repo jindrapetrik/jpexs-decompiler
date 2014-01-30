@@ -137,7 +137,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         maxw /= SWF.unitDivisor;
         maxh /= SWF.unitDivisor;
 
-        int cols = (int) Math.ceil(Math.sqrt(shapes.size()));
+        int shapeCount = Math.min(400, shapes.size());
+        int cols = (int) Math.ceil(Math.sqrt(shapeCount));
         int pos = 0;
         int w2 = prevWidth / cols;
         int h2 = prevHeight / cols;
