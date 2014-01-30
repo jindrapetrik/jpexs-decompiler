@@ -497,9 +497,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private JPanel createGenericTagCard() {
         JPanel genericTagCard = new JPanel(new BorderLayout());
+        JPanel genericTagPanel = new JPanel();
         genericTagPropertiesEditorPane = new JEditorPane();
         genericTagPropertiesEditorPane.setEditable(false);
-        genericTagCard.add(genericTagPropertiesEditorPane, BorderLayout.CENTER);
+        genericTagPanel.add(genericTagPropertiesEditorPane);
+        genericTagCard.add(genericTagPanel, BorderLayout.CENTER);
 
         return genericTagCard;
     }
