@@ -25,7 +25,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -55,10 +61,25 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
         changesText.setEditable(false);
         changesText.setFont(UIManager.getFont("TextField.font"));
         String changesStr = "";
+        SimpleDateFormat serverFormatter = new SimpleDateFormat("MM/dd/yyyy");
+        DateFormat formatter;
+        String customFormat = translate("customDateFormat");
+        if (customFormat.equals("default")) {
+            formatter = DateFormat.getDateInstance();
+        } else {
+            formatter = new SimpleDateFormat(customFormat);
+        }
         for (Version v : versions) {
             changesStr += translate("version") + " " + v.versionName + "\r\n";
             changesStr += "-----------------------\r\n";
-            changesStr += translate("releasedate") + v.releaseDate + "\r\n";
+            String releaseDate = v.releaseDate;
+            try {            
+                Date date = serverFormatter.parse(releaseDate);
+                releaseDate = formatter.format(date);
+            } catch (ParseException ex) {
+                Logger.getLogger(NewVersionDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            changesStr += translate("releasedate") + " " + releaseDate + "\r\n";
             for (String type : v.changes.keySet()) {
                 changesStr += type + ":" + "\r\n";
                 for (String ch : v.changes.get(type)) {
