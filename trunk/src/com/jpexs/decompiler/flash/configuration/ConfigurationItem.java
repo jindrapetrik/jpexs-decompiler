@@ -82,4 +82,9 @@ public class ConfigurationItem<T> {
     public boolean isModified() {
         return modified;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
