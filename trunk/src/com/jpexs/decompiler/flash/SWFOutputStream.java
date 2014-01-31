@@ -343,16 +343,30 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeRECT(RECT value) throws IOException {
         int nBits = 0;
-        nBits = enlargeBitCountS(nBits, value.Xmin);
-        nBits = enlargeBitCountS(nBits, value.Xmax);
-        nBits = enlargeBitCountS(nBits, value.Ymin);
-        nBits = enlargeBitCountS(nBits, value.Ymax);
+        int xMin = truncateTo31Bit(value.Xmin);
+        int xMax = truncateTo31Bit(value.Xmax);
+        int yMin = truncateTo31Bit(value.Ymin);
+        int yMax = truncateTo31Bit(value.Ymax);
+        nBits = enlargeBitCountS(nBits, xMin);
+        nBits = enlargeBitCountS(nBits, xMax);
+        nBits = enlargeBitCountS(nBits, yMin);
+        nBits = enlargeBitCountS(nBits, yMax);
         writeUB(5, nBits);
-        writeSB(nBits, value.Xmin);
-        writeSB(nBits, value.Xmax);
-        writeSB(nBits, value.Ymin);
-        writeSB(nBits, value.Ymax);
+        writeSB(nBits, xMin);
+        writeSB(nBits, xMax);
+        writeSB(nBits, yMin);
+        writeSB(nBits, yMax);
         alignByte();
+    }
+    
+    private int truncateTo31Bit(int value) {
+        if (value > 0x3fffffff) {
+            value = 0x3fffffff;
+        }
+        if (value < -0x3fffffff) {
+            value = -0x3fffffff;
+        }
+        return value;
     }
 
     /**

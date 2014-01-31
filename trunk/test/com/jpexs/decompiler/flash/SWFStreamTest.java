@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.types.RECT;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -138,5 +139,23 @@ public class SWFStreamTest {
         sis = new SWFInputStream(bais, 10);
         assertEquals(ff, sis.readFIXED8());
         sis.close();
+    }
+    
+    @Test
+    public void testRECT() throws IOException {
+        RECT rect;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (SWFOutputStream sos = new SWFOutputStream(baos, 10)) {
+            rect = new RECT(-0x80000000, 0x7FFFFFFF, -0x80000000, 0x7FFFFFFF);
+            sos.writeRECT(rect);
+        }
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        try (SWFInputStream sis = new SWFInputStream(bais, 10)) {
+            RECT readRECT = sis.readRECT();
+            assertEquals(readRECT.Xmin, -0x3FFFFFFF);
+            assertEquals(readRECT.Xmax, 0x3FFFFFFF);
+            assertEquals(readRECT.Ymin, -0x3FFFFFFF);
+            assertEquals(readRECT.Ymax, 0x3FFFFFFF);
+        }
     }
 }
