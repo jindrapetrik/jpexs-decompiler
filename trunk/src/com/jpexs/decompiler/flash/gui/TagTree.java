@@ -227,6 +227,10 @@ public class TagTree extends JTree {
                 }
             }
         }
+        
+        if (t instanceof Tag) {
+            return TreeNodeType.OTHER_TAG;
+        }
 
         return TreeNodeType.FOLDER;
     }

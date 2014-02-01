@@ -37,6 +37,7 @@ public enum TreeNodeType {
     MOVIE,
     SOUND,
     BINARY_DATA,
+    OTHER_TAG,
     FOLDER,
     FOLDER_OPEN,
     BUNDLE_ZIP,

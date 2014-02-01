@@ -284,8 +284,6 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         assignListener(saveCommandButton, ACTION_SAVE);
         saveasCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveas")), View.getResizableIcon("saveas16"));
         assignListener(saveasCommandButton, ACTION_SAVE_AS);
-        saveasexeCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveasexe")), View.getResizableIcon("saveas16"));
-        assignListener(saveasexeCommandButton, ACTION_SAVE_AS_EXE);
 
         reloadCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.reload")), View.getResizableIcon("reload16"));
         assignListener(reloadCommandButton, ACTION_RELOAD);
@@ -293,7 +291,6 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveasCommandButton, RibbonElementPriority.MEDIUM);
-        editBand.addCommandButton(saveasexeCommandButton, RibbonElementPriority.MEDIUM);
         editBand.addCommandButton(reloadCommandButton, RibbonElementPriority.MEDIUM);
 
         JRibbonBand exportBand = new JRibbonBand(translate("menu.export"), null);
@@ -304,10 +301,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         assignListener(exportAllCommandButton, ACTION_EXPORT);
         exportSelectionCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.selection")), View.getResizableIcon("exportsel16"));
         assignListener(exportSelectionCommandButton, ACTION_EXPORT_SEL);
+        saveasexeCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveasexe")), View.getResizableIcon("saveasexe16"));
+        assignListener(saveasexeCommandButton, ACTION_SAVE_AS_EXE);
 
         exportBand.addCommandButton(exportFlaCommandButton, RibbonElementPriority.TOP);
         exportBand.addCommandButton(exportAllCommandButton, RibbonElementPriority.MEDIUM);
         exportBand.addCommandButton(exportSelectionCommandButton, RibbonElementPriority.MEDIUM);
+        exportBand.addCommandButton(saveasexeCommandButton, RibbonElementPriority.MEDIUM);
 
         return new RibbonTask(translate("menu.file"), editBand, exportBand);
     }

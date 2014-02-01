@@ -549,10 +549,12 @@ public class Main {
                 return AppStrings.translate("filter.gfx");
             }
         };
-        if (swf.gfx) {
-            fc.setFileFilter(gfxFilter);
-        } else {
-            fc.addChoosableFileFilter(gfxFilter);
+        if (mode == SaveFileMode.SAVE || mode == SaveFileMode.SAVEAS) {
+            if (swf.gfx) {
+                fc.setFileFilter(gfxFilter);
+            } else {
+                fc.addChoosableFileFilter(gfxFilter);
+            }
         }
         fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();

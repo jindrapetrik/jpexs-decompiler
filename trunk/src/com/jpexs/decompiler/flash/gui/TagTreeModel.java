@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.gui.treenodes.StringNode;
 import com.jpexs.decompiler.flash.gui.treenodes.TagTreeRoot;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -130,7 +131,8 @@ public class TagTreeModel implements TreeModel {
                                 || t instanceof PlaceObject3Tag 
                                 || t instanceof PlaceObject4Tag
                                 || t instanceof RemoveObjectTag
-                                || t instanceof RemoveObject2Tag)) {
+                                || t instanceof RemoveObject2Tag
+                                || t instanceof FrameLabelTag)) {
                             others.add(new TagNode(t)); 
                         }
                     }
