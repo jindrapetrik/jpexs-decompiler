@@ -26,6 +26,12 @@ import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.gui.treenodes.StringNode;
 import com.jpexs.decompiler.flash.gui.treenodes.TagTreeRoot;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
+import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
+import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
@@ -119,7 +125,14 @@ public class TagTreeModel implements TreeModel {
                 case BINARY_DATA: binaryData.add(new TagNode(t)); break;
                 default:
                     if (!actionScriptTags.contains(t)) {
-                        others.add(new TagNode(t)); 
+                        if (!(t instanceof PlaceObjectTag 
+                                || t instanceof PlaceObject2Tag 
+                                || t instanceof PlaceObject3Tag 
+                                || t instanceof PlaceObject4Tag
+                                || t instanceof RemoveObjectTag
+                                || t instanceof RemoveObject2Tag)) {
+                            others.add(new TagNode(t)); 
+                        }
                     }
                     break;
             }

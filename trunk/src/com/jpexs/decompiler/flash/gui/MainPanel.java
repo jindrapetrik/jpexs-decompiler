@@ -131,6 +131,7 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -497,10 +498,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private JPanel createGenericTagCard() {
         JPanel genericTagCard = new JPanel(new BorderLayout());
-        JPanel genericTagPanel = new JPanel();
+        JPanel genericTagPanel = new JPanel(new BorderLayout());
         genericTagPropertiesEditorPane = new JEditorPane();
         genericTagPropertiesEditorPane.setEditable(false);
-        genericTagPanel.add(genericTagPropertiesEditorPane);
+        genericTagPanel.add(new JScrollPane(genericTagPropertiesEditorPane));
         genericTagCard.add(genericTagPanel, BorderLayout.CENTER);
 
         return genericTagCard;

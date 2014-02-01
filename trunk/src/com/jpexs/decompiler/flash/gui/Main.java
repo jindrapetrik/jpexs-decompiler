@@ -1002,10 +1002,10 @@ public class Main {
             Socket sock = new Socket("www.free-decompiler.com", 80);
             OutputStream os = sock.getOutputStream();
             String currentLoc = Configuration.locale.get("en");
-            os.write(("GET /flash/update.html?action=check&currentVersion=" + ApplicationInfo.version + " HTTP/1.1\r\n"+
-                      "Host: www.free-decompiler.com\r\n"
+            os.write(("GET /flash/update.html?action=check&currentVersion=" + ApplicationInfo.version + " HTTP/1.1\r\n"
+                    + "Host: www.free-decompiler.com\r\n"
                     + "User-Agent: " + ApplicationInfo.shortApplicationVerName + "\r\n"
-                    + "Accept-Language: "+currentLoc+("en".equals(currentLoc)?"":", en;q=0.8") + "\r\n"
+                    + "Accept-Language: " + currentLoc + ("en".equals(currentLoc) ? "" : ", en;q=0.8") + "\r\n"
                     + "Connection: close\r\n"
                     + "\r\n").getBytes());
             BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
