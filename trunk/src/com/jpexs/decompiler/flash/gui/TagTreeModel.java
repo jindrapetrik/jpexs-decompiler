@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
@@ -113,7 +114,10 @@ public class TagTreeModel implements TreeModel {
         for (Tag t : list) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
             switch (ttype) {
-                case SHOW_FRAME: frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true))); break;
+                case SHOW_FRAME: 
+                    ShowFrameTag showFrameTag = (ShowFrameTag) t;
+                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true), showFrameTag.innerTags)); 
+                    break;
                 case SHAPE: shapes.add(new TagNode(t)); break;
                 case MORPH_SHAPE: morphShapes.add(new TagNode(t)); break;
                 case SPRITE: sprites.add(new TagNode(t)); break;
@@ -125,16 +129,8 @@ public class TagTreeModel implements TreeModel {
                 case SOUND: sounds.add(new TagNode(t)); break;
                 case BINARY_DATA: binaryData.add(new TagNode(t)); break;
                 default:
-                    if (!actionScriptTags.contains(t)) {
-                        if (!(t instanceof PlaceObjectTag 
-                                || t instanceof PlaceObject2Tag 
-                                || t instanceof PlaceObject3Tag 
-                                || t instanceof PlaceObject4Tag
-                                || t instanceof RemoveObjectTag
-                                || t instanceof RemoveObject2Tag
-                                || t instanceof FrameLabelTag)) {
-                            others.add(new TagNode(t)); 
-                        }
+                    if (!actionScriptTags.contains(t) && !isFrameInnerTag(t)) {
+                        others.add(new TagNode(t)); 
                     }
                     break;
             }
@@ -254,9 +250,12 @@ public class TagTreeModel implements TreeModel {
         for (Tag t : list) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
             switch (ttype) {
-                case SHOW_FRAME: frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true))); break;
+                case SHOW_FRAME: 
+                    ShowFrameTag showFrameTag = (ShowFrameTag) t;
+                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true), showFrameTag.innerTags)); 
+                    break;
                 default:
-                    if (!actionScriptTags.contains(t)) {
+                    if (!actionScriptTags.contains(t) && !isFrameInnerTag(t)) {
                         others.add(new TagNode(t)); 
                     }
                     break;
@@ -274,6 +273,16 @@ public class TagTreeModel implements TreeModel {
         return ret;
     }
 
+    private boolean isFrameInnerTag(Tag t) {
+        return t instanceof PlaceObjectTag 
+                || t instanceof PlaceObject2Tag 
+                || t instanceof PlaceObject3Tag 
+                || t instanceof PlaceObject4Tag
+                || t instanceof RemoveObjectTag
+                || t instanceof RemoveObject2Tag
+                || t instanceof FrameLabelTag;
+    }
+    
     private List<TreeNode> searchTag(TreeItem obj, TreeNode parent, List<TreeNode> path) {
         List<TreeNode> ret = null;
         int cnt = getChildCount(parent);

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
+import java.util.List;
 
 /**
  * Instructs Flash Player to display the contents of the display list
@@ -26,6 +27,8 @@ import com.jpexs.decompiler.flash.SWF;
 public class ShowFrameTag extends Tag {
 
     public static final int ID = 1;
+    
+    public List<Tag> innerTags;
 
     /**
      * Constructor

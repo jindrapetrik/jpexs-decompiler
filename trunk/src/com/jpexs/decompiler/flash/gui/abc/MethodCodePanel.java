@@ -107,7 +107,7 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         graphButton.setToolTipText(AppStrings.translate("button.viewgraph"));
         graphButton.setMargin(new Insets(3, 3, 3, 3));
 
-        hexButton = new JToggleButton(View.getIcon("hex16"));
+        hexButton = new JToggleButton(View.getIcon("hexas16"));
         hexButton.setActionCommand(ACTION_HEX);
         hexButton.addActionListener(this);
         hexButton.setToolTipText(AppStrings.translate("button.viewhex"));

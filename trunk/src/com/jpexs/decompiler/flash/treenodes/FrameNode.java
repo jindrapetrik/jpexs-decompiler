@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.treenodes;
 
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
+import java.util.List;
 
 /**
  *
@@ -24,8 +26,13 @@ import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
  */
 public class FrameNode extends TreeNode {
 
-    public FrameNode(FrameNodeItem item) {
+    public FrameNode(FrameNodeItem item, List<Tag> innerTags) {
         super(item);
+        if (innerTags != null) {
+            for (Tag tag : innerTags) {
+                subNodes.add(new TagNode(tag));
+            }
+        }
     }
 
     @Override

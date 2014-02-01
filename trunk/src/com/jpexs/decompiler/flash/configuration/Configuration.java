@@ -75,7 +75,7 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> offeredAssociation = null;
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> removeNops = null;
-    @ConfigurationDefaultBoolean(false)
+    @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> showHexOnlyButton = null;
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> decimalAddress = null;

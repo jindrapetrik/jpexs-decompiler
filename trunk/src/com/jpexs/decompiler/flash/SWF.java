@@ -414,6 +414,23 @@ public final class SWF implements TreeItem {
         }
         tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly);
         if (!checkOnly) {
+            Map<Long, Tag> tagMap = new HashMap<>();
+            for (Tag tag : tags) {
+                tagMap.put(tag.getPos(), tag);
+            }
+
+            for (Tag tag : tags) {
+                if (tag instanceof ShowFrameTag) {
+                    ShowFrameTag showFrameTag = (ShowFrameTag) tag;
+                    List<Long> tagPositions = sis.tagPositionsInFrames.get(tag.getPos());
+                    List<Tag> innerTags = new ArrayList<>();
+                    for (long tagPos : tagPositions) {
+                        innerTags.add(tagMap.get(tagPos));
+                    }
+                    showFrameTag.innerTags = innerTags;
+                }
+            }
+            
             assignExportNamesToSymbols();
             assignClassesToSymbols();
             findFileAttributes();
@@ -839,7 +856,8 @@ public final class SWF implements TreeItem {
             }
             TreeNode addNode = null;
             if (t instanceof ShowFrameTag) {
-                FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, false));
+                // do not add PlaceObjects (+etc) to script nodes
+                FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, false), null);
 
                 for (int r = ret.size() - 1; r >= 0; r--) {
                     if (!(ret.get(r).getItem() instanceof DefineSpriteTag)) {

@@ -198,7 +198,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version, pos);
         spriteId = sis.readUI16();
         frameCount = sis.readUI16();
-        subTags = sis.readTagList(swf, level + 1, parallel, skipUnusualTags);
+        subTags = sis.readTagList(swf, level + 1, parallel, skipUnusualTags, true);
     }
     static int c = 0;
 

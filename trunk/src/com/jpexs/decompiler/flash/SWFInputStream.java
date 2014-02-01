@@ -63,8 +63,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -82,7 +83,6 @@ import java.util.zip.InflaterInputStream;
 public class SWFInputStream extends InputStream {
 
     private InputStream is;
-    private final Stack<Integer> margedPos = new Stack<>();
     private long pos;
     private int version;
     private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
@@ -90,7 +90,17 @@ public class SWFInputStream extends InputStream {
     private long percentMax;
     private final List<byte[]> buffered = new ArrayList<>();
     private ByteArrayOutputStream buffer;
-    private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = Configuration.deobfuscateUsePrevTagOnly.get();
+    private List<Long> tagPositionsInFrame = new ArrayList<>();
+    public Map<Long, List<Long>> tagPositionsInFrames = new HashMap<>();
+    private List<Integer> frameTagTypeIds = new ArrayList<Integer>() {{
+        add(PlaceObjectTag.ID);
+        add(PlaceObject2Tag.ID);
+        add(PlaceObject3Tag.ID);
+        add(PlaceObject4Tag.ID);
+        add(RemoveObjectTag.ID);
+        add(RemoveObject2Tag.ID);
+        add(FrameLabelTag.ID);
+    }};
 
     public int getVersion() {
         return version;
@@ -618,35 +628,6 @@ public class SWFInputStream extends InputStream {
 
     /**
      * Reads list of tags from the stream. Reading ends with End tag(=0) or end
-     * of the stream.
-     *
-     * @param swf
-     * @param level
-     * @param parallel
-     * @return List of tags
-     * @throws IOException
-     */
-    public List<Tag> readTagList(SWF swf, int level, boolean parallel) throws IOException, InterruptedException {
-        return readTagList(swf, level, parallel, false);
-    }
-
-    /**
-     * Reads list of tags from the stream. Reading ends with End tag(=0) or end
-     * of the stream. Optionally can skip AS1/2 tags when file is AS3
-     *
-     * @param swf
-     * @param level
-     * @param parallel
-     * @param skipUnusualTags
-     * @return List of tags
-     * @throws IOException
-     */
-    public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
-        return readTagList(swf, level, parallel, skipUnusualTags, true);
-    }
-
-    /**
-     * Reads list of tags from the stream. Reading ends with End tag(=0) or end
      * of the stream. Optionally can skip AS1/2 tags when file is AS3
      *
      * @param swf
@@ -686,6 +667,15 @@ public class SWFInputStream extends InputStream {
             }
             tag.previousTag = previousTag;
             previousTag = tag;
+    
+            if (frameTagTypeIds.contains(tag.getId())) {
+                tagPositionsInFrame.add(pos);
+            }
+            else if (tag.getId() == ShowFrameTag.ID) {
+                tagPositionsInFrames.put(pos, tagPositionsInFrame);
+                tagPositionsInFrame = new ArrayList<>();
+            }
+            
             boolean doParse;
             if (!skipUnusualTags) {
                 doParse = true;
