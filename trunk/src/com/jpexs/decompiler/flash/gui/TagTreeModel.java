@@ -35,7 +35,12 @@ import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.StartSound2Tag;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.VideoFrameTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
 import com.jpexs.decompiler.flash.treeitems.StringItem;
@@ -274,13 +279,14 @@ public class TagTreeModel implements TreeModel {
     }
 
     private boolean isFrameInnerTag(Tag t) {
-        return t instanceof PlaceObjectTag 
-                || t instanceof PlaceObject2Tag 
-                || t instanceof PlaceObject3Tag 
-                || t instanceof PlaceObject4Tag
-                || t instanceof RemoveObjectTag
-                || t instanceof RemoveObject2Tag
-                || t instanceof FrameLabelTag;
+        return t instanceof PlaceObjectTypeTag
+                || t instanceof RemoveTag
+                || t instanceof FrameLabelTag
+                || t instanceof StartSoundTag
+                || t instanceof StartSound2Tag
+                || t instanceof VideoFrameTag
+                || t instanceof SoundStreamBlockTag
+                || t instanceof SoundStreamHeadTypeTag;
     }
     
     private List<TreeNode> searchTag(TreeItem obj, TreeNode parent, List<TreeNode> path) {
