@@ -318,7 +318,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         JRibbonBand toolsBand = new JRibbonBand(translate("menu.tools"), null);
         toolsBand.setResizePolicies(getResizePolicies(toolsBand));
 
-        searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchas")), View.getResizableIcon("search32"));
+        searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.search")), View.getResizableIcon("search32"));
         assignListener(searchCommandButton, ACTION_SEARCH_AS);
         gotoDocumentClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.gotodocumentclass")), View.getResizableIcon("gotomainclass32"));
         assignListener(gotoDocumentClassCommandButton, ACTION_GOTO_DOCUMENT_CLASS);
