@@ -354,15 +354,10 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         deobfuscationBand.addCommandButton(globalrenameCommandButton, RibbonElementPriority.MEDIUM);
         deobfuscationBand.addCommandButton(renameinvalidCommandButton, RibbonElementPriority.MEDIUM);
 
-        JRibbonBand otherToolsBand = new JRibbonBand(translate("menu.tools.otherTools"), null);
-        otherToolsBand.setResizePolicies(getResizePolicies(otherToolsBand));
+        //JRibbonBand otherToolsBand = new JRibbonBand(translate("menu.tools.otherTools"), null);
+        //otherToolsBand.setResizePolicies(getResizePolicies(otherToolsBand));
 
-        clearRecentFilesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.otherTools.clearRecentFiles")), View.getResizableIcon("deobfuscate32"));
-        assignListener(clearRecentFilesCommandButton, ACTION_CLEAR_RECENT_FILES);
-
-        otherToolsBand.addCommandButton(clearRecentFilesCommandButton, RibbonElementPriority.MEDIUM);
-
-        return new RibbonTask(translate("menu.tools"), toolsBand, deobfuscationBand, otherToolsBand);
+        return new RibbonTask(translate("menu.tools"), toolsBand, deobfuscationBand/*, otherToolsBand*/);
     }
 
     private RibbonTask createSettingsRibbonTask(boolean externalFlashPlayerUnavailable) {
@@ -433,11 +428,14 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         languageBand.addCommandButton(setLanguageCommandButton, RibbonElementPriority.TOP);
 
         JRibbonBand advancedSettingsBand = new JRibbonBand(translate("menu.advancedsettings.advancedsettings"), null);
-        List<RibbonBandResizePolicy> advancedSettingsBandResizePolicies = getIconBandResizePolicies(languageBand);
-        advancedSettingsBand.setResizePolicies(advancedSettingsBandResizePolicies);
+        advancedSettingsBand.setResizePolicies(getResizePolicies(advancedSettingsBand));
         JCommandButton advancedSettingsCommandButton = new JCommandButton(fixCommandTitle(translate("menu.advancedsettings.advancedsettings")), View.getResizableIcon("settings32"));
         assignListener(advancedSettingsCommandButton, ACTION_ADVANCED_SETTINGS);
         advancedSettingsBand.addCommandButton(advancedSettingsCommandButton, RibbonElementPriority.TOP);
+
+        clearRecentFilesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.otherTools.clearRecentFiles")), View.getResizableIcon("clearrecent16"));
+        assignListener(clearRecentFilesCommandButton, ACTION_CLEAR_RECENT_FILES);
+        advancedSettingsBand.addCommandButton(clearRecentFilesCommandButton, RibbonElementPriority.MEDIUM);
 
         return new RibbonTask(translate("menu.settings"), settingsBand, languageBand, advancedSettingsBand);
     }
