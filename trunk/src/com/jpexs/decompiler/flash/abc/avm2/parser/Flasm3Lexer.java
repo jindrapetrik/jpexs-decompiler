@@ -2,7 +2,7 @@
 
 /* Flash assembler language lexer specification */
 /*
- *  Copyright (C) 2010-2013 JPEXS
+ *  Copyright (C) 2010-2014 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
