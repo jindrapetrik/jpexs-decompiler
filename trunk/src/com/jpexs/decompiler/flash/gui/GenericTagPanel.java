@@ -16,16 +16,33 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.DoubleEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.FloatEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.IntegerEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.LongEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.ShortEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
+import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.ZONERECORD;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SpringLayout;
 
 /**
  *
@@ -37,6 +54,7 @@ public class GenericTagPanel extends JPanel {
     private final JPanel genericTagPropertiesEditPanel;
     private final JScrollPane genericTagPropertiesEditorPaneScrollPanel;
     private final JScrollPane genericTagPropertiesEditPanelScrollPanel;
+    private Tag tag;
 
     public GenericTagPanel() {
         super(new BorderLayout());
@@ -52,9 +70,15 @@ public class GenericTagPanel extends JPanel {
         add(genericTagPropertiesEditorPaneScrollPanel);
 
         genericTagPropertiesEditPanel = new JPanel();
+        genericTagPropertiesEditPanel.setLayout(new SpringLayout());
         genericTagPropertiesEditPanelScrollPanel = new JScrollPane(genericTagPropertiesEditPanel);
     }
 
+    public void clear() {
+        tag = null;
+        genericTagPropertiesEditPanel.removeAll();
+    }
+    
     public void setEditMode(boolean edit) {
         if (edit) {
             remove(genericTagPropertiesEditorPaneScrollPanel);
@@ -75,16 +99,83 @@ public class GenericTagPanel extends JPanel {
                 sb.append(field.getName()).append(": ").append(field.get(tag));
                 sb.append(GraphTextWriter.NEW_LINE);
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         genericTagPropertiesEditorPane.setText(sb.toString());
         genericTagPropertiesEditorPane.setCaretPosition(0);
     }
 
-    public void generateEditControls() {
+    public void generateEditControls(Tag tag) {
         genericTagPropertiesEditPanel.removeAll();
-        genericTagPropertiesEditPanel.add(new JLabel("aa"));
+        this.tag = tag;
+        int propCount = generateEditControlsRecursive(tag, "");
+        //Lay out the panel.
+        SpringUtilities.makeCompactGrid(genericTagPropertiesEditPanel,
+                                        propCount, 2, //rows, cols
+                                        6, 6,        //initX, initY
+                                        6, 6);       //xPad, yPad        
         repaint();
+    }
+    
+    private int generateEditControlsRecursive(Object obj, String parent) {
+        Field[] fields = obj.getClass().getDeclaredFields();
+        int propCount = 0;
+        for (Field field : fields) {
+            try {
+                if (Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
+                field.setAccessible(true);
+                Class<?> type = field.getType();
+                String name = parent + field.getName();
+                Component editor = null;
+                Object value = field.get(obj);
+                if (type.equals(int.class) || type.equals(Integer.class)) {
+                    editor = new IntegerEditor(obj, field);
+                } else if (type.equals(short.class) || type.equals(Short.class)) {
+                    editor = new ShortEditor(obj, field);
+                } else if (type.equals(long.class) || type.equals(Long.class)) {
+                    editor = new LongEditor(obj, field);
+                } else if (type.equals(double.class) || type.equals(Double.class)) {
+                    editor = new DoubleEditor(obj, field);
+                } else if (type.equals(float.class) || type.equals(Float.class)) {
+                    editor = new FloatEditor(obj, field);
+                } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
+                    editor = new BooleanEditor(obj, field);
+                } else if (type.equals(String.class)) {
+                    editor = new StringEditor(obj, field);
+                } else if (type.equals(RECT.class) || type.equals(RGB.class) || type.equals(ZONERECORD.class)) {
+                    // todo: add other swf releated classes
+                    propCount += generateEditControlsRecursive(field.get(obj), field.getName() + ".");
+                } else if (value instanceof Iterable) {
+                    // todo: add list/array support
+                } else {
+                    JTextArea textArea = new JTextArea(field.get(obj).toString());
+                    textArea.setLineWrap(true);
+                    textArea.setEditable(false);
+                    editor = textArea;
+                }
+                if (editor != null) {
+                    JLabel label = new JLabel(name + ":", JLabel.TRAILING);
+                    genericTagPropertiesEditPanel.add(label);
+                    label.setLabelFor(editor);
+                    genericTagPropertiesEditPanel.add(editor);
+                    propCount++;
+                }
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return propCount;
+    }
+    
+    public void save() {
+        for (Object component : genericTagPropertiesEditPanel.getComponents()) {
+            if (component instanceof GenericTagEditor) {
+                ((GenericTagEditor) component).save();
+            }
+        }
+        setTagText(tag);
     }
 }

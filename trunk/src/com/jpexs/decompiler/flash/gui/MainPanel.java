@@ -526,7 +526,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         genericButtonsPanel.add(genericSaveButton);
         genericButtonsPanel.add(genericCancelButton);
         // todo: honfika: temporary hide edit button
-        //genericTagCard.add(genericButtonsPanel, BorderLayout.SOUTH);
+        genericTagCard.add(genericButtonsPanel, BorderLayout.SOUTH);
 
         return genericTagCard;
     }
@@ -996,6 +996,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         swfs.clear();
         oldNode = null;
         oldTag = null;
+        genericTagPanel.clear();
         if (abcPanel != null) {
             abcPanel.clearSwf();
         }
@@ -1020,6 +1021,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         oldNode = null;
         oldTag = null;
+        genericTagPanel.clear();
         updateUi();
         updateTagTree();
     }
@@ -2103,7 +2105,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (tagObj instanceof TreeNode) {
                     item = ((TreeNode) tagObj).getItem();
                 }
-                if (tagObj instanceof DefineBinaryDataTag) {
+                if (item instanceof DefineBinaryDataTag) {
                     DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
                     JFileChooser fc = new JFileChooser();
                     fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
@@ -2121,14 +2123,26 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
             break;
             case ACTION_EDIT_GENERIC_TAG: {
-                genericEditButton.setVisible(false);
-                genericSaveButton.setVisible(true);
-                genericCancelButton.setVisible(true);
-                genericTagPanel.setEditMode(true);
-                genericTagPanel.generateEditControls();
+                Object tagObj = tagTree.getLastSelectedPathComponent();
+                if (tagObj == null) {
+                    return;
+                }
+
+                TreeItem item = null;
+                if (tagObj instanceof TreeNode) {
+                    item = ((TreeNode) tagObj).getItem();
+                }
+                if (item instanceof Tag) {
+                    genericEditButton.setVisible(false);
+                    genericSaveButton.setVisible(true);
+                    genericCancelButton.setVisible(true);
+                    genericTagPanel.setEditMode(true);
+                    genericTagPanel.generateEditControls((Tag) item);
+                }
             }
             break;
             case ACTION_SAVE_GENERIC_TAG: {
+                genericTagPanel.save();
                 genericEditButton.setVisible(true);
                 genericSaveButton.setVisible(false);
                 genericCancelButton.setVisible(false);
@@ -2438,6 +2452,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else if (tagObj instanceof Tag) {
             showCard(CARDGENEICTAGPANEL);
             genericTagPanel.setTagText((Tag) tagObj);
+            genericEditButton.setVisible(true);
+            genericSaveButton.setVisible(false);
+            genericCancelButton.setVisible(false);
+            genericTagPanel.setEditMode(false);
         } else {
             showCard(CARDEMPTYPANEL);
         }
