@@ -356,7 +356,6 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
 
         //JRibbonBand otherToolsBand = new JRibbonBand(translate("menu.tools.otherTools"), null);
         //otherToolsBand.setResizePolicies(getResizePolicies(otherToolsBand));
-
         return new RibbonTask(translate("menu.tools"), toolsBand, deobfuscationBand/*, otherToolsBand*/);
     }
 

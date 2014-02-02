@@ -27,7 +27,7 @@ import java.util.List;
 public class ShowFrameTag extends Tag {
 
     public static final int ID = 1;
-    
+
     public List<Tag> innerTags;
 
     /**

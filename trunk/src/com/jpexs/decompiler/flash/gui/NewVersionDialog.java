@@ -73,7 +73,7 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
             changesStr += translate("version") + " " + v.versionName + "\r\n";
             changesStr += "-----------------------\r\n";
             String releaseDate = v.releaseDate;
-            try {            
+            try {
                 Date date = serverFormatter.parse(releaseDate);
                 releaseDate = formatter.format(date);
             } catch (ParseException ex) {

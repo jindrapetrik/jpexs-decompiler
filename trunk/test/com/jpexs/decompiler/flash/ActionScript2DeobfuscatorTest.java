@@ -26,7 +26,8 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -44,33 +45,33 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
 
     @Test
     public void testRemoveJumpsToTheNextAction() {
-        String actionsString = "ConstantPool \"a\" \"b\" \"c\"\n" +
-            "Push false register1\n" +
-            "StoreRegister 2\n" +
-            "Pop\n" +
-            "Push register2\n" +
-            "StoreRegister 0\n" +
-            "Push \"a\"\n" +
-            "StrictEquals\n" +
-            "If loc005a\n" +
-            "Push register0 \"b\"\n" +
-            "StrictEquals\n" +
-            "If loc0068\n" +
-            "Jump loc0048;\n" +
-            "loc0048:Push register0 \"c\"\n" +
-            "StrictEquals\n" +
-            "If loc0076\n" +
-            "Jump loc0084\n" +
-            "loc005a:Push 1\n" +
-            "Trace\n" +
-            "Jump loc0084\n" +
-            "loc0068:Push 2\n" +
-            "Trace\n" +
-            "Jump loc0084\n" +
-            "loc0076:Push 3\n" +
-            "Trace\n" +
-            "Jump loc0084\n" +
-            "loc0084:";
+        String actionsString = "ConstantPool \"a\" \"b\" \"c\"\n"
+                + "Push false register1\n"
+                + "StoreRegister 2\n"
+                + "Pop\n"
+                + "Push register2\n"
+                + "StoreRegister 0\n"
+                + "Push \"a\"\n"
+                + "StrictEquals\n"
+                + "If loc005a\n"
+                + "Push register0 \"b\"\n"
+                + "StrictEquals\n"
+                + "If loc0068\n"
+                + "Jump loc0048;\n"
+                + "loc0048:Push register0 \"c\"\n"
+                + "StrictEquals\n"
+                + "If loc0076\n"
+                + "Jump loc0084\n"
+                + "loc005a:Push 1\n"
+                + "Trace\n"
+                + "Jump loc0084\n"
+                + "loc0068:Push 2\n"
+                + "Trace\n"
+                + "Jump loc0084\n"
+                + "loc0076:Push 3\n"
+                + "Trace\n"
+                + "Jump loc0084\n"
+                + "loc0084:";
         try {
             List<Action> actions = ASMParser.parse(0, 0, true, actionsString, swf.version, false);
 

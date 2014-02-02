@@ -47,8 +47,8 @@ public final class MethodInfoLexer {
     /**
      * Translates characters to character classes
      */
-    private static final String ZZ_CMAP_PACKED =
-            "\11\5\1\3\1\2\1\0\1\3\1\1\16\5\4\0\1\3\1\0"
+    private static final String ZZ_CMAP_PACKED
+            = "\11\5\1\3\1\2\1\0\1\3\1\1\16\5\4\0\1\3\1\0"
             + "\1\42\1\0\1\4\2\0\1\56\2\0\1\45\1\37\1\44\1\7"
             + "\1\35\1\0\1\6\3\57\4\40\2\10\1\43\2\0\1\46\3\0"
             + "\4\4\1\36\6\4\1\31\1\4\1\25\1\4\1\17\12\4\1\12"
@@ -145,8 +145,8 @@ public final class MethodInfoLexer {
      * Translates DFA states to action switch labels.
      */
     private static final int[] ZZ_ACTION = zzUnpackAction();
-    private static final String ZZ_ACTION_PACKED_0 =
-            "\2\0\2\1\1\2\1\3\1\1\1\3\7\2\1\1"
+    private static final String ZZ_ACTION_PACKED_0
+            = "\2\0\2\1\1\2\1\3\1\1\1\3\7\2\1\1"
             + "\1\4\1\5\1\6\1\7\1\10\2\2\1\11\2\12"
             + "\1\1\1\13\1\14\1\0\1\14\2\0\7\2\1\0"
             + "\3\2\1\15\1\16\1\17\1\20\1\21\1\22\1\16"
@@ -165,7 +165,9 @@ public final class MethodInfoLexer {
 
     private static int zzUnpackAction(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -180,8 +182,8 @@ public final class MethodInfoLexer {
      * Translates a state to a row index in the transition table
      */
     private static final int[] ZZ_ROWMAP = zzUnpackRowMap();
-    private static final String ZZ_ROWMAP_PACKED_0 =
-            "\0\0\0\60\0\140\0\220\0\300\0\360\0\u0120\0\u0150"
+    private static final String ZZ_ROWMAP_PACKED_0
+            = "\0\0\0\60\0\140\0\220\0\300\0\360\0\u0120\0\u0150"
             + "\0\u0180\0\u01b0\0\u01e0\0\u0210\0\u0240\0\u0270\0\u02a0\0\u02d0"
             + "\0\140\0\140\0\140\0\140\0\140\0\u0300\0\u0330\0\u0360"
             + "\0\u0390\0\140\0\u03c0\0\140\0\360\0\u03f0\0\u0420\0\u0450"
@@ -208,7 +210,9 @@ public final class MethodInfoLexer {
 
     private static int zzUnpackRowMap(String packed, int offset, int[] result) {
         int i = 0;  /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int high = packed.charAt(i++) << 16;
@@ -220,8 +224,8 @@ public final class MethodInfoLexer {
      * The transition table of the DFA
      */
     private static final int[] ZZ_TRANS = zzUnpackTrans();
-    private static final String ZZ_TRANS_PACKED_0 =
-            "\3\3\1\4\1\5\1\3\1\6\1\7\1\10\1\11"
+    private static final String ZZ_TRANS_PACKED_0
+            = "\3\3\1\4\1\5\1\3\1\6\1\7\1\10\1\11"
             + "\2\3\1\12\1\13\1\3\2\5\1\14\1\15\1\5"
             + "\1\16\1\5\1\17\5\5\1\3\1\20\1\5\1\3"
             + "\1\10\1\3\1\21\1\22\1\23\1\24\1\25\1\26"
@@ -388,7 +392,9 @@ public final class MethodInfoLexer {
 
     private static int zzUnpackTrans(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -412,12 +418,11 @@ public final class MethodInfoLexer {
         "Error: pushback value was too large"
     };
     /**
-     * ZZ_ATTRIBUTE[aState] contains the attributes of state
-     * <code>aState</code>
+     * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
      */
     private static final int[] ZZ_ATTRIBUTE = zzUnpackAttribute();
-    private static final String ZZ_ATTRIBUTE_PACKED_0 =
-            "\2\0\1\11\15\1\5\11\4\1\1\11\1\1\1\11"
+    private static final String ZZ_ATTRIBUTE_PACKED_0
+            = "\2\0\1\11\15\1\5\11\4\1\1\11\1\1\1\11"
             + "\1\1\1\0\1\1\2\0\7\1\1\0\3\1\1\11"
             + "\1\1\4\11\1\1\4\11\1\1\4\0\6\1\1\11"
             + "\4\1\1\11\2\0\12\1\1\11\1\0\10\1\1\0"
@@ -433,7 +438,9 @@ public final class MethodInfoLexer {
 
     private static int zzUnpackAttribute(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -553,7 +560,9 @@ public final class MethodInfoLexer {
     private static char[] zzUnpackCMap(String packed) {
         char[] map = new char[0x10000];
         int i = 0;  /* index in packed string  */
+
         int j = 0;  /* index in unpacked array */
+
         while (i < 1768) {
             int count = packed.charAt(i++);
             char value = packed.charAt(i++);
@@ -622,6 +631,7 @@ public final class MethodInfoLexer {
      */
     public final void yyclose() throws java.io.IOException {
         zzAtEOF = true;            /* indicate end of file */
+
         zzEndRead = zzStartRead;  /* invalidate buffer    */
 
         if (zzReader != null) {
@@ -820,7 +830,6 @@ public final class MethodInfoLexer {
             zzCurrentPosL = zzCurrentPos = zzStartRead = zzMarkedPosL;
 
             zzState = ZZ_LEXSTATE[zzLexicalState];
-
 
             zzForAction:
             {

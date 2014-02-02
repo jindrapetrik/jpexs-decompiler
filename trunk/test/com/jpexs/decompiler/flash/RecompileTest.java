@@ -18,8 +18,13 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.NotSameException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import java.io.*;
-import static org.testng.Assert.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
 /**

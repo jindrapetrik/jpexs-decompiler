@@ -17,7 +17,12 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;

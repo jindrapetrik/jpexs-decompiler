@@ -51,7 +51,7 @@ public class TimeLinePanel extends JPanel implements MouseListener {
     public TimeLinePanel(SWF swf) {
         this.swf = swf;
         this.timeLine = new TimeLine(swf);
-        Dimension dim = new Dimension(FRAME_WIDTH * timeLine.getFrameCount()+1, FRAME_HEIGHT * timeLine.getMaxDepth());
+        Dimension dim = new Dimension(FRAME_WIDTH * timeLine.getFrameCount() + 1, FRAME_HEIGHT * timeLine.getMaxDepth());
         setSize(dim);
         setPreferredSize(dim);
         addMouseListener(this);
@@ -76,11 +76,11 @@ public class TimeLinePanel extends JPanel implements MouseListener {
         }
 
         boolean keyfound[] = new boolean[end_d - start_d + 1];
-        
+
         for (int f = start_f; f <= end_f; f++) {
             for (int d = start_d; d <= end_d; d++) {
                 DepthState fl = timeLine.frames.get(f).layers.get(d);
-                if(fl == null){
+                if (fl == null) {
                     g.setColor(emptyFrameColor);
                     g.fillRect(f * FRAME_WIDTH, d * FRAME_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT);
                     g.setColor(emptyBorderColor);
@@ -99,7 +99,7 @@ public class TimeLinePanel extends JPanel implements MouseListener {
                 }
                 if (selected) {
                     g.setColor(selectedColor);
-                    g.fillRect(f * FRAME_WIDTH+1, d * FRAME_HEIGHT+1, FRAME_WIDTH-1, FRAME_HEIGHT-1);
+                    g.fillRect(f * FRAME_WIDTH + 1, d * FRAME_HEIGHT + 1, FRAME_WIDTH - 1, FRAME_HEIGHT - 1);
                 }
 
                 if (fl == null) {
@@ -138,12 +138,12 @@ public class TimeLinePanel extends JPanel implements MouseListener {
                     }
                     g.setColor(frameColor);
                     g.fillRect(draw_f * FRAME_WIDTH, d * FRAME_HEIGHT, num_frames * FRAME_WIDTH, FRAME_HEIGHT);
-                    
+
                     if (selected) {
                         g.setColor(selectedColor);
                         g.fillRect(draw_f * FRAME_WIDTH, d * FRAME_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT);
                     }
-                    
+
                     g.setColor(borderColor);
                     g.drawRect(draw_f * FRAME_WIDTH, d * FRAME_HEIGHT, num_frames * FRAME_WIDTH, FRAME_HEIGHT);
                     g.setColor(keyColor);
@@ -152,10 +152,10 @@ public class TimeLinePanel extends JPanel implements MouseListener {
                 }
             }
         }
-        
-        if(cursor!=null && cursor.x>=start_f && cursor.x<=end_f){
+
+        if (cursor != null && cursor.x >= start_f && cursor.x <= end_f) {
             g.setColor(timeColor);
-            g.drawLine(cursor.x*FRAME_WIDTH + FRAME_WIDTH/2, 0, cursor.x*FRAME_WIDTH + FRAME_WIDTH/2, getHeight());
+            g.drawLine(cursor.x * FRAME_WIDTH + FRAME_WIDTH / 2, 0, cursor.x * FRAME_WIDTH + FRAME_WIDTH / 2, getHeight());
         }
     }
 

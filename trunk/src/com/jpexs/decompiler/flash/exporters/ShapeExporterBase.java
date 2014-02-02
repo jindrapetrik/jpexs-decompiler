@@ -248,7 +248,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             bounds.yMax = point.y;
         }
     }
-    
+
     protected void exportFillPath(int groupIndex) {
         List<IEdge> path = createPathFromEdgeMap(fillEdgeMaps.get(groupIndex));
         PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -279,7 +279,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                 matrix = new Matrix(fillStyle.gradientMatrix);
                                 beginGradientFill(
                                         fillStyle.fillStyleType,
-                                        fillStyle.gradient.gradientRecords, 
+                                        fillStyle.gradient.gradientRecords,
                                         matrix,
                                         fillStyle.gradient.spreadMode,
                                         fillStyle.gradient.interpolationMode,

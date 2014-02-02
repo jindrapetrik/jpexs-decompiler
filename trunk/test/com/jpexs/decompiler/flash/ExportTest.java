@@ -25,7 +25,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import static org.testng.Assert.*;
+import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -83,12 +83,12 @@ public class ExportTest {
     public void testDecompileAS(File f) {
         testDecompile(f, ExportMode.SOURCE);
     }
-    
+
     @Test(dataProvider = "swfFiles")
     public void testDecompilePcode(File f) {
         testDecompile(f, ExportMode.PCODE);
     }
-    
+
     public void testDecompile(File f, ExportMode exportMode) {
         try {
             SWF swf = new SWF(new FileInputStream(f), false);
@@ -107,7 +107,7 @@ public class ExportTest {
                 public AbortRetryIgnoreHandler getNewInstance() {
                     return this;
                 }
-                
+
             }, fdir.getAbsolutePath(), exportMode, false);
         } catch (Exception ex) {
             fail();

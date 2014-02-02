@@ -51,8 +51,8 @@ public final class TextLexer {
     /**
      * Translates characters to character classes
      */
-    private static final String ZZ_CMAP_PACKED =
-            "\12\0\1\15\2\0\1\3\22\0\1\3\1\0\1\13\4\0\1\14"
+    private static final String ZZ_CMAP_PACKED
+            = "\12\0\1\15\2\0\1\3\22\0\1\3\1\0\1\13\4\0\1\14"
             + "\10\0\12\1\41\0\1\4\1\5\1\2\1\0\1\1\1\0\1\1"
             + "\1\6\3\1\1\11\7\1\1\10\3\1\1\12\1\1\1\7\6\1"
             + "\uff85\0";
@@ -64,8 +64,8 @@ public final class TextLexer {
      * Translates DFA states to action switch labels.
      */
     private static final int[] ZZ_ACTION = zzUnpackAction();
-    private static final String ZZ_ACTION_PACKED_0 =
-            "\3\0\1\1\1\2\1\1\1\3\1\4\1\5\1\3"
+    private static final String ZZ_ACTION_PACKED_0
+            = "\3\0\1\1\1\2\1\1\1\3\1\4\1\5\1\3"
             + "\1\6\1\7\1\10\1\11\1\12\1\13\1\14\1\15"
             + "\1\16\1\17\1\20\1\21";
 
@@ -78,7 +78,9 @@ public final class TextLexer {
 
     private static int zzUnpackAction(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -93,8 +95,8 @@ public final class TextLexer {
      * Translates a state to a row index in the transition table
      */
     private static final int[] ZZ_ROWMAP = zzUnpackRowMap();
-    private static final String ZZ_ROWMAP_PACKED_0 =
-            "\0\0\0\16\0\34\0\52\0\52\0\70\0\52\0\106"
+    private static final String ZZ_ROWMAP_PACKED_0
+            = "\0\0\0\16\0\34\0\52\0\52\0\70\0\52\0\106"
             + "\0\52\0\124\0\142\0\52\0\52\0\52\0\52\0\52"
             + "\0\52\0\52\0\52\0\52\0\52\0\52";
 
@@ -107,7 +109,9 @@ public final class TextLexer {
 
     private static int zzUnpackRowMap(String packed, int offset, int[] result) {
         int i = 0;  /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int high = packed.charAt(i++) << 16;
@@ -119,8 +123,8 @@ public final class TextLexer {
      * The transition table of the DFA
      */
     private static final int[] ZZ_TRANS = zzUnpackTrans();
-    private static final String ZZ_TRANS_PACKED_0 =
-            "\4\4\1\5\1\6\7\4\2\7\1\10\1\11\1\12"
+    private static final String ZZ_TRANS_PACKED_0
+            = "\4\4\1\5\1\6\7\4\2\7\1\10\1\11\1\12"
             + "\2\7\5\10\2\7\1\12\2\13\1\11\1\12\11\13"
             + "\1\12\16\0\2\14\1\15\1\14\1\16\1\17\1\20"
             + "\1\21\1\22\1\23\1\24\1\25\1\26\2\0\1\10"
@@ -136,7 +140,9 @@ public final class TextLexer {
 
     private static int zzUnpackTrans(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -160,12 +166,11 @@ public final class TextLexer {
         "Error: pushback value was too large"
     };
     /**
-     * ZZ_ATTRIBUTE[aState] contains the attributes of state
-     * <code>aState</code>
+     * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
      */
     private static final int[] ZZ_ATTRIBUTE = zzUnpackAttribute();
-    private static final String ZZ_ATTRIBUTE_PACKED_0 =
-            "\3\0\2\11\1\1\1\11\1\1\1\11\2\1\13\11";
+    private static final String ZZ_ATTRIBUTE_PACKED_0
+            = "\3\0\2\11\1\1\1\11\1\1\1\11\2\1\13\11";
 
     private static int[] zzUnpackAttribute() {
         int[] result = new int[22];
@@ -176,7 +181,9 @@ public final class TextLexer {
 
     private static int zzUnpackAttribute(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -296,7 +303,9 @@ public final class TextLexer {
     private static char[] zzUnpackCMap(String packed) {
         char[] map = new char[0x10000];
         int i = 0;  /* index in packed string  */
+
         int j = 0;  /* index in unpacked array */
+
         while (i < 62) {
             int count = packed.charAt(i++);
             char value = packed.charAt(i++);
@@ -365,6 +374,7 @@ public final class TextLexer {
      */
     public final void yyclose() throws java.io.IOException {
         zzAtEOF = true;            /* indicate end of file */
+
         zzEndRead = zzStartRead;  /* invalidate buffer    */
 
         if (zzReader != null) {
@@ -563,7 +573,6 @@ public final class TextLexer {
             zzCurrentPosL = zzCurrentPos = zzStartRead = zzMarkedPosL;
 
             zzState = ZZ_LEXSTATE[zzLexicalState];
-
 
             zzForAction:
             {

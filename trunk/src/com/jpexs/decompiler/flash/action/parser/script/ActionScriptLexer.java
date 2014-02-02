@@ -58,8 +58,8 @@ public final class ActionScriptLexer {
     /**
      * Translates characters to character classes
      */
-    private static final String ZZ_CMAP_PACKED =
-            "\11\7\1\3\1\2\1\0\1\3\1\1\16\7\4\0\1\14\1\107"
+    private static final String ZZ_CMAP_PACKED
+            = "\11\7\1\3\1\2\1\0\1\3\1\1\16\7\4\0\1\14\1\107"
             + "\1\16\1\0\1\6\1\116\1\112\1\30\1\77\1\100\1\5\1\114"
             + "\1\106\1\26\1\11\1\4\1\17\3\23\4\24\2\20\1\10\1\105"
             + "\1\12\1\15\1\13\1\111\1\117\1\61\1\22\1\71\1\72\1\25"
@@ -181,8 +181,8 @@ public final class ActionScriptLexer {
      * Translates DFA states to action switch labels.
      */
     private static final int[] ZZ_ACTION = zzUnpackAction();
-    private static final String ZZ_ACTION_PACKED_0 =
-            "\5\0\1\1\2\2\1\3\1\4\1\5\1\6\1\7"
+    private static final String ZZ_ACTION_PACKED_0
+            = "\5\0\1\1\2\2\1\3\1\4\1\5\1\6\1\7"
             + "\1\10\1\11\1\12\1\13\1\14\2\15\1\16\1\17"
             + "\26\6\1\20\1\21\1\22\1\23\1\24\1\25\1\26"
             + "\1\27\1\30\1\31\1\32\1\33\1\34\1\35\1\36"
@@ -232,7 +232,9 @@ public final class ActionScriptLexer {
 
     private static int zzUnpackAction(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -247,8 +249,8 @@ public final class ActionScriptLexer {
      * Translates a state to a row index in the transition table
      */
     private static final int[] ZZ_ROWMAP = zzUnpackRowMap();
-    private static final String ZZ_ROWMAP_PACKED_0 =
-            "\0\0\0\120\0\240\0\360\0\u0140\0\u0190\0\u01e0\0\u0190"
+    private static final String ZZ_ROWMAP_PACKED_0
+            = "\0\0\0\120\0\240\0\360\0\u0140\0\u0190\0\u01e0\0\u0190"
             + "\0\u0230\0\u0280\0\u02d0\0\u0320\0\u0370\0\u03c0\0\u0410\0\u0460"
             + "\0\u04b0\0\u0190\0\u0500\0\u0550\0\u05a0\0\u0190\0\u05f0\0\u0640"
             + "\0\u0690\0\u06e0\0\u0730\0\u0780\0\u07d0\0\u0820\0\u0870\0\u08c0"
@@ -343,7 +345,9 @@ public final class ActionScriptLexer {
 
     private static int zzUnpackRowMap(String packed, int offset, int[] result) {
         int i = 0;  /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int high = packed.charAt(i++) << 16;
@@ -355,8 +359,8 @@ public final class ActionScriptLexer {
      * The transition table of the DFA
      */
     private static final int[] ZZ_TRANS = zzUnpackTrans();
-    private static final String ZZ_TRANS_PACKED_0 =
-            "\1\6\1\7\1\10\1\11\1\12\1\13\1\14\1\6"
+    private static final String ZZ_TRANS_PACKED_0
+            = "\1\6\1\7\1\10\1\11\1\12\1\13\1\14\1\6"
             + "\1\15\1\16\1\17\1\20\1\11\1\21\1\22\1\23"
             + "\1\24\2\14\2\24\1\14\1\25\1\6\1\26\1\27"
             + "\1\30\1\31\1\32\1\14\1\33\1\34\1\35\1\36"
@@ -919,7 +923,9 @@ public final class ActionScriptLexer {
 
     private static int zzUnpackTrans(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -943,12 +949,11 @@ public final class ActionScriptLexer {
         "Error: pushback value was too large"
     };
     /**
-     * ZZ_ATTRIBUTE[aState] contains the attributes of state
-     * <code>aState</code>
+     * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
      */
     private static final int[] ZZ_ATTRIBUTE = zzUnpackAttribute();
-    private static final String ZZ_ATTRIBUTE_PACKED_0 =
-            "\5\0\1\11\1\1\1\11\11\1\1\11\3\1\1\11"
+    private static final String ZZ_ATTRIBUTE_PACKED_0
+            = "\5\0\1\11\1\1\1\11\11\1\1\11\3\1\1\11"
             + "\26\1\10\11\1\1\2\11\5\1\1\11\2\1\2\11"
             + "\3\1\1\11\2\1\1\11\1\1\1\11\2\1\1\0"
             + "\3\11\2\0\1\1\1\0\1\1\1\11\1\1\1\11"
@@ -967,7 +972,9 @@ public final class ActionScriptLexer {
 
     private static int zzUnpackAttribute(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -1119,7 +1126,9 @@ public final class ActionScriptLexer {
     private static char[] zzUnpackCMap(String packed) {
         char[] map = new char[0x10000];
         int i = 0;  /* index in packed string  */
+
         int j = 0;  /* index in unpacked array */
+
         while (i < 2264) {
             int count = packed.charAt(i++);
             char value = packed.charAt(i++);
@@ -1188,6 +1197,7 @@ public final class ActionScriptLexer {
      */
     public final void yyclose() throws java.io.IOException {
         zzAtEOF = true;            /* indicate end of file */
+
         zzEndRead = zzStartRead;  /* invalidate buffer    */
 
         if (zzReader != null) {
@@ -1332,7 +1342,6 @@ public final class ActionScriptLexer {
             zzCurrentPosL = zzCurrentPos = zzStartRead = zzMarkedPosL;
 
             zzState = ZZ_LEXSTATE[zzLexicalState];
-
 
             zzForAction:
             {

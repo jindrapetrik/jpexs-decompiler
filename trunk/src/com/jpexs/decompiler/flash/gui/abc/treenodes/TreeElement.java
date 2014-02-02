@@ -22,7 +22,11 @@ import com.jpexs.decompiler.flash.gui.abc.TreeVisitor;
 import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
 import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import javax.swing.tree.TreePath;
 
 public abstract class TreeElement extends TreeNode {

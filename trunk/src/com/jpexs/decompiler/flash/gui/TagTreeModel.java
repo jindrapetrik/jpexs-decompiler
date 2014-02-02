@@ -27,12 +27,6 @@ import com.jpexs.decompiler.flash.gui.treenodes.StringNode;
 import com.jpexs.decompiler.flash.gui.treenodes.TagTreeRoot;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
-import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
-import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
-import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
-import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
-import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
-import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
@@ -110,32 +104,52 @@ public class TagTreeModel implements TreeModel {
         List<TreeNode> sounds = new ArrayList<>();
         List<TreeNode> binaryData = new ArrayList<>();
         List<TreeNode> others = new ArrayList<>();
-        
+
         List<TreeNode> actionScript = SWF.createASTagList(list, null);
         List<Tag> actionScriptTags = new ArrayList<>();
         SWF.getTagsFromTreeNodes(actionScript, actionScriptTags);
-        
+
         int frameCnt = 0;
         for (Tag t : list) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
             switch (ttype) {
-                case SHOW_FRAME: 
+                case SHOW_FRAME:
                     ShowFrameTag showFrameTag = (ShowFrameTag) t;
-                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true), showFrameTag.innerTags)); 
+                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true), showFrameTag.innerTags));
                     break;
-                case SHAPE: shapes.add(new TagNode(t)); break;
-                case MORPH_SHAPE: morphShapes.add(new TagNode(t)); break;
-                case SPRITE: sprites.add(new TagNode(t)); break;
-                case BUTTON: buttons.add(new TagNode(t)); break;
-                case IMAGE: images.add(new TagNode(t)); break;
-                case FONT: fonts.add(new TagNode(t)); break;
-                case TEXT: texts.add(new TagNode(t)); break;
-                case MOVIE: movies.add(new TagNode(t)); break;
-                case SOUND: sounds.add(new TagNode(t)); break;
-                case BINARY_DATA: binaryData.add(new TagNode(t)); break;
+                case SHAPE:
+                    shapes.add(new TagNode(t));
+                    break;
+                case MORPH_SHAPE:
+                    morphShapes.add(new TagNode(t));
+                    break;
+                case SPRITE:
+                    sprites.add(new TagNode(t));
+                    break;
+                case BUTTON:
+                    buttons.add(new TagNode(t));
+                    break;
+                case IMAGE:
+                    images.add(new TagNode(t));
+                    break;
+                case FONT:
+                    fonts.add(new TagNode(t));
+                    break;
+                case TEXT:
+                    texts.add(new TagNode(t));
+                    break;
+                case MOVIE:
+                    movies.add(new TagNode(t));
+                    break;
+                case SOUND:
+                    sounds.add(new TagNode(t));
+                    break;
+                case BINARY_DATA:
+                    binaryData.add(new TagNode(t));
+                    break;
                 default:
                     if (!actionScriptTags.contains(t) && !isFrameInnerTag(t)) {
-                        others.add(new TagNode(t)); 
+                        others.add(new TagNode(t));
                     }
                     break;
             }
@@ -250,18 +264,18 @@ public class TagTreeModel implements TreeModel {
         List<TreeNode> ret = new ArrayList<>();
         List<TreeNode> frames = new ArrayList<>();
         List<TreeNode> others = new ArrayList<>();
-        
+
         int frameCnt = 0;
         for (Tag t : list) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
             switch (ttype) {
-                case SHOW_FRAME: 
+                case SHOW_FRAME:
                     ShowFrameTag showFrameTag = (ShowFrameTag) t;
-                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true), showFrameTag.innerTags)); 
+                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true), showFrameTag.innerTags));
                     break;
                 default:
                     if (!actionScriptTags.contains(t) && !isFrameInnerTag(t)) {
-                        others.add(new TagNode(t)); 
+                        others.add(new TagNode(t));
                     }
                     break;
             }
@@ -288,7 +302,7 @@ public class TagTreeModel implements TreeModel {
                 || t instanceof SoundStreamBlockTag
                 || t instanceof SoundStreamHeadTypeTag;
     }
-    
+
     private List<TreeNode> searchTag(TreeItem obj, TreeNode parent, List<TreeNode> path) {
         List<TreeNode> ret = null;
         int cnt = getChildCount(parent);

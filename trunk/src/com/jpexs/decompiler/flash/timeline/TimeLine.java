@@ -34,41 +34,41 @@ import java.util.List;
  * @author JPEXS
  */
 public class TimeLine {
+
     public List<Frame> frames = new ArrayList<>();
 
     public TimeLine() {
     }
-    
-    public int getMaxDepth()
-    {
-        int max_depth=0;
-        for(Frame f:frames){
-            for(int depth:f.layers.keySet()){
-               if(depth>max_depth){
-                   max_depth = depth;
-               } 
+
+    public int getMaxDepth() {
+        int max_depth = 0;
+        for (Frame f : frames) {
+            for (int depth : f.layers.keySet()) {
+                if (depth > max_depth) {
+                    max_depth = depth;
+                }
             }
         }
         return max_depth;
     }
 
-    public int getFrameCount(){
+    public int getFrameCount() {
         return frames.size();
     }
-    
+
     public TimeLine(SWF swf) {
-        Frame frame=new Frame();
-        for(Tag t:swf.tags){
-            if(t instanceof PlaceObjectTypeTag){
-                PlaceObjectTypeTag po=(PlaceObjectTypeTag)t;
-                int depth=po.getDepth();
-                if(!frame.layers.containsKey(depth)){
+        Frame frame = new Frame();
+        for (Tag t : swf.tags) {
+            if (t instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
+                int depth = po.getDepth();
+                if (!frame.layers.containsKey(depth)) {
                     frame.layers.put(depth, new DepthState());
                 }
                 DepthState fl = frame.layers.get(depth);
                 int characterId = po.getCharacterId();
-                if(characterId!=-1){
-                   fl.characterId = characterId;
+                if (characterId != -1) {
+                    fl.characterId = characterId;
                 }
                 if (po.flagMove()) {
                     MATRIX matrix2 = po.getMatrix();
@@ -121,12 +121,12 @@ public class TimeLine {
                 }
                 fl.key = true;
             }
-            if(t instanceof RemoveTag){
-                RemoveTag r=(RemoveTag)t;
-                int depth=r.getDepth();
+            if (t instanceof RemoveTag) {
+                RemoveTag r = (RemoveTag) t;
+                int depth = r.getDepth();
                 frame.layers.remove(depth);
             }
-            if(t instanceof ShowFrameTag){
+            if (t instanceof ShowFrameTag) {
                 frames.add(frame);
                 frame = new Frame(frame);
             }

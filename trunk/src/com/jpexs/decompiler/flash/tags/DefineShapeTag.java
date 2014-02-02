@@ -90,7 +90,7 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
         }
         return baos.toByteArray();
     }
-    
+
     @Override
     public int getCharacterId() {
         return shapeId;

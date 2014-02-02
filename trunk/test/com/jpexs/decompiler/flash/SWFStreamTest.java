@@ -20,7 +20,8 @@ import com.jpexs.decompiler.flash.types.RECT;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 /**
@@ -156,7 +157,7 @@ public class SWFStreamTest {
         assertEquals(ff, sis.readFIXED8());
         sis.close();
     }
-    
+
     @Test
     public void testRECT() throws IOException {
         RECT rect;

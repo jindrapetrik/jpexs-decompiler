@@ -42,7 +42,7 @@ public class AS3Generator {
 
     public static void main(String[] args) throws Exception {
         Configuration.autoDeobfuscate.set(false);
-        SWF swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")),false);
+        SWF swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
         DoABCDefineTag tag = null;
         for (Tag t : swf.tags) {
             if (t instanceof DoABCDefineTag) {
@@ -63,7 +63,7 @@ public class AS3Generator {
                     s.append(name);
                     s.append("\", ");
                     HilightedTextWriter src = new HilightedTextWriter(false);
-                    abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", ExportMode.SOURCE, false, -1/*FIX?*/, classId, abc, null,abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, src, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
+                    abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", ExportMode.SOURCE, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, src, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
                     String[] srcs = src.toString().split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {
                         String ss = srcs[i];

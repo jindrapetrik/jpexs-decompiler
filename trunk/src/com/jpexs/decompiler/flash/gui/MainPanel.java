@@ -131,7 +131,6 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -1620,7 +1619,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void renameOneIdentifier(final SWF swf) {
-        if (swf.fileAttributes!=null && swf.fileAttributes.actionScript3) {
+        if (swf.fileAttributes != null && swf.fileAttributes.actionScript3) {
             final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
             final List<ABCContainerTag> abcList = swf.abcList;
             if (multiName > 0) {
@@ -2411,7 +2410,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         genericTagPropertiesEditorPane.setText(sb.toString());
     }
-    
+
     private void createAndShowTempSwf(Object tagObj) {
         SWF swf;
         try {

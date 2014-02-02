@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.geom.AffineTransform;
 
@@ -38,7 +37,7 @@ public class Matrix {
         mat.scale(scale);
         return mat;
     }
-    
+
     public Matrix() {
         scaleX = 1;
         scaleY = 1;
@@ -76,14 +75,14 @@ public class Matrix {
         translateX += x;
         translateY += y;
     }
-    
+
     public void scale(double factor) {
         scaleX *= factor;
         scaleY *= factor;
         rotateSkew0 *= factor;
         rotateSkew1 *= factor;
     }
-    
+
     public AffineTransform toTransform() {
         AffineTransform transform = new AffineTransform(scaleX, rotateSkew0,
                 rotateSkew1, scaleY,

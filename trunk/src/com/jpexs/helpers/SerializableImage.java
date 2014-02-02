@@ -14,24 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.helpers;
 
-import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Hashtable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
@@ -55,7 +50,7 @@ public class SerializableImage implements Serializable {
     public SerializableImage(BufferedImage image) {
         this.image = image;
     }
-    
+
     public SerializableImage(int i, int i1, int i2) {
         image = new BufferedImage(i, i1, i2);
     }
@@ -70,13 +65,13 @@ public class SerializableImage implements Serializable {
 
     public BufferedImage getBufferedImage() {
         /*try {
-            ImageIO.write(image, "png", new File("c:\\10\\x\\imageid" + String.format("%03d", imageid++) + ".png"));
-        } catch (IOException ex) {
-            Logger.getLogger(BitmapExporter.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+         ImageIO.write(image, "png", new File("c:\\10\\x\\imageid" + String.format("%03d", imageid++) + ".png"));
+         } catch (IOException ex) {
+         Logger.getLogger(BitmapExporter.class.getName()).log(Level.SEVERE, null, ex);
+         }*/
         return image;
     }
-    
+
     @Override
     protected Object clone() throws CloneNotSupportedException {
         SerializableImage image = new SerializableImage();
@@ -128,7 +123,7 @@ public class SerializableImage implements Serializable {
     public String toString() {
         return image.toString();
     }
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         ImageIO.write(image, "png", out);
     }

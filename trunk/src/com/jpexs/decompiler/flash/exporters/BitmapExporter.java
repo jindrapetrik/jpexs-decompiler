@@ -29,7 +29,6 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
-import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -66,19 +65,19 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private Color lineColor;
     private Stroke lineStroke;
     private Stroke defaultStroke;
-    
+
     public static SerializableImage export(SWF swf, SHAPE shape) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, null);
         exporter.export();
         return exporter.getImage();
     }
-    
+
     public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor);
         exporter.export();
         return exporter.getImage();
     }
-    
+
     private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor) {
         super(shape);
         this.swf = swf;
@@ -350,7 +349,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
-        path.quadTo(controlX / SWF.unitDivisor - deltaX, controlY / SWF.unitDivisor - deltaY, 
+        path.quadTo(controlX / SWF.unitDivisor - deltaX, controlY / SWF.unitDivisor - deltaY,
                 anchorX / SWF.unitDivisor - deltaX, anchorY / SWF.unitDivisor - deltaY);
     }
 

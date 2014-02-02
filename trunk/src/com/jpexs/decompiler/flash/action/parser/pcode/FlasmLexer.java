@@ -58,8 +58,8 @@ public final class FlasmLexer {
     /**
      * Translates characters to character classes
      */
-    private static final String ZZ_CMAP_PACKED =
-            "\11\6\1\4\1\2\1\0\1\4\1\1\16\6\4\0\1\4\1\0"
+    private static final String ZZ_CMAP_PACKED
+            = "\11\6\1\4\1\2\1\0\1\4\1\1\16\6\4\0\1\4\1\0"
             + "\1\45\1\0\1\5\2\0\1\47\3\0\1\37\1\0\1\30\1\35"
             + "\1\0\1\33\3\50\4\40\2\11\1\12\1\3\5\0\4\7\1\36"
             + "\3\7\1\31\4\7\1\34\14\7\1\0\1\41\2\0\1\10\1\0"
@@ -178,8 +178,8 @@ public final class FlasmLexer {
      * Translates DFA states to action switch labels.
      */
     private static final int[] ZZ_ACTION = zzUnpackAction();
-    private static final String ZZ_ACTION_PACKED_0 =
-            "\3\0\3\1\1\2\1\3\1\4\2\5\1\1\1\6"
+    private static final String ZZ_ACTION_PACKED_0
+            = "\3\0\3\1\1\2\1\3\1\4\2\5\1\1\1\6"
             + "\2\7\1\10\1\11\1\12\1\13\5\11\1\1\1\11"
             + "\1\12\1\11\1\1\1\11\1\14\1\0\1\15\1\16"
             + "\1\17\1\20\1\21\1\22\2\23\1\24\1\25\1\26"
@@ -198,7 +198,9 @@ public final class FlasmLexer {
 
     private static int zzUnpackAction(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -213,8 +215,8 @@ public final class FlasmLexer {
      * Translates a state to a row index in the transition table
      */
     private static final int[] ZZ_ROWMAP = zzUnpackRowMap();
-    private static final String ZZ_ROWMAP_PACKED_0 =
-            "\0\0\0\51\0\122\0\173\0\244\0\315\0\366\0\173"
+    private static final String ZZ_ROWMAP_PACKED_0
+            = "\0\0\0\51\0\122\0\173\0\244\0\315\0\366\0\173"
             + "\0\u011f\0\u0148\0\173\0\u0171\0\173\0\u019a\0\173\0\u01c3"
             + "\0\u01ec\0\u0215\0\173\0\u023e\0\u0267\0\u0290\0\u02b9\0\u02e2"
             + "\0\u030b\0\u0334\0\u035d\0\u0386\0\u03af\0\u03d8\0\173\0\315"
@@ -237,7 +239,9 @@ public final class FlasmLexer {
 
     private static int zzUnpackRowMap(String packed, int offset, int[] result) {
         int i = 0;  /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int high = packed.charAt(i++) << 16;
@@ -249,8 +253,8 @@ public final class FlasmLexer {
      * The transition table of the DFA
      */
     private static final int[] ZZ_TRANS = zzUnpackTrans();
-    private static final String ZZ_TRANS_PACKED_0 =
-            "\4\4\1\5\1\6\1\4\1\7\1\6\3\4\1\10"
+    private static final String ZZ_TRANS_PACKED_0
+            = "\4\4\1\5\1\6\1\4\1\7\1\6\3\4\1\10"
             + "\13\7\1\4\2\7\1\4\1\7\1\4\1\7\3\4"
             + "\3\7\1\4\1\7\2\4\1\11\1\12\1\13\36\11"
             + "\1\14\3\11\1\15\3\11\1\4\1\16\1\17\1\20"
@@ -394,7 +398,9 @@ public final class FlasmLexer {
 
     private static int zzUnpackTrans(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -418,12 +424,11 @@ public final class FlasmLexer {
         "Error: pushback value was too large"
     };
     /**
-     * ZZ_ATTRIBUTE[aState] contains the attributes of state
-     * <code>aState</code>
+     * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
      */
     private static final int[] ZZ_ATTRIBUTE = zzUnpackAttribute();
-    private static final String ZZ_ATTRIBUTE_PACKED_0 =
-            "\3\0\1\11\3\1\1\11\2\1\1\11\1\1\1\11"
+    private static final String ZZ_ATTRIBUTE_PACKED_0
+            = "\3\0\1\11\3\1\1\11\2\1\1\11\1\1\1\11"
             + "\1\1\1\11\3\1\1\11\13\1\1\11\1\0\6\11"
             + "\2\1\4\11\1\0\7\1\1\0\1\11\4\1\1\11"
             + "\1\1\1\0\5\1\1\0\10\1\1\0\5\1\1\0"
@@ -439,7 +444,9 @@ public final class FlasmLexer {
 
     private static int zzUnpackAttribute(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
+
         int j = offset;  /* index in unpacked array */
+
         int l = packed.length();
         while (i < l) {
             int count = packed.charAt(i++);
@@ -557,7 +564,9 @@ public final class FlasmLexer {
     private static char[] zzUnpackCMap(String packed) {
         char[] map = new char[0x10000];
         int i = 0;  /* index in packed string  */
+
         int j = 0;  /* index in unpacked array */
+
         while (i < 2206) {
             int count = packed.charAt(i++);
             char value = packed.charAt(i++);
@@ -626,6 +635,7 @@ public final class FlasmLexer {
      */
     public final void yyclose() throws java.io.IOException {
         zzAtEOF = true;            /* indicate end of file */
+
         zzEndRead = zzStartRead;  /* invalidate buffer    */
 
         if (zzReader != null) {
@@ -824,7 +834,6 @@ public final class FlasmLexer {
             zzCurrentPosL = zzCurrentPos = zzStartRead = zzMarkedPosL;
 
             zzState = ZZ_LEXSTATE[zzLexicalState];
-
 
             zzForAction:
             {

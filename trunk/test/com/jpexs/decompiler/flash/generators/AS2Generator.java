@@ -60,23 +60,22 @@ public class AS2Generator {
                     doa = null;
                     continue;
                 }
-               
 
                 String[] srcs = src.split("[\r\n]+");
-                String testName="frame"+frame+"_Test";
-                String pref="trace(\"";
-                for(String p:srcs){
-                    if(p.trim().matches("trace\\(\"(.*)Test\"\\);")){
-                        testName="frame"+frame+"_"+p.substring(pref.length(),p.length()-3/* "); */);
+                String testName = "frame" + frame + "_Test";
+                String pref = "trace(\"";
+                for (String p : srcs) {
+                    if (p.trim().matches("trace\\(\"(.*)Test\"\\);")) {
+                        testName = "frame" + frame + "_" + p.substring(pref.length(), p.length() - 3/* "); */);
                     }
                 }
-                
+
                 s.append("@Test\r\npublic void ");
                 s.append(testName);
                 s.append("(){\r\ncompareSrc(");
                 s.append(frame);
                 s.append(",");
-                
+
                 for (int i = 0; i < srcs.length; i++) {
                     String ss = srcs[i];
                     s.append("\"");

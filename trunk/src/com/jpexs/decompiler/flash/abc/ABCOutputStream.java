@@ -16,8 +16,17 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
-import com.jpexs.decompiler.flash.abc.types.*;
-import com.jpexs.decompiler.flash.abc.types.traits.*;
+import com.jpexs.decompiler.flash.abc.types.Decimal;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.io.OutputStream;

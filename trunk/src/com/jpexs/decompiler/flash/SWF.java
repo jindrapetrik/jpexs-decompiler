@@ -52,7 +52,6 @@ import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
@@ -430,7 +429,7 @@ public final class SWF implements TreeItem {
                     showFrameTag.innerTags = innerTags;
                 }
             }
-            
+
             assignExportNamesToSymbols();
             assignClassesToSymbols();
             findFileAttributes();
@@ -991,7 +990,7 @@ public final class SWF implements TreeItem {
         }
         return ret;
     }
-    
+
     public static void getTagsFromTreeNodes(List<TreeNode> treeNodes, List<Tag> result) {
         for (TreeNode treeNode : treeNodes) {
             TreeItem treeItem = treeNode.getItem();
@@ -1001,7 +1000,7 @@ public final class SWF implements TreeItem {
             getTagsFromTreeNodes(treeNode.subNodes, result);
         }
     }
-    
+
     private final HashSet<EventListener> listeners = new HashSet<>();
 
     public final void addEventListener(EventListener listener) {
@@ -2076,7 +2075,7 @@ public final class SWF implements TreeItem {
                 mat.getRotateSkew1Float(), mat.getScaleYFloat(),
                 mat.translateX, mat.translateY);
     }
-    
+
     private static Cache<SerializableImage> frameCache = Cache.getInstance(false);
 
     public static SerializableImage getFromCache(String key) {
@@ -2085,11 +2084,11 @@ public final class SWF implements TreeItem {
         }
         return null;
     }
-    
+
     public static void putToCache(String key, SerializableImage img) {
         frameCache.put(key, img);
     }
-    
+
     public static void clearImageCache() {
         frameCache.clear();
     }
@@ -2165,8 +2164,8 @@ public final class SWF implements TreeItem {
             CharacterTag character = characters.get(layer.characterId);
             Matrix mat = new Matrix(layer.matrix);
             /*if (firstLevel) {
-                mat.scale(unzoom);
-            }*/
+             mat.scale(unzoom);
+             }*/
             mat.translate(fixX, fixY);
 
             if (character instanceof DrawableTag) {
@@ -2174,9 +2173,9 @@ public final class SWF implements TreeItem {
                 SerializableImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, transformation);
                 mat.translate(img.bounds.getMinX() * unzoom, img.bounds.getMinY() * unzoom);
                 /*if (character instanceof BoundedTag) {
-                    BoundedTag bounded = (BoundedTag) character;
-                    RECT rect = bounded.getRect(characters, visited);
-                }*/
+                 BoundedTag bounded = (BoundedTag) character;
+                 RECT rect = bounded.getRect(characters, visited);
+                 }*/
                 if (layer.filters != null) {
                     for (FILTER filter : layer.filters) {
                         img = filter.apply(img);

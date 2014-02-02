@@ -27,7 +27,9 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -45,14 +47,14 @@ public class ActionScript2AssemblerTest extends ActionStript2TestBase {
 
     @Test
     public void testModifiedConstantPools() {
-        String actionsString = "ConstantPool \"ok\"\n" +
-            "Jump loc001f\n" +
-            "loc000d:Push \"ok\" false\n" +
-            "SetVariable\n" +
-            "Jump loc002f\n" +
-            "loc001f:ConstantPool \"wrong\"\n" +
-            "Jump loc000d\n" +
-            "loc002f:";
+        String actionsString = "ConstantPool \"ok\"\n"
+                + "Jump loc001f\n"
+                + "loc000d:Push \"ok\" false\n"
+                + "SetVariable\n"
+                + "Jump loc002f\n"
+                + "loc001f:ConstantPool \"wrong\"\n"
+                + "Jump loc000d\n"
+                + "loc002f:";
         try {
             List<Action> actions = ASMParser.parse(0, 0, true, actionsString, swf.version, false);
 

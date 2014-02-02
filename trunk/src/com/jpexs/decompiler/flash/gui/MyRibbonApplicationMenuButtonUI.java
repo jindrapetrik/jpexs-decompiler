@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.Icon;
@@ -33,7 +35,9 @@ import org.pushingpixels.lafwidget.animation.effects.GhostingListener;
 import org.pushingpixels.substance.api.painter.border.SubstanceBorderPainter;
 import org.pushingpixels.substance.api.painter.fill.SubstanceFillPainter;
 import org.pushingpixels.substance.flamingo.common.ui.ActionPopupTransitionAwareUI;
-import org.pushingpixels.substance.flamingo.utils.*;
+import org.pushingpixels.substance.flamingo.utils.CommandButtonBackgroundDelegate;
+import org.pushingpixels.substance.flamingo.utils.CommandButtonVisualStateTracker;
+import org.pushingpixels.substance.flamingo.utils.RibbonApplicationMenuButtonBackgroundDelegate;
 import org.pushingpixels.substance.internal.animation.StateTransitionTracker;
 import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
 

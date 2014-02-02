@@ -18,7 +18,47 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.types.*;
+import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
+import com.jpexs.decompiler.flash.types.ARGB;
+import com.jpexs.decompiler.flash.types.BITMAPDATA;
+import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
+import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
+import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.CLIPEVENTFLAGS;
+import com.jpexs.decompiler.flash.types.CXFORM;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
+import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.GRADIENT;
+import com.jpexs.decompiler.flash.types.GRADRECORD;
+import com.jpexs.decompiler.flash.types.KERNINGRECORD;
+import com.jpexs.decompiler.flash.types.LANGCODE;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE2;
+import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHGRADIENT;
+import com.jpexs.decompiler.flash.types.MORPHGRADRECORD;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
+import com.jpexs.decompiler.flash.types.PIX15;
+import com.jpexs.decompiler.flash.types.PIX24;
+import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.SOUNDENVELOPE;
+import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.flash.types.ZONEDATA;
+import com.jpexs.decompiler.flash.types.ZONERECORD;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
 import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
@@ -358,7 +398,7 @@ public class SWFOutputStream extends OutputStream {
         writeSB(nBits, yMax);
         alignByte();
     }
-    
+
     private int truncateTo31Bit(int value) {
         if (value > 0x3fffffff) {
             value = 0x3fffffff;

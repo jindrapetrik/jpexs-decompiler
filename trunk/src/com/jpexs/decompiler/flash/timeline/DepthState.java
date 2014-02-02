@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -31,6 +30,7 @@ import java.util.List;
  * @author JPEXS
  */
 public class DepthState {
+
     public int characterId;
     public MATRIX matrix = null;
     public String instanceName = null;
@@ -43,13 +43,13 @@ public class DepthState {
     public RGBA backGroundColor = null;
     public CLIPACTIONS clipActions = null;
     public int ratio;
-    public boolean key=false;
-    
-    public DepthState(){
-        
+    public boolean key = false;
+
+    public DepthState() {
+
     }
-    
-    public DepthState(DepthState obj){
+
+    public DepthState(DepthState obj) {
         characterId = obj.characterId;
         matrix = obj.matrix;
         instanceName = obj.instanceName;

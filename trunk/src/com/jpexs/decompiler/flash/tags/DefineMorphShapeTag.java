@@ -207,7 +207,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
                 finalRecords.add(edge2);
                 break;
             }
-            
+
             if (edge1 instanceof CurvedEdgeRecord || edge2 instanceof CurvedEdgeRecord) {
                 CurvedEdgeRecord cer1 = null;
                 if (edge1 instanceof CurvedEdgeRecord) {
