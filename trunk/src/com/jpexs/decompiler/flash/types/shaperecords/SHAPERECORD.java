@@ -32,6 +32,7 @@ import java.awt.Shape;
 import java.awt.font.GlyphVector;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,7 +47,7 @@ import javax.swing.JPanel;
 public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Serializable {
 
     public static final int MAX_CHARACTERS_IN_FONT_PREVIEW = 400;
-    
+
     public abstract void calculateBits();
 
     @Override
@@ -122,6 +123,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     }
 
     public static SerializableImage shapeListToImage(SWF swf, List<SHAPE> shapes, int prevWidth, int prevHeight, Color color) {
+        if (shapes.isEmpty()) {
+            return new SerializableImage(1, 1, BufferedImage.TYPE_INT_RGB);
+        }
         SerializableImage ret = new SerializableImage(prevWidth, prevHeight, SerializableImage.TYPE_INT_ARGB);
         Graphics g = ret.getGraphics();
 
