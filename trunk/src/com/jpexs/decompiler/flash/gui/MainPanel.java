@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.gui.timeline.TimelineFrame;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.ApplicationInfo;
@@ -2955,5 +2956,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void setErrorState(ErrorState errorState) {
         statusPanel.setErrorState(errorState);
+    }
+
+    public void timeline() {
+        final SWF swf = getCurrentSwf();
+        if (swf != null) {
+            TimelineFrame tf = new TimelineFrame(swf);
+            tf.setVisible(true);
+        }
     }
 }

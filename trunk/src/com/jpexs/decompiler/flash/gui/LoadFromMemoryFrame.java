@@ -31,6 +31,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -388,6 +389,10 @@ public class LoadFromMemoryFrame extends AppFrame implements ActionListener {
         cnt.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel), BorderLayout.CENTER);
         View.setWindowIcon(this);
         View.centerScreen(this);
+        java.util.List<Image> images = new ArrayList<>();
+        images.add(View.loadImage("loadmemory16"));
+        images.add(View.loadImage("loadmemory32"));
+        setIconImages(images);
     }
 
     @Override

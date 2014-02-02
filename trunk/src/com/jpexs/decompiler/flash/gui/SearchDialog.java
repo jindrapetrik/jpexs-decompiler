@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash.gui;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.BoxLayout;
@@ -94,6 +96,10 @@ public class SearchDialog extends AppDialog implements ActionListener {
         setTitle(translate("dialog.title"));
         setModalityType(ModalityType.APPLICATION_MODAL);
         pack();
+        java.util.List<Image> images = new ArrayList<>();
+        images.add(View.loadImage("search16"));
+        images.add(View.loadImage("search32"));
+        setIconImages(images);
     }
 
     @Override

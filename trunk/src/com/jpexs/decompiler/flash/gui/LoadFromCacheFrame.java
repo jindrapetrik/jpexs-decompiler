@@ -27,6 +27,7 @@ import com.jpexs.helpers.ReReadableInputStream;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -147,6 +148,11 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         progressBar.setVisible(false);
         openButton.setEnabled(false);
         saveButton.setEnabled(false);
+        
+        java.util.List<Image> images = new ArrayList<>();
+        images.add(View.loadImage("loadcache16"));
+        images.add(View.loadImage("loadcache32"));
+        setIconImages(images);
         refresh();
     }
 

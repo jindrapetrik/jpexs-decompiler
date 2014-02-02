@@ -720,7 +720,7 @@ public class Main {
         autoCheckForUpdates();
         offerAssociation();
     }
-
+       
     public static void showModeFrame() {
         View.execInEventDispatch(new Runnable() {
             @Override
