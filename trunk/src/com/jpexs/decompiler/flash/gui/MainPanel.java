@@ -1620,7 +1620,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void renameOneIdentifier(final SWF swf) {
-        if (swf.fileAttributes.actionScript3) {
+        if (swf.fileAttributes!=null && swf.fileAttributes.actionScript3) {
             final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
             final List<ABCContainerTag> abcList = swf.abcList;
             if (multiName > 0) {
