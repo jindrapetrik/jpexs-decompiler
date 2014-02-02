@@ -59,6 +59,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,23 +105,30 @@ public class TagTree extends JTree {
                 //setToolTipText(null); //no tool tip
             }
 
-            String tos = value.toString();
-            int sw = getFontMetrics(getFont()).stringWidth(tos);
-            setPreferredSize(new Dimension(18 + sw, getPreferredSize().height));
+            Font font = getFont();
+            boolean isModified = false;
+            if (treeNode instanceof TreeNode) {
+                if (treeNode.getItem() instanceof Tag) {
+                    Tag tag = (Tag) treeNode.getItem();
+                    if (tag.isModified()) {
+                        isModified = true;
+                    }
+                }
+            }
+            
+            if (isModified) {
+                font = font.deriveFont(Font.BOLD);
+            } else {
+                font = font.deriveFont(Font.PLAIN);
+            }
+            setFont(font);
+
             setUI(new BasicLabelUI());
             setOpaque(false);
             //setBackground(Color.green);
             setBackgroundNonSelectionColor(Color.white);
             //setBackgroundSelectionColor(Color.ORANGE);
 
-            if (treeNode instanceof TreeNode) {
-                if (treeNode.getItem() instanceof Tag) {
-                    Tag tag = (Tag) treeNode.getItem();
-                    if (tag.isModified()) {
-                        setFont(getFont().deriveFont(Font.BOLD));
-                    }
-                }
-            }
             return this;
         }
     }

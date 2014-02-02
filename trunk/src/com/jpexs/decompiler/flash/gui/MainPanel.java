@@ -2143,6 +2143,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             break;
             case ACTION_SAVE_GENERIC_TAG: {
                 genericTagPanel.save();
+                tagTree.repaint();
                 genericEditButton.setVisible(true);
                 genericSaveButton.setVisible(false);
                 genericCancelButton.setVisible(false);

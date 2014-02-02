@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import java.awt.Color;
 import java.lang.reflect.Field;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JTextArea;
 
 /**
@@ -34,6 +32,7 @@ public class LongEditor extends JTextArea implements GenericTagEditor {
     public LongEditor(Object obj, Field field) {
         setBackground(Color.white);
         setSize(100, getSize().height);
+        setMaximumSize(getSize());
         setWrapStyleWord(true);
         this.obj = obj;
         this.field = field;

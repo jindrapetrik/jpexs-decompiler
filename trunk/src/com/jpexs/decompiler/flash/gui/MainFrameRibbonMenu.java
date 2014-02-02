@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.jpexs.process.ProcessTools;
@@ -518,6 +519,12 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
             saveCommandButton.setEnabled(mainFrame.panel.getCurrentSwf() != null);
         }
     }
+    
+    private void clearModified(SWF swf) {
+        for (Tag tag : swf.tags) {
+            tag.setModified(false);
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -647,11 +654,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                         View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
+                clearModified(swf);
             }
             break;
             case ACTION_SAVE_AS: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
                 saveAs(swf, SaveFileMode.SAVEAS);
+                clearModified(swf);
             }
             break;
             case ACTION_SAVE_AS_EXE: {
