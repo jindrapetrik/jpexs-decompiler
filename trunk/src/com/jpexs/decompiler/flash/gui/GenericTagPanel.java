@@ -79,6 +79,7 @@ public class GenericTagPanel extends JPanel {
             }
         }
         genericTagPropertiesEditorPane.setText(sb.toString());
+        genericTagPropertiesEditorPane.setCaretPosition(0);
     }
 
     public void generateEditControls() {
