@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -45,15 +44,19 @@ public class GenericTagPanel extends JPanel implements ComponentListener {
     public GenericTagPanel() {
         super(new BorderLayout());
 
-        genericTagPropertiesEditorPane = new JEditorPane();
+        genericTagPropertiesEditorPane = new JEditorPane() {
+            public boolean getScrollableTracksViewportWidth() {
+                return true;
+            }
+        };
         genericTagPropertiesEditorPane.setEditable(false);
         genericTagPropertiesEditorPaneScrollPanel = new JScrollPane(genericTagPropertiesEditorPane);
         add(genericTagPropertiesEditorPaneScrollPanel);
-        
+
         genericTagPropertiesEditPanel = new JPanel();
         genericTagPropertiesEditPanelScrollPanel = new JScrollPane(genericTagPropertiesEditPanel);
     }
-    
+
     public void setEditMode(boolean edit) {
         if (edit) {
             remove(genericTagPropertiesEditorPaneScrollPanel);
@@ -61,10 +64,10 @@ public class GenericTagPanel extends JPanel implements ComponentListener {
         } else {
             remove(genericTagPropertiesEditPanelScrollPanel);
             add(genericTagPropertiesEditorPaneScrollPanel);
-        }
+        }        
         repaint();
     }
-    
+
     public void setTagText(Tag tag) {
         StringBuilder sb = new StringBuilder();
         Field[] fields = tag.getClass().getDeclaredFields();
@@ -80,7 +83,7 @@ public class GenericTagPanel extends JPanel implements ComponentListener {
         genericTagPropertiesEditorPane.setText(sb.toString());
         genericTagPropertiesEditorPane.setSize(0, 0);
     }
-    
+
     public void generateEditControls() {
         genericTagPropertiesEditPanel.removeAll();
         genericTagPropertiesEditPanel.add(new JLabel("aa"));
