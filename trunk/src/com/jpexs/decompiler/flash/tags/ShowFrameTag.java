@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +29,23 @@ public class ShowFrameTag extends Tag {
 
     public static final int ID = 1;
 
+    private static List<Integer> nestedTagTypeIds = new ArrayList<Integer>() {
+        {
+            add(PlaceObjectTag.ID);
+            add(PlaceObject2Tag.ID);
+            add(PlaceObject3Tag.ID);
+            add(PlaceObject4Tag.ID);
+            add(RemoveObjectTag.ID);
+            add(RemoveObject2Tag.ID);
+            add(FrameLabelTag.ID);
+            add(StartSoundTag.ID);
+            add(StartSound2Tag.ID);
+            add(VideoFrameTag.ID);
+            add(SoundStreamBlockTag.ID);
+            add(SoundStreamHeadTag.ID);
+            add(SoundStreamHead2Tag.ID);
+        }
+    };
     public List<Tag> innerTags;
 
     /**
@@ -53,5 +71,9 @@ public class ShowFrameTag extends Tag {
     @Override
     public byte[] getData(int version) {
         return super.getData(version);
+    }
+    
+    public static boolean isNestedTagType(int tagTypeId) {
+        return nestedTagTypeIds.contains(tagTypeId);
     }
 }

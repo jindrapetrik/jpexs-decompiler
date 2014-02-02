@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import static com.jpexs.decompiler.flash.gui.ErrorState.WARNING;
 import com.jpexs.helpers.CancellableWorker;
 import java.awt.BorderLayout;
 import java.awt.Cursor;

@@ -148,7 +148,7 @@ public class TagTreeModel implements TreeModel {
                     binaryData.add(new TagNode(t));
                     break;
                 default:
-                    if (!actionScriptTags.contains(t) && !isFrameInnerTag(t)) {
+                    if (!actionScriptTags.contains(t) && !ShowFrameTag.isNestedTagType(t.getId())) {
                         others.add(new TagNode(t));
                     }
                     break;
@@ -274,7 +274,7 @@ public class TagTreeModel implements TreeModel {
                     frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true), showFrameTag.innerTags));
                     break;
                 default:
-                    if (!actionScriptTags.contains(t) && !isFrameInnerTag(t)) {
+                    if (!actionScriptTags.contains(t) && !ShowFrameTag.isNestedTagType(t.getId())) {
                         others.add(new TagNode(t));
                     }
                     break;
@@ -290,17 +290,6 @@ public class TagTreeModel implements TreeModel {
         }
 
         return ret;
-    }
-
-    private boolean isFrameInnerTag(Tag t) {
-        return t instanceof PlaceObjectTypeTag
-                || t instanceof RemoveTag
-                || t instanceof FrameLabelTag
-                || t instanceof StartSoundTag
-                || t instanceof StartSound2Tag
-                || t instanceof VideoFrameTag
-                || t instanceof SoundStreamBlockTag
-                || t instanceof SoundStreamHeadTypeTag;
     }
 
     private List<TreeNode> searchTag(TreeItem obj, TreeNode parent, List<TreeNode> path) {

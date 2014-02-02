@@ -298,17 +298,6 @@ public class SWFInputStream extends InputStream {
     private ByteArrayOutputStream buffer;
     private List<Long> tagPositionsInFrame = new ArrayList<>();
     public Map<Long, List<Long>> tagPositionsInFrames = new HashMap<>();
-    private List<Integer> frameTagTypeIds = new ArrayList<Integer>() {
-        {
-            add(PlaceObjectTag.ID);
-            add(PlaceObject2Tag.ID);
-            add(PlaceObject3Tag.ID);
-            add(PlaceObject4Tag.ID);
-            add(RemoveObjectTag.ID);
-            add(RemoveObject2Tag.ID);
-            add(FrameLabelTag.ID);
-        }
-    };
 
     public int getVersion() {
         return version;
@@ -876,7 +865,7 @@ public class SWFInputStream extends InputStream {
             tag.previousTag = previousTag;
             previousTag = tag;
 
-            if (frameTagTypeIds.contains(tag.getId())) {
+            if (ShowFrameTag.isNestedTagType(tag.getId())) {
                 tagPositionsInFrame.add(pos);
             } else if (tag.getId() == ShowFrameTag.ID) {
                 tagPositionsInFrames.put(pos, tagPositionsInFrame);
