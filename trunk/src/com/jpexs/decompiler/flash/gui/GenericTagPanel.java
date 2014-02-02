@@ -19,8 +19,6 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.awt.BorderLayout;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,13 +26,12 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 
 /**
  *
  * @author JPEXS
  */
-public class GenericTagPanel extends JPanel implements ComponentListener {
+public class GenericTagPanel extends JPanel {
 
     private final JEditorPane genericTagPropertiesEditorPane;
     private final JPanel genericTagPropertiesEditPanel;
@@ -45,6 +42,7 @@ public class GenericTagPanel extends JPanel implements ComponentListener {
         super(new BorderLayout());
 
         genericTagPropertiesEditorPane = new JEditorPane() {
+            @Override
             public boolean getScrollableTracksViewportWidth() {
                 return true;
             }
@@ -81,29 +79,11 @@ public class GenericTagPanel extends JPanel implements ComponentListener {
             }
         }
         genericTagPropertiesEditorPane.setText(sb.toString());
-        genericTagPropertiesEditorPane.setSize(0, 0);
     }
 
     public void generateEditControls() {
         genericTagPropertiesEditPanel.removeAll();
         genericTagPropertiesEditPanel.add(new JLabel("aa"));
         repaint();
-    }
-
-    @Override
-    public void componentResized(ComponentEvent e) {
-        genericTagPropertiesEditorPane.setSize(0, 0);
-    }
-
-    @Override
-    public void componentMoved(ComponentEvent ce) {
-    }
-
-    @Override
-    public void componentShown(ComponentEvent ce) {
-    }
-
-    @Override
-    public void componentHidden(ComponentEvent ce) {
     }
 }
