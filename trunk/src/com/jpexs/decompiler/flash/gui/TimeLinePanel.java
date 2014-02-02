@@ -34,8 +34,8 @@ import javax.swing.JPanel;
  */
 public class TimeLinePanel extends JPanel implements MouseListener {
 
-    private SWF swf;
-    private TimeLine timeLine;
+    private final SWF swf;
+    private final TimeLine timeLine;
     public static final int FRAME_WIDTH = 10;
     public static final int FRAME_HEIGHT = 20;
     public static final Color frameColor = Color.lightGray;
