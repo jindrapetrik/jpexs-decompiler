@@ -21,14 +21,16 @@ import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public final class BinaryPanel extends JPanel implements ActionListener, ComponentListener {
+/**
+ *
+ * @author JPEXS
+ */
+public final class BinaryPanel extends JPanel implements ComponentListener {
 
     public LineMarkedEditorPane hexEditor = new LineMarkedEditorPane();
     private byte[] data;
@@ -43,10 +45,6 @@ public final class BinaryPanel extends JPanel implements ActionListener, Compone
         bottomPanel.add(buttonsPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
         addComponentListener(this);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
     }
 
     public void setBinaryData(byte[] data) {
