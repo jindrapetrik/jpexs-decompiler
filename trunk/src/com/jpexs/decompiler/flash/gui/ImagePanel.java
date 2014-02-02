@@ -131,8 +131,12 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                 img = drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
                 SWF.putToCache(key, img);
             }
-            mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
-            setImage(img);
+            if (img != null && img.bounds != null && mat != null) {
+                mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
+            }
+            if (img != null) {
+                setImage(img);
+            }
             return;
         }
         play();
