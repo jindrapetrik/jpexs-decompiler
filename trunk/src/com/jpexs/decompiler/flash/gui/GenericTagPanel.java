@@ -62,6 +62,7 @@ public class GenericTagPanel extends JPanel implements ComponentListener {
             remove(genericTagPropertiesEditPanelScrollPanel);
             add(genericTagPropertiesEditorPaneScrollPanel);
         }
+        repaint();
     }
     
     public void setTagText(Tag tag) {
@@ -83,6 +84,7 @@ public class GenericTagPanel extends JPanel implements ComponentListener {
     public void generateEditControls() {
         genericTagPropertiesEditPanel.removeAll();
         genericTagPropertiesEditPanel.add(new JLabel("aa"));
+        repaint();
     }
 
     @Override

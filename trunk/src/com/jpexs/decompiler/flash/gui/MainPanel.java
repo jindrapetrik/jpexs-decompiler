@@ -526,7 +526,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         genericButtonsPanel.add(genericSaveButton);
         genericButtonsPanel.add(genericCancelButton);
         // todo: honfika: temporary hide edit button
-        genericTagCard.add(genericButtonsPanel, BorderLayout.SOUTH);
+        //genericTagCard.add(genericButtonsPanel, BorderLayout.SOUTH);
 
         return genericTagCard;
     }
