@@ -65,7 +65,12 @@ public class SWFSourceInfo {
 
     public boolean isBundle() {
         if (inputStream == null) {
-            String extension = Helper.getExtension(new File(file));
+            File fileObj = new File(file);
+            String fileName = fileObj.getName();
+            if (fileName.startsWith("asdec_") && fileName.endsWith(".tmp")) {
+                return false;
+            }
+            String extension = Helper.getExtension(fileObj);
             return !(extension.equals(".swf") || extension.equals(".gfx"));
         }
         return false;
