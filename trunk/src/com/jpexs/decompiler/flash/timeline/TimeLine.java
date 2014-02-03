@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 JPEXS
+ * Copyright (C) 2010-2014 JPEXS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -33,11 +34,11 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class TimeLine {
+public class Timeline {
 
     public List<Frame> frames = new ArrayList<>();
 
-    public TimeLine() {
+    public Timeline() {
     }
 
     public int getMaxDepth() {
@@ -56,7 +57,7 @@ public class TimeLine {
         return frames.size();
     }
 
-    public TimeLine(SWF swf) {
+    public Timeline(SWF swf) {
         Frame frame = new Frame();
         for (Tag t : swf.tags) {
             if (t instanceof PlaceObjectTypeTag) {
@@ -125,6 +126,9 @@ public class TimeLine {
                 RemoveTag r = (RemoveTag) t;
                 int depth = r.getDepth();
                 frame.layers.remove(depth);
+            }
+            if (t instanceof DoActionTag) {
+                frame.action = (DoActionTag) t;
             }
             if (t instanceof ShowFrameTag) {
                 frames.add(frame);

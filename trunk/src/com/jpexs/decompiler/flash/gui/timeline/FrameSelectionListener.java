@@ -14,30 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.timeline;
-
-import com.jpexs.decompiler.flash.tags.DoActionTag;
-import java.util.HashMap;
-import java.util.Map;
+package com.jpexs.decompiler.flash.gui.timeline;
 
 /**
  *
  * @author JPEXS
  */
-public class Frame {
+public interface FrameSelectionListener {
 
-    public Map<Integer, DepthState> layers = new HashMap<>();
-    public DoActionTag action;
-
-    public Frame() {
-
-    }
-
-    public Frame(Frame obj) {
-        layers = new HashMap<>();
-        for (int depth : obj.layers.keySet()) {
-            layers.put(depth, new DepthState(obj.layers.get(depth)));
-        }
-    }
-
+    public void frameSelected(int frame, int depth);
 }

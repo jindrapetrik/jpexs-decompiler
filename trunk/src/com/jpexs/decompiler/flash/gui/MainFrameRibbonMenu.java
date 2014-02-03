@@ -86,7 +86,8 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_GOTO_DOCUMENT_CLASS = "GOTODOCUMENTCLASS";
     static final String ACTION_PARALLEL_SPEED_UP = "PARALLELSPEEDUP";
     static final String ACTION_INTERNAL_VIEWER_SWITCH = "INTERNALVIEWERSWITCH";
-    static final String ACTION_SEARCH_AS = "SEARCHAS";
+    static final String ACTION_SEARCH = "SEARCH";
+    static final String ACTION_TIMELINE = "TIMELINE";    
     static final String ACTION_AUTO_DEOBFUSCATE = "AUTODEOBFUSCATE";
     static final String ACTION_EXIT = "EXIT";
 
@@ -138,6 +139,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     private JCommandButton globalrenameCommandButton;
     private JCommandButton deobfuscationCommandButton;
     private JCommandButton searchCommandButton;
+    private JCommandButton timeLineCommandButton;
     private JCommandButton gotoDocumentClassCommandButton;
     private JCommandButton clearRecentFilesCommandButton;
 
@@ -320,7 +322,11 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         toolsBand.setResizePolicies(getResizePolicies(toolsBand));
 
         searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.search")), View.getResizableIcon("search32"));
-        assignListener(searchCommandButton, ACTION_SEARCH_AS);
+        assignListener(searchCommandButton, ACTION_SEARCH);
+        
+        timeLineCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.timeline")), View.getResizableIcon("timeline32"));
+        assignListener(timeLineCommandButton, ACTION_TIMELINE);
+               
         gotoDocumentClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.gotodocumentclass")), View.getResizableIcon("gotomainclass32"));
         assignListener(gotoDocumentClassCommandButton, ACTION_GOTO_DOCUMENT_CLASS);
 
@@ -334,6 +340,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         assignListener(loadCacheCommandButton, ACTION_LOAD_CACHE);
 
         toolsBand.addCommandButton(searchCommandButton, RibbonElementPriority.TOP);
+        toolsBand.addCommandButton(timeLineCommandButton, RibbonElementPriority.TOP);        
         toolsBand.addCommandButton(gotoDocumentClassCommandButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(proxyCommandButton, RibbonElementPriority.MEDIUM);
         toolsBand.addCommandButton(loadMemoryCommandButton, RibbonElementPriority.MEDIUM);
@@ -507,6 +514,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         globalrenameCommandButton.setEnabled(swfLoaded);
         deobfuscationCommandButton.setEnabled(swfLoaded);
         searchCommandButton.setEnabled(swfLoaded);
+        timeLineCommandButton.setEnabled(swfLoaded);
 
         gotoDocumentClassCommandButton.setEnabled(hasAbc);
         deobfuscationCommandButton.setEnabled(hasAbc);
@@ -598,8 +606,11 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 Configuration.internalFlashViewer.set(miInternalViewer.isSelected());
                 mainFrame.panel.reload(true);
                 break;
-            case ACTION_SEARCH_AS:
+            case ACTION_SEARCH:
                 mainFrame.panel.searchAs();
+                break;
+            case ACTION_TIMELINE:
+                mainFrame.panel.timeline();
                 break;
             case ACTION_AUTO_DEOBFUSCATE:
                 if (View.showConfirmDialog(mainFrame.panel, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
