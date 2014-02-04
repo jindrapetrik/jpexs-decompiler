@@ -25,6 +25,9 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -80,6 +83,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
     /**
      * Is this BUTTONCONDACTION last in the list?
      */
+    @Internal
     public boolean isLast;
     /**
      * Idle to OverDown
@@ -116,6 +120,8 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
     /**
      * @since SWF 4 key code
      */
+    @SWFType(value=BasicType.UB,count=7)
+    @Conditional(minSwfVersion=4)
     public int condKeyPress;
     /**
      * OverDown to Idle
@@ -128,6 +134,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
     /**
      * Actions to perform in byte array
      */
+    @Internal
     public byte[] actionBytes;
 
     /**

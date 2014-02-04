@@ -16,12 +16,20 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
+import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
  */
 public class LINESTYLE {
 
+    @SWFType(BasicType.UI16)
     public int width;
+    
+    @ConditionalType(tags = {DefineShape3Tag.ID,DefineShape4Tag.ID}, type=RGBA.class)
     public RGB color;
 }

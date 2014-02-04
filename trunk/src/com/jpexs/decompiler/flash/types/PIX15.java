@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  * Represents 15-bit red, green and blue value
  *
@@ -26,13 +28,16 @@ public class PIX15 {
     /**
      * Red color value
      */
+    @SWFType(value=BasicType.UB, count = 5)
     public int red;
     /**
      * Green color value
      */
+    @SWFType(value=BasicType.UB, count = 5)
     public int green;
     /**
      * Blue color value
      */
+    @SWFType(value=BasicType.UB, count = 5)
     public int blue;
 }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.Color;
 
 /**
@@ -28,14 +29,17 @@ public class RGB {
     /**
      * Red color value
      */
+    @SWFType(BasicType.UI8)    
     public int red;
     /**
      * Green color value
      */
+    @SWFType(BasicType.UI8)    
     public int green;
     /**
      * Blue color value
      */
+    @SWFType(BasicType.UI8)    
     public int blue;
 
     public RGB(int red, int green, int blue) {

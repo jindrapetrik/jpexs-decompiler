@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  * Represents 32-bit alpha, red, green and blue value
  *
@@ -23,7 +25,9 @@ package com.jpexs.decompiler.flash.types;
  */
 public class ZONEDATA {
 
+    @SWFType(BasicType.FLOAT16)
     public int alignmentCoordinate;
+    @SWFType(BasicType.FLOAT16)
     public int range;
 
     @Override

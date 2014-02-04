@@ -16,12 +16,15 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
  */
 public class LANGCODE {
 
+    @SWFType(BasicType.UI8)
     public int languageCode;
 
     public LANGCODE() {
@@ -30,4 +33,11 @@ public class LANGCODE {
     public LANGCODE(int languageCode) {
         this.languageCode = languageCode;
     }
+
+    @Override
+    public String toString() {
+        return "[LANGCODE:"+languageCode+"]";
+    }
+    
+    
 }

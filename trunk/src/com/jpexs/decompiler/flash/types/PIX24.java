@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  * Represents 15-bit red, green and blue value
  *
@@ -23,18 +26,23 @@ package com.jpexs.decompiler.flash.types;
  */
 public class PIX24 {
 
+    @SWFType(BasicType.UI8)
+    @Reserved
     public int reserved;
     /**
      * Red color value
      */
+    @SWFType(BasicType.UI8)
     public int red;
     /**
      * Green color value
      */
+    @SWFType(BasicType.UI8)
     public int green;
     /**
      * Blue color value
      */
+    @SWFType(BasicType.UI8)
     public int blue;
 
     @Override

@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,7 +28,9 @@ import java.util.Set;
  */
 public class MORPHFILLSTYLE implements NeedsCharacters {
 
+    @SWFType(BasicType.UI8)
     public int fillStyleType;
+    
     public static final int SOLID = 0x0;
     public static final int LINEAR_GRADIENT = 0x10;
     public static final int RADIAL_GRADIENT = 0x12;
@@ -34,13 +38,29 @@ public class MORPHFILLSTYLE implements NeedsCharacters {
     public static final int CLIPPED_BITMAP = 0x41;
     public static final int NON_SMOOTHED_REPEATING_BITMAP = 0x42;
     public static final int NON_SMOOTHED_CLIPPED_BITMAP = 0x43;
+    
+    @Conditional(value="fillStyleType",options = {SOLID})
     public RGBA startColor;
+    
+    @Conditional(value="fillStyleType",options = {SOLID})
     public RGBA endColor;
+    
+    @Conditional(value="fillStyleType",options = {LINEAR_GRADIENT,RADIAL_GRADIENT})
     public MATRIX startGradientMatrix;
+    
+    @Conditional(value="fillStyleType",options = {LINEAR_GRADIENT,RADIAL_GRADIENT})
     public MATRIX endGradientMatrix;
+    
+    @Conditional(value="fillStyleType",options = {LINEAR_GRADIENT,RADIAL_GRADIENT})
     public MORPHGRADIENT gradient;
+    
+    @Conditional(value="fillStyleType",options = {CLIPPED_BITMAP,NON_SMOOTHED_REPEATING_BITMAP,NON_SMOOTHED_CLIPPED_BITMAP})
     public int bitmapId;
+    
+    @Conditional(value="fillStyleType",options = {CLIPPED_BITMAP,NON_SMOOTHED_REPEATING_BITMAP,NON_SMOOTHED_CLIPPED_BITMAP})
     public MATRIX startBitmapMatrix;
+    
+    @Conditional(value="fillStyleType",options = {CLIPPED_BITMAP,NON_SMOOTHED_REPEATING_BITMAP,NON_SMOOTHED_CLIPPED_BITMAP})
     public MATRIX endBitmapMatrix;
 
     @Override

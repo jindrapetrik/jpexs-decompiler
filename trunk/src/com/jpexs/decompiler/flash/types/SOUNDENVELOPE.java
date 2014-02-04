@@ -16,13 +16,18 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
  */
 public class SOUNDENVELOPE {
 
+    @SWFType(BasicType.UI32)
     public long pos44;
+    @SWFType(BasicType.UI16)
     public int leftLevel;
+    @SWFType(BasicType.UI16)
     public int rightLevel;
 }

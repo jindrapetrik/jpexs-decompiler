@@ -16,13 +16,17 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
  */
 public class GLYPHENTRY {
 
+    @SWFType(value=BasicType.UB,countField="+glyphBits")
     public int glyphIndex;
+    @SWFType(value=BasicType.SB,countField="advanceBits")
     public int glyphAdvance;
 
     @Override

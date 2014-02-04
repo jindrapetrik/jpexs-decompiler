@@ -1548,19 +1548,19 @@ public class SWFInputStream extends InputStream {
             int NScaleBits = (int) readUB(5);
             ret.scaleX = (int) readSB(NScaleBits);
             ret.scaleY = (int) readSB(NScaleBits);
-            ret.bitsScale = NScaleBits;
+            ret.nScaleBits = NScaleBits;
         }
         ret.hasRotate = readUB(1) == 1;
         if (ret.hasRotate) {
             int NRotateBits = (int) readUB(5);
             ret.rotateSkew0 = (int) readSB(NRotateBits);
             ret.rotateSkew1 = (int) readSB(NRotateBits);
-            ret.bitsRotate = NRotateBits;
+            ret.nRotateBits = NRotateBits;
         }
         int NTranslateBits = (int) readUB(5);
         ret.translateX = (int) readSB(NTranslateBits);
         ret.translateY = (int) readSB(NTranslateBits);
-        ret.bitsTranslate = NTranslateBits;
+        ret.nTranslateBits = NTranslateBits;
         alignByte();
         return ret;
     }

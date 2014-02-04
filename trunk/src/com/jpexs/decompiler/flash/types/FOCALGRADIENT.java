@@ -16,11 +16,14 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
  */
 public class FOCALGRADIENT extends GRADIENT {
 
+    @SWFType(BasicType.FIXED8)
     public float focalPoint;
 }

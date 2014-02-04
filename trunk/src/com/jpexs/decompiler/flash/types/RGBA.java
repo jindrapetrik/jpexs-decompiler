@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.Color;
 
 /**
@@ -28,6 +29,7 @@ public class RGBA extends RGB {
     /**
      * Alpha value defining opacity
      */
+    @SWFType(BasicType.UI8)        
     public int alpha;
 
     public float getAlphaFloat() {

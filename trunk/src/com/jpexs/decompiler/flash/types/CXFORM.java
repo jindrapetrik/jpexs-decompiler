@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.helpers.SerializableImage;
 
@@ -35,30 +36,37 @@ public class CXFORM {
      * Has color multiply values
      */
     public boolean hasMultTerms;
+    @SWFType(value=BasicType.UB,count=4)
     public int nbits;
     /**
      * Red multiply value
      */
+    @SWFType(value=BasicType.SB,countField="nbits")
     public int redMultTerm;
     /**
      * Green multiply value
      */
+    @SWFType(value=BasicType.SB,countField="nbits")
     public int greenMultTerm;
     /**
      * Blue multiply value
      */
+    @SWFType(value=BasicType.SB,countField="nbits")
     public int blueMultTerm;
     /**
      * Red addition value
      */
+    @SWFType(value=BasicType.SB,countField="nbits")
     public int redAddTerm;
     /**
      * Green addition value
      */
+    @SWFType(value=BasicType.SB,countField="nbits")
     public int greenAddTerm;
     /**
      * Blue addition value
      */
+    @SWFType(value=BasicType.SB,countField="nbits")
     public int blueAddTerm;
 
     public SerializableImage apply(SerializableImage src) {

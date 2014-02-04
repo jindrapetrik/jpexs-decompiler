@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
@@ -28,8 +31,19 @@ public class SOUNDINFO {
     public boolean hasLoops;
     public boolean hasOutPoint;
     public boolean hasInPoint;
+    
+    @Conditional("hasInPoint")
+    @SWFType(BasicType.UI32)
     public long inPoint;
+    
+    @Conditional("hasOutPoint")
+    @SWFType(BasicType.UI32)
     public long outPoint;
+    
+    @Conditional("hasLoops")
+    @SWFType(BasicType.UI16)
     public int loopCount;
+    
+    @Conditional("hasEnvelope")
     public SOUNDENVELOPE[] envelopeRecords = new SOUNDENVELOPE[0];
 }

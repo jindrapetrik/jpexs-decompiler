@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
@@ -25,12 +28,17 @@ public class MORPHGRADIENT {
     /**
      * Spread mode. See GRADIENT.SPREAD_* constants
      */
+    @SWFType(value=BasicType.UB,count=2)
     public int spreadMode;
     /**
      * Interpolation mode. See GRADIENT.INTERPOLATION_* constants
      */
+    @SWFType(value=BasicType.UB,count=2)
     public int interPolationMode;
+    @Internal
     public int numGradients;
+    
+    
     public MORPHGRADRECORD[] gradientRecords;
 
     public static RGBA morphColor(RGBA c1, RGBA c2, int ratio) {
