@@ -40,4 +40,6 @@ public @interface SWFType {
     int count() default 1;
     /// Field name on which Count depends
     String countField() default "";
+    //Count to add to countField
+    int countAdd() default 0;
 }
