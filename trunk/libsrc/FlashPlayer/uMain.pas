@@ -152,7 +152,6 @@ end;
 
 procedure TPipeThread.Execute();
 var
-  f: Textfile;
   pipe: cardinal;
   buffer: TBuf;
   pipename: PAnsiChar;
@@ -178,14 +177,6 @@ const
   CMD_SETVARIABLE = 13;
 begin
 
-  AssignFile(f, 'c:\log\pipelog.txt');
-  if FileExists('c:\log\pipelog.txt') = False then
-    Rewrite(f)
-  else
-  begin
-    Append(f);
-  end;
-
   try
     pipename := PAnsiChar('\\.\\pipe\ffdec_flashplayer_' + ParamStr(1));
     begin
@@ -193,7 +184,6 @@ begin
         FILE_SHARE_READ or FILE_SHARE_WRITE, nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
       repeat
-        cmd := 0;
         try
           ReadPipe(pipe, buffer, 1);
           cmd := buffer[0];
@@ -210,8 +200,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_PLAY error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
             end;
@@ -238,8 +226,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_CURRENT_FRAME error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
               buffer[0] := (val shr 8) mod 256;
@@ -256,8 +242,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_TOTAL_FRAMES error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
               buffer[0] := (val shr 8) mod 256;
@@ -272,8 +256,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_PAUSE error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
             end;
@@ -285,8 +267,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_RESUME error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
             end;
@@ -301,8 +281,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_PLAYING error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
 
@@ -316,8 +294,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_REWIND error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
             end;
@@ -331,8 +307,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_GOTO error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
             end;
@@ -349,8 +323,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_CALL error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
               val := length(vals);
@@ -373,8 +345,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_GETVARIABLE error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
               val := length(vals);
@@ -402,8 +372,6 @@ begin
                 on E: Exception do
                 begin
                   freeSWF();
-                  Writeln(f, 'CMD_SETVARIABLE error: ' + E.Message);
-                  Flush(f);
                 end;
               end;
             end;
@@ -412,8 +380,6 @@ begin
           on E: Exception do
           begin
             freeSWF();
-            Writeln(f, 'FATAL ERROR: ' + E.Message + ' cmd: ' + IntToStr(cmd));
-            Flush(f);
           end;
         end;
       until False;
