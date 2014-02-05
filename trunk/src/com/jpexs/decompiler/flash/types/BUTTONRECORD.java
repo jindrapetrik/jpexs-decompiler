@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.util.List;
 
@@ -53,10 +56,12 @@ public class BUTTONRECORD {
     /**
      * ID of character to place
      */
+    @SWFType(BasicType.UI16)        
     public int characterId;
     /**
      * Depth at which to place character
      */
+    @SWFType(BasicType.UI16)
     public int placeDepth;
     /**
      * Transformation matrix for character placement
@@ -74,6 +79,8 @@ public class BUTTONRECORD {
     /**
      * If within DefineButton2Tag and buttonHasBlendMode: Blend mode
      */
+    @SWFType(BasicType.UI8)
+    @Conditional(value={"buttonHasBlendMode"},tags={DefineButton2Tag.ID})
     public int blendMode;
 
     @Override

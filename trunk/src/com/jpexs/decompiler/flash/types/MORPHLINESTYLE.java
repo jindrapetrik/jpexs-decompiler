@@ -16,13 +16,17 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
  */
 public class MORPHLINESTYLE {
 
+    @SWFType(BasicType.UI16)
     public int startWidth;
+    @SWFType(BasicType.UI16)
     public int endWidth;
     public RGBA startColor;
     public RGBA endColor;

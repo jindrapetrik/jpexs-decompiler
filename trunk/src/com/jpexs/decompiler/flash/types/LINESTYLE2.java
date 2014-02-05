@@ -16,13 +16,18 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
  */
 public class LINESTYLE2 extends LINESTYLE {
 
+    @SWFType(value=BasicType.UB,count = 2)
     public int startCapStyle;
+    @SWFType(value=BasicType.UB,count = 2)
     public int joinStyle;
     public static final int ROUND_JOIN = 0;
     public static final int BEVEL_JOIN = 1;
@@ -32,10 +37,14 @@ public class LINESTYLE2 extends LINESTYLE {
     public boolean noVScaleFlag;
     public boolean pixelHintingFlag;
     public boolean noClose;
+    @SWFType(value=BasicType.UB,count = 2)
     public int endCapStyle;
     public static final int ROUND_CAP = 0;
     public static final int NO_CAP = 1;
     public static final int SQUARE_CAP = 2;
+    
+    @SWFType(BasicType.UI16)
+    @Conditional(value="joinStyle",options = MITER_JOIN)
     public int miterLimitFactor;
     public FILLSTYLE fillType;
 }

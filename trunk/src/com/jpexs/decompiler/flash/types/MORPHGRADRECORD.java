@@ -16,15 +16,22 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
  */
 public class MORPHGRADRECORD {
 
+    @SWFType(BasicType.UI8)
     public int startRatio;
+    
     public RGBA startColor;
+    
+    @SWFType(BasicType.UI8)
     public int endRatio;
+    
     public RGBA endColor;
 
     public GRADRECORD getStartRecord() {

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.Font;
 import java.awt.font.GlyphVector;
 import java.awt.font.TextAttribute;
@@ -31,8 +32,13 @@ import javax.swing.JPanel;
  */
 public class KERNINGRECORD {
 
+    @SWFType(value=BasicType.UI8,alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public int fontKerningCode1;
+    
+    @SWFType(value=BasicType.UI8,alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")    
     public int fontKerningCode2;
+    
+    @SWFType(BasicType.SI16)
     public int fontKerningAdjustment;
 
     @Override

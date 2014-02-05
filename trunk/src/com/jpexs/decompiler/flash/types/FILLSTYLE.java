@@ -16,7 +16,12 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +31,7 @@ import java.util.Set;
  */
 public class FILLSTYLE implements NeedsCharacters {
 
+    @SWFType(BasicType.UI8)
     public int fillStyleType;
     public static final int SOLID = 0x0;
     public static final int LINEAR_GRADIENT = 0x10;
@@ -35,11 +41,22 @@ public class FILLSTYLE implements NeedsCharacters {
     public static final int CLIPPED_BITMAP = 0x41;
     public static final int NON_SMOOTHED_REPEATING_BITMAP = 0x42;
     public static final int NON_SMOOTHED_CLIPPED_BITMAP = 0x43;
+    @Internal
     public boolean inShape3;
+    @ConditionalType(type = RGBA.class,tags = DefineShape3Tag.ID)
     public RGB color;
+    
+    @Conditional(value="fillStyleType",options={LINEAR_GRADIENT,RADIAL_GRADIENT,FOCAL_RADIAL_GRADIENT})
     public MATRIX gradientMatrix;
+    
+    @Conditional(value="fillStyleType",options={LINEAR_GRADIENT,RADIAL_GRADIENT,FOCAL_RADIAL_GRADIENT})
+    @ConditionalType(value="fillStyleType",type=FOCALGRADIENT.class, options={FOCAL_RADIAL_GRADIENT})
     public GRADIENT gradient;
+    
+    @Conditional(value="fillStyleType",options={REPEATING_BITMAP,CLIPPED_BITMAP,NON_SMOOTHED_REPEATING_BITMAP,NON_SMOOTHED_CLIPPED_BITMAP})    
     public int bitmapId;
+    
+    @Conditional(value="fillStyleType",options={REPEATING_BITMAP,CLIPPED_BITMAP,NON_SMOOTHED_REPEATING_BITMAP,NON_SMOOTHED_CLIPPED_BITMAP})    
     public MATRIX bitmapMatrix;
 
     @Override

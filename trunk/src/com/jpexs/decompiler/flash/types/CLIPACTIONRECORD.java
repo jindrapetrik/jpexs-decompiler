@@ -25,6 +25,8 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -85,8 +87,11 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
         "<Space>"
     };
 
+    @Internal
     private final SWF swf;
+    @Internal
     private long pos;
+    @Internal
     private long hdrPos;
 
     public CLIPACTIONRECORD(SWF swf, InputStream is, int version, long pos) throws IOException {
@@ -123,11 +128,13 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
     /**
      * If EventFlags contain ClipEventKeyPress: Key code to trap
      */
+    @Conditional("eventFlags.clipEventKeyPress")
     public int keyCode;
     /**
      * Actions to perform
      */
     //public List<Action> actions;
+    @Internal
     public byte[] actionBytes;
 
     /**

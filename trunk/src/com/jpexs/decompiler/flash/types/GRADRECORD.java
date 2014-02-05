@@ -16,13 +16,19 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
  */
 public class GRADRECORD {
 
+    @SWFType(BasicType.UI8)
     public int ratio;
+    
+    @Internal
     public boolean inShape3;
     public RGB color;
 
