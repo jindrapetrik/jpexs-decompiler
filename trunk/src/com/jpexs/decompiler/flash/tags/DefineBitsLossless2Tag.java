@@ -24,6 +24,9 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
 import com.jpexs.decompiler.flash.types.ARGB;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
@@ -37,14 +40,27 @@ import javax.imageio.ImageIO;
 
 public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
+    @SWFType(BasicType.UI16)    
     public int characterID;
+    
+    @SWFType(BasicType.UI8)    
     public int bitmapFormat;
+    
+    @SWFType(BasicType.UI16)
     public int bitmapWidth;
+    
+    @SWFType(BasicType.UI16)
     public int bitmapHeight;
+    
+    @SWFType(BasicType.UI8)
+    @Conditional(value="bitmapFormat",options={FORMAT_8BIT_COLORMAPPED})
     public int bitmapColorTableSize;
+    
     public byte[] zlibBitmapData; //TODO: Parse ALPHACOLORMAPDATA,ALPHABITMAPDATA
+    
     public static final int FORMAT_8BIT_COLORMAPPED = 3;
     public static final int FORMAT_32BIT_ARGB = 5;
+    
     public static final int ID = 36;
 
     @Override

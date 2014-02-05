@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,10 +38,12 @@ public class RemoveObjectTag extends CharacterIdTag implements RemoveTag {
     /**
      * ID of character to place
      */
+    @SWFType(BasicType.UI16)
     public int characterId;
     /**
      * Depth of character
      */
+    @SWFType(BasicType.UI16)
     public int depth;
     public static final int ID = 5;
 

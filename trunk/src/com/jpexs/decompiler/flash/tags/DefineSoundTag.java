@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,7 +34,10 @@ import java.io.OutputStream;
  */
 public class DefineSoundTag extends CharacterTag {
 
+    @SWFType(BasicType.UI16)
     public int soundId;
+       
+    @SWFType(value=BasicType.UB,count=4)
     public int soundFormat;
     public static final int FORMAT_UNCOMPRESSED_NATIVE_ENDIAN = 0;
     public static final int FORMAT_ADPCM = 1;
@@ -42,10 +47,16 @@ public class DefineSoundTag extends CharacterTag {
     public static final int FORMAT_NELLYMOSER8KHZ = 5;
     public static final int FORMAT_NELLYMOSER = 6;
     public static final int FORMAT_SPEEX = 11;
+    
+    @SWFType(value=BasicType.UB,count=2)    
     public int soundRate;
-    public int soundSize;
-    public int soundType;
+    
+    public boolean soundSize;
+    public boolean soundType;
+    
+    @SWFType(BasicType.UI32)
     public long soundSampleCount;
+    
     public byte[] soundData;
     public static final int ID = 14;
 
@@ -69,8 +80,8 @@ public class DefineSoundTag extends CharacterTag {
             sos.writeUI16(soundId);
             sos.writeUB(4, soundFormat);
             sos.writeUB(2, soundRate);
-            sos.writeUB(1, soundSize);
-            sos.writeUB(1, soundType);
+            sos.writeUB(1, soundSize?1:0);
+            sos.writeUB(1, soundType?1:0);
             sos.writeUI32(soundSampleCount);
             sos.write(soundData);
         } catch (IOException e) {
@@ -91,8 +102,8 @@ public class DefineSoundTag extends CharacterTag {
         soundId = sis.readUI16();
         soundFormat = (int) sis.readUB(4);
         soundRate = (int) sis.readUB(2);
-        soundSize = (int) sis.readUB(1);
-        soundType = (int) sis.readUB(1);
+        soundSize = sis.readUB(1)==1;
+        soundType = sis.readUB(1)==1;
         soundSampleCount = sis.readUI32();
         soundData = sis.readBytesEx(sis.available());
     }

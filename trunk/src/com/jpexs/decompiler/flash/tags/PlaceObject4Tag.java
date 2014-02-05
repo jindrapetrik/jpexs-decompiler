@@ -26,11 +26,16 @@ import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -113,64 +118,86 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
     /**
      * Depth of character
      */
+    @SWFType(BasicType.UI16)
     public int depth;
     /**
      * If PlaceFlagHasClassName or (PlaceFlagHasImage and
      * PlaceFlagHasCharacter), Name of the class to place
      */
+    @Conditional("placeFlagHasClassName|(placeFlagHasImage,placeFlagHasCharacter)")
     public String className;
     /**
      * If PlaceFlagHasCharacter, ID of character to place
      */
+    @SWFType(BasicType.UI16)
+    @Conditional("placeFlagHasCharacter")
     public int characterId;
     /**
      * If PlaceFlagHasMatrix, Transform matrix data
      */
+    @Conditional("placeFlagHasMatrix")
     public MATRIX matrix;
     /**
      * If PlaceFlagHasColorTransform, Color transform data
      */
+    @Conditional("placeFlagHasColorTransform")
     public CXFORMWITHALPHA colorTransform;
     /**
      * If PlaceFlagHasRatio, Ratio
      */
+    @SWFType(BasicType.UI16)
+    @Conditional("placeFlagHasRatio")
     public int ratio;
     /**
      * If PlaceFlagHasName, Name of character
      */
+    @Conditional("placeFlagHasName")
     public String name;
     /**
      * If PlaceFlagHasClipDepth, Clip depth
      */
+    @SWFType(BasicType.UI16)
+    @Conditional("placeFlagHasClipDepth")
     public int clipDepth;
     /**
      * If PlaceFlagHasFilterList, List of filters on this object
      */
+    @Conditional("placeFlagHasFilterList")
     public List<FILTER> surfaceFilterList;
     /**
      * If PlaceFlagHasBlendMode, Blend mode
      */
+    @SWFType(BasicType.UI8)
+    @Conditional("placeFlagHasBlendMode")
     public int blendMode;
     /**
      * If PlaceFlagHasCacheAsBitmap, 0 = Bitmap cache disabled, 1-255 = Bitmap
      * cache enabled
      */
+    @SWFType(BasicType.UI8)
+    @Conditional("placeFlagHasCacheAsBitmap")
     public int bitmapCache;
     /**
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
+    @Conditional(value = "placeFlagHasClipActions", minSwfVersion = 5)
     public CLIPACTIONS clipActions;
     /**
      * If PlaceFlagHasVisible, 0 = Place invisible, 1 = Place visible
      */
+    @Conditional("placeFlagHasVisible")
     public int visible;
     /**
      * If PlaceFlagHasVisible, Background color
      */
+    @Conditional("placeFlagOpaqueBackground")
     public RGBA backgroundColor;
     // FIXME bug found in ecoDrive.swf, 
+    @Internal
     private boolean bitmapCacheBug;
-    private final int reserved;
+    @Reserved
+    public boolean reserved;
+
     public static final int ID = 94;
     public byte[] amfData;  //TODO: Parse AMF data?
 
@@ -217,7 +244,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
             sos.writeUB(1, placeFlagHasMatrix ? 1 : 0);
             sos.writeUB(1, placeFlagHasCharacter ? 1 : 0);
             sos.writeUB(1, placeFlagMove ? 1 : 0);
-            sos.writeUB(1, reserved);
+            sos.writeUB(1, reserved ? 1 : 0);
             sos.writeUB(1, placeFlagOpaqueBackground ? 1 : 0); //SWF11
             sos.writeUB(1, placeFlagHasVisible ? 1 : 0); //SWF11
             sos.writeUB(1, placeFlagHasImage ? 1 : 0);
@@ -293,7 +320,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
         placeFlagHasMatrix = sis.readUB(1) == 1;
         placeFlagHasCharacter = sis.readUB(1) == 1;
         placeFlagMove = sis.readUB(1) == 1;
-        reserved = (int) sis.readUB(1);
+        reserved = sis.readUB(1) == 1;
         placeFlagOpaqueBackground = sis.readUB(1) == 1; //SWF11
         placeFlagHasVisible = sis.readUB(1) == 1;       //SWF11
         placeFlagHasImage = sis.readUB(1) == 1;

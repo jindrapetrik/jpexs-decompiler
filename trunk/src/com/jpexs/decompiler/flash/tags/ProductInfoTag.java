@@ -18,18 +18,32 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class ProductInfoTag extends Tag {
 
+    @SWFType(BasicType.UI32)    
     public long productID;
+    @SWFType(BasicType.UI32)
     public long edition;
+    @SWFType(BasicType.UI8)
     public int majorVersion;
+    @SWFType(BasicType.UI8)
     public int minorVersion;
+    @SWFType(BasicType.UI32)
     public long buildLow;
+    @SWFType(BasicType.UI32)
     public long buildHigh;
-    public long compilationDate;
+    @SWFType(BasicType.UI32)
+    public long compilationDateLow;
+    @SWFType(BasicType.UI32)
+    public long compilationDateHigh;
     public static final int ID = 41;
 
     public ProductInfoTag(SWF swf, byte[] data, int version, long pos) throws IOException {
@@ -57,7 +71,28 @@ public class ProductInfoTag extends Tag {
         minorVersion = sis.readUI8();
         buildLow = sis.readUI32();
         buildHigh = sis.readUI32();
-        compilationDate = sis.readUI32() & 0xffffffffL;
-        compilationDate |= sis.readUI32() << 32;
+        compilationDateLow = sis.readUI32();
+        compilationDateHigh = sis.readUI32();
     }
+
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI32(productID);
+            sos.writeUI32(edition);
+            sos.writeUI8(majorVersion);
+            sos.writeUI8(minorVersion);
+            sos.writeUI32(buildLow);
+            sos.writeUI32(buildHigh);
+            sos.writeUI32(compilationDateLow);
+            sos.writeUI32(compilationDateHigh);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
+    
+    
 }

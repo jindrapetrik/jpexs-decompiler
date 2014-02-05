@@ -25,11 +25,14 @@ import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -82,34 +85,44 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
     /**
      * Depth of character
      */
+    @SWFType(BasicType.UI16)
     public int depth;
     /**
      * If PlaceFlagHasCharacter, ID of character to place
      */
+    @SWFType(BasicType.UI16)
+    @Conditional("placeFlagHasCharacter")
     public int characterId;
     /**
      * If PlaceFlagHasMatrix, Transform matrix data
      */
+    @Conditional("placeFlagHasMatrix")
     public MATRIX matrix;
     /**
      * If PlaceFlagHasColorTransform, Color transform data
      */
+    @Conditional("placeFlagHasColorTransform")
     public CXFORMWITHALPHA colorTransform;
     /**
      * If PlaceFlagHasRatio, ratio
      */
+    @SWFType(BasicType.UI16)
+    @Conditional("placeFlagHasRatio")
     public int ratio;
     /**
      * If PlaceFlagHasName, Name of character
      */
+    @Conditional("placeFlagHasName")
     public String name;
     /**
      * If PlaceFlagHasClipDepth, Clip depth
      */
+    @Conditional("placeFlagHasClipDepth")
     public int clipDepth;
     /**
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
+    @Conditional("placeFlagHasClipActions")    
     public CLIPACTIONS clipActions;
     public static final int ID = 26;
 

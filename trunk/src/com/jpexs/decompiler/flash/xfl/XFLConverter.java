@@ -1301,8 +1301,8 @@ public class XFLConverter {
             } else if ((symbol instanceof SoundStreamHeadTypeTag) || (symbol instanceof DefineSoundTag)) {
                 int soundFormat = 0;
                 int soundRate = 0;
-                int soundType = 0;
-                int soundSize = 0;
+                boolean soundType = false;
+                boolean soundSize = false;
                 long soundSampleCount = 0;
                 byte[] soundData = new byte[0];
                 int[] rateMap = {5, 11, 22, 44};
@@ -1339,7 +1339,7 @@ public class XFLConverter {
                 if ((soundFormat == DefineSoundTag.FORMAT_ADPCM)
                         || (soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN)
                         || (soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN)) {
-                    if (soundType == 1) { //stereo
+                    if (soundType) { //stereo
                         format += 1;
                     }
                     switch (soundRate) {
@@ -1372,7 +1372,7 @@ public class XFLConverter {
                 }
                 if (soundFormat == DefineSoundTag.FORMAT_MP3) {
                     exportFormat = "mp3";
-                    if (soundType == 0) { //mono
+                    if (!soundType) { //mono
                         format += 1;
                     }
                     format += 4; //quality best
@@ -1438,8 +1438,8 @@ public class XFLConverter {
                     mediaLinkStr += " href=\"" + symbolFile + "\"";
                     mediaLinkStr += " format=\"";
                     mediaLinkStr += rateMap[soundRate] + "kHz";
-                    mediaLinkStr += " " + (soundSize == 1 ? "16bit" : "8bit");
-                    mediaLinkStr += " " + (soundType == 1 ? "Stereo" : "Mono");
+                    mediaLinkStr += " " + (soundSize ? "16bit" : "8bit");
+                    mediaLinkStr += " " + (soundType ? "Stereo" : "Mono");
                     mediaLinkStr += "\"";
                     mediaLinkStr += " exportFormat=\"" + format + "\" exportBits=\"" + bits + "\" sampleCount=\"" + soundSampleCount + "\"";
 

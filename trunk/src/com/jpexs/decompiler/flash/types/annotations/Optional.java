@@ -15,26 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jpexs.decompiler.flash.types;
+package com.jpexs.decompiler.flash.types.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- *
+ * The field is optional anc can be unset
  * @author JPEXS
  */
-public enum BasicType {
-    UI8,
-    UI16,    
-    UI32,
-    EncodedU32,
-    SI8,
-    SI16,
-    SI32,
-    UB,
-    SB,
-    FB,
-    FLOAT,
-    FLOAT16,
-    FIXED,
-    FIXED8,
-    NONE
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Optional {
+    
 }

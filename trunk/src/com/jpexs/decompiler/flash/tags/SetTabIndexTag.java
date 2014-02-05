@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,10 +36,12 @@ public class SetTabIndexTag extends Tag {
     /**
      * Depth of character
      */
+    @SWFType(BasicType.UI16)
     public int depth;
     /**
      * Tab order value
      */
+    @SWFType(BasicType.UI16)
     public int tabIndex;
     public static final int ID = 66;
 

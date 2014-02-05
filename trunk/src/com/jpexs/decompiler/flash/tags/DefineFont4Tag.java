@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,7 +29,9 @@ import java.io.OutputStream;
 
 public class DefineFont4Tag extends CharacterTag {
 
+    @SWFType(BasicType.UI16)
     public int fontID;
+    
     public boolean fontFlagsHasFontData;
     public boolean fontFlagsItalic;
     public boolean fontFlagsBold;

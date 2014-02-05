@@ -20,7 +20,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,14 +35,27 @@ import java.io.OutputStream;
  */
 public class DefineButtonSoundTag extends CharacterTag {
 
+    @SWFType(BasicType.UI16)    
     public int buttonId;
+    
+    @SWFType(BasicType.UI16)        
     public int buttonSoundChar0;
+    
     public SOUNDINFO buttonSoundInfo0;
+    
+    @SWFType(BasicType.UI16)        
     public int buttonSoundChar1;
+    
     public SOUNDINFO buttonSoundInfo1;
+    
+    @SWFType(BasicType.UI16)    
     public int buttonSoundChar2;
+    
     public SOUNDINFO buttonSoundInfo2;
+    
+    @SWFType(BasicType.UI16)    
     public int buttonSoundChar3;
+    
     public SOUNDINFO buttonSoundInfo3;
     public static final int ID = 17;
 

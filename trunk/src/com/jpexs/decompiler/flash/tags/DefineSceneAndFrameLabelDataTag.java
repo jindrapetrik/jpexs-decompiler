@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,9 +33,14 @@ import java.io.OutputStream;
  */
 public class DefineSceneAndFrameLabelDataTag extends Tag {
 
+    @SWFType(BasicType.EncodedU32)
     public long[] sceneOffsets;
+    
     public String[] sceneNames;
+    
+    @SWFType(BasicType.EncodedU32)
     public long[] frameNums;
+    
     public String[] frameNames;
     public static final int ID = 86;
 

@@ -30,11 +30,13 @@ import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
@@ -58,6 +60,7 @@ import java.util.regex.Pattern;
  */
 public class DefineTextTag extends TextTag implements DrawableTag {
 
+    @SWFType(BasicType.UI16)
     public int characterID;
     public RECT textBounds;
     public MATRIX textMatrix;

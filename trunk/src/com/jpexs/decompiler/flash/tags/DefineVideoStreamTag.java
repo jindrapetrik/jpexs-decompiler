@@ -21,7 +21,9 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,13 +38,26 @@ import java.util.Stack;
  */
 public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
 
+    @SWFType(BasicType.UI16)
     public int characterID;
+    
+    @SWFType(BasicType.UI16)
     public int numFrames;
+    
+    @SWFType(BasicType.UI16)
     public int width;
+    
+    @SWFType(BasicType.UI16)
     public int height;
+    
+    @SWFType(value=BasicType.UB,count=3)
     public int videoFlagsDeblocking;
+    
     public boolean videoFlagsSmoothing;
+    
+    @SWFType(BasicType.UI8)
     public int codecID;
+    
     public static final int CODEC_SORENSON_H263 = 2;
     public static final int CODEC_SCREEN_VIDEO = 3;
     public static final int CODEC_VP6 = 4;

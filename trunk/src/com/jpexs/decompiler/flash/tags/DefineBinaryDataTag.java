@@ -20,6 +20,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,9 +30,15 @@ import java.io.OutputStream;
 
 public class DefineBinaryDataTag extends CharacterTag {
 
+    @SWFType(BasicType.UI16)
     public int tag;
+        
     public byte[] binaryData;
+    
+    @Reserved
+    @SWFType(BasicType.UI32)
     public long reserved;
+    
     public static final int ID = 87;
 
     /**

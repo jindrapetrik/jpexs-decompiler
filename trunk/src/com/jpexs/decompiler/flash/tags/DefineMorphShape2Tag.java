@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
@@ -33,6 +34,7 @@ import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -57,6 +59,7 @@ import java.util.Stack;
  */
 public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, MorphShapeTag, DrawableTag {
 
+    @SWFType(BasicType.UI16)
     public int characterId;
     public RECT startBounds;
     public RECT endBounds;

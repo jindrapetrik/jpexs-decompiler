@@ -1141,18 +1141,18 @@ public final class SWF implements TreeItem {
         }
     }
 
-    private static void createWavFromAdpcm(OutputStream fos, int soundRate, int soundSize, int soundType, byte[] data) throws IOException {
-        byte[] pcmData = AdpcmDecoder.decode(data, soundType == 1 ? true : false);
+    private static void createWavFromAdpcm(OutputStream fos, int soundRate, boolean soundSize, boolean soundType, byte[] data) throws IOException {
+        byte[] pcmData = AdpcmDecoder.decode(data, soundType);
 
         ByteArrayOutputStream subChunk1Data = new ByteArrayOutputStream();
         int audioFormat = 1; //PCM
         writeLE(subChunk1Data, audioFormat, 2);
-        int numChannels = soundType == 1 ? 2 : 1;
+        int numChannels = soundType ? 2 : 1;
         writeLE(subChunk1Data, numChannels, 2);
         int[] rateMap = {5512, 11025, 22050, 44100};
         int sampleRate = rateMap[soundRate];
         writeLE(subChunk1Data, sampleRate, 4);
-        int bitsPerSample = soundSize == 1 ? 16 : 8;
+        int bitsPerSample = soundSize ? 16 : 8;
         int byteRate = sampleRate * numChannels * bitsPerSample / 8;
         writeLE(subChunk1Data, byteRate, 4);
         int blockAlign = numChannels * bitsPerSample / 8;

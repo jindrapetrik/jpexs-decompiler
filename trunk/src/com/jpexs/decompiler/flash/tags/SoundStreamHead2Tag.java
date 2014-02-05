@@ -21,6 +21,10 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,15 +37,29 @@ import java.io.OutputStream;
  */
 public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHeadTypeTag {
 
+    @SWFType(value=BasicType.UB,count=2)
     public int playBackSoundRate;
-    public int playBackSoundSize;
-    public int playBackSoundType;
+    
+    public boolean playBackSoundSize;
+    public boolean playBackSoundType;
+    
+    @SWFType(value=BasicType.UB,count=4)
     public int streamSoundCompression;
+    
+    @SWFType(value=BasicType.UB,count=2)
     public int streamSoundRate;
-    public int streamSoundSize;
-    public int streamSoundType;
+    
+    public boolean streamSoundSize;
+    public boolean streamSoundType;
+    
+    @SWFType(BasicType.UI16)
     public int streamSoundSampleCount;
+    
+    @SWFType(BasicType.SI16)
+    @Conditional(value="streamSoundCompression",options={2})
     public int latencySeek;
+    
+    @Internal
     private int virtualCharacterId = 0;
     public static final int ID = 45;
 
@@ -85,12 +103,12 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
         try {
             sos.writeUB(4, 0);//reserved
             sos.writeUB(2, playBackSoundRate);
-            sos.writeUB(1, playBackSoundSize);
-            sos.writeUB(1, playBackSoundType);
+            sos.writeUB(1, playBackSoundSize?1:0);
+            sos.writeUB(1, playBackSoundType?1:0);
             sos.writeUB(4, streamSoundCompression);
             sos.writeUB(2, streamSoundRate);
-            sos.writeUB(1, streamSoundSize);
-            sos.writeUB(1, streamSoundType);
+            sos.writeUB(1, streamSoundSize?1:0);
+            sos.writeUB(1, streamSoundType?1:0);
             sos.writeUI16(streamSoundSampleCount);
             if (streamSoundCompression == 2) {
                 sos.writeSI16(latencySeek);
@@ -113,12 +131,12 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         sis.readUB(4);//reserved
         playBackSoundRate = (int) sis.readUB(2);
-        playBackSoundSize = (int) sis.readUB(1);
-        playBackSoundType = (int) sis.readUB(1);
+        playBackSoundSize =  sis.readUB(1) == 1;
+        playBackSoundType = sis.readUB(1) == 1;
         streamSoundCompression = (int) sis.readUB(4);
         streamSoundRate = (int) sis.readUB(2);
-        streamSoundSize = (int) sis.readUB(1);
-        streamSoundType = (int) sis.readUB(1);
+        streamSoundSize = sis.readUB(1) == 1;
+        streamSoundType = sis.readUB(1) == 1;
         streamSoundSampleCount = sis.readUI16();
         if (streamSoundCompression == 2) {
             latencySeek = sis.readSI16();
@@ -136,12 +154,12 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
     }
 
     @Override
-    public int getSoundSize() {
+    public boolean getSoundSize() {
         return streamSoundSize;
     }
 
     @Override
-    public int getSoundType() {
+    public boolean getSoundType() {
         return streamSoundType;
     }
 }

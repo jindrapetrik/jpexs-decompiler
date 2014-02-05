@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,9 +34,15 @@ import javax.imageio.ImageIO;
 
 public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
+    @SWFType(BasicType.UI16)
     public int characterID;
+    
+    @SWFType(BasicType.UI8)
     public byte[] imageData;
+    
+    @SWFType(BasicType.UI8)
     public byte[] bitmapAlphaData;
+    
     public static final int ID = 35;
 
     @Override

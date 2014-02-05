@@ -43,11 +43,11 @@ public class AUDIODATA extends DATA {
     public static final int SOUNDTYPE_STEREO = 1;
     public int soundFormat;
     public int soundRate;
-    public int soundSize;
-    public int soundType;
+    public boolean soundSize;
+    public boolean soundType;
     public byte[] soundData;
 
-    public AUDIODATA(int soundFormat, int soundRate, int soundSize, int soundType, byte[] soundData) {
+    public AUDIODATA(int soundFormat, int soundRate, boolean soundSize, boolean soundType, byte[] soundData) {
         this.soundFormat = soundFormat;
         this.soundRate = soundRate;
         this.soundSize = soundSize;
@@ -62,8 +62,8 @@ public class AUDIODATA extends DATA {
             FLVOutputStream flv = new FLVOutputStream(baos);
             flv.writeUB(4, soundFormat);
             flv.writeUB(2, soundRate);
-            flv.writeUB(1, soundSize);
-            flv.writeUB(1, soundType);
+            flv.writeUB(1, soundSize?1:0);
+            flv.writeUB(1, soundType?1:0);
             flv.write(soundData);
         } catch (IOException ex) {
             //ignore

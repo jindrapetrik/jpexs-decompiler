@@ -31,8 +31,10 @@ import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
@@ -60,7 +62,9 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     /**
      * ID for this character
      */
+    @SWFType(BasicType.UI16)    
     public int buttonId;
+    
     /**
      * Track as menu button
      */

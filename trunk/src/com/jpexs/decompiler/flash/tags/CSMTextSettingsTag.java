@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,11 +33,21 @@ import java.io.OutputStream;
  */
 public class CSMTextSettingsTag extends Tag {
 
+    @SWFType(BasicType.UI16)
     public int textID;
+    
+    @SWFType(value=BasicType.UB,count=2)
     public int useFlashType;
+    
+    @SWFType(value=BasicType.UB,count=3)
     public int gridFit;
+    
+    @SWFType(value=BasicType.FLOAT)  //F32 = FLOAT
     public float thickness;
+    
+    @SWFType(value=BasicType.FLOAT)  //F32 = FLOAT
     public float sharpness;
+    
     public static final int ID = 74;
 
     /**

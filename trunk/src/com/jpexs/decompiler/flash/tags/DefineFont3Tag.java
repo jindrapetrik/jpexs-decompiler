@@ -22,10 +22,14 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
@@ -39,7 +43,9 @@ import javax.swing.JPanel;
 
 public class DefineFont3Tag extends FontTag {
 
+    @SWFType(BasicType.UI16)    
     public int fontId;
+    
     public boolean fontFlagsHasLayout;
     public boolean fontFlagsShiftJIS;
     public boolean fontFlagsSmallText;
@@ -50,13 +56,26 @@ public class DefineFont3Tag extends FontTag {
     public boolean fontFlagsBold;
     public LANGCODE languageCode;
     public String fontName;
+    @Internal
     public int numGlyphs;
-    //public long[] offsetTable];
+    
     public List<SHAPE> glyphShapeTable;
+        
+    @SWFType(value=BasicType.UI16,alternateValue = BasicType.UI32,alternateCondition = "fontFlagsWideCodes")
     public List<Integer> codeTable;
+    
+    @SWFType(BasicType.UI16)
+    @Conditional("fontFlagsHasLayout")
     public int fontAscent;
+    
+    @SWFType(BasicType.UI16)
+    @Conditional("fontFlagsHasLayout")
     public int fontDescent;
+    
+    @SWFType(BasicType.SI16)
+    @Conditional("fontFlagsHasLayout")
     public int fontLeading;
+    
     public List<Integer> fontAdvanceTable;
     public List<RECT> fontBoundsTable;
     public KERNINGRECORD[] fontKerningTable;

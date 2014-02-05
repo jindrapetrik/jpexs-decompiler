@@ -22,6 +22,9 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,6 +43,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
     /**
      * ActionScript 3 bytecodes
      */
+    @Internal
     private final ABC abc;
     /**
      * A 32-bit flags value, which may contain the following bits set:
@@ -47,6 +51,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      * executed immediately, but only parsed. A later finddef may cause its
      * scripts to execute.
      */
+    @SWFType(BasicType.UI32)    
     public long flags;
     /**
      * The name assigned to the bytecode.

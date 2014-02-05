@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -42,6 +43,7 @@ public class DoActionTag extends Tag implements ASMSource {
      * List of actions to perform
      */
     //public List<Action> actions = new ArrayList<Action>();
+    @Internal
     public byte[] actionBytes;
     public static final int ID = 12;
 

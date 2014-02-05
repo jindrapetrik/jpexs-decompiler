@@ -37,7 +37,7 @@ public @interface SWFType {
     /// Condition for alternate type
     String alternateCondition() default "";
     /// Count - used primarily for bit fields UB,SB,FB to specify number of bits
-    int count() default 1;
+    int count() default -1;
     /// Field name on which Count depends
     String countField() default "";
     //Count to add to countField

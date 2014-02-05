@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ZONERECORD;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,7 +31,9 @@ import java.util.List;
 
 public class DefineFontAlignZonesTag extends Tag {
 
+    @SWFType(BasicType.UI16)
     public int fontID;
+    @SWFType(value=BasicType.UB,count=2)
     public int CSMTableHint;
     public List<ZONERECORD> zoneTable;
     public static final int ID = 73;

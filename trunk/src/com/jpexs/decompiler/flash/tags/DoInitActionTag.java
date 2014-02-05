@@ -25,6 +25,9 @@ import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -41,11 +44,13 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     /**
      * Identifier of Sprite
      */
+    @SWFType(BasicType.UI16)
     public int spriteId = 0;
     /**
      * List of actions to perform
      */
     //public List<Action> actions = new ArrayList<Action>();
+    @Internal
     public byte[] actionBytes;
     public static final int ID = 59;
 

@@ -26,9 +26,9 @@ public interface SoundStreamHeadTypeTag {
 
     public int getSoundRate();
 
-    public int getSoundSize();
+    public boolean getSoundSize();
 
-    public int getSoundType();
+    public boolean getSoundType();
 
     public long getSoundSampleCount();
 

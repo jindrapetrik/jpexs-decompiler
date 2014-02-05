@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,6 +36,7 @@ import java.util.List;
  */
 public class DefineFontInfoTag extends Tag {
 
+    @SWFType(BasicType.UI16)
     public int fontId;
     public String fontName;
     public boolean fontFlagsSmallText;
@@ -42,6 +45,7 @@ public class DefineFontInfoTag extends Tag {
     public boolean fontFlagsItalic;
     public boolean fontFlagsBold;
     public boolean fontFlagsWideCodes;
+    @SWFType(value=BasicType.UI8,alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public List<Integer> codeTable;
     public static final int ID = 13;
 

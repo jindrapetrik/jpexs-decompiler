@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,8 +34,10 @@ public class FileAttributesTag extends Tag {
     public boolean actionScript3;
     public boolean useNetwork;
     public boolean noCrossDomainCache;
-    private int reserved1;
-    private int reserved2;
+    private boolean reserved1;
+    private boolean reserved2;
+    
+    @SWFType(value=BasicType.UB,count=24)
     private int reserved3;
     public static final int ID = 69;
 
@@ -44,14 +48,14 @@ public class FileAttributesTag extends Tag {
     public FileAttributesTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "FileAttributes", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        reserved1 = (int) sis.readUB(1); // reserved
+        reserved1 = sis.readUB(1)==1; // reserved
         // UB[1] == 0  (reserved)
         useDirectBlit = sis.readUB(1) != 0;
         useGPU = sis.readUB(1) != 0;
         hasMetadata = sis.readUB(1) != 0;
         actionScript3 = sis.readUB(1) != 0;
         noCrossDomainCache = sis.readUB(1) != 0;
-        reserved2 = (int) sis.readUB(1); // reserved
+        reserved2 = sis.readUB(1)==1; // reserved
         useNetwork = sis.readUB(1) != 0;
         // UB[24] == 0 (reserved)
         reserved3 = (int) sis.readUB(24); //reserved
@@ -69,13 +73,13 @@ public class FileAttributesTag extends Tag {
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
-            sos.writeUB(1, reserved1); //reserved
+            sos.writeUB(1, reserved1?1:0); //reserved
             sos.writeUB(1, useDirectBlit ? 1 : 0);
             sos.writeUB(1, useGPU ? 1 : 0);
             sos.writeUB(1, hasMetadata ? 1 : 0);
             sos.writeUB(1, actionScript3 ? 1 : 0);
             sos.writeUB(1, noCrossDomainCache ? 1 : 0);
-            sos.writeUB(1, reserved2); //reserved
+            sos.writeUB(1, reserved2?1:0); //reserved
             sos.writeUB(1, useNetwork ? 1 : 0);
             sos.writeUB(24, reserved3); //reserved
         } catch (IOException e) {

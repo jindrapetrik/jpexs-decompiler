@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.LANGCODE;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,6 +37,7 @@ import java.util.List;
  */
 public class DefineFontInfo2Tag extends Tag {
 
+    @SWFType(BasicType.UI16)
     public int fontID;
     public String fontName;
     public boolean fontFlagsSmallText;
@@ -42,8 +45,9 @@ public class DefineFontInfo2Tag extends Tag {
     public boolean fontFlagsANSI;
     public boolean fontFlagsItalic;
     public boolean fontFlagsBold;
-    public boolean fontFlagsWideCodes;
+    public boolean fontFlagsWideCodes; //always 1
     public LANGCODE languageCode;
+    @SWFType(BasicType.UI16)
     public List<Integer> codeTable;
     public static final int ID = 62;
 

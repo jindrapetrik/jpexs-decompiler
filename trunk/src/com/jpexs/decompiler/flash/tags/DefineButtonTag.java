@@ -33,8 +33,11 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
@@ -64,6 +67,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     /**
      * ID for this character
      */
+    @SWFType(BasicType.UI16)    
     public int buttonId;
     /**
      * Characters that make up the button
@@ -73,6 +77,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      * Actions to perform
      */
     //public List<Action> actions;
+    @Internal
     public byte[] actionBytes;
     public static final int ID = 7;
 

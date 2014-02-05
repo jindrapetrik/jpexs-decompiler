@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
     /**
      * ActionScript 3 bytecodes
      */
+    @Internal
     private final ABC abc;
     public static final int ID = 72;
 

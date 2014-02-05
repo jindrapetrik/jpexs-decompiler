@@ -29,8 +29,11 @@ import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.geom.AffineTransform;
@@ -53,16 +56,18 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     /**
      * Character ID of sprite
      */
+    @SWFType(BasicType.UI16)
     public int spriteId;
     /**
      * Number of frames in sprite
      */
+    @SWFType(BasicType.UI16)
     public int frameCount;
     /**
      * A series of tags
      */
     public List<Tag> subTags;
-    private int level;
+    
     public static final int ID = 39;
 
     @Override

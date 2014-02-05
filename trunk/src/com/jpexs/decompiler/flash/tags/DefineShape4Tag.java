@@ -25,8 +25,10 @@ import com.jpexs.decompiler.flash.exporters.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,9 +39,10 @@ import java.util.Stack;
 
 public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTag {
 
+    @SWFType(BasicType.UI16)
     public int shapeId;
-    private final RECT shapeBounds;
-    private final RECT edgeBounds;
+    public RECT shapeBounds;
+    public RECT edgeBounds;
     public boolean usesFillWindingRule;
     public boolean usesNonScalingStrokes;
     public boolean usesScalingStrokes;

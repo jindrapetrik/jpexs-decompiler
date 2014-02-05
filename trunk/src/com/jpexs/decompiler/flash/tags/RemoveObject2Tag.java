@@ -19,11 +19,14 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 public class RemoveObject2Tag extends Tag implements RemoveTag {
 
+    @SWFType(BasicType.UI16)
     public int depth;
     public static final int ID = 28;
 

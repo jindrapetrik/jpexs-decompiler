@@ -21,11 +21,14 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.Optional;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,10 +48,12 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
     /**
      * ID of character to place
      */
+    @SWFType(BasicType.UI16)
     public int characterId;
     /**
      * Depth of character
      */
+    @SWFType(BasicType.UI16)
     public int depth;
     /**
      * Transform matrix data
@@ -57,6 +62,7 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
     /**
      * Color transform data
      */
+    @Optional
     public CXFORM colorTransform;
     public static final int ID = 4;
 
