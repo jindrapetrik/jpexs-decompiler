@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -31,31 +33,37 @@ public class GRADIENTBEVELFILTER extends FILTER {
 
     /**
      * Gradient colors
-     */
+     */    
     public RGBA[] gradientColors = new RGBA[0];
     /**
      * Gradient ratios
      */
+    @SWFType(BasicType.UI8)    
     public int[] gradientRatio = new int[0];
     /**
      * Horizontal blur amount
      */
+    @SWFType(BasicType.FIXED)
     public double blurX;
     /**
      * Vertical blur amount
      */
+    @SWFType(BasicType.FIXED)
     public double blurY;
     /**
      * Radian angle of the gradient bevel
      */
+    @SWFType(BasicType.FIXED)
     public double angle;
     /**
      * Distance of the gradient bevel
      */
+    @SWFType(BasicType.FIXED)
     public double distance;
     /**
      * Strength of the gradient bevel
      */
+    @SWFType(BasicType.FIXED8)
     public float strength;
     /**
      * Inner bevel mode
@@ -76,6 +84,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
     /**
      * Number of blur passes
      */
+    @SWFType(value=BasicType.UB,count=4)
     public int passes;
 
     public GRADIENTBEVELFILTER() {

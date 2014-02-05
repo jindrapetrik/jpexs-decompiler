@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 
 /**
@@ -29,22 +31,27 @@ public class CONVOLUTIONFILTER extends FILTER {
     /**
      * Horizontal matrix size
      */
+    @SWFType(BasicType.UI8)
     public int matrixX;
     /**
      * Vertical matrix size
      */
+    @SWFType(BasicType.UI8)    
     public int matrixY;
     /**
      * Divisor applied to the matrix values
      */
+    @SWFType(BasicType.FLOAT)
     public float divisor;
     /**
      * Bias applied to the matrix values
      */
+    @SWFType(BasicType.FLOAT)
     public float bias;
     /**
      * Matrix values
      */
+    @SWFType(BasicType.FLOAT)
     public float[][] matrix = new float[0][0];
     /**
      * Default color for pixels outside the image

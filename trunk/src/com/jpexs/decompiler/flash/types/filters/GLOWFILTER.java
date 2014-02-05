@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 
 /**
@@ -33,14 +35,17 @@ public class GLOWFILTER extends FILTER {
     /**
      * Horizontal blur amount
      */
+    @SWFType(BasicType.FIXED)
     public double blurX;
     /**
      * Vertical blur amount
      */
+    @SWFType(BasicType.FIXED)
     public double blurY;
     /**
      * Strength of the glow
      */
+    @SWFType(BasicType.FIXED8)
     public float strength;
     /**
      * Inner glow mode
@@ -57,6 +62,7 @@ public class GLOWFILTER extends FILTER {
     /**
      * Number of blur passes
      */
+    @SWFType(value=BasicType.UB,count=5)
     public int passes;
 
     /**

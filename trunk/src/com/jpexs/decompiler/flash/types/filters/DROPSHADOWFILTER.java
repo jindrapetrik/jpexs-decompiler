@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 
 /**
@@ -33,22 +35,27 @@ public class DROPSHADOWFILTER extends FILTER {
     /**
      * Horizontal blur amount
      */
+    @SWFType(BasicType.FIXED)
     public double blurX;
     /**
      * Vertical blur amount
      */
+    @SWFType(BasicType.FIXED)
     public double blurY;
     /**
      * Radian angle of the drop shadow
      */
+    @SWFType(BasicType.FIXED)
     public double angle;
     /**
      * Distance of the drop shadow
      */
+    @SWFType(BasicType.FIXED)
     public double distance;
     /**
      * Strength of the drop shadow
      */
+    @SWFType(BasicType.FIXED8)
     public float strength;
     /**
      * Inner shadow mode
@@ -65,6 +72,7 @@ public class DROPSHADOWFILTER extends FILTER {
     /**
      * Number of blur passes
      */
+    @SWFType(value=BasicType.UB,count=5)
     public int passes;
 
     /**

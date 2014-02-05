@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -36,26 +38,32 @@ public class GRADIENTGLOWFILTER extends FILTER {
     /**
      * Gradient ratios
      */
+    @SWFType(BasicType.UI8)
     public int[] gradientRatio;
     /**
      * Horizontal blur amount
      */
+    @SWFType(BasicType.FIXED)
     public double blurX;
     /**
      * Vertical blur amount
      */
+    @SWFType(BasicType.FIXED)
     public double blurY;
     /**
      * Radian angle of the gradient glow
      */
+    @SWFType(BasicType.FIXED)
     public double angle;
     /**
      * Distance of the gradient glow
      */
+    @SWFType(BasicType.FIXED)
     public double distance;
     /**
      * Strength of the gradient glow
      */
+    @SWFType(BasicType.FIXED8)
     public float strength;
     /**
      * Inner glow mode
@@ -76,6 +84,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
     /**
      * Number of blur passes
      */
+    @SWFType(value=BasicType.UB,count=4)
     public int passes;
 
     /**

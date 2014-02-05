@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 
 /**
@@ -28,6 +30,7 @@ public class COLORMATRIXFILTER extends FILTER {
     /**
      * Color matrix values
      */
+    @SWFType(BasicType.FLOAT)    
     public float[] matrix = new float[20];
 
     /**

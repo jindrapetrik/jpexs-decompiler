@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 
 /**
@@ -28,14 +30,17 @@ public class BLURFILTER extends FILTER {
     /**
      * Horizontal blur amount
      */
+    @SWFType(BasicType.FIXED)
     public double blurX;
     /**
      * Vertical blur amount
      */
+    @SWFType(BasicType.FIXED)
     public double blurY;
     /**
      * Number of blur passes
      */
+    @SWFType(value=BasicType.UB,count=5)
     public int passes;
 
     public BLURFILTER() {
