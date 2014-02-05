@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import java.awt.Color;
 import java.lang.reflect.Field;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JTextArea;
 
 /**

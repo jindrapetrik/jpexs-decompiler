@@ -39,7 +39,7 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
     public float fontSize = 10.0f;
     private int scrollOffset = 0;
     private int selectedFrame = -1;
-    private List<FrameSelectionListener> listeners = new ArrayList<>();
+    private final List<FrameSelectionListener> listeners = new ArrayList<>();
 
     public TimelineTimePanel() {
         Dimension dim = new Dimension(Integer.MAX_VALUE, TimelinePanel.FRAME_HEIGHT);

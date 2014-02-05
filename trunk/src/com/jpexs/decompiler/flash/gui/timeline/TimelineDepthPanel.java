@@ -29,7 +29,7 @@ import javax.swing.JPanel;
  */
 public class TimelineDepthPanel extends JPanel {
 
-    private int maxDepth;
+    private final int maxDepth;
     public static final int padding = 5;
     public static final float fontSize = 10.0f;
     private int scrollOffset = 0;

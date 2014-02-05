@@ -17,19 +17,12 @@
 package com.jpexs.decompiler.flash.gui.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
