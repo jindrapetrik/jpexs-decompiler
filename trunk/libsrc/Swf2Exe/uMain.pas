@@ -20,17 +20,18 @@ type
 type
   TMySWF = class(TShockwaveFlash)
   public
-    Procedure CreateWnd; override;
+    procedure CreateWnd; override;
   end;
 
 var
-  frmMain: TfrmMain;
+  frmMain:    TfrmMain;
   flaPreview: TMySWF;
+
 implementation
 
 {$R *.dfm}
 
-Procedure TMySWF.CreateWnd;
+procedure TMySWF.CreateWnd;
 begin
   inherited;
 end;
@@ -40,13 +41,13 @@ const
   exeSize = 470016;
 var
   stream: TFileStream;
-  buffer: array of Byte;
-  tempFile: array[0..MAX_PATH - 1] of Char;
-  tempPath: array[0..MAX_PATH - 1] of Char;
-  flashVarData : TVarData;
-  width: Integer;
-  height: Integer;
-  scaleMode: Byte;
+  buffer: array of byte;
+  tempFile: array[0..MAX_PATH - 1] of char;
+  tempPath: array[0..MAX_PATH - 1] of char;
+  flashVarData: TVarData;
+  Width:  integer;
+  Height: integer;
+  scaleMode: byte;
 begin
   flaPreview := TMySWF.Create(frmMain);
   flaPreview.Parent := frmMain;
@@ -54,14 +55,13 @@ begin
   flaPreview.Align := alClient;
   GetTempPath(MAX_PATH, TempPath);
   if GetTempFileName(TempPath, PAnsiChar('ffd'), 0, TempFile) = 0 then
-    raise Exception.Create(
-      'GetTempFileName API failed. ' + SysErrorMessage(GetLastError)
-    );
+    raise Exception.Create('GetTempFileName API failed. ' +
+      SysErrorMessage(GetLastError));
   try
     stream := TFileStream.Create(ParamStr(0), fmOpenRead);
     stream.Seek(exeSize, soBeginning);
-    stream.Read(width, 4);
-    stream.Read(height, 4);
+    stream.Read(Width, 4);
+    stream.Read(Height, 4);
     stream.Read(scaleMode, 1);
     SetLength(buffer, stream.Size - exeSize);
     try
@@ -70,12 +70,12 @@ begin
       stream.Free;
     end;
   except
-    width := 12800;
-    height := 9600;
+    Width  := 12800;
+    Height := 9600;
     scaleMode := 3;
   end;
-  ClientWidth := width div 20;
-  ClientHeight := height div 20;
+  ClientWidth := Width div 20;
+  ClientHeight := Height div 20;
   stream := TFileStream.Create(tempFile, fmOpenWrite);
   try
     stream.Write(buffer[0], Length(buffer));

@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.timeline;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import java.awt.Color;
@@ -56,7 +54,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener {
     public static final int borderLinesLength = 2;
     public static final float fontSize = 10.0f;
 
-    private List<FrameSelectionListener> listeners = new ArrayList<>();
+    private final List<FrameSelectionListener> listeners = new ArrayList<>();
 
     public Point cursor = null;
 

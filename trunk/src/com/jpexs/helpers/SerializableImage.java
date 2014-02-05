@@ -74,9 +74,11 @@ public class SerializableImage implements Serializable {
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        SerializableImage image = new SerializableImage();
-        image.image = this.image;
-        return image;
+        SerializableImage retImage = new SerializableImage();
+        retImage.image = image;
+        retImage.bounds = new Rectangle2D.Double(bounds.getMinX(), bounds.getMinY(),
+                bounds.getWidth(), bounds.getHeight());
+        return retImage;
     }
 
     public Graphics getGraphics() {
@@ -125,10 +127,12 @@ public class SerializableImage implements Serializable {
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeObject(bounds);
         ImageIO.write(image, "png", out);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        bounds = (Rectangle2D) in.readObject();
         image = ImageIO.read(in);
     }
 }

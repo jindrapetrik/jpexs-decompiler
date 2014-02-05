@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
@@ -35,8 +36,12 @@ import java.awt.Panel;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -47,8 +52,9 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     private boolean executed = false;
     private String flash;
     private HANDLE pipe;
-    private static final List<HANDLE> processes = new ArrayList<>();
-    private static final List<HANDLE> pipes = new ArrayList<>();
+    private HANDLE process;
+    private WinDef.HWND hwnd;
+    private WinDef.HWND hwndFrame;
     private Component frame;
     private boolean stopped = true;
     private static final int CMD_PLAY = 1;
@@ -64,22 +70,22 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     private static final int CMD_CALL = 11;
     private static final int CMD_GETVARIABLE = 12;
     private static final int CMD_SETVARIABLE = 13;
+    private static final int PIPE_TIMEOUT_MS = 1000;
     private int frameRate;
     public boolean specialPlayback = false;
     private boolean specialPlaying = false;
 
     public synchronized String getVariable(String name) {
         if (pipe != null) {
-            IntByReference ibr = new IntByReference();
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_GETVARIABLE}, 1, ibr, null);
+            writeToPipe(new byte[]{CMD_GETVARIABLE});
             int nameLen = name.getBytes().length;
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((nameLen >> 8) & 0xff), (byte) (nameLen & 0xff)}, 2, ibr, null);
-            Kernel32.INSTANCE.WriteFile(pipe, name.getBytes(), nameLen, ibr, null);
+            writeToPipe(new byte[]{(byte) ((nameLen >> 8) & 0xff), (byte) (nameLen & 0xff)});
+            writeToPipe(name.getBytes());
             byte res[] = new byte[2];
-            if (Kernel32.INSTANCE.ReadFile(pipe, res, 2, ibr, null)) {
+            if (readFromPipe(res)) {
                 int retLen = ((res[0] & 0xff) << 8) + (res[1] & 0xff);
                 res = new byte[retLen];
-                if (Kernel32.INSTANCE.ReadFile(pipe, res, retLen, ibr, null)) {
+                if (readFromPipe(res)) {
                     String ret = new String(res, 0, retLen);
                     return ret;
                 } else {
@@ -94,31 +100,29 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
 
     public synchronized void setVariable(String name, String value) {
         if (pipe != null) {
-            IntByReference ibr = new IntByReference();
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_SETVARIABLE}, 1, ibr, null);
+            writeToPipe(new byte[]{CMD_SETVARIABLE});
             int nameLen = name.getBytes().length;
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((nameLen >> 8) & 0xff), (byte) (nameLen & 0xff)}, 2, ibr, null);
-            Kernel32.INSTANCE.WriteFile(pipe, name.getBytes(), nameLen, ibr, null);
+            writeToPipe(new byte[]{(byte) ((nameLen >> 8) & 0xff), (byte) (nameLen & 0xff)});
+            writeToPipe(name.getBytes());
 
             int valLen = value.getBytes().length;
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((valLen >> 8) & 0xff), (byte) (valLen & 0xff)}, 2, ibr, null);
-            Kernel32.INSTANCE.WriteFile(pipe, value.getBytes(), valLen, ibr, null);
+            writeToPipe(new byte[]{(byte) ((valLen >> 8) & 0xff), (byte) (valLen & 0xff)});
+            writeToPipe(value.getBytes());
         }
     }
 
     public synchronized String call(String callString) {
         if (pipe != null) {
-            IntByReference ibr = new IntByReference();
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_CALL}, 1, ibr, null);
+            writeToPipe(new byte[]{CMD_CALL});
             int callLen = callString.getBytes().length;
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((callLen >> 8) & 0xff), (byte) (callLen & 0xff)}, 2, ibr, null);
-            Kernel32.INSTANCE.WriteFile(pipe, callString.getBytes(), callLen, ibr, null);
+            writeToPipe(new byte[]{(byte) ((callLen >> 8) & 0xff), (byte) (callLen & 0xff)});
+            writeToPipe(callString.getBytes());
 
             byte res[] = new byte[2];
-            if (Kernel32.INSTANCE.ReadFile(pipe, res, 2, ibr, null)) {
+            if (readFromPipe(res)) {
                 int retLen = ((res[0] & 0xff) << 8) + (res[1] & 0xff);
                 res = new byte[retLen];
-                if (Kernel32.INSTANCE.ReadFile(pipe, res, retLen, ibr, null)) {
+                if (readFromPipe(res)) {
                     String ret = new String(res, 0, retLen);
                     return ret;
                 } else {
@@ -133,19 +137,17 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
 
     private synchronized void resize() {
         if (pipe != null) {
-            IntByReference ibr = new IntByReference();
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_RESIZE}, 1, ibr, null);
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{
+            writeToPipe(new byte[]{CMD_RESIZE});
+            writeToPipe(new byte[]{
                 (byte) (getWidth() / 256), (byte) (getWidth() % 256),
-                (byte) (getHeight() / 256), (byte) (getHeight() % 256),}, 4, ibr, null);
+                (byte) (getHeight() / 256), (byte) (getHeight() % 256),});
         }
     }
 
     private int __getCurrentFrame() {
         byte[] res = new byte[2];
-        IntByReference ibr = new IntByReference();
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_CURRENT_FRAME}, 1, ibr, null);
-        if (Kernel32.INSTANCE.ReadFile(pipe, res, res.length, ibr, null)) {
+        writeToPipe(new byte[]{CMD_CURRENT_FRAME});
+        if (readFromPipe(res)) {
             return ((res[0] & 0xff) << 8) + (res[1] & 0xff);
         } else {
             return 0;
@@ -175,9 +177,8 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
             }
         }
         byte[] res = new byte[2];
-        IntByReference ibr = new IntByReference();
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_TOTAL_FRAMES}, 1, ibr, null);
-        if (Kernel32.INSTANCE.ReadFile(pipe, res, res.length, ibr, null)) {
+        writeToPipe(new byte[]{CMD_TOTAL_FRAMES});
+        if (readFromPipe(res)) {
             return ((res[0] & 0xff) << 8) + (res[1] & 0xff);
         } else {
             return 0;
@@ -186,9 +187,8 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
 
     @Override
     public synchronized void setBackground(Color color) {
-        IntByReference ibr = new IntByReference();
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_BGCOLOR}, 1, ibr, null);
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()}, 3, ibr, null);
+        writeToPipe(new byte[]{CMD_BGCOLOR});
+        writeToPipe(new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()});
     }
 
     public FlashPlayerPanel(Component frame) {
@@ -216,9 +216,28 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
             }
         });
     }
-    private WinDef.HWND hwndFrame;
 
-    private void execute() {
+    private synchronized void execute() {
+        if (!executed) {
+            hwnd = new WinDef.HWND();
+            hwnd.setPointer(Native.getComponentPointer(this));
+
+            hwndFrame = new WinDef.HWND();
+            hwndFrame.setPointer(Native.getComponentPointer(frame));
+
+            startFlashPlayer();
+            
+            executed = true;
+        }
+    }
+
+    private void restartFlashPlayer() {
+        Kernel32.INSTANCE.TerminateProcess(process, 0);
+        Kernel32.INSTANCE.CloseHandle(pipe);
+        startFlashPlayer();
+    }
+
+    private void startFlashPlayer() {
         String path = Utf8Helper.urlDecode(FlashPlayerPanel.class.getProtectionDomain().getCodeSource().getLocation().getPath());
         String appDir = new File(path).getParentFile().getAbsolutePath();
         if (!appDir.endsWith("\\")) {
@@ -230,13 +249,8 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
             return;
         }
 
-        WinDef.HWND hwnd = new WinDef.HWND();
-        hwnd.setPointer(Native.getComponentPointer(this));
-
-        hwndFrame = new WinDef.HWND();
-        hwndFrame.setPointer(Native.getComponentPointer(frame));
-
-        pipe = Kernel32.INSTANCE.CreateNamedPipe("\\\\.\\pipe\\ffdec_flashplayer_" + hwnd.getPointer().hashCode(), Kernel32.PIPE_ACCESS_DUPLEX, Kernel32.PIPE_TYPE_BYTE, 1, 0, 0, 0, null);
+        String pipeName = "\\\\.\\pipe\\ffdec_flashplayer_" + hwnd.getPointer().hashCode();
+        pipe = Kernel32.INSTANCE.CreateNamedPipe(pipeName, Kernel32.PIPE_ACCESS_DUPLEX, Kernel32.PIPE_TYPE_BYTE, 1, 0, 0, 0, null);
 
         SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
         sei.fMask = 0x00000040;
@@ -244,13 +258,11 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         sei.lpParameters = new WString(hwnd.getPointer().hashCode() + " " + hwndFrame.getPointer().hashCode());
         sei.nShow = WinUser.SW_NORMAL;
         Shell32.INSTANCE.ShellExecuteEx(sei);
-        processes.add(sei.hProcess);
+        process = sei.hProcess;
 
         Kernel32.INSTANCE.ConnectNamedPipe(pipe, null);
-        pipes.add(pipe);
-        executed = true;
     }
-
+    
     public synchronized void stopSWF() {
         displaySWF("-", null, 1);
         stopped = true;
@@ -264,25 +276,15 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         this.flash = flash;
         repaint();
         this.frameRate = frameRate;
-        if (!executed) {
-            execute();
-            /*
-             //How about commenting this out? Will it work? Let's try...
-             try {
-             Thread.sleep(1000);
-             } catch (InterruptedException ex) {
-             Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
-             }*/
-        }
+        execute();
         if (bgColor != null) {
             setBackground(bgColor);
         }
         resize();
         if (pipe != null) {
-            IntByReference ibr = new IntByReference();
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PLAY}, 1, ibr, null);
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) flash.getBytes().length}, 1, ibr, null);
-            Kernel32.INSTANCE.WriteFile(pipe, flash.getBytes(), flash.getBytes().length, ibr, null);
+            writeToPipe(new byte[]{CMD_PLAY});
+            writeToPipe(new byte[]{(byte) flash.getBytes().length});
+            writeToPipe(flash.getBytes());
         }
         stopped = false;
         specialPlaying = false;
@@ -292,18 +294,25 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         }
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        Kernel32.INSTANCE.CloseHandle(pipe);
+        Kernel32.INSTANCE.TerminateProcess(process, 0);
+    }
+
     public static void unload() {
-        if (Platform.isWindows()) {
+        /*if (Platform.isWindows()) {
             for (int i = 0; i < processes.size(); i++) {
                 Kernel32.INSTANCE.CloseHandle(pipes.get(i));
                 Kernel32.INSTANCE.TerminateProcess(processes.get(i), 0);
             }
-        }
+        }*/
     }
 
     @Override
     public void paint(Graphics g) {
-        if ((!executed) && flash != null) {
+        if (flash != null) {
             execute();
         }
         super.paint(g);
@@ -311,8 +320,7 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     private int specialPosition = 0;
 
     private synchronized void __pause() {
-        IntByReference ibr = new IntByReference();
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PAUSE}, 1, ibr, null);
+        writeToPipe(new byte[]{CMD_PAUSE});
     }
 
     @Override
@@ -339,13 +347,11 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
 
             return;
         }
-        IntByReference ibr = new IntByReference();
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_REWIND}, 1, ibr, null);
+        writeToPipe(new byte[]{CMD_REWIND});
     }
 
     private synchronized void __play() {
-        IntByReference ibr = new IntByReference();
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_RESUME}, 1, ibr, null);
+        writeToPipe(new byte[]{CMD_RESUME});
     }
 
     @Override
@@ -366,10 +372,9 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
         if (specialPlayback) {
             return specialPlaying;
         }
-        IntByReference ibr = new IntByReference();
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PLAYING}, 1, ibr, null);
+        writeToPipe(new byte[]{CMD_PLAYING});
         byte[] res = new byte[1];
-        if (Kernel32.INSTANCE.ReadFile(pipe, res, res.length, ibr, null)) {
+        if (readFromPipe(res)) {
             return res[0] == 1;
         } else {
             return false;
@@ -377,9 +382,8 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     }
 
     private synchronized void __gotoFrame(int frame) {
-        IntByReference ibr = new IntByReference();
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_GOTO}, 1, ibr, null);
-        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) ((frame >> 8) & 0xff), (byte) (frame & 0xff)}, 2, ibr, null);
+        writeToPipe(new byte[]{CMD_GOTO});
+        writeToPipe(new byte[]{(byte) ((frame >> 8) & 0xff), (byte) (frame & 0xff)});
     }
 
     @Override
@@ -408,5 +412,65 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     @Override
     public boolean isLoaded() {
         return !isStopped();
+    }
+    
+    private synchronized boolean writeToPipe(final byte[] data) {
+        final IntByReference ibr = new IntByReference();
+        int result = -1;
+        try {
+            result = CancellableWorker.call(new Callable<Integer>() {
+                @Override
+                public Integer call() throws Exception {
+                    boolean result = Kernel32.INSTANCE.WriteFile(pipe, data, data.length, ibr, null);
+                    if (!result) {
+                        return Kernel32.INSTANCE.GetLastError();
+                    }
+                    if (ibr.getValue() != data.length) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            }, PIPE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            // ignore
+        }
+        if (result != 0) {
+            if (result == Kernel32.ERROR_NO_DATA || result == -1) {
+                restartFlashPlayer();
+            } else {
+                // System.out.println("pipe write failed. datalength: " + data.length + " error:" + result);
+            }
+        }
+        return result == 0;
+    }
+
+    private synchronized boolean readFromPipe(final byte[] res) {
+        final IntByReference ibr = new IntByReference();
+        int result = -1;
+        try {
+            result = CancellableWorker.call(new Callable<Integer>() {
+                @Override
+                public Integer call() throws Exception {
+                    boolean result = Kernel32.INSTANCE.ReadFile(pipe, res, res.length, ibr, null);
+                    if (!result) {
+                        return Kernel32.INSTANCE.GetLastError();
+                    }
+                    if (ibr.getValue() != res.length) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            }, PIPE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            // ignore
+        }
+        if (result != 0) {
+            if (result == Kernel32.ERROR_BROKEN_PIPE || result == -1) {
+                restartFlashPlayer();
+            } else {
+                // System.out.println("pipe read failed. result: " + result + " datalength: " + res.length + " received: " + ibr.getValue() + " error: " + result);
+            }
+        }
+        return result == 0;
     }
 }
