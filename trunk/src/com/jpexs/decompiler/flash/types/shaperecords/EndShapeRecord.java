@@ -16,13 +16,17 @@
  */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+
 /**
  *
  * @author JPEXS
  */
 public class EndShapeRecord extends SHAPERECORD {
 
-    public int typeFlag = 0;
+    public boolean typeFlag = false;
+    @SWFType(value=BasicType.UB,count=5)
     public int endOfShape = 0;
 
     @Override

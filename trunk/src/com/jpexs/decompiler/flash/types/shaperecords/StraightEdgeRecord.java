@@ -17,6 +17,9 @@
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 
 /**
  *
@@ -24,12 +27,32 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
  */
 public class StraightEdgeRecord extends SHAPERECORD {
 
+    /*
+    if (!ser.generalLineFlag) {
+                    ser.vertLineFlag = readUB(1) == 1;
+                }
+                if (ser.generalLineFlag || (!ser.vertLineFlag)) {
+                    ser.deltaX = (int) readSB(ser.numBits + 2);
+                }
+                if (ser.generalLineFlag || (ser.vertLineFlag)) {
+                    ser.deltaY = (int) readSB(ser.numBits + 2);
+                }
+    */
     public int typeFlag = 1;
     public int straightFlag = 1;
+    @SWFType(value=BasicType.UB,count=4)
     public int numBits;
     public boolean generalLineFlag;
+    
+    @Conditional(value="generalLineFlag",revert = true)
     public boolean vertLineFlag;
+    
+    @SWFType(value=BasicType.SB,countField = "numBits",countAdd = 2)
+    @Conditional("generalLineFlag|!vertLineFlag")
     public int deltaX;
+    
+    @SWFType(value=BasicType.SB,countField = "numBits",countAdd = 2)
+    @Conditional("generalLineFlag|vertLineFlag")
     public int deltaY;
 
     @Override
