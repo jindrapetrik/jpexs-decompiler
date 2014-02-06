@@ -87,6 +87,7 @@ public class DefineFontInfoTag extends Tag {
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos
@@ -97,7 +98,11 @@ public class DefineFontInfoTag extends Tag {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontId = sis.readUI16();
         int fontNameLen = sis.readUI8();
-        fontName = new String(sis.readBytesEx(fontNameLen));
+        if (version >= 6) {
+            fontName = new String(sis.readBytesEx(fontNameLen), Utf8Helper.charset);
+        } else {
+            fontName = new String(sis.readBytesEx(fontNameLen));
+        }
         sis.readUB(2); //reserved
         fontFlagsSmallText = sis.readUB(1) == 1;
         fontFlagsShiftJIS = sis.readUB(1) == 1;

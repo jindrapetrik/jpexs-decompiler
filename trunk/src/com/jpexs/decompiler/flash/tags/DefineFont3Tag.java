@@ -124,7 +124,11 @@ public class DefineFont3Tag extends FontTag {
         fontFlagsBold = sis.readUB(1) == 1;
         languageCode = sis.readLANGCODE();
         int fontNameLen = sis.readUI8();
-        fontName = new String(sis.readBytesEx(fontNameLen));
+        if (version >= 6) {
+            fontName = new String(sis.readBytesEx(fontNameLen), Utf8Helper.charset);
+        } else {
+            fontName = new String(sis.readBytesEx(fontNameLen));
+        }
         numGlyphs = sis.readUI16();
         for (int i = 0; i < numGlyphs; i++) { //offsetTable
             if (fontFlagsWideOffsets) {
