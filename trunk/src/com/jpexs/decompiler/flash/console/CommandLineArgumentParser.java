@@ -123,6 +123,7 @@ public class CommandLineArgumentParser {
      * Parses the console arguments
      *
      * @return path to the file which should be opened or null
+     * @throws java.io.IOException
      */
     public static String parseArguments(String[] arguments) throws IOException {
         Level traceLevel = Level.WARNING;

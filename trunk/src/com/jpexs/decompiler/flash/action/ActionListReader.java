@@ -85,6 +85,7 @@ public class ActionListReader {
      * @param path
      * @return List of actions
      * @throws IOException
+     * @throws java.util.concurrent.TimeoutException
      */
     public static List<Action> readActionListTimeout(final List<DisassemblyListener> listeners, final long containerSWFOffset, final MemoryInputStream mis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
         try {
@@ -121,6 +122,7 @@ public class ActionListReader {
      * @param path
      * @return List of actions
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, MemoryInputStream mis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
         boolean deobfuscate = Configuration.autoDeobfuscate.get();
@@ -217,6 +219,7 @@ public class ActionListReader {
      * @param path
      * @return List of actions
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public static List<Action> deobfuscateActionList(List<DisassemblyListener> listeners, long containerSWFOffset, List<Action> actions, int version, int ip, String path) throws IOException, InterruptedException {
         if (actions.isEmpty()) {
@@ -525,6 +528,7 @@ public class ActionListReader {
      *
      * @param actions
      * @param index
+     * @return 
      */
     public static boolean removeAction(List<Action> actions, int index, int version, boolean removeWhenLast) {
 

@@ -632,6 +632,7 @@ public final class FlasmLexer {
 
     /**
      * Closes the input stream.
+     * @throws java.io.IOException
      */
     public final void yyclose() throws java.io.IOException {
         zzAtEOF = true;            /* indicate end of file */
@@ -666,6 +667,7 @@ public final class FlasmLexer {
 
     /**
      * Returns the current lexical state.
+     * @return 
      */
     public final int yystate() {
         return zzLexicalState;
@@ -682,6 +684,7 @@ public final class FlasmLexer {
 
     /**
      * Returns the text matched by the current regular expression.
+     * @return 
      */
     public final String yytext() {
         return new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
@@ -703,6 +706,7 @@ public final class FlasmLexer {
 
     /**
      * Returns the length of the matched text region.
+     * @return 
      */
     public final int yylength() {
         return zzMarkedPos - zzStartRead;
@@ -754,6 +758,7 @@ public final class FlasmLexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
+     * @throws com.jpexs.decompiler.flash.action.parser.ParseException
      */
     public ASMParsedSymbol yylex() throws java.io.IOException, ParseException {
         int zzInput;

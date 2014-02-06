@@ -120,8 +120,8 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
     /**
      * @since SWF 4 key code
      */
-    @SWFType(value=BasicType.UB,count=7)
-    @Conditional(minSwfVersion=4)
+    @SWFType(value = BasicType.UB, count = 7)
+    @Conditional(minSwfVersion = 4)
     public int condKeyPress;
     /**
      * OverDown to Idle
@@ -160,6 +160,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
      *
      * @param version SWF version
      * @return ASM source
+     * @throws java.lang.InterruptedException
      */
     @Override
     public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
@@ -184,6 +185,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
      *
      * @param version Version
      * @return List of actions
+     * @throws java.lang.InterruptedException
      */
     @Override
     public List<Action> getActions(int version) throws InterruptedException {

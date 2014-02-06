@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.configuration;
 /**
  *
  * @author JPEXS
+ * @param <T>
  */
 public class ConfigurationItem<T> {
 

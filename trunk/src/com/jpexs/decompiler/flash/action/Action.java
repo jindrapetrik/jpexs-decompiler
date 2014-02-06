@@ -402,6 +402,7 @@ public class Action implements GraphSourceItem {
      * @param importantOffsets List of important offsets to mark as labels
      * @param version SWF version
      * @param exportMode PCode or hex?
+     * @param writer
      * @param swfPos
      * @param path
      * @return HilightedTextWriter
@@ -627,6 +628,7 @@ public class Action implements GraphSourceItem {
      * @param functions Functions
      * @param staticOperation the value of staticOperation
      * @param path the value of path
+     * @throws java.lang.InterruptedException
      */
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
     }
@@ -707,6 +709,7 @@ public class Action implements GraphSourceItem {
      * @param actions List of actions
      * @param version SWF version
      * @param path
+     * @throws java.lang.InterruptedException
      */
     public static void actionsToSource(ASMSource asm, final List<Action> actions, final int version, final String path, GraphTextWriter writer) throws InterruptedException {
         writer.suspendMeasure();
@@ -756,6 +759,7 @@ public class Action implements GraphSourceItem {
      * @param staticOperation
      * @param path
      * @return List of treeItems
+     * @throws java.lang.InterruptedException
      */
     public static List<GraphTargetItem> actionsToTree(HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
         //Stack<ActionItem> stack = new Stack<ActionItem>();

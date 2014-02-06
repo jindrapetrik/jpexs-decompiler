@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author JPEXS
+ * @param <E>
  */
 public class Cache<E> {
 

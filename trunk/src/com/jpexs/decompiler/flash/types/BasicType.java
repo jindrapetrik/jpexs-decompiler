@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.types;
 
 /**
@@ -22,8 +21,9 @@ package com.jpexs.decompiler.flash.types;
  * @author JPEXS
  */
 public enum BasicType {
+
     UI8,
-    UI16,    
+    UI16,
     UI32,
     EncodedU32,
     SI8,

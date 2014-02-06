@@ -134,6 +134,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos

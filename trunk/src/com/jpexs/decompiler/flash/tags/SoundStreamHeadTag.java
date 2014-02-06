@@ -37,19 +37,19 @@ import java.io.OutputStream;
  */
 public class SoundStreamHeadTag extends CharacterTag implements SoundStreamHeadTypeTag {
 
-    @SWFType(value=BasicType.UB,count=2)
+    @SWFType(value = BasicType.UB, count = 2)
     public int playBackSoundRate;
     public boolean playBackSoundSize;
     public boolean playBackSoundType;
-    @SWFType(value=BasicType.UB,count=4)
+    @SWFType(value = BasicType.UB, count = 4)
     public int streamSoundCompression;
-    @SWFType(value=BasicType.UB,count=2)
+    @SWFType(value = BasicType.UB, count = 2)
     public int streamSoundRate;
     public boolean streamSoundSize;
     public boolean streamSoundType;
-    @SWFType(value=BasicType.UI16)
+    @SWFType(value = BasicType.UI16)
     public int streamSoundSampleCount;
-    @Conditional(value="streamSoundCompression",options={2})
+    @Conditional(value = "streamSoundCompression", options = {2})
     public int latencySeek;
     @Internal
     private int virtualCharacterId = 0;
@@ -95,12 +95,12 @@ public class SoundStreamHeadTag extends CharacterTag implements SoundStreamHeadT
         try {
             sos.writeUB(4, 0);//reserved
             sos.writeUB(2, playBackSoundRate);
-            sos.writeUB(1, playBackSoundSize?1:0);
-            sos.writeUB(1, playBackSoundType?1:0);
+            sos.writeUB(1, playBackSoundSize ? 1 : 0);
+            sos.writeUB(1, playBackSoundType ? 1 : 0);
             sos.writeUB(4, streamSoundCompression);
             sos.writeUB(2, streamSoundRate);
-            sos.writeUB(1, streamSoundSize?1:0);
-            sos.writeUB(1, streamSoundType?1:0);
+            sos.writeUB(1, streamSoundSize ? 1 : 0);
+            sos.writeUB(1, streamSoundType ? 1 : 0);
             sos.writeUI16(streamSoundSampleCount);
             if (streamSoundCompression == 2) {
                 sos.writeSI16(latencySeek);
@@ -115,6 +115,7 @@ public class SoundStreamHeadTag extends CharacterTag implements SoundStreamHeadT
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public SoundStreamHeadTag(SWF swf, byte[] data, int version, long pos) throws IOException {

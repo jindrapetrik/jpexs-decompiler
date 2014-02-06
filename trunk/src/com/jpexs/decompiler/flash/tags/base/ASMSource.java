@@ -36,6 +36,7 @@ public interface ASMSource extends TreeItem {
      * @param version SWF version
      * @param exportMode PCode or hex?
      * @return ASM source
+     * @throws java.lang.InterruptedException
      */
     public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException;
 
@@ -51,6 +52,7 @@ public interface ASMSource extends TreeItem {
      *
      * @param version Version
      * @return List of actions
+     * @throws java.lang.InterruptedException
      */
     public List<Action> getActions(int version) throws InterruptedException;
 

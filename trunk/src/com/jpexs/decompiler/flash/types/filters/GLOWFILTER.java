@@ -62,7 +62,7 @@ public class GLOWFILTER extends FILTER {
     /**
      * Number of blur passes
      */
-    @SWFType(value=BasicType.UB,count=5)
+    @SWFType(value = BasicType.UB, count = 5)
     public int passes;
 
     /**

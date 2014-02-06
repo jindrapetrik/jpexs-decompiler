@@ -41,52 +41,52 @@ public class CXFORMWITHALPHA {
      * Red multiply value
      */
     @Conditional("hasMultTerms")
-    @SWFType(value=BasicType.SB,countField="nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int redMultTerm;
     /**
      * Green multiply value
      */
     @Conditional("hasMultTerms")
-    @SWFType(value=BasicType.SB,countField="nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int greenMultTerm;
     /**
      * Blue multiply value
      */
     @Conditional("hasMultTerms")
-    @SWFType(value=BasicType.SB,countField="nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int blueMultTerm;
     /**
      * Alpha multiply value
      */
     @Conditional("hasMultTerms")
-    @SWFType(value=BasicType.SB,countField="nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int alphaMultTerm;
     /**
      * Red addition value
      */
     @Conditional("hasAddTerms")
-    @SWFType(value=BasicType.SB,countField="nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int redAddTerm;
     /**
      * Green addition value
      */
     @Conditional("hasAddTerms")
-    @SWFType(value=BasicType.SB,countField="nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int greenAddTerm;
     /**
      * Blue addition value
      */
     @Conditional("hasAddTerms")
-    @SWFType(value=BasicType.SB,countField="nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int blueAddTerm;
     /**
      * Alpha addition value
      */
     @Conditional("hasAddTerms")
-    @SWFType(value=BasicType.SB,countField="nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int alphaAddTerm;
-    
-    @SWFType(value=BasicType.UB, count=4)
+
+    @SWFType(value = BasicType.UB, count = 4)
     public int nbits;
 
     public SerializableImage apply(SerializableImage src) {

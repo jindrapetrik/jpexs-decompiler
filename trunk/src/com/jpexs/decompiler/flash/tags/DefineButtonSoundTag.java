@@ -35,27 +35,27 @@ import java.io.OutputStream;
  */
 public class DefineButtonSoundTag extends CharacterTag {
 
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public int buttonId;
-    
-    @SWFType(BasicType.UI16)        
+
+    @SWFType(BasicType.UI16)
     public int buttonSoundChar0;
-    
+
     public SOUNDINFO buttonSoundInfo0;
-    
-    @SWFType(BasicType.UI16)        
+
+    @SWFType(BasicType.UI16)
     public int buttonSoundChar1;
-    
+
     public SOUNDINFO buttonSoundInfo1;
-    
-    @SWFType(BasicType.UI16)    
+
+    @SWFType(BasicType.UI16)
     public int buttonSoundChar2;
-    
+
     public SOUNDINFO buttonSoundInfo2;
-    
-    @SWFType(BasicType.UI16)    
+
+    @SWFType(BasicType.UI16)
     public int buttonSoundChar3;
-    
+
     public SOUNDINFO buttonSoundInfo3;
     public static final int ID = 17;
 
@@ -103,6 +103,7 @@ public class DefineButtonSoundTag extends CharacterTag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineButtonSoundTag(SWF swf, byte[] data, int version, long pos) throws IOException {

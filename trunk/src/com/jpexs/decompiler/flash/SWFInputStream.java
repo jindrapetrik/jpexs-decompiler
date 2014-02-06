@@ -377,6 +377,7 @@ public class SWFInputStream extends InputStream {
      * Sets position in bytes in the stream
      *
      * @param pos Number of bytes
+     * @throws java.io.IOException
      */
     public void seek(long pos) throws IOException {
         if (is instanceof SeekableInputStream) {
@@ -834,6 +835,7 @@ public class SWFInputStream extends InputStream {
      * @param parseTags
      * @return List of tags
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags) throws IOException, InterruptedException {
         ExecutorService executor = null;
@@ -1232,6 +1234,7 @@ public class SWFInputStream extends InputStream {
      * @param skipUnusualTags
      * @return Tag or null when End tag
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public Tag readTag(SWF swf, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
         int tagIDTagLength = readUI16();
@@ -1297,6 +1300,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one Action from the stream
      *
+     * @param cpool
      * @return Action or null when ActionEndFlag or end of the stream
      * @throws IOException
      */
@@ -1656,6 +1660,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one CLIPACTIONRECORD value from the stream
      *
+     * @param swf
      * @return CLIPACTIONRECORD value
      * @throws IOException
      */
@@ -1671,6 +1676,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one CLIPACTIONS value from the stream
      *
+     * @param swf
      * @return CLIPACTIONS value
      * @throws IOException
      */
@@ -2021,6 +2027,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads list of BUTTONCONDACTION values from the stream
      *
+     * @param swf
      * @return List of BUTTONCONDACTION values
      * @throws IOException
      */
@@ -2037,6 +2044,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one BUTTONCONDACTION value from the stream
      *
+     * @param swf
      * @return BUTTONCONDACTION value
      * @throws IOException
      */

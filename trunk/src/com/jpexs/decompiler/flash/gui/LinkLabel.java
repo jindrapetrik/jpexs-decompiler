@@ -37,6 +37,7 @@ public class LinkLabel extends JLabel {
 
     /**
      * Creates a new LinkLabel with the given text.
+     * @param text
      */
     public LinkLabel(String text) {
         super(text);
@@ -48,6 +49,7 @@ public class LinkLabel extends JLabel {
 
     /**
      * Sets the text of the label.
+     * @param text
      */
     @Override
     public void setText(String text) {
@@ -57,6 +59,7 @@ public class LinkLabel extends JLabel {
 
     /**
      * Returns the text set by the user.
+     * @return 
      */
     public String getNormalText() {
         return text;
@@ -64,6 +67,7 @@ public class LinkLabel extends JLabel {
 
     /**
      * Processes mouse events and responds to clicks.
+     * @param evt
      */
     @Override
     protected void processMouseEvent(MouseEvent evt) {

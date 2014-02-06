@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 public class EndShapeRecord extends SHAPERECORD {
 
     public boolean typeFlag = false;
-    @SWFType(value=BasicType.UB,count=5)
+    @SWFType(value = BasicType.UB, count = 5)
     public int endOfShape = 0;
 
     @Override

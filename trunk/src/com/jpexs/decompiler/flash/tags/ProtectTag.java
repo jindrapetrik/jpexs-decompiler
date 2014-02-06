@@ -62,6 +62,7 @@ public class ProtectTag extends Tag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public ProtectTag(SWF swf, byte[] data, int version, long pos) throws IOException {

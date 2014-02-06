@@ -31,7 +31,7 @@ public class DefineFont4Tag extends CharacterTag {
 
     @SWFType(BasicType.UI16)
     public int fontID;
-    
+
     public boolean fontFlagsHasFontData;
     public boolean fontFlagsItalic;
     public boolean fontFlagsBold;

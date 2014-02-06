@@ -71,6 +71,7 @@ public class RemoveObjectTag extends CharacterIdTag implements RemoveTag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public RemoveObjectTag(SWF swf, byte[] data, int version, long pos) throws IOException {

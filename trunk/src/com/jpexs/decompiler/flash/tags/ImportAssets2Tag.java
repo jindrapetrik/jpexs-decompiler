@@ -45,6 +45,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public ImportAssets2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {

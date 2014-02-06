@@ -27,7 +27,7 @@ public class GRADIENT {
     /**
      * Spread mode
      */
-    @SWFType(value=BasicType.UB,count=2)
+    @SWFType(value = BasicType.UB, count = 2)
     public int spreadMode;
     public static final int SPREAD_PAD_MODE = 0;
     public static final int SPREAD_REFLECT_MODE = 1;
@@ -36,7 +36,7 @@ public class GRADIENT {
     /**
      * Interpolation mode
      */
-    @SWFType(value=BasicType.UB,count=2)
+    @SWFType(value = BasicType.UB, count = 2)
     public int interpolationMode;
     public static final int INTERPOLATION_RGB_MODE = 0;
     public static final int INTERPOLATION_LINEAR_RGB_MODE = 1;

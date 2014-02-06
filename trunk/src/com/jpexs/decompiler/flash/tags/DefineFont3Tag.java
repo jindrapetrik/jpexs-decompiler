@@ -43,9 +43,9 @@ import javax.swing.JPanel;
 
 public class DefineFont3Tag extends FontTag {
 
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public int fontId;
-    
+
     public boolean fontFlagsHasLayout;
     public boolean fontFlagsShiftJIS;
     public boolean fontFlagsSmallText;
@@ -58,24 +58,24 @@ public class DefineFont3Tag extends FontTag {
     public String fontName;
     @Internal
     public int numGlyphs;
-    
+
     public List<SHAPE> glyphShapeTable;
-        
-    @SWFType(value=BasicType.UI16,alternateValue = BasicType.UI32,alternateCondition = "fontFlagsWideCodes")
+
+    @SWFType(value = BasicType.UI16, alternateValue = BasicType.UI32, alternateCondition = "fontFlagsWideCodes")
     public List<Integer> codeTable;
-    
+
     @SWFType(BasicType.UI16)
     @Conditional("fontFlagsHasLayout")
     public int fontAscent;
-    
+
     @SWFType(BasicType.UI16)
     @Conditional("fontFlagsHasLayout")
     public int fontDescent;
-    
+
     @SWFType(BasicType.SI16)
     @Conditional("fontFlagsHasLayout")
     public int fontLeading;
-    
+
     public List<Integer> fontAdvanceTable;
     public List<RECT> fontBoundsTable;
     public KERNINGRECORD[] fontKerningTable;

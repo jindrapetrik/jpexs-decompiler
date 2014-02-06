@@ -32,13 +32,13 @@ public class DefineBinaryDataTag extends CharacterTag {
 
     @SWFType(BasicType.UI16)
     public int tag;
-        
+
     public byte[] binaryData;
-    
+
     @Reserved
     @SWFType(BasicType.UI32)
     public long reserved;
-    
+
     public static final int ID = 87;
 
     /**

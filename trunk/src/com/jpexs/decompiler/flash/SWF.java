@@ -331,6 +331,7 @@ public final class SWF implements TreeItem {
      * @param listener
      * @param parallelRead Use parallel threads?
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public SWF(InputStream is, ProgressListener listener, boolean parallelRead) throws IOException, InterruptedException {
         this(is, listener, parallelRead, false);
@@ -344,6 +345,7 @@ public final class SWF implements TreeItem {
      * @param parallelRead Use parallel threads?
      * @param checkOnly Check only file validity
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException, InterruptedException {
         byte[] hdr = new byte[3];

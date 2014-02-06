@@ -32,12 +32,12 @@ import javax.swing.JPanel;
  */
 public class KERNINGRECORD {
 
-    @SWFType(value=BasicType.UI8,alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
+    @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public int fontKerningCode1;
-    
-    @SWFType(value=BasicType.UI8,alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")    
+
+    @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public int fontKerningCode2;
-    
+
     @SWFType(BasicType.SI16)
     public int fontKerningAdjustment;
 

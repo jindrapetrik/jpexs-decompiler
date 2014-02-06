@@ -30,7 +30,7 @@ public class COLORMATRIXFILTER extends FILTER {
     /**
      * Color matrix values
      */
-    @SWFType(BasicType.FLOAT)    
+    @SWFType(BasicType.FLOAT)
     public float[] matrix = new float[20];
 
     /**

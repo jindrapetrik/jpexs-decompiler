@@ -24,9 +24,9 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
  */
 public class GLYPHENTRY {
 
-    @SWFType(value=BasicType.UB,countField="+glyphBits")
+    @SWFType(value = BasicType.UB, countField = "+glyphBits")
     public int glyphIndex;
-    @SWFType(value=BasicType.SB,countField="advanceBits")
+    @SWFType(value = BasicType.SB, countField = "advanceBits")
     public int glyphAdvance;
 
     @Override

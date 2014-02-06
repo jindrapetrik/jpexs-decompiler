@@ -2157,6 +2157,7 @@ public class Graph {
      * @param tree List of TreeItem
      * @param localData
      * @return String
+     * @throws java.lang.InterruptedException
      */
     public static GraphTextWriter graphToString(List<GraphTargetItem> tree, GraphTextWriter writer, LocalData localData) throws InterruptedException {
         for (GraphTargetItem ti : tree) {

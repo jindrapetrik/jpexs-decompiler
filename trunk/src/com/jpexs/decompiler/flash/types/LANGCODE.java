@@ -36,8 +36,7 @@ public class LANGCODE {
 
     @Override
     public String toString() {
-        return "[LANGCODE:"+languageCode+"]";
+        return "[LANGCODE:" + languageCode + "]";
     }
-    
-    
+
 }

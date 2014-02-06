@@ -168,19 +168,19 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
      * If PlaceFlagHasBlendMode, Blend mode
      */
     @SWFType(BasicType.UI8)
-    @Conditional("placeFlagHasBlendMode")    
+    @Conditional("placeFlagHasBlendMode")
     public int blendMode;
     /**
      * If PlaceFlagHasCacheAsBitmap, 0 = Bitmap cache disabled, 1-255 = Bitmap
      * cache enabled
      */
     @SWFType(BasicType.UI8)
-    @Conditional("placeFlagHasCacheAsBitmap")    
+    @Conditional("placeFlagHasCacheAsBitmap")
     public int bitmapCache;
     /**
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
-    @Conditional(value="placeFlagHasClipActions",minSwfVersion = 5)
+    @Conditional(value = "placeFlagHasClipActions", minSwfVersion = 5)
     public CLIPACTIONS clipActions;
     /**
      * If PlaceFlagHasVisible, 0 = Place invisible, 1 = Place visible
@@ -242,7 +242,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
             sos.writeUB(1, placeFlagHasMatrix ? 1 : 0);
             sos.writeUB(1, placeFlagHasCharacter ? 1 : 0);
             sos.writeUB(1, placeFlagMove ? 1 : 0);
-            sos.writeUB(1, reserved ?1:0);
+            sos.writeUB(1, reserved ? 1 : 0);
             sos.writeUB(1, placeFlagOpaqueBackground ? 1 : 0); //SWF11
             sos.writeUB(1, placeFlagHasVisible ? 1 : 0); //SWF11
             sos.writeUB(1, placeFlagHasImage ? 1 : 0);

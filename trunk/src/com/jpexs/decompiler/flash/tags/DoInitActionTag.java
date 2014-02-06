@@ -106,6 +106,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      *
      * @param version SWF version
      * @return ASM source
+     * @throws java.lang.InterruptedException
      */
     @Override
     public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {

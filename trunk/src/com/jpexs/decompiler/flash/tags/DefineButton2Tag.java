@@ -62,9 +62,9 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     /**
      * ID for this character
      */
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public int buttonId;
-    
+
     /**
      * Track as menu button
      */
@@ -92,6 +92,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos

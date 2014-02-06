@@ -628,6 +628,7 @@ public final class MethodInfoLexer {
 
     /**
      * Closes the input stream.
+     * @throws java.io.IOException
      */
     public final void yyclose() throws java.io.IOException {
         zzAtEOF = true;            /* indicate end of file */
@@ -662,6 +663,7 @@ public final class MethodInfoLexer {
 
     /**
      * Returns the current lexical state.
+     * @return 
      */
     public final int yystate() {
         return zzLexicalState;
@@ -678,6 +680,7 @@ public final class MethodInfoLexer {
 
     /**
      * Returns the text matched by the current regular expression.
+     * @return 
      */
     public final String yytext() {
         return new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
@@ -699,6 +702,7 @@ public final class MethodInfoLexer {
 
     /**
      * Returns the length of the matched text region.
+     * @return 
      */
     public final int yylength() {
         return zzMarkedPos - zzStartRead;
@@ -750,6 +754,7 @@ public final class MethodInfoLexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
+     * @throws com.jpexs.decompiler.flash.abc.methodinfo_parser.ParseException
      */
     public ParsedSymbol yylex() throws java.io.IOException, ParseException {
         int zzInput;

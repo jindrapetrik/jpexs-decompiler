@@ -30,7 +30,7 @@ public class FILTER {
     /**
      * Identificator of type of the filter
      */
-    @SWFType(BasicType.UI8)    
+    @SWFType(BasicType.UI8)
     public int id;
 
     /**

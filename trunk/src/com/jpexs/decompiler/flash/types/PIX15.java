@@ -28,16 +28,16 @@ public class PIX15 {
     /**
      * Red color value
      */
-    @SWFType(value=BasicType.UB, count = 5)
+    @SWFType(value = BasicType.UB, count = 5)
     public int red;
     /**
      * Green color value
      */
-    @SWFType(value=BasicType.UB, count = 5)
+    @SWFType(value = BasicType.UB, count = 5)
     public int green;
     /**
      * Blue color value
      */
-    @SWFType(value=BasicType.UB, count = 5)
+    @SWFType(value = BasicType.UB, count = 5)
     public int blue;
 }

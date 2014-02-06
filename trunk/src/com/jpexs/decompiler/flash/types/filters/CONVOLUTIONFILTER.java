@@ -36,7 +36,7 @@ public class CONVOLUTIONFILTER extends FILTER {
     /**
      * Vertical matrix size
      */
-    @SWFType(BasicType.UI8)    
+    @SWFType(BasicType.UI8)
     public int matrixY;
     /**
      * Divisor applied to the matrix values

@@ -78,7 +78,7 @@ public class GenericTagPanel extends JPanel {
         tag = null;
         genericTagPropertiesEditPanel.removeAll();
     }
-    
+
     public void setEditMode(boolean edit) {
         if (edit) {
             remove(genericTagPropertiesEditorPaneScrollPanel);
@@ -86,7 +86,7 @@ public class GenericTagPanel extends JPanel {
         } else {
             remove(genericTagPropertiesEditPanelScrollPanel);
             add(genericTagPropertiesEditorPaneScrollPanel);
-        }        
+        }
         repaint();
     }
 
@@ -112,12 +112,12 @@ public class GenericTagPanel extends JPanel {
         int propCount = generateEditControlsRecursive(tag, "");
         //Lay out the panel.
         SpringUtilities.makeCompactGrid(genericTagPropertiesEditPanel,
-                                        propCount, 2, //rows, cols
-                                        6, 6,        //initX, initY
-                                        6, 6);       //xPad, yPad        
+                propCount, 2, //rows, cols
+                6, 6, //initX, initY
+                6, 6);       //xPad, yPad        
         repaint();
     }
-    
+
     private int generateEditControlsRecursive(Object obj, String parent) {
         Field[] fields = obj.getClass().getDeclaredFields();
         int propCount = 0;
@@ -148,7 +148,7 @@ public class GenericTagPanel extends JPanel {
         }
         return propCount;
     }
-    
+
     private int addEditor(String name, Object obj, Field field) throws IllegalArgumentException, IllegalAccessException {
         Component editor;
         Class<?> type = field.getType();
@@ -166,8 +166,8 @@ public class GenericTagPanel extends JPanel {
             editor = new BooleanEditor(obj, field);
         } else if (type.equals(String.class)) {
             editor = new StringEditor(obj, field);
-        } else if (type.equals(RECT.class) 
-                || type.equals(RGB.class) 
+        } else if (type.equals(RECT.class)
+                || type.equals(RGB.class)
                 || type.equals(ZONERECORD.class)
                 || type.equals(ZONEDATA.class)) {
             // todo: add other swf releated classes
@@ -178,14 +178,14 @@ public class GenericTagPanel extends JPanel {
             textArea.setEditable(false);
             editor = textArea;
         }
-        
+
         JLabel label = new JLabel(name + ":", JLabel.TRAILING);
         genericTagPropertiesEditPanel.add(label);
         label.setLabelFor(editor);
         genericTagPropertiesEditPanel.add(editor);
         return 1;
     }
-    
+
     public void save() {
         for (Object component : genericTagPropertiesEditPanel.getComponents()) {
             if (component instanceof GenericTagEditor) {

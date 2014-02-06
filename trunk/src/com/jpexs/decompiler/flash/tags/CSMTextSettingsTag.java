@@ -35,19 +35,19 @@ public class CSMTextSettingsTag extends Tag {
 
     @SWFType(BasicType.UI16)
     public int textID;
-    
-    @SWFType(value=BasicType.UB,count=2)
+
+    @SWFType(value = BasicType.UB, count = 2)
     public int useFlashType;
-    
-    @SWFType(value=BasicType.UB,count=3)
+
+    @SWFType(value = BasicType.UB, count = 3)
     public int gridFit;
-    
-    @SWFType(value=BasicType.FLOAT)  //F32 = FLOAT
+
+    @SWFType(value = BasicType.FLOAT)  //F32 = FLOAT
     public float thickness;
-    
-    @SWFType(value=BasicType.FLOAT)  //F32 = FLOAT
+
+    @SWFType(value = BasicType.FLOAT)  //F32 = FLOAT
     public float sharpness;
-    
+
     public static final int ID = 74;
 
     /**

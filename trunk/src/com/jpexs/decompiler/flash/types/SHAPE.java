@@ -29,9 +29,9 @@ import java.util.Set;
  */
 public class SHAPE implements NeedsCharacters {
 
-    @SWFType(value=BasicType.UB, count=4)
+    @SWFType(value = BasicType.UB, count = 4)
     public int numFillBits;
-    @SWFType(value=BasicType.UB, count=4)
+    @SWFType(value = BasicType.UB, count = 4)
     public int numLineBits;
     public List<SHAPERECORD> shapeRecords;
 

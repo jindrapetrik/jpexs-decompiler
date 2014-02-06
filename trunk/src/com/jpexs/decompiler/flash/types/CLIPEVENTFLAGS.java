@@ -63,37 +63,37 @@ public class CLIPEVENTFLAGS {
     /**
      * @since SWF 6 Mouse drag over event
      */
-    @Conditional(minSwfVersion=6)
+    @Conditional(minSwfVersion = 6)
     public boolean clipEventDragOver;
     /**
      * @since SWF 6 Mouse rollout event
      */
-    @Conditional(minSwfVersion=6)
+    @Conditional(minSwfVersion = 6)
     public boolean clipEventRollOut;
     /**
      * @since SWF 6 Mouse rollover event
      */
-    @Conditional(minSwfVersion=6)
+    @Conditional(minSwfVersion = 6)
     public boolean clipEventRollOver;
     /**
      * @since SWF 6 Mouse release outside event
      */
-    @Conditional(minSwfVersion=6)
+    @Conditional(minSwfVersion = 6)
     public boolean clipEventReleaseOutside;
     /**
      * @since SWF 6 Mouse release inside event
      */
-    @Conditional(minSwfVersion=6)
+    @Conditional(minSwfVersion = 6)
     public boolean clipEventRelease;
     /**
      * @since SWF 6 Mouse press event
      */
-    @Conditional(minSwfVersion=6)
+    @Conditional(minSwfVersion = 6)
     public boolean clipEventPress;
     /**
      * @since SWF 6 Initialize event
      */
-    @Conditional(minSwfVersion=6)
+    @Conditional(minSwfVersion = 6)
     public boolean clipEventInitialize;
     /**
      * Data received event
@@ -102,17 +102,17 @@ public class CLIPEVENTFLAGS {
     /**
      * @since SWF 7 Construct event
      */
-    @Conditional(minSwfVersion=7)
+    @Conditional(minSwfVersion = 7)
     public boolean clipEventConstruct = false;
     /**
      * @since SWF 6 Key press event
      */
-    @Conditional(minSwfVersion=6)
+    @Conditional(minSwfVersion = 6)
     public boolean clipEventKeyPress = false;
     /**
      * @since SWF 6 Mouse drag out event
      */
-    @Conditional(minSwfVersion=6)
+    @Conditional(minSwfVersion = 6)
     public boolean clipEventDragOut = false;
 
     public String getHeader(int key, boolean asFileName) {

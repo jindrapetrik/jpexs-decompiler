@@ -37,13 +37,13 @@ public class MATRIX implements Serializable {
      * X scale value
      */
     @Conditional("hasScale")
-    @SWFType(value=BasicType.FB,countField = "nScaleBits")
+    @SWFType(value = BasicType.FB, countField = "nScaleBits")
     public int scaleX;
     /**
      * Y scale value
      */
     @Conditional("hasScale")
-    @SWFType(value=BasicType.FB,countField = "nScaleBits")
+    @SWFType(value = BasicType.FB, countField = "nScaleBits")
     public int scaleY;
     /**
      * Has rotate and skew values
@@ -53,34 +53,34 @@ public class MATRIX implements Serializable {
      * First rotate and skew value
      */
     @Conditional("hasRotate")
-    @SWFType(value=BasicType.FB,countField = "nRotateBits")
+    @SWFType(value = BasicType.FB, countField = "nRotateBits")
     public int rotateSkew0;
     /**
      * Second rotate and skew value
      */
     @Conditional("hasRotate")
-    @SWFType(value=BasicType.FB,countField = "nRotateBits")
+    @SWFType(value = BasicType.FB, countField = "nRotateBits")
     public int rotateSkew1;
     /**
      * X translate value in twips
      */
-    @SWFType(value=BasicType.SB,countField = "nTranslateBits")
+    @SWFType(value = BasicType.SB, countField = "nTranslateBits")
     public int translateX;
     /**
      * Y translate value in twips
      */
-    @SWFType(value=BasicType.SB,countField = "nTranslateBits")
+    @SWFType(value = BasicType.SB, countField = "nTranslateBits")
     public int translateY;
-    
-    @SWFType(value=BasicType.UB,count = 5)
+
+    @SWFType(value = BasicType.UB, count = 5)
     public int nTranslateBits;
-    
-    @SWFType(value=BasicType.UB,count = 5)
+
+    @SWFType(value = BasicType.UB, count = 5)
     public int nRotateBits;
-    
-    @SWFType(value=BasicType.UB,count = 5)
+
+    @SWFType(value = BasicType.UB, count = 5)
     public int nScaleBits;
-    
+
     public MATRIX() {
     }
 

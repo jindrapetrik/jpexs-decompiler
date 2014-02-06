@@ -40,24 +40,24 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
 
     @SWFType(BasicType.UI16)
     public int characterID;
-    
+
     @SWFType(BasicType.UI16)
     public int numFrames;
-    
+
     @SWFType(BasicType.UI16)
     public int width;
-    
+
     @SWFType(BasicType.UI16)
     public int height;
-    
-    @SWFType(value=BasicType.UB,count=3)
+
+    @SWFType(value = BasicType.UB, count = 3)
     public int videoFlagsDeblocking;
-    
+
     public boolean videoFlagsSmoothing;
-    
+
     @SWFType(BasicType.UI8)
     public int codecID;
-    
+
     public static final int CODEC_SORENSON_H263 = 2;
     public static final int CODEC_SCREEN_VIDEO = 3;
     public static final int CODEC_VP6 = 4;
@@ -99,6 +99,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineVideoStreamTag(SWF swf, byte[] data, int version, long pos) throws IOException {

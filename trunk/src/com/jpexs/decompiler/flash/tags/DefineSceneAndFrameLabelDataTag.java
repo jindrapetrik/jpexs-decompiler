@@ -35,12 +35,12 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
 
     @SWFType(BasicType.EncodedU32)
     public long[] sceneOffsets;
-    
+
     public String[] sceneNames;
-    
+
     @SWFType(BasicType.EncodedU32)
     public long[] frameNums;
-    
+
     public String[] frameNames;
     public static final int ID = 86;
 
@@ -78,6 +78,7 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineSceneAndFrameLabelDataTag(SWF swf, byte[] data, int version, long pos) throws IOException {

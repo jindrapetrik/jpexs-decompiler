@@ -35,7 +35,7 @@ import java.io.OutputStream;
 public class EnableDebugger2Tag extends Tag {
 
     @Reserved
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public int reserved;
     /**
      * MD5 hash of password
@@ -68,6 +68,7 @@ public class EnableDebugger2Tag extends Tag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public EnableDebugger2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {

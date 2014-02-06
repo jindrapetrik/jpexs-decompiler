@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.types.annotations;
 
 import java.lang.annotation.ElementType;
@@ -24,10 +23,11 @@ import java.lang.annotation.Target;
 
 /**
  * The field is optional anc can be unset
+ *
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Optional {
-    
+
 }

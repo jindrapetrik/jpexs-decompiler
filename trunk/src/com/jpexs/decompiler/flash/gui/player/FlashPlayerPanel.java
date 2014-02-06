@@ -40,8 +40,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -226,7 +224,7 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
             hwndFrame.setPointer(Native.getComponentPointer(frame));
 
             startFlashPlayer();
-            
+
             executed = true;
         }
     }
@@ -262,7 +260,7 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
 
         Kernel32.INSTANCE.ConnectNamedPipe(pipe, null);
     }
-    
+
     public synchronized void stopSWF() {
         displaySWF("-", null, 1);
         stopped = true;
@@ -303,11 +301,11 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
 
     public static void unload() {
         /*if (Platform.isWindows()) {
-            for (int i = 0; i < processes.size(); i++) {
-                Kernel32.INSTANCE.CloseHandle(pipes.get(i));
-                Kernel32.INSTANCE.TerminateProcess(processes.get(i), 0);
-            }
-        }*/
+         for (int i = 0; i < processes.size(); i++) {
+         Kernel32.INSTANCE.CloseHandle(pipes.get(i));
+         Kernel32.INSTANCE.TerminateProcess(processes.get(i), 0);
+         }
+         }*/
     }
 
     @Override
@@ -413,7 +411,7 @@ public class FlashPlayerPanel extends Panel implements FlashDisplay {
     public boolean isLoaded() {
         return !isStopped();
     }
-    
+
     private synchronized boolean writeToPipe(final byte[] data) {
         final IntByReference ibr = new IntByReference();
         int result = -1;

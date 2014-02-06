@@ -72,7 +72,7 @@ public class ShowFrameTag extends Tag {
     public byte[] getData(int version) {
         return super.getData(version);
     }
-    
+
     public static boolean isNestedTagType(int tagTypeId) {
         return nestedTagTypeIds.contains(tagTypeId);
     }

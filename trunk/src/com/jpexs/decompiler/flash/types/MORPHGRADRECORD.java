@@ -26,12 +26,12 @@ public class MORPHGRADRECORD {
 
     @SWFType(BasicType.UI8)
     public int startRatio;
-    
+
     public RGBA startColor;
-    
+
     @SWFType(BasicType.UI8)
     public int endRatio;
-    
+
     public RGBA endColor;
 
     public GRADRECORD getStartRecord() {

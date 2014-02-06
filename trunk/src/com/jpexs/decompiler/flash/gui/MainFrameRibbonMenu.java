@@ -87,7 +87,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_PARALLEL_SPEED_UP = "PARALLELSPEEDUP";
     static final String ACTION_INTERNAL_VIEWER_SWITCH = "INTERNALVIEWERSWITCH";
     static final String ACTION_SEARCH = "SEARCH";
-    static final String ACTION_TIMELINE = "TIMELINE";    
+    static final String ACTION_TIMELINE = "TIMELINE";
     static final String ACTION_AUTO_DEOBFUSCATE = "AUTODEOBFUSCATE";
     static final String ACTION_EXIT = "EXIT";
 
@@ -323,10 +323,10 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
 
         searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.search")), View.getResizableIcon("search32"));
         assignListener(searchCommandButton, ACTION_SEARCH);
-        
+
         timeLineCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.timeline")), View.getResizableIcon("timeline32"));
         assignListener(timeLineCommandButton, ACTION_TIMELINE);
-               
+
         gotoDocumentClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.gotodocumentclass")), View.getResizableIcon("gotomainclass32"));
         assignListener(gotoDocumentClassCommandButton, ACTION_GOTO_DOCUMENT_CLASS);
 
@@ -340,7 +340,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         assignListener(loadCacheCommandButton, ACTION_LOAD_CACHE);
 
         toolsBand.addCommandButton(searchCommandButton, RibbonElementPriority.TOP);
-        toolsBand.addCommandButton(timeLineCommandButton, RibbonElementPriority.TOP);        
+        toolsBand.addCommandButton(timeLineCommandButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(gotoDocumentClassCommandButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(proxyCommandButton, RibbonElementPriority.MEDIUM);
         toolsBand.addCommandButton(loadMemoryCommandButton, RibbonElementPriority.MEDIUM);
@@ -527,7 +527,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
             saveCommandButton.setEnabled(mainFrame.panel.getCurrentSwf() != null);
         }
     }
-    
+
     private void clearModified(SWF swf) {
         for (Tag tag : swf.tags) {
             tag.setModified(false);

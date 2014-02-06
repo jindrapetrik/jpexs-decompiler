@@ -30,10 +30,10 @@ public class ScriptLimitsTag extends Tag {
 
     @SWFType(BasicType.UI16)
     public int maxRecursionDepth;
-    
+
     @SWFType(BasicType.UI16)
     public int scriptTimeoutSeconds;
-    
+
     public static final int ID = 65;
 
     public ScriptLimitsTag(SWF swf, byte[] data, int version, long pos) throws IOException {

@@ -128,6 +128,7 @@ public class Highlighting implements Serializable {
      * @param startPos Starting position
      * @param data Highlighting data
      * @param type Highlighting type
+     * @param text
      */
     public Highlighting(int startPos, Map<String, String> data, HilightType type, String text) {
         this.startPos = startPos;

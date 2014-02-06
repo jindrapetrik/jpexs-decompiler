@@ -28,7 +28,7 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
 
     private final Object obj;
     private final Field field;
-    
+
     public BooleanEditor(Object obj, Field field) {
         setBackground(Color.white);
         this.obj = obj;
@@ -39,7 +39,7 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
             // ignore
         }
     }
-    
+
     @Override
     public void save() {
         try {

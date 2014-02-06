@@ -33,7 +33,7 @@ public class DefineFontAlignZonesTag extends Tag {
 
     @SWFType(BasicType.UI16)
     public int fontID;
-    @SWFType(value=BasicType.UB,count=2)
+    @SWFType(value = BasicType.UB, count = 2)
     public int CSMTableHint;
     public List<ZONERECORD> zoneTable;
     public static final int ID = 73;

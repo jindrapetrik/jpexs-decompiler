@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
@@ -67,7 +66,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
      * A series of tags
      */
     public List<Tag> subTags;
-    
+
     public static final int ID = 39;
 
     @Override

@@ -30,28 +30,28 @@ public class RECT implements Serializable {
     /**
      * X minimum position for rectangle in twips
      */
-    @SWFType(value=BasicType.SB, countField = "nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int Xmin;
-    
+
     /**
      * X maximum position for rectangle in twips
      */
-    @SWFType(value=BasicType.SB, countField = "nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int Xmax;
-    
+
     /**
      * Y minimum position for rectangle in twips
      */
-    @SWFType(value=BasicType.SB, countField = "nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int Ymin;
-    
+
     /**
      * Y maximum position for rectangle in twips
      */
-    @SWFType(value=BasicType.SB, countField = "nbits")
+    @SWFType(value = BasicType.SB, countField = "nbits")
     public int Ymax;
-    
-    @SWFType(value=BasicType.UB, count = 5)
+
+    @SWFType(value = BasicType.UB, count = 5)
     public int nbits;
 
     public RECT(int Xmin, int Xmax, int Ymin, int Ymax) {

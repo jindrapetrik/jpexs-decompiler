@@ -20,6 +20,7 @@ package com.jpexs.helpers;
  * Class with helper method
  *
  * @author JPEXS
+ * @param <T>
  */
 public abstract class Callback<T> {
 

@@ -33,12 +33,12 @@ public class GRADIENTBEVELFILTER extends FILTER {
 
     /**
      * Gradient colors
-     */    
+     */
     public RGBA[] gradientColors = new RGBA[0];
     /**
      * Gradient ratios
      */
-    @SWFType(BasicType.UI8)    
+    @SWFType(BasicType.UI8)
     public int[] gradientRatio = new int[0];
     /**
      * Horizontal blur amount
@@ -84,7 +84,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
     /**
      * Number of blur passes
      */
-    @SWFType(value=BasicType.UB,count=4)
+    @SWFType(value = BasicType.UB, count = 4)
     public int passes;
 
     public GRADIENTBEVELFILTER() {

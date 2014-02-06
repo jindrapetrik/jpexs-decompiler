@@ -34,12 +34,12 @@ import javax.imageio.ImageIO;
 
 public class DefineBitsTag extends ImageTag {
 
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public int characterID;
-    
+
     @SWFType(BasicType.UI8)
     public byte[] jpegData;
-    
+
     @Internal
     private JPEGTablesTag jtt = null;
     public static final int ID = 6;

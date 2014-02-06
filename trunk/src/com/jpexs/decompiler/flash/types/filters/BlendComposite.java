@@ -93,6 +93,7 @@ public final class BlendComposite implements Composite {
 
     /**
      * {@inheritDoc}
+     * @return 
      */
     @Override
     public int hashCode() {

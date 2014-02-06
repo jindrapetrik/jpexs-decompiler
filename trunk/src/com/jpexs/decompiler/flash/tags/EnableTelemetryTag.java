@@ -36,13 +36,13 @@ import java.io.OutputStream;
 public class EnableTelemetryTag extends Tag {
 
     public static final int ID = 93;
-    
-    @SWFType(value=BasicType.UB,count=16)
+
+    @SWFType(value = BasicType.UB, count = 16)
     @Reserved
     public int reserved;
-    
+
     @Optional
-    @SWFType(value=BasicType.UI8,count=32)
+    @SWFType(value = BasicType.UI8, count = 32)
     public byte[] passwordHash;
 
     /**

@@ -62,8 +62,8 @@ public class AUDIODATA extends DATA {
             FLVOutputStream flv = new FLVOutputStream(baos);
             flv.writeUB(4, soundFormat);
             flv.writeUB(2, soundRate);
-            flv.writeUB(1, soundSize?1:0);
-            flv.writeUB(1, soundType?1:0);
+            flv.writeUB(1, soundSize ? 1 : 0);
+            flv.writeUB(1, soundType ? 1 : 0);
             flv.write(soundData);
         } catch (IOException ex) {
             //ignore

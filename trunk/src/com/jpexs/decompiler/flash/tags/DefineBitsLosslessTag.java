@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import static com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.BITMAPDATA;
@@ -43,35 +42,34 @@ import javax.imageio.ImageIO;
 
 public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public int characterID;
-    
-    @SWFType(BasicType.UI8)        
-    public int bitmapFormat;
-    
-    
-    @SWFType(BasicType.UI16)    
-    public int bitmapWidth;
-    
-    @SWFType(BasicType.UI16)    
-    public int bitmapHeight;
-    
+
     @SWFType(BasicType.UI8)
-    @Conditional(value="bitmapFormat",options={FORMAT_8BIT_COLORMAPPED})
+    public int bitmapFormat;
+
+    @SWFType(BasicType.UI16)
+    public int bitmapWidth;
+
+    @SWFType(BasicType.UI16)
+    public int bitmapHeight;
+
+    @SWFType(BasicType.UI8)
+    @Conditional(value = "bitmapFormat", options = {FORMAT_8BIT_COLORMAPPED})
     public int bitmapColorTableSize;
-       
+
     public byte[] zlibBitmapData; //TODO: Parse COLORMAPDATA,BITMAPDATA
     public static final int FORMAT_8BIT_COLORMAPPED = 3;
     public static final int FORMAT_15BIT_RGB = 4;
     public static final int FORMAT_24BIT_RGB = 5;
-    
+
     @Internal
     private COLORMAPDATA colorMapData;
     @Internal
     private BITMAPDATA bitmapData;
     @Internal
     private boolean decompressed = false;
-    
+
     public static final int ID = 20;
 
     @Override

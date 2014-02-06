@@ -28,7 +28,7 @@ import java.io.OutputStream;
 
 public class ProductInfoTag extends Tag {
 
-    @SWFType(BasicType.UI32)    
+    @SWFType(BasicType.UI32)
     public long productID;
     @SWFType(BasicType.UI32)
     public long edition;
@@ -93,6 +93,5 @@ public class ProductInfoTag extends Tag {
         }
         return baos.toByteArray();
     }
-    
-    
+
 }

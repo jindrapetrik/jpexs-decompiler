@@ -34,7 +34,7 @@ import java.io.OutputStream;
  */
 public class DefineButtonCxformTag extends Tag {
 
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public int buttonId;
     public CXFORM buttonColorTransform;
     public static final int ID = 23;
@@ -63,6 +63,7 @@ public class DefineButtonCxformTag extends Tag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineButtonCxformTag(SWF swf, byte[] data, int version, long pos) throws IOException {

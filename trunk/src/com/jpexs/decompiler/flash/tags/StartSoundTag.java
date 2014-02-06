@@ -63,6 +63,7 @@ public class StartSoundTag extends Tag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public StartSoundTag(SWF swf, byte[] data, int version, long pos) throws IOException {

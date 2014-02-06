@@ -33,6 +33,7 @@ import jsyntaxpane.actions.DocumentSearchData;
 /**
  *
  * @author JPEXS
+ * @param <E>
  */
 public class SearchPanel<E> extends JPanel implements ActionListener {
 

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.types.annotations;
 
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -25,21 +24,28 @@ import java.lang.annotation.Target;
 
 /**
  * Maps basic java types (int,float,double) to SWF types (UI8,UI16...FLOAT)
+ *
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface SWFType {
+
     /// Type of value
     BasicType value();
+
     /// Alternate type when condition is met
     BasicType alternateValue() default BasicType.NONE;
+
     /// Condition for alternate type
     String alternateCondition() default "";
+
     /// Count - used primarily for bit fields UB,SB,FB to specify number of bits
     int count() default -1;
+
     /// Field name on which Count depends
     String countField() default "";
+
     //Count to add to countField
     int countAdd() default 0;
 }

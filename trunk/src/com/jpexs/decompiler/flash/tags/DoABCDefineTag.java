@@ -51,7 +51,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      * executed immediately, but only parsed. A later finddef may cause its
      * scripts to execute.
      */
-    @SWFType(BasicType.UI32)    
+    @SWFType(BasicType.UI32)
     public long flags;
     /**
      * The name assigned to the bytecode.

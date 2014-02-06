@@ -27,7 +27,7 @@ public class GRADRECORD {
 
     @SWFType(BasicType.UI8)
     public int ratio;
-    
+
     @Internal
     public boolean inShape3;
     public RGB color;

@@ -33,9 +33,9 @@ import java.io.OutputStream;
  */
 public class DebugIDTag extends Tag {
 
-    @SWFType(value=BasicType.UI8,count=16)
+    @SWFType(value = BasicType.UI8, count = 16)
     public byte[] debugId;
-    
+
     public static final int ID = 63;
 
     /**
@@ -62,6 +62,7 @@ public class DebugIDTag extends Tag {
      * @param swf
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DebugIDTag(SWF swf, byte[] data, int version, long pos) throws IOException {

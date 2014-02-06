@@ -65,6 +65,7 @@ public class VideoFrameTag extends Tag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public VideoFrameTag(SWF swf, byte[] data, int version, long pos) throws IOException {

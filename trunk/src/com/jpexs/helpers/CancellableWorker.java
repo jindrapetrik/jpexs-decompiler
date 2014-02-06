@@ -31,6 +31,7 @@ import java.util.concurrent.TimeoutException;
 /**
  *
  * @author JPEXS
+ * @param <T>
  */
 public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 

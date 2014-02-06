@@ -31,19 +31,19 @@ public class SOUNDINFO {
     public boolean hasLoops;
     public boolean hasOutPoint;
     public boolean hasInPoint;
-    
+
     @Conditional("hasInPoint")
     @SWFType(BasicType.UI32)
     public long inPoint;
-    
+
     @Conditional("hasOutPoint")
     @SWFType(BasicType.UI32)
     public long outPoint;
-    
+
     @Conditional("hasLoops")
     @SWFType(BasicType.UI16)
     public int loopCount;
-    
+
     @Conditional("hasEnvelope")
     public SOUNDENVELOPE[] envelopeRecords = new SOUNDENVELOPE[0];
 }

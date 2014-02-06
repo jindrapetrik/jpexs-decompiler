@@ -67,7 +67,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     /**
      * ID for this character
      */
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public int buttonId;
     /**
      * Characters that make up the button
@@ -95,6 +95,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos
@@ -143,6 +144,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      *
      * @param version SWF version
      * @return ASM source
+     * @throws java.lang.InterruptedException
      */
     @Override
     public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
@@ -167,6 +169,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      *
      * @param version Version
      * @return List of actions
+     * @throws java.lang.InterruptedException
      */
     @Override
     public List<Action> getActions(int version) throws InterruptedException {

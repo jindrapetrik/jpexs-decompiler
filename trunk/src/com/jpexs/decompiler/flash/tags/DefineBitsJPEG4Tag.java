@@ -42,16 +42,16 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     @SWFType(BasicType.UI16)
     public int characterID;
-    
-    @SWFType(BasicType.UI16)    
+
+    @SWFType(BasicType.UI16)
     public int deblockParam;
-    
-    @SWFType(BasicType.UI8)    
+
+    @SWFType(BasicType.UI8)
     public byte[] imageData;
-    
-    @SWFType(BasicType.UI8)    
+
+    @SWFType(BasicType.UI8)
     public byte[] bitmapAlphaData;
-    
+
     public static final int ID = 90;
 
     @Override

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.types.annotations;
 
 import java.lang.annotation.ElementType;
@@ -24,23 +23,31 @@ import java.lang.annotation.Target;
 
 /**
  * Mark for field that its type is different whern certain field (value) is set
+ *
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface ConditionalType {        
+public @interface ConditionalType {
+
     ///Name of field on which this depends
     String[] value() default {};
+
     ///Tag IDs which this field must be in
     int[] tags() default {};
+
     ///Minimum SWF version for this field
     int minSwfVersion() default 1;
+
     ///Maximum SWF version for this field
     int maxSwfVersion() default Integer.MAX_VALUE;
+
     ///List of values for condition (if true/false is not enough)
     int[] options() default {};
+
     ///Revert condition (if false...)
     boolean revert() default false;
+
     ///Field type when condition is met
     Class type();
 }

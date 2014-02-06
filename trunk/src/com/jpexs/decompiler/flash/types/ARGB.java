@@ -34,17 +34,17 @@ public class ARGB {
     /**
      * Red color value
      */
-    @SWFType(BasicType.UI8)    
+    @SWFType(BasicType.UI8)
     public int red;
     /**
      * Green color value
      */
-    @SWFType(BasicType.UI8)    
+    @SWFType(BasicType.UI8)
     public int green;
     /**
      * Blue color value
      */
-    @SWFType(BasicType.UI8)    
+    @SWFType(BasicType.UI8)
     public int blue;
 
     @Override

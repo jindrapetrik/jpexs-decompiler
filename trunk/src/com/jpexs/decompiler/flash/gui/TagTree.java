@@ -113,7 +113,7 @@ public class TagTree extends JTree {
                     }
                 }
             }
-            
+
             if (isModified) {
                 font = font.deriveFont(Font.BOLD);
             } else {

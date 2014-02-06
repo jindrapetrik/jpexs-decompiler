@@ -37,28 +37,28 @@ import java.io.OutputStream;
  */
 public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHeadTypeTag {
 
-    @SWFType(value=BasicType.UB,count=2)
+    @SWFType(value = BasicType.UB, count = 2)
     public int playBackSoundRate;
-    
+
     public boolean playBackSoundSize;
     public boolean playBackSoundType;
-    
-    @SWFType(value=BasicType.UB,count=4)
+
+    @SWFType(value = BasicType.UB, count = 4)
     public int streamSoundCompression;
-    
-    @SWFType(value=BasicType.UB,count=2)
+
+    @SWFType(value = BasicType.UB, count = 2)
     public int streamSoundRate;
-    
+
     public boolean streamSoundSize;
     public boolean streamSoundType;
-    
+
     @SWFType(BasicType.UI16)
     public int streamSoundSampleCount;
-    
+
     @SWFType(BasicType.SI16)
-    @Conditional(value="streamSoundCompression",options={2})
+    @Conditional(value = "streamSoundCompression", options = {2})
     public int latencySeek;
-    
+
     @Internal
     private int virtualCharacterId = 0;
     public static final int ID = 45;
@@ -103,12 +103,12 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
         try {
             sos.writeUB(4, 0);//reserved
             sos.writeUB(2, playBackSoundRate);
-            sos.writeUB(1, playBackSoundSize?1:0);
-            sos.writeUB(1, playBackSoundType?1:0);
+            sos.writeUB(1, playBackSoundSize ? 1 : 0);
+            sos.writeUB(1, playBackSoundType ? 1 : 0);
             sos.writeUB(4, streamSoundCompression);
             sos.writeUB(2, streamSoundRate);
-            sos.writeUB(1, streamSoundSize?1:0);
-            sos.writeUB(1, streamSoundType?1:0);
+            sos.writeUB(1, streamSoundSize ? 1 : 0);
+            sos.writeUB(1, streamSoundType ? 1 : 0);
             sos.writeUI16(streamSoundSampleCount);
             if (streamSoundCompression == 2) {
                 sos.writeSI16(latencySeek);
@@ -121,6 +121,7 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos
@@ -131,7 +132,7 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         sis.readUB(4);//reserved
         playBackSoundRate = (int) sis.readUB(2);
-        playBackSoundSize =  sis.readUB(1) == 1;
+        playBackSoundSize = sis.readUB(1) == 1;
         playBackSoundType = sis.readUB(1) == 1;
         streamSoundCompression = (int) sis.readUB(4);
         streamSoundRate = (int) sis.readUB(2);

@@ -29,9 +29,9 @@ public class MORPHLINESTYLE2 {
     public int startWidth;
     @SWFType(BasicType.UI16)
     public int endWidth;
-    @SWFType(value=BasicType.UB,count = 2)
+    @SWFType(value = BasicType.UB, count = 2)
     public int startCapStyle;
-     @SWFType(value=BasicType.UB,count = 2)
+    @SWFType(value = BasicType.UB, count = 2)
     public int joinStyle;
     public static final int ROUND_JOIN = 0;
     public static final int BEVEL_JOIN = 1;
@@ -41,25 +41,25 @@ public class MORPHLINESTYLE2 {
     public boolean noVScaleFlag;
     public boolean pixelHintingFlag;
     public boolean noClose;
-    
-    @SWFType(value=BasicType.UB,count = 2)
+
+    @SWFType(value = BasicType.UB, count = 2)
     public int endCapStyle;
-    
+
     public static final int ROUND_CAP = 0;
     public static final int NO_CAP = 1;
     public static final int SQUARE_CAP = 2;
-    
-    @SWFType(value=BasicType.UI16)
-    @Conditional(value="joinStyle",options = {MITER_JOIN})
+
+    @SWFType(value = BasicType.UI16)
+    @Conditional(value = "joinStyle", options = {MITER_JOIN})
     public int miterLimitFactor;
-    
-    @Conditional(value="hasFillFlag",revert = true)
+
+    @Conditional(value = "hasFillFlag", revert = true)
     public RGBA startColor;
-    
-    @Conditional(value="hasFillFlag",revert = true)
+
+    @Conditional(value = "hasFillFlag", revert = true)
     public RGBA endColor;
-    
-    @Conditional(value="hasFillFlag")
+
+    @Conditional(value = "hasFillFlag")
     public MORPHFILLSTYLE fillType;
 
     public LINESTYLE2 getLineStyle2At(int ratio) {

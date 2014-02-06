@@ -36,8 +36,8 @@ public class FileAttributesTag extends Tag {
     public boolean noCrossDomainCache;
     private boolean reserved1;
     private boolean reserved2;
-    
-    @SWFType(value=BasicType.UB,count=24)
+
+    @SWFType(value = BasicType.UB, count = 24)
     private int reserved3;
     public static final int ID = 69;
 
@@ -48,14 +48,14 @@ public class FileAttributesTag extends Tag {
     public FileAttributesTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "FileAttributes", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        reserved1 = sis.readUB(1)==1; // reserved
+        reserved1 = sis.readUB(1) == 1; // reserved
         // UB[1] == 0  (reserved)
         useDirectBlit = sis.readUB(1) != 0;
         useGPU = sis.readUB(1) != 0;
         hasMetadata = sis.readUB(1) != 0;
         actionScript3 = sis.readUB(1) != 0;
         noCrossDomainCache = sis.readUB(1) != 0;
-        reserved2 = sis.readUB(1)==1; // reserved
+        reserved2 = sis.readUB(1) == 1; // reserved
         useNetwork = sis.readUB(1) != 0;
         // UB[24] == 0 (reserved)
         reserved3 = (int) sis.readUB(24); //reserved
@@ -73,13 +73,13 @@ public class FileAttributesTag extends Tag {
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
-            sos.writeUB(1, reserved1?1:0); //reserved
+            sos.writeUB(1, reserved1 ? 1 : 0); //reserved
             sos.writeUB(1, useDirectBlit ? 1 : 0);
             sos.writeUB(1, useGPU ? 1 : 0);
             sos.writeUB(1, hasMetadata ? 1 : 0);
             sos.writeUB(1, actionScript3 ? 1 : 0);
             sos.writeUB(1, noCrossDomainCache ? 1 : 0);
-            sos.writeUB(1, reserved2?1:0); //reserved
+            sos.writeUB(1, reserved2 ? 1 : 0); //reserved
             sos.writeUB(1, useNetwork ? 1 : 0);
             sos.writeUB(24, reserved3); //reserved
         } catch (IOException e) {

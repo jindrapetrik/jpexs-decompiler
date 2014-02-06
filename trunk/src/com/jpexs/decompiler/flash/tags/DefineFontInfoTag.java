@@ -45,7 +45,7 @@ public class DefineFontInfoTag extends Tag {
     public boolean fontFlagsItalic;
     public boolean fontFlagsBold;
     public boolean fontFlagsWideCodes;
-    @SWFType(value=BasicType.UI8,alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
+    @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public List<Integer> codeTable;
     public static final int ID = 13;
 

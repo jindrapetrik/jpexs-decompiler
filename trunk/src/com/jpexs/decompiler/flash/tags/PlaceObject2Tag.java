@@ -122,7 +122,7 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
     /**
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
-    @Conditional("placeFlagHasClipActions")    
+    @Conditional("placeFlagHasClipActions")
     public CLIPACTIONS clipActions;
     public static final int ID = 26;
 

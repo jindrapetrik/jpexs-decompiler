@@ -28,7 +28,7 @@ public class DoubleEditor extends JTextArea implements GenericTagEditor {
 
     private final Object obj;
     private final Field field;
-    
+
     public DoubleEditor(Object obj, Field field) {
         setBackground(Color.white);
         setSize(100, getSize().height);
@@ -42,7 +42,7 @@ public class DoubleEditor extends JTextArea implements GenericTagEditor {
             // ignore
         }
     }
-    
+
     @Override
     public void save() {
         try {

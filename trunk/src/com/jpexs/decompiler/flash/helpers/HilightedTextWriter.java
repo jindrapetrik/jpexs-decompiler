@@ -65,6 +65,7 @@ public class HilightedTextWriter extends GraphTextWriter {
     /**
      * Highlights specified text as instruction by adding special tags
      *
+     * @param src
      * @param pos Offset of instruction
      * @return HilightedTextWriter
      */

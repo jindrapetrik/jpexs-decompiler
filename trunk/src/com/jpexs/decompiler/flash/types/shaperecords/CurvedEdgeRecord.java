@@ -28,20 +28,20 @@ public class CurvedEdgeRecord extends SHAPERECORD {
 
     public boolean typeFlag = true;
     public boolean straightFlag = false;
-    
-    @SWFType(value=BasicType.UB,count=4)
+
+    @SWFType(value = BasicType.UB, count = 4)
     public int numBits;
-    
-    @SWFType(value=BasicType.SB,countField = "numBits",countAdd = 2)
+
+    @SWFType(value = BasicType.SB, countField = "numBits", countAdd = 2)
     public int controlDeltaX;
-    
-    @SWFType(value=BasicType.SB,countField = "numBits",countAdd = 2)
+
+    @SWFType(value = BasicType.SB, countField = "numBits", countAdd = 2)
     public int controlDeltaY;
-    
-    @SWFType(value=BasicType.SB,countField = "numBits",countAdd = 2)
+
+    @SWFType(value = BasicType.SB, countField = "numBits", countAdd = 2)
     public int anchorDeltaX;
-    
-    @SWFType(value=BasicType.SB,countField = "numBits",countAdd = 2)
+
+    @SWFType(value = BasicType.SB, countField = "numBits", countAdd = 2)
     public int anchorDeltaY;
 
     @Override

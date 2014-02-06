@@ -148,7 +148,7 @@ public class LoadFromCacheFrame extends AppFrame implements ActionListener {
         progressBar.setVisible(false);
         openButton.setEnabled(false);
         saveButton.setEnabled(false);
-        
+
         java.util.List<Image> images = new ArrayList<>();
         images.add(View.loadImage("loadcache16"));
         images.add(View.loadImage("loadcache32"));

@@ -55,9 +55,9 @@ import java.util.regex.Pattern;
  */
 public class DefineEditTextTag extends TextTag {
 
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public int characterID;
-    
+
     public RECT bounds;
     public boolean hasText;
     public boolean wordWrap;
@@ -75,50 +75,50 @@ public class DefineEditTextTag extends TextTag {
     public boolean wasStatic;
     public boolean html;
     public boolean useOutlines;
-       
-    @SWFType(BasicType.UI16)        
+
+    @SWFType(BasicType.UI16)
     @Conditional("hasFont")
     public int fontId;
-    
+
     @Conditional("hasFontClass")
     public String fontClass;
-    
-    @SWFType(BasicType.UI16)    
+
+    @SWFType(BasicType.UI16)
     @Conditional("hasFont")
     public int fontHeight;
-        
+
     @Conditional("hasTextColor")
     public RGBA textColor;
-    
-    @SWFType(BasicType.UI16)    
+
+    @SWFType(BasicType.UI16)
     @Conditional("hasMaxLength")
     public int maxLength;
-    
+
     @SWFType(BasicType.UI8)
     @Conditional("hasLayout")
     public int align;
-    
+
     @SWFType(BasicType.UI16)
     @Conditional("hasLayout")
     public int leftMargin;
-    
+
     @SWFType(BasicType.UI16)
-    @Conditional("hasLayout")    
+    @Conditional("hasLayout")
     public int rightMargin;
-    
+
     @SWFType(BasicType.UI16)
-    @Conditional("hasLayout")    
+    @Conditional("hasLayout")
     public int indent;
-    
+
     @SWFType(BasicType.SI16)
-    @Conditional("hasLayout")    
+    @Conditional("hasLayout")
     public int leading;
-    
+
     public String variableName;
-    
+
     @Conditional("hasText")
     public String initialText;
-    
+
     public static final int ID = 37;
 
     @Override

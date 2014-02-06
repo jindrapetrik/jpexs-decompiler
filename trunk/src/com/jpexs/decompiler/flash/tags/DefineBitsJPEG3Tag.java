@@ -36,13 +36,13 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     @SWFType(BasicType.UI16)
     public int characterID;
-    
+
     @SWFType(BasicType.UI8)
     public byte[] imageData;
-    
+
     @SWFType(BasicType.UI8)
     public byte[] bitmapAlphaData;
-    
+
     public static final int ID = 35;
 
     @Override

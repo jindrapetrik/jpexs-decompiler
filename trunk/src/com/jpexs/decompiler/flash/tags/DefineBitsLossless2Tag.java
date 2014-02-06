@@ -40,27 +40,27 @@ import javax.imageio.ImageIO;
 
 public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public int characterID;
-    
-    @SWFType(BasicType.UI8)    
+
+    @SWFType(BasicType.UI8)
     public int bitmapFormat;
-    
+
     @SWFType(BasicType.UI16)
     public int bitmapWidth;
-    
+
     @SWFType(BasicType.UI16)
     public int bitmapHeight;
-    
+
     @SWFType(BasicType.UI8)
-    @Conditional(value="bitmapFormat",options={FORMAT_8BIT_COLORMAPPED})
+    @Conditional(value = "bitmapFormat", options = {FORMAT_8BIT_COLORMAPPED})
     public int bitmapColorTableSize;
-    
+
     public byte[] zlibBitmapData; //TODO: Parse ALPHACOLORMAPDATA,ALPHABITMAPDATA
-    
+
     public static final int FORMAT_8BIT_COLORMAPPED = 3;
     public static final int FORMAT_32BIT_ARGB = 5;
-    
+
     public static final int ID = 36;
 
     @Override

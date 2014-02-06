@@ -38,7 +38,7 @@ public class ExportAssetsTag extends Tag {
     /**
      * HashMap with assets
      */
-    @SWFType(BasicType.UI16)    
+    @SWFType(BasicType.UI16)
     public List<Integer> tags;
     public List<String> names;
     public static final int ID = 56;
@@ -54,6 +54,7 @@ public class ExportAssetsTag extends Tag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public ExportAssetsTag(SWF swf, byte[] data, int version, long pos) throws IOException {

@@ -28,7 +28,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
 
     private final Object tag;
     private final Field field;
-    
+
     public StringEditor(Object obj, Field field) {
         setBackground(Color.white);
         setLineWrap(true);
@@ -40,7 +40,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
             // ignore
         }
     }
-    
+
     @Override
     public void save() {
         try {

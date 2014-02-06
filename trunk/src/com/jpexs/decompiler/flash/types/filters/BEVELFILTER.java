@@ -41,7 +41,7 @@ public class BEVELFILTER extends FILTER {
      */
     @SWFType(BasicType.FIXED)
     public double blurX;
-    
+
     /**
      * Vertical blur amount
      */
@@ -81,7 +81,7 @@ public class BEVELFILTER extends FILTER {
     /**
      * Number of blur passes
      */
-    @SWFType(value=BasicType.UB,count=4)
+    @SWFType(value = BasicType.UB, count = 4)
     public int passes;
 
     /**

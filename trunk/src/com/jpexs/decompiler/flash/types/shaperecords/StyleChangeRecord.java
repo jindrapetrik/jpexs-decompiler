@@ -38,40 +38,40 @@ public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     public boolean stateFillStyle1;
     public boolean stateFillStyle0;
     public boolean stateMoveTo;
-    
-    @SWFType(value=BasicType.UB,count=5)
+
+    @SWFType(value = BasicType.UB, count = 5)
     @Conditional("stateMoveTo")
     public int moveBits;
-    
-    @SWFType(value=BasicType.SB,countField = "moveBits")
-    @Conditional("stateMoveTo")    
+
+    @SWFType(value = BasicType.SB, countField = "moveBits")
+    @Conditional("stateMoveTo")
     public int moveDeltaX;
-    
-    @SWFType(value=BasicType.SB,countField = "moveBits")
-    @Conditional("stateMoveTo")    
+
+    @SWFType(value = BasicType.SB, countField = "moveBits")
+    @Conditional("stateMoveTo")
     public int moveDeltaY;
-    
-    @SWFType(value=BasicType.UB,countField = "fillBits") //last defined fillBits
-    @Conditional("stateFillStyle0")        
+
+    @SWFType(value = BasicType.UB, countField = "fillBits") //last defined fillBits
+    @Conditional("stateFillStyle0")
     public int fillStyle0;
-    
-    @SWFType(value=BasicType.UB,countField = "fillBits") //last defined fillBits
-    @Conditional("stateFillStyle1")        
+
+    @SWFType(value = BasicType.UB, countField = "fillBits") //last defined fillBits
+    @Conditional("stateFillStyle1")
     public int fillStyle1;
-    
-    @SWFType(value=BasicType.UB,countField = "lineBits") //last defined lineBits
-    @Conditional("stateLineStyle")        
+
+    @SWFType(value = BasicType.UB, countField = "lineBits") //last defined lineBits
+    @Conditional("stateLineStyle")
     public int lineStyle;
-    
+
     @Conditional("stateNewStyles")
     public FILLSTYLEARRAY fillStyles;
-    
+
     @Conditional("stateNewStyles")
     public LINESTYLEARRAY lineStyles;
-    
+
     @Conditional("stateNewStyles")
     public int numFillBits;
-    
+
     @Conditional("stateNewStyles")
     public int numLineBits;
 

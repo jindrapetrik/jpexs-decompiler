@@ -28,30 +28,30 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 public class StraightEdgeRecord extends SHAPERECORD {
 
     /*
-    if (!ser.generalLineFlag) {
-                    ser.vertLineFlag = readUB(1) == 1;
-                }
-                if (ser.generalLineFlag || (!ser.vertLineFlag)) {
-                    ser.deltaX = (int) readSB(ser.numBits + 2);
-                }
-                if (ser.generalLineFlag || (ser.vertLineFlag)) {
-                    ser.deltaY = (int) readSB(ser.numBits + 2);
-                }
-    */
+     if (!ser.generalLineFlag) {
+     ser.vertLineFlag = readUB(1) == 1;
+     }
+     if (ser.generalLineFlag || (!ser.vertLineFlag)) {
+     ser.deltaX = (int) readSB(ser.numBits + 2);
+     }
+     if (ser.generalLineFlag || (ser.vertLineFlag)) {
+     ser.deltaY = (int) readSB(ser.numBits + 2);
+     }
+     */
     public int typeFlag = 1;
     public int straightFlag = 1;
-    @SWFType(value=BasicType.UB,count=4)
+    @SWFType(value = BasicType.UB, count = 4)
     public int numBits;
     public boolean generalLineFlag;
-    
-    @Conditional(value="generalLineFlag",revert = true)
+
+    @Conditional(value = "generalLineFlag", revert = true)
     public boolean vertLineFlag;
-    
-    @SWFType(value=BasicType.SB,countField = "numBits",countAdd = 2)
+
+    @SWFType(value = BasicType.SB, countField = "numBits", countAdd = 2)
     @Conditional("generalLineFlag|!vertLineFlag")
     public int deltaX;
-    
-    @SWFType(value=BasicType.SB,countField = "numBits",countAdd = 2)
+
+    @SWFType(value = BasicType.SB, countField = "numBits", countAdd = 2)
     @Conditional("generalLineFlag|vertLineFlag")
     public int deltaY;
 
