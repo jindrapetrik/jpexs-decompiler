@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 
 /**
@@ -36,6 +37,8 @@ public class LINESTYLE2 extends LINESTYLE {
     public boolean noHScaleFlag;
     public boolean noVScaleFlag;
     public boolean pixelHintingFlag;
+    @Reserved
+    public int reserved;
     public boolean noClose;
     @SWFType(value = BasicType.UB, count = 2)
     public int endCapStyle;

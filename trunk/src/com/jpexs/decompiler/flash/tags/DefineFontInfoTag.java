@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
@@ -39,6 +40,8 @@ public class DefineFontInfoTag extends Tag {
     @SWFType(BasicType.UI16)
     public int fontId;
     public String fontName;
+    @Reserved
+    public int reserved;
     public boolean fontFlagsSmallText;
     public boolean fontFlagsShiftJIS;
     public boolean fontFlagsANSI;
@@ -65,7 +68,7 @@ public class DefineFontInfoTag extends Tag {
             byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
             sos.writeUI8(fontNameBytes.length);
             sos.write(fontNameBytes);
-            sos.writeUB(2, 0); //reserved
+            sos.writeUB(2, reserved);
             sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
             sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
             sos.writeUB(1, fontFlagsANSI ? 1 : 0);
@@ -103,7 +106,7 @@ public class DefineFontInfoTag extends Tag {
         } else {
             fontName = new String(sis.readBytesEx(fontNameLen));
         }
-        sis.readUB(2); //reserved
+        reserved = (int) sis.readUB(2);
         fontFlagsSmallText = sis.readUB(1) == 1;
         fontFlagsShiftJIS = sis.readUB(1) == 1;
         fontFlagsANSI = sis.readUB(1) == 1;

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
+import com.jpexs.decompiler.flash.types.BasicType;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import javax.swing.JTextArea;
@@ -24,18 +25,20 @@ import javax.swing.JTextArea;
  *
  * @author JPEXS
  */
-public class LongEditor extends JTextArea implements GenericTagEditor {
+public class NumberEditor extends JTextArea implements GenericTagEditor {
 
     private final Object obj;
     private final Field field;
+    private final BasicType basicType;
 
-    public LongEditor(Object obj, Field field) {
+    public NumberEditor(Object obj, Field field, BasicType basicType) {
         setBackground(Color.white);
         setSize(100, getSize().height);
         setMaximumSize(getSize());
         setWrapStyleWord(true);
         this.obj = obj;
         this.field = field;
+        this.basicType = basicType;
         try {
             setText(field.get(obj).toString());
         } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -46,7 +49,18 @@ public class LongEditor extends JTextArea implements GenericTagEditor {
     @Override
     public void save() {
         try {
-            field.set(obj, Long.parseLong(getText()));
+            Class<?> type = field.getType();
+            if (type.equals(int.class) || type.equals(Integer.class)) {
+                field.set(obj, Integer.parseInt(getText()));
+            } else if (type.equals(short.class) || type.equals(Short.class)) {
+                field.set(obj, Short.parseShort(getText()));
+            } else if (type.equals(long.class) || type.equals(Long.class)) {
+                field.set(obj, Long.parseLong(getText()));
+            } else if (type.equals(double.class) || type.equals(Double.class)) {
+                field.set(obj, Double.parseDouble(getText()));
+            } else if (type.equals(float.class) || type.equals(Float.class)) {
+                field.set(obj, Float.parseFloat(getText()));
+            }
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }

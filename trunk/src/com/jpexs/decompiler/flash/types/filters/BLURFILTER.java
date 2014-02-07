@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 
@@ -42,6 +43,8 @@ public class BLURFILTER extends FILTER {
      */
     @SWFType(value = BasicType.UB, count = 5)
     public int passes;
+    @Reserved
+    public int reserved;
 
     public BLURFILTER() {
         super(1);

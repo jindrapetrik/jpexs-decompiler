@@ -17,20 +17,18 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
-import com.jpexs.decompiler.flash.gui.generictageditors.DoubleEditor;
-import com.jpexs.decompiler.flash.gui.generictageditors.FloatEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
-import com.jpexs.decompiler.flash.gui.generictageditors.IntegerEditor;
-import com.jpexs.decompiler.flash.gui.generictageditors.LongEditor;
-import com.jpexs.decompiler.flash.gui.generictageditors.ShortEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.ZONEDATA;
 import com.jpexs.decompiler.flash.types.ZONERECORD;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.lang.reflect.Field;
@@ -152,16 +150,14 @@ public class GenericTagPanel extends JPanel {
     private int addEditor(String name, Object obj, Field field) throws IllegalArgumentException, IllegalAccessException {
         Component editor;
         Class<?> type = field.getType();
-        if (type.equals(int.class) || type.equals(Integer.class)) {
-            editor = new IntegerEditor(obj, field);
-        } else if (type.equals(short.class) || type.equals(Short.class)) {
-            editor = new ShortEditor(obj, field);
-        } else if (type.equals(long.class) || type.equals(Long.class)) {
-            editor = new LongEditor(obj, field);
-        } else if (type.equals(double.class) || type.equals(Double.class)) {
-            editor = new DoubleEditor(obj, field);
-        } else if (type.equals(float.class) || type.equals(Float.class)) {
-            editor = new FloatEditor(obj, field);
+        SWFType swfType = field.getAnnotation(SWFType.class);
+        BasicType basicType = swfType == null ? BasicType.NONE : swfType.value();
+        if (type.equals(int.class) || type.equals(Integer.class) ||
+            type.equals(short.class) || type.equals(Short.class) ||
+            type.equals(long.class) || type.equals(Long.class) ||
+            type.equals(double.class) || type.equals(Double.class) || 
+            type.equals(float.class) || type.equals(Float.class)) {
+            editor = new NumberEditor(obj, field, basicType);
         } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
             editor = new BooleanEditor(obj, field);
         } else if (type.equals(String.class)) {

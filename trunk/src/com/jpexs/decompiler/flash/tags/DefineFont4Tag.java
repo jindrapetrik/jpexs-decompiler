@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,6 +33,8 @@ public class DefineFont4Tag extends CharacterTag {
     @SWFType(BasicType.UI16)
     public int fontID;
 
+    @Reserved
+    public int reserved;
     public boolean fontFlagsHasFontData;
     public boolean fontFlagsItalic;
     public boolean fontFlagsBold;
@@ -48,7 +51,7 @@ public class DefineFont4Tag extends CharacterTag {
         super(swf, ID, "DefineFont4", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontID = sis.readUI16();
-        sis.readUB(5);
+        reserved = (int) sis.readUB(5);
         fontFlagsHasFontData = sis.readUB(1) == 1;
         fontFlagsItalic = sis.readUB(1) == 1;
         fontFlagsBold = sis.readUB(1) == 1;
@@ -69,7 +72,7 @@ public class DefineFont4Tag extends CharacterTag {
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
             sos.writeUI16(fontID);
-            sos.writeUB(5, 0);
+            sos.writeUB(5, reserved);
             sos.writeUB(1, fontFlagsHasFontData ? 1 : 0);
             sos.writeUB(1, fontFlagsItalic ? 1 : 0);
             sos.writeUB(1, fontFlagsBold ? 1 : 0);

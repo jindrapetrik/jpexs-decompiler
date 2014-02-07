@@ -704,11 +704,11 @@ public class SWFOutputStream extends OutputStream {
         writeUB(1, value.clipEventInitialize ? 1 : 0);
         writeUB(1, value.clipEventData ? 1 : 0);
         if (version >= 6) {
-            writeUB(5, 0);
+            writeUB(5, value.reserved);
             writeUB(1, value.clipEventConstruct ? 1 : 0);
             writeUB(1, value.clipEventKeyPress ? 1 : 0);
             writeUB(1, value.clipEventDragOut ? 1 : 0);
-            writeUB(8, 0);
+            writeUB(8, value.reserved2);
         }
     }
 
@@ -739,7 +739,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeCLIPACTIONS(CLIPACTIONS value) throws IOException {
-        writeUI16(0);//reserved
+        writeUI16(value.reserved);
         writeCLIPEVENTFLAGS(value.allEventFlags);
         for (CLIPACTIONRECORD car : value.clipActionRecords) {
             writeCLIPACTIONRECORD(car);
@@ -818,7 +818,7 @@ public class SWFOutputStream extends OutputStream {
             }
         }
         writeRGBA(value.defaultColor);
-        writeUB(6, 0); //reserved
+        writeUB(6, value.reserved);
         writeUB(1, value.clamp ? 1 : 0);
         writeUB(1, value.preserveAlpha ? 1 : 0);
     }
@@ -833,7 +833,7 @@ public class SWFOutputStream extends OutputStream {
         writeFIXED(value.blurX);
         writeFIXED(value.blurY);
         writeUB(5, value.passes);
-        writeUB(3, 0);//reserved
+        writeUB(3, value.reserved);
     }
 
     /**
@@ -1014,7 +1014,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeBUTTONRECORD(BUTTONRECORD value, boolean inDefineButton2) throws IOException {
-        writeUB(2, 0);//reserved
+        writeUB(2, value.reserved);
         writeUB(1, value.buttonHasBlendMode ? 1 : 0);
         writeUB(1, value.buttonHasFilterList ? 1 : 0);
         writeUB(1, value.buttonStateHitTest ? 1 : 0);
@@ -1220,7 +1220,7 @@ public class SWFOutputStream extends OutputStream {
         writeUB(1, value.noHScaleFlag ? 1 : 0);
         writeUB(1, value.noVScaleFlag ? 1 : 0);
         writeUB(1, value.pixelHintingFlag ? 1 : 0);
-        writeUB(5, 0);//reserved
+        writeUB(5, value.reserved);
         writeUB(1, value.noClose ? 1 : 0);
         writeUB(2, value.endCapStyle);
         if (value.joinStyle == LINESTYLE2.MITER_JOIN) {
@@ -1374,7 +1374,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeSOUNDINFO(SOUNDINFO value) throws IOException {
-        writeUB(2, 0);//reserved
+        writeUB(2, value.reserved);
         writeUB(1, value.syncStop ? 1 : 0);
         writeUB(1, value.syncNoMultiple ? 1 : 0);
         writeUB(1, value.hasEnvelope ? 1 : 0);
@@ -1580,7 +1580,7 @@ public class SWFOutputStream extends OutputStream {
         writeUB(1, value.noHScaleFlag ? 1 : 0);
         writeUB(1, value.noVScaleFlag ? 1 : 0);
         writeUB(1, value.pixelHintingFlag ? 1 : 0);
-        writeUB(5, 0);//reserved
+        writeUB(5, value.reserved);
         writeUB(1, value.noClose ? 1 : 0);
         writeUB(2, value.endCapStyle);
         if (value.joinStyle == LINESTYLE2.MITER_JOIN) {

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,6 +37,9 @@ import java.io.OutputStream;
  * @author JPEXS
  */
 public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHeadTypeTag {
+
+    @Reserved
+    public int reserved;
 
     @SWFType(value = BasicType.UB, count = 2)
     public int playBackSoundRate;
@@ -101,7 +105,7 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
-            sos.writeUB(4, 0);//reserved
+            sos.writeUB(4, reserved);
             sos.writeUB(2, playBackSoundRate);
             sos.writeUB(1, playBackSoundSize ? 1 : 0);
             sos.writeUB(1, playBackSoundType ? 1 : 0);
@@ -130,7 +134,7 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
     public SoundStreamHead2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "SoundStreamHead2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        sis.readUB(4);//reserved
+        reserved = (int) sis.readUB(4);
         playBackSoundRate = (int) sis.readUB(2);
         playBackSoundSize = sis.readUB(1) == 1;
         playBackSoundType = sis.readUB(1) == 1;

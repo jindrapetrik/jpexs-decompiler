@@ -50,6 +50,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     public boolean preloadArgumentsFlag;
     public boolean suppressThisFlag;
     public boolean preloadThisFlag;
+    public int reserved;
     public boolean preloadGlobalFlag;
     public int registerCount;
     public int codeSize;
@@ -92,7 +93,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         preloadArgumentsFlag = sis.readUB(1) == 1;
         suppressThisFlag = sis.readUB(1) == 1;
         preloadThisFlag = sis.readUB(1) == 1;
-        sis.readUB(7);//reserved
+        reserved = (int) sis.readUB(7);
         preloadGlobalFlag = sis.readUB(1) == 1;
         for (int i = 0; i < numParams; i++) {
             paramRegisters.add(sis.readUI8());
@@ -145,7 +146,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
             sos.writeUB(1, preloadArgumentsFlag ? 1 : 0);
             sos.writeUB(1, suppressThisFlag ? 1 : 0);
             sos.writeUB(1, preloadThisFlag ? 1 : 0);
-            sos.writeUB(7, 0);
+            sos.writeUB(7, reserved);
             sos.writeUB(1, preloadGlobalFlag ? 1 : 0);
             for (int i = 0; i < paramNames.size(); i++) {
                 sos.writeUI8(paramRegisters.get(i));

@@ -40,6 +40,7 @@ import java.util.Stack;
 
 public class ActionTry extends Action implements GraphSourceItemContainer {
 
+    public int reserved;
     public boolean catchInRegisterFlag;
     public boolean finallyBlockFlag;
     public boolean catchBlockFlag;
@@ -66,8 +67,8 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     public ActionTry(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x8F, actionLength);
         long startPos = sis.getPos();
-        sis.readUB(5);
         this.version = version;
+        reserved = (int) sis.readUB(5);
         catchInRegisterFlag = sis.readUB(1) == 1;
         finallyBlockFlag = sis.readUB(1) == 1;
         catchBlockFlag = sis.readUB(1) == 1;
@@ -91,7 +92,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);
         try {
-            sos.writeUB(5, 0);
+            sos.writeUB(5, reserved);
             sos.writeUB(1, catchInRegisterFlag ? 1 : 0);
             sos.writeUB(1, finallyBlockFlag ? 1 : 0);
             sos.writeUB(1, catchBlockFlag ? 1 : 0);
@@ -184,7 +185,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);
         try {
-            sos.writeUB(5, 0);
+            sos.writeUB(5, reserved);
             sos.writeUB(1, catchInRegisterFlag ? 1 : 0);
             sos.writeUB(1, finallyBlockFlag ? 1 : 0);
             sos.writeUB(1, catchBlockFlag ? 1 : 0);

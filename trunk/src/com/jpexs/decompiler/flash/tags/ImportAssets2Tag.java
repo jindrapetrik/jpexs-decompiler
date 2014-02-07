@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,6 +35,10 @@ import java.util.HashMap;
 public class ImportAssets2Tag extends Tag implements ImportTag {
 
     public String url;
+    @Reserved
+    public int reserved1 = 1;
+    @Reserved
+    public int reserved2;
     /**
      * HashMap with assets
      */
@@ -53,8 +58,8 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
         assets = new HashMap<>();
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         url = sis.readString();
-        sis.readUI8();//reserved, must be 1
-        sis.readUI8();//reserved, must be 0
+        reserved1 = sis.readUI8();//reserved, must be 1
+        reserved2 = sis.readUI8();//reserved, must be 0
         int count = sis.readUI16();
         for (int i = 0; i < count; i++) {
             int characterId = sis.readUI16();
@@ -76,8 +81,8 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
             sos.writeString(url);
-            sos.writeUI8(1); //reserved
-            sos.writeUI8(0); //reserved
+            sos.writeUI8(reserved1);
+            sos.writeUI8(reserved2);
             sos.writeUI16(assets.size());
             for (int characterId : assets.keySet()) {
                 sos.writeUI16(characterId);

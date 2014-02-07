@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 
 /**
@@ -25,6 +26,8 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
  */
 public class SOUNDINFO {
 
+    @Reserved
+    public int reserved;
     public boolean syncStop;
     public boolean syncNoMultiple;
     public boolean hasEnvelope;

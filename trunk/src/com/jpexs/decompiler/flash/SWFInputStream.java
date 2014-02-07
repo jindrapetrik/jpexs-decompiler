@@ -1648,11 +1648,11 @@ public class SWFInputStream extends InputStream {
         ret.clipEventInitialize = readUB(1) == 1;
         ret.clipEventData = readUB(1) == 1;
         if (version >= 6) {
-            readUB(5);
+            ret.reserved = (int) readUB(5);
             ret.clipEventConstruct = readUB(1) == 1;
             ret.clipEventKeyPress = readUB(1) == 1;
             ret.clipEventDragOut = readUB(1) == 1;
-            readUB(8);
+            ret.reserved2 = (int) readUB(8);
         }
         return ret;
     }
@@ -1682,7 +1682,7 @@ public class SWFInputStream extends InputStream {
      */
     public CLIPACTIONS readCLIPACTIONS(SWF swf) throws IOException {
         CLIPACTIONS ret = new CLIPACTIONS();
-        readUI16();//reserved
+        ret.reserved = readUI16();
         ret.allEventFlags = readCLIPEVENTFLAGS();
         CLIPACTIONRECORD cr;
         ret.clipActionRecords = new ArrayList<>();
@@ -1770,7 +1770,7 @@ public class SWFInputStream extends InputStream {
             }
         }
         ret.defaultColor = readRGBA();
-        readUB(6);//reserved
+        ret.reserved = (int) readUB(6);
         ret.clamp = readUB(1) == 1;
         ret.preserveAlpha = readUB(1) == 1;
         return ret;
@@ -1787,7 +1787,7 @@ public class SWFInputStream extends InputStream {
         ret.blurX = readFIXED();
         ret.blurY = readFIXED();
         ret.passes = (int) readUB(5);
-        readUB(3); //reserved
+        ret.reserved = (int) readUB(3);
         return ret;
     }
 
@@ -1985,7 +1985,7 @@ public class SWFInputStream extends InputStream {
      */
     public BUTTONRECORD readBUTTONRECORD(boolean inDefineButton2) throws IOException {
         BUTTONRECORD ret = new BUTTONRECORD();
-        int res = (int) readUB(2); //reserved
+        ret.reserved = (int) readUB(2);
         ret.buttonHasBlendMode = readUB(1) == 1;
         ret.buttonHasFilterList = readUB(1) == 1;
         ret.buttonStateHitTest = readUB(1) == 1;
@@ -1993,20 +1993,10 @@ public class SWFInputStream extends InputStream {
         ret.buttonStateOver = readUB(1) == 1;
         ret.buttonStateUp = readUB(1) == 1;
 
-        if (!ret.buttonHasBlendMode) {
-            if (!ret.buttonHasFilterList) {
-                if (!ret.buttonStateHitTest) {
-                    if (!ret.buttonStateDown) {
-                        if (!ret.buttonStateOver) {
-                            if (!ret.buttonStateUp) {
-                                if (res == 0) {
-                                    return null;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        if (!ret.buttonHasBlendMode && !ret.buttonHasFilterList && 
+            !ret.buttonStateHitTest && !ret.buttonStateDown && 
+            !ret.buttonStateOver && !ret.buttonStateUp && ret.reserved == 0) {
+            return null;
         }
 
         ret.characterId = readUI16();
@@ -2208,7 +2198,7 @@ public class SWFInputStream extends InputStream {
         ret.noHScaleFlag = (int) readUB(1) == 1;
         ret.noVScaleFlag = (int) readUB(1) == 1;
         ret.pixelHintingFlag = (int) readUB(1) == 1;
-        readUB(5);//reserved
+        ret.reserved = (int) readUB(5);
         ret.noClose = (int) readUB(1) == 1;
         ret.endCapStyle = (int) readUB(2);
         if (ret.joinStyle == LINESTYLE2.MITER_JOIN) {
@@ -2394,7 +2384,7 @@ public class SWFInputStream extends InputStream {
      */
     public SOUNDINFO readSOUNDINFO() throws IOException {
         SOUNDINFO ret = new SOUNDINFO();
-        readUB(2);
+        ret.reserved = (int) readUB(2);
         ret.syncStop = readUB(1) == 1;
         ret.syncNoMultiple = readUB(1) == 1;
         ret.hasEnvelope = readUB(1) == 1;
@@ -2617,7 +2607,7 @@ public class SWFInputStream extends InputStream {
         ret.noHScaleFlag = (int) readUB(1) == 1;
         ret.noVScaleFlag = (int) readUB(1) == 1;
         ret.pixelHintingFlag = (int) readUB(1) == 1;
-        readUB(5);//reserved
+        ret.reserved = (int) readUB(5);
         ret.noClose = (int) readUB(1) == 1;
         ret.endCapStyle = (int) readUB(2);
         if (ret.joinStyle == LINESTYLE2.MITER_JOIN) {

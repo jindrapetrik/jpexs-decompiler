@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
@@ -64,6 +65,9 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
      */
     @SWFType(BasicType.UI16)
     public int buttonId;
+
+    @Reserved
+    public int reserved;
 
     /**
      * Track as menu button
@@ -102,7 +106,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         super(swf, ID, "DefineButton2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
-        sis.readUB(7); //reserved
+        reserved = (int) sis.readUB(7);
         trackAsMenu = sis.readUB(1) == 1;
         int actionOffset = sis.readUI16();
         characters = sis.readBUTTONRECORDList(true);
@@ -133,7 +137,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
             sos.writeUI16(buttonId);
-            sos.writeUB(7, 0); //reserved
+            sos.writeUB(7, reserved);
             sos.writeUB(1, trackAsMenu ? 1 : 0);
 
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();

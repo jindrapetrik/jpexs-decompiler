@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ZONERECORD;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,6 +36,8 @@ public class DefineFontAlignZonesTag extends Tag {
     public int fontID;
     @SWFType(value = BasicType.UB, count = 2)
     public int CSMTableHint;
+    @Reserved
+    public int reserved;
     public List<ZONERECORD> zoneTable;
     public static final int ID = 73;
 
@@ -43,7 +46,7 @@ public class DefineFontAlignZonesTag extends Tag {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontID = sis.readUI16();
         CSMTableHint = (int) sis.readUB(2);
-        sis.readUB(6);
+        reserved = (int) sis.readUB(6);
         zoneTable = new ArrayList<>();
         while (sis.available() > 0) {
             ZONERECORD zr = sis.readZONERECORD();
@@ -65,7 +68,7 @@ public class DefineFontAlignZonesTag extends Tag {
         try {
             sos.writeUI16(fontID);
             sos.writeUB(2, CSMTableHint);
-            sos.writeUB(6, 0);
+            sos.writeUB(6, reserved);
             for (ZONERECORD z : zoneTable) {
                 sos.writeZONERECORD(z);
             }

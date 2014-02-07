@@ -48,6 +48,7 @@ public class ActionGetURL2 extends Action {
     public static final int POST = 2;
     public boolean loadTargetFlag;
     public boolean loadVariablesFlag;
+    public int reserved;
 
     public ActionGetURL2(int sendVarsMethod, boolean loadTargetFlag, boolean loadVariablesFlag) {
         super(0x9A, 1);
@@ -60,7 +61,7 @@ public class ActionGetURL2 extends Action {
         super(0x9A, actionLength);
         loadVariablesFlag = sis.readUB(1) == 1;
         loadTargetFlag = sis.readUB(1) == 1;
-        sis.readUB(4); //reserved
+        reserved = (int) sis.readUB(4);
         sendVarsMethod = (int) sis.readUB(2); //This is first in documentation, which is WRONG!
     }
 
@@ -76,7 +77,7 @@ public class ActionGetURL2 extends Action {
         try {
             sos.writeUB(1, loadVariablesFlag ? 1 : 0);
             sos.writeUB(1, loadTargetFlag ? 1 : 0);
-            sos.writeUB(4, 0);
+            sos.writeUB(4, reserved);
             sos.writeUB(2, sendVarsMethod);
             sos.close();
         } catch (IOException e) {

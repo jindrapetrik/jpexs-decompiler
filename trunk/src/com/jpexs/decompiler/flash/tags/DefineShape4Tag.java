@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
@@ -43,6 +44,8 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
     public int shapeId;
     public RECT shapeBounds;
     public RECT edgeBounds;
+    @Reserved
+    public int reserved;
     public boolean usesFillWindingRule;
     public boolean usesNonScalingStrokes;
     public boolean usesScalingStrokes;
@@ -97,7 +100,7 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();
         edgeBounds = sis.readRECT();
-        sis.readUB(5);
+        reserved = (int) sis.readUB(5);
         usesFillWindingRule = sis.readUB(1) == 1;
         usesNonScalingStrokes = sis.readUB(1) == 1;
         usesScalingStrokes = sis.readUB(1) == 1;

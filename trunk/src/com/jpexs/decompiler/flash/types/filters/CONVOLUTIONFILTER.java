@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 
@@ -57,6 +58,8 @@ public class CONVOLUTIONFILTER extends FILTER {
      * Default color for pixels outside the image
      */
     public RGBA defaultColor;
+    @Reserved
+    public int reserved;
     /**
      * Clamp mode
      */

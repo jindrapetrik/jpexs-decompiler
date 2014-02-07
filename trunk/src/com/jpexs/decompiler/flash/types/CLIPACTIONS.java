@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,9 @@ import java.util.List;
  */
 public class CLIPACTIONS {
 
+    @Reserved
+    @SWFType(BasicType.UI16)
+    public int reserved;
     /**
      * All events used in these clip actions
      */

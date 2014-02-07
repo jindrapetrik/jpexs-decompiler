@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -49,6 +50,9 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
 
     @SWFType(BasicType.UI16)
     public int height;
+
+    @Reserved
+    public int reserved;
 
     @SWFType(value = BasicType.UB, count = 3)
     public int videoFlagsDeblocking;
@@ -85,7 +89,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
             sos.writeUI16(numFrames);
             sos.writeUI16(width);
             sos.writeUI16(height);
-            sos.writeUB(4, 0);
+            sos.writeUB(4, reserved);
             sos.writeUB(3, videoFlagsDeblocking);
             sos.writeUB(1, videoFlagsSmoothing ? 1 : 0);
             sos.writeUI8(codecID);
@@ -109,7 +113,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
         numFrames = sis.readUI16();
         width = sis.readUI16();
         height = sis.readUI16();
-        sis.readUB(4);
+        reserved = (int) sis.readUB(4);
         videoFlagsDeblocking = (int) sis.readUB(3);
         videoFlagsSmoothing = sis.readUB(1) == 1;
         codecID = sis.readUI8();

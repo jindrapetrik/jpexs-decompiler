@@ -499,15 +499,15 @@ public class Configuration {
 
     public static Object getDefaultValue(Field field) {
         Object defaultValue = null;
-        ConfigurationDefaultBoolean aBool = (ConfigurationDefaultBoolean) field.getAnnotation(ConfigurationDefaultBoolean.class);
+        ConfigurationDefaultBoolean aBool = field.getAnnotation(ConfigurationDefaultBoolean.class);
         if (aBool != null) {
             defaultValue = aBool.value();
         }
-        ConfigurationDefaultInt aInt = (ConfigurationDefaultInt) field.getAnnotation(ConfigurationDefaultInt.class);
+        ConfigurationDefaultInt aInt = field.getAnnotation(ConfigurationDefaultInt.class);
         if (aInt != null) {
             defaultValue = aInt.value();
         }
-        ConfigurationDefaultString aString = (ConfigurationDefaultString) field.getAnnotation(ConfigurationDefaultString.class);
+        ConfigurationDefaultString aString = field.getAnnotation(ConfigurationDefaultString.class);
         if (aString != null) {
             defaultValue = aString.value();
         }
@@ -515,7 +515,7 @@ public class Configuration {
     }
 
     public static String getDescription(Field field) {
-        ConfigurationDescription a = (ConfigurationDescription) field.getAnnotation(ConfigurationDescription.class);
+        ConfigurationDescription a = field.getAnnotation(ConfigurationDescription.class);
         if (a != null) {
             return a.value();
         }
@@ -527,7 +527,7 @@ public class Configuration {
         Map<String, Field> result = new HashMap<>();
         for (Field field : fields) {
             if (ConfigurationItem.class.isAssignableFrom(field.getType())) {
-                ConfigurationName annotation = (ConfigurationName) field.getAnnotation(ConfigurationName.class);
+                ConfigurationName annotation = field.getAnnotation(ConfigurationName.class);
                 String name = annotation == null ? field.getName() : annotation.value();
                 result.put(name, field);
             }

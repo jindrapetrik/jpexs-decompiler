@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.util.List;
@@ -29,6 +30,8 @@ import java.util.List;
  */
 public class BUTTONRECORD {
 
+    @Reserved
+    public int reserved;
     /**
      * @since SWF 8 Has blend mode?
      */

@@ -34,6 +34,7 @@ public class ActionGotoFrame2 extends Action {
     boolean sceneBiasFlag;
     boolean playFlag;
     public int sceneBias;
+    int reserved;
 
     public ActionGotoFrame2(boolean playFlag, boolean sceneBiasFlag, int sceneBias) {
         super(0x9F, 0);
@@ -44,7 +45,7 @@ public class ActionGotoFrame2 extends Action {
 
     public ActionGotoFrame2(int actionLength, SWFInputStream sis) throws IOException {
         super(0x9F, actionLength);
-        sis.readUB(6); //reserved
+        reserved = (int) sis.readUB(6);
         sceneBiasFlag = sis.readUB(1) == 1;
         playFlag = sis.readUB(1) == 1;
         if (sceneBiasFlag) {
@@ -57,7 +58,7 @@ public class ActionGotoFrame2 extends Action {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);
         try {
-            sos.writeUB(6, 0);
+            sos.writeUB(6, reserved);
             sos.writeUB(1, sceneBiasFlag ? 1 : 0);
             sos.writeUB(1, playFlag ? 1 : 0);
             if (sceneBiasFlag) {

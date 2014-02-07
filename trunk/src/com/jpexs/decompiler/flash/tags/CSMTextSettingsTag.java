@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -42,11 +43,17 @@ public class CSMTextSettingsTag extends Tag {
     @SWFType(value = BasicType.UB, count = 3)
     public int gridFit;
 
+    @Reserved
+    public int reserved;
+
     @SWFType(value = BasicType.FLOAT)  //F32 = FLOAT
     public float thickness;
 
     @SWFType(value = BasicType.FLOAT)  //F32 = FLOAT
     public float sharpness;
+
+    @Reserved
+    public int reserved2;
 
     public static final int ID = 74;
 
@@ -65,10 +72,10 @@ public class CSMTextSettingsTag extends Tag {
             sos.writeUI16(textID);
             sos.writeUB(2, useFlashType);
             sos.writeUB(3, gridFit);
-            sos.writeUB(3, 0);
+            sos.writeUB(3, reserved);
             sos.writeFLOAT(thickness); //F32 = FLOAT
             sos.writeFLOAT(sharpness); //F32 = FLOAT
-            sos.writeUI8(0);
+            sos.writeUI8(reserved2);
         } catch (IOException e) {
         }
         return baos.toByteArray();
@@ -89,10 +96,10 @@ public class CSMTextSettingsTag extends Tag {
         textID = sis.readUI16();
         useFlashType = (int) sis.readUB(2);
         gridFit = (int) sis.readUB(3);
-        sis.readUB(3); //reserved
+        reserved = (int) sis.readUB(3);
         thickness = sis.readFLOAT(); //F32 = FLOAT
         sharpness = sis.readFLOAT(); //F32 = FLOAT
-        sis.readUI8(); //reserved
+        reserved2 = sis.readUI8(); //reserved
     }
 
     /**

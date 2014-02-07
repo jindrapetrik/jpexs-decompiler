@@ -61,7 +61,7 @@ public class DefineFont3Tag extends FontTag {
 
     public List<SHAPE> glyphShapeTable;
 
-    @SWFType(value = BasicType.UI16, alternateValue = BasicType.UI32, alternateCondition = "fontFlagsWideCodes")
+    @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public List<Integer> codeTable;
 
     @SWFType(BasicType.UI16)

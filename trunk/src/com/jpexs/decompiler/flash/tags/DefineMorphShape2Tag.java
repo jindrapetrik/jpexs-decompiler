@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
@@ -65,6 +66,8 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     public RECT endBounds;
     public RECT startEdgeBounds;
     public RECT endEdgeBounds;
+    @Reserved
+    public int reserved;
     public boolean usesNonScalingStrokes;
     public boolean usesScalingStrokes;
     public MORPHFILLSTYLEARRAY morphFillStyles;
@@ -114,7 +117,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
             sos.writeRECT(endBounds);
             sos.writeRECT(startEdgeBounds);
             sos.writeRECT(endEdgeBounds);
-            sos.writeUB(6, 0);
+            sos.writeUB(6, reserved);
             sos.writeUB(1, usesNonScalingStrokes ? 1 : 0);
             sos.writeUB(1, usesScalingStrokes ? 1 : 0);
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
@@ -148,7 +151,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
         endBounds = sis.readRECT();
         startEdgeBounds = sis.readRECT();
         endEdgeBounds = sis.readRECT();
-        sis.readUB(6); //reserved
+        reserved = (int) sis.readUB(6);
         usesNonScalingStrokes = sis.readUB(1) == 1;
         usesScalingStrokes = sis.readUB(1) == 1;
         long offset = sis.readUI32();
