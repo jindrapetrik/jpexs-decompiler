@@ -106,6 +106,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      *
      * @param version SWF version
      * @param actions
+     * @param writer
      * @return ASM source
      * @throws java.lang.InterruptedException
      */

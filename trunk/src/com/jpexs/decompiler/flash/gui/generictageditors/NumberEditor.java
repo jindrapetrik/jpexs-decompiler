@@ -90,7 +90,9 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
             case UB: {
                 long max = 1;
                 if (swfType.count() > 0) {
-                    max <<= (swfType.count());
+                    max <<= swfType.count();
+                } else {
+                    max <<= 31;
                 }
                 m = new SpinnerNumberModel((Number) toLong(value), 0L, (long) max - 1, 1L);
             }
@@ -104,12 +106,16 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
                 m = new SpinnerNumberModel(toInt(value), -0x80, 0x7f, 1);
                 break;
             case SI16:
+            case FLOAT16:
                 m = new SpinnerNumberModel(toInt(value), -0x8000, 0x7fff, 1);
                 break;
+            case FB:
             case SB: {
                 long max = 1;
                 if (swfType.count() > 0) {
                     max <<= (swfType.count() - 1);
+                } else {
+                    max <<= 30;
                 }
                 m = new SpinnerNumberModel((Number) toLong(value), (long) (-max), (long) max - 1, 1L);
             }
@@ -117,9 +123,7 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
             case SI32:
                 m = new SpinnerNumberModel(toDouble(value), -0x80000000, 0x7fffffff, 1);
                 break;
-            case FB:
             case FLOAT:
-            case FLOAT16:
             case FIXED:
             case FIXED8:
                 m = new SpinnerNumberModel(toDouble(value), -0x80000000, 0x7fffffff, 0.01);
@@ -149,6 +153,12 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     }
 
     private long toLong(Object value) {
+        if (value instanceof Short) {
+            return (long) (Short) value;
+        }
+        if (value instanceof Integer) {
+            return (long) (Integer) value;
+        }
         if (value instanceof Long) {
             return (long) (Long) value;
         }

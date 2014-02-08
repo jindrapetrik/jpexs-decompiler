@@ -787,6 +787,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
 
         /**
          * Override to the appropriate object for INVALID_HANDLE_VALUE.
+         * @param nativeValue
          * @param context
          * @return 
          */

@@ -160,6 +160,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
      *
      * @param version SWF version
      * @param actions
+     * @param writer
      * @return ASM source
      * @throws java.lang.InterruptedException
      */

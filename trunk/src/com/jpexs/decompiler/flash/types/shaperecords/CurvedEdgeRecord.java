@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 
 /**
@@ -29,6 +30,7 @@ public class CurvedEdgeRecord extends SHAPERECORD {
     public boolean typeFlag = true;
     public boolean straightFlag = false;
 
+    @Calculated
     @SWFType(value = BasicType.UB, count = 4)
     public int numBits;
 

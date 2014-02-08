@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
+import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.util.Set;
@@ -39,6 +40,7 @@ public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     public boolean stateFillStyle0;
     public boolean stateMoveTo;
 
+    @Calculated
     @SWFType(value = BasicType.UB, count = 5)
     @Conditional("stateMoveTo")
     public int moveBits;
@@ -69,9 +71,11 @@ public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     @Conditional("stateNewStyles")
     public LINESTYLEARRAY lineStyles;
 
+    @Calculated
     @Conditional("stateNewStyles")
     public int numFillBits;
 
+    @Calculated
     @Conditional("stateNewStyles")
     public int numLineBits;
 

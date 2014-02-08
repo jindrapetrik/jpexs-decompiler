@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.helpers.SerializableImage;
@@ -36,6 +37,7 @@ public class CXFORM {
      * Has color multiply values
      */
     public boolean hasMultTerms;
+    @Calculated
     @SWFType(value = BasicType.UB, count = 4)
     public int nbits;
     /**

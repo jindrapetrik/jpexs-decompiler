@@ -37,6 +37,7 @@ public class FontPreviewDialog extends AppDialog {
 
     /**
      * Creates new form FontPreviewDialog
+     * @param parent
      * @param font
      * @param modal
      */

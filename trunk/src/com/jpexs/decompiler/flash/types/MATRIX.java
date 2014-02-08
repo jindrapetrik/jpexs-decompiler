@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.Point;
@@ -72,12 +73,15 @@ public class MATRIX implements Serializable {
     @SWFType(value = BasicType.SB, countField = "nTranslateBits")
     public int translateY;
 
+    @Calculated
     @SWFType(value = BasicType.UB, count = 5)
     public int nTranslateBits;
 
+    @Calculated
     @SWFType(value = BasicType.UB, count = 5)
     public int nRotateBits;
 
+    @Calculated
     @SWFType(value = BasicType.UB, count = 5)
     public int nScaleBits;
 

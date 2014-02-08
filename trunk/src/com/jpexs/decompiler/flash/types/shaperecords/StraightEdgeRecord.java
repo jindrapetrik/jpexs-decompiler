@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 
@@ -40,6 +41,8 @@ public class StraightEdgeRecord extends SHAPERECORD {
      */
     public int typeFlag = 1;
     public int straightFlag = 1;
+
+    @Calculated
     @SWFType(value = BasicType.UB, count = 4)
     public int numBits;
     public boolean generalLineFlag;

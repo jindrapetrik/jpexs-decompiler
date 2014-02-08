@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.Filtering;
@@ -86,6 +87,7 @@ public class CXFORMWITHALPHA {
     @SWFType(value = BasicType.SB, countField = "nbits")
     public int alphaAddTerm;
 
+    @Calculated
     @SWFType(value = BasicType.UB, count = 4)
     public int nbits;
 
