@@ -31,6 +31,7 @@ import java.util.List;
 public class BUTTONRECORD {
 
     @Reserved
+    @SWFType(value = BasicType.UB, count = 2)
     public int reserved;
     /**
      * @since SWF 8 Has blend mode?

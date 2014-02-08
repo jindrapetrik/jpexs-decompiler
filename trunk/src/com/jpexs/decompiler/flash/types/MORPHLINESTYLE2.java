@@ -42,6 +42,7 @@ public class MORPHLINESTYLE2 {
     public boolean noVScaleFlag;
     public boolean pixelHintingFlag;
     @Reserved
+    @SWFType(value = BasicType.UB, count = 5)
     public int reserved;
     public boolean noClose;
 

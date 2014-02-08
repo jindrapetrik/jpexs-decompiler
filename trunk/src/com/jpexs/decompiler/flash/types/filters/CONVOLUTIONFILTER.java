@@ -59,6 +59,7 @@ public class CONVOLUTIONFILTER extends FILTER {
      */
     public RGBA defaultColor;
     @Reserved
+    @SWFType(value = BasicType.UB, count = 6)
     public int reserved;
     /**
      * Clamp mode

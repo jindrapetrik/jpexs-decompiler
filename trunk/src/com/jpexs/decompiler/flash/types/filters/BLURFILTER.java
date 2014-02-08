@@ -44,6 +44,7 @@ public class BLURFILTER extends FILTER {
     @SWFType(value = BasicType.UB, count = 5)
     public int passes;
     @Reserved
+    @SWFType(value = BasicType.UB, count = 3)
     public int reserved;
 
     public BLURFILTER() {

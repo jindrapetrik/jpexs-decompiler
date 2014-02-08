@@ -67,6 +67,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     public RECT startEdgeBounds;
     public RECT endEdgeBounds;
     @Reserved
+    @SWFType(value = BasicType.UB, count=6)
     public int reserved;
     public boolean usesNonScalingStrokes;
     public boolean usesScalingStrokes;

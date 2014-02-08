@@ -42,6 +42,7 @@ public class DefineFontInfo2Tag extends Tag {
     public int fontID;
     public String fontName;
     @Reserved
+    @SWFType(value = BasicType.UB, count = 2)
     public int reserved;
     public boolean fontFlagsSmallText;
     public boolean fontFlagsShiftJIS;

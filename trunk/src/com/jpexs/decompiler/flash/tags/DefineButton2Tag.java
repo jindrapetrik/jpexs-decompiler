@@ -67,6 +67,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     public int buttonId;
 
     @Reserved
+    @SWFType(value = BasicType.UB, count = 7)
     public int reserved;
 
     /**

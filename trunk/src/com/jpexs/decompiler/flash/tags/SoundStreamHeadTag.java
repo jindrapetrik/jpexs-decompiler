@@ -39,6 +39,7 @@ import java.io.OutputStream;
 public class SoundStreamHeadTag extends CharacterTag implements SoundStreamHeadTypeTag {
 
     @Reserved
+    @SWFType(value = BasicType.UB, count = 4)
     public int reserved;
     @SWFType(value = BasicType.UB, count = 2)
     public int playBackSoundRate;

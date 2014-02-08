@@ -45,6 +45,7 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
     public RECT shapeBounds;
     public RECT edgeBounds;
     @Reserved
+    @SWFType(value = BasicType.UB, count = 5)
     public int reserved;
     public boolean usesFillWindingRule;
     public boolean usesNonScalingStrokes;

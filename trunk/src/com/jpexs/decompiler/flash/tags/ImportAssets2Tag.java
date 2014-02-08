@@ -20,7 +20,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,9 +38,11 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
 
     public String url;
     @Reserved
+    @SWFType(BasicType.UI8)
     public int reserved1 = 1;
     @Reserved
-    public int reserved2;
+    @SWFType(BasicType.UI8)
+    public int reserved2 = 0;
     /**
      * HashMap with assets
      */

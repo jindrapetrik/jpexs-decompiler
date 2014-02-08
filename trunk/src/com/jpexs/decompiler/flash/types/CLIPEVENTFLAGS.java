@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,11 +102,13 @@ public class CLIPEVENTFLAGS {
      */
     public boolean clipEventData;
     @Reserved
+    @SWFType(value = BasicType.UB, count = 5)
+    @Conditional(minSwfVersion = 6)
     public int reserved;
     /**
      * @since SWF 7 Construct event
      */
-    @Conditional(minSwfVersion = 7)
+    @Conditional(minSwfVersion = 7) //in v 6 always 0
     public boolean clipEventConstruct = false;
     /**
      * @since SWF 6 Key press event
@@ -117,7 +120,10 @@ public class CLIPEVENTFLAGS {
      */
     @Conditional(minSwfVersion = 6)
     public boolean clipEventDragOut = false;
+    
     @Reserved
+    @SWFType(value = BasicType.UB, count = 8)
+    @Conditional(minSwfVersion = 6)
     public int reserved2;
 
     public String getHeader(int key, boolean asFileName) {

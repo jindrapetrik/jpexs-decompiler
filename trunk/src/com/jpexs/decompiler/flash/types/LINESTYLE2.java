@@ -38,6 +38,7 @@ public class LINESTYLE2 extends LINESTYLE {
     public boolean noVScaleFlag;
     public boolean pixelHintingFlag;
     @Reserved
+    @SWFType(value = BasicType.UB, count = 5)
     public int reserved;
     public boolean noClose;
     @SWFType(value = BasicType.UB, count = 2)

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 public class SOUNDINFO {
 
     @Reserved
+    @SWFType(value = BasicType.UB, count = 2)
     public int reserved;
     public boolean syncStop;
     public boolean syncNoMultiple;

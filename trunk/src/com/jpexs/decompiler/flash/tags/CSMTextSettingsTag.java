@@ -44,6 +44,7 @@ public class CSMTextSettingsTag extends Tag {
     public int gridFit;
 
     @Reserved
+    @SWFType(value = BasicType.UB, count=3)
     public int reserved;
 
     @SWFType(value = BasicType.FLOAT)  //F32 = FLOAT
@@ -53,6 +54,7 @@ public class CSMTextSettingsTag extends Tag {
     public float sharpness;
 
     @Reserved
+    @SWFType(BasicType.UI8)
     public int reserved2;
 
     public static final int ID = 74;

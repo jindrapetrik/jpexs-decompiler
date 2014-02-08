@@ -52,6 +52,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
     public int height;
 
     @Reserved
+    @SWFType(value = BasicType.UB, count = 4)
     public int reserved;
 
     @SWFType(value = BasicType.UB, count = 3)
