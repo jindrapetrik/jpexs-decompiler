@@ -66,6 +66,7 @@ public class EnableDebugger2Tag extends Tag {
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos

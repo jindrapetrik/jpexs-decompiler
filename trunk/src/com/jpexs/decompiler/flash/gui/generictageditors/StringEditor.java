@@ -26,16 +26,20 @@ import javax.swing.JTextArea;
  */
 public class StringEditor extends JTextArea implements GenericTagEditor {
 
-    private final Object tag;
+    private final Object obj;
     private final Field field;
+    private final int index;
+    private final Class<?> type;
 
-    public StringEditor(Object obj, Field field) {
+    public StringEditor(Object obj, Field field, int index, Class<?> type) {
         setBackground(Color.white);
         setLineWrap(true);
-        this.tag = obj;
+        this.obj = obj;
         this.field = field;
+        this.index = index;
+        this.type = type;
         try {
-            setText((String) field.get(obj));
+            setText((String) ReflectionTools.getValue(obj, field, index));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -44,7 +48,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     @Override
     public void save() {
         try {
-            field.set(tag, getText());
+            ReflectionTools.setValue(obj, field, index, getText());
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }

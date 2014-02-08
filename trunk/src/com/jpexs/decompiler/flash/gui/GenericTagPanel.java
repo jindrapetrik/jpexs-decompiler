@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.ZONEDATA;
@@ -31,8 +30,10 @@ import com.jpexs.decompiler.flash.types.ZONERECORD;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
@@ -75,6 +76,7 @@ public class GenericTagPanel extends JPanel {
     public void clear() {
         tag = null;
         genericTagPropertiesEditPanel.removeAll();
+        genericTagPropertiesEditPanel.setSize(0, 0);
     }
 
     public void setEditMode(boolean edit) {
@@ -94,7 +96,20 @@ public class GenericTagPanel extends JPanel {
         for (Field field : fields) {
             try {
                 field.setAccessible(true);
-                sb.append(field.getName()).append(": ").append(field.get(tag));
+                Object value = field.get(tag);
+                sb.append(field.getName()).append(": ");
+                if (field.getType().isArray()) {
+                    sb.append("[");
+                    for (int i = 0; i < Array.getLength(value); i++) {
+                        if (i != 0) {
+                            sb.append(", ");
+                        }
+                        sb.append(Array.get(value, i));
+                    }
+                    sb.append("]");
+                } else {
+                    sb.append(value);
+                }
                 sb.append(GraphTextWriter.NEW_LINE);
             } catch (IllegalArgumentException | IllegalAccessException ex) {
                 Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -106,11 +121,12 @@ public class GenericTagPanel extends JPanel {
 
     public void generateEditControls(Tag tag) {
         genericTagPropertiesEditPanel.removeAll();
+        genericTagPropertiesEditPanel.setSize(0, 0);
         this.tag = tag;
         int propCount = generateEditControlsRecursive(tag, "");
         //Lay out the panel.
         SpringUtilities.makeCompactGrid(genericTagPropertiesEditPanel,
-                propCount, 2, //rows, cols
+                propCount, 3, //rows, cols
                 6, 6, //initX, initY
                 6, 6);       //xPad, yPad        
         repaint();
@@ -127,18 +143,23 @@ public class GenericTagPanel extends JPanel {
                 field.setAccessible(true);
                 String name = parent + field.getName();
                 Object value = field.get(obj);
-                if (value instanceof Iterable) {
-                    int i = 0;
-                    for (Object obj1 : (Iterable) value) {
-                        propCount += generateEditControlsRecursive(obj1, name + "[" + i++ + "]");
+                if (List.class.isAssignableFrom(field.getType())) {
+                    if (value != null) {
+                        int i = 0;
+                        for (Object obj1 : (Iterable) value) {
+                            propCount += addEditor(name + "[" + i + "]", obj, field, i, obj1.getClass(), obj1);
+                            i++;
+                        }
                     }
-                } else if (value instanceof Object[]) {
-                    Object[] objArr = (Object[]) value;
-                    for (int i = 0; i < objArr.length; i++) {
-                        propCount += generateEditControlsRecursive(objArr[i], name + "[" + i + "]");
+                } else if (field.getType().isArray()) {
+                    if (value != null) {
+                        for (int i = 0; i < Array.getLength(value); i++) {
+                            Object item = Array.get(value, i);
+                            propCount += addEditor(name + "[" + i + "]", obj, field, i, item.getClass(), item);
+                        }
                     }
                 } else {
-                    propCount += addEditor(name, obj, field);
+                    propCount += addEditor(name, obj, field, 0, field.getType(), value);
                 }
             } catch (IllegalArgumentException | IllegalAccessException ex) {
                 Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -147,29 +168,27 @@ public class GenericTagPanel extends JPanel {
         return propCount;
     }
 
-    private int addEditor(String name, Object obj, Field field) throws IllegalArgumentException, IllegalAccessException {
+    private int addEditor(String name, Object obj, Field field, int index, Class<?> type, Object value) throws IllegalArgumentException, IllegalAccessException {
         Component editor;
-        Class<?> type = field.getType();
         SWFType swfType = field.getAnnotation(SWFType.class);
-        BasicType basicType = swfType == null ? BasicType.NONE : swfType.value();
         if (type.equals(int.class) || type.equals(Integer.class) ||
             type.equals(short.class) || type.equals(Short.class) ||
             type.equals(long.class) || type.equals(Long.class) ||
             type.equals(double.class) || type.equals(Double.class) || 
             type.equals(float.class) || type.equals(Float.class)) {
-            editor = new NumberEditor(obj, field, basicType);
+            editor = new NumberEditor(obj, field, index, type, swfType);
         } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
-            editor = new BooleanEditor(obj, field);
+            editor = new BooleanEditor(obj, field, index, type);
         } else if (type.equals(String.class)) {
-            editor = new StringEditor(obj, field);
+            editor = new StringEditor(obj, field, index, type);
         } else if (type.equals(RECT.class)
                 || type.equals(RGB.class)
                 || type.equals(ZONERECORD.class)
                 || type.equals(ZONEDATA.class)) {
             // todo: add other swf releated classes
-            return generateEditControlsRecursive(field.get(obj), field.getName() + ".");
+            return generateEditControlsRecursive(value, field.getName() + ".");
         } else {
-            JTextArea textArea = new JTextArea(field.get(obj).toString());
+            JTextArea textArea = new JTextArea(value.toString());
             textArea.setLineWrap(true);
             textArea.setEditable(false);
             editor = textArea;
@@ -179,7 +198,30 @@ public class GenericTagPanel extends JPanel {
         genericTagPropertiesEditPanel.add(label);
         label.setLabelFor(editor);
         genericTagPropertiesEditPanel.add(editor);
+        JLabel typeLabel = new JLabel(swfTypeToString(swfType), JLabel.TRAILING);
+        genericTagPropertiesEditPanel.add(typeLabel);
         return 1;
+    }
+
+    public String swfTypeToString(SWFType swfType) {
+        if (swfType == null) {
+            return null;
+        }
+        String result = swfType.value().toString();
+        if (swfType.count() > 0) {
+            result += "[" + swfType.count();
+            if (swfType.countAdd() > 0) {
+                result += " + " + swfType.countAdd();
+            }
+            result += "]";
+        } else if (!swfType.countField().equals("")) {
+            result += "[" + swfType.count();
+            if (swfType.countAdd() > 0) {
+                result += " + " + swfType.countAdd();
+            }
+            result += "]";
+        }
+        return result;
     }
 
     public void save() {
@@ -190,5 +232,9 @@ public class GenericTagPanel extends JPanel {
         }
         tag.setModified(true);
         setTagText(tag);
+    }
+    
+    public Tag getTag() {
+        return tag;
     }
 }

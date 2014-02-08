@@ -196,6 +196,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
      * @param parallel
      * @param skipUnusualTags
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public DefineSpriteTag(SWF swf, byte[] data, int version, int level, long pos, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
         super(swf, ID, "DefineSprite", data, pos);

@@ -117,6 +117,7 @@ public class SoundStreamHeadTag extends CharacterTag implements SoundStreamHeadT
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos

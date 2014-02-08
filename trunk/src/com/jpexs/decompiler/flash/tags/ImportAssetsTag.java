@@ -43,6 +43,7 @@ public class ImportAssetsTag extends Tag implements ImportTag {
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos

@@ -85,6 +85,7 @@ public class ActionListReader {
      * @param path
      * @return List of actions
      * @throws IOException
+     * @throws java.lang.InterruptedException
      * @throws java.util.concurrent.TimeoutException
      */
     public static List<Action> readActionListTimeout(final List<DisassemblyListener> listeners, final long containerSWFOffset, final MemoryInputStream mis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
@@ -528,6 +529,7 @@ public class ActionListReader {
      *
      * @param actions
      * @param index
+     * @param removeWhenLast
      * @return 
      */
     public static boolean removeAction(List<Action> actions, int index, int version, boolean removeWhenLast) {

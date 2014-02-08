@@ -143,6 +143,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      * Converts actions to ASM source
      *
      * @param version SWF version
+     * @param actions
      * @return ASM source
      * @throws java.lang.InterruptedException
      */

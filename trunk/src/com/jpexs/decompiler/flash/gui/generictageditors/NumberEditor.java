@@ -17,30 +17,37 @@
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.Color;
 import java.lang.reflect.Field;
-import javax.swing.JTextArea;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 
 /**
  *
  * @author JPEXS
  */
-public class NumberEditor extends JTextArea implements GenericTagEditor {
+public class NumberEditor extends JSpinner implements GenericTagEditor {
 
     private final Object obj;
     private final Field field;
-    private final BasicType basicType;
+    private final int index;
+    private final Class<?> type;
+    private final SWFType swfType;
 
-    public NumberEditor(Object obj, Field field, BasicType basicType) {
+    public NumberEditor(Object obj, Field field, int index, Class<?> type, SWFType swfType) {
         setBackground(Color.white);
         setSize(100, getSize().height);
         setMaximumSize(getSize());
-        setWrapStyleWord(true);
         this.obj = obj;
         this.field = field;
-        this.basicType = basicType;
+        this.index = index;
+        this.type = type;
+        this.swfType = swfType;
         try {
-            setText(field.get(obj).toString());
+            Object value = ReflectionTools.getValue(obj, field, index);
+            setModel(getModel(swfType, value));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -49,20 +56,102 @@ public class NumberEditor extends JTextArea implements GenericTagEditor {
     @Override
     public void save() {
         try {
-            Class<?> type = field.getType();
+            Object value = null;
             if (type.equals(int.class) || type.equals(Integer.class)) {
-                field.set(obj, Integer.parseInt(getText()));
+                value = Integer.parseInt(getValue().toString());
             } else if (type.equals(short.class) || type.equals(Short.class)) {
-                field.set(obj, Short.parseShort(getText()));
+                value = Short.parseShort(getValue().toString());
             } else if (type.equals(long.class) || type.equals(Long.class)) {
-                field.set(obj, Long.parseLong(getText()));
+                value = Long.parseLong(getValue().toString());
             } else if (type.equals(double.class) || type.equals(Double.class)) {
-                field.set(obj, Double.parseDouble(getText()));
+                value = Double.parseDouble(getValue().toString());
             } else if (type.equals(float.class) || type.equals(Float.class)) {
-                field.set(obj, Float.parseFloat(getText()));
+                value = Float.parseFloat(getValue().toString());
+            }
+            
+            if (value != null) {
+                ReflectionTools.setValue(obj, field, index, value);
             }
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
+    }
+    
+    private SpinnerModel getModel(SWFType swfType, Object value) {
+        SpinnerNumberModel m = null;
+        BasicType basicType = swfType == null ? BasicType.NONE : swfType.value();
+        switch (basicType) {
+            case UI8:
+                m = new SpinnerNumberModel(toInt(value), 0, 0xff, 1);
+                break;
+            case UI16:
+                m = new SpinnerNumberModel(toInt(value), 0, 0xffff, 1);
+                break;
+            case UB: {
+                long max = 1;
+                if (swfType.count() > 0) {
+                    max <<= (swfType.count());
+                }
+                m = new SpinnerNumberModel((Number) toLong(value), 0L, (long) max - 1, 1L);
+            }
+            break;
+            case UI32:
+            case EncodedU32:
+            case NONE:
+                m = new SpinnerNumberModel((Number) toLong(value), 0L, 0xffffffffL, 1L);
+                break;
+            case SI8:
+                m = new SpinnerNumberModel(toInt(value), -0x80, 0x7f, 1);
+                break;
+            case SI16:
+                m = new SpinnerNumberModel(toInt(value), -0x8000, 0x7fff, 1);
+                break;
+            case SB: {
+                long max = 1;
+                if (swfType.count() > 0) {
+                    max <<= (swfType.count() - 1);
+                }
+                m = new SpinnerNumberModel((Number) toLong(value), (long) (-max), (long) max - 1, 1L);
+            }
+            break;
+            case SI32:
+                m = new SpinnerNumberModel(toDouble(value), -0x80000000, 0x7fffffff, 1);
+                break;
+            case FB:
+            case FLOAT:
+            case FLOAT16:
+            case FIXED:
+            case FIXED8:
+                m = new SpinnerNumberModel(toDouble(value), -0x80000000, 0x7fffffff, 0.01);
+                break;
+        }
+        return m;
+    }
+    
+    private double toDouble(Object value) {
+        if (value instanceof Float) {
+            return (double) (Float) value;
+        }
+        if (value instanceof Double) {
+            return (double) (Double) value;
+        }
+        return 0;
+    }
+
+    private int toInt(Object value) {
+        if (value instanceof Short) {
+            return (int) (Short) value;
+        }
+        if (value instanceof Integer) {
+            return (int) (Integer) value;
+        }
+        return 0;
+    }
+
+    private long toLong(Object value) {
+        if (value instanceof Long) {
+            return (long) (Long) value;
+        }
+        return 0;
     }
 }

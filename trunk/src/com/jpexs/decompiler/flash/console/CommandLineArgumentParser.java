@@ -122,6 +122,7 @@ public class CommandLineArgumentParser {
     /**
      * Parses the console arguments
      *
+     * @param arguments
      * @return path to the file which should be opened or null
      * @throws java.io.IOException
      */

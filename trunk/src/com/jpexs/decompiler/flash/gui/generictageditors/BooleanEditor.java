@@ -28,13 +28,17 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
 
     private final Object obj;
     private final Field field;
+    private final int index;
+    private final Class<?> type;
 
-    public BooleanEditor(Object obj, Field field) {
+    public BooleanEditor(Object obj, Field field, int index, Class<?> type) {
         setBackground(Color.white);
         this.obj = obj;
         this.field = field;
+        this.index = index;
+        this.type = type;
         try {
-            setSelected((boolean) field.get(obj));
+            setSelected((boolean) ReflectionTools.getValue(obj, field, index));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -43,7 +47,7 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     @Override
     public void save() {
         try {
-            field.set(obj, isSelected());
+            ReflectionTools.setValue(obj, field, index, isSelected());
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }

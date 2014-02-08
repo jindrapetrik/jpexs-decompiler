@@ -75,6 +75,7 @@ public class DoActionTag extends Tag implements ASMSource {
      * Converts actions to ASM source
      *
      * @param version SWF version
+     * @param actions
      * @return ASM source
      * @throws java.lang.InterruptedException
      */

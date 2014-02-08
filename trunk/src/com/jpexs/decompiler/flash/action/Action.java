@@ -709,6 +709,7 @@ public class Action implements GraphSourceItem {
      * @param actions List of actions
      * @param version SWF version
      * @param path
+     * @param writer
      * @throws java.lang.InterruptedException
      */
     public static void actionsToSource(ASMSource asm, final List<Action> actions, final int version, final String path, GraphTextWriter writer) throws InterruptedException {

@@ -35,6 +35,7 @@ public interface ASMSource extends TreeItem {
      *
      * @param version SWF version
      * @param exportMode PCode or hex?
+     * @param actions
      * @return ASM source
      * @throws java.lang.InterruptedException
      */
