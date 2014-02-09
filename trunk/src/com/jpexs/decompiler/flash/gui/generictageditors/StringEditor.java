@@ -16,7 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
-import java.awt.Color;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import javax.swing.JTextArea;
 
@@ -30,13 +31,15 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     private final Field field;
     private final int index;
     private final Class<?> type;
+    private String fieldName;
 
-    public StringEditor(Object obj, Field field, int index, Class<?> type) {
+    public StringEditor(String fieldName,Object obj, Field field, int index, Class<?> type) {
         setLineWrap(true);
         this.obj = obj;
         this.field = field;
         this.index = index;
-        this.type = type;
+        this.type = type;     
+        this.fieldName = fieldName;
         try {
             setText((String) ReflectionTools.getValue(obj, field, index));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -52,4 +55,32 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
             // ignore
         }
     }
+    
+    @Override
+    public void addChangeListener(final ChangeListener l) {
+        final GenericTagEditor t = this;
+        addFocusListener(new FocusAdapter() {
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                l.change(t);
+            }
+
+        });
+    }
+
+    @Override
+    public Object getChangedValue() {
+        return getText();
+    }
+
+    @Override
+    public String getFieldName() {
+        return fieldName;
+    }
+    
+    public Field getField() {
+        return field;
+    }
+    
 }

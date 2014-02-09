@@ -18,7 +18,8 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import java.awt.Color;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
@@ -35,8 +36,9 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     private final int index;
     private final Class<?> type;
     private final SWFType swfType;
+    private String fieldName;
 
-    public NumberEditor(Object obj, Field field, int index, Class<?> type, SWFType swfType) {
+    public NumberEditor(String fieldName,Object obj, Field field, int index, Class<?> type, SWFType swfType) {
         setSize(100, getSize().height);
         setMaximumSize(getSize());
         this.obj = obj;
@@ -44,30 +46,19 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
         this.index = index;
         this.type = type;
         this.swfType = swfType;
+        this.fieldName = fieldName;
         try {
             Object value = ReflectionTools.getValue(obj, field, index);
             setModel(getModel(swfType, value));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
-        }        
+        }
     }
 
     @Override
     public void save() {
         try {
-            Object value = null;
-            if (type.equals(int.class) || type.equals(Integer.class)) {
-                value = Integer.parseInt(getValue().toString());
-            } else if (type.equals(short.class) || type.equals(Short.class)) {
-                value = Short.parseShort(getValue().toString());
-            } else if (type.equals(long.class) || type.equals(Long.class)) {
-                value = Long.parseLong(getValue().toString());
-            } else if (type.equals(double.class) || type.equals(Double.class)) {
-                value = Double.parseDouble(getValue().toString());
-            } else if (type.equals(float.class) || type.equals(Float.class)) {
-                value = Float.parseFloat(getValue().toString());
-            }
-            
+            Object value = getChangedValue();
             if (value != null) {
                 ReflectionTools.setValue(obj, field, index, value);
             }
@@ -75,7 +66,7 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
             // ignore
         }
     }
-    
+
     private SpinnerModel getModel(SWFType swfType, Object value) {
         SpinnerNumberModel m = null;
         BasicType basicType = swfType == null ? BasicType.NONE : swfType.value();
@@ -130,7 +121,7 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
         }
         return m;
     }
-    
+
     private double toDouble(Object value) {
         if (value instanceof Float) {
             return (double) (Float) value;
@@ -163,4 +154,43 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
         }
         return 0;
     }
+
+    @Override
+    public void addChangeListener(final ChangeListener l) {
+        final GenericTagEditor t = this;
+        addFocusListener(new FocusAdapter() {
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                l.change(t);
+            }
+
+        });
+    }
+
+    @Override
+    public Object getChangedValue() {
+        Object value = null;
+        if (type.equals(int.class) || type.equals(Integer.class)) {
+            value = Integer.parseInt(getValue().toString());
+        } else if (type.equals(short.class) || type.equals(Short.class)) {
+            value = Short.parseShort(getValue().toString());
+        } else if (type.equals(long.class) || type.equals(Long.class)) {
+            value = Long.parseLong(getValue().toString());
+        } else if (type.equals(double.class) || type.equals(Double.class)) {
+            value = Double.parseDouble(getValue().toString());
+        } else if (type.equals(float.class) || type.equals(Float.class)) {
+            value = Float.parseFloat(getValue().toString());
+        }
+        return value;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+    
+    public Field getField() {
+        return field;
+    }
+    
 }

@@ -16,7 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
-import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import javax.swing.JCheckBox;
 
@@ -30,13 +31,15 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     private final Field field;
     private final int index;
     private final Class<?> type;
+    private String fieldName;
 
-    public BooleanEditor(Object obj, Field field, int index, Class<?> type) {
+    public BooleanEditor(String fieldName,Object obj, Field field, int index, Class<?> type) {
         super();
         this.obj = obj;
         this.field = field;
         this.index = index;
         this.type = type;
+        this.fieldName = fieldName;
         try {
             setSelected((boolean) ReflectionTools.getValue(obj, field, index));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -52,4 +55,31 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
             // ignore
         }
     }
+
+    @Override
+    public void addChangeListener(final ChangeListener l) {
+        final GenericTagEditor t=this;
+        addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                l.change(t);
+            }
+        });
+    }
+
+    @Override
+    public Object getChangedValue() {
+        return isSelected();
+    }
+    
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public Field getField() {
+        return field;
+    }
+    
+    
 }
