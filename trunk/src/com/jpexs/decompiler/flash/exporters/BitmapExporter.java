@@ -390,7 +390,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                 graphics.draw(path);
             }
         }
-        path = new GeneralPath();
+        path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display
         lineStroke = null;
         lineColor = null;
         fillPaint = null;
