@@ -157,10 +157,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         if (drawable == null) {
             return 0;
         }
-        int ret = (int) Math.ceil(percent * drawable.getNumFrames() / 100.0);
-        if (ret == 0) {
-            ret = 1;
-        }
+        int ret = percent * (drawable.getNumFrames() - 1) / 100;
         return ret;
     }
 
@@ -184,7 +181,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         if (drawable == null) {
             return;
         }
-        int nframe = percent * drawable.getNumFrames() / 100;
+        int nframe = percent * (drawable.getNumFrames() - 1) / 100;
         if (nframe != frame) {
             Matrix mat = new Matrix();
             mat.translateX = swf.displayRect.Xmin;

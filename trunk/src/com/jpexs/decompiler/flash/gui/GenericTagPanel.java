@@ -90,6 +90,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             remove(genericTagPropertiesEditorPaneScrollPanel);
             add(genericTagPropertiesEditPanelScrollPanel);
         } else {
+            genericTagPropertiesEditPanel.removeAll();
+            genericTagPropertiesEditPanel.setSize(0, 0);
             remove(genericTagPropertiesEditPanelScrollPanel);
             add(genericTagPropertiesEditorPaneScrollPanel);
         }

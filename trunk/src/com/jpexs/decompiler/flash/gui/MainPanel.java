@@ -662,7 +662,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         textValue = new LineMarkedEditorPane();
         textTopPanel.add(new JScrollPane(textValue), BorderLayout.CENTER);
         textValue.setEditable(false);
-        //textValue.setFont(UIManager.getFont("TextField.font"));
 
         JPanel textButtonsPanel = new JPanel();
         textButtonsPanel.setLayout(new FlowLayout());
@@ -2443,6 +2442,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 previewSplitPane.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewSplitPane.getWidth() / 2));
                 showDetailWithPreview(CARDTEXTPANEL);
                 textValue.setContentType("text/swf_text");
+                //textValue.setFont(new Font("Monospaced", Font.PLAIN, 13));
                 textValue.setText(textTag.getFormattedText());
                 textValue.setCaretPosition(0);
             } else if (tagObj instanceof FontTag) {

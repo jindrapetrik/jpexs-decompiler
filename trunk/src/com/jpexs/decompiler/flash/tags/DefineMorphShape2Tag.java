@@ -202,70 +202,112 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
         List<SHAPERECORD> finalRecords = new ArrayList<>();
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(frame);
         LINESTYLEARRAY lineStyles = morphLineStyles.getLineStylesAt(getShapeNum(), frame);
-        int endIndex = 0;
 
-        for (int startIndex = 0; startIndex < startEdges.shapeRecords.size(); startIndex++, endIndex++) {
+        int startPosX = 0, startPosY = 0;
+        int endPosX = 0, endPosY = 0;
+        int posX = 0, posY = 0;
+        
+        for (int startIndex = 0, endIndex = 0;
+            startIndex < startEdges.shapeRecords.size() &&
+            endIndex < endEdges.shapeRecords.size(); startIndex++, endIndex++) {
 
-            if (startIndex == 0) {
-                StyleChangeRecord scr1 = (StyleChangeRecord) startEdges.shapeRecords.get(startIndex);
-                StyleChangeRecord scr2 = (StyleChangeRecord) startEdges.shapeRecords.get(endIndex);
-                StyleChangeRecord scr = (StyleChangeRecord) scr1.clone();
-                if (scr1.stateMoveTo && scr2.stateMoveTo) {
-                    scr.moveDeltaX = scr1.moveDeltaX + (scr2.moveDeltaX - scr1.moveDeltaX) * frame / 65535;
-                    scr.moveDeltaY = scr1.moveDeltaY + (scr2.moveDeltaY - scr1.moveDeltaY) * frame / 65535;
-                    finalRecords.add(scr);
-                    continue;
-                }
-            }
-            SHAPERECORD edge1 = null;
-            do {
-                edge1 = startEdges.shapeRecords.get(startIndex);
-                if (edge1 instanceof StyleChangeRecord) {
-                    finalRecords.add(edge1);
-                    edge1 = null;
-                    startIndex++;
-                }
-            } while (edge1 == null);
+            SHAPERECORD edge1 = startEdges.shapeRecords.get(startIndex);
             SHAPERECORD edge2 = endEdges.shapeRecords.get(endIndex);
+            if (edge1 instanceof StyleChangeRecord || edge2 instanceof StyleChangeRecord) {
+                StyleChangeRecord scr1;
+                if (edge1 instanceof StyleChangeRecord) {
+                    scr1 = (StyleChangeRecord) edge1;
+                    if (scr1.stateMoveTo) {
+                        startPosX = scr1.moveDeltaX;
+                        startPosY = scr1.moveDeltaY;
+                    }
+                } else {
+                    scr1 = new StyleChangeRecord();
+                    startIndex--;
+                }
+                StyleChangeRecord scr2;
+                if (edge2 instanceof StyleChangeRecord) {
+                    scr2 = (StyleChangeRecord) edge2;
+                    if (scr2.stateMoveTo) {
+                        endPosX = scr2.moveDeltaX;
+                        endPosY = scr2.moveDeltaY;
+                    }
+                } else {
+                    scr2 = new StyleChangeRecord();
+                    endIndex--;
+                }
+                StyleChangeRecord scr = (StyleChangeRecord) scr1.clone();
+                if (scr1.stateMoveTo || scr2.stateMoveTo) {
+                    scr.moveDeltaX = startPosX + (endPosX - startPosX) * frame / 65535;
+                    scr.moveDeltaY = startPosY + (endPosY - startPosY) * frame / 65535;
+                    scr.stateMoveTo = scr.moveDeltaX != posX || scr.moveDeltaY != posY;
+                }
+                finalRecords.add(scr);
+                continue;
+            }
+
             if (edge1 instanceof EndShapeRecord) {
                 finalRecords.add(edge1);
                 break;
             }
             if (edge2 instanceof EndShapeRecord) {
+                finalRecords.add(edge2);
                 break;
             }
-            if ((edge1 instanceof StyleChangeRecord) && (edge2 instanceof StyleChangeRecord)) {
-                StyleChangeRecord scr1 = (StyleChangeRecord) edge1;
-                StyleChangeRecord scr2 = (StyleChangeRecord) edge2;
-                StyleChangeRecord scr = (StyleChangeRecord) scr1.clone();
-                if (scr1.stateMoveTo && scr2.stateMoveTo) {
-                    scr.moveDeltaX = scr1.moveDeltaX + (scr2.moveDeltaX - scr1.moveDeltaX) * frame / 65535;
-                    scr.moveDeltaY = scr1.moveDeltaY + (scr2.moveDeltaY - scr1.moveDeltaY) * frame / 65535;
-                    finalRecords.add(scr);
+
+            if (edge1 instanceof CurvedEdgeRecord || edge2 instanceof CurvedEdgeRecord) {
+                CurvedEdgeRecord cer1 = null;
+                if (edge1 instanceof CurvedEdgeRecord) {
+                    cer1 = (CurvedEdgeRecord) edge1;
+                } else if (edge1 instanceof StraightEdgeRecord) {
+                    cer1 = SHAPERECORD.straightToCurve((StraightEdgeRecord) edge1);
+                }
+                CurvedEdgeRecord cer2 = null;
+                if (edge2 instanceof CurvedEdgeRecord) {
+                    cer2 = (CurvedEdgeRecord) edge2;
+                } else if (edge2 instanceof StraightEdgeRecord) {
+                    cer2 = SHAPERECORD.straightToCurve((StraightEdgeRecord) edge2);
+                }
+                if ((cer2 == null) || (cer1 == null)) {
                     continue;
                 }
+                CurvedEdgeRecord cer = new CurvedEdgeRecord();
+                cer.controlDeltaX = cer1.controlDeltaX + (cer2.controlDeltaX - cer1.controlDeltaX) * frame / 65535;
+                cer.controlDeltaY = cer1.controlDeltaY + (cer2.controlDeltaY - cer1.controlDeltaY) * frame / 65535;
+                cer.anchorDeltaX = cer1.anchorDeltaX + (cer2.anchorDeltaX - cer1.anchorDeltaX) * frame / 65535;
+                cer.anchorDeltaY = cer1.anchorDeltaY + (cer2.anchorDeltaY - cer1.anchorDeltaY) * frame / 65535;
+                startPosX += cer1.controlDeltaX + cer1.anchorDeltaX;
+                startPosY += cer1.controlDeltaY + cer1.anchorDeltaY;
+                endPosX += cer2.controlDeltaX + cer2.anchorDeltaX;
+                endPosY += cer2.controlDeltaY + cer2.anchorDeltaY;
+                posX += cer.controlDeltaX + cer.anchorDeltaX;
+                posY += cer.controlDeltaY + cer.anchorDeltaY;
+                finalRecords.add(cer);
+            } else {
+                StraightEdgeRecord ser1 = null;
+                if (edge1 instanceof StraightEdgeRecord) {
+                    ser1 = (StraightEdgeRecord) edge1;
+                }
+                StraightEdgeRecord ser2 = null;
+                if (edge2 instanceof StraightEdgeRecord) {
+                    ser2 = (StraightEdgeRecord) edge2;
+                }
+                if ((ser2 == null) || (ser1 == null)) {
+                    continue;
+                }
+                StraightEdgeRecord ser = new StraightEdgeRecord();
+                ser.generalLineFlag = true;
+                ser.vertLineFlag = false;
+                ser.deltaX = ser1.deltaX + (ser2.deltaX - ser1.deltaX) * frame / 65535;
+                ser.deltaY = ser1.deltaY + (ser2.deltaY - ser1.deltaY) * frame / 65535;
+                startPosX += ser1.deltaX;
+                startPosY += ser1.deltaY;
+                endPosX += ser2.deltaX;
+                endPosY += ser2.deltaY;
+                posX += ser.deltaX;
+                posY += ser.deltaX;
+                finalRecords.add(ser);
             }
-            CurvedEdgeRecord cer1 = null;
-            if (edge1 instanceof CurvedEdgeRecord) {
-                cer1 = (CurvedEdgeRecord) edge1;
-            } else if (edge1 instanceof StraightEdgeRecord) {
-                cer1 = SHAPERECORD.straightToCurve((StraightEdgeRecord) edge1);
-            }
-            CurvedEdgeRecord cer2 = null;
-            if (edge2 instanceof CurvedEdgeRecord) {
-                cer2 = (CurvedEdgeRecord) edge2;
-            } else if (edge2 instanceof StraightEdgeRecord) {
-                cer2 = SHAPERECORD.straightToCurve((StraightEdgeRecord) edge2);
-            }
-            if ((cer2 == null) || (cer1 == null)) {
-                continue;
-            }
-            CurvedEdgeRecord cer = new CurvedEdgeRecord();
-            cer.controlDeltaX = cer1.controlDeltaX + (cer2.controlDeltaX - cer1.controlDeltaX) * frame / 65535;
-            cer.controlDeltaY = cer1.controlDeltaY + (cer2.controlDeltaY - cer1.controlDeltaY) * frame / 65535;
-            cer.anchorDeltaX = cer1.anchorDeltaX + (cer2.anchorDeltaX - cer1.anchorDeltaX) * frame / 65535;
-            cer.anchorDeltaY = cer1.anchorDeltaY + (cer2.anchorDeltaY - cer1.anchorDeltaY) * frame / 65535;
-            finalRecords.add(cer);
         }
         SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
         shape.fillStyles = fillStyles;

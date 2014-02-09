@@ -2138,9 +2138,9 @@ public final class SWF implements TreeItem {
         float unzoom = (float) SWF.unitDivisor;
         int fixX = -displayRect.Xmin;
         int fixY = -displayRect.Ymin;
+        displayRect = fixRect(displayRect);
         int width = displayRect.getWidth();
         int height = displayRect.getHeight();
-        displayRect = fixRect(displayRect);
 
         SerializableImage ret = new SerializableImage((int) (width / unzoom), (int) (height / unzoom), SerializableImage.TYPE_INT_ARGB);
         ret.bounds = new Rectangle2D.Double(-fixX / unzoom, -fixY / unzoom, width / unzoom, height / unzoom);
