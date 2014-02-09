@@ -37,7 +37,6 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     private final SWFType swfType;
 
     public NumberEditor(Object obj, Field field, int index, Class<?> type, SWFType swfType) {
-        setBackground(Color.white);
         setSize(100, getSize().height);
         setMaximumSize(getSize());
         this.obj = obj;
@@ -50,7 +49,7 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
             setModel(getModel(swfType, value));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
-        }
+        }        
     }
 
     @Override

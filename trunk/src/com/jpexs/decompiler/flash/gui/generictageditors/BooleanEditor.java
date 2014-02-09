@@ -32,7 +32,7 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     private final Class<?> type;
 
     public BooleanEditor(Object obj, Field field, int index, Class<?> type) {
-        setBackground(Color.white);
+        super();
         this.obj = obj;
         this.field = field;
         this.index = index;

@@ -99,6 +99,8 @@ public class View {
                     UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
                     UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
                     UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());
+                    UIManager.put("TextField.background", Color.WHITE);
+                    UIManager.put("FormattedTextField.background", Color.WHITE);
 
                     FontPolicy pol = SubstanceLookAndFeel.getFontPolicy();
                     final FontSet fs = pol.getFontSet("Substance", null);

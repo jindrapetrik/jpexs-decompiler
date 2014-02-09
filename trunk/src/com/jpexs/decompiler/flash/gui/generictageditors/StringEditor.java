@@ -32,7 +32,6 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     private final Class<?> type;
 
     public StringEditor(Object obj, Field field, int index, Class<?> type) {
-        setBackground(Color.white);
         setLineWrap(true);
         this.obj = obj;
         this.field = field;
