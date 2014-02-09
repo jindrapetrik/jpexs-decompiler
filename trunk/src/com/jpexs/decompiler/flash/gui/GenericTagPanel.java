@@ -27,6 +27,8 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
+import com.jpexs.decompiler.flash.types.annotations.parser.ParseException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.lang.reflect.Array;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
@@ -287,28 +290,36 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 p += f.getName();
                 Conditional cond = f.getAnnotation(Conditional.class);
                 if (cond != null) {
-                    String condVals[] = cond.value();
-                    if (condVals != null) {
-                        for (String condVal : condVals) { //TODO: complex conditions
+                    ConditionEvaluator ev=new ConditionEvaluator(cond);
+                    
+                    try {
+                        Set<String> fieldNames=ev.getFields();
+                        Map<String,Boolean> fields=new HashMap<>();
+                        for(String fld:fieldNames){
                             String ckey = "";
                             if (!par.equals("")) {
                                 ckey = par + ".";
-                            }
-                            ckey += condVal;
+                            }    
+                            ckey += fld;
                             if (editors.containsKey(ckey)) {
                                 GenericTagEditor editor = editors.get(ckey);
                                 Object val = editor.getChangedValue();
+                                fields.put(fld, true);
                                 if (val instanceof Boolean) {
-                                    if (conditionMet) {
-                                        conditionMet = (Boolean) val;
-                                    }
+                                    fields.put(fld, (Boolean)val);                                     
                                 }
-                                ((Component) dependentEditor).setVisible(conditionMet);
-                                dependentLabel.setVisible(conditionMet);
-                                dependentTypeLabel.setVisible(conditionMet);
-                            }
+                                                         }
                         }
-                    }
+                        boolean ok = ev.eval(fields);
+                        if(conditionMet){
+                            conditionMet = ok;
+                        }
+                        ((Component) dependentEditor).setVisible(conditionMet);
+                        dependentLabel.setVisible(conditionMet);
+                        dependentTypeLabel.setVisible(conditionMet);   
+                    } catch (ParseException ex) {
+                        Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, "Invalid condition", ex);
+                    }                  
                 }
                 if (!conditionMet) {
                     break;
