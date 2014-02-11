@@ -105,6 +105,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -1700,30 +1701,53 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         String fileName = (new File(swf.file).getName());
         fileName = fileName.substring(0, fileName.length() - 4) + ".fla";
         fc.setSelectedFile(new File(selDir + fileName));
-        FileFilter fla = new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return f.isDirectory() || (f.getName().toLowerCase().endsWith(".fla"));
-            }
+        List<FileFilter> flaFilters = new ArrayList<>();
+        List<FileFilter> xflFilters = new ArrayList<>();
+        List<FLAVersion> versions = new ArrayList<>();
+        FileFilter defaultFilter = null;
+        for (int i = FLAVersion.values().length - 1; i >= 0; i--) {
+            final FLAVersion v = FLAVersion.values()[i];
+            if (!swf.isAS3 && v.minASVersion() > 2) {
+                //This version does not support AS1/2
+            } else {
+                versions.add(v);
+                FileFilter f = new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return f.isDirectory() || (f.getName().toLowerCase().endsWith(".fla"));
+                    }
 
-            @Override
-            public String getDescription() {
-                return translate("filter.fla");
-            }
-        };
-        FileFilter xfl = new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return f.isDirectory() || (f.getName().toLowerCase().endsWith(".xfl"));
-            }
+                    @Override
+                    public String getDescription() {
+                        return translate("filter.fla").replace("%version%", v.applicationName());
+                    }
+                };
+                if (v == FLAVersion.CS6) {
+                    defaultFilter = f;
+                    fc.setFileFilter(f);
+                } else {
+                    fc.addChoosableFileFilter(f);
+                }
+                flaFilters.add(f);
+                f = new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return f.isDirectory() || (f.getName().toLowerCase().endsWith(".xfl"));
+                    }
 
-            @Override
-            public String getDescription() {
-                return translate("filter.xfl");
+                    @Override
+                    public String getDescription() {
+                        return translate("filter.xfl").replace("%version%", v.applicationName());
+                    }
+                };
+                fc.addChoosableFileFilter(f);
+                xflFilters.add(f);
             }
-        };
-        fc.setFileFilter(fla);
-        fc.addChoosableFileFilter(xfl);
+        }
+        if (defaultFilter == null) {
+            defaultFilter = flaFilters.get(0);
+        }
+
         fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
@@ -1733,12 +1757,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
 
             Main.startWork(translate("work.exporting.fla") + "...");
-            final boolean compressed = fc.getFileFilter() == fla;
+            final boolean compressed = flaFilters.contains(fc.getFileFilter());
             if (!compressed) {
                 if (sf.getName().endsWith(".fla")) {
                     sf = new File(sf.getAbsolutePath().substring(0, sf.getAbsolutePath().length() - 4) + ".xfl");
                 }
             }
+            final FLAVersion selectedVersion = versions.get(compressed ? flaFilters.indexOf(fc.getFileFilter()) : xflFilters.indexOf(fc.getFileFilter()));
             final File selfile = sf;
             new CancellableWorker() {
                 @Override
@@ -1746,9 +1771,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     Helper.freeMem();
                     try {
                         if (compressed) {
-                            swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(swf.file).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
+                            swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(swf.file).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
                         } else {
-                            swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(swf.file).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
+                            swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(swf.file).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
                         }
                     } catch (IOException ex) {
                         View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);

@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.sun.jna.Platform;
@@ -130,6 +131,7 @@ public class CommandLineArgumentParser {
         Level traceLevel = Level.WARNING;
         Queue<String> args = new LinkedList<>(Arrays.asList(arguments));
         AbortRetryIgnoreHandler handler = null;
+        String format = null;
 
         String nextParam;
         OUTER:
@@ -186,8 +188,10 @@ public class CommandLineArgumentParser {
             System.exit(0);
         } else if (nextParam.equals("-proxy")) {
             parseProxy(args);
+        } else if (nextParam.equals("-format")) {
+            format = parseFormat(args);
         } else if (nextParam.equals("-export")) {
-            parseExport(args, handler, traceLevel);
+            parseExport(args, handler, traceLevel, format);
         } else if (nextParam.equals("-compress")) {
             parseCompress(args);
         } else if (nextParam.equals("-decompress")) {
@@ -434,7 +438,7 @@ public class CommandLineArgumentParser {
         Main.startProxy(port);
     }
 
-    private static void parseExport(Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel) {
+    private static void parseExport(Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, String format) {
         if (args.size() < 3) {
             badArguments();
         }
@@ -554,11 +558,27 @@ public class CommandLineArgumentParser {
                     exportOK = true;
                     break;
                 case "fla":
-                    exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
+                    FLAVersion flaVersion = FLAVersion.fromString(format);
+                    if(flaVersion == null){
+                        flaVersion = FLAVersion.CS6; //Defaults to CS6
+                        if(format!=null){
+                            System.err.println("Invalid export FLA format: "+format);
+                            badArguments();
+                        }
+                    }
+                    exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(),flaVersion);
                     exportOK = true;
                     break;
-                case "xfl":
-                    exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get());
+                case "xfl":                    
+                    FLAVersion xflVersion = FLAVersion.fromString(format);
+                    if(xflVersion == null){
+                        xflVersion = FLAVersion.CS6; //Defaults to CS6
+                        if(format!=null){
+                            System.err.println("Invalid export XFL format: "+format);
+                            badArguments();
+                        }
+                    }
+                    exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(),xflVersion);
                     exportOK = true;
                     break;
                 default:
@@ -670,6 +690,13 @@ public class CommandLineArgumentParser {
         System.exit(0);
     }
 
+    private static String parseFormat(Queue<String> args) {        
+        if (args.size() < 1) {
+            badArguments();
+        }
+        return args.remove().toLowerCase();
+    }
+    
     private static void parseDumpSwf(Queue<String> args) {
         if (args.isEmpty()) {
             badArguments();
