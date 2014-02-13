@@ -22,10 +22,11 @@ import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
-import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.Optional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
 import com.jpexs.decompiler.flash.types.annotations.parser.ParseException;
@@ -63,10 +64,13 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
     private Map<String, Component> labels = new HashMap<>();
     private Map<String, Component> types = new HashMap<>();
     private Map<String, List<Field>> fieldPaths = new HashMap<>();
+    private HeaderLabel hdr;
 
     public GenericTagPanel() {
         super(new BorderLayout());
 
+        hdr = new HeaderLabel("");
+        add(hdr, BorderLayout.NORTH);
         genericTagPropertiesEditorPane = new JEditorPane() {
             @Override
             public boolean getScrollableTracksViewportWidth() {
@@ -75,7 +79,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         };
         genericTagPropertiesEditorPane.setEditable(false);
         genericTagPropertiesEditorPaneScrollPanel = new JScrollPane(genericTagPropertiesEditorPane);
-        add(genericTagPropertiesEditorPaneScrollPanel);
+        add(genericTagPropertiesEditorPaneScrollPanel, BorderLayout.CENTER);
 
         genericTagPropertiesEditPanel = new JPanel();
         genericTagPropertiesEditPanel.setLayout(new SpringLayout());
@@ -91,46 +95,57 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
     public void setEditMode(boolean edit) {
         if (edit) {
             remove(genericTagPropertiesEditorPaneScrollPanel);
-            add(genericTagPropertiesEditPanelScrollPanel);
+            add(genericTagPropertiesEditPanelScrollPanel, BorderLayout.CENTER);
         } else {
             genericTagPropertiesEditPanel.removeAll();
             genericTagPropertiesEditPanel.setSize(0, 0);
             remove(genericTagPropertiesEditPanelScrollPanel);
-            add(genericTagPropertiesEditorPaneScrollPanel);
+            add(genericTagPropertiesEditorPaneScrollPanel, BorderLayout.CENTER);
         }
         repaint();
     }
 
     public void setTagText(Tag tag) {
-        StringBuilder sb = new StringBuilder();
-        Field[] fields = tag.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                Object value = field.get(tag);
-                sb.append(field.getName()).append(": ");
-                if (field.getType().isArray()) {
-                    sb.append("[");
-                    for (int i = 0; i < Array.getLength(value); i++) {
-                        if (i != 0) {
-                            sb.append(", ");
-                        }
-                        sb.append(Array.get(value, i));
-                    }
-                    sb.append("]");
-                } else {
-                    sb.append(value);
-                }
-                sb.append(GraphTextWriter.NEW_LINE);
-            } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+        generateEditControls(tag, true);
+        String val = "";
+        for (String key : keys) {
+            GenericTagEditor ed = editors.get(key);
+            if (((Component) ed).isVisible()) {
+                val += key + " : " + ed.getChangedValue() + "\r\n";
             }
         }
-        genericTagPropertiesEditorPane.setText(sb.toString());
+        genericTagPropertiesEditorPane.setText(val);
         genericTagPropertiesEditorPane.setCaretPosition(0);
+        hdr.setText(tag.toString());
+        /*StringBuilder sb = new StringBuilder();
+         Field[] fields = tag.getClass().getDeclaredFields();
+         for (Field field : fields) {
+         try {
+         field.setAccessible(true);
+         Object value = field.get(tag);
+         sb.append(field.getName()).append(": ");
+         if (field.getType().isArray()) {
+         sb.append("[");
+         for (int i = 0; i < Array.getLength(value); i++) {
+         if (i != 0) {
+         sb.append(", ");
+         }
+         sb.append(Array.get(value, i));
+         }
+         sb.append("]");
+         } else {
+         sb.append(value);
+         }
+         sb.append(GraphTextWriter.NEW_LINE);
+         } catch (IllegalArgumentException | IllegalAccessException ex) {
+         Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         }
+         genericTagPropertiesEditorPane.setText(sb.toString());
+         genericTagPropertiesEditorPane.setCaretPosition(0);*/
     }
 
-    public void generateEditControls(Tag tag) {
+    public void generateEditControls(Tag tag, boolean readonly) {
         editors.clear();
         fieldPaths.clear();
         labels.clear();
@@ -139,7 +154,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         genericTagPropertiesEditPanel.removeAll();
         genericTagPropertiesEditPanel.setSize(0, 0);
         this.tag = tag;
-        generateEditControlsRecursive(tag, "", new ArrayList<Field>());
+        generateEditControlsRecursive(tag, "", new ArrayList<Field>(), readonly);
         change(null);
     }
 
@@ -152,7 +167,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         repaint();
     }
 
-    private int generateEditControlsRecursive(Object obj, String parent, List<Field> parentFields) {
+    private int generateEditControlsRecursive(Object obj, String parent, List<Field> parentFields, boolean readonly) {
         if (obj == null) {
             return 0;
         }
@@ -170,7 +185,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                     if (value != null) {
                         int i = 0;
                         for (Object obj1 : (Iterable) value) {
-                            propCount += addEditor(name + "[" + i + "]", obj, field, i, obj1.getClass(), obj1, parentFields);
+                            propCount += addEditor(name + "[" + i + "]", obj, field, i, obj1.getClass(), obj1, parentFields, readonly);
                             i++;
                         }
                     }
@@ -178,11 +193,11 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                     if (value != null) {
                         for (int i = 0; i < Array.getLength(value); i++) {
                             Object item = Array.get(value, i);
-                            propCount += addEditor(name + "[" + i + "]", obj, field, i, item.getClass(), item, parentFields);
+                            propCount += addEditor(name + "[" + i + "]", obj, field, i, item.getClass(), item, parentFields, readonly);
                         }
                     }
                 } else {
-                    propCount += addEditor(name, obj, field, 0, field.getType(), value, parentFields);
+                    propCount += addEditor(name, obj, field, 0, field.getType(), value, parentFields, readonly);
                 }
             } catch (IllegalArgumentException | IllegalAccessException ex) {
                 Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -191,13 +206,17 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         return propCount;
     }
 
-    private int addEditor(String name, Object obj, Field field, int index, Class<?> type, Object value, List<Field> parentList) throws IllegalArgumentException, IllegalAccessException {
+    private int addEditor(String name, Object obj, Field field, int index, Class<?> type, Object value, List<Field> parentList, boolean readonly) throws IllegalArgumentException, IllegalAccessException {
         Calculated calculated = field.getAnnotation(Calculated.class);
         if (calculated != null) {
             return 0;
         }
         List<Field> parList = new ArrayList<>(parentList);
         parList.add(field);
+        Internal inter = field.getAnnotation(Internal.class);
+        if (inter != null) {
+            return 0;
+        }
         SWFType swfType = field.getAnnotation(SWFType.class);
         Component editor;
         if (type.equals(int.class) || type.equals(Integer.class)
@@ -211,7 +230,24 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         } else if (type.equals(String.class)) {
             editor = new StringEditor(name, obj, field, index, type);
         } else {
-            return generateEditControlsRecursive(value, field.getName() + ".", parList);
+            if (value == null) {
+                if (readonly) {
+                    return 0;
+                }
+                Optional opt = field.getAnnotation(Optional.class);
+                if (opt == null) {
+                    try {
+                        value = field.getType().newInstance();
+                        field.set(obj, value);
+                    } catch (InstantiationException | IllegalAccessException ex) {
+                        Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        return 0;
+                    }
+                } else {
+                    return 0;
+                }
+            }
+            return generateEditControlsRecursive(value, field.getName() + ".", parList, readonly);
             /*} else {
              JTextArea textArea = new JTextArea(value == null ? "" : value.toString());
              textArea.setLineWrap(true);
@@ -282,7 +318,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             List<Field> path = fieldPaths.get(key);
             String p = "";
             boolean conditionMet = true;
-            for (Field f : path) {                
+            for (Field f : path) {
                 String par = p;
                 if (!p.equals("")) {
                     p += ".";
@@ -290,36 +326,36 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 p += f.getName();
                 Conditional cond = f.getAnnotation(Conditional.class);
                 if (cond != null) {
-                    ConditionEvaluator ev=new ConditionEvaluator(cond);
-                    
+                    ConditionEvaluator ev = new ConditionEvaluator(cond);
+
                     try {
-                        Set<String> fieldNames=ev.getFields();
-                        Map<String,Boolean> fields=new HashMap<>();
-                        for(String fld:fieldNames){
+                        Set<String> fieldNames = ev.getFields();
+                        Map<String, Boolean> fields = new HashMap<>();
+                        for (String fld : fieldNames) {
                             String ckey = "";
                             if (!par.equals("")) {
                                 ckey = par + ".";
-                            }    
+                            }
                             ckey += fld;
                             if (editors.containsKey(ckey)) {
                                 GenericTagEditor editor = editors.get(ckey);
                                 Object val = editor.getChangedValue();
                                 fields.put(fld, true);
                                 if (val instanceof Boolean) {
-                                    fields.put(fld, (Boolean)val);                                     
+                                    fields.put(fld, (Boolean) val);
                                 }
-                                                         }
+                            }
                         }
                         boolean ok = ev.eval(fields);
-                        if(conditionMet){
+                        if (conditionMet) {
                             conditionMet = ok;
                         }
                         ((Component) dependentEditor).setVisible(conditionMet);
                         dependentLabel.setVisible(conditionMet);
-                        dependentTypeLabel.setVisible(conditionMet);   
+                        dependentTypeLabel.setVisible(conditionMet);
                     } catch (ParseException ex) {
                         Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, "Invalid condition", ex);
-                    }                  
+                    }
                 }
                 if (!conditionMet) {
                     break;

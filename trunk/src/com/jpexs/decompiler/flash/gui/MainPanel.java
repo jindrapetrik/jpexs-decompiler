@@ -2158,8 +2158,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     genericEditButton.setVisible(false);
                     genericSaveButton.setVisible(true);
                     genericCancelButton.setVisible(true);
+                    genericTagPanel.generateEditControls((Tag) item, false);
                     genericTagPanel.setEditMode(true);
-                    genericTagPanel.generateEditControls((Tag) item);
+                    
                 }
             }
             break;
