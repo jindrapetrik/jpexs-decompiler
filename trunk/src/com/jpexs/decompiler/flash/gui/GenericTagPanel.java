@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.ReflectionTools;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -64,6 +65,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
     private Map<String, Component> labels = new HashMap<>();
     private Map<String, Component> types = new HashMap<>();
     private Map<String, List<Field>> fieldPaths = new HashMap<>();
+    private Map<String, List<Integer>> fieldIndices = new HashMap<>();
     private HeaderLabel hdr;
 
     public GenericTagPanel() {
@@ -88,6 +90,12 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
 
     public void clear() {
         tag = null;
+        editors.clear();
+        fieldPaths.clear();
+        fieldIndices.clear();
+        labels.clear();
+        types.clear();
+        keys.clear();
         genericTagPropertiesEditPanel.removeAll();
         genericTagPropertiesEditPanel.setSize(0, 0);
     }
@@ -106,6 +114,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
     }
 
     public void setTagText(Tag tag) {
+        clear();
         generateEditControls(tag, true);
         String val = "";
         for (String key : keys) {
@@ -116,45 +125,13 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         }
         genericTagPropertiesEditorPane.setText(val);
         genericTagPropertiesEditorPane.setCaretPosition(0);
-        hdr.setText(tag.toString());
-        /*StringBuilder sb = new StringBuilder();
-         Field[] fields = tag.getClass().getDeclaredFields();
-         for (Field field : fields) {
-         try {
-         field.setAccessible(true);
-         Object value = field.get(tag);
-         sb.append(field.getName()).append(": ");
-         if (field.getType().isArray()) {
-         sb.append("[");
-         for (int i = 0; i < Array.getLength(value); i++) {
-         if (i != 0) {
-         sb.append(", ");
-         }
-         sb.append(Array.get(value, i));
-         }
-         sb.append("]");
-         } else {
-         sb.append(value);
-         }
-         sb.append(GraphTextWriter.NEW_LINE);
-         } catch (IllegalArgumentException | IllegalAccessException ex) {
-         Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         }
-         genericTagPropertiesEditorPane.setText(sb.toString());
-         genericTagPropertiesEditorPane.setCaretPosition(0);*/
+        hdr.setText(tag.toString());       
     }
 
     public void generateEditControls(Tag tag, boolean readonly) {
-        editors.clear();
-        fieldPaths.clear();
-        labels.clear();
-        types.clear();
-        keys.clear();
-        genericTagPropertiesEditPanel.removeAll();
-        genericTagPropertiesEditPanel.setSize(0, 0);
+        clear();
         this.tag = tag;
-        generateEditControlsRecursive(tag, "", new ArrayList<Field>(), readonly);
+        generateEditControlsRecursive(tag, "", new ArrayList<Field>(),new ArrayList<Integer>(), readonly);
         change(null);
     }
 
@@ -167,7 +144,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         repaint();
     }
 
-    private int generateEditControlsRecursive(Object obj, String parent, List<Field> parentFields, boolean readonly) {
+    private int generateEditControlsRecursive(Object obj, String parent, List<Field> parentFields, List<Integer> parentIndices, boolean readonly) {
         if (obj == null) {
             return 0;
         }
@@ -185,7 +162,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                     if (value != null) {
                         int i = 0;
                         for (Object obj1 : (Iterable) value) {
-                            propCount += addEditor(name + "[" + i + "]", obj, field, i, obj1.getClass(), obj1, parentFields, readonly);
+                            propCount += addEditor(name + "[" + i + "]", obj, field, i, obj1.getClass(), obj1, parentFields,parentIndices, readonly);
                             i++;
                         }
                     }
@@ -193,11 +170,11 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                     if (value != null) {
                         for (int i = 0; i < Array.getLength(value); i++) {
                             Object item = Array.get(value, i);
-                            propCount += addEditor(name + "[" + i + "]", obj, field, i, item.getClass(), item, parentFields, readonly);
+                            propCount += addEditor(name + "[" + i + "]", obj, field, i, item.getClass(), item, parentFields,parentIndices, readonly);
                         }
                     }
                 } else {
-                    propCount += addEditor(name, obj, field, 0, field.getType(), value, parentFields, readonly);
+                    propCount += addEditor(name, obj, field, 0, field.getType(), value, parentFields,parentIndices, readonly);
                 }
             } catch (IllegalArgumentException | IllegalAccessException ex) {
                 Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -206,13 +183,16 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         return propCount;
     }
 
-    private int addEditor(String name, Object obj, Field field, int index, Class<?> type, Object value, List<Field> parentList, boolean readonly) throws IllegalArgumentException, IllegalAccessException {
+    private int addEditor(String name, Object obj, Field field, int index, Class<?> type, Object value, List<Field> parentList,List<Integer> parentIndices, boolean readonly) throws IllegalArgumentException, IllegalAccessException {
         Calculated calculated = field.getAnnotation(Calculated.class);
         if (calculated != null) {
             return 0;
         }
         List<Field> parList = new ArrayList<>(parentList);
         parList.add(field);
+        
+        List<Integer> parIndices = new ArrayList<>(parentIndices);
+        parIndices.add(index);
         Internal inter = field.getAnnotation(Internal.class);
         if (inter != null) {
             return 0;
@@ -247,18 +227,14 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                     return 0;
                 }
             }
-            return generateEditControlsRecursive(value, field.getName() + ".", parList, readonly);
-            /*} else {
-             JTextArea textArea = new JTextArea(value == null ? "" : value.toString());
-             textArea.setLineWrap(true);
-             textArea.setEditable(false);
-             editor = textArea;*/
+            return generateEditControlsRecursive(value, name + ".", parList,parIndices, readonly);
         }
         if (editor instanceof GenericTagEditor) {
             GenericTagEditor ce = (GenericTagEditor) editor;
             ce.addChangeListener(this);
             editors.put(name, ce);
             fieldPaths.put(name, parList);
+            fieldIndices.put(name,parIndices);
         }
 
         JLabel label = new JLabel(name + ":", JLabel.TRAILING);
@@ -316,14 +292,20 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             Component dependentLabel = labels.get(key);
             Component dependentTypeLabel = types.get(key);
             List<Field> path = fieldPaths.get(key);
+            List<Integer> indices = fieldIndices.get(key);
             String p = "";
-            boolean conditionMet = true;
-            for (Field f : path) {
+            boolean conditionMet = true;            
+            for (int i=0;i<path.size();i++) {
+                Field f = path.get(i);
+                int index=indices.get(i);
                 String par = p;
                 if (!p.equals("")) {
                     p += ".";
                 }
                 p += f.getName();
+                if(ReflectionTools.needsIndex(f)){
+                    p+="["+index+"]";
+                }
                 Conditional cond = f.getAnnotation(Conditional.class);
                 if (cond != null) {
                     ConditionEvaluator ev = new ConditionEvaluator(cond);

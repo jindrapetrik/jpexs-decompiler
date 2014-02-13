@@ -39,6 +39,16 @@ public class ReflectionTools {
         return value;
     }
     
+    public static boolean needsIndex(Field field){
+        if (List.class.isAssignableFrom(field.getType())) {
+            return true;
+        }
+        else if (field.getType().isArray()) {
+            return true;
+        }
+        return false;
+    }
+    
     @SuppressWarnings("unchecked")
     public static void setValue(Object obj, Field field, int index, Object newValue) throws IllegalArgumentException, IllegalAccessException {
         Object value = field.get(obj);
