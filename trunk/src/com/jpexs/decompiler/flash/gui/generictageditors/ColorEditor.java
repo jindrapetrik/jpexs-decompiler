@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -97,6 +98,8 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
                 }
                 
             };            
+            buttonChange.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
+            buttonChange.setCursor(new Cursor(Cursor.HAND_CURSOR));
             buttonChange.addActionListener(this);
             buttonChange.setBackground(color);       
             buttonChange.setBorderPainted(true);

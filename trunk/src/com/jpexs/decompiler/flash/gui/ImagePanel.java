@@ -40,7 +40,7 @@ import javax.swing.JPanel;
 
 public final class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
 
-    static final String ACTION_SELECT_COLOR = "SELECTCOLOR";
+    static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
 
     public JLabel label = new JLabel();
     public DrawableTag drawable;
@@ -72,8 +72,8 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton selectColorButton = new JButton(View.getIcon("color16"));
         selectColorButton.addActionListener(this);
-        selectColorButton.setActionCommand(ACTION_SELECT_COLOR);
-        selectColorButton.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
+        selectColorButton.setActionCommand(ACTION_SELECT_BKCOLOR);
+        selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
         buttonsPanel.add(selectColorButton);
         bottomPanel.add(buttonsPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -81,11 +81,11 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand() == ACTION_SELECT_COLOR) {
+        if (e.getActionCommand() == ACTION_SELECT_BKCOLOR) {
             View.execInEventDispatch(new Runnable() {
                 @Override
                 public void run() {
-                    Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectcolor.title"), View.swfBackgroundColor);
+                    Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.swfBackgroundColor);
                     if (newColor != null) {
                         View.swfBackgroundColor = newColor;
                         setBackground(newColor);

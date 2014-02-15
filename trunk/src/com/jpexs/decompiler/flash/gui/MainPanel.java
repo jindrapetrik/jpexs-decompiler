@@ -263,7 +263,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public TreeItem oldTag;
     private File tempFile;
 
-    private static final String ACTION_SELECT_COLOR = "SELECTCOLOR";
+    private static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
     private static final String ACTION_REPLACE_IMAGE = "REPLACEIMAGE";
     private static final String ACTION_REPLACE_BINARY = "REPLACEBINARY";
     private static final String ACTION_EDIT_GENERIC_TAG = "EDITGENERICTAG";
@@ -752,8 +752,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             JPanel buttonsPanel = new JPanel(new FlowLayout());
             JButton selectColorButton = new JButton(View.getIcon("color16"));
             selectColorButton.addActionListener(this);
-            selectColorButton.setActionCommand(ACTION_SELECT_COLOR);
-            selectColorButton.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
+            selectColorButton.setActionCommand(ACTION_SELECT_BKCOLOR);
+            selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
             buttonsPanel.add(selectColorButton);
             bottomPanel.add(buttonsPanel, BorderLayout.EAST);
             pan.add(bottomPanel, BorderLayout.SOUTH);
@@ -2052,8 +2052,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case ACTION_SELECT_COLOR:
-                Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectcolor.title"), View.swfBackgroundColor);
+            case ACTION_SELECT_BKCOLOR:
+                Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectbkcolor.title"), View.swfBackgroundColor);
                 if (newColor != null) {
                     View.swfBackgroundColor = newColor;
                     reload(true);
