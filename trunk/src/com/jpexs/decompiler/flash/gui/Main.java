@@ -750,6 +750,9 @@ public class Main {
     }
 
     public static void initLang() {
+        if(GraphicsEnvironment.isHeadless()){ //No GUI in OS
+            return;
+        }
         Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
         AppStrings.updateLanguage();
         ErrorLogFrame.createNewInstance();
