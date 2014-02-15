@@ -49,7 +49,7 @@ public class ProtectTag extends Tag {
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
-            if (passwordHash != null) {
+            if (!"".equals(passwordHash)) {
                 sos.writeString(passwordHash);
             }
         } catch (IOException e) {
@@ -71,6 +71,8 @@ public class ProtectTag extends Tag {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         if (sis.available() > 0) {
             passwordHash = sis.readString();
+        }else{
+            passwordHash = "";
         }
     }
 }
