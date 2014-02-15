@@ -793,4 +793,13 @@ public class Helper {
                 appendNoHilight(AppStrings.translate("decompilationError.error.description")).
                 appendNoHilight("\");").newLine();
     }
+        
+     public static String escapeHTML(String text){
+        String from[] = new String[]{"&", "<", ">", "\"", "'", "/"};
+        String to[] = new String[]{"&amp;", "&lt;", "&gt;", "&quot;", "&#x27;", "&#x2F;"};
+        for(int i=0;i<from.length;i++){
+            text = text.replace(from[i], to[i]);
+        }
+        return text;
+    }
 }

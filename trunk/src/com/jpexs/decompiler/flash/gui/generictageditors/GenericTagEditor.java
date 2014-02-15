@@ -30,4 +30,6 @@ public interface GenericTagEditor {
     public Object getChangedValue();
     public String getFieldName();
     public Field getField();
+    
+    public String getReadOnlyValue();
 }

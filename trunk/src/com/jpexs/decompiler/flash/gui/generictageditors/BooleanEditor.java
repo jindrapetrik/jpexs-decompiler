@@ -80,6 +80,12 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     public Field getField() {
         return field;
     }
+
+    @Override
+    public String getReadOnlyValue() {
+        return getChangedValue().toString();
+    }
+    
     
     
 }

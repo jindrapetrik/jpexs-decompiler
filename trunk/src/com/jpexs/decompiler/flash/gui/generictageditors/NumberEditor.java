@@ -193,4 +193,8 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
         return field;
     }
     
+    @Override
+    public String getReadOnlyValue() {
+        return getChangedValue().toString();
+    }
 }

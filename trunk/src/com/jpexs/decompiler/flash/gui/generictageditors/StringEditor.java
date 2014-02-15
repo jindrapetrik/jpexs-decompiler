@@ -16,10 +16,12 @@
  */
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
+import com.jpexs.helpers.Helper;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import javax.swing.JTextArea;
+import jsyntaxpane.util.StringUtils;
 
 /**
  *
@@ -83,4 +85,9 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
         return field;
     }
     
+    @Override
+    public String getReadOnlyValue() {
+        return Helper.escapeHTML(getChangedValue().toString());
+    }    
+   
 }

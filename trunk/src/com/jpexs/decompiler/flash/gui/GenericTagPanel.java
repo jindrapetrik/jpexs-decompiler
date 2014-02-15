@@ -18,12 +18,16 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
+import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ReflectionTools;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.ARGB;
+import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -43,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Box;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -120,9 +125,12 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         for (String key : keys) {
             GenericTagEditor ed = editors.get(key);
             if (((Component) ed).isVisible()) {
-                val += key + " : " + ed.getChangedValue() + "\r\n";
+                val += key + " : " + ed.getReadOnlyValue()+ "<br>";
             }
         }
+        //HTML for colors:
+        val = "<html>"+val+"</html>";      
+        genericTagPropertiesEditorPane.setContentType("text/html");
         genericTagPropertiesEditorPane.setText(val);
         genericTagPropertiesEditorPane.setCaretPosition(0);
         hdr.setText(tag.toString());       
@@ -209,7 +217,9 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             editor = new BooleanEditor(name, obj, field, index, type);
         } else if (type.equals(String.class)) {
             editor = new StringEditor(name, obj, field, index, type);
-        } else {
+        } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)){
+            editor = new ColorEditor(name, obj, field, index, type);
+        }else {
             if (value == null) {
                 if (readonly) {
                     return 0;
@@ -238,6 +248,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         }
 
         JLabel label = new JLabel(name + ":", JLabel.TRAILING);
+        label.setVerticalAlignment(JLabel.TOP);
         genericTagPropertiesEditPanel.add(label);
         label.setLabelFor(editor);
         labels.put(name, label);
@@ -357,7 +368,10 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 genericTagPropertiesEditPanel.add(dependentTypeLabel);
                 propCount++;
             }
-        }
-        relayout(propCount);
+        }        
+        genericTagPropertiesEditPanel.add(new JPanel());
+        genericTagPropertiesEditPanel.add(new JPanel());
+        genericTagPropertiesEditPanel.add(new JPanel());
+        relayout(propCount+1);
     }
 }

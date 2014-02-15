@@ -55,4 +55,13 @@ public class ARGB {
     public Color toColor() {
         return new Color(red, green, blue, alpha);
     }
+    public ARGB(){
+        
+    }
+    public ARGB(Color color) {
+        this.alpha = color.getAlpha();
+        this.red = color.getRed();
+        this.green = color.getGreen();
+        this.blue = color.getBlue();        
+    }
 }
