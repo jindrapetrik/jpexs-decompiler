@@ -39,6 +39,7 @@ import com.jpexs.helpers.streams.SeekableInputStream;
 import com.sun.jna.Platform;
 import java.awt.AWTException;
 import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
@@ -708,6 +709,10 @@ public class Main {
     }
 
     private static void initGui() {
+        if(GraphicsEnvironment.isHeadless()){
+            System.err.println("Error: Your system does not support Graphic User Interface");
+            exit();
+        }
         if (Configuration.useRibbonInterface.get()) {
             View.setLookAndFeel();
         } else {
@@ -993,7 +998,9 @@ public class Main {
 
     public static void exit() {
         Configuration.saveConfig();
-        FlashPlayerPanel.unload();
+        if(!GraphicsEnvironment.isHeadless()){
+            FlashPlayerPanel.unload();
+        }
         System.exit(0);
     }
 
@@ -1144,7 +1151,9 @@ public class Main {
         fileTxt.setFormatter(formatterTxt);
         logger.addHandler(fileTxt);
 
-        ErrorLogFrame.getInstance().clearErrorState();
+        if(!GraphicsEnvironment.isHeadless()){
+            ErrorLogFrame.getInstance().clearErrorState();
+        }
 
         sdf = new SimpleDateFormat("yyyy-MM-dd");
         logger.log(Level.INFO, "Date: {0}", sdf.format(new Date()));
