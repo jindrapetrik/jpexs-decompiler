@@ -36,5 +36,6 @@ public enum BasicType {
     FLOAT16,
     FIXED,
     FIXED8,
-    NONE
+    NONE,
+    OTHER
 }

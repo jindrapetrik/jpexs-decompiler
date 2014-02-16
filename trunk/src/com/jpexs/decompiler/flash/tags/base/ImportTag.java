@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -25,6 +26,6 @@ import java.util.HashMap;
 public interface ImportTag {
 
     public String getUrl();
-
-    public HashMap<Integer, String> getAssets();
+    
+    public Map<Integer, String> getAssets();
 }

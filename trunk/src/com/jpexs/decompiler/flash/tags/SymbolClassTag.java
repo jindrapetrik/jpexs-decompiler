@@ -28,8 +28,9 @@ import java.io.OutputStream;
 
 public class SymbolClassTag extends Tag {
 
-    @SWFType(BasicType.UI16)
+    @SWFType(value=BasicType.UI16,countField = "numSymbols")
     public int[] tagIDs;
+    @SWFType(countField = "numSymbols")
     public String[] classNames;
     public static final int ID = 76;
 

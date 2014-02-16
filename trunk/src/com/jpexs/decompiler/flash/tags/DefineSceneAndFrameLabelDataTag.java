@@ -33,14 +33,15 @@ import java.io.OutputStream;
  */
 public class DefineSceneAndFrameLabelDataTag extends Tag {
 
-    @SWFType(BasicType.EncodedU32)
+    @SWFType(value=BasicType.EncodedU32,countField="sceneCount")
     public long[] sceneOffsets;
-
+    @SWFType(countField="sceneCount")
     public String[] sceneNames;
 
-    @SWFType(BasicType.EncodedU32)
+    @SWFType(value=BasicType.EncodedU32,countField="frameLabelCount")
     public long[] frameNums;
 
+    @SWFType(countField = "frameLabelCount")
     public String[] frameNames;
     public static final int ID = 86;
 

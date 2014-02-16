@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
 public @interface SWFType {
 
     /// Type of value
-    BasicType value();
+    BasicType value() default BasicType.OTHER;
 
     /// Alternate type when condition is met
     BasicType alternateValue() default BasicType.NONE;
