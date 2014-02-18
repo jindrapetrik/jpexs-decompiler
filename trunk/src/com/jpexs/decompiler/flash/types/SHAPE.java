@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +28,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class SHAPE implements NeedsCharacters {
+public class SHAPE implements NeedsCharacters,Serializable {
 
     @SWFType(value = BasicType.UB, count = 4)
     public int numFillBits;

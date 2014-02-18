@@ -16,12 +16,14 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.io.Serializable;
+
 /**
  * Represents 32-bit alpha, red, green and blue value
  *
  * @author JPEXS
  */
-public class BITMAPDATA {
+public class BITMAPDATA implements Serializable {
 
     public PIX15[] bitmapPixelDataPix15 = new PIX15[0];
     public PIX24[] bitmapPixelDataPix24 = new PIX24[0];

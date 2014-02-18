@@ -22,13 +22,14 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class TEXTRECORD {
+public class TEXTRECORD implements Serializable {
 
     public boolean styleFlagsHasFont;
     public boolean styleFlagsHasColor;

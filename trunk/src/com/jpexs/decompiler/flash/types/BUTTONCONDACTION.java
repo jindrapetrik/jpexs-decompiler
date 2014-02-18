@@ -33,6 +33,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -43,7 +44,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem {
+public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, Serializable {
 
     private final SWF swf;
     private final long pos;

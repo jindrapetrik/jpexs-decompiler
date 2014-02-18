@@ -17,12 +17,13 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class SOUNDENVELOPE {
+public class SOUNDENVELOPE implements Serializable {
 
     @SWFType(BasicType.UI32)
     public long pos44;

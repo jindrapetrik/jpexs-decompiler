@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class EdgeType {
+public class EdgeType implements Serializable {
 
     private static final int sizes[] = new int[]{1, 2, 1, 2, 1, 2, 3, 4, 2, 3, 4, 5, 6, 7, 8, 9};
     private static final int Edge_H12 = 0;  //  2 bytes

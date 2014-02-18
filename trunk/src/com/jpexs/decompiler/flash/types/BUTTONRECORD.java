@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class BUTTONRECORD {
+public class BUTTONRECORD implements Serializable {
 
     @Reserved
     @SWFType(value = BasicType.UB, count = 2)

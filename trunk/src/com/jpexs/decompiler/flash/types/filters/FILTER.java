@@ -19,13 +19,14 @@ package com.jpexs.decompiler.flash.types.filters;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
+import java.io.Serializable;
 
 /**
  * Bitmap filter
  *
  * @author JPEXS
  */
-public class FILTER {
+public class FILTER implements Serializable {
 
     /**
      * Identificator of type of the filter

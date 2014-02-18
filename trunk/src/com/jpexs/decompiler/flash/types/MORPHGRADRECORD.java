@@ -17,12 +17,13 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class MORPHGRADRECORD {
+public class MORPHGRADRECORD implements Serializable {
 
     @SWFType(BasicType.UI8)
     public int startRatio;

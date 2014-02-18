@@ -17,12 +17,13 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class MORPHLINESTYLE {
+public class MORPHLINESTYLE implements Serializable {
 
     @SWFType(BasicType.UI16)
     public int startWidth;

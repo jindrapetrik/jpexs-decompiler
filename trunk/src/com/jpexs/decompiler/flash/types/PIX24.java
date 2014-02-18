@@ -18,13 +18,14 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  * Represents 15-bit red, green and blue value
  *
  * @author JPEXS
  */
-public class PIX24 {
+public class PIX24 implements Serializable {
 
     @SWFType(BasicType.UI8)
     @Reserved

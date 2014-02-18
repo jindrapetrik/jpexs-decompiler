@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,7 +41,7 @@ import java.util.Set;
 /**
  * Represents Tag inside SWF file
  */
-public class Tag implements NeedsCharacters, Exportable, ContainerItem {
+public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializable {
 
     /**
      * Identifier of tag type
@@ -57,8 +58,8 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem {
     public boolean forceWriteAsLong = false;
     private final long pos;
     protected String name;
-    public Tag previousTag;
-    protected SWF swf;
+    public Tag previousTag;    
+    protected transient SWF swf;
     private boolean modified;
 
     public String getName() {

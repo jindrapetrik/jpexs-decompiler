@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class MORPHFILLSTYLEARRAY implements NeedsCharacters {
+public class MORPHFILLSTYLEARRAY implements NeedsCharacters,Serializable {
 
     public MORPHFILLSTYLE[] fillStyles;
 

@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.io.Serializable;
+
 /**
  *
  * @author JPEXS
  */
-public class MORPHLINESTYLEARRAY {
+public class MORPHLINESTYLEARRAY implements Serializable {
 
     public MORPHLINESTYLE[] lineStyles;
     public MORPHLINESTYLE2[] lineStyles2;

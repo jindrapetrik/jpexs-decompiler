@@ -17,12 +17,13 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class FOCALGRADIENT extends GRADIENT {
+public class FOCALGRADIENT extends GRADIENT implements Serializable {
 
     @SWFType(BasicType.FIXED8)
     public float focalPoint;

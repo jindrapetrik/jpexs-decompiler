@@ -18,13 +18,14 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  * Represents 32-bit red, green, blue and alpha value
  *
  * @author JPEXS
  */
-public class RGBA extends RGB {
+public class RGBA extends RGB implements Serializable{
 
     /**
      * Alpha value defining opacity

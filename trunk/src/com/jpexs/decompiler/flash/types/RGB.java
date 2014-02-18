@@ -18,13 +18,14 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  * Represents 24-bit red, green, blue value
  *
  * @author JPEXS
  */
-public class RGB {
+public class RGB implements Serializable {
 
     /**
      * Red color value

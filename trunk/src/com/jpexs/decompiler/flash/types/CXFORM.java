@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.helpers.SerializableImage;
+import java.io.Serializable;
 
 /**
  * Defines a transform that can be applied to the color space of a graphic
@@ -27,7 +28,7 @@ import com.jpexs.helpers.SerializableImage;
  *
  * @author JPEXS
  */
-public class CXFORM {
+public class CXFORM implements Serializable {
 
     /**
      * Has color addition values

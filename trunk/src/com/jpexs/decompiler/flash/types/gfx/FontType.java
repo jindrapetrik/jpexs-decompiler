@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types.gfx;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class FontType {
+public class FontType implements Serializable {
 
     public static final int FF_Italic = 0x0001;
     public static final int FF_Bold = 0x0002;

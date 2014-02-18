@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class CLIPACTIONS {
+public class CLIPACTIONS implements Serializable {
 
     @Reserved
     @SWFType(BasicType.UI16)

@@ -19,12 +19,13 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class SOUNDINFO {
+public class SOUNDINFO implements Serializable {
 
     @Reserved
     @SWFType(value = BasicType.UB, count = 2)

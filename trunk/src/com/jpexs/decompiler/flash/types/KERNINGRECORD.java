@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.Font;
 import java.awt.font.GlyphVector;
 import java.awt.font.TextAttribute;
+import java.io.Serializable;
 import java.text.AttributedCharacterIterator;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ import javax.swing.JPanel;
  *
  * @author JPEXS
  */
-public class KERNINGRECORD {
+public class KERNINGRECORD implements Serializable {
 
     @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public int fontKerningCode1;

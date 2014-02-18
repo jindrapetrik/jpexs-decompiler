@@ -17,12 +17,13 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class GLYPHENTRY {
+public class GLYPHENTRY implements Serializable {
 
     @SWFType(value = BasicType.UB, countField = "+glyphBits")
     public int glyphIndex;

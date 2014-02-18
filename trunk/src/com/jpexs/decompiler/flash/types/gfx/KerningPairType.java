@@ -17,12 +17,13 @@
 package com.jpexs.decompiler.flash.types.gfx;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class KerningPairType {
+public class KerningPairType implements Serializable {
 
     public int char1;
     public int char2;

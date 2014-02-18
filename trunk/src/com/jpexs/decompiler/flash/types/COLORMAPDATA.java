@@ -16,10 +16,12 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.io.Serializable;
+
 /**
  * @author JPEXS
  */
-public class COLORMAPDATA {
+public class COLORMAPDATA implements Serializable {
 
     public RGB[] colorTableRGB;
     public byte[] colorMapPixelData;

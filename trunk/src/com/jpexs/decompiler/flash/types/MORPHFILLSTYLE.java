@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class MORPHFILLSTYLE implements NeedsCharacters {
+public class MORPHFILLSTYLE implements NeedsCharacters,Serializable {
 
     @SWFType(BasicType.UI8)
     public int fillStyleType;

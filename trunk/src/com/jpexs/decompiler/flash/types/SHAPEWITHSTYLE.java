@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +26,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters {
+public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializable {
 
     public FILLSTYLEARRAY fillStyles;
     public LINESTYLEARRAY lineStyles;

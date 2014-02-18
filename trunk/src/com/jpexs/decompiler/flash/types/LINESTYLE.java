@@ -20,12 +20,13 @@ import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class LINESTYLE {
+public class LINESTYLE implements Serializable {
 
     @SWFType(BasicType.UI16)
     public int width;

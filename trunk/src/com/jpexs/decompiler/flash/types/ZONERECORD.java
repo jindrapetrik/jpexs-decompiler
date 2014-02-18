@@ -16,12 +16,14 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.io.Serializable;
+
 /**
  * Represents 32-bit alpha, red, green and blue value
  *
  * @author JPEXS
  */
-public class ZONERECORD {
+public class ZONERECORD implements Serializable{
 
     public ZONEDATA[] zonedata = new ZONEDATA[0];
     public boolean zoneMaskX;

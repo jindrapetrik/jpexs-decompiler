@@ -17,12 +17,13 @@
 package com.jpexs.decompiler.flash.types.gfx;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class GLYPHIDX {
+public class GLYPHIDX  implements Serializable {
 
     public int indexInFont;
     public int indexInTexture;

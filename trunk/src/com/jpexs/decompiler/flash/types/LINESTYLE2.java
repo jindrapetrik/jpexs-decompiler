@@ -19,12 +19,13 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class LINESTYLE2 extends LINESTYLE {
+public class LINESTYLE2 extends LINESTYLE implements Serializable {
 
     @SWFType(value = BasicType.UB, count = 2)
     public int startCapStyle;

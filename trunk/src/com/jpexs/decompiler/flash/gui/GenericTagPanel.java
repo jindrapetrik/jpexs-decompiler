@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
@@ -31,10 +32,12 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.decompiler.flash.types.annotations.Optional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
 import com.jpexs.decompiler.flash.types.annotations.parser.ParseException;
+import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -76,6 +79,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
     private final JScrollPane genericTagPropertiesEditorPaneScrollPanel;
     private final JScrollPane genericTagPropertiesEditPanelScrollPanel;
     private Tag tag;
+    private Tag editedTag;
+
     private List<String> keys = new ArrayList<>();
     private Map<String, GenericTagEditor> editors = new HashMap<>();
     private Map<String, Component> labels = new HashMap<>();
@@ -104,11 +109,12 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
 
         genericTagPropertiesEditPanel = new JPanel();
         genericTagPropertiesEditPanel.setLayout(new SpringLayout());
-        genericTagPropertiesEditPanelScrollPanel = new JScrollPane(genericTagPropertiesEditPanel);
+        JPanel edPanel=new JPanel(new BorderLayout());
+        edPanel.add(genericTagPropertiesEditPanel,BorderLayout.NORTH);        
+        genericTagPropertiesEditPanelScrollPanel = new JScrollPane(edPanel);
     }
 
     public void clear() {
-        tag = null;
         editors.clear();
         fieldPaths.clear();
         fieldIndices.clear();
@@ -122,8 +128,16 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         genericTagPropertiesEditPanel.setSize(0, 0);
     }
 
-    public void setEditMode(boolean edit) {
-        if (edit) {
+    public void setEditMode(boolean edit, Tag tag) {
+        if(tag==null){
+            tag = this.tag;
+        }
+        
+        this.tag = tag;
+        this.editedTag = (Tag)Helper.deepCopy(tag);
+        generateEditControls(editedTag, !edit);
+        
+        if (edit){            
             remove(genericTagPropertiesEditorPaneScrollPanel);
             add(genericTagPropertiesEditPanelScrollPanel, BorderLayout.CENTER);
         } else {
@@ -131,11 +145,13 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             genericTagPropertiesEditPanel.setSize(0, 0);
             remove(genericTagPropertiesEditPanelScrollPanel);
             add(genericTagPropertiesEditorPaneScrollPanel, BorderLayout.CENTER);
+            setTagText(this.tag);
         }
+        revalidate();
         repaint();
     }
 
-    public void setTagText(Tag tag) {
+    private void setTagText(Tag tag) {
         clear();
         generateEditControls(tag, true);
         String val = "";
@@ -153,9 +169,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         hdr.setText(tag.toString());
     }
 
-    public void generateEditControls(Tag tag, boolean readonly) {
+    private void generateEditControls(Tag tag, boolean readonly) {
         clear();
-        this.tag = tag;
         generateEditControlsRecursive(tag, "", new ArrayList<Field>(), new ArrayList<Integer>(), readonly);
         change(null);
     }
@@ -166,6 +181,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 propCount, 3, //rows, cols
                 6, 6, //initX, initY
                 6, 6);       //xPad, yPad        
+        revalidate();
         repaint();
     }
 
@@ -223,7 +239,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 } else {
                     propCount += addEditor(name, obj, field, 0, field.getType(), value, parentFields, parentIndices, readonly);
                 }
-                if (ReflectionTools.needsIndex(field) && !readonly) {
+                if (ReflectionTools.needsIndex(field) && !readonly && !field.getName().equals("clipActionRecords")) { //No clip actions, sorry
                     JButton addButton = new JButton(View.getIcon("add16"));
                     addButton.addActionListener(new ActionListener() {
                         @Override
@@ -280,7 +296,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         }
         
         
-        generateEditControls(tag, false);
+        generateEditControls(editedTag, false);
 
         //Restore scroll top after some time. TODO: Handle this better. I don't know how :-(.
         new Thread() {
@@ -300,7 +316,9 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 });
             }
 
-        }.start();
+        }.start(); 
+        revalidate();
+        repaint();
     }
 
     private void addItem(Object obj, Field field) {
@@ -329,7 +347,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         } else {
             ReflectionTools.enlargeField(obj, field, true);
         }
-        generateEditControls(tag, false);
+        generateEditControls(editedTag, false);
 
         //Restore scroll top after some time. TODO: Handle this better. I don't know how :-(.
         new Thread() {
@@ -350,6 +368,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             }
 
         }.start();
+        revalidate();
+        repaint();        
     }
 
     private int addEditor(String name, Object obj, Field field, int index, Class<?> type, Object value, List<Field> parentList, List<Integer> parentIndices, boolean readonly) throws IllegalArgumentException, IllegalAccessException {
@@ -367,6 +387,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             return 0;
         }
         SWFType swfType = field.getAnnotation(SWFType.class);
+        Multiline multiline = field.getAnnotation(Multiline.class);
         Component editor;
         if (type.equals(int.class) || type.equals(Integer.class)
                 || type.equals(short.class) || type.equals(Short.class)
@@ -377,7 +398,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
             editor = new BooleanEditor(name, obj, field, index, type);
         } else if (type.equals(String.class)) {
-            editor = new StringEditor(name, obj, field, index, type);
+            editor = new StringEditor(name, obj, field, index, type,multiline!=null);
         } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)) {
             editor = new ColorEditor(name, obj, field, index, type);
         } else {
@@ -445,6 +466,28 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         }
         return result;
     }
+    
+    private void assignTag(Tag t,Tag assigned){
+        if(t.getClass()!=assigned.getClass()){
+            return;
+        }
+        for(Field f:t.getClass().getDeclaredFields()){
+            if((f.getModifiers()&Modifier.FINAL) == Modifier.FINAL){
+                continue;
+            }
+            if((f.getModifiers()&Modifier.STATIC) == Modifier.STATIC){
+                continue;
+            }
+            if(f.getName().equals("ID")){
+                continue;
+            }
+            try {
+                f.set(t, f.get(assigned));
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
     public void save() {
         for (Object component : genericTagPropertiesEditPanel.getComponents()) {
@@ -452,7 +495,10 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 ((GenericTagEditor) component).save();
             }
         }
+        SWF swf=tag.getSwf();
+        assignTag(tag, editedTag);
         tag.setModified(true);
+        tag.setSwf(swf);
         setTagText(tag);
     }
 
@@ -528,9 +574,9 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             if (addKeys.contains(key)) {
                 dependentEditor = addButtons.get(key);
             } else if (removeButtons.containsKey(key)) { //It's array/list, add remove button
-                JPanel editRemPanel = new JPanel(new FlowLayout());
-                editRemPanel.add((Component) editors.get(key));
-                editRemPanel.add(removeButtons.get(key));
+                JPanel editRemPanel = new JPanel(new BorderLayout());
+                editRemPanel.add((Component) editors.get(key),BorderLayout.CENTER);
+                editRemPanel.add(removeButtons.get(key),BorderLayout.EAST);
                 dependentEditor = editRemPanel;
             } else {
                 dependentEditor = (Component) editors.get(key);
@@ -544,9 +590,9 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 propCount++;
             }
         }
+        /*genericTagPropertiesEditPanel.add(new JPanel());
         genericTagPropertiesEditPanel.add(new JPanel());
-        genericTagPropertiesEditPanel.add(new JPanel());
-        genericTagPropertiesEditPanel.add(new JPanel());
-        relayout(propCount + 1);
+        genericTagPropertiesEditPanel.add(new JPanel());*/
+        relayout(propCount /*+ 1*/);
     }
 }

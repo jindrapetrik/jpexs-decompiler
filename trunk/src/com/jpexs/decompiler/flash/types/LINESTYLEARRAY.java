@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.io.Serializable;
+
 /**
  *
  * @author JPEXS
  */
-public class LINESTYLEARRAY {
+public class LINESTYLEARRAY implements Serializable {
 
     public LINESTYLE[] lineStyles = new LINESTYLE[0];
 }

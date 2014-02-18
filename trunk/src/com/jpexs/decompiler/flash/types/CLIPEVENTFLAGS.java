@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.Helper;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class CLIPEVENTFLAGS {
+public class CLIPEVENTFLAGS implements Serializable {
 
     /**
      * Key up event

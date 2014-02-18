@@ -17,13 +17,14 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  * Represents 15-bit red, green and blue value
  *
  * @author JPEXS
  */
-public class PIX15 {
+public class PIX15 implements Serializable {
 
     /**
      * Red color value

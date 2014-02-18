@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.helpers.Helper;
+import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
@@ -34,14 +35,26 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     private final int index;
     private final Class<?> type;
     private String fieldName;
+    private boolean multiline;
 
-    public StringEditor(String fieldName,Object obj, Field field, int index, Class<?> type) {
-        setLineWrap(true);
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return true;
+    }
+    
+    public StringEditor(String fieldName,Object obj, Field field, int index, Class<?> type, boolean multiline) {
+        setLineWrap(true);       
         this.obj = obj;
         this.field = field;
         this.index = index;
         this.type = type;     
         this.fieldName = fieldName;
+        this.multiline = multiline;
+        if(multiline){
+            Dimension d = new Dimension(500,200);
+            setPreferredSize(d);
+            setSize(d);
+        }
         try {
             setText((String) ReflectionTools.getValue(obj, field, index));
         } catch (IllegalArgumentException | IllegalAccessException ex) {

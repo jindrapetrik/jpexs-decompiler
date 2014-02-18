@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class FILLSTYLE implements NeedsCharacters {
+public class FILLSTYLE implements NeedsCharacters, Serializable {
 
     @SWFType(BasicType.UI8)
     public int fillStyleType;

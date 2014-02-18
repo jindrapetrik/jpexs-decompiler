@@ -17,12 +17,13 @@
 package com.jpexs.decompiler.flash.types.gfx;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class FONTINFO {
+public class FONTINFO implements Serializable {
 
     public int fontId;
     public GLYPHIDX glyphIndices[];

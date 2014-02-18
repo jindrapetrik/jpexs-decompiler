@@ -32,6 +32,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -42,7 +43,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem {
+public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, Serializable {
 
     public static String keyToString(int key) {
         if ((key < CLIPACTIONRECORD.KEYNAMES.length) && (key > 0) && (CLIPACTIONRECORD.KEYNAMES[key] != null)) {

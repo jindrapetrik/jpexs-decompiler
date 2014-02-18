@@ -17,13 +17,14 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  * Represents 32-bit alpha, red, green and blue value
  *
  * @author JPEXS
  */
-public class ZONEDATA {
+public class ZONEDATA implements Serializable{
 
     @SWFType(BasicType.FLOAT16)
     public int alignmentCoordinate;
