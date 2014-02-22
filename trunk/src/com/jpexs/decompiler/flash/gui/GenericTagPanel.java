@@ -40,17 +40,12 @@ import com.jpexs.decompiler.flash.types.annotations.parser.ParseException;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,7 +53,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -66,10 +60,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
 
 /**
- *
+ * Old Generic Tag editor
  * @author JPEXS
  */
 public class GenericTagPanel extends JPanel implements ChangeListener {
@@ -330,7 +323,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             for (int f = 0; f < fields.length; f++) {
                 SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
                 if (fieldSwfType != null && fieldSwfType.countField().equals(swfType.countField())) {
-                    ReflectionTools.enlargeField(obj, fields[f], true);
+                    ReflectionTools.addToField(obj, fields[f], ReflectionTools.getFieldSubSize(obj, fields[f]),true);
                 }
             }
             try {
@@ -345,7 +338,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 //ignored
             }
         } else {
-            ReflectionTools.enlargeField(obj, field, true);
+            ReflectionTools.addToField(obj, field,ReflectionTools.getFieldSubSize(obj, field), true);
         }
         generateEditControls(editedTag, false);
 
@@ -476,9 +469,6 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 continue;
             }
             if((f.getModifiers()&Modifier.STATIC) == Modifier.STATIC){
-                continue;
-            }
-            if(f.getName().equals("ID")){
                 continue;
             }
             try {

@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

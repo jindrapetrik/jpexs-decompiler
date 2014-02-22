@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,23 +29,24 @@ import java.io.OutputStream;
 
 public class SymbolClassTag extends Tag {
 
-    @SWFType(value=BasicType.UI16,countField = "numSymbols")
-    public int[] tagIDs;
-    @SWFType(countField = "numSymbols")
-    public String[] classNames;
+    @SWFType(value=BasicType.UI16)
+    @SWFArray(value="tag",countField = "numSymbols")
+    public int[] tags;
+    @SWFArray(value="name",countField = "numSymbols")
+    public String[] names;
     public static final int ID = 76;
 
     public SymbolClassTag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "SymbolClass", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         int numSymbols = sis.readUI16();
-        tagIDs = new int[numSymbols];
-        classNames = new String[numSymbols];
+        tags = new int[numSymbols];
+        names = new String[numSymbols];
         for (int ii = 0; ii < numSymbols; ii++) {
             int tagID = sis.readUI16();
             String className = sis.readString();
-            tagIDs[ii] = tagID;
-            classNames[ii] = className;
+            tags[ii] = tagID;
+            names[ii] = className;
         }
     }
 
@@ -60,11 +62,11 @@ public class SymbolClassTag extends Tag {
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
-            int numSymbols = tagIDs.length;
+            int numSymbols = tags.length;
             sos.writeUI16(numSymbols);
             for (int ii = 0; ii < numSymbols; ii++) {
-                sos.writeUI16(tagIDs[ii]);
-                sos.writeString(classNames[ii]);
+                sos.writeUI16(tags[ii]);
+                sos.writeString(names[ii]);
             }
         } catch (IOException e) {
         }

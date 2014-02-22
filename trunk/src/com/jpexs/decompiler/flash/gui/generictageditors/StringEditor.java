@@ -17,12 +17,12 @@
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.helpers.Helper;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import javax.swing.JTextArea;
-import jsyntaxpane.util.StringUtils;
 
 /**
  *
@@ -41,6 +41,25 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     public boolean getScrollableTracksViewportWidth() {
         return true;
     }
+
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension ret= super.getPreferredSize();
+        ret.width = 300;        
+        return ret;
+    }
+    
+    
+    @Override
+    public BaselineResizeBehavior getBaselineResizeBehavior() {
+        return Component.BaselineResizeBehavior.CONSTANT_ASCENT;
+    }
+
+    @Override
+    public int getBaseline(int width, int height) {
+        return 0;
+    }
+    
     
     public StringEditor(String fieldName,Object obj, Field field, int index, Class<?> type, boolean multiline) {
         setLineWrap(true);       

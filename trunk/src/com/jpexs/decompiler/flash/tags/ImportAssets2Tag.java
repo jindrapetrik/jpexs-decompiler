@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -49,9 +50,10 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
     /**
      * HashMap with assets
      */
-    @SWFType(value=BasicType.UI16,countField = "count")
-    public List<Integer> characterIds;
-    @SWFType(countField = "count")
+    @SWFType(value=BasicType.UI16)
+    @SWFArray(value="tag",countField = "count")
+    public List<Integer> tags;
+    @SWFArray(value="name",countField = "count")
     public List<String> names;
     public static final int ID = 71;
 
@@ -66,7 +68,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
      */
     public ImportAssets2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
         super(swf, ID, "ImportAssets2", data, pos);
-        characterIds = new ArrayList<>();
+        tags = new ArrayList<>();
         names = new ArrayList<>();
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         url = sis.readString();
@@ -76,7 +78,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
         for (int i = 0; i < count; i++) {
             int charId = sis.readUI16();
             String tagName = sis.readString();
-            characterIds.add(charId);
+            tags.add(charId);
             names.add(tagName);
         }
     }
@@ -96,9 +98,9 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
             sos.writeString(url);
             sos.writeUI8(reserved1);
             sos.writeUI8(reserved2);
-            sos.writeUI16(characterIds.size());
-            for (int i=0;i<characterIds.size();i++) {
-                sos.writeUI16(characterIds.get(i));
+            sos.writeUI16(tags.size());
+            for (int i=0;i<tags.size();i++) {
+                sos.writeUI16(tags.get(i));
                 sos.writeString(names.get(i));
             }
         } catch (IOException e) {
@@ -109,8 +111,8 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
     @Override
     public Map<Integer, String> getAssets() {
         Map<Integer, String> assets = new HashMap<>();
-        for (int i = 0; i < characterIds.size(); i++) {
-            assets.put(characterIds.get(i), names.get(i));
+        for (int i = 0; i < tags.size(); i++) {
+            assets.put(tags.get(i), names.get(i));
         }
         return assets;
     }

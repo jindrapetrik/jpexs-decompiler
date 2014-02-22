@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ZONERECORD;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,6 +40,7 @@ public class DefineFontAlignZonesTag extends Tag {
     @Reserved
     @SWFType(value = BasicType.UB, count = 6)
     public int reserved;
+    @SWFArray(value="zone",countField = "glyphCount")
     public List<ZONERECORD> zoneTable;
     public static final int ID = 73;
 

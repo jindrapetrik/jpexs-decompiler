@@ -510,9 +510,9 @@ public final class SWF implements TreeItem {
         for (Tag t : tags) {
             if (t instanceof SymbolClassTag) {
                 SymbolClassTag sct = (SymbolClassTag) t;
-                for (int i = 0; i < sct.tagIDs.length; i++) {
-                    if ((!classes.containsKey(sct.tagIDs[i])) && (!classes.containsValue(sct.classNames[i]))) {
-                        classes.put(sct.tagIDs[i], sct.classNames[i]);
+                for (int i = 0; i < sct.tags.length; i++) {
+                    if ((!classes.containsKey(sct.tags[i])) && (!classes.containsValue(sct.names[i]))) {
+                        classes.put(sct.tags[i], sct.names[i]);
                     }
                 }
             }
@@ -1793,10 +1793,10 @@ public final class SWF implements TreeItem {
         for (Tag tag : tags) {
             if (tag instanceof SymbolClassTag) {
                 SymbolClassTag sc = (SymbolClassTag) tag;
-                for (int i = 0; i < sc.classNames.length; i++) {
-                    String newname = deobfuscation.deobfuscateNameWithPackage(sc.classNames[i], deobfuscated, renameType, deobfuscated);
+                for (int i = 0; i < sc.names.length; i++) {
+                    String newname = deobfuscation.deobfuscateNameWithPackage(sc.names[i], deobfuscated, renameType, deobfuscated);
                     if (newname != null) {
-                        sc.classNames[i] = newname;
+                        sc.names[i] = newname;
                     }
                 }
             }

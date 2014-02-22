@@ -30,6 +30,9 @@ import java.util.logging.Logger;
 public class ReflectionTools {
 
     public static Object getValue(Object obj, Field field, int index) throws IllegalArgumentException, IllegalAccessException {
+        if(getFieldSubSize(obj, field)<=index){
+            return null;
+        }
         Object value = field.get(obj);
         if (List.class.isAssignableFrom(field.getType())) {
             return ((List) value).get(index);
@@ -50,10 +53,29 @@ public class ReflectionTools {
         }
         return false;
     }
+    
+    @SuppressWarnings("unchecked")
+    public static int getFieldSubSize(Object obj,Field field){
+        Object val;
+        try {
+            val = field.get(obj);
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            return 0;
+        }
+        if (List.class.isAssignableFrom(field.getType())) {
+            return ((List)val).size();
+        } else if (field.getType().isArray()) {
+            return Array.getLength(val);
+        }
+        return 0;
+    }
 
     @SuppressWarnings("unchecked")
     public static void setValue(Object obj, Field field, int index, Object newValue) throws IllegalArgumentException, IllegalAccessException {
         Object value = field.get(obj);
+        if(needsIndex(field)&& index>=getFieldSubSize(obj, field)){ //outofbounds, ignore
+            return;
+        }
         if (List.class.isAssignableFrom(field.getType())) {
             ((List) value).set(index, newValue);
         } else if (field.getType().isArray()) {
@@ -77,7 +99,7 @@ public class ReflectionTools {
     }
 
     @SuppressWarnings("unchecked")
-    public static boolean enlargeList(Object object, Field field) {
+    public static boolean addToList(Object object, Field field, int index) {
         if (!List.class.isAssignableFrom(field.getType())) {
             return false;
         }
@@ -92,7 +114,7 @@ public class ReflectionTools {
         Class<?> parameterClass = (Class<?>) listType.getActualTypeArguments()[0];
         try {
             Object val = newInstanceOf(parameterClass);
-            list.add(val);
+            list.add(index,val);
         } catch (InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
             return false;
@@ -100,7 +122,24 @@ public class ReflectionTools {
         return true;
     }
 
-    public static boolean enlargeArray(Object object, Field field, boolean notnull) {
+    public static Class<?> getFieldSubType(Object object,Field field){
+        if(field.getType().isArray()){
+            Object arrValue;
+            try {
+                arrValue = field.get(object);
+                return arrValue.getClass().getComponentType();
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                return null;
+            }                
+        }
+        if(List.class.isAssignableFrom(field.getType())) {            
+            ParameterizedType listType = (ParameterizedType) field.getGenericType();
+            return (Class<?>) listType.getActualTypeArguments()[0];            
+        }
+        return null;
+    }
+    
+    public static boolean addToArray(Object object, Field field, int index, boolean notnull) {
         if (!field.getType().isArray()) {
             return false;
         }
@@ -114,16 +153,21 @@ public class ReflectionTools {
         Class componentClass = arrValue.getClass().getComponentType();
         int originalSize = Array.getLength(arrValue);
         Object copy = Array.newInstance(componentClass, originalSize + 1);
-        for (int i = 0; i < originalSize; i++) {
+        //Copy items before
+        for (int i = 0; i < index; i++) {
             Array.set(copy, i, Array.get(arrValue, i));
         }
-        if (!componentClass.isPrimitive() && notnull) {
+        if (!componentClass.isPrimitive()) {
             try {
-                Array.set(copy, originalSize, componentClass.newInstance());
+                Array.set(copy, index, componentClass.newInstance());
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
+        }
+        //Copy items after
+        for (int i = index; i < originalSize ; i++) {
+            Array.set(copy, i+1, Array.get(arrValue, i));
         }
         try {
             field.set(object, copy);
@@ -134,13 +178,13 @@ public class ReflectionTools {
         return true;
     }
 
-    public static boolean enlargeField(Object object, Field field, boolean notnull) {
+    public static boolean addToField(Object object, Field field, int index,boolean notnull) {
         if (List.class.isAssignableFrom(field.getType())) {
-            return enlargeList(object, field);
+            return addToList(object, field,index);
         }
 
         if (field.getType().isArray()) {
-            return enlargeArray(object, field, notnull);
+            return addToArray(object, field, index,notnull);
         }
         return false;
     }

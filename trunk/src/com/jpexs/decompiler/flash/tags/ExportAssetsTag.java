@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,9 +39,11 @@ public class ExportAssetsTag extends Tag {
     /**
      * HashMap with assets
      */
-    @SWFType(value = BasicType.UI16,countField = "count")
+    @SWFType(value = BasicType.UI16)
+    @SWFArray(value="tag",countField = "count")
     public List<Integer> tags;
-    @SWFType(countField = "count")
+    
+    @SWFArray(value="name",countField = "count")
     public List<String> names;
     public static final int ID = 56;
 

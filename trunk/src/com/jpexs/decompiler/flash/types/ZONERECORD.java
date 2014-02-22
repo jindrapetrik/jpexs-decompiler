@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import java.io.Serializable;
 
 /**
@@ -25,6 +26,7 @@ import java.io.Serializable;
  */
 public class ZONERECORD implements Serializable{
 
+    @SWFArray(value="zone",countField = "numZoneData")
     public ZONEDATA[] zonedata = new ZONEDATA[0];
     public boolean zoneMaskX;
     public boolean zoneMaskY;

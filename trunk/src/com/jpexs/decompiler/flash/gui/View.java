@@ -30,6 +30,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -43,6 +44,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
@@ -50,6 +52,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.basic.BasicColorChooserUI;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.SubstanceColorScheme;
@@ -351,5 +355,66 @@ public class View {
 
     public static SubstanceColorScheme getColorScheme() {
         return SubstanceColorSchemeUtilities.getActiveColorScheme(new JButton(), ComponentState.ENABLED);
+    }
+    
+     public static void refreshTree(JTree tree,TreeModel model) {
+        List<List<String>> expandedNodes = getExpandedNodes(tree);
+        tree.setModel(model);
+        expandTreeNodes(tree, expandedNodes);
+    }
+
+    
+
+    private static List<List<String>> getExpandedNodes(JTree tree) {
+        List<List<String>> expandedNodes = new ArrayList<>();
+        int rowCount = tree.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            TreePath path = tree.getPathForRow(i);
+            if (tree.isExpanded(path)) {
+                List<String> pathAsStringList = new ArrayList<>();
+                for (Object pathCompnent : path.getPath()) {
+                    pathAsStringList.add(pathCompnent.toString());
+                }
+                expandedNodes.add(pathAsStringList);
+            }
+        }
+        return expandedNodes;
+    }
+
+    private static void expandTreeNodes(JTree tree, List<List<String>> pathsToExpand) {
+        for (List<String> pathAsStringList : pathsToExpand) {
+            expandTreeNode(tree, pathAsStringList);
+        }
+    }
+
+    private static void expandTreeNode(JTree tree, List<String> pathAsStringList) {
+        TreeModel model = tree.getModel();
+        Object node = model.getRoot();
+
+        if (pathAsStringList.isEmpty()) {
+            return;
+        }
+        if (!pathAsStringList.get(0).equals(node.toString())) {
+            return;
+        }
+
+        List<Object> path = new ArrayList<>();
+        path.add(node);
+
+        for (int i = 1; i < pathAsStringList.size(); i++) {
+            String name = pathAsStringList.get(i);
+            int childCount = model.getChildCount(node);
+            for (int j = 0; j < childCount; j++) {
+                Object child = model.getChild(node, j);
+                if (child.toString().equals(name)) {
+                    node = child;
+                    path.add(node);
+                    break;
+                }
+            }
+        }
+
+        TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
+        tree.expandPath(tp);
     }
 }

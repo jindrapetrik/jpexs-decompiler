@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,11 +35,14 @@ public class FileAttributesTag extends Tag {
     public boolean actionScript3;
     public boolean useNetwork;
     public boolean noCrossDomainCache;
-    private boolean reserved1;
-    private boolean reserved2;
+    @Reserved
+    public boolean reserved1;
+    @Reserved
+    public boolean reserved2;
 
     @SWFType(value = BasicType.UB, count = 24)
-    private int reserved3;
+    @Reserved
+    public int reserved3;
     public static final int ID = 69;
 
     public FileAttributesTag() {

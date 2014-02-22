@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.gui.timeline.TimelineFrame;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.ApplicationInfo;
@@ -39,6 +38,7 @@ import com.jpexs.decompiler.flash.gui.abc.treenodes.TreeElement;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
+import com.jpexs.decompiler.flash.gui.timeline.TimelineFrame;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFBundleNode;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.helpers.Freed;
@@ -503,7 +503,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private JPanel createGenericTagCard() {
         JPanel genericTagCard = new JPanel(new BorderLayout());
-        genericTagPanel = new GenericTagPanel();
+        genericTagPanel = new GenericTagTreePanel();
         genericTagCard.add(genericTagPanel, BorderLayout.CENTER);
 
         genericEditButton = new JButton(translate("button.edit"), View.getIcon("edit16"));
@@ -1520,9 +1520,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         for (Tag t : swf.tags) {
             if (t instanceof SymbolClassTag) {
                 SymbolClassTag sc = (SymbolClassTag) t;
-                for (int i = 0; i < sc.tagIDs.length; i++) {
-                    if (sc.tagIDs[i] == 0) {
-                        documentClass = sc.classNames[i];
+                for (int i = 0; i < sc.tags.length; i++) {
+                    if (sc.tags[i] == 0) {
+                        documentClass = sc.names[i];
                         break loopdc;
                     }
                 }
@@ -2010,6 +2010,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         showCard(CARDEMPTYPANEL);
         refreshTree();
+    }
+    
+    public void refreshTree(){
+        View.refreshTree(tagTree, new TagTreeModel(mainFrame, swfs));
+        expandSwfNodes();
     }
 
     public void refreshDecompiled() {
@@ -2879,16 +2884,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         showDetailWithPreview(CARDFONTPANEL);
     }
 
-    public void refreshTree() {
-        List<List<String>> expandedNodes = getExpandedNodes(tagTree);
-
-        tagTree.setModel(new TagTreeModel(mainFrame, swfs));
-
-        expandSwfNodes();
-        expandTreeNodes(tagTree, expandedNodes);
-    }
-
-    public void expandSwfNodes() {
+   public void expandSwfNodes() {
         TreeModel model = tagTree.getModel();
         Object node = model.getRoot();
         int childCount = model.getChildCount(node);
@@ -2896,59 +2892,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             Object child = model.getChild(node, j);
             tagTree.expandPath(new TreePath(new Object[]{node, child}));
         }
-    }
-
-    private List<List<String>> getExpandedNodes(JTree tree) {
-        List<List<String>> expandedNodes = new ArrayList<>();
-        int rowCount = tree.getRowCount();
-        for (int i = 0; i < rowCount; i++) {
-            TreePath path = tree.getPathForRow(i);
-            if (tree.isExpanded(path)) {
-                List<String> pathAsStringList = new ArrayList<>();
-                for (Object pathCompnent : path.getPath()) {
-                    pathAsStringList.add(pathCompnent.toString());
-                }
-                expandedNodes.add(pathAsStringList);
-            }
-        }
-        return expandedNodes;
-    }
-
-    private void expandTreeNodes(JTree tree, List<List<String>> pathsToExpand) {
-        for (List<String> pathAsStringList : pathsToExpand) {
-            expandTreeNode(tree, pathAsStringList);
-        }
-    }
-
-    private void expandTreeNode(JTree tree, List<String> pathAsStringList) {
-        TreeModel model = tree.getModel();
-        Object node = model.getRoot();
-
-        if (pathAsStringList.isEmpty()) {
-            return;
-        }
-        if (!pathAsStringList.get(0).equals(node.toString())) {
-            return;
-        }
-
-        List<Object> path = new ArrayList<>();
-        path.add(node);
-
-        for (int i = 1; i < pathAsStringList.size(); i++) {
-            String name = pathAsStringList.get(i);
-            int childCount = model.getChildCount(node);
-            for (int j = 0; j < childCount; j++) {
-                Object child = model.getChild(node, j);
-                if (child.toString().equals(name)) {
-                    node = child;
-                    path.add(node);
-                    break;
-                }
-            }
-        }
-
-        TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
-        tree.expandPath(tp);
     }
 
     public void setEditText(boolean edit) {

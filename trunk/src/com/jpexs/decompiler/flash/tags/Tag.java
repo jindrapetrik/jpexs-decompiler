@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,11 +56,16 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
      * If true, then Tag is written to the stream as longer than 0x3f even if it
      * is not
      */
+    @Internal
     public boolean forceWriteAsLong = false;
+    @Internal
     private final long pos;
     protected String name;
+    @Internal
     public Tag previousTag;    
+    @Internal
     protected transient SWF swf;
+    @Internal
     private boolean modified;
 
     public String getName() {

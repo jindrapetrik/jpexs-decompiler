@@ -2118,9 +2118,9 @@ public class XFLConverter {
         for (Tag t : tags) {
             if (t instanceof SymbolClassTag) {
                 SymbolClassTag sc = (SymbolClassTag) t;
-                for (int i = 0; i < sc.tagIDs.length; i++) {
-                    if (!ret.containsKey(sc.tagIDs[i]) && !ret.containsValue(sc.classNames[i])) {
-                        ret.put(sc.tagIDs[i], sc.classNames[i]);
+                for (int i = 0; i < sc.tags.length; i++) {
+                    if (!ret.containsKey(sc.tags[i]) && !ret.containsValue(sc.names[i])) {
+                        ret.put(sc.tags[i], sc.names[i]);
                     }
                 }
             }

@@ -18,12 +18,15 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.awt.Component;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
+import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.text.DefaultFormatter;
 
 /**
  *
@@ -38,6 +41,18 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     private final SWFType swfType;
     private String fieldName;
 
+    @Override
+    public BaselineResizeBehavior getBaselineResizeBehavior() {
+        return Component.BaselineResizeBehavior.CONSTANT_ASCENT;
+    }
+
+    @Override
+    public int getBaseline(int width, int height) {
+        return 0;
+    }
+    
+    
+
     public NumberEditor(String fieldName,Object obj, Field field, int index, Class<?> type, SWFType swfType) {
         setSize(100, getSize().height);
         setMaximumSize(getSize());
@@ -49,7 +64,10 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
         this.fieldName = fieldName;
         try {
             Object value = ReflectionTools.getValue(obj, field, index);
-            setModel(getModel(swfType, value));
+            setModel(getModel(swfType, value));            
+            JFormattedTextField jtf = ((JSpinner.NumberEditor)getEditor()).getTextField();
+            DefaultFormatter formatter = (DefaultFormatter) jtf.getFormatter();
+            formatter.setCommitsOnValidEdit(true);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -169,7 +187,7 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     }
 
     @Override
-    public Object getChangedValue() {
+    public Object getChangedValue() {   
         Object value = null;
         if (type.equals(int.class) || type.equals(Integer.class)) {
             value = Integer.parseInt(getValue().toString());
