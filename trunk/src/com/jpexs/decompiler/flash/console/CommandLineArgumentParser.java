@@ -107,15 +107,15 @@ public class CommandLineArgumentParser {
         System.out.println("java -jar ffdec.jar myfile.swf");
         System.out.println("java -jar ffdec.jar -proxy");
         System.out.println("java -jar ffdec.jar -proxy -P1234");
-        System.out.println("java -jar ffdec.jar -export as \"C:\\decompiled\\\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -export as \"C:\\decompiled\\\" myfile.swf -selectas3class com.example.MyClass com.example.SecondClass");
-        System.out.println("java -jar ffdec.jar -export pcode \"C:\\decompiled\\\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -export as \"C:\\decompiled\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -export as \"C:\\decompiled\" myfile.swf -selectas3class com.example.MyClass com.example.SecondClass");
+        System.out.println("java -jar ffdec.jar -export pcode \"C:\\decompiled\" myfile.swf");
         System.out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
         System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
         System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
-        System.out.println("java -jar ffdec.jar -onerror ignore -export as \"C:\\decompiled\\\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -onerror retry 5 -export as \"C:\\decompiled\\\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export as \"C:\\decompiled\\\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -onerror ignore -export as \"C:\\decompiled\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -onerror retry 5 -export as \"C:\\decompiled\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export as \"C:\\decompiled\" myfile.swf");
         System.out.println("");
         System.out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
     }
