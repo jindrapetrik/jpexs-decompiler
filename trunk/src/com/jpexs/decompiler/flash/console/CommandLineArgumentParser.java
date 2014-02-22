@@ -39,8 +39,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,26 +70,59 @@ public class CommandLineArgumentParser {
         return commandLineMode;
     }
 
+    //(as|pcode|pcodehex|hex|image|shape|movie|sound|binaryData|text|textplain|all|all_as|all_pcode|all_pcodehex|all_hex)
     public static void printCmdLineUsage() {
         System.out.println("Commandline arguments:");
         System.out.println(" 1) -help | --help | /?");
         System.out.println(" ...shows commandline arguments (this help)");
-        System.out.println(" 2) infile");
+        System.out.println(" 2) <infile>");
         System.out.println(" ...opens SWF file with the decompiler GUI");
-        System.out.println(" 3) -proxy (-PXXX)");
+        System.out.println(" 3) -proxy [-P<port>]");
         System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
-        System.out.println(" 4) -export (as|pcode|pcodehex|hex|image|shape|movie|sound|binaryData|text|textplain|all|all_as|all_pcode|all_pcodehex|all_hex) outdirectory infile [-selectas3class class1 class2 ...]");
-        System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images, shapes, movies, binaryData, text with formatting, plain text or all.");
-        System.out.println("     When \"as\" or \"pcode\" type specified, optional \"-selectas3class\" parameter can be passed to export only selected classes (ActionScript 3 only)");
-        System.out.println(" 5) -dumpSWF infile");
+        System.out.println(" 4) -export <itemtypes> <outdirectory> <infile> [-selectas3class <class1> <class2> ...]");
+        System.out.println("  ...export <infile> sources to <outdirectory> ");
+        System.out.println("     Values for <itemtypes> parameter:");
+        System.out.println("        script - Scripts (Default format: ActionScript source)");
+        System.out.println("               - For this type, optional \"-selectas3class\" parameter can be passed to export only selected classes (ActionScript 3 only)");
+        System.out.println("        image - Images (Default format: PNG/JPEG)");
+        System.out.println("        shape - Shapes (Default format: SVG)");
+        System.out.println("        movie - Movies (Default format: FLV without sound)");
+        System.out.println("        sound - Sounds (Default format: MP3/WAV/FLV only sound)");
+        System.out.println("        binaryData - Binary data (Default format:  Raw data)");
+        System.out.println("        text - Texts (Default format: Formatted text)");
+        System.out.println("        all - Every resource");
+        System.out.println("        fla - Everything to FLA compressed format");
+        System.out.println("        xfl - Everything to uncompressed FLA format (XFL)");
+        System.out.println("   You can export multiple types of items by using colon \",\"");
+        System.out.println("      DO NOT PUT space between comma (,) and next value.");
+        System.out.println();
+        System.out.println("   Old DEPRECATED aliases include: (please use basic itemtypes and -format parameter instead)");
+        System.out.println("        as, pcode, pcodehex, hex, all_as, all_pcode, all_pcodehex, textplain");
+        System.out.println();
+        System.out.println(" 5) -format <formats>");
+        System.out.println("  ...sets output formats for export");
+        System.out.println("    Values for <formats> parameter:");
+        System.out.println("         script:as - ActionScript source");
+        System.out.println("         script:pcode - ActionScript P-code");
+        System.out.println("         script:pcodehex - ActionScript P-code with hex");
+        System.out.println("         script:hex - ActionScript Hex only");
+        System.out.println("         text:plain - Plain text format for Texts");
+        System.out.println("         text:formatted - Formatted text format for Texts");
+        System.out.println("         fla:<flaversion> or xfl:<flaversion> - Specify FLA format version");
+        System.out.println("            - values for <flaversion>: cs5,cs5.5,cs6,cc");
+
+        System.out.println("      You can set multiple formats at once using comma (,)");
+        System.out.println("      DO NOT PUT space between comma (,) and next value.");
+        System.out.println("      The prefix with colon (:) is neccessary.");
+        System.out.println(" 6) -dumpSWF <infile>");
         System.out.println("  ...dumps list of SWF tags to console");
-        System.out.println(" 6) -compress infile outfile");
-        System.out.println("  ...Compress SWF infile and save it to outfile");
-        System.out.println(" 7) -decompress infile outfile");
-        System.out.println("  ...Decompress infile and save it to outfile");
-        System.out.println(" 8) -renameInvalidIdentifiers (typeNumber|randomWord) infile outfile");
-        System.out.println("  ...Renames the invalid identifiers in infile and save it to outfile");
-        System.out.println(" 9) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
+        System.out.println(" 7) -compress <infile> <outfile>");
+        System.out.println("  ...Compress SWF <infile> and save it to <outfile>");
+        System.out.println(" 8) -decompress <infile> <outfile>");
+        System.out.println("  ...Decompress <infile> and save it to <outfile>");
+        System.out.println(" 9) -renameInvalidIdentifiers (typeNumber|randomWord) <infile> <outfil>e");
+        System.out.println("  ...Renames the invalid identifiers in <infile> and save it to <outfile>");
+        System.out.println(" 10) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
         System.out.print("  ...Sets configuration values. Available keys[current setting]:");
         for (ConfigurationItem item : commandlineConfigBoolean) {
             System.out.print(" " + item + "[" + item.get() + "]");
@@ -94,28 +131,30 @@ public class CommandLineArgumentParser {
         System.out.println("    Values are boolean, you can use 0/1, true/false, on/off or yes/no.");
         System.out.println("    If no other parameters passed, configuration is saved. Otherwise it is used only once.");
         System.out.println("    DO NOT PUT space between comma (,) and next value.");
-        System.out.println(" 10) -onerror (abort|retryN|ignore)");
+        System.out.println(" 11) -onerror (abort|retryN|ignore)");
         System.out.println("  ...error handling mode. \"abort\" stops the exporting, \"retry\" tries the exporting N times, \"ignore\" ignores the current file");
-        System.out.println(" 11) -timeout N");
+        System.out.println(" 12) -timeout <N>");
         System.out.println("  ...decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds");
-        System.out.println(" 12) -exportTimeout N");
+        System.out.println(" 13) -exportTimeout <N>");
         System.out.println("  ...total export timeout in seconds");
-        System.out.println(" 13) -exportFileTimeout N");
+        System.out.println(" 14) -exportFileTimeout <N>");
         System.out.println("  ...export timeout for a single AS3 class in seconds");
         System.out.println();
         System.out.println("Examples:");
         System.out.println("java -jar ffdec.jar myfile.swf");
         System.out.println("java -jar ffdec.jar -proxy");
         System.out.println("java -jar ffdec.jar -proxy -P1234");
-        System.out.println("java -jar ffdec.jar -export as \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -export as \"C:\\decompiled\" myfile.swf -selectas3class com.example.MyClass com.example.SecondClass");
-        System.out.println("java -jar ffdec.jar -export pcode \"C:\\decompiled\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -export script \"C:\\decompiled\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -export script \"C:\\decompiled\" myfile.swf -selectas3class com.example.MyClass com.example.SecondClass");
+        System.out.println("java -jar ffdec.jar -format script:pcode -export script \"C:\\decompiled\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -format script:pcode,text:plain -export script,text,image \"C:\\decompiled\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\" myfile.swf");
         System.out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
         System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
         System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
-        System.out.println("java -jar ffdec.jar -onerror ignore -export as \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -onerror retry 5 -export as \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export as \"C:\\decompiled\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -onerror ignore -export script \"C:\\decompiled\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -onerror retry 5 -export script \"C:\\decompiled\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export script \"C:\\decompiled\" myfile.swf");
         System.out.println("");
         System.out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
     }
@@ -131,7 +170,7 @@ public class CommandLineArgumentParser {
         Level traceLevel = Level.WARNING;
         Queue<String> args = new LinkedList<>(Arrays.asList(arguments));
         AbortRetryIgnoreHandler handler = null;
-        String format = null;
+        Map<String, String> format = new HashMap<>();
 
         String nextParam;
         OUTER:
@@ -141,6 +180,9 @@ public class CommandLineArgumentParser {
                 nextParam = nextParam.toLowerCase();
             }
             switch (nextParam) {
+                case "-format":
+                    format = parseFormat(args);
+                    break;
                 case "-config":
                     parseConfig(args);
                     if (args.isEmpty()) {
@@ -188,8 +230,6 @@ public class CommandLineArgumentParser {
             System.exit(0);
         } else if (nextParam.equals("-proxy")) {
             parseProxy(args);
-        } else if (nextParam.equals("-format")) {
-            format = parseFormat(args);
         } else if (nextParam.equals("-export")) {
             parseExport(args, handler, traceLevel, format);
         } else if (nextParam.equals("-compress")) {
@@ -438,44 +478,70 @@ public class CommandLineArgumentParser {
         Main.startProxy(port);
     }
 
-    private static void parseExport(Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, String format) {
+    private static List<String> parseSelectClasses(Queue<String> args) {
+        List<String> ret = new ArrayList<>();
+        if (!args.isEmpty() && args.peek().equals("-selectas3class")) {
+            args.remove();
+            while (!args.isEmpty()) {
+                ret.add(args.remove());
+
+            }
+        }
+        return ret;
+
+    }
+
+    private static void parseExport(Queue<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats) {
         if (args.size() < 3) {
             badArguments();
         }
-        String[] validExportFormats = new String[]{
-            "as",
-            "pcode",
+        String[] validExportItems = new String[]{
+            "script",
             "image",
             "shape",
             "movie",
             "sound",
             "binarydata",
             "text",
-            "textplain",
             "all",
             "fla",
             "xfl"
         };
 
+        String[] deprecatedExportFormats = new String[]{
+            "as",
+            "pcode",
+            "all_as",
+            "all_pcode",
+            "all_pcodehex",
+            "all_hex",
+            "textplain"
+        };
+
         if (handler == null) {
             handler = new ConsoleAbortRetryIgnoreHandler(AbortRetryIgnoreHandler.UNDEFINED, 0);
         }
-        String exportFormat = args.remove().toLowerCase();
-        if (!Arrays.asList(validExportFormats).contains(exportFormat)) {
-            System.err.println("Invalid export format:" + exportFormat);
-            badArguments();
+        String exportFormatString = args.remove().toLowerCase();
+        String exportFormats[];
+        if (exportFormatString.contains(",")) {
+            exportFormats = exportFormatString.split(",");
+        } else {
+            exportFormats = new String[]{exportFormatString};
         }
+        long startTime = System.currentTimeMillis();
+
         File outDir = new File(args.remove());
         File inFile = new File(args.remove());
         if (!inFile.exists()) {
             System.err.println("Input SWF file does not exist!");
             badArguments();
         }
-        commandLineMode = true;
-        long startTime = System.currentTimeMillis();
-        boolean exportOK;
+        printHeader();
+        boolean exportOK = true;
+
+        List<String> as3classes = new ArrayList<>();
+
         try {
-            printHeader();
             SWF exfile = new SWF(new FileInputStream(inFile), Configuration.parallelSpeedUp.get());
             final Level level = traceLevel;
             exfile.addEventListener(new EventListener() {
@@ -490,99 +556,125 @@ public class CommandLineArgumentParser {
                 }
             });
 
-            switch (exportFormat) {
-                case "all":
-                case "all_as":
-                case "all_pcode":
-                case "all_pcodehex":
-                case "all_hex":
-                    ExportMode allExportMode = strToExportFormat(exportFormat.substring(3));
-                    System.out.println("Exporting images...");
-                    exfile.exportImages(handler, outDir.getAbsolutePath() + File.separator + "images");
-                    System.out.println("Exporting shapes...");
-                    exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes");
-                    System.out.println("Exporting scripts...");
-                    exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", allExportMode, Configuration.parallelSpeedUp.get());
-                    System.out.println("Exporting movies...");
-                    exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies");
-                    System.out.println("Exporting sounds...");
-                    exfile.exportSounds(handler, outDir.getAbsolutePath() + File.separator + "sounds", true, true);
-                    System.out.println("Exporting binaryData...");
-                    exfile.exportBinaryData(handler, outDir.getAbsolutePath() + File.separator + "binaryData");
-                    System.out.println("Exporting texts...");
-                    exfile.exportTexts(handler, outDir.getAbsolutePath() + File.separator + "texts", true);
-                    exportOK = true;
-                    break;
-                case "image":
-                    exfile.exportImages(handler, outDir.getAbsolutePath());
-                    exportOK = true;
-                    break;
-                case "shape":
-                    exfile.exportShapes(handler, outDir.getAbsolutePath());
-                    exportOK = true;
-                    break;
-                case "as":
-                case "pcode":
-                case "pcodehex":
-                case "hex":
-                    ExportMode exportMode = strToExportFormat(exportFormat);
-                    boolean parallel = Configuration.parallelSpeedUp.get();
-                    if (!args.isEmpty() && args.peek().equals("-selectas3class")) {
-                        args.remove();
-                        exportOK = true;
-                        while (!args.isEmpty()) {
-                            exportOK = exportOK && exfile.exportAS3Class(args.remove(), outDir.getAbsolutePath(), exportMode, parallel);
+            for (String exportFormat : exportFormats) {
+                if (!Arrays.asList(validExportItems).contains(exportFormat) && !Arrays.asList(deprecatedExportFormats).contains(exportFormat)) {
+                    System.err.println("Invalid export item:" + exportFormat);
+                    badArguments();
+                }
+                if (Arrays.asList(deprecatedExportFormats).contains(exportFormat)) {
+                    System.err.println("Warning: Using DEPRECATED export item: " + exportFormat + ". Run application with --help parameter to see available formats.");
+                }
+
+                commandLineMode = true;
+
+                switch (exportFormat) {
+                    case "all":
+                    case "all_as":
+                    case "all_pcode":
+                    case "all_pcodehex":
+                    case "all_hex":
+                        ExportMode allExportMode = ExportMode.SOURCE;
+                        if (!exportFormat.equals("all")) {
+                            allExportMode = strToExportFormat(exportFormat.substring("all_".length() - 1));
+                        } else if (formats.containsKey("script")) {
+                            allExportMode = strToExportFormat(formats.get("script"));
                         }
-                    } else {
-                        exportOK = exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportMode, parallel) != null;
-                    }
-                    break;
-                case "movie":
-                    exfile.exportMovies(handler, outDir.getAbsolutePath());
-                    exportOK = true;
-                    break;
-                case "sound":
-                    exfile.exportSounds(handler, outDir.getAbsolutePath(), true, true);
-                    exportOK = true;
-                    break;
-                case "binarydata":
-                    exfile.exportBinaryData(handler, outDir.getAbsolutePath());
-                    exportOK = true;
-                    break;
-                case "text":
-                    exfile.exportTexts(handler, outDir.getAbsolutePath(), true);
-                    exportOK = true;
-                    break;
-                case "textplain":
-                    exfile.exportTexts(handler, outDir.getAbsolutePath(), false);
-                    exportOK = true;
-                    break;
-                case "fla":
-                    FLAVersion flaVersion = FLAVersion.fromString(format);
-                    if(flaVersion == null){
-                        flaVersion = FLAVersion.CS6; //Defaults to CS6
-                        if(format!=null){
-                            System.err.println("Invalid export FLA format: "+format);
-                            badArguments();
+                        System.out.println("Exporting images...");
+                        exfile.exportImages(handler, outDir.getAbsolutePath() + File.separator + "images");
+                        System.out.println("Exporting shapes...");
+                        exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes");
+                        System.out.println("Exporting scripts...");
+                        exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", allExportMode, Configuration.parallelSpeedUp.get());
+                        System.out.println("Exporting movies...");
+                        exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies");
+                        System.out.println("Exporting sounds...");
+                        exfile.exportSounds(handler, outDir.getAbsolutePath() + File.separator + "sounds", true, true);
+                        System.out.println("Exporting binaryData...");
+                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + File.separator + "binaryData");
+                        System.out.println("Exporting texts...");
+
+                        String allTextFormat = formats.get("text");
+                        if (allTextFormat == null) {
+                            allTextFormat = "formatted";
                         }
-                    }
-                    exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(),flaVersion);
-                    exportOK = true;
-                    break;
-                case "xfl":                    
-                    FLAVersion xflVersion = FLAVersion.fromString(format);
-                    if(xflVersion == null){
-                        xflVersion = FLAVersion.CS6; //Defaults to CS6
-                        if(format!=null){
-                            System.err.println("Invalid export XFL format: "+format);
-                            badArguments();
+                        exfile.exportTexts(handler, outDir.getAbsolutePath() + File.separator + "texts", allTextFormat.equals("formatted"));
+                        break;
+                    case "image":
+                        System.out.println("Exporting images...");
+                        exfile.exportImages(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "images" : ""));
+                        break;
+                    case "shape":
+                        System.out.println("Exporting shapes...");
+                        exfile.exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""));
+                        break;
+                    case "script":
+                    case "as":
+                    case "pcode":
+                    case "pcodehex":
+                    case "hex":
+                        System.out.println("Exporting scripts...");
+                        ExportMode exportMode = ExportMode.SOURCE;
+                        if (!exportFormat.equals("script")) {
+                            exportMode = strToExportFormat(exportFormat);
+                        } else if (formats.containsKey("script")) {
+                            exportMode = strToExportFormat(formats.get("script"));
                         }
-                    }
-                    exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(),xflVersion);
-                    exportOK = true;
-                    break;
-                default:
-                    exportOK = false;
+                        boolean parallel = Configuration.parallelSpeedUp.get();
+                        if (as3classes.isEmpty()) {
+                            as3classes = parseSelectClasses(args);
+                        }
+                        if (!as3classes.isEmpty()) {
+                            for (String as3class : as3classes) {
+                                exportOK = exportOK && exfile.exportAS3Class(as3class, outDir.getAbsolutePath(), exportMode, parallel);
+                            }
+                        } else {
+                            exportOK = exportOK && exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportMode, parallel) != null;
+                        }
+                        break;
+                    case "movie":
+                        System.out.println("Exporting movies...");
+                        exfile.exportMovies(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "movies" : ""));
+                        break;
+                    case "sound":
+                        System.out.println("Exporting sounds...");
+                        exfile.exportSounds(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "sounds" : ""), true, true);
+                        break;
+                    case "binarydata":
+                        System.out.println("Exporting binaryData...");
+                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "binaryData" : ""));
+                        break;
+                    case "text":
+                        System.out.println("Exporting texts...");
+                        String textFormat = formats.get("text");
+                        if (textFormat == null) {
+                            textFormat = "formatted";
+                        }
+                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), textFormat.equals("formatted"));
+                        break;
+                    case "textplain":
+                        System.out.println("Exporting texts...");
+                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), false);
+                        break;
+                    case "fla":
+                        System.out.println("Exporting FLA...");
+                        FLAVersion flaVersion = FLAVersion.fromString(formats.get("fla"));
+                        if (flaVersion == null) {
+                            flaVersion = FLAVersion.CS6; //Defaults to CS6
+                        }
+                        exfile.exportFla(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "fla" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion);
+                        break;
+                    case "xfl":
+                        System.out.println("Exporting XFL...");
+                        FLAVersion xflVersion = FLAVersion.fromString(formats.get("xfl"));
+                        if (xflVersion == null) {
+                            xflVersion = FLAVersion.CS6; //Defaults to CS6                            
+                        }
+                        exfile.exportXfl(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "xfl" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), xflVersion);
+                        break;
+                    default:
+                        exportOK = false;
+                }
+
             }
         } catch (OutOfMemoryError | Exception ex) {
             exportOK = false;
@@ -690,13 +782,25 @@ public class CommandLineArgumentParser {
         System.exit(0);
     }
 
-    private static String parseFormat(Queue<String> args) {        
+    private static Map<String, String> parseFormat(Queue<String> args) {
         if (args.size() < 1) {
             badArguments();
         }
-        return args.remove().toLowerCase();
+        String fmtStr = args.remove();
+        String[] fmts;
+        if (fmtStr.contains(",")) {
+            fmts = fmtStr.split(",");
+        } else {
+            fmts = new String[]{fmtStr};
+        }
+        Map<String, String> ret = new HashMap<>();
+        for (int i = 0; i < fmts.length; i++) {
+            String parts[] = fmts[i].split(":");
+            ret.put(parts[0].toLowerCase(), parts[1].toLowerCase());
+        }
+        return ret;
     }
-    
+
     private static void parseDumpSwf(Queue<String> args) {
         if (args.isEmpty()) {
             badArguments();
