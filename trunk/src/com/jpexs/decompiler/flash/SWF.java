@@ -2130,7 +2130,7 @@ public final class SWF implements TreeItem {
     }
 
     public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
-        String key = "frame_" + frame + "_" + containerId;
+        String key = "frame_" + frame + "_" + containerId + "_" + allTags.get(0).getSwf().hashCode();
         if (frameCache.contains(key)) {
             SerializableImage ciret = ((SerializableImage) frameCache.get(key));
             return ciret;

@@ -38,6 +38,12 @@ public class Matrix {
         return mat;
     }
 
+    public static Matrix getTranslateInstance(double x, double y) {
+        Matrix mat = new Matrix();
+        mat.translate(x, y);
+        return mat;
+    }
+
     public Matrix() {
         scaleX = 1;
         scaleY = 1;

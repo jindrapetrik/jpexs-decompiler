@@ -192,7 +192,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         return att;
     }
 
-    public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText, SerializableImage image, Matrix transformation) {
+    public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
         int textHeight = 12;
@@ -223,15 +223,18 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 y = rec.yOffset;
             }
 
-            Matrix mat = transformation.clone();
             double rat = textHeight / 1024.0 / font.getDivider();
-            mat = mat.preConcatenate(Matrix.getScaleInstance(rat));
-            mat.translate(x - textBounds.Xmin, y - textBounds.Ymin);
+            
             for (GLYPHENTRY entry : rec.glyphEntries) {
+                Matrix mat = transformation.clone();
+                mat = mat.concatenate(new Matrix(textMatrix));
+                Matrix matTr = Matrix.getTranslateInstance(x, y);
+                mat = mat.concatenate(matTr);
+                mat = mat.concatenate(Matrix.getScaleInstance(rat));
                 // shapeNum: 1
                 SHAPE shape = glyphs.get(entry.glyphIndex);
                 BitmapExporter.exportTo(swf, shape, textColor, image, mat);
-                mat.translate(entry.glyphAdvance, 0);
+                x += entry.glyphAdvance;
             }
         }
     }

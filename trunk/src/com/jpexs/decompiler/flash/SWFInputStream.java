@@ -835,6 +835,7 @@ public class SWFInputStream extends InputStream {
      * @param parallel
      * @param skipUnusualTags
      * @param parseTags
+     * @param gfx
      * @return List of tags
      * @throws IOException
      * @throws java.lang.InterruptedException
@@ -1241,6 +1242,7 @@ public class SWFInputStream extends InputStream {
      * @param resolve
      * @param parallel
      * @param skipUnusualTags
+     * @param gfx
      * @return Tag or null when End tag
      * @throws IOException
      * @throws java.lang.InterruptedException
