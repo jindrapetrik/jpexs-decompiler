@@ -203,10 +203,12 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
         return value;
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
     }
     
+    @Override
     public Field getField() {
         return field;
     }

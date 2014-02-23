@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 JPEXS
+ *  Copyright (C) 2010-2014 PEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,18 +14,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
+package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import java.awt.Color;
 import java.util.Map;
-import java.util.Stack;
 
 /**
  *
  * @author JPEXS
  */
-public interface BoundedTag {
+public class FrameInfo {
 
-    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited);
-    //public List<GeneralPath> getPaths(List<Tag> tags);
+    public int maxDepth;
+    public Map<Integer, Layer> layers;
+    public Color backgroundColor;
+    public Map<Integer, CharacterTag> characters;
+    public int frame;
 }

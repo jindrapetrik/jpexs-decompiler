@@ -46,7 +46,7 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
     private final Field field;
     private final int index;
     private final Class<?> type;
-    private String fieldName;
+    private final String fieldName;
     private Color color;
     public static final int COLOR_TYPE_RGB = 0;
     public static final int COLOR_TYPE_RGBA = 1;

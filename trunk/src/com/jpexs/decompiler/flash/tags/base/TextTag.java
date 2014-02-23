@@ -34,8 +34,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.font.LineMetrics;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -194,21 +192,13 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         return att;
     }
 
-    public static SerializableImage staticTextToImage(SWF swf, HashMap<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText, Matrix transformation) {
-        double unzoom = SWF.unitDivisor;
-        double fixX = -textBounds.Xmin / unzoom;
-        double fixY = -textBounds.Ymin / unzoom;
-        double width = textBounds.getWidth() / unzoom;
-        double height = textBounds.getHeight() / unzoom;
-        SerializableImage ret = new SerializableImage((int) width, (int) height, SerializableImage.TYPE_INT_ARGB);
-        ret.bounds = new Rectangle2D.Double(-fixX, -fixY, width, height);
-
+    public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText, SerializableImage image, Matrix transformation) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
         int textHeight = 12;
-        int x = textBounds.Xmin;
+        int x = 0;
         int y = 0;
-        Graphics2D g = (Graphics2D) ret.getGraphics();
+        Graphics2D g = (Graphics2D) image.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -233,19 +223,16 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 y = rec.yOffset;
             }
 
+            Matrix mat = transformation.clone();
+            double rat = textHeight / 1024.0 / font.getDivider();
+            mat = mat.preConcatenate(Matrix.getScaleInstance(rat));
+            mat.translate(x - textBounds.Xmin, y - textBounds.Ymin);
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 // shapeNum: 1
                 SHAPE shape = glyphs.get(entry.glyphIndex);
-                SerializableImage img = BitmapExporter.export(swf, shape, textColor, true);
-                AffineTransform tr = new AffineTransform();
-                double rat = textHeight / 1024.0;
-                tr.translate(x / unzoom + img.bounds.getMinX() * rat + fixX, y / unzoom + img.bounds.getMinY() * rat + fixY);
-                tr.scale(1.0 / font.getDivider(), 1.0 / font.getDivider());
-                tr.scale(rat, rat);
-                g.drawImage(img.getBufferedImage(), tr, null);
-                x += (int) entry.glyphAdvance;
+                BitmapExporter.exportTo(swf, shape, textColor, image, mat);
+                mat.translate(entry.glyphAdvance, 0);
             }
         }
-        return ret;
     }
 }

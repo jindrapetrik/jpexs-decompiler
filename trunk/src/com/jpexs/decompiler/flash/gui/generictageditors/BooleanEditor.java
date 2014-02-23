@@ -31,7 +31,7 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     private final Field field;
     private final int index;
     private final Class<?> type;
-    private String fieldName;
+    private final String fieldName;
 
     public BooleanEditor(String fieldName,Object obj, Field field, int index, Class<?> type) {
         super();
@@ -73,10 +73,12 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
         return isSelected();
     }
     
+    @Override
     public String getFieldName() {
         return fieldName;
     }
 
+    @Override
     public Field getField() {
         return field;
     }

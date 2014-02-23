@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
  *
  * @author JPEXS
  */
-public interface ShapeTag extends DrawableTag {
+public interface ShapeTag extends BoundedTag, DrawableTag {
 
     public SHAPEWITHSTYLE getShapes();
 

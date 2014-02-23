@@ -16,24 +16,41 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
+import com.jpexs.decompiler.flash.types.RECT;
+
 /**
  *
  * @author JPEXS
  */
-public class Rectangle {
+public class ExportRectangle {
 
     public double xMin;
     public double yMin;
     public double xMax;
     public double yMax;
 
-    Rectangle(double xMin, double yMin, double xMax, double yMax) {
+    public ExportRectangle(double xMin, double yMin, double xMax, double yMax) {
         this.xMin = xMin;
         this.yMin = yMin;
         this.xMax = xMax;
         this.yMax = yMax;
     }
 
+    public ExportRectangle(RECT rect) {
+        this.xMin = rect.Xmin;
+        this.yMin = rect.Ymin;
+        this.xMax = rect.Xmax;
+        this.yMax = rect.Ymax;
+    }
+    
+    public double getWidth() {
+        return xMax - xMin;
+    } 
+    
+    public double getHeight() {
+        return yMax - yMin;
+    } 
+    
     @Override
     public int hashCode() {
         long bits = Double.doubleToLongBits(xMin);
@@ -45,8 +62,8 @@ public class Rectangle {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Rectangle) {
-            Rectangle r = (Rectangle) obj;
+        if (obj instanceof ExportRectangle) {
+            ExportRectangle r = (ExportRectangle) obj;
             return (xMin == r.xMin) && (yMin == r.yMin) && (xMax == r.xMax) && (yMax == r.yMax);
         }
         return super.equals(obj);

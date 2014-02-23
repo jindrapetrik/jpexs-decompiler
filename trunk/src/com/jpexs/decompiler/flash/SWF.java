@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
@@ -125,7 +126,6 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -175,7 +175,7 @@ public final class SWF implements TreeItem {
      */
     public List<Tag> tags = new ArrayList<>();
     /**
-     * Rectangle for the display
+     * ExportRectangle for the display
      */
     public RECT displayRect;
     /**
@@ -2129,180 +2129,37 @@ public final class SWF implements TreeItem {
         return ret;
     }
 
-    public static SerializableImage frameToImage(int containerId, int maxDepth, HashMap<Integer, Layer> layers, Color backgroundColor, HashMap<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited, Matrix transformation) {
+    public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
         String key = "frame_" + frame + "_" + containerId;
         if (frameCache.contains(key)) {
             SerializableImage ciret = ((SerializableImage) frameCache.get(key));
             return ciret;
         }
 
-        float unzoom = (float) SWF.unitDivisor;
-        int fixX = -displayRect.Xmin;
-        int fixY = -displayRect.Ymin;
-        displayRect = fixRect(displayRect);
-        int width = displayRect.getWidth();
-        int height = displayRect.getHeight();
-
-        SerializableImage ret = new SerializableImage((int) (width / unzoom), (int) (height / unzoom), SerializableImage.TYPE_INT_ARGB);
-        ret.bounds = new Rectangle2D.Double(-fixX / unzoom, -fixY / unzoom, width / unzoom, height / unzoom);
-
-        Graphics2D g = (Graphics2D) ret.getGraphics();
-        g.setPaint(backgroundColor);
-        g.fill(new Rectangle(ret.getWidth(), ret.getHeight()));
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        for (int i = 1; i <= maxDepth; i++) {
-            if (!layers.containsKey(i)) {
-                continue;
-            }
-            Layer layer = layers.get(i);
-            if (!characters.containsKey(layer.characterId)) {
-                continue;
-            }
-            if (!layer.visible) {
-                continue;
-            }
-            CharacterTag character = characters.get(layer.characterId);
-            Matrix mat = new Matrix(layer.matrix);
-            /*if (firstLevel) {
-             mat.scale(unzoom);
-             }*/
-            mat.translate(fixX, fixY);
-
-            if (character instanceof DrawableTag) {
-                DrawableTag drawable = (DrawableTag) character;
-                SerializableImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, transformation);
-                mat.translate(img.bounds.getMinX() * unzoom, img.bounds.getMinY() * unzoom);
-                /*if (character instanceof BoundedTag) {
-                 BoundedTag bounded = (BoundedTag) character;
-                 RECT rect = bounded.getRect(characters, visited);
-                 }*/
-                if (layer.filters != null) {
-                    for (FILTER filter : layer.filters) {
-                        img = filter.apply(img);
-                    }
-                }
-                if (layer.colorTransForm != null) {
-                    img = layer.colorTransForm.apply(img);
-                }
-
-                if (layer.colorTransFormAlpha != null) {
-                    img = layer.colorTransFormAlpha.apply(img);
-                }
-                switch (layer.blendMode) {
-                    case 0:
-                    case 1:
-                        g.setComposite(AlphaComposite.SrcOver);
-                        break;
-                    case 2: //TODO:Layer
-                        g.setComposite(AlphaComposite.SrcOver);
-                        break;
-                    case 3:
-                        g.setComposite(BlendComposite.Multiply);
-                        break;
-                    case 4:
-                        g.setComposite(BlendComposite.Screen);
-                        break;
-                    case 5:
-                        g.setComposite(BlendComposite.Lighten);
-                        break;
-                    case 6:
-                        g.setComposite(BlendComposite.Darken);
-                        break;
-                    case 7:
-                        g.setComposite(BlendComposite.Difference);
-                        break;
-                    case 8:
-                        g.setComposite(BlendComposite.Add);
-                        break;
-                    case 9:
-                        g.setComposite(BlendComposite.Subtract);
-                        break;
-                    case 10:
-                        g.setComposite(BlendComposite.Invert);
-                        break;
-                    case 11:
-                        g.setComposite(BlendComposite.Alpha);
-                        break;
-                    case 12:
-                        g.setComposite(BlendComposite.Erase);
-                        break;
-                    case 13:
-                        g.setComposite(BlendComposite.Overlay);
-                        break;
-                    case 14:
-                        g.setComposite(BlendComposite.HardLight);
-                        break;
-                    default: //Not implemented
-                        g.setComposite(AlphaComposite.SrcOver);
-                        break;
-                }
-
-                mat.translateX /= unzoom;
-                mat.translateY /= unzoom;
-                AffineTransform trans = mat.toTransform();
-                g.setTransform(trans);
-                g.drawImage(img.getBufferedImage(), 0, 0, null);
-            } else if (character instanceof BoundedTag) {
-                mat.translateX /= unzoom;
-                mat.translateY /= unzoom;
-                AffineTransform trans = mat.toTransform();
-                g.setTransform(trans);
-                BoundedTag b = (BoundedTag) character;
-                g.setPaint(new Color(255, 255, 255, 128));
-                g.setComposite(BlendComposite.Invert);
-                RECT r = b.getRect(characters, visited);
-                int div = (int) unzoom;
-                g.drawString(character.toString(), r.Xmin / div + 3, r.Ymin / div + 15);
-                g.draw(new Rectangle(r.Xmin / div, r.Ymin / div, r.getWidth() / div, r.getHeight() / div));
-                g.drawLine(r.Xmin / div, r.Ymin / div, r.Xmax / div, r.Ymax / div);
-                g.drawLine(r.Xmax / div, r.Ymin / div, r.Xmin / div, r.Ymax / div);
-                g.setComposite(AlphaComposite.Dst);
-            }
-        }
-        g.setTransform(AffineTransform.getScaleInstance(1, 1));
-        /*g.setPaint(Color.yellow);
-         g.draw(new Rectangle(ret.getWidth()-1,ret.getHeight()-1));*/
-        frameCache.put(key, ret);
-
-        /*try {
-         ImageIO.write(ret, "png", new File("tst_id_" + containerId + "_time_" + System.currentTimeMillis() + ".png"));
-         } catch (IOException ex) {
-         Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
-         }*/
-        return ret;
-    }
-
-    public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
-        List<SerializableImage> ret = new ArrayList<>();
-        framesToImage(containerId, ret, frame, frame, allTags, controlTags, displayRect, totalFrameCount, visited, transformation);
-        if (ret.isEmpty()) {
+        List<FrameInfo> frameInfos = getFrameInfo(frame, frame, allTags, controlTags, totalFrameCount);
+        if (frameInfos.isEmpty()) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
-        return ret.get(0);
+        
+        FrameInfo fi = frameInfos.get(0);
+    
+        RECT rect = displayRect;
+        SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
+                (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+        Matrix m = new Matrix();
+        m.translate(-rect.Xmin, -rect.Ymin);
+        frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m);
+        frameCache.put(key, image);
+        return image;
     }
 
-    public static void framesToImage(int containerId, List<SerializableImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
-        for (int i = startFrame; i <= stopFrame; i++) {
-            String key = "frame_" + i + "_" + containerId;
-            if (frameCache.contains(key)) {
-                SerializableImage g = (SerializableImage) frameCache.get(key);
-                if (g == null) {
-                    break;
-                }
-                ret.add(g);
-                startFrame++;
-            } else {
-                break;
-            }
-        }
+    private static List<FrameInfo> getFrameInfo(int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, int totalFrameCount) {
+        List<FrameInfo> ret = new ArrayList<>();
         if (startFrame > stopFrame) {
-            return;
+            return ret;
         }
         if (totalFrameCount == 0) {
-            return;
+            return ret;
         }
 
         while (startFrame >= totalFrameCount) {
@@ -2313,7 +2170,7 @@ public final class SWF implements TreeItem {
             stopFrame -= totalFrameCount;
         }
 
-        HashMap<Integer, CharacterTag> characters = new HashMap<>();
+        Map<Integer, CharacterTag> characters = new HashMap<>();
         for (Tag t : allTags) {
             if (t instanceof CharacterTag) {
                 CharacterTag ch = (CharacterTag) t;
@@ -2321,7 +2178,7 @@ public final class SWF implements TreeItem {
             }
         }
 
-        HashMap<Integer, Layer> layers = new HashMap<>();
+        Map<Integer, Layer> layers = new HashMap<>();
 
         int maxDepth = 0;
         int f = 0;
@@ -2401,14 +2258,184 @@ public final class SWF implements TreeItem {
                 l.duration++;
             }
             if (t instanceof ShowFrameTag) {
+                if ((f >= startFrame) && (f <= stopFrame)) {
+                    FrameInfo fi = new FrameInfo();
+                    fi.maxDepth = maxDepth;
+                    fi.layers = layers;
+                    fi.backgroundColor = backgroundColor;
+                    fi.characters = characters;
+                    fi.frame = f;
+                    ret.add(fi);
+                }
+                f++;
                 if (f > stopFrame) {
                     break;
                 }
-                if ((f >= startFrame) && (f <= stopFrame)) {
-                    ret.add(frameToImage(containerId, maxDepth, layers, backgroundColor, characters, f, allTags, controlTags, displayRect, visited, transformation));
-                }
-                f++;
             }
+        }
+        
+        return ret;
+    }
+    
+    public static void framesToImage(int containerId, List<SerializableImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
+        List<FrameInfo> frameInfos = getFrameInfo(startFrame, stopFrame, allTags, controlTags, totalFrameCount);
+        RECT rect = displayRect;
+        for (FrameInfo fi : frameInfos) {
+            SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
+                    (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+            Matrix m = new Matrix();
+            m.translate(-rect.Xmin, -rect.Ymin);
+            frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m);
+            ret.add(image);
+        }
+    }
+
+    public static void frameToImage(int containerId, int maxDepth, Map<Integer, Layer> layers, Color backgroundColor, Map<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+        float unzoom = (float) SWF.unitDivisor;
+
+        Graphics2D g = (Graphics2D) image.getGraphics();
+        g.setPaint(backgroundColor);
+        g.fill(new Rectangle(image.getWidth(), image.getHeight()));
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setTransform(transformation.toTransform());
+
+        for (int i = 1; i <= maxDepth; i++) {
+            if (!layers.containsKey(i)) {
+                continue;
+            }
+            Layer layer = layers.get(i);
+            if (!characters.containsKey(layer.characterId)) {
+                continue;
+            }
+            if (!layer.visible) {
+                continue;
+            }
+            CharacterTag character = characters.get(layer.characterId);
+            Matrix mat = new Matrix(layer.matrix);
+            mat = mat.preConcatenate(transformation);
+
+            if (character instanceof DrawableTag) {
+                DrawableTag drawable = (DrawableTag) character;
+                SerializableImage img;
+                Matrix drawMatrix = new Matrix();
+                if (drawable instanceof BoundedTag) {
+                    BoundedTag bounded = (BoundedTag) drawable;
+                    RECT boundRect = bounded.getRect(characters, new Stack<Integer>());
+                    ExportRectangle rect = new ExportRectangle(boundRect);
+                    rect = mat.transform(rect);
+                    img = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
+                            (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                    Matrix m = mat.clone();
+                    m.translate(-rect.xMin, -rect.yMin);
+                    drawMatrix.translate(rect.xMin, rect.yMin);
+                    drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, img, m);
+                } else {
+                    img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, transformation);
+                }
+                /*if (character instanceof BoundedTag) {
+                 BoundedTag bounded = (BoundedTag) character;
+                 RECT rect = bounded.getRect(characters, visited);
+                 }*/
+                if (layer.filters != null) {
+                    for (FILTER filter : layer.filters) {
+                        img = filter.apply(img);
+                    }
+                }
+                if (layer.colorTransForm != null) {
+                    img = layer.colorTransForm.apply(img);
+                }
+
+                if (layer.colorTransFormAlpha != null) {
+                    img = layer.colorTransFormAlpha.apply(img);
+                }
+                switch (layer.blendMode) {
+                    case 0:
+                    case 1:
+                        g.setComposite(AlphaComposite.SrcOver);
+                        break;
+                    case 2: //TODO:Layer
+                        g.setComposite(AlphaComposite.SrcOver);
+                        break;
+                    case 3:
+                        g.setComposite(BlendComposite.Multiply);
+                        break;
+                    case 4:
+                        g.setComposite(BlendComposite.Screen);
+                        break;
+                    case 5:
+                        g.setComposite(BlendComposite.Lighten);
+                        break;
+                    case 6:
+                        g.setComposite(BlendComposite.Darken);
+                        break;
+                    case 7:
+                        g.setComposite(BlendComposite.Difference);
+                        break;
+                    case 8:
+                        g.setComposite(BlendComposite.Add);
+                        break;
+                    case 9:
+                        g.setComposite(BlendComposite.Subtract);
+                        break;
+                    case 10:
+                        g.setComposite(BlendComposite.Invert);
+                        break;
+                    case 11:
+                        g.setComposite(BlendComposite.Alpha);
+                        break;
+                    case 12:
+                        g.setComposite(BlendComposite.Erase);
+                        break;
+                    case 13:
+                        g.setComposite(BlendComposite.Overlay);
+                        break;
+                    case 14:
+                        g.setComposite(BlendComposite.HardLight);
+                        break;
+                    default: //Not implemented
+                        g.setComposite(AlphaComposite.SrcOver);
+                        break;
+                }
+
+                drawMatrix.translateX /= unzoom;
+                drawMatrix.translateY /= unzoom;
+                g.setTransform(drawMatrix.toTransform());
+                g.drawImage(img.getBufferedImage(), 0, 0, null);
+            } else if (character instanceof BoundedTag) {
+                mat.translateX /= unzoom;
+                mat.translateY /= unzoom;
+                AffineTransform trans = mat.toTransform();
+                g.setTransform(trans);
+                BoundedTag b = (BoundedTag) character;
+                g.setPaint(new Color(255, 255, 255, 128));
+                g.setComposite(BlendComposite.Invert);
+                RECT r = b.getRect(characters, visited);
+                int div = (int) unzoom;
+                g.drawString(character.toString(), r.Xmin / div + 3, r.Ymin / div + 15);
+                g.draw(new Rectangle(r.Xmin / div, r.Ymin / div, r.getWidth() / div, r.getHeight() / div));
+                g.drawLine(r.Xmin / div, r.Ymin / div, r.Xmax / div, r.Ymax / div);
+                g.drawLine(r.Xmax / div, r.Ymin / div, r.Xmin / div, r.Ymax / div);
+                g.setComposite(AlphaComposite.Dst);
+            }
+        }
+        g.setTransform(AffineTransform.getScaleInstance(1, 1));
+        /*g.setPaint(Color.yellow);
+         g.draw(new ExportRectangle(ret.getWidth()-1,ret.getHeight()-1));*/
+
+        /*try {
+         ImageIO.write(ret, "png", new File("tst_id_" + containerId + "_time_" + System.currentTimeMillis() + ".png"));
+         } catch (IOException ex) {
+         Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+         }*/
+    }
+
+    public static void frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+        List<FrameInfo> frameInfos = getFrameInfo(frame, frame, allTags, controlTags, totalFrameCount);
+        if (!frameInfos.isEmpty()) {
+            FrameInfo fi = frameInfos.get(0);
+            frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, transformation);
         }
     }
 

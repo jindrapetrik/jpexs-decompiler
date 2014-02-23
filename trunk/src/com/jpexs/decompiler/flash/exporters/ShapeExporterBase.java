@@ -53,7 +53,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     protected Map<Integer, List<IEdge>> currentLineEdgeMap;
     private int numGroups;
     protected Map<String, List<IEdge>> coordMap;
-    private final Rectangle bounds = new Rectangle(Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+    private final ExportRectangle bounds = new ExportRectangle(Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
 
     private boolean edgeMapsCreated;
 

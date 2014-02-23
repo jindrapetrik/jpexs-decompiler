@@ -20,8 +20,10 @@ import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -127,7 +129,19 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             String key = "drawable_0_" + drawable.hashCode();
             SerializableImage img = SWF.getFromCache(key);
             if (img == null) {
-                img = drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+                if (drawable instanceof BoundedTag) {
+                    BoundedTag bounded = (BoundedTag) drawable;
+                    RECT rect = bounded.getRect(characters, new Stack<Integer>());
+                    SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
+                            (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                    Matrix m = new Matrix();
+                    m.translate(-rect.Xmin, -rect.Ymin);
+                    drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), image, m);
+                    img = image;
+                    
+                } else {
+                    img = drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+                }
                 SWF.putToCache(key, img);
             }
             if (img != null && img.bounds != null && mat != null) {
@@ -189,7 +203,19 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             String key = "drawable_" + nframe + "_" + drawable.hashCode();
             SerializableImage img = SWF.getFromCache(key);
             if (img == null) {
-                img = drawable.toImage(nframe, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+                if (drawable instanceof BoundedTag) {
+                    BoundedTag bounded = (BoundedTag) drawable;
+                    RECT rect = bounded.getRect(characters, new Stack<Integer>());
+                    SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
+                            (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                    Matrix m = new Matrix();
+                    m.translate(-rect.Xmin, -rect.Ymin);
+                    drawable.toImage(nframe, swf.tags, characters, new Stack<Integer>(), image, m);
+                    img = image;
+                    
+                } else {
+                    img = drawable.toImage(nframe, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+                }
                 SWF.putToCache(key, img);
             }
             mat.translate(img.bounds.getMinX(), img.bounds.getMinY());

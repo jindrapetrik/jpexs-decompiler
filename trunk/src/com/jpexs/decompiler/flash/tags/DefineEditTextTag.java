@@ -38,9 +38,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -470,7 +470,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {
+    public RECT getRect(Map<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {
         return bounds;
     }
 

@@ -65,6 +65,8 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private Color lineColor;
     private Stroke lineStroke;
     private Stroke defaultStroke;
+    private Matrix transform;
+    private double unitDivisor;
 
     public static SerializableImage export(SWF swf, SHAPE shape) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, null);
@@ -72,10 +74,15 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         return exporter.getImage();
     }
 
-    public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, boolean putToCache) {
+    public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor);
         exporter.export();
         return exporter.getImage();
+    }
+
+    public static void exportTo(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation) {
+        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor);
+        exporter.exportTo(image, transformation);
     }
 
     private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor) {
@@ -97,11 +104,12 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                 }
             }
         }
-        double maxLineWidth = maxLineWidthTwips / SWF.unitDivisor / 2;
-        deltaX = bounds.Xmin / SWF.unitDivisor - maxLineWidth;
-        deltaY = bounds.Ymin / SWF.unitDivisor - maxLineWidth;
-        double width = bounds.getWidth() / SWF.unitDivisor + 2 * (maxLineWidth + 1);
-        double height = bounds.getHeight() / SWF.unitDivisor + 2 * (maxLineWidth + 1);
+        unitDivisor = SWF.unitDivisor;
+        double maxLineWidth = maxLineWidthTwips / unitDivisor / 2;
+        deltaX = bounds.Xmin / unitDivisor - maxLineWidth;
+        deltaY = bounds.Ymin / unitDivisor - maxLineWidth;
+        double width = bounds.getWidth() / unitDivisor + 2 * (maxLineWidth + 1);
+        double height = bounds.getHeight() / unitDivisor + 2 * (maxLineWidth + 1);
         image = new SerializableImage((int) width, (int) height, SerializableImage.TYPE_INT_ARGB);
         graphics = (Graphics2D) image.getGraphics();
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -110,6 +118,21 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         defaultStroke = graphics.getStroke();
         super.export();
         image.bounds = new Rectangle2D.Double(deltaX, deltaY, width, height);
+    }
+
+    private void exportTo(SerializableImage image, Matrix transformation) {
+        this.image = image;
+        this.transform = transformation;
+        graphics = (Graphics2D) image.getGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        AffineTransform at = transformation.toTransform();
+        at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
+        unitDivisor = 1;
+        graphics.setTransform(at);
+        defaultStroke = graphics.getStroke();
+        super.export();
     }
 
     public SerializableImage getImage() {
@@ -150,12 +173,12 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     @Override
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
-        matrix.translateX /= SWF.unitDivisor;
-        matrix.translateY /= SWF.unitDivisor;
-        matrix.scaleX /= SWF.unitDivisor;
-        matrix.scaleY /= SWF.unitDivisor;
-        matrix.rotateSkew0 /= SWF.unitDivisor;
-        matrix.rotateSkew1 /= SWF.unitDivisor;
+        matrix.translateX /= unitDivisor;
+        matrix.translateY /= unitDivisor;
+        matrix.scaleX /= unitDivisor;
+        matrix.scaleY /= unitDivisor;
+        matrix.rotateSkew0 /= unitDivisor;
+        matrix.rotateSkew1 /= unitDivisor;
         switch (type) {
             case FILLSTYLE.LINEAR_GRADIENT: {
                 List<Color> colors = new ArrayList<>();
@@ -264,12 +287,12 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth) {
         finalizePath();
-        matrix.translateX /= SWF.unitDivisor;
-        matrix.translateY /= SWF.unitDivisor;
-        matrix.scaleX /= SWF.unitDivisor;
-        matrix.scaleY /= SWF.unitDivisor;
-        matrix.rotateSkew0 /= SWF.unitDivisor;
-        matrix.rotateSkew1 /= SWF.unitDivisor;
+        matrix.translateX /= unitDivisor;
+        matrix.translateY /= unitDivisor;
+        matrix.scaleX /= unitDivisor;
+        matrix.scaleY /= unitDivisor;
+        matrix.rotateSkew0 /= unitDivisor;
+        matrix.rotateSkew1 /= unitDivisor;
         ImageTag image = null;
         for (Tag t : swf.tags) {
             if (t instanceof ImageTag) {
@@ -300,7 +323,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        thickness /= SWF.unitDivisor;
+        thickness /= unitDivisor;
         lineColor = color.toColor();
         int capStyle = BasicStroke.CAP_ROUND;
         switch (startCaps) {
@@ -339,18 +362,18 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
 
     @Override
     public void moveTo(double x, double y) {
-        path.moveTo(x / SWF.unitDivisor - deltaX, y / SWF.unitDivisor - deltaY);
+        path.moveTo(x / unitDivisor - deltaX, y / unitDivisor - deltaY);
     }
 
     @Override
     public void lineTo(double x, double y) {
-        path.lineTo(x / SWF.unitDivisor - deltaX, y / SWF.unitDivisor - deltaY);
+        path.lineTo(x / unitDivisor - deltaX, y / unitDivisor - deltaY);
     }
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
-        path.quadTo(controlX / SWF.unitDivisor - deltaX, controlY / SWF.unitDivisor - deltaY,
-                anchorX / SWF.unitDivisor - deltaX, anchorY / SWF.unitDivisor - deltaY);
+        path.quadTo(controlX / unitDivisor - deltaX, controlY / unitDivisor - deltaY,
+                anchorX / unitDivisor - deltaX, anchorY / unitDivisor - deltaY);
     }
 
     protected void finalizePath() {
@@ -364,6 +387,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                     }
                     graphics.fill(path);
                     graphics.setClip(path);
+                    fillTransform.preConcatenate(oldAf);
                     graphics.setTransform(fillTransform);
 
                     graphics.setPaint(fillPaint);
@@ -373,6 +397,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                 } else if (fillPaint instanceof TexturePaint) {
                     AffineTransform oldAf = graphics.getTransform();
                     graphics.setClip(path);
+                    fillTransform.preConcatenate(oldAf);
                     graphics.setTransform(fillTransform);
 
                     graphics.setPaint(fillPaint);

@@ -63,11 +63,15 @@ public class SerializableImage implements Serializable {
         image = new BufferedImage(i, i1, i2, icm);
     }
 
+    public void setBufferedImage(BufferedImage image, Rectangle2D bounds) {
+        this.image = image;
+        this.bounds = bounds;
+    }
+    
     public BufferedImage getBufferedImage() {
         /*try {
          ImageIO.write(image, "png", new File("c:\\10\\x\\imageid" + String.format("%03d", imageid++) + ".png"));
          } catch (IOException ex) {
-         Logger.getLogger(BitmapExporter.class.getName()).log(Level.SEVERE, null, ex);
          }*/
         return image;
     }

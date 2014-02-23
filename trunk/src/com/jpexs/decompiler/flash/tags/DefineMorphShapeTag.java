@@ -46,9 +46,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -136,7 +136,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         RECT rect = new RECT();
         rect.Xmin = Math.min(startBounds.Xmin, endBounds.Xmin);
         rect.Ymin = Math.min(startBounds.Ymin, endBounds.Ymin);
@@ -180,8 +180,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
         return 1;
     }
 
-    @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+    private SHAPEWITHSTYLE getFrame(int frame) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(frame);
         LINESTYLEARRAY lineStyles = morphLineStyles.getLineStylesAt(getShapeNum(), frame);
@@ -296,15 +295,26 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
         shape.fillStyles = fillStyles;
         shape.lineStyles = lineStyles;
         shape.shapeRecords = finalRecords;
+        return shape;
+    }
+    
+    @Override
+    public SerializableImage toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+        throw new Error("this overload of toImage call is not supported on BoundedTag");
+    }
+
+    @Override
+    public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+        SHAPEWITHSTYLE shape = getFrame(frame);
         // shapeNum: 3
         // todo: Currently the generated image is not cached, because the cache 
         // key contains the hashCode of the finalRecord object, and it is always 
         // recreated
-        return BitmapExporter.export(swf, shape, null, false);
+        BitmapExporter.exportTo(swf, shape, null, image, transformation);
     }
-
+    
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(
                 (startBounds.Xmin + (endBounds.Xmin - startBounds.Xmin) * frame / 65535) / SWF.unitDivisor,
                 (startBounds.Ymin + (endBounds.Ymin - startBounds.Ymin) * frame / 65535) / SWF.unitDivisor);

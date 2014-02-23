@@ -29,7 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -122,7 +122,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new RECT(0, (int) (SWF.unitDivisor * width), 0, (int) (SWF.unitDivisor * height));
     }
 }

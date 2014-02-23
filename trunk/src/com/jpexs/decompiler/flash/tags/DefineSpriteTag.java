@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -74,7 +75,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
         return spriteId;
     }
 
-    private RECT getCharacterBounds(HashMap<Integer, CharacterTag> allCharacters, Set<Integer> characters, Stack<Integer> visited) {
+    private RECT getCharacterBounds(Map<Integer, CharacterTag> allCharacters, Set<Integer> characters, Stack<Integer> visited) {
         if (visited.contains(spriteId)) {
             return new RECT();
         }
@@ -109,7 +110,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     private static final Cache<RECT> rectCache = Cache.getInstance(true);
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         if (rectCache.contains(this)) {
             return (RECT) rectCache.get(this);
         }
@@ -277,9 +278,14 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+    public SerializableImage toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+        throw new Error("this overload of toImage call is not supported on BoundedTag");
+    }
+
+    @Override
+    public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
         if (visited.contains(spriteId)) {
-            return new SerializableImage(1, 1, SerializableImage.TYPE_4BYTE_ABGR);
+            return;
         }
         /* 
          rect.Xmax=displayRect.Xmin+rect.getWidth();
@@ -290,13 +296,12 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
          SWF.fixRect(rect);*/
         RECT rect = getRect(characters, visited);
         visited.push(spriteId);
-        SerializableImage ret = SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited, transformation);
+        SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited, image, transformation);
         visited.pop();
-        return ret;
     }
-
+    
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         //RECT displayRect = getRect(characters, visited); //use visited
         return new Point(0, 0); //displayRect.Xmin,displayRect.Ymin);
     }

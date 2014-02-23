@@ -113,6 +113,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
         return fieldName;
     }
     
+    @Override
     public Field getField() {
         return field;
     }

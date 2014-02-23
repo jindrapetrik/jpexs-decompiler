@@ -101,7 +101,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private class MyTreeCellEditor extends AbstractCellEditor implements TreeCellEditor {
 
         private GenericTagEditor editor = null;
-        private JTree tree;
+        private final JTree tree;
 
         public MyTreeCellEditor(JTree tree) {
             this.tree = tree;
@@ -321,6 +321,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     }
 
+    @Override
     public void clear() {
 
     }
@@ -445,8 +446,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private static class MyTreeModel extends DefaultTreeModel {
 
-        private Object root;
-        private List<TreeModelListener> listeners = new ArrayList<>();
+        private final Object root;
+        private final List<TreeModelListener> listeners = new ArrayList<>();
         private DefaultMutableTreeNode rootNode;
 
         public MyTreeModel(Tag root) {
@@ -526,6 +527,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         return new MyTreeModel(editedTag);
     }
 
+    @Override
     public void setEditMode(boolean edit, Tag tag) {
         if (tag == null) {
             tag = this.tag;
@@ -536,6 +538,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         tree.setEditable(edit);
     }
 
+    @Override
     public void save() {
         tree.stopEditing();
         SWF swf = tag.getSwf();
@@ -557,6 +560,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
     }
 
+    @Override
     public Tag getTag() {
         return tag;
     }

@@ -168,7 +168,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 }
 
                 // shapeNum: 1
-                SerializableImage img = BitmapExporter.export(swf, shapes.get(pos), color, false);
+                SerializableImage img = BitmapExporter.export(swf, shapes.get(pos), color);
 
                 int w1 = img.getWidth();
                 int h1 = img.getHeight();

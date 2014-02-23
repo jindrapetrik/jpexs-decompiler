@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGShapeExporter;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -34,12 +33,12 @@ import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag {
+public class DefineShapeTag extends CharacterTag implements ShapeTag {
 
     @SWFType(BasicType.UI16)
     public int shapeId;
@@ -63,7 +62,7 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return shapeBounds;
     }
 
@@ -107,12 +106,17 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
-        return BitmapExporter.export(swf, getShapes());
+    public SerializableImage toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+        throw new Error("this overload of toImage call is not supported on BoundedTag");
     }
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+        BitmapExporter.exportTo(swf, getShapes(), null, image, transformation);
+    }
+    
+    @Override
+    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(shapeBounds.Xmin / SWF.unitDivisor, shapeBounds.Ymin / SWF.unitDivisor);
     }
 

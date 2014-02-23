@@ -31,7 +31,7 @@ import java.util.Stack;
  */
 public class ConditionEvaluator {
 
-    private Conditional cond;
+    private final Conditional cond;
 
     public ConditionEvaluator(Conditional cond) {
         this.cond = cond;

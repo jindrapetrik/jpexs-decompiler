@@ -45,9 +45,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -492,7 +492,7 @@ public class DefineTextTag extends TextTag implements DrawableTag {
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return textBounds;
     }
 
@@ -508,12 +508,17 @@ public class DefineTextTag extends TextTag implements DrawableTag {
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
-        return staticTextToImage(swf, characters, textRecords, textBounds, 1, transformation);
+    public SerializableImage toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+        throw new Error("this overload of toImage call is not supported on BoundedTag");
     }
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+        staticTextToImage(swf, characters, textRecords, textBounds, 1, image, transformation);
+    }
+    
+    @Override
+    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(textBounds.Xmin / SWF.unitDivisor, textBounds.Ymin / SWF.unitDivisor);
     }
 

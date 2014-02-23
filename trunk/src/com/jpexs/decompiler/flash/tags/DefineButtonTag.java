@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -228,7 +229,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     private static final Cache<RECT> rectCache = Cache.getInstance(true);
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {
+    public RECT getRect(Map<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {
         if (rectCache.contains(this)) {
             return (RECT) rectCache.get(this);
         }
@@ -276,9 +277,14 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+    public SerializableImage toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+        throw new Error("this overload of toImage call is not supported on BoundedTag");
+    }
+
+    @Override
+    public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
         if (visited.contains(buttonId)) {
-            return new SerializableImage(1, 1, SerializableImage.TYPE_4BYTE_ABGR);
+            return;
         }
         visited.push(buttonId);
         HashMap<Integer, Layer> layers = new HashMap<>();
@@ -300,13 +306,12 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         visited.pop();
         RECT displayRect = getRect(characters, visited);
         visited.push(buttonId);
-        SerializableImage ret = SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited, transformation);
+        SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited, image, transformation);
         visited.pop();
-        return ret;
     }
-
+    
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         RECT r = getRect(characters, visited);
         return new Point(r.Xmin / SWF.unitDivisor, r.Ymin / SWF.unitDivisor);
     }
