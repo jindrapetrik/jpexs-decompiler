@@ -19,19 +19,25 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import java.awt.geom.GeneralPath;
+import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,7 +59,7 @@ import java.util.regex.Pattern;
  *
  * @author JPEXS
  */
-public class DefineEditTextTag extends TextTag {
+public class DefineEditTextTag extends TextTag implements DrawableTag {
 
     @SWFType(BasicType.UI16)
     public int characterID;
@@ -609,8 +615,86 @@ public class DefineEditTextTag extends TextTag {
         return needed;
     }
 
-    //@Override
-    public List<GeneralPath> getPaths(List<Tag> tags) {
-        return null; //FIXME
+    @Override
+    public SerializableImage toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+        throw new Error("this overload of toImage call is not supported on BoundedTag");
+    }
+
+    @Override
+    public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+        FontTag font = null;
+        for (Tag tag : tags) {
+            if (tag instanceof FontTag) {
+                if (((FontTag) tag).getFontId() == fontId) {
+                    font = (FontTag) tag;
+                }
+            }
+        }
+        if (hasText) {
+            List<TEXTRECORD> textRecords = new ArrayList<>();
+            TEXTRECORD tr = new TEXTRECORD();
+            tr.styleFlagsHasFont = true;
+            tr.fontId = fontId;
+            tr.textHeight = fontHeight;
+            tr.styleFlagsHasYOffset = true;
+            tr.yOffset = fontHeight;
+            String txt;
+            if (html) {
+                txt = getInnerText(initialText);
+            } else {
+                txt = initialText;
+            }
+            tr.glyphEntries = new GLYPHENTRY[txt.length()];
+            for (int i = 0; i < txt.length(); i++) {
+                char c = txt.charAt(i);
+                Character nextChar = null;
+                if (i + 1 < txt.length()) {
+                    nextChar = txt.charAt(i + 1);
+                }
+                int advance;
+                tr.glyphEntries[i] = new GLYPHENTRY();
+                tr.glyphEntries[i].glyphIndex = font.charToGlyph(tags, c);
+                if (font.hasLayout()) {
+                    int kerningAdjustment = 0;
+                    if (nextChar != null) {
+                        kerningAdjustment = font.getGlyphKerningAdjustment(tags, tr.glyphEntries[i].glyphIndex, font.charToGlyph(tags, nextChar));
+                        kerningAdjustment /= font.getDivider();
+                    }
+                    advance = (int) Math.round(font.getDivider() * Math.round((double) fontHeight * (font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
+                } else {
+                    String fontName = FontTag.defaultFontName;
+                    advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (fontHeight / SWF.unitDivisor), c, nextChar));
+                }
+                tr.glyphEntries[i].glyphAdvance = advance;
+            }
+            textRecords.add(tr);
+            staticTextToImage(swf, characters, textRecords, bounds, 1, image, transformation);
+        }
+    }
+    
+    private String getInnerText(String html) {
+        String result = "";
+        boolean inTag = false;
+        for (int i = 0; i < html.length(); i++) {
+            char c = html.charAt(i);
+            if (c == '<') {
+                inTag = true;
+            } else if (inTag && c == '>') {
+                inTag = false;
+            } else if (!inTag) {
+                result += c;
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        return new Point(bounds.Xmin / SWF.unitDivisor, bounds.Ymin / SWF.unitDivisor);
+    }
+
+    @Override
+    public int getNumFrames() {
+        return 1;
     }
 }
