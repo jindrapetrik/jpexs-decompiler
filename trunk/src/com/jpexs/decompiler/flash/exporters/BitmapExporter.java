@@ -167,7 +167,11 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     @Override
     public void beginFill(RGB color) {
         finalizePath();
-        fillPaint = color.toColor();
+        if (color == null) {
+            fillPaint = defaultColor;
+        } else {
+            fillPaint = color.toColor();
+        }
     }
 
     @Override

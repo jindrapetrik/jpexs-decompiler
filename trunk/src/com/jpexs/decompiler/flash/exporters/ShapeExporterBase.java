@@ -302,8 +302,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         }
                     } catch (Exception ex) {
                         // Font shapes define no fillstyles per se, but do reference fillstyle index 1,
-                        // which represents the font color. We just report solid black in this case.
-                        beginFill(new RGB(Color.BLACK));
+                        // which represents the font color. We just report null in this case.
+                        beginFill(null);
                     }
                 }
                 if (!pos.equals(e.getFrom())) {
