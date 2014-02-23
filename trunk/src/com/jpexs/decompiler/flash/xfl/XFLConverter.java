@@ -401,36 +401,34 @@ public class XFLConverter {
         ret += "/>";
         return ret;
     }
-/*
-    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, SHAPE shape) {
-        return convertShape(characters, mat, shapeNum, shape.shapeRecords);
-    }
+    /*
+     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, SHAPE shape) {
+     return convertShape(characters, mat, shapeNum, shape.shapeRecords);
+     }
 
-    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, SHAPEWITHSTYLE shape,boolean morphShape) {
-        return convertShape(characters, mat, shapeNum, shape.shapeRecords, shape.fillStyles, shape.lineStyles, morphShape);
-    }
+     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, SHAPEWITHSTYLE shape,boolean morphShape) {
+     return convertShape(characters, mat, shapeNum, shape.shapeRecords, shape.fillStyles, shape.lineStyles, morphShape);
+     }
 
-    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, ShapeTag shape, boolean morphShape) {
-        return convertShape(characters, mat, shape.getShapeNum(), shape.getShapes(),morphShape);
-    }
+     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, ShapeTag shape, boolean morphShape) {
+     return convertShape(characters, mat, shape.getShapeNum(), shape.getShapes(),morphShape);
+     }
 
-    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords,boolean useLayers) {
-        return convertShape(characters, mat, shapeNum, shapeRecords, null, null, false,true);
-    }*/
+     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords,boolean useLayers) {
+     return convertShape(characters, mat, shapeNum, shapeRecords, null, null, false,true);
+     }*/
 
-    private static boolean shapeHasMultiLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles){
+    private static boolean shapeHasMultiLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles) {
         List<String> layers = getShapeLayers(characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, false);
-        return layers.size()>1;
+        return layers.size() > 1;
     }
-    
+
     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers) {
         String ret = "";
         List<String> layers = getShapeLayers(characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape);
-        if(layers.size() == 1 && !useLayers){
+        if (layers.size() == 1 && !useLayers) {
             ret += layers.get(0);
-        }
-        else
-        {
+        } else {
             int layer = 1;
             for (int l = layers.size() - 1; l >= 0; l--) {
                 ret += "<DOMLayer name=\"Layer " + (layer++) + "\">"; //color=\"#4FFF4F\"
@@ -446,11 +444,74 @@ public class XFLConverter {
         }
         return ret;
     }
-    
+
+    /**
+     * Remove bugs in shape:
+     * 
+     * ...
+     * straightrecord
+     * straightrecord
+     * stylechange
+     * straightrecord (-2,0)   <-- merge this with previous
+     * stylegchange
+     *
+     * @param shapeRecords
+     * @return
+     */
+    private static List<SHAPERECORD> smoothShape(List<SHAPERECORD> shapeRecords) {
+        List<SHAPERECORD> ret = new ArrayList<>(shapeRecords);
+
+        for (int i = 1; i < ret.size() - 1; i++) {
+            if (ret.get(i) instanceof StraightEdgeRecord && (ret.get(i - 1) instanceof StyleChangeRecord) && (ret.get(i + 1) instanceof StyleChangeRecord)) {
+                StraightEdgeRecord ser = (StraightEdgeRecord) ret.get(i);
+                StyleChangeRecord scr = (StyleChangeRecord) ret.get(i - 1);
+                StyleChangeRecord scr2 = (StyleChangeRecord) ret.get(i + 1);
+                if ((!scr.stateMoveTo && !scr.stateNewStyles) && Math.abs(ser.deltaX) < 5 && Math.abs(ser.deltaY) < 5) {
+                    if (i >= 2) {
+                        SHAPERECORD rbef = ret.get(i - 2);
+                        if (rbef instanceof StraightEdgeRecord) {
+                            StraightEdgeRecord ser_b = (StraightEdgeRecord) rbef;
+                            ser_b.generalLineFlag = true;
+                            ser_b.deltaX = ser.changeX(ser_b.deltaX);
+                            ser_b.deltaY = ser.changeY(ser_b.deltaY);
+                        } else if (rbef instanceof CurvedEdgeRecord) {
+                            CurvedEdgeRecord cer_b = (CurvedEdgeRecord) rbef;
+                            cer_b.anchorDeltaX = ser.changeX(cer_b.anchorDeltaX);
+                            cer_b.anchorDeltaY = ser.changeY(cer_b.anchorDeltaY);
+                        } else {
+                            //???
+                        }
+                        if (i >= 2) {
+                            ret.remove(i - 1);
+                            ret.remove(i - 1);
+                            if (scr.stateFillStyle0 && !scr2.stateFillStyle0) {
+                                scr2.stateFillStyle0 = true;
+                                scr2.fillStyle0 = scr.fillStyle0;
+                            }
+                            if (scr.stateFillStyle1 && !scr2.stateFillStyle1) {
+                                scr2.stateFillStyle1 = true;
+                                scr2.fillStyle1 = scr.fillStyle1;
+                            }
+                            if (scr.stateLineStyle && !scr2.stateLineStyle) {
+                                scr2.stateLineStyle = true;
+                                scr2.lineStyle = scr.lineStyle;
+                            }
+                            i-=2;
+                        }
+
+                    }
+                }
+            }
+
+        }
+        return ret;
+    }
+
     public static List<String> getShapeLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) {
         if (mat == null) {
             mat = new MATRIX();
         }
+        shapeRecords = smoothShape(shapeRecords);
         List<SHAPERECORD> edges = new ArrayList<>();
         int lineStyleCount = 0;
         int fillStyle0 = -1;
@@ -495,7 +556,7 @@ public class XFLConverter {
 
         int layer = 1;
 
-        if ((fillStyleCount > 0) || (lineStyleCount > 0)) {           
+        if ((fillStyleCount > 0) || (lineStyleCount > 0)) {
             currentLayer += "<DOMShape isFloating=\"true\">";
             currentLayer += fillsStr;
             currentLayer += strokesStr;
@@ -552,13 +613,13 @@ public class XFLConverter {
                         }
 
                         currentLayer += "</edges>";
-                        currentLayer += "</DOMShape>";                      
-                        if(!currentLayer.contains("<edges></edges>")){ //no empty layers,  TODO:handle this better
+                        currentLayer += "</DOMShape>";
+                        if (!currentLayer.contains("<edges></edges>")) { //no empty layers,  TODO:handle this better
                             layers.add(currentLayer);
                         }
                         currentLayer = "";
                     }
-                   
+
                     currentLayer += "<DOMShape isFloating=\"true\">";
                     //ret += convertShape(characters, null, shape);
                     for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
@@ -690,12 +751,12 @@ public class XFLConverter {
         if (!currentLayer.isEmpty()) {
             currentLayer += "</edges>";
             currentLayer += "</DOMShape>";
-          
-            if(!currentLayer.contains("<edges></edges>")){ //no empty layers, TODO:handle this better
+
+            if (!currentLayer.contains("<edges></edges>")) { //no empty layers, TODO:handle this better
                 layers.add(currentLayer);
             }
         }
-        return layers;                  
+        return layers;
     }
 
     private static int getLayerCount(List<Tag> tags) {
@@ -715,10 +776,10 @@ public class XFLConverter {
         return maxDepth;
     }
 
-    private static void walkShapeUsages(List<Tag> timeLineTags,HashMap<Integer, CharacterTag> characters,HashMap<Integer, Integer> usages){
+    private static void walkShapeUsages(List<Tag> timeLineTags, HashMap<Integer, CharacterTag> characters, HashMap<Integer, Integer> usages) {
         for (Tag t : timeLineTags) {
-            if(t instanceof DefineSpriteTag){
-                DefineSpriteTag sprite=(DefineSpriteTag)t;
+            if (t instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) t;
                 walkShapeUsages(sprite.subTags, characters, usages);
             }
             if (t instanceof PlaceObjectTypeTag) {
@@ -752,20 +813,20 @@ public class XFLConverter {
             }
         }
     }
-    
+
     private static List<Integer> getNonLibraryShapes(List<Tag> tags, HashMap<Integer, CharacterTag> characters) {
         HashMap<Integer, Integer> usages = new HashMap<>();
         walkShapeUsages(tags, characters, usages);
         List<Integer> ret = new ArrayList<>();
         for (int ch : usages.keySet()) {
             if (usages.get(ch) < 2) {
-                if(characters.get(ch) instanceof ShapeTag){                    
-                    ShapeTag shp=(ShapeTag)characters.get(ch);                                        
-                    if(!shapeHasMultiLayers(characters, null, shp.getShapeNum(), shp.getShapes().shapeRecords, shp.getShapes().fillStyles, shp.getShapes().lineStyles)){
+                if (characters.get(ch) instanceof ShapeTag) {
+                    ShapeTag shp = (ShapeTag) characters.get(ch);
+                    if (!shapeHasMultiLayers(characters, null, shp.getShapeNum(), shp.getShapes().shapeRecords, shp.getShapes().fillStyles, shp.getShapes().lineStyles)) {
                         ret.add(ch);
                     }
                 }
-                
+
             }
         }
         return ret;
@@ -1255,7 +1316,7 @@ public class XFLConverter {
                     ShapeTag shape = (ShapeTag) symbol;
                     symbolStr += "<DOMTimeline name=\"Symbol " + symbol.getCharacterId() + "\" currentFrame=\"0\">";
                     symbolStr += "<layers>";
-                    symbolStr += convertShape(characters, null, shape.getShapeNum(),shape.getShapes().shapeRecords,shape.getShapes().fillStyles,shape.getShapes().lineStyles,false,true);
+                    symbolStr += convertShape(characters, null, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, true);
                     symbolStr += "</layers>";
                     symbolStr += "</DOMTimeline>";
                 }
@@ -1786,10 +1847,10 @@ public class XFLConverter {
             if (t instanceof RemoveTag) {
                 RemoveTag rt = (RemoveTag) t;
                 if (rt.getDepth() == depth) {
-                    if(shapeTween && character!=null){
+                    if (shapeTween && character != null) {
                         MorphShapeTag m = (MorphShapeTag) character;
                         shapeTweener = m;
-                        shapeTween = false;    
+                        shapeTween = false;
                     }
                     character = null;
                     matrix = null;
@@ -1802,23 +1863,23 @@ public class XFLConverter {
                     isVisible = true;
                     backGroundColor = null;
                     characterId = -1;
-                    clipActions = null;                                    
+                    clipActions = null;
                 }
             }
 
             if (t instanceof ShowFrameTag) {
                 elements = "";
 
-                if ((character instanceof ShapeTag) && nonLibraryShapes.contains(characterId)) {
-                    ShapeTag shape=(ShapeTag)character;
-                    elements += convertShape(characters, matrix, shape.getShapeNum(),shape.getShapes().shapeRecords,shape.getShapes().fillStyles,shape.getShapes().lineStyles,false,false);
+                if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId)||shapeTweener!=null)) {
+                    ShapeTag shape = (ShapeTag) character;
+                    elements += convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false);
                     shapeTween = false;
                     shapeTweener = null;
                 } else if (character != null) {
                     if (character instanceof MorphShapeTag) {
                         MorphShapeTag m = (MorphShapeTag) character;
-                        elements += convertShape(characters, matrix, 3, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true,false);
-                        shapeTween = true;                        
+                        elements += convertShape(characters, matrix, 3, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false);
+                        shapeTween = true;
                     } else {
                         shapeTween = false;
                         if (character instanceof TextTag) {
