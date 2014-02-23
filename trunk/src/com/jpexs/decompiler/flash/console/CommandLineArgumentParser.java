@@ -148,7 +148,7 @@ public class CommandLineArgumentParser {
         System.out.println("java -jar ffdec.jar -export script \"C:\\decompiled\" myfile.swf -selectas3class com.example.MyClass com.example.SecondClass");
         System.out.println("java -jar ffdec.jar -format script:pcode -export script \"C:\\decompiled\" myfile.swf");
         System.out.println("java -jar ffdec.jar -format script:pcode,text:plain -export script,text,image \"C:\\decompiled\" myfile.swf");
-        System.out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\\myfile.fla\" myfile.swf");
         System.out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
         System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
         System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");

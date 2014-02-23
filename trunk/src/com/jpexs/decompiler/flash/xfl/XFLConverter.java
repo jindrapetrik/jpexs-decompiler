@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2014 PEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -143,7 +143,7 @@ public class XFLConverter {
     public static final int KEY_MODE_SHAPE_TWEEN = 17922;
     public static final int KEY_MODE_MOTION_TWEEN = 8195;
     public static final int KEY_MODE_SHAPE_LAYERS = 8192;
-    
+
     private XFLConverter() {
     }
 
@@ -726,7 +726,7 @@ public class XFLConverter {
     }
 
     private static List<Integer> getOneInstanceShapes(List<Tag> tags, HashMap<Integer, CharacterTag> characters) {
-        if (true) { //the feature was removed due to multiple layers in some shapes            
+        if (true) { //the feature was removed due to multiple layers in some shapes
             return new ArrayList<>();
         }
         HashMap<Integer, Integer> usages = new HashMap<>();
@@ -1013,7 +1013,7 @@ public class XFLConverter {
         if (cacheAsBitmap) {
             ret += " cacheAsBitmap=\"true\"";
         }
-        if (!isVisible && flaVersion.ordinal()>=FLAVersion.CS5_5.ordinal()) {
+        if (!isVisible && flaVersion.ordinal() >= FLAVersion.CS5_5.ordinal()) {
             ret += " isVisible=\"false\"";
         }
         ret += ">";
@@ -1107,7 +1107,7 @@ public class XFLConverter {
         return new Date().getTime() / 1000;
     }
 
-    public static String convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles,FLAVersion flaVersion) {
+    public static String convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion) {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
@@ -1211,7 +1211,7 @@ public class XFLConverter {
                                     } else if (character instanceof DefineVideoStreamTag) {
                                         recCharStr = convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null);
                                     } else {
-                                        recCharStr = convertSymbolInstance(null, matrix, null, colorTransformAlpha, false, blendMode, filters, true, null, null, characters.get(rec.characterId), characters, tags,flaVersion);
+                                        recCharStr = convertSymbolInstance(null, matrix, null, colorTransformAlpha, false, blendMode, filters, true, null, null, characters.get(rec.characterId), characters, tags, flaVersion);
                                     }
                                     int duration = frame - lastFrame;
                                     lastFrame = frame;
@@ -1248,7 +1248,7 @@ public class XFLConverter {
                     if (sprite.subTags.isEmpty()) { //probably AS2 class
                         continue;
                     }
-                    symbolStr += convertTimeline(sprite.spriteId, oneInstanceShapes, backgroundColor, tags, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterId(),flaVersion);
+                    symbolStr += convertTimeline(sprite.spriteId, oneInstanceShapes, backgroundColor, tags, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files);
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
                     ShapeTag shape = (ShapeTag) symbol;
@@ -1269,11 +1269,11 @@ public class XFLConverter {
                     symbLinkStr += " itemIcon=\"" + itemIcon + "\"";
                 }
                 symbLinkStr += " loadImmediate=\"false\"";
-                if(flaVersion.ordinal()>=FLAVersion.CS5_5.ordinal()) {
+                if (flaVersion.ordinal() >= FLAVersion.CS5_5.ordinal()) {
                     symbLinkStr += " lastModified=\"" + getTimestamp() + "\"";
                     //TODO: itemID=\"518de416-00000341\"
                 }
-                symbLinkStr += "/>"; 
+                symbLinkStr += "/>";
                 symbols.add(symbLinkStr);
             } else if (symbol instanceof ImageTag) {
                 ImageTag imageTag = (ImageTag) symbol;
@@ -1485,7 +1485,7 @@ public class XFLConverter {
                 }
                 String symbolFile = "movie" + symbol.getCharacterId() + "." + "flv";
                 String mediaLinkStr = "";
-                if (data.length == 0) { //Video has zero length, this probably means it is "Video - Actionscript-controlled"                    
+                if (data.length == 0) { //Video has zero length, this probably means it is "Video - Actionscript-controlled"
                     long ts = getTimestamp();
                     String datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";
                     mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceExternalFilepath=\"./LIBRARY/" + symbolFile + "\" sourceLastImported=\"" + ts + "\" videoDataHRef=\"" + datFileName + "\" channels=\"0\" isSpecial=\"true\" />";
@@ -1564,7 +1564,7 @@ public class XFLConverter {
         }
     }
 
-    private static String convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, List<Tag> tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements) {
+    private static String convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, List<Tag> tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files) {
         String ret = "";
         DefineSoundTag sound = null;
         if (startSound != null) {
@@ -1590,14 +1590,16 @@ public class XFLConverter {
         }
         String soundEnvelopeStr = "";
         if (soundStreamHead != null && startSound == null) {
-            ret += " soundName=\"sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat() + "\"";
+            String soundName = "sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat();
+            ret += " soundName=\"" + soundName + "\"";
             ret += " soundSync=\"stream\"";
             soundEnvelopeStr += "<SoundEnvelope>";
             soundEnvelopeStr += "<SoundEnvelopePoint level0=\"32768\" level1=\"32768\"/>";
             soundEnvelopeStr += "</SoundEnvelope>";
         }
         if (startSound != null && sound != null) {
-            ret += " soundName=\"sound" + sound.soundId + "." + sound.getExportFormat() + "\"";
+            String soundName = "sound" + sound.soundId + "." + sound.getExportFormat();
+            ret += " soundName=\"" + soundName + "\"";
             if (startSound.soundInfo.hasInPoint) {
                 ret += " inPoint44=\"" + startSound.soundInfo.inPoint + "\"";
             }
@@ -1689,7 +1691,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private static String convertFrames(String prevStr, String afterStr, List<Integer> oneInstanceShapes, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion) {
+    private static String convertFrames(String prevStr, String afterStr, List<Integer> oneInstanceShapes, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files) {
         String ret = "";
         prevStr += "<frames>";
         int frame = -1;
@@ -1820,14 +1822,14 @@ public class XFLConverter {
                         } else if (character instanceof DefineVideoStreamTag) {
                             elements += convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions);
                         } else {
-                            elements += convertSymbolInstance(instanceName, matrix, colorTransForm, colorTransFormAlpha, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, character, characters, tags,flaVersion);
+                            elements += convertSymbolInstance(instanceName, matrix, colorTransForm, colorTransFormAlpha, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, character, characters, tags, flaVersion);
                         }
                     }
                 }
 
                 frame++;
                 if (!elements.equals(lastElements) && frame > 0) {
-                    ret += convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, duration, "", lastElements);
+                    ret += convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, duration, "", lastElements, files);
                     duration = 1;
                 } else if (frame == 0) {
                     duration = 1;
@@ -1841,7 +1843,7 @@ public class XFLConverter {
         }
         if (!lastElements.isEmpty()) {
             frame++;
-            ret += convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements);
+            ret += convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files);
         }
         afterStr = "</frames>" + afterStr;
         if (!ret.isEmpty()) {
@@ -1966,7 +1968,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, List<Tag> tags, List<Tag> timeLineTags) {
+    public static String convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, List<Tag> tags, List<Tag> timeLineTags, HashMap<String, byte[]> files) {
         String ret = "";
         StartSoundTag lastStartSound = null;
         SoundStreamHeadTypeTag lastSoundStreamHead = null;
@@ -1977,14 +1979,30 @@ public class XFLConverter {
         for (Tag t : timeLineTags) {
             if (t instanceof StartSoundTag) {
                 startSound = (StartSoundTag) t;
+
+                for (Tag ta : tags) {
+                    if (ta instanceof DefineSoundTag) {
+                        DefineSoundTag s = (DefineSoundTag) ta;
+                        if (s.soundId == startSound.soundId) {
+                            if (!files.containsKey("sound" + s.soundId + "." + s.getExportFormat())) { //Sound was not exported
+                                startSound = null; //ignore
+                            }
+                            break;
+                        }
+                    }
+                }
+
             }
             if (t instanceof SoundStreamHeadTypeTag) {
                 soundStreamHead = (SoundStreamHeadTypeTag) t;
+                if (!files.containsKey("sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat())) { //Sound was not exported
+                    soundStreamHead = null; //ignore
+                }
             }
             if (t instanceof ShowFrameTag) {
                 if (soundStreamHead != null || startSound != null) {
                     if (lastSoundStreamHead != null || lastStartSound != null) {
-                        ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "");
+                        ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files);
                     }
                     frame += duration;
                     duration = 1;
@@ -2002,7 +2020,7 @@ public class XFLConverter {
                 frame = 0;
                 duration = 1;
             }
-            ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "");
+            ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files);
         }
         if (!ret.isEmpty()) {
             ret = "<DOMLayer name=\"Layer " + layerIndex + "\" color=\"" + randomOutlineColor() + "\">"
@@ -2023,7 +2041,7 @@ public class XFLConverter {
         return outlineColor.toHexRGB();
     }
 
-    public static String convertTimeline(int spriteId, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion) {
+    public static String convertTimeline(int spriteId, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files) {
         String ret = "";
         ret += "<DOMTimeline name=\"" + name + "\">";
         ret += "<layers>";
@@ -2046,7 +2064,7 @@ public class XFLConverter {
                         ret += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + randomOutlineColor() + "\" ";
                         ret += " layerType=\"mask\" locked=\"true\"";
                         ret += ">";
-                        ret += convertFrames("", "", oneInstanceShapes, tags, timelineTags, characters, po.getDepth(),flaVersion);
+                        ret += convertFrames("", "", oneInstanceShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files);
                         ret += "</DOMLayer>";
                         index++;
                         break;
@@ -2087,7 +2105,7 @@ public class XFLConverter {
             }
             layerPrev += ">";
             String layerAfter = "</DOMLayer>";
-            String cf = convertFrames(layerPrev, layerAfter, oneInstanceShapes, tags, timelineTags, characters, d,flaVersion);
+            String cf = convertFrames(layerPrev, layerAfter, oneInstanceShapes, tags, timelineTags, characters, d, flaVersion, files);
             if (cf.isEmpty()) {
                 index--;
             }
@@ -2096,7 +2114,7 @@ public class XFLConverter {
 
         int soundLayerIndex = layerCount;
         layerCount++;
-        ret += convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags);
+        ret += convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags, files);
         ret += "</layers>";
         ret += "</DOMTimeline>";
         return ret;
@@ -2491,8 +2509,8 @@ public class XFLConverter {
         return ret;
     }
 
-    public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException {                
-        
+    public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException {
+
         FileAttributesTag fa = null;
         for (Tag t : swf.tags) {
             if (t instanceof FileAttributesTag) {
@@ -2506,9 +2524,9 @@ public class XFLConverter {
             useAS3 = fa.actionScript3;
             useNetwork = fa.useNetwork;
         }
-        
-        if(!useAS3 && flaVersion.minASVersion()>2){
-            throw new IllegalArgumentException("FLA version "+flaVersion+" does not support AS1/2");
+
+        if (!useAS3 && flaVersion.minASVersion() > 2) {
+            throw new IllegalArgumentException("FLA version " + flaVersion + " does not support AS1/2");
         }
         File file = new File(outfile);
         File outDir = file.getParentFile();
@@ -2533,7 +2551,6 @@ public class XFLConverter {
         Map<Integer, String> characterClasses = getCharacterClasses(swf.tags);
         Map<Integer, String> characterVariables = getCharacterVariables(swf.tags);
 
-        
         String backgroundColor = "#ffffff";
         for (Tag t : swf.tags) {
             if (t instanceof SetBackgroundColorTag) {
@@ -2541,7 +2558,7 @@ public class XFLConverter {
                 backgroundColor = sbc.backgroundColor.toHexRGB();
             }
         }
-        domDocument += "<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\""+flaVersion.xflVersion()+"\" creatorInfo=\"" + generator + "\" platform=\"Windows\" versionInfo=\"Saved by " + generatorVerName + "\" majorVersion=\"" + generatorVersion + "\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"";
+        domDocument += "<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"" + flaVersion.xflVersion() + "\" creatorInfo=\"" + generator + "\" platform=\"Windows\" versionInfo=\"Saved by " + generatorVerName + "\" majorVersion=\"" + generatorVersion + "\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"";
         domDocument += " backgroundColor=\"" + backgroundColor + "\"";
         domDocument += " frameRate=\"" + swf.frameRate + "\"";
 
@@ -2555,9 +2572,9 @@ public class XFLConverter {
         }
         domDocument += ">";
 
-        domDocument += convertLibrary(swf, characterVariables, characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files, datfiles,flaVersion);
+        domDocument += convertLibrary(swf, characterVariables, characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files, datfiles, flaVersion);
         domDocument += "<timelines>";
-        domDocument += convertTimeline(0, oneInstaceShapes, backgroundColor, swf.tags, swf.tags, characters, "Scene 1",flaVersion);
+        domDocument += convertTimeline(0, oneInstaceShapes, backgroundColor, swf.tags, swf.tags, characters, "Scene 1", flaVersion, files);
         domDocument += "</timelines>";
         domDocument += "</DOMDocument>";
         domDocument = prettyFormatXML(domDocument);
@@ -2597,7 +2614,7 @@ public class XFLConverter {
             }
         }
 
-        int flaSwfVersion = swf.version>flaVersion.maxSwfVersion()?flaVersion.maxSwfVersion():swf.version;
+        int flaSwfVersion = swf.version > flaVersion.maxSwfVersion() ? flaVersion.maxSwfVersion() : swf.version;
         String publishSettings = "<flash_profiles>\n"
                 + "<flash_profile version=\"1.0\" name=\"Default\" current=\"true\">\n"
                 + "  <PublishFormatProperties enabled=\"true\">\n"
@@ -2609,7 +2626,7 @@ public class XFLConverter {
                 + "    <gif>0</gif>\n"
                 + "    <jpeg>0</jpeg>\n"
                 + "    <png>0</png>\n"
-                + (flaVersion.ordinal()>=FLAVersion.CC.ordinal()?"    <svg>0</svg>\n":"    <qt>0</qt>\n")
+                + (flaVersion.ordinal() >= FLAVersion.CC.ordinal() ? "    <svg>0</svg>\n" : "    <qt>0</qt>\n")
                 + "    <rnwk>0</rnwk>\n"
                 + "    <swc>0</swc>\n"
                 + "    <flashDefaultName>1</flashDefaultName>\n"
@@ -2619,7 +2636,7 @@ public class XFLConverter {
                 + "    <gifDefaultName>1</gifDefaultName>\n"
                 + "    <jpegDefaultName>1</jpegDefaultName>\n"
                 + "    <pngDefaultName>1</pngDefaultName>\n"
-                + (flaVersion.ordinal()>=FLAVersion.CC.ordinal()?"    <svgDefaultName>1</svgDefaultName>\n":"    <qtDefaultName>1</qtDefaultName>\n")
+                + (flaVersion.ordinal() >= FLAVersion.CC.ordinal() ? "    <svgDefaultName>1</svgDefaultName>\n" : "    <qtDefaultName>1</qtDefaultName>\n")
                 + "    <rnwkDefaultName>1</rnwkDefaultName>\n"
                 + "    <swcDefaultName>1</swcDefaultName>\n"
                 + "    <flashFileName>" + baseName + ".swf</flashFileName>\n"
@@ -2629,7 +2646,7 @@ public class XFLConverter {
                 + "    <gifFileName>" + baseName + ".gif</gifFileName>\n"
                 + "    <jpegFileName>" + baseName + ".jpg</jpegFileName>\n"
                 + "    <pngFileName>" + baseName + ".png</pngFileName>\n"
-                + (flaVersion.ordinal()>=FLAVersion.CC.ordinal()?"    <svgFileName>1</svgFileName>\n":"    <qtFileName>1</qtFileName>\n")
+                + (flaVersion.ordinal() >= FLAVersion.CC.ordinal() ? "    <svgFileName>1</svgFileName>\n" : "    <qtFileName>1</qtFileName>\n")
                 + "    <rnwkFileName>" + baseName + ".smil</rnwkFileName>\n"
                 + "    <swcFileName>" + baseName + ".swc</swcFileName>\n"
                 + "  </PublishFormatProperties>\n"
@@ -2672,8 +2689,8 @@ public class XFLConverter {
                 + "    <EventFormat>0</EventFormat>\n"
                 + "    <EventCompress>7</EventCompress>\n"
                 + "    <OverrideSounds>0</OverrideSounds>\n"
-                + "    <Version>"+flaSwfVersion+"</Version>\n"
-                + "    <ExternalPlayer>"+FLAVersion.swfVersionToPlayer(flaSwfVersion)+"</ExternalPlayer>\n"
+                + "    <Version>" + flaSwfVersion + "</Version>\n"
+                + "    <ExternalPlayer>" + FLAVersion.swfVersionToPlayer(flaSwfVersion) + "</ExternalPlayer>\n"
                 + "    <ActionScriptVersion>" + (useAS3 ? "3" : "2") + "</ActionScriptVersion>\n"
                 + "    <PackageExportFrame>1</PackageExportFrame>\n"
                 + "    <PackagePaths></PackagePaths>\n"
@@ -2703,8 +2720,7 @@ public class XFLConverter {
                 + "    <DefaultLibraryLinkage>rsl</DefaultLibraryLinkage>\n"
                 + "    <RSLPreloaderMethod>wrap</RSLPreloaderMethod>\n"
                 + "    <RSLPreloaderSWF>$(AppConfig)/ActionScript 3.0/rsls/loader_animation.swf</RSLPreloaderSWF>\n"
-                + ((flaVersion.ordinal()>=FLAVersion.CC.ordinal())?(
-                  "    <LibraryPath>\n"
+                + ((flaVersion.ordinal() >= FLAVersion.CC.ordinal()) ? ("    <LibraryPath>\n"
                 + "      <library-path-entry>\n"
                 + "        <swc-path>$(AppConfig)/ActionScript 3.0/libs</swc-path>\n"
                 + "        <linkage>merge</linkage>\n"
@@ -2721,9 +2737,8 @@ public class XFLConverter {
                 + "      </library-path-entry>\n"
                 + "    </LibraryPath>\n"
                 + "    <LibraryVersions>\n"
-                + "    </LibraryVersions> "):    
-                
-                  "    <LibraryPath>\n"
+                + "    </LibraryVersions> ")
+                : "    <LibraryPath>\n"
                 + "      <library-path-entry>\n"
                 + "        <swc-path>$(AppConfig)/ActionScript 3.0/libs</swc-path>\n"
                 + "        <linkage>merge</linkage>\n"
@@ -2745,8 +2760,6 @@ public class XFLConverter {
                 + "        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>\n"
                 + "      </library-version>\n"
                 + "    </LibraryVersions>\n")
-                
-                
                 + "  </PublishFlashProperties>\n"
                 + "  <PublishJpegProperties enabled=\"true\">\n"
                 + "    <Width>" + width + "</Width>\n"
@@ -2810,9 +2823,8 @@ public class XFLConverter {
                 + "    <MaxColors>255</MaxColors>\n"
                 + "    <PaletteName></PaletteName>\n"
                 + "  </PublishPNGProperties>\n"
-                
-                + ((flaVersion.ordinal()>=FLAVersion.CC.ordinal())?"":
-                  ("  <PublishQTProperties enabled=\"true\">\n"
+                + ((flaVersion.ordinal() >= FLAVersion.CC.ordinal()) ? ""
+                : ("  <PublishQTProperties enabled=\"true\">\n"
                 + "    <Width>" + width + "</Width>\n"
                 + "    <Height>" + height + "</Height>\n"
                 + "    <MatchMovieDim>1</MatchMovieDim>\n"
