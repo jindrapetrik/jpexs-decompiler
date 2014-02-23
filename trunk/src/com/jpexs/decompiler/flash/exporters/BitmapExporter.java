@@ -65,14 +65,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private Color lineColor;
     private Stroke lineStroke;
     private Stroke defaultStroke;
-    private Matrix transform;
     private double unitDivisor;
-
-    public static SerializableImage export(SWF swf, SHAPE shape) {
-        BitmapExporter exporter = new BitmapExporter(swf, shape, null);
-        exporter.export();
-        return exporter.getImage();
-    }
 
     public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor);
@@ -122,7 +115,6 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
 
     private void exportTo(SerializableImage image, Matrix transformation) {
         this.image = image;
-        this.transform = transformation;
         graphics = (Graphics2D) image.getGraphics();
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);

@@ -668,7 +668,7 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                 tr.glyphEntries[i].glyphAdvance = advance;
             }
             textRecords.add(tr);
-            staticTextToImage(swf, characters, textRecords, bounds, 1, image, getTextMatrix(), transformation);
+            staticTextToImage(swf, characters, textRecords, 1, image, getTextMatrix(), transformation);
         }
     }
     

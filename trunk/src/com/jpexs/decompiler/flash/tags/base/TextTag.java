@@ -192,7 +192,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         return att;
     }
 
-    public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation) {
+    public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
         int textHeight = 12;

@@ -138,7 +138,6 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     m.translate(-rect.Xmin, -rect.Ymin);
                     drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), image, m);
                     img = image;
-                    
                 } else {
                     img = drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
                 }
