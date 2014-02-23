@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -125,6 +126,9 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     @Override
     public void beginFill(RGB color) {
+        if (color == null) {
+            color = new RGB(Color.BLACK);
+        }
         finalizePath();
         path.setAttribute("stroke", "none");
         path.setAttribute("fill", color.toHexRGB());
