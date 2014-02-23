@@ -808,19 +808,21 @@ public class SWFInputStream extends InputStream {
         private final boolean parallel;
         private final boolean skipUnusualTags;
         private final SWF swf;
+        private final boolean gfx;
 
-        public TagResolutionTask(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags) {
+        public TagResolutionTask(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) {
             this.tag = tag;
             this.version = version;
             this.level = level;
             this.parallel = parallel;
             this.skipUnusualTags = skipUnusualTags;
             this.swf = swf;
+            this.gfx = gfx;
         }
 
         @Override
         public Tag call() throws Exception {
-            return SWFInputStream.resolveTag(swf, tag, version, level, parallel, skipUnusualTags);
+            return SWFInputStream.resolveTag(swf, tag, version, level, parallel, skipUnusualTags, gfx);
         }
     }
 
@@ -837,7 +839,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags) throws IOException, InterruptedException {
+    public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags, boolean gfx) throws IOException, InterruptedException {
         ExecutorService executor = null;
         List<Future<Tag>> futureResults = new ArrayList<>();
         if (parallel) {
@@ -851,7 +853,7 @@ public class SWFInputStream extends InputStream {
         while (true) {
             long pos = getPos();
             try {
-                tag = readTag(swf, level, pos, parseTags && !parallel, parallel, skipUnusualTags);
+                tag = readTag(swf, level, pos, parseTags && !parallel, parallel, skipUnusualTags, gfx);
             } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
@@ -880,7 +882,7 @@ public class SWFInputStream extends InputStream {
             } else {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: //FileAttributes
-                        FileAttributesTag fileAttributes = (FileAttributesTag) resolveTag(swf, tag, version, level, parallel, skipUnusualTags);
+                        FileAttributesTag fileAttributes = (FileAttributesTag) resolveTag(swf, tag, version, level, parallel, skipUnusualTags, gfx);
                         if (fileAttributes.actionScript3) {
                             isAS3 = true;
                         }
@@ -923,7 +925,7 @@ public class SWFInputStream extends InputStream {
 
             if (doParse) {
                 if (parallel) {
-                    Future<Tag> future = executor.submit(new TagResolutionTask(swf, tag, version, level, parallel, skipUnusualTags));
+                    Future<Tag> future = executor.submit(new TagResolutionTask(swf, tag, version, level, parallel, skipUnusualTags, gfx));
                     futureResults.add(future);
                 }
             }
@@ -945,7 +947,7 @@ public class SWFInputStream extends InputStream {
         return tags;
     }
 
-    public static Tag resolveTag(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags) throws InterruptedException {
+    public static Tag resolveTag(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) throws InterruptedException {
         Tag ret;
 
         byte[] data = tag.getData(version);
@@ -1180,38 +1182,45 @@ public class SWFInputStream extends InputStream {
                 case 94:
                     ret = new PlaceObject4Tag(swf, data, version, pos);
                     break;
-                case 1000:
-                    ret = new ExporterInfoTag(swf, data, version, pos);
-                    break;
-                case 1001:
-                    ret = new DefineExternalImage(swf, data, version, pos);
-                    break;
-                case 1002:
-                    ret = new FontTextureInfo(swf, data, version, pos);
-                    break;
-                case 1003:
-                    ret = new DefineExternalGradient(swf, data, version, pos);
-                    break;
-                case 1004:
-                    ret = new DefineGradientMap(swf, data, version, pos);
-                    break;
-                case 1005:
-                    ret = new DefineCompactedFont(swf, data, version, pos);
-                    break;
-                case 1006:
-                    ret = new DefineExternalSound(swf, data, version, pos);
-                    break;
-                case 1007:
-                    ret = new DefineExternalStreamSound(swf, data, version, pos);
-                    break;
-                case 1008:
-                    ret = new DefineSubImage(swf, data, version, pos);
-                    break;
-                case 1009:
-                    ret = new DefineExternalImage2(swf, data, version, pos);
-                    break;
                 default:
-                    ret = new UnknownTag(swf, tag.getId(), data, pos);
+                    if (gfx) {   //GFX tags only in GFX files. There may be incorrect GFX tags in non GFX files
+                        switch (tag.getId()) {
+                            case 1000:
+                                ret = new ExporterInfoTag(swf, data, version, pos);
+                                break;
+                            case 1001:
+                                ret = new DefineExternalImage(swf, data, version, pos);
+                                break;
+                            case 1002:
+                                ret = new FontTextureInfo(swf, data, version, pos);
+                                break;
+                            case 1003:
+                                ret = new DefineExternalGradient(swf, data, version, pos);
+                                break;
+                            case 1004:
+                                ret = new DefineGradientMap(swf, data, version, pos);
+                                break;
+                            case 1005:
+                                ret = new DefineCompactedFont(swf, data, version, pos);
+                                break;
+                            case 1006:
+                                ret = new DefineExternalSound(swf, data, version, pos);
+                                break;
+                            case 1007:
+                                ret = new DefineExternalStreamSound(swf, data, version, pos);
+                                break;
+                            case 1008:
+                                ret = new DefineSubImage(swf, data, version, pos);
+                                break;
+                            case 1009:
+                                ret = new DefineExternalImage2(swf, data, version, pos);
+                                break;
+                            default:
+                                ret = new UnknownTag(swf, tag.getId(), data, pos);
+                        }
+                    } else {
+                        ret = new UnknownTag(swf, tag.getId(), data, pos);
+                    }
             }
         } catch (IOException ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", ex);
@@ -1236,7 +1245,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public Tag readTag(SWF swf, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
+    public Tag readTag(SWF swf, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags, boolean gfx) throws IOException, InterruptedException {
         int tagIDTagLength = readUI16();
         int tagID = (tagIDTagLength) >> 6;
         if (tagID == 0) {
@@ -1289,7 +1298,7 @@ public class SWFInputStream extends InputStream {
         }
         if (resolve) {
             try {
-                return resolveTag(swf, ret, version, level, parallel, skipUnusualTags);
+                return resolveTag(swf, ret, version, level, parallel, skipUnusualTags, gfx);
             } catch (EndOfStreamException ex) {
                 return ret;
             }
@@ -1993,9 +2002,9 @@ public class SWFInputStream extends InputStream {
         ret.buttonStateOver = readUB(1) == 1;
         ret.buttonStateUp = readUB(1) == 1;
 
-        if (!ret.buttonHasBlendMode && !ret.buttonHasFilterList && 
-            !ret.buttonStateHitTest && !ret.buttonStateDown && 
-            !ret.buttonStateOver && !ret.buttonStateUp && ret.reserved == 0) {
+        if (!ret.buttonHasBlendMode && !ret.buttonHasFilterList
+                && !ret.buttonStateHitTest && !ret.buttonStateDown
+                && !ret.buttonStateOver && !ret.buttonStateUp && ret.reserved == 0) {
             return null;
         }
 

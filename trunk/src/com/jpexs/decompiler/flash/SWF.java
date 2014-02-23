@@ -414,7 +414,7 @@ public final class SWF implements TreeItem {
         if (checkOnly) {
             //return;
         }
-        tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly);
+        tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, gfx);
         if (!checkOnly) {
             Map<Long, Tag> tagMap = new HashMap<>();
             for (Tag tag : tags) {

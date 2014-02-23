@@ -44,6 +44,9 @@ public class Matrix {
     }
 
     public Matrix(MATRIX matrix) {
+        if(matrix == null){
+            matrix = new MATRIX();
+        }
         translateX = matrix.translateX;
         translateY = matrix.translateY;
         if (matrix.hasScale) {
