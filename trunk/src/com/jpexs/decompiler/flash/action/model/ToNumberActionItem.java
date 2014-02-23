@@ -34,7 +34,7 @@ public class ToNumberActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("Number(");
         value.toString(writer, localData);
         return writer.append(")");

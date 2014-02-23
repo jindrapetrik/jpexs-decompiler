@@ -39,7 +39,7 @@ public class BreakItem extends GraphTargetItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("break");
         if (writer instanceof NulWriter) {
             NulWriter nulWriter = (NulWriter) writer;

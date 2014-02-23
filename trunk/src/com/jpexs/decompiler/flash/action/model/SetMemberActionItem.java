@@ -80,7 +80,7 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (!((objectName instanceof DirectValueActionItem) && (((DirectValueActionItem) objectName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
             object.toString(writer, localData);

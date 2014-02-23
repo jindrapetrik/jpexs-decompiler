@@ -27,7 +27,7 @@ import java.util.List;
 public class StopAllSoundsActionItem extends ActionItem {
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("stopAllSounds()");
     }
 

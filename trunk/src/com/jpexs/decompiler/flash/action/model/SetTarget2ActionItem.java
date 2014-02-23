@@ -35,7 +35,7 @@ public class SetTarget2ActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("tellTarget(");
         target.toString(writer, localData);
         return writer.append(")");

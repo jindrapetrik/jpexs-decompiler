@@ -39,7 +39,7 @@ public class AddActionItem extends BinaryOpItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (rightSide.getPrecedence() >= precedence) { //string + vs number +
             String ret = "";
             if (leftSide.getPrecedence() > precedence) {

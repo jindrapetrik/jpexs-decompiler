@@ -76,7 +76,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (namespace != null) {
             namespace.toString(writer, localData);
             writer.append("::");

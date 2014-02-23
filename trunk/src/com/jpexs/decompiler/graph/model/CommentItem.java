@@ -38,7 +38,7 @@ public class CommentItem extends GraphTargetItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("/* ");
         for (int i = 0; i < commentLines.length; i++) {
             writer.append(commentLines[i]);

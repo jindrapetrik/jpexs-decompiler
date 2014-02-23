@@ -35,7 +35,7 @@ public class EscapeXElemAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("{");
         expression.toString(writer, localData);
         return writer.append("}");

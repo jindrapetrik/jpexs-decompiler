@@ -31,7 +31,7 @@ public class UnsupportedActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("//" + AppStrings.translate("decompilation.unsupported") + ":" + value);
     }
 

@@ -37,7 +37,7 @@ public class TypeOfActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("typeof(");
         value.toString(writer, localData);
         return writer.append(")");

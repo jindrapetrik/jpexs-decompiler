@@ -113,7 +113,7 @@ public abstract class GraphTargetItem implements Serializable {
         return writer;
     }
 
-    protected abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
+    public abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
 
     public String toString(LocalData localData) throws InterruptedException {
         HilightedTextWriter writer = new HilightedTextWriter(false);
@@ -165,7 +165,7 @@ public abstract class GraphTargetItem implements Serializable {
         return writer;
     }
 
-    protected GraphTextWriter appendToNoQuotes(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendToNoQuotes(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData);
     }
 

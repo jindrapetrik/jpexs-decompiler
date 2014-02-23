@@ -50,7 +50,7 @@ public class CloneSpriteActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("duplicateMovieClip(");
         target.toString(writer, localData);
         writer.append(",");

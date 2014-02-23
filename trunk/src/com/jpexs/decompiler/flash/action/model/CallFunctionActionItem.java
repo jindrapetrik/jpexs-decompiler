@@ -45,7 +45,7 @@ public class CallFunctionActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         String paramStr = "";
         stripQuotes(functionName, localData, writer);
         writer.append("(");

@@ -35,7 +35,7 @@ public class DefineRegisterActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("var " + identifier);
     }
 

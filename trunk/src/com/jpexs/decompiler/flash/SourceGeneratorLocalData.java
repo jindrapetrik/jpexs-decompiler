@@ -26,11 +26,12 @@ import java.util.HashMap;
 public class SourceGeneratorLocalData implements Serializable {
 
     public HashMap<String, Integer> registerVars;
-    public Boolean inFunction;
+    public Integer inFunction;
     public Boolean inMethod;
     public Integer forInLevel;
+    
 
-    public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Boolean inFunction, Boolean inMethod, Integer forInLevel) {
+    public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {
         this.registerVars = registerVars;
         this.inFunction = inFunction;
         this.inMethod = inMethod;

@@ -35,7 +35,7 @@ public class MultiplyAVM2Item extends BinaryOpItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (rightSide instanceof ModuloAVM2Item) {
             if (leftSide.getPrecedence() > precedence) {
                 writer.append("(");

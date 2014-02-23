@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
@@ -35,6 +36,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -47,6 +49,8 @@ public class FunctionActionItem extends ActionItem {
     public List<String> paramNames;
     public GraphTargetItem calculatedFunctionName;
     private int regStart;
+    private List<VariableActionItem> variables;
+
     public static final int REGISTER_THIS = 1;
     public static final int REGISTER_ARGUMENTS = 2;
     public static final int REGISTER_SUPER = 3;
@@ -65,20 +69,18 @@ public class FunctionActionItem extends ActionItem {
         super(null, PRECEDENCE_PRIMARY);
     }
 
-    public FunctionActionItem(GraphSourceItem instruction, String functionName, List<String> paramNames, List<GraphTargetItem> actions, List<String> constants, int regStart) {
+    public FunctionActionItem(GraphSourceItem instruction, String functionName, List<String> paramNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.actions = actions;
         this.constants = constants;
         this.functionName = functionName;
         this.paramNames = paramNames;
         this.regStart = regStart;
+        this.variables = variables;
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (true) {
-            //return writer.appendNoHilight("<func>")
-        }
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("function");
         if (calculatedFunctionName != null) {
             writer.append(" ");
@@ -88,6 +90,7 @@ public class FunctionActionItem extends ActionItem {
             writer.append(functionName);
         }
         writer.append("(");
+
         for (int p = 0; p < paramNames.size(); p++) {
             if (p > 0) {
                 writer.append(", ");
@@ -101,6 +104,7 @@ public class FunctionActionItem extends ActionItem {
         writer.append(")").newLine();
         writer.append("{").newLine();
         writer.indent();
+
         Graph.graphToString(actions, writer, localData);
         writer.unindent();
         return writer.append("}");
@@ -152,21 +156,18 @@ public class FunctionActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+
+        Set<String> usedNames = new HashSet<>();
+        for (VariableActionItem v : variables) {
+            usedNames.add(v.getVariableName());
+        }
+
         List<GraphSourceItem> ret = new ArrayList<>();
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         List<Integer> paramRegs = new ArrayList<>();
         @SuppressWarnings("unchecked")
         SourceGeneratorLocalData localDataCopy = (SourceGeneratorLocalData) Helper.deepCopy(localData);
-        HashMap<String, Integer> registerVars = asGenerator.getRegisterVars(localDataCopy);
-        registerVars.put("_parent", REGISTER_PARENT);
-        registerVars.put("_root", REGISTER_ROOT);
-        registerVars.put("super", REGISTER_SUPER);
-        registerVars.put("arguments", REGISTER_ARGUMENTS);
-        registerVars.put("this", REGISTER_THIS);
-        registerVars.put("_global", REGISTER_GLOBAL);
-        for (int i = 0; i < paramNames.size(); i++) {
-            registerVars.put(paramNames.get(i), (7 + i)); //(paramNames.size() - i)));
-        }
+        localDataCopy.inFunction++;
         boolean preloadParentFlag = false;
         boolean preloadRootFlag = false;
         boolean preloadSuperFlag = false;
@@ -177,135 +178,100 @@ public class FunctionActionItem extends ActionItem {
         boolean suppressParentFlag = false;
         boolean suppressArgumentsFlag = false;
         boolean suppressThisFlag = false;
-        TreeSet<Integer> usedRegisters = new TreeSet<>();
-        if (actions != null && !actions.isEmpty()) {
-            asGenerator.setInFunction(localDataCopy, true);
-            List<Action> body = asGenerator.toActionList(asGenerator.generate(localDataCopy, actions));
-            for (Action a : body) {
-                if (a instanceof ActionStoreRegister) {
-                    usedRegisters.add(((ActionStoreRegister) a).registerNumber);
-                }
-                if (a instanceof ActionPush) {
-                    ActionPush ap = (ActionPush) a;
-                    for (Object o : ap.values) {
-                        if (o instanceof RegisterNumber) {
-                            usedRegisters.add(((RegisterNumber) o).number);
-                        }
-                    }
-                }
-            }
-            if (usedRegisters.contains(REGISTER_PARENT)) {
-                preloadParentFlag = true;
-            } else {
-                suppressParentFlag = true;
-            }
-            if (usedRegisters.contains(REGISTER_ROOT)) {
-                preloadRootFlag = true;
-            }
-            if (usedRegisters.contains(REGISTER_SUPER)) {
-                preloadSuperFlag = true;
-            }
-            if (usedRegisters.contains(REGISTER_ARGUMENTS)) {
-                preloadArgumentsFlag = true;
-            } else {
-                suppressArgumentsFlag = true;
-            }
-            if (usedRegisters.contains(REGISTER_THIS)) {
-                preloadThisFlag = true;
-            } else {
-                suppressThisFlag = true;
-            }
-            if (usedRegisters.contains(REGISTER_GLOBAL)) {
-                preloadGlobalFlag = true;
-            }
 
-            int newpos = 1;
-            HashMap<Integer, Integer> registerMap = new HashMap<>();
-            if (preloadThisFlag) {
-                registerMap.put(REGISTER_THIS, newpos);
-                newpos++;
-            }
-            if (preloadArgumentsFlag) {
-                registerMap.put(REGISTER_ARGUMENTS, newpos);
-                newpos++;
-            }
-            if (preloadSuperFlag) {
-                registerMap.put(REGISTER_SUPER, newpos);
-                newpos++;
-            }
-            if (preloadRootFlag) {
-                registerMap.put(REGISTER_ROOT, newpos);
-                newpos++;
-            }
-            if (preloadParentFlag) {
-                registerMap.put(REGISTER_PARENT, newpos);
-                newpos++;
-            }
-            if (preloadGlobalFlag) {
-                registerMap.put(REGISTER_GLOBAL, newpos);
-                newpos++;
-            }
-            if (newpos < 1) {
-                newpos = 1;
-            }
-            for (int i = 0; i < 256; i++) {
-                if (usedRegisters.contains(7 + i)) {
-                    registerMap.put(7 + i, newpos);
-                    if (i < paramNames.size()) {
-                        paramRegs.add(newpos);
-                    }
-                    newpos++;
-                } else {
-                    if (i < paramNames.size()) {
-                        paramRegs.add(0);
-                    }
-                }
-            }
+        boolean needsFun2 = false;
 
-            TreeSet<Integer> usedRegisters2 = new TreeSet<>();
-            for (int i : usedRegisters) {
-                if (registerMap.get(i) == null) {
-                    usedRegisters2.add(i);
-                } else {
-                    usedRegisters2.add(registerMap.get(i));
-                }
-            }
-            usedRegisters = usedRegisters2;
-
-            for (Action a : body) {
-                if (a instanceof ActionStoreRegister) {
-                    if (registerMap.containsKey(((ActionStoreRegister) a).registerNumber)) {
-                        ((ActionStoreRegister) a).registerNumber = registerMap.get(((ActionStoreRegister) a).registerNumber);
-                    }
-                }
-                if (a instanceof ActionPush) {
-                    ActionPush ap = (ActionPush) a;
-                    for (Object o : ap.values) {
-                        if (o instanceof RegisterNumber) {
-                            if (registerMap.containsKey(((RegisterNumber) o).number)) {
-                                ((RegisterNumber) o).number = registerMap.get(((RegisterNumber) o).number);
-                            }
-                        }
-                    }
-                }
-            }
-            ret.addAll(body);
+        List<String> registerNames = new ArrayList<>();
+        registerNames.add("***** ZERO *****");
+        if (usedNames.contains("this")) {
+            needsFun2 = true;
+            preloadThisFlag = true;
+            registerNames.add("this");
         } else {
+            suppressThisFlag = true;
+        }
+        if (usedNames.contains("arguments")) {
+            preloadArgumentsFlag = true;
+            needsFun2 = true;
+            registerNames.add("arguments");
+        } else {
+            suppressArgumentsFlag = true;
+        }
+        if (usedNames.contains("super")) {
+            preloadSuperFlag = true;
+            needsFun2 = true;
+            registerNames.add("super");
+        }
+        if (usedNames.contains("_root")) {
+            preloadRootFlag = true;
+            needsFun2 = true;
+            registerNames.add("_root");
+        }
+        if (usedNames.contains("_parent")) {
+            preloadParentFlag = true;
+            needsFun2 = true;
+            registerNames.add("_parent");
+        } else {
+            suppressParentFlag = true;
+        }
+        if (usedNames.contains("_global")) {
+            needsFun2 = true;
+            preloadGlobalFlag = true;
+            registerNames.add("_global");
+        }
+
+        int preloadedNumber = registerNames.size();
+        if (!paramNames.isEmpty()) {
+            needsFun2 = true;
+        }
+        if (localData.inMethod) {
+            needsFun2 = true;
+        }
+        if (localData.inFunction > 1) {
+            needsFun2 = true;
+        }
+        if (needsFun2) {
             for (int i = 0; i < paramNames.size(); i++) {
-                paramRegs.add(1 + i);
+                paramRegs.add(registerNames.size());
+                registerNames.add(paramNames.get(i));
             }
         }
+
+        if (actions != null && !actions.isEmpty()) {
+            localDataCopy.inFunction++;
+
+            for (VariableActionItem v : variables) {
+                String varName = v.getVariableName();
+                GraphTargetItem stored = v.getStoreValue();
+                if (needsFun2) {
+                    if (v.isDefinition() && !registerNames.contains(varName)) {
+                        registerNames.add(varName);
+                    }
+                }
+
+                if (registerNames.contains(varName)) {
+                    if (stored != null) {
+                        v.setBoxedValue(new StoreRegisterActionItem(null, new RegisterNumber(registerNames.indexOf(varName), varName), stored, false));
+                    } else {
+                        v.setBoxedValue(new DirectValueActionItem(new RegisterNumber(registerNames.indexOf(varName), varName)));
+                    }
+                } else {
+                    if (v.isDefinition()) {
+                        v.setBoxedValue(new DefineLocalActionItem(null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName), stored));
+                    } else {
+                        if (stored != null) {
+                            v.setBoxedValue(new SetVariableActionItem(null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName), stored));
+                        } else {
+                            v.setBoxedValue(new GetVariableActionItem(null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName)));
+                        }
+                    }
+                }
+
+            }
+            ret.addAll(asGenerator.toActionList(asGenerator.generate(localDataCopy, actions)));
+        }
         int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, SWF.DEFAULT_VERSION).length;
-        if ((!preloadParentFlag)
-                && (!preloadRootFlag)
-                && (!preloadSuperFlag)
-                && (!preloadArgumentsFlag)
-                && (!preloadThisFlag)
-                && (!preloadGlobalFlag)
-                && (suppressArgumentsFlag)
-                && (suppressThisFlag)
-                && (suppressParentFlag)
-                && usedRegisters.isEmpty()) {
+        if (!needsFun2 && paramNames.isEmpty()) {
             ret.add(0, new ActionDefineFunction(functionName, paramNames, len, SWF.DEFAULT_VERSION));
         } else {
             ret.add(0, new ActionDefineFunction2(functionName,
@@ -318,8 +284,9 @@ public class FunctionActionItem extends ActionItem {
                     suppressThisFlag,
                     preloadThisFlag,
                     preloadGlobalFlag,
-                    usedRegisters.isEmpty() ? 0 : (usedRegisters.last() + 1), len, SWF.DEFAULT_VERSION, paramNames, paramRegs));
+                    registerNames.size() - 1, len, SWF.DEFAULT_VERSION, paramNames, paramRegs));
         }
+
         return ret;
     }
 

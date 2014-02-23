@@ -50,7 +50,7 @@ public class NewMethodActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean blankMethod = false;
         if (methodName instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) methodName).value instanceof Undefined) {

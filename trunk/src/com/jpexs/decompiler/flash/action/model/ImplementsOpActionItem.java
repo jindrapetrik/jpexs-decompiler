@@ -35,7 +35,7 @@ public class ImplementsOpActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         subclass.toString(writer, localData);
         writer.append(" implements ");
         for (int i = 0; i < superclasses.size(); i++) {

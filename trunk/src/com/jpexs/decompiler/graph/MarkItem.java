@@ -34,7 +34,7 @@ public class MarkItem extends GraphTargetItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("//" + AppStrings.translate("decompilerMark") + ":" + mark);
     }
 

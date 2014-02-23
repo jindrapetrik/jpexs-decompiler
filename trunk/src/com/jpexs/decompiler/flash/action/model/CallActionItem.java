@@ -34,7 +34,7 @@ public class CallActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("call(");
         stripQuotes(value, localData, writer);
         return writer.append(")");

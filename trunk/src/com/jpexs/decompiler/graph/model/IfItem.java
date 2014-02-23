@@ -57,7 +57,7 @@ public class IfItem extends GraphTargetItem implements Block {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         GraphTargetItem expr = expression;
         List<GraphTargetItem> ifBranch = onTrue;
         List<GraphTargetItem> elseBranch = onFalse;

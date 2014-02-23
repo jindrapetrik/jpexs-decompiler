@@ -38,7 +38,7 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("op_" + name + "(");
         ofs.toString(writer, localData);
         writer.append(",");

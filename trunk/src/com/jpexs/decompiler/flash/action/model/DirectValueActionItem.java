@@ -110,7 +110,7 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendToNoQuotes(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendToNoQuotes(GraphTextWriter writer, LocalData localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
                 return writer.append("0");
@@ -151,7 +151,7 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
                 return writer.append("0");

@@ -72,7 +72,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (writer instanceof NulWriter) {
             ((NulWriter) writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
         }
@@ -140,7 +140,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
         loopExpr.add(forInEndIf);
         List<Action> loopBody = new ArrayList<>();
         loopBody.add(new ActionPush(new RegisterNumber(exprReg)));
-        if (asGenerator.isInFunction(localData)) {
+        if (asGenerator.isInFunction(localData)==2) {
             loopBody.add(new ActionStoreRegister(innerExprReg));
             loopBody.add(new ActionPop());
         } else {

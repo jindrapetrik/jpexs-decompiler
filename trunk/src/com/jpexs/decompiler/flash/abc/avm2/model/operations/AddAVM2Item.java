@@ -31,7 +31,7 @@ public class AddAVM2Item extends BinaryOpItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (rightSide.getPrecedence() >= precedence) { //string + vs number +
             if (leftSide.getPrecedence() > precedence) {
                 writer.append("(");

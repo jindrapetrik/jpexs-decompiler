@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.ExtendsActionItem;
@@ -43,6 +44,7 @@ import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -1266,8 +1268,13 @@ public class Action implements GraphSourceItem {
         return 0;
     }
 
-    public static GraphTargetItem gettoset(GraphTargetItem get, GraphTargetItem value) {
+    public static GraphTargetItem gettoset(GraphTargetItem get, GraphTargetItem value,List<VariableActionItem> variables) {
         GraphTargetItem ret = get;
+        boolean boxed = false;
+        if(get instanceof VariableActionItem){
+            boxed = true;
+           ret = ((VariableActionItem)ret).getBoxedValue();
+        }
         if (ret instanceof GetVariableActionItem) {
             GetVariableActionItem gv = (GetVariableActionItem) ret;
             ret = new SetVariableActionItem(null, gv.name, value);
@@ -1279,6 +1286,13 @@ public class Action implements GraphSourceItem {
         } else if (ret instanceof GetPropertyActionItem) {
             GetPropertyActionItem gp = (GetPropertyActionItem) ret;
             ret = new SetPropertyActionItem(null, gp.target, gp.propertyIndex, value);
+        }
+        if(boxed){
+            GraphTargetItem b=ret;
+            ret = new VariableActionItem(((VariableActionItem)get).getVariableName(), value,((VariableActionItem)get).isDefinition());
+            ((VariableActionItem)ret).setBoxedValue((ActionItem)b);
+            variables.remove((VariableActionItem)get);
+            variables.add((VariableActionItem)ret);
         }
         return ret;
     }

@@ -48,7 +48,7 @@ public class InitObjectActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("{");
         for (int i = 0; i < values.size(); i++) {
             if (i > 0) {

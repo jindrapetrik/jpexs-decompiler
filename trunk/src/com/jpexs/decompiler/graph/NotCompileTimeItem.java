@@ -47,7 +47,7 @@ public class NotCompileTimeItem extends GraphTargetItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return object.toString(writer, localData);
     }
 

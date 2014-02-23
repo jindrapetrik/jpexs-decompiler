@@ -31,7 +31,7 @@ public class WithObjectAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer;
     }
 }

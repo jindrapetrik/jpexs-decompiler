@@ -31,7 +31,7 @@ public class GetLexAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append(propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames));
     }
 }

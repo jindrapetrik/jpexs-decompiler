@@ -35,7 +35,7 @@ public class GotoLabelActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("gotoAndStop(\"");
         writer.append(Helper.escapeString(label));
         return writer.append("\")");

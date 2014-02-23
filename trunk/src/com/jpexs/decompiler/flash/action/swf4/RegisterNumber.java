@@ -46,8 +46,12 @@ public class RegisterNumber implements Serializable {
         return true;
     }
 
-    public RegisterNumber(int number) {
+    public RegisterNumber(int number,String name) {
         this.number = number;
+        this.name = name;
+    }
+    public RegisterNumber(int number) {
+        this(number,null);
     }
 
     @Override

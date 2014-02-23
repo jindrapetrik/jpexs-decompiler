@@ -30,7 +30,7 @@ public class DecLocalAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append(localRegName(localData.localRegNames, regIndex));
         return writer.append("--");
     }

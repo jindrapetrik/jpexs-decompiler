@@ -42,7 +42,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         formatProperty(writer, object, propertyName, localData);
         writer.append(" = ");
         return value.toString(writer, localData);

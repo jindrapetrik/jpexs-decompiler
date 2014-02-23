@@ -37,7 +37,7 @@ public class TernarOpItem extends GraphTargetItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         expression.toString(writer, localData);
         writer.append("?");
         onTrue.toString(writer, localData);

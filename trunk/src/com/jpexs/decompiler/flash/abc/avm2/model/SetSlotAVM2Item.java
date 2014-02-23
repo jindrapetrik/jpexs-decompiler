@@ -43,7 +43,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         getName(writer, localData);
         writer.append(" = ");
         return value.toString(writer, localData);

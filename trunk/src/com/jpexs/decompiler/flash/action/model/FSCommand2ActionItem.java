@@ -49,7 +49,7 @@ public class FSCommand2ActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("FSCommand2(");
         command.toString(writer, localData);
         for (int t = 0; t < arguments.size(); t++) {

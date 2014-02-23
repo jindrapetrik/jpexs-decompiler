@@ -156,7 +156,7 @@ public class ClassActionItem extends ActionItem implements Block {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("class ");
         className.toStringNoQuotes(writer, localData);
         if (extendsOp != null) {

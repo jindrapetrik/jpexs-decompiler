@@ -59,7 +59,7 @@ public class TryActionItem extends ActionItem implements Block {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("try").newLine();
         writer.append("{").newLine();
         writer.indent();

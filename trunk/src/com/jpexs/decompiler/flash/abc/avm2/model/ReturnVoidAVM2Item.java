@@ -28,7 +28,7 @@ public class ReturnVoidAVM2Item extends AVM2Item implements ExitItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("return");
     }
 }

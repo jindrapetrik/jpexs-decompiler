@@ -39,7 +39,7 @@ public class FSCommandActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("fscommand(\"");
         writer.append(Helper.escapeString(command));
         return writer.append("\")");

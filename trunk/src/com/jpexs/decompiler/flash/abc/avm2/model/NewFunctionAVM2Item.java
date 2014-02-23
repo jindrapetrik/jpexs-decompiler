@@ -57,7 +57,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         MethodBody body = abc.findBody(methodIndex);
         writer.append("function" + (!functionName.isEmpty() ? " " + functionName : ""));
         writer.startMethod(methodIndex);

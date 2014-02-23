@@ -45,7 +45,7 @@ public class DeclarationAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (assignment instanceof SetLocalAVM2Item) {
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
             String type = "*";

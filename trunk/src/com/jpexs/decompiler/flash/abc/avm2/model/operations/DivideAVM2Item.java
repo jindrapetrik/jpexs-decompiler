@@ -38,7 +38,7 @@ public class DivideAVM2Item extends BinaryOpItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (rightSide.getPrecedence() >= precedence) { // >=  add or subtract too
             if (leftSide.getPrecedence() > precedence) {
                 writer.append("(");

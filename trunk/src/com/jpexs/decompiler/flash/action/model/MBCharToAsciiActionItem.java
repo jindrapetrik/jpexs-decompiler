@@ -34,7 +34,7 @@ public class MBCharToAsciiActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("mbord(");
         value.toString(writer, localData);
         return writer.append(")");

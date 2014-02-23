@@ -46,7 +46,7 @@ public class GetMemberActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (!((memberName instanceof DirectValueActionItem) && (((DirectValueActionItem) memberName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
             object.toString(writer, localData);

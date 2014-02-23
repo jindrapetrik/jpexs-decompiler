@@ -34,7 +34,7 @@ public class SetTargetActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("tellTarget(\"");
         writer.append(Helper.escapeString(target));
         return writer.append("\")");

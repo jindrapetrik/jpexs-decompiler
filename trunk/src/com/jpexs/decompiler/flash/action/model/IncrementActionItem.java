@@ -46,7 +46,7 @@ public class IncrementActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         object.toString(writer, localData);
         return writer.append(" + 1");
     }

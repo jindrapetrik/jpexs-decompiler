@@ -30,7 +30,7 @@ public class StrictModeActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("StrictMode(" + mode + ");"); //I still don't know how AS source of Strict Mode instruction looks like, assuming this...
     }
 

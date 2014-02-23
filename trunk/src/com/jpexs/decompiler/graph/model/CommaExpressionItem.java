@@ -37,7 +37,7 @@ public class CommaExpressionItem extends GraphTargetItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean first = true;
         for (GraphTargetItem t : commands) {
             if (!first) {

@@ -31,7 +31,7 @@ public class NameSpaceAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         if (namespaceIndex == 0) {
             return writer.append("*");
         }

@@ -52,7 +52,7 @@ public class PrintNumActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("printNum(");
         num.toString(writer, localData);
         writer.append(",");

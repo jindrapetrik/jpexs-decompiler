@@ -31,7 +31,7 @@ public class GetURLActionItem extends ActionItem {
     public String targetString;
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("getUrl(\"");
         writer.append(Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString));
         return writer.append("\")");

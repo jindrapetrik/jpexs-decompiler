@@ -36,7 +36,7 @@ public class ConstructPropAVM2Item extends AVM2Item {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("new ");
         int idx = writer.getLength();
         object.toString(writer, localData);

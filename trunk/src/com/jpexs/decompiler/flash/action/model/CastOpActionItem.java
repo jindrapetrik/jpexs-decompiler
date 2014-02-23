@@ -47,7 +47,7 @@ public class CastOpActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("(");
         stripQuotes(constructor, localData, writer);
         writer.append(")");

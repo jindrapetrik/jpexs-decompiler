@@ -27,7 +27,7 @@ import java.util.List;
 public class PlayActionItem extends ActionItem {
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("play()");
     }
 

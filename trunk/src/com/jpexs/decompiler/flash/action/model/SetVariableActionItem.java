@@ -70,7 +70,7 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (name instanceof DirectValueActionItem || name instanceof GetVariableActionItem) {
             stripQuotes(name, localData, writer);
             writer.append(" = ");

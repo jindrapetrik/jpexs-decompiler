@@ -455,11 +455,11 @@ public class ActionSourceGenerator implements SourceGenerator {
         localData.registerVars = value;
     }
 
-    public void setInFunction(SourceGeneratorLocalData localData, boolean value) {
+    public void setInFunction(SourceGeneratorLocalData localData, int value) {
         localData.inFunction = value;
     }
 
-    public boolean isInFunction(SourceGeneratorLocalData localData) {
+    public int isInFunction(SourceGeneratorLocalData localData) {
         return localData.inFunction;
     }
 

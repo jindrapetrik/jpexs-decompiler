@@ -52,7 +52,7 @@ public class PrintAsBitmapNumActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("printAsBitmapNum(");
         num.toString(writer, localData);
         writer.append(",");

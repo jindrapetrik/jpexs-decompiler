@@ -42,7 +42,7 @@ public class GetURL2ActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         String methodStr = "";
         if (sendVarsMethod == 1) {
             methodStr = ",\"GET\"";

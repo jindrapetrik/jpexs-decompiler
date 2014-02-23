@@ -34,7 +34,7 @@ public class GotoFrameActionItem extends ActionItem {
     }
 
     @Override
-    protected GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("gotoAndStop(");
         writer.append("" + (frame + 1));
         return writer.append(")");

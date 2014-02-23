@@ -2316,6 +2316,7 @@ public final class SWF implements TreeItem {
             Matrix mat = new Matrix(layer.matrix);
             mat = mat.preConcatenate(transformation);
 
+            boolean showPlaceholder = false;
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
                 SerializableImage img;
@@ -2332,12 +2333,9 @@ public final class SWF implements TreeItem {
                     drawMatrix.translate(rect.xMin, rect.yMin);
                     drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, img, m);
                 } else {
+                    // only DefineFont tags
                     img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, transformation);
                 }
-                /*if (character instanceof BoundedTag) {
-                 BoundedTag bounded = (BoundedTag) character;
-                 RECT rect = bounded.getRect(characters, visited);
-                 }*/
                 if (layer.filters != null) {
                     for (FILTER filter : layer.filters) {
                         img = filter.apply(img);
@@ -2404,6 +2402,10 @@ public final class SWF implements TreeItem {
                 g.setTransform(drawMatrix.toTransform());
                 g.drawImage(img.getBufferedImage(), 0, 0, null);
             } else if (character instanceof BoundedTag) {
+                showPlaceholder = true;
+            }
+
+            if (showPlaceholder) {
                 mat.translateX /= unzoom;
                 mat.translateY /= unzoom;
                 AffineTransform trans = mat.toTransform();
@@ -2418,17 +2420,9 @@ public final class SWF implements TreeItem {
                 g.drawLine(r.Xmin / div, r.Ymin / div, r.Xmax / div, r.Ymax / div);
                 g.drawLine(r.Xmax / div, r.Ymin / div, r.Xmin / div, r.Ymax / div);
                 g.setComposite(AlphaComposite.Dst);
-            }
+            }            
         }
         g.setTransform(AffineTransform.getScaleInstance(1, 1));
-        /*g.setPaint(Color.yellow);
-         g.draw(new ExportRectangle(ret.getWidth()-1,ret.getHeight()-1));*/
-
-        /*try {
-         ImageIO.write(ret, "png", new File("tst_id_" + containerId + "_time_" + System.currentTimeMillis() + ".png"));
-         } catch (IOException ex) {
-         Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
-         }*/
     }
 
     public static void frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
