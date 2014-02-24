@@ -1087,9 +1087,10 @@ public class ActionScriptParser {
                         if (isEval) {
                             ret = var;
                         } else {
-                            if (mustBeCommand) {
-                                throw new ParseException("Not a command", lexer.yyline());
-                            }
+                            ret = null; //expression can be command too
+                            /*if (mustBeCommand) {
+                             throw new ParseException("Not a command", lexer.yyline());
+                             }*/
                         }
                 }
                 break;
@@ -1302,17 +1303,19 @@ public class ActionScriptParser {
                 }
                 return null;
         }
+        if (debugMode) {
+            System.out.println("/command");
+        }
+        lexer.removeListener(buf);
+        if (ret == null) {  //can be popped expression            
+            buf.pushAllBack(lexer);
+            ret = expression(registerVars, inFunction, inMethod, true, variables);
+        }
         s = lex();
         if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
             lexer.pushback(s);
         }
-        if (debugMode) {
-            System.out.println("/command");
-        }
-        if (ret == null && (!mustBeCommand)) {
-            buf.pushAllBack(lexer);
-        }
-        lexer.removeListener(buf);
+
         return ret;
 
     }

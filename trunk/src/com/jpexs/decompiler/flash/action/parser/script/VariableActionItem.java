@@ -58,7 +58,9 @@ public class VariableActionItem extends ActionItem {
 
     public void setBoxedValue(ActionItem it) {
         this.it = it;
-        this.precedence = it.getPrecedence();
+        if(it!=null){
+            this.precedence = it.getPrecedence();
+        }
     }
 
     public ActionItem getBoxedValue() {
