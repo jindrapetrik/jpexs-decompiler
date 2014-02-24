@@ -1529,9 +1529,11 @@ public class ActionScriptParser {
                     if (s.type != SymbolType.COMMA) {
                         lexer.pushback(s);
                     }
-                    objectNames.add(expression(registerVars, inFunction, inMethod, true, variables));
+                    s = lex();
+                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    objectNames.add(0, pushConst((String) s.value));
                     expectedType(SymbolType.COLON);
-                    objectValues.add(expression(registerVars, inFunction, inMethod, true, variables));
+                    objectValues.add(0, expression(registerVars, inFunction, inMethod, true, variables));
                     s = lex();
                     if (!s.isType(SymbolType.COMMA, SymbolType.CURLY_CLOSE)) {
                         expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE);
