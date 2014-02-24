@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetProperty;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
@@ -52,9 +53,12 @@ public class PreDecrementActionItem extends UnaryOpItem {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         List<GraphSourceItem> ret = new ArrayList<>();
-
-        if (value instanceof GetVariableActionItem) {
-            GetVariableActionItem gv = (GetVariableActionItem) value;
+        GraphTargetItem val = value;
+        if (val instanceof VariableActionItem) {
+            val = ((VariableActionItem) val).getBoxedValue();
+        }
+        if (val instanceof GetVariableActionItem) {
+            GetVariableActionItem gv = (GetVariableActionItem) val;
             ret.addAll(gv.toSource(localData, generator));
             ret.remove(ret.size() - 1); //ActionGetVariable
             ret.addAll(gv.toSource(localData, generator));
@@ -63,8 +67,8 @@ public class PreDecrementActionItem extends UnaryOpItem {
             ret.add(new ActionStoreRegister(tmpReg));
             ret.add(new ActionSetVariable());
             ret.add(new ActionPush(new RegisterNumber(tmpReg)));
-        } else if (value instanceof GetMemberActionItem) {
-            GetMemberActionItem mem = (GetMemberActionItem) value;
+        } else if (val instanceof GetMemberActionItem) {
+            GetMemberActionItem mem = (GetMemberActionItem) val;
             ret.addAll(mem.toSource(localData, generator));
             ret.remove(ret.size() - 1); //ActionGetMember
             ret.addAll(mem.toSource(localData, generator));
@@ -73,13 +77,13 @@ public class PreDecrementActionItem extends UnaryOpItem {
             ret.add(new ActionStoreRegister(tmpReg));
             ret.add(new ActionSetMember());
             ret.add(new ActionPush(new RegisterNumber(tmpReg)));
-        } else if ((value instanceof DirectValueActionItem) && ((DirectValueActionItem) value).value instanceof RegisterNumber) {
-            RegisterNumber rn = (RegisterNumber) ((DirectValueActionItem) value).value;
+        } else if ((val instanceof DirectValueActionItem) && ((DirectValueActionItem) val).value instanceof RegisterNumber) {
+            RegisterNumber rn = (RegisterNumber) ((DirectValueActionItem) val).value;
             ret.add(new ActionPush(new RegisterNumber(rn.number)));
             ret.add(new ActionDecrement());
             ret.add(new ActionStoreRegister(rn.number));
-        } else if (value instanceof GetPropertyActionItem) {
-            GetPropertyActionItem gp = (GetPropertyActionItem) value;
+        } else if (val instanceof GetPropertyActionItem) {
+            GetPropertyActionItem gp = (GetPropertyActionItem) val;
             ret.addAll(gp.toSource(localData, generator)); // old value
             ret.addAll(gp.toSource(localData, generator));
             ret.remove(ret.size() - 1);

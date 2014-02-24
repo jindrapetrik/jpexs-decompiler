@@ -1194,6 +1194,7 @@ public final class ActionScriptLexer {
 
     /**
      * Closes the input stream.
+     *
      * @throws java.io.IOException
      */
     public final void yyclose() throws java.io.IOException {
@@ -1229,7 +1230,8 @@ public final class ActionScriptLexer {
 
     /**
      * Returns the current lexical state.
-     * @return 
+     *
+     * @return
      */
     public final int yystate() {
         return zzLexicalState;
@@ -1246,7 +1248,8 @@ public final class ActionScriptLexer {
 
     /**
      * Returns the text matched by the current regular expression.
-     * @return 
+     *
+     * @return
      */
     public final String yytext() {
         return new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
@@ -1268,7 +1271,8 @@ public final class ActionScriptLexer {
 
     /**
      * Returns the length of the matched text region.
-     * @return 
+     *
+     * @return
      */
     public final int yylength() {
         return zzMarkedPos - zzStartRead;

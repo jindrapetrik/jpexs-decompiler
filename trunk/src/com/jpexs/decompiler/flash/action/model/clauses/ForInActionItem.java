@@ -140,7 +140,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
         loopExpr.add(forInEndIf);
         List<Action> loopBody = new ArrayList<>();
         loopBody.add(new ActionPush(new RegisterNumber(exprReg)));
-        if (asGenerator.isInFunction(localData)==2) {
+        if (asGenerator.isInFunction(localData) == 2) {
             loopBody.add(new ActionStoreRegister(innerExprReg));
             loopBody.add(new ActionPop());
         } else {

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.operations.SubtractActionItem;
+import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetProperty;
@@ -91,28 +92,33 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
         List<GraphSourceItem> ret = new ArrayList<>();
 
-        if (object instanceof GetVariableActionItem) {
-            GetVariableActionItem gv = (GetVariableActionItem) object;
+        GraphTargetItem val = object;
+        if (val instanceof VariableActionItem) {
+            val = ((VariableActionItem) val).getBoxedValue();
+        }
+
+        if (val instanceof GetVariableActionItem) {
+            GetVariableActionItem gv = (GetVariableActionItem) val;
             ret.addAll(gv.toSource(localData, generator));
             ret.remove(ret.size() - 1); //ActionGetVariable
             ret.addAll(gv.toSource(localData, generator));
             ret.add(new ActionDecrement());
             ret.add(new ActionSetVariable());
-        } else if (object instanceof GetMemberActionItem) {
-            GetMemberActionItem mem = (GetMemberActionItem) object;
+        } else if (val instanceof GetMemberActionItem) {
+            GetMemberActionItem mem = (GetMemberActionItem) val;
             ret.addAll(mem.toSource(localData, generator));
             ret.remove(ret.size() - 1); //ActionGetMember
             ret.addAll(mem.toSource(localData, generator));
             ret.add(new ActionDecrement());
             ret.add(new ActionSetMember());
-        } else if ((object instanceof DirectValueActionItem) && ((DirectValueActionItem) object).value instanceof RegisterNumber) {
-            RegisterNumber rn = (RegisterNumber) ((DirectValueActionItem) object).value;
+        } else if ((val instanceof DirectValueActionItem) && ((DirectValueActionItem) val).value instanceof RegisterNumber) {
+            RegisterNumber rn = (RegisterNumber) ((DirectValueActionItem) val).value;
             ret.add(new ActionPush(new RegisterNumber(rn.number)));
             ret.add(new ActionDecrement());
             ret.add(new ActionStoreRegister(rn.number));
             ret.add(new ActionPop());
-        } else if (object instanceof GetPropertyActionItem) {
-            GetPropertyActionItem gp = (GetPropertyActionItem) object;
+        } else if (val instanceof GetPropertyActionItem) {
+            GetPropertyActionItem gp = (GetPropertyActionItem) val;
             ret.addAll(gp.toSource(localData, generator));
             ret.remove(ret.size() - 1);
             ret.addAll(gp.toSource(localData, generator));

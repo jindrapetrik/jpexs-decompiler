@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -34,23 +33,20 @@ import java.util.List;
 public class VariableActionItem extends ActionItem {
 
     private ActionItem it;
-    
-    private final String variableName;  
+
+    private final String variableName;
     private GraphTargetItem storeValue;
     private final boolean definition;
 
     public void setStoreValue(GraphTargetItem storeValue) {
         this.storeValue = storeValue;
     }
-    
-    
-    
-    public String getVariableName(){
+
+    public String getVariableName() {
         return variableName;
     }
-    
-    
-    public VariableActionItem(String variableName, GraphTargetItem storeValue, boolean definition){
+
+    public VariableActionItem(String variableName, GraphTargetItem storeValue, boolean definition) {
         this.variableName = variableName;
         this.storeValue = storeValue;
         this.definition = definition;
@@ -59,8 +55,6 @@ public class VariableActionItem extends ActionItem {
     public boolean isDefinition() {
         return definition;
     }
-    
-    
 
     public void setBoxedValue(ActionItem it) {
         this.it = it;
@@ -74,57 +68,45 @@ public class VariableActionItem extends ActionItem {
         return storeValue;
     }
 
-    
-
-    
-    
-    
-    
-    
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if(it == null){
+        if (it == null) {
             return writer;
         }
-       return it.appendTo(writer, localData);
+        return it.appendTo(writer, localData);
     }
 
-    
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        if(it==null){
+        if (it == null) {
             return new ArrayList<>();
-        }          
+        }
         return it.toSource(localData, generator);
-    }  
+    }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        if(it==null){
+        if (it == null) {
             return new ArrayList<>();
-        }          
+        }
         return it.toSourceIgnoreReturnValue(localData, generator);
     }
-    
-    
 
     @Override
     public boolean hasReturnValue() {
-        if(it==null){
+        if (it == null) {
             return false;
-        }else{
+        } else {
             return it.hasReturnValue();
         }
     }
 
     @Override
     public boolean needsSemicolon() {
-        if(it==null){
+        if (it == null) {
             return super.needsSemicolon();
         }
-        return it.needsSemicolon();        
+        return it.needsSemicolon();
     }
-    
-    
-    
+
 }

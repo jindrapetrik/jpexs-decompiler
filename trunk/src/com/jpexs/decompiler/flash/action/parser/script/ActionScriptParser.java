@@ -141,12 +141,6 @@ import java.util.List;
  */
 public class ActionScriptParser {
 
-    public static final int REGISTER_THIS = 1;
-    public static final int REGISTER_ARGUMENTS = 2;
-    public static final int REGISTER_SUPER = 3;
-    public static final int REGISTER_ROOT = 4;
-    public static final int REGISTER_PARENT = 5;
-    public static final int REGISTER_GLOBAL = 6;
     private long uniqLast = 0;
     private final boolean debugMode = false;
 
@@ -335,22 +329,12 @@ public class ActionScriptParser {
                 expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
             }
         }
-        HashMap<String, Integer> registerVars = new HashMap<>();
-        registerVars.put("_parent", REGISTER_PARENT);
-        registerVars.put("_root", REGISTER_ROOT);
-        registerVars.put("super", REGISTER_SUPER);
-        registerVars.put("arguments", REGISTER_ARGUMENTS);
-        registerVars.put("this", REGISTER_THIS);
-        registerVars.put("_global", REGISTER_GLOBAL);
-        for (int i = 0; i < paramNames.size(); i++) {
-            registerVars.put(paramNames.get(i), (7 + i)); //(paramNames.size() - i)));
-        }
         List<GraphTargetItem> body = null;
         List<VariableActionItem> subvariables = new ArrayList<>();
         if (withBody) {
             expectedType(SymbolType.CURLY_OPEN);
 
-            body = commands(registerVars, true, isMethod, 0, subvariables);
+            body = commands(new HashMap<String, Integer>(), true, isMethod, 0, subvariables);
             expectedType(SymbolType.CURLY_CLOSE);
         }
 

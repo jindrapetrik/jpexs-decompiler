@@ -19,13 +19,11 @@ package com.jpexs.decompiler.flash.action.model.clauses;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
-import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
-import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.Block;
@@ -97,23 +95,8 @@ public class ClassActionItem extends ActionItem implements Block {
     }
 
     private boolean isThis(GraphTargetItem item) {
-        if (item instanceof DirectValueActionItem) {
-            DirectValueActionItem di = (DirectValueActionItem) item;
-            if (di.value instanceof RegisterNumber) {
-                RegisterNumber rn = (RegisterNumber) di.value;
-                if ("this".equals(rn.name)) {
-                    return true;
-                }
-            }
-        }
-        if (item instanceof GetVariableActionItem) {
-            GetVariableActionItem gv = (GetVariableActionItem) item;
-            if (gv.name instanceof DirectValueActionItem) {
-                DirectValueActionItem di = (DirectValueActionItem) gv.name;
-                if ("this".equals(di.toStringNoH(null))) {
-                    return true;
-                }
-            }
+        if (item instanceof VariableActionItem) {
+            return "this".equals(((VariableActionItem) item).getVariableName());
         }
         return false;
     }
