@@ -91,6 +91,8 @@ public class Configuration {
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> showAllAddresses = null;
     @ConfigurationDefaultBoolean(true)
+    public static final ConfigurationItem<Boolean> useFrameCache = null;
+    @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> useRibbonInterface = null;
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> openFolderAfterFlaExport = null;

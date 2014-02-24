@@ -110,7 +110,6 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         defaultStroke = graphics.getStroke();
         super.export();
-        image.bounds = new Rectangle2D.Double(deltaX, deltaY, width, height);
     }
 
     private void exportTo(SerializableImage image, Matrix transformation) {
