@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -28,6 +29,7 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.streams.SeekableInputStream;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Kernel32;
 import java.io.BufferedInputStream;
@@ -120,9 +122,11 @@ public class CommandLineArgumentParser {
         System.out.println("  ...Compress SWF <infile> and save it to <outfile>");
         System.out.println(" 8) -decompress <infile> <outfile>");
         System.out.println("  ...Decompress <infile> and save it to <outfile>");
-        System.out.println(" 9) -renameInvalidIdentifiers (typeNumber|randomWord) <infile> <outfil>e");
+        System.out.println(" 9) -extract <infile> [(all|biggest)]");
+        System.out.println("  ...Extracts SWF files from ZIP or other binary files");
+        System.out.println(" 10) -renameInvalidIdentifiers (typeNumber|randomWord) <infile> <outfil>e");
         System.out.println("  ...Renames the invalid identifiers in <infile> and save it to <outfile>");
-        System.out.println(" 10) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
+        System.out.println(" 11) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
         System.out.print("  ...Sets configuration values. Available keys[current setting]:");
         for (ConfigurationItem item : commandlineConfigBoolean) {
             System.out.print(" " + item + "[" + item.get() + "]");
@@ -131,13 +135,13 @@ public class CommandLineArgumentParser {
         System.out.println("    Values are boolean, you can use 0/1, true/false, on/off or yes/no.");
         System.out.println("    If no other parameters passed, configuration is saved. Otherwise it is used only once.");
         System.out.println("    DO NOT PUT space between comma (,) and next value.");
-        System.out.println(" 11) -onerror (abort|retryN|ignore)");
+        System.out.println(" 12) -onerror (abort|retryN|ignore)");
         System.out.println("  ...error handling mode. \"abort\" stops the exporting, \"retry\" tries the exporting N times, \"ignore\" ignores the current file");
-        System.out.println(" 12) -timeout <N>");
+        System.out.println(" 13) -timeout <N>");
         System.out.println("  ...decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds");
-        System.out.println(" 13) -exportTimeout <N>");
+        System.out.println(" 14) -exportTimeout <N>");
         System.out.println("  ...total export timeout in seconds");
-        System.out.println(" 14) -exportFileTimeout <N>");
+        System.out.println(" 15) -exportFileTimeout <N>");
         System.out.println("  ...export timeout for a single AS3 class in seconds");
         System.out.println();
         System.out.println("Examples:");
@@ -236,6 +240,8 @@ public class CommandLineArgumentParser {
             parseCompress(args);
         } else if (nextParam.equals("-decompress")) {
             parseDecompress(args);
+        } else if (nextParam.equals("-extract")) {
+            parseExtract(args);
         } else if (nextParam.equals("-renameinvalididentifiers")) {
             parseRenameInvalidIdentifiers(args);
         } else if (nextParam.equals("-dumpswf")) {
@@ -734,6 +740,70 @@ public class CommandLineArgumentParser {
                 }
             } catch (FileNotFoundException ex) {
                 System.err.println("File not found.");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        System.exit(0);
+    }
+
+    private static void parseExtract(Queue<String> args) {
+        if (args.size() < 1) {
+            badArguments();
+        }
+
+        String fileName = args.remove();
+        ExtractMode mode = ExtractMode.ALL;
+        if (args.size() > 0) {
+            String modeStr = args.remove().toLowerCase();
+            switch (modeStr) {
+                case "biggest":
+                    mode = ExtractMode.BIGGEST;
+                    break;
+            }
+        }
+        
+        try {
+            SWFSourceInfo sourceInfo = new SWFSourceInfo(null, fileName, null);
+            if (!sourceInfo.isBundle()) {
+                System.err.println("Error: <infile> should be a bundle. (ZIP or non SWF binary file)");
+                System.exit(1);
+            }
+            SWFBundle bundle = sourceInfo.getBundle();
+            List<Map.Entry<String, SeekableInputStream>> streamsToExtract = new ArrayList<>();
+            Map.Entry<String, SeekableInputStream> biggest = null;
+            int biggestSize = 0;
+            for (Map.Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
+                InputStream stream = streamEntry.getValue();
+                stream.reset();
+                switch (mode) {
+                    case ALL:
+                        streamsToExtract.add(streamEntry);
+                        break;
+                    case BIGGEST:
+                        byte[] swfData = new byte[stream.available()];
+                        int available = stream.read(swfData); // stream.available() reports wrong value
+                        if (available > biggestSize) {
+                            biggest = streamEntry;
+                            biggestSize = available;
+                        }
+                        break;
+                }
+            }
+            
+            if (mode == ExtractMode.BIGGEST && biggest != null) {
+                streamsToExtract.add(biggest);
+            }
+            
+            for (Map.Entry<String, SeekableInputStream> streamEntry : streamsToExtract) {
+                InputStream stream = streamEntry.getValue();
+                stream.reset();
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(streamEntry.getKey() + ".swf"))) {
+                    byte[] swfData = new byte[stream.available()];
+                    int cnt = stream.read(swfData);
+                    fos.write(swfData, 0, cnt);
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
