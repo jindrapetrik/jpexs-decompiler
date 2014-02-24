@@ -44,12 +44,11 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
 
     @Override
     public Dimension getPreferredSize() {
-        Dimension ret= super.getPreferredSize();
-        ret.width = 300;        
+        Dimension ret = super.getPreferredSize();
+        ret.width = 300;
         return ret;
     }
-    
-    
+
     @Override
     public BaselineResizeBehavior getBaselineResizeBehavior() {
         return Component.BaselineResizeBehavior.CONSTANT_ASCENT;
@@ -59,18 +58,17 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     public int getBaseline(int width, int height) {
         return 0;
     }
-    
-    
-    public StringEditor(String fieldName,Object obj, Field field, int index, Class<?> type, boolean multiline) {
-        setLineWrap(true);       
+
+    public StringEditor(String fieldName, Object obj, Field field, int index, Class<?> type, boolean multiline) {
+        setLineWrap(true);
         this.obj = obj;
         this.field = field;
         this.index = index;
-        this.type = type;     
+        this.type = type;
         this.fieldName = fieldName;
         this.multiline = multiline;
-        if(multiline){
-            Dimension d = new Dimension(500,200);
+        if (multiline) {
+            Dimension d = new Dimension(500, 200);
             setPreferredSize(d);
             setSize(d);
         }
@@ -89,7 +87,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
             // ignore
         }
     }
-    
+
     @Override
     public void addChangeListener(final ChangeListener l) {
         final GenericTagEditor t = this;
@@ -112,15 +110,15 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     public String getFieldName() {
         return fieldName;
     }
-    
+
     @Override
     public Field getField() {
         return field;
     }
-    
+
     @Override
     public String getReadOnlyValue() {
         return Helper.escapeHTML(getChangedValue().toString());
-    }    
-   
+    }
+
 }

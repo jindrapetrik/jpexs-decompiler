@@ -356,14 +356,12 @@ public class View {
     public static SubstanceColorScheme getColorScheme() {
         return SubstanceColorSchemeUtilities.getActiveColorScheme(new JButton(), ComponentState.ENABLED);
     }
-    
-     public static void refreshTree(JTree tree,TreeModel model) {
+
+    public static void refreshTree(JTree tree, TreeModel model) {
         List<List<String>> expandedNodes = getExpandedNodes(tree);
         tree.setModel(model);
         expandTreeNodes(tree, expandedNodes);
     }
-
-    
 
     private static List<List<String>> getExpandedNodes(JTree tree) {
         List<List<String>> expandedNodes = new ArrayList<>();

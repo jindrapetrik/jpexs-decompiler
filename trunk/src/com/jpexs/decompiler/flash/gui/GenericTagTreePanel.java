@@ -194,7 +194,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         public boolean stopCellEditing() {
             super.stopCellEditing();
             editor.save();
-            ((MyTreeModel)tree.getModel()).vchanged(tree.getSelectionPath());
+            ((MyTreeModel) tree.getModel()).vchanged(tree.getSelectionPath());
             return true;
         }
 
@@ -221,10 +221,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 final FieldNode fnode = (FieldNode) selObject;
                                 SWFArray swfArray = fnode.field.getAnnotation(SWFArray.class);
                                 String itemStr = "";
-                                if(swfArray!=null){
+                                if (swfArray != null) {
                                     itemStr = swfArray.value();
                                 }
-                                if(itemStr.equals("")){
+                                if (itemStr.equals("")) {
                                     itemStr = AppStrings.translate("generictag.array.item");
                                 }
                                 if (ReflectionTools.needsIndex(fnode.field)) {
@@ -296,7 +296,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private Tag tag;
 
-    public class MyTreeCellRenderer extends DefaultTreeCellRenderer {        
+    public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
 
         @Override
         public Component getTreeCellRendererComponent(
@@ -315,7 +315,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
             setUI(new BasicLabelUI());
             setOpaque(false);
-            setBackgroundNonSelectionColor(Color.white);           
+            setBackgroundNonSelectionColor(Color.white);
             return this;
         }
 
@@ -343,9 +343,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         }
 
-        
         /*
-*/
+         */
         @Override
         public String toString() {
 
@@ -356,27 +355,27 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 Object val = getValue();
                 Color color = null;
                 String colorAdd = "";
-                if(val instanceof RGB){ //Note: Can be RGBA too
-                    color = ((RGB)val).toColor();
+                if (val instanceof RGB) { //Note: Can be RGBA too
+                    color = ((RGB) val).toColor();
                 }
-                if(val instanceof ARGB){
-                    color = ((ARGB)val).toColor();
+                if (val instanceof ARGB) {
+                    color = ((ARGB) val).toColor();
                 }
-                
-                if(color!=null){
-                    colorAdd = "<cite style=\"color:rgb("+color.getRed()+","+color.getGreen()+","+color.getBlue()+");\">●</cite> ";
+
+                if (color != null) {
+                    colorAdd = "<cite style=\"color:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");\">●</cite> ";
                 }
-                
+
                 valStr += " = " + colorAdd + val.toString();
             }
-            return "<html>"+getNameType() + valStr+"</html>";
+            return "<html>" + getNameType() + valStr + "</html>";
         }
 
         public String getType() {
             SWFType swfType = field.getAnnotation(SWFType.class);
             SWFArray swfArray = field.getAnnotation(SWFArray.class);
             String typeStr = null;
-            if ((swfType != null || swfArray!=null) && !(ReflectionTools.needsIndex(field) && (index > -1))) {
+            if ((swfType != null || swfArray != null) && !(ReflectionTools.needsIndex(field) && (index > -1))) {
                 Class<?> type = field.getType();
                 if (ReflectionTools.needsIndex(field)) {
                     type = ReflectionTools.getFieldSubType(obj, field);
@@ -393,8 +392,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         public String getName() {
             SWFArray swfArray = field.getAnnotation(SWFArray.class);
-            String name="";
-            if(swfArray!=null){
+            String name = "";
+            if (swfArray != null) {
                 name = swfArray.value();
             }
             return (index > -1 ? name + "[" + index + "]" : field.getName());
@@ -456,7 +455,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
 
         @Override
-        public Object getRoot() {            
+        public Object getRoot() {
             return root;
         }
 
@@ -507,7 +506,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             return r;
         }
 
-        public void vchanged(TreePath path){
+        public void vchanged(TreePath path) {
             fireTreeNodesChanged(this, path.getPath(), null, null);
         }
 
@@ -534,8 +533,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
         this.tag = tag;
         this.editedTag = (Tag) Helper.deepCopy(tag);
-        refreshTree();
         tree.setEditable(edit);
+        if (!edit) {
+            tree.stopEditing();
+        }
+        refreshTree();
     }
 
     @Override
@@ -565,23 +567,23 @@ public class GenericTagTreePanel extends GenericTagPanel {
         return tag;
     }
 
-    public static String swfArrayToString(SWFArray swfArray){
-        String result="";
-        if(swfArray==null){
+    public static String swfArrayToString(SWFArray swfArray) {
+        String result = "";
+        if (swfArray == null) {
             return result;
         }
         if (swfArray.count() > 0) {
             result += "[" + swfArray.count() + "]";
         } else if (!swfArray.countField().equals("")) {
-            result += "[" + swfArray.countField()+ "]";
+            result += "[" + swfArray.countField() + "]";
         }
-        return result;        
+        return result;
     }
-    
+
     public static String swfTypeToString(Class<?> type, SWFType swfType, SWFArray swfArray) {
         String stype = type.getSimpleName();
-        if (swfType == null) {            
-            return stype+swfArrayToString(swfArray);
+        if (swfType == null) {
+            return stype + swfArrayToString(swfArray);
         }
         String result = swfType.value().toString();
         if (swfType.value() == BasicType.OTHER) {
@@ -600,7 +602,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
             result += "]";
         }
-        return result+swfArrayToString(swfArray);
+        return result + swfArrayToString(swfArray);
     }
 
     private static boolean hasEditor(Object obj, Field field, int index) {

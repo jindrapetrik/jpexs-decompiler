@@ -63,6 +63,7 @@ import javax.swing.SpringLayout;
 
 /**
  * Old Generic Tag editor
+ *
  * @author JPEXS
  */
 public class GenericTagPanel extends JPanel implements ChangeListener {
@@ -102,8 +103,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
 
         genericTagPropertiesEditPanel = new JPanel();
         genericTagPropertiesEditPanel.setLayout(new SpringLayout());
-        JPanel edPanel=new JPanel(new BorderLayout());
-        edPanel.add(genericTagPropertiesEditPanel,BorderLayout.NORTH);        
+        JPanel edPanel = new JPanel(new BorderLayout());
+        edPanel.add(genericTagPropertiesEditPanel, BorderLayout.NORTH);
         genericTagPropertiesEditPanelScrollPanel = new JScrollPane(edPanel);
     }
 
@@ -122,15 +123,15 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
     }
 
     public void setEditMode(boolean edit, Tag tag) {
-        if(tag==null){
+        if (tag == null) {
             tag = this.tag;
         }
-        
+
         this.tag = tag;
-        this.editedTag = (Tag)Helper.deepCopy(tag);
+        this.editedTag = (Tag) Helper.deepCopy(tag);
         generateEditControls(editedTag, !edit);
-        
-        if (edit){            
+
+        if (edit) {
             remove(genericTagPropertiesEditorPaneScrollPanel);
             add(genericTagPropertiesEditPanelScrollPanel, BorderLayout.CENTER);
         } else {
@@ -276,7 +277,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             try {
                 //If countField exists, decrement, otherwise do nothing
                 Field countField = obj.getClass().getDeclaredField(swfType.countField());
-                if(countField!=null){
+                if (countField != null) {
                     int cnt = countField.getInt(obj);
                     cnt--;
                     countField.setInt(obj, cnt);
@@ -287,8 +288,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         } else {
             ReflectionTools.removeFromField(obj, field, index);
         }
-        
-        
+
         generateEditControls(editedTag, false);
 
         //Restore scroll top after some time. TODO: Handle this better. I don't know how :-(.
@@ -309,7 +309,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 });
             }
 
-        }.start(); 
+        }.start();
         revalidate();
         repaint();
     }
@@ -323,13 +323,13 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             for (int f = 0; f < fields.length; f++) {
                 SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
                 if (fieldSwfType != null && fieldSwfType.countField().equals(swfType.countField())) {
-                    ReflectionTools.addToField(obj, fields[f], ReflectionTools.getFieldSubSize(obj, fields[f]),true);
+                    ReflectionTools.addToField(obj, fields[f], ReflectionTools.getFieldSubSize(obj, fields[f]), true);
                 }
             }
             try {
                 //If countField exists, increment, otherwise do nothing
                 Field countField = obj.getClass().getDeclaredField(swfType.countField());
-                if(countField!=null){
+                if (countField != null) {
                     int cnt = countField.getInt(obj);
                     cnt++;
                     countField.setInt(obj, cnt);
@@ -338,7 +338,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 //ignored
             }
         } else {
-            ReflectionTools.addToField(obj, field,ReflectionTools.getFieldSubSize(obj, field), true);
+            ReflectionTools.addToField(obj, field, ReflectionTools.getFieldSubSize(obj, field), true);
         }
         generateEditControls(editedTag, false);
 
@@ -362,7 +362,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
 
         }.start();
         revalidate();
-        repaint();        
+        repaint();
     }
 
     private int addEditor(String name, Object obj, Field field, int index, Class<?> type, Object value, List<Field> parentList, List<Integer> parentIndices, boolean readonly) throws IllegalArgumentException, IllegalAccessException {
@@ -391,7 +391,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
             editor = new BooleanEditor(name, obj, field, index, type);
         } else if (type.equals(String.class)) {
-            editor = new StringEditor(name, obj, field, index, type,multiline!=null);
+            editor = new StringEditor(name, obj, field, index, type, multiline != null);
         } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)) {
             editor = new ColorEditor(name, obj, field, index, type);
         } else {
@@ -459,16 +459,16 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         }
         return result;
     }
-    
-    private void assignTag(Tag t,Tag assigned){
-        if(t.getClass()!=assigned.getClass()){
+
+    private void assignTag(Tag t, Tag assigned) {
+        if (t.getClass() != assigned.getClass()) {
             return;
         }
-        for(Field f:t.getClass().getDeclaredFields()){
-            if((f.getModifiers()&Modifier.FINAL) == Modifier.FINAL){
+        for (Field f : t.getClass().getDeclaredFields()) {
+            if ((f.getModifiers() & Modifier.FINAL) == Modifier.FINAL) {
                 continue;
             }
-            if((f.getModifiers()&Modifier.STATIC) == Modifier.STATIC){
+            if ((f.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
                 continue;
             }
             try {
@@ -485,7 +485,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 ((GenericTagEditor) component).save();
             }
         }
-        SWF swf=tag.getSwf();
+        SWF swf = tag.getSwf();
         assignTag(tag, editedTag);
         tag.setModified(true);
         tag.setSwf(swf);
@@ -565,8 +565,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 dependentEditor = addButtons.get(key);
             } else if (removeButtons.containsKey(key)) { //It's array/list, add remove button
                 JPanel editRemPanel = new JPanel(new BorderLayout());
-                editRemPanel.add((Component) editors.get(key),BorderLayout.CENTER);
-                editRemPanel.add(removeButtons.get(key),BorderLayout.EAST);
+                editRemPanel.add((Component) editors.get(key), BorderLayout.CENTER);
+                editRemPanel.add(removeButtons.get(key), BorderLayout.EAST);
                 dependentEditor = editRemPanel;
             } else {
                 dependentEditor = (Component) editors.get(key);
@@ -581,8 +581,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             }
         }
         /*genericTagPropertiesEditPanel.add(new JPanel());
-        genericTagPropertiesEditPanel.add(new JPanel());
-        genericTagPropertiesEditPanel.add(new JPanel());*/
+         genericTagPropertiesEditPanel.add(new JPanel());
+         genericTagPropertiesEditPanel.add(new JPanel());*/
         relayout(propCount /*+ 1*/);
     }
 }

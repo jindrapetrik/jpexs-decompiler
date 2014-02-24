@@ -25,11 +25,14 @@ import java.lang.reflect.Field;
 public interface GenericTagEditor {
 
     public void save();
-    
+
     public void addChangeListener(ChangeListener l);
+
     public Object getChangedValue();
+
     public String getFieldName();
+
     public Field getField();
-    
+
     public String getReadOnlyValue();
 }

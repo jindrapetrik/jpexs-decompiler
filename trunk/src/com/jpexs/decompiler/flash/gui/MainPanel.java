@@ -2011,8 +2011,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         showCard(CARDEMPTYPANEL);
         refreshTree();
     }
-    
-    public void refreshTree(){
+
+    public void refreshTree() {
         View.refreshTree(tagTree, new TagTreeModel(mainFrame, swfs));
         expandSwfNodes();
     }
@@ -2164,8 +2164,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     genericSaveButton.setVisible(true);
                     genericCancelButton.setVisible(true);
                     //genericTagPanel.generateEditControls((Tag) item, false);
-                    genericTagPanel.setEditMode(true,(Tag) item);
-                    
+                    genericTagPanel.setEditMode(true, (Tag) item);
+
                 }
             }
             break;
@@ -2178,14 +2178,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 genericEditButton.setVisible(true);
                 genericSaveButton.setVisible(false);
                 genericCancelButton.setVisible(false);
-                genericTagPanel.setEditMode(false,null);
+                genericTagPanel.setEditMode(false, null);
             }
             break;
             case ACTION_CANCEL_GENERIC_TAG: {
                 genericEditButton.setVisible(true);
                 genericSaveButton.setVisible(false);
                 genericCancelButton.setVisible(false);
-                genericTagPanel.setEditMode(false,null);
+                genericTagPanel.setEditMode(false, null);
             }
             break;
             case ACTION_REMOVE_ITEM:
@@ -2488,7 +2488,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             genericEditButton.setVisible(true);
             genericSaveButton.setVisible(false);
             genericCancelButton.setVisible(false);
-            genericTagPanel.setEditMode(false,(Tag)tagObj);
+            genericTagPanel.setEditMode(false, (Tag) tagObj);
         } else {
             showCard(CARDEMPTYPANEL);
         }
@@ -2884,7 +2884,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         showDetailWithPreview(CARDFONTPANEL);
     }
 
-   public void expandSwfNodes() {
+    public void expandSwfNodes() {
         TreeModel model = tagTree.getModel();
         Object node = model.getRoot();
         int childCount = model.getChildCount(node);

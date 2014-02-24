@@ -709,7 +709,7 @@ public class Main {
     }
 
     private static void initGui() {
-        if(GraphicsEnvironment.isHeadless()){
+        if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Error: Your system does not support Graphic User Interface");
             exit();
         }
@@ -750,7 +750,7 @@ public class Main {
     }
 
     public static void initLang() {
-        if(GraphicsEnvironment.isHeadless()){ //No GUI in OS
+        if (GraphicsEnvironment.isHeadless()) { //No GUI in OS
             return;
         }
         Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
@@ -1001,7 +1001,7 @@ public class Main {
 
     public static void exit() {
         Configuration.saveConfig();
-        if(!GraphicsEnvironment.isHeadless()){
+        if (!GraphicsEnvironment.isHeadless()) {
             FlashPlayerPanel.unload();
         }
         System.exit(0);
@@ -1154,7 +1154,7 @@ public class Main {
         fileTxt.setFormatter(formatterTxt);
         logger.addHandler(fileTxt);
 
-        if(!GraphicsEnvironment.isHeadless()){
+        if (!GraphicsEnvironment.isHeadless()) {
             ErrorLogFrame.getInstance().clearErrorState();
         }
 

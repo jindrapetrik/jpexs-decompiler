@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 public class ReflectionTools {
 
     public static Object getValue(Object obj, Field field, int index) throws IllegalArgumentException, IllegalAccessException {
-        if(getFieldSubSize(obj, field)<=index){
+        if (getFieldSubSize(obj, field) <= index) {
             return null;
         }
         Object value = field.get(obj);
@@ -53,9 +53,9 @@ public class ReflectionTools {
         }
         return false;
     }
-    
+
     @SuppressWarnings("unchecked")
-    public static int getFieldSubSize(Object obj,Field field){
+    public static int getFieldSubSize(Object obj, Field field) {
         Object val;
         try {
             val = field.get(obj);
@@ -63,7 +63,7 @@ public class ReflectionTools {
             return 0;
         }
         if (List.class.isAssignableFrom(field.getType())) {
-            return ((List)val).size();
+            return ((List) val).size();
         } else if (field.getType().isArray()) {
             return Array.getLength(val);
         }
@@ -73,7 +73,7 @@ public class ReflectionTools {
     @SuppressWarnings("unchecked")
     public static void setValue(Object obj, Field field, int index, Object newValue) throws IllegalArgumentException, IllegalAccessException {
         Object value = field.get(obj);
-        if(needsIndex(field)&& index>=getFieldSubSize(obj, field)){ //outofbounds, ignore
+        if (needsIndex(field) && index >= getFieldSubSize(obj, field)) { //outofbounds, ignore
             return;
         }
         if (List.class.isAssignableFrom(field.getType())) {
@@ -85,14 +85,14 @@ public class ReflectionTools {
         }
     }
 
-    public static Object newInstanceOf(Class cls) throws InstantiationException, IllegalAccessException {        
+    public static Object newInstanceOf(Class cls) throws InstantiationException, IllegalAccessException {
         if (cls == Integer.class || cls == int.class) {
             return new Integer(0);
         } else if (cls == Float.class || cls == float.class) {
             return new Float(0.0f);
-        } else if (cls == Double.class || cls == double.class ) {
+        } else if (cls == Double.class || cls == double.class) {
             return new Double(0);
-        } else if(cls == Long.class || cls == long.class){
+        } else if (cls == Long.class || cls == long.class) {
             return new Long(0L);
         }
         return cls.newInstance();
@@ -114,7 +114,7 @@ public class ReflectionTools {
         Class<?> parameterClass = (Class<?>) listType.getActualTypeArguments()[0];
         try {
             Object val = newInstanceOf(parameterClass);
-            list.add(index,val);
+            list.add(index, val);
         } catch (InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
             return false;
@@ -122,23 +122,23 @@ public class ReflectionTools {
         return true;
     }
 
-    public static Class<?> getFieldSubType(Object object,Field field){
-        if(field.getType().isArray()){
+    public static Class<?> getFieldSubType(Object object, Field field) {
+        if (field.getType().isArray()) {
             Object arrValue;
             try {
                 arrValue = field.get(object);
                 return arrValue.getClass().getComponentType();
             } catch (IllegalArgumentException | IllegalAccessException ex) {
                 return null;
-            }                
+            }
         }
-        if(List.class.isAssignableFrom(field.getType())) {            
+        if (List.class.isAssignableFrom(field.getType())) {
             ParameterizedType listType = (ParameterizedType) field.getGenericType();
-            return (Class<?>) listType.getActualTypeArguments()[0];            
+            return (Class<?>) listType.getActualTypeArguments()[0];
         }
         return null;
     }
-    
+
     public static boolean addToArray(Object object, Field field, int index, boolean notnull) {
         if (!field.getType().isArray()) {
             return false;
@@ -166,8 +166,8 @@ public class ReflectionTools {
             }
         }
         //Copy items after
-        for (int i = index; i < originalSize ; i++) {
-            Array.set(copy, i+1, Array.get(arrValue, i));
+        for (int i = index; i < originalSize; i++) {
+            Array.set(copy, i + 1, Array.get(arrValue, i));
         }
         try {
             field.set(object, copy);
@@ -178,44 +178,44 @@ public class ReflectionTools {
         return true;
     }
 
-    public static boolean addToField(Object object, Field field, int index,boolean notnull) {
+    public static boolean addToField(Object object, Field field, int index, boolean notnull) {
         if (List.class.isAssignableFrom(field.getType())) {
-            return addToList(object, field,index);
+            return addToList(object, field, index);
         }
 
         if (field.getType().isArray()) {
-            return addToArray(object, field, index,notnull);
+            return addToArray(object, field, index, notnull);
         }
         return false;
     }
-    
-    public static boolean removeFromField(Object object, Field field,int index){
+
+    public static boolean removeFromField(Object object, Field field, int index) {
         if (List.class.isAssignableFrom(field.getType())) {
-            return removeFromList(object, field,index);
+            return removeFromList(object, field, index);
         }
-        
+
         if (field.getType().isArray()) {
             return removeFromArray(object, field, index);
         }
         return false;
     }
-    
-    public static boolean removeFromList(Object object, Field field,int index){
+
+    public static boolean removeFromList(Object object, Field field, int index) {
         List list;
-        try {        
-            list=(List)field.get(object);
+        try {
+            list = (List) field.get(object);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
-        if(index<0 || index>=list.size()){
+        if (index < 0 || index >= list.size()) {
             return false;
         }
-        list.remove(index);        
+        list.remove(index);
         return true;
     }
-    
-    public static boolean removeFromArray(Object object, Field field, int index){
+
+    public static boolean removeFromArray(Object object, Field field, int index) {
         Object arrValue;
         try {
             arrValue = field.get(object);
@@ -226,14 +226,14 @@ public class ReflectionTools {
         Class componentClass = arrValue.getClass().getComponentType();
         int originalSize = Array.getLength(arrValue);
         Object copy = Array.newInstance(componentClass, originalSize - 1);
-        int pos=0;
+        int pos = 0;
         //copy all before index
         for (int i = 0; i < index; i++) {
             Array.set(copy, pos, Array.get(arrValue, i));
             pos++;
         }
         //copy all after index
-        for (int i = index+1; i <originalSize ; i++) {
+        for (int i = index + 1; i < originalSize; i++) {
             Array.set(copy, pos, Array.get(arrValue, i));
             pos++;
         }

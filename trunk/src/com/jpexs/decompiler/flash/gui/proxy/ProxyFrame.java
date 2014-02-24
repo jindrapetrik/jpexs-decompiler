@@ -99,6 +99,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
 
     /**
      * Constructor
+     *
      * @param mainFrame
      */
     public ProxyFrame(final MainFrame mainFrame) {

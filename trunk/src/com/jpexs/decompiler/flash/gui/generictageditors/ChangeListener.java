@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
 /**
@@ -22,5 +21,6 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
  * @author JPEXS
  */
 public interface ChangeListener {
+
     public void change(GenericTagEditor editor);
 }
