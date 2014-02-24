@@ -86,7 +86,9 @@ public class UniversalLoopItem extends LoopItem implements Block {
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
-        ret.add(commands);
+        if (commands != null) {
+            ret.add(commands);
+        }
         return ret;
     }
 

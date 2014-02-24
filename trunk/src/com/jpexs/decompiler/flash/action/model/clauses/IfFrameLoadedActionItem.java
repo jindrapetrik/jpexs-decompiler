@@ -70,7 +70,9 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
-        ret.add(actions);
+        if (actions != null) {
+            ret.add(actions);
+        }
         return ret;
     }
 

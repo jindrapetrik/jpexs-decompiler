@@ -39,9 +39,15 @@ public class ForItem extends LoopItem implements Block {
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
-        ret.add(firstCommands);
-        ret.add(commands);
-        ret.add(finalCommands);
+        if (firstCommands != null) {
+            ret.add(firstCommands);
+        }
+        if (commands != null) {
+            ret.add(commands);
+        }
+        if (finalCommands != null) {
+            ret.add(finalCommands);
+        }
         return ret;
     }
 

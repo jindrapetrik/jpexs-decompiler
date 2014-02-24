@@ -36,9 +36,13 @@ public class TryAVM2Item extends AVM2Item implements Block {
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
-        ret.add(tryCommands);
+        if (tryCommands != null) {
+            ret.add(tryCommands);
+        }
         ret.addAll(catchCommands);
-        ret.add(finallyCommands);
+        if (finallyCommands != null) {
+            ret.add(finallyCommands);
+        }
         return ret;
     }
 

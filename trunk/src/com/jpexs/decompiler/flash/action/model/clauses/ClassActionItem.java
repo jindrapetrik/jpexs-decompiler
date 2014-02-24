@@ -53,8 +53,12 @@ public class ClassActionItem extends ActionItem implements Block {
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
-        ret.add(functions);
-        ret.add(staticFunctions);
+        if (functions != null) {
+            ret.add(functions);
+        }
+        if (staticFunctions != null) {
+            ret.add(staticFunctions);
+        }
         return ret;
     }
 

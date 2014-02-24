@@ -44,8 +44,12 @@ public class IfItem extends GraphTargetItem implements Block {
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
-        ret.add(onTrue);
-        ret.add(onFalse);
+        if (onTrue != null) {
+            ret.add(onTrue);
+        }
+        if (onFalse != null) {
+            ret.add(onFalse);
+        }
         return ret;
     }
 
