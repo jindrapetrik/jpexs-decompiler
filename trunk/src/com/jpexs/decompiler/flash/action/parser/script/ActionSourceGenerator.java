@@ -492,6 +492,9 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     private String getName(GraphTargetItem item) {
+        if(item instanceof VariableActionItem){
+            return ((VariableActionItem)item).getVariableName();
+        }
         if (item instanceof DirectValueActionItem) {
             DirectValueActionItem dv = (DirectValueActionItem) item;
             return (String) dv.getResult();

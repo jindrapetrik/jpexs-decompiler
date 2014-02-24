@@ -378,8 +378,8 @@ public class ActionScriptParser {
         String classNameStr = "";
         if (nameStr instanceof GetMemberActionItem) {
             GetMemberActionItem mem = (GetMemberActionItem) nameStr;
-            if (mem.memberName instanceof DirectValueActionItem) {
-                classNameStr = ((DirectValueActionItem) mem.memberName).toStringNoQuotes(LocalData.create(new ConstantPool(constantPool)));
+            if (mem.memberName instanceof VariableActionItem) {
+                classNameStr = ((VariableActionItem) mem.memberName).getVariableName();
             }
         } else if (nameStr instanceof VariableActionItem) {
             VariableActionItem var = (VariableActionItem) nameStr;
