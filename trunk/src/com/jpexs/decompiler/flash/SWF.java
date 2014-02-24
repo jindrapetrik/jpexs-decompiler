@@ -2089,7 +2089,9 @@ public final class SWF implements TreeItem {
     }
 
     public static void putToCache(String key, SerializableImage img) {
-        frameCache.put(key, img);
+        if (Configuration.useFrameCache.get()) {
+            frameCache.put(key, img);
+        }
     }
 
     public static void clearImageCache() {
@@ -2131,9 +2133,9 @@ public final class SWF implements TreeItem {
 
     public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
         String key = "frame_" + frame + "_" + containerId + "_" + allTags.get(0).getSwf().hashCode();
-        if (frameCache.contains(key)) {
-            SerializableImage ciret = ((SerializableImage) frameCache.get(key));
-            return ciret;
+        SerializableImage image = getFromCache(key); 
+        if (image != null) {
+            return image;
         }
 
         List<FrameInfo> frameInfos = getFrameInfo(frame, frame, allTags, controlTags, totalFrameCount);
@@ -2144,12 +2146,12 @@ public final class SWF implements TreeItem {
         FrameInfo fi = frameInfos.get(0);
     
         RECT rect = displayRect;
-        SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
+        image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
                 (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
         frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m);
-        frameCache.put(key, image);
+        putToCache(key, image);
         return image;
     }
 
@@ -2326,11 +2328,16 @@ public final class SWF implements TreeItem {
                     RECT boundRect = bounded.getRect(characters, new Stack<Integer>());
                     ExportRectangle rect = new ExportRectangle(boundRect);
                     rect = mat.transform(rect);
-                    img = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
-                            (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
                     Matrix m = mat.clone();
-                    m.translate(-rect.xMin, -rect.yMin);
-                    drawMatrix.translate(rect.xMin, rect.yMin);
+                    if (layer.filters != null) {
+                        // needs the whole size because of the filters
+                        img = new SerializableImage(image.getWidth(), image.getHeight(), SerializableImage.TYPE_INT_ARGB);
+                    } else {
+                        img = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
+                                (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                        m.translate(-rect.xMin, -rect.yMin);
+                        drawMatrix.translate(rect.xMin, rect.yMin);
+                    }
                     drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, img, m);
                 } else {
                     // only DefineFont tags

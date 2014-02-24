@@ -17,11 +17,11 @@
 package com.jpexs.helpers;
 
 import java.awt.Graphics;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -42,7 +42,6 @@ public class SerializableImage implements Serializable {
 
     static int imageid = 0;
     private BufferedImage image;
-    public Rectangle2D bounds = new Rectangle2D.Double();
 
     public SerializableImage() {
     }
@@ -63,11 +62,6 @@ public class SerializableImage implements Serializable {
         image = new BufferedImage(i, i1, i2, icm);
     }
 
-    public void setBufferedImage(BufferedImage image, Rectangle2D bounds) {
-        this.image = image;
-        this.bounds = bounds;
-    }
-    
     public BufferedImage getBufferedImage() {
         /*try {
          ImageIO.write(image, "png", new File("c:\\10\\x\\imageid" + String.format("%03d", imageid++) + ".png"));
@@ -80,8 +74,6 @@ public class SerializableImage implements Serializable {
     protected Object clone() throws CloneNotSupportedException {
         SerializableImage retImage = new SerializableImage();
         retImage.image = image;
-        retImage.bounds = new Rectangle2D.Double(bounds.getMinX(), bounds.getMinY(),
-                bounds.getWidth(), bounds.getHeight());
         return retImage;
     }
 
@@ -131,12 +123,12 @@ public class SerializableImage implements Serializable {
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeObject(bounds);
+        // out.writeObject(bounds);
         ImageIO.write(image, "png", out);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        bounds = (Rectangle2D) in.readObject();
+        // bounds = (Rectangle2D) in.readObject();
         image = ImageIO.read(in);
     }
 }

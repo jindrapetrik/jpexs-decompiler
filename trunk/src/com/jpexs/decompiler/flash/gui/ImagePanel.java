@@ -143,9 +143,6 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                 }
                 SWF.putToCache(key, img);
             }
-            if (img != null && img.bounds != null && mat != null) {
-                mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
-            }
             if (img != null) {
                 setImage(img);
             }
@@ -217,7 +214,6 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                 }
                 SWF.putToCache(key, img);
             }
-            mat.translate(img.bounds.getMinX(), img.bounds.getMinY());
             ImageIcon icon = new ImageIcon(img.getBufferedImage());
             label.setIcon(icon);
             frame = nframe;
