@@ -103,7 +103,7 @@ public class NewMethodActionItem extends ActionItem {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), scriptObject, methodName, new ActionNewMethod());
     }
-
+       
     @Override
     public boolean hasReturnValue() {
         return true;

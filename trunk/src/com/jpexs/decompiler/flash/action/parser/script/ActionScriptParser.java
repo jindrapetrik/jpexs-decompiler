@@ -122,7 +122,6 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
-import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.ParenthesisItem;
@@ -928,19 +927,6 @@ public class ActionScriptParser {
                 expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
                 ret = (function(true, s.value.toString(), false, variables));
                 break;
-            case NEW:
-                GraphTargetItem type = type(variables);
-                expectedType(SymbolType.PARENT_OPEN);
-                if (type instanceof GetMemberActionItem) {
-                    GetMemberActionItem mem = (GetMemberActionItem) type;
-                    ret = new NewMethodActionItem(null, mem.object, mem.memberName, call(registerVars, inFunction, inMethod, variables));
-                } else if (type instanceof VariableActionItem) {
-                    VariableActionItem var = (VariableActionItem) type;
-                    ret = new NewObjectActionItem(null, var, call(registerVars, inFunction, inMethod, variables));
-                } else {
-                    ret = new NewObjectActionItem(null, ret, call(registerVars, inFunction, inMethod, variables));
-                }
-                break;
             case VAR:
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
@@ -1349,6 +1335,10 @@ public class ActionScriptParser {
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
         switch (s.type) {
+            case DOT:
+                lexer.pushback(s);
+                ret = memberOrCall(expr, registerVars, inFunction, inMethod, variables);
+                break;
             case TERNAR:
                 GraphTargetItem terOnTrue = expression(registerVars, inFunction, inMethod, false, variables);
                 expectedType(SymbolType.COLON);
@@ -1619,11 +1609,11 @@ public class ActionScriptParser {
                     GetMemberActionItem mem = (GetMemberActionItem) newvar;
                     ret = new NewMethodActionItem(null, mem.object, mem.memberName, call(registerVars, inFunction, inMethod, variables));
                 } else if (newvar instanceof VariableActionItem) {
-                    //VariableActionItem gv = (VariableActionItem) newvar;
                     ret = new NewObjectActionItem(null, newvar, call(registerVars, inFunction, inMethod, variables));
                 } else {
                     throw new ParseException("Invalid new item", lexer.yyline());
                 }
+                existsRemainder = true;
                 break;
             case IDENTIFIER:
             case THIS:
