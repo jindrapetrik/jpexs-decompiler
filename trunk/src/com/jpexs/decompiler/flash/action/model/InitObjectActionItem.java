@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf5.ActionInitObject;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -50,8 +51,8 @@ public class InitObjectActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("{");
-        for (int i = 0; i < values.size(); i++) {
-            if (i > 0) {
+        for (int i = values.size()-1;i>=0; i--) {
+            if (i < values.size()-1) {
                 writer.append(",");
             }
             names.get(i).toStringNoQuotes(writer, localData); //AS1/2 do not allow quotes in name here
@@ -87,6 +88,7 @@ public class InitObjectActionItem extends ActionItem {
             ret.addAll(values.get(i).toSource(localData, generator));
         }
         ret.add(new ActionPush((Long) (long) values.size()));
+        ret.add(new ActionInitObject());
         return ret;
     }
 
