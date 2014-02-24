@@ -1075,7 +1075,7 @@ public class ActionScriptParser {
                         break;
                     case PARENT_OPEN: //function call
                         ret = var;
-                        if (varS.type == SymbolType.SUPER || varS.type == SymbolType.THIS) {
+                        if (varS.type == SymbolType.SUPER || varS.type == SymbolType.THIS && (var instanceof VariableActionItem)) {
                             List<GraphTargetItem> args = call(registerVars, inFunction, inMethod, variables);
                             ret = new CallMethodActionItem(null, ret, new DirectValueActionItem(null, 0, new Undefined(), constantPool), args);
                         } else {
