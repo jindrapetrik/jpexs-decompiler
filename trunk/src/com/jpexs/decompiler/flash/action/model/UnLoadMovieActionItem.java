@@ -56,7 +56,7 @@ public class UnLoadMovieActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, new ActionPush(""), targetString, new ActionGetURL2(0, true, false));
+        return toSourceMerge(localData, generator, new ActionPush(""), targetString, new ActionGetURL2(0, false,true));
     }
 
     @Override

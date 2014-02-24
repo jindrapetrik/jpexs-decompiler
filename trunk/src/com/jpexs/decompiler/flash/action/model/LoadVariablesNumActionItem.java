@@ -72,7 +72,7 @@ public class LoadVariablesNumActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        return toSourceMerge(localData, generator, urlString, new AddActionItem(src, asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(method, false, true));
+        return toSourceMerge(localData, generator, urlString, new AddActionItem(src, asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(method, true, false));
     }
 
     @Override

@@ -69,7 +69,7 @@ public class LoadMovieActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, urlString, targetString, new ActionGetURL2(method, true, false));
+        return toSourceMerge(localData, generator, urlString, targetString, new ActionGetURL2(method, false, true));
     }
 
     @Override

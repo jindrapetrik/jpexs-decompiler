@@ -50,7 +50,7 @@ public class ActionGetURL2 extends Action {
     public boolean loadVariablesFlag;
     public int reserved;
 
-    public ActionGetURL2(int sendVarsMethod, boolean loadTargetFlag, boolean loadVariablesFlag) {
+    public ActionGetURL2(int sendVarsMethod,  boolean loadVariablesFlag, boolean loadTargetFlag) {
         super(0x9A, 1);
         this.loadTargetFlag = loadTargetFlag;
         this.loadVariablesFlag = loadVariablesFlag;
@@ -67,7 +67,7 @@ public class ActionGetURL2 extends Action {
 
     @Override
     public String toString() {
-        return "GetURL2 " + loadTargetFlag + " " + loadVariablesFlag + " " + sendVarsMethod;
+        return "GetURL2 " + loadVariablesFlag + " " + loadTargetFlag + " " + sendVarsMethod;
     }
 
     @Override
@@ -87,8 +87,8 @@ public class ActionGetURL2 extends Action {
 
     public ActionGetURL2(FlasmLexer lexer) throws IOException, ParseException {
         super(0x9A, -1);
-        loadTargetFlag = lexBoolean(lexer);
         loadVariablesFlag = lexBoolean(lexer);
+        loadTargetFlag = lexBoolean(lexer);        
         sendVarsMethod = (int) lexLong(lexer);
     }
 
