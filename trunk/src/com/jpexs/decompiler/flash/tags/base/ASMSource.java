@@ -59,7 +59,6 @@ public interface ASMSource extends TreeItem {
     /**
      * Sets actions associated with this object
      *
-     * @param version Version
      * @param actions Action list
      */
     public void setActions(List<Action> actions);
