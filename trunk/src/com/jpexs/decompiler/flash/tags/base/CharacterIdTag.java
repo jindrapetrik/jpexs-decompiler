@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,7 @@ public abstract class CharacterIdTag extends Tag {
     /**
      * List of ExportAssetsTag used for converting to String
      */
+    @Internal
     public List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
     protected String className;
     protected String exportName;

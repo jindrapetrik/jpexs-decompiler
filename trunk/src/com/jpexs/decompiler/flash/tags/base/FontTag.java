@@ -138,7 +138,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         if (fontName != null) {
             nameAppend = ": " + fontName;
         }
-        return name + " (" + getCharacterId() + nameAppend + ")";
+        return tagName + " (" + getCharacterId() + nameAppend + ")";
     }
 
     public String getSystemFontName() {

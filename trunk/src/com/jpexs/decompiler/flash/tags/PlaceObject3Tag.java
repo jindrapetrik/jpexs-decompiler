@@ -518,7 +518,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
 
     @Override
     public String toString() {
-        if (name != null) {
+        if (placeFlagHasName) {
             return super.toString() + " (" + name + ")";
         } else {
             return super.toString();

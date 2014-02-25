@@ -60,7 +60,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     public boolean forceWriteAsLong = false;
     @Internal
     private final long pos;
-    protected String name;
+    protected String tagName;
     @Internal
     public Tag previousTag;
     @Internal
@@ -69,7 +69,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     private boolean modified;
 
     public String getName() {
-        return name;
+        return tagName;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
      */
     public Tag(SWF swf, int id, String name, byte[] data, long pos) {
         this.id = id;
-        this.name = name;
+        this.tagName = name;
         this.data = data;
         this.pos = pos;
         this.swf = swf;
@@ -266,7 +266,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     public byte[] getData() {
         return data;
     }
-    
+
     public int getVersion() {
         if (swf == null) {
             return SWF.DEFAULT_VERSION;

@@ -763,7 +763,7 @@ public class CommandLineArgumentParser {
                 args.remove();
             }
         }
-        
+
         if (args.size() > 0) {
             String modeStr = args.remove().toLowerCase();
             switch (modeStr) {

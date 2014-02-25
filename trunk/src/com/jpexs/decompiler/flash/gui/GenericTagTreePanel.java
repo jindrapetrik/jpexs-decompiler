@@ -29,10 +29,13 @@ import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
+import com.jpexs.decompiler.flash.types.annotations.parser.ParseException;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -48,7 +51,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,6 +63,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicLabelUI;
@@ -102,6 +108,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         private GenericTagEditor editor = null;
         private final JTree tree;
+        private FieldNode fnode;
 
         public MyTreeCellEditor(JTree tree) {
             this.tree = tree;
@@ -110,7 +117,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         @Override
         public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
             if (value instanceof FieldNode) {
-                FieldNode fnode = (FieldNode) value;
+                fnode = (FieldNode) value;
                 Field field = fnode.field;
                 int index = fnode.index;
                 Object obj = fnode.obj;
@@ -193,8 +200,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
         @Override
         public boolean stopCellEditing() {
             super.stopCellEditing();
+
+            /*List<FieldNode> depends = ((MyTreeModel) tree.getModel()).getDependentFields(fnode);
+             boolean dep = false;
+             if (!depends.isEmpty()) {
+             dep = true;            
+             }     */
             editor.save();
             ((MyTreeModel) tree.getModel()).vchanged(tree.getSelectionPath());
+            refreshTree();
             return true;
         }
 
@@ -204,7 +218,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         setLayout(new BorderLayout());
         tree = new MyTree();
 
-        add(tree, BorderLayout.CENTER);
+        add(new JScrollPane(tree), BorderLayout.CENTER);
         tree.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -404,7 +418,17 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 if (ReflectionTools.needsIndex(field) && (index == -1)) {
                     return obj;
                 }
-                return ReflectionTools.getValue(obj, field, index);
+                Object val = ReflectionTools.getValue(obj, field, index);
+                if (val == null) {
+                    try {
+                        val = ReflectionTools.newInstanceOf(field.getType());
+                        ReflectionTools.setValue(obj, field, index, val);
+                    } catch (InstantiationException | IllegalAccessException ex) {
+                        Logger.getLogger(GenericTagPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        return null;
+                    }
+                }
+                return val;
             } catch (IllegalArgumentException | IllegalAccessException ex) {
                 return null;
             }
@@ -439,30 +463,93 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
             return true;
         }
-
-        DefaultTreeModel d;
     }
 
     private static class MyTreeModel extends DefaultTreeModel {
 
-        private final Object root;
+        private final Object mtroot;
         private final List<TreeModelListener> listeners = new ArrayList<>();
-        private DefaultMutableTreeNode rootNode;
+        private Map<String, Object> nodeCache = new HashMap<>();
+
+        private Object getNodeByPath(String path) {
+            if (nodeCache.containsKey(path)) {
+                return nodeCache.get(path);
+            }
+            return null;
+        }
+
+        public List<FieldNode> getDependentFields(FieldNode fnode) {
+            List<FieldNode> ret = new ArrayList<>();
+            getDependentFields(getNodePathName(fnode), mtroot.getClass().getSimpleName(), mtroot, ret);
+            return ret;
+        }
+
+        public void getDependentFields(String dependence, String currentPath, Object node, List<FieldNode> ret) {
+            if (node instanceof FieldNode) {
+                FieldNode fnode = (FieldNode) node;
+                Conditional cond = fnode.field.getAnnotation(Conditional.class);
+                if (cond != null) {
+                    ConditionEvaluator ev = new ConditionEvaluator(cond);
+                    String parentPath = currentPath.indexOf(".") == -1 ? "" : currentPath.substring(0, currentPath.lastIndexOf("."));
+                    try {
+                        for (String cname : ev.getFields()) {
+                            String fullParh = parentPath + "." + cname;
+                            if (fullParh.equals(dependence)) {
+                                ret.add(fnode);
+                                break;
+                            }
+                        }
+                    } catch (ParseException ex) {
+                        Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+            for (int i = 0; i < getChildCount(node); i++) {
+                FieldNode f = (FieldNode) getChild(node, i);
+                getDependentFields(dependence, currentPath + "." + f.getName(), f, ret);
+            }
+        }
+
+        public String getNodePathName(Object find) {
+
+            for (Map.Entry<String, Object> en : nodeCache.entrySet()) {
+                if (en.getValue().equals(find)) {
+                    return en.getKey();
+                }
+            }
+            return null;
+        }
 
         public MyTreeModel(Tag root) {
             super(new DefaultMutableTreeNode(root));
-            this.root = root;
+            this.mtroot = root;
+            buildCache(root, "");
+        }
+
+        private void buildCache(Object obj, String parentPath) {
+            if (!"".equals(parentPath)) {
+                parentPath += ".";
+            }
+            if (obj instanceof FieldNode) {
+                FieldNode fn = (FieldNode) obj;
+                parentPath += fn.getName();
+            } else {
+                parentPath += obj.getClass().getSimpleName();
+            }
+            nodeCache.put(parentPath, obj);
+            for (int i = 0; i < getChildCount(obj, false); i++) {
+                buildCache(getChild(obj, i, false), parentPath);
+            }
         }
 
         @Override
         public Object getRoot() {
-            return root;
+            return mtroot;
         }
 
-        @Override
-        public Object getChild(Object parent, int index) {
-            if (parent == root) {
-                return new FieldNode(root, getAvailableFields(root.getClass()).get(index), -1);
+        private Object getChild(Object parent, int index, boolean limited) {
+            if (parent == mtroot) {
+                return new FieldNode(mtroot, filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited).get(index), -1);
             }
             FieldNode fnode = (FieldNode) parent;
             Field field = fnode.field;
@@ -470,13 +557,22 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 return new FieldNode(fnode.obj, field, index);
             }
             parent = fnode.getValue();
-            return new FieldNode(parent, getAvailableFields(parent.getClass()).get(index), -1);
+            return new FieldNode(parent, filterFields(this, getNodePathName(fnode), parent.getClass(), limited).get(index), -1);
+        }
+
+        @Override
+        public Object getChild(Object parent, int index) {
+            return getChild(parent, index, true);
         }
 
         @Override
         public int getChildCount(Object parent) {
-            if (parent == root) {
-                return getAvailableFields(root.getClass()).size();
+            return getChildCount(parent, true);
+        }
+
+        private int getChildCount(Object parent, boolean limited) {
+            if (parent == mtroot) {
+                return filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited).size();
             }
             FieldNode fnode = (FieldNode) parent;
             if (isLeaf(fnode)) {
@@ -488,12 +584,12 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
             parent = fnode.getValue();
 
-            return getAvailableFields(parent.getClass()).size();
+            return filterFields(this, getNodePathName(fnode), parent.getClass(), limited).size();
         }
 
         @Override
         public boolean isLeaf(Object node) {
-            if (node == root) {
+            if (node == mtroot) {
                 return false;
             }
 
@@ -637,6 +733,39 @@ public class GenericTagTreePanel extends GenericTagPanel {
         } else {
             return false;
         }
+    }
+
+    private static List<Field> filterFields(MyTreeModel mod, String parentPath, Class<?> cls, boolean limited) {
+        List<Field> ret = new ArrayList<>();
+        List<Field> fields = getAvailableFields(cls);
+        for (Field f : fields) {
+            if (limited) {
+                Conditional cond = f.getAnnotation(Conditional.class);
+                if (cond != null) {
+                    ConditionEvaluator ev = new ConditionEvaluator(cond);
+                    try {
+                        Map<String, Boolean> fieldMap = new HashMap<>();
+                        for (String sf : ev.getFields()) {
+                            String fulldf = parentPath + "." + sf;
+                            FieldNode condnode = (FieldNode) (mod).getNodeByPath(fulldf);
+
+                            if (condnode != null) {
+                                fieldMap.put(sf, (Boolean) ReflectionTools.getValue(condnode.obj, condnode.field, condnode.index));
+                            } else {
+                                fieldMap.put(sf, true);
+                            }
+                        }
+                        if (!ev.eval(fieldMap)) {
+                            continue;
+                        }
+                    } catch (ParseException | IllegalArgumentException | IllegalAccessException ex) {
+                        Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+            ret.add(f);
+        }
+        return ret;
     }
 
     private static List<Field> getAvailableFields(Class<?> cls) {

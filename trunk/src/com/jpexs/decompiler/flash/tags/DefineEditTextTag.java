@@ -670,7 +670,7 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
             staticTextToImage(swf, characters, textRecords, 1, image, getTextMatrix(), transformation);
         }
     }
-    
+
     private String getInnerText(String html) {
         String result = "";
         boolean inTag = false;
@@ -686,7 +686,7 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
         }
         return result;
     }
-    
+
     @Override
     public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(bounds.Xmin / SWF.unitDivisor, bounds.Ymin / SWF.unitDivisor);
