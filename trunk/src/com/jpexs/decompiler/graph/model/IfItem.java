@@ -82,28 +82,26 @@ public class IfItem extends GraphTargetItem implements Block {
         }
         writer.append("if(");
         expr.toString(writer, localData);
-        writer.append(")").newLine();
-        writer.append("{").newLine();
-        writer.indent();
+        writer.append(")").startBlock();
         for (GraphTargetItem ti : ifBranch) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();
             }
         }
-        writer.unindent();
-        writer.append("}");
+        writer.endBlock();
         if (elseBranch.size() > 0) {
-            writer.newLine();
-            writer.append("else").newLine();
-            writer.append("{").newLine();
-            writer.indent();
+            if(writer.getFormatting().beginBlockOnNewLine){
+               writer.newLine();
+            }else{
+               writer.append(" ");
+            }
+            writer.append("else").startBlock();
             for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
                     ti.toStringSemicoloned(writer, localData).newLine();
                 }
             }
-            writer.unindent();
-            writer.append("}");
+            writer.endBlock();
         }
         return writer;
     }

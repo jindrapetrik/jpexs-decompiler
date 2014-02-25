@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -92,7 +93,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     public void load(TraitSlotConst trait, ABC abc, boolean isStatic) {
         this.abc = abc;
         this.trait = trait;
-        HilightedTextWriter writer = new HilightedTextWriter(true);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),true);
         writer.appendNoHilight("trait ");
         writer.hilightSpecial(abc.constants.multinameToString(trait.name_index), "traitname");
         writer.appendNoHilight(" ");

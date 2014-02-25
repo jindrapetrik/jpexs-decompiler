@@ -88,14 +88,11 @@ public class ForInActionItem extends LoopActionItem implements Block {
         stripQuotes(variableName, localData, writer);
         writer.append(" in ");
         enumVariable.toString(writer, localData);
-        writer.append(")").newLine();
-        writer.append("{").newLine();
-        writer.indent();
+        writer.append(")").startBlock();
         for (GraphTargetItem ti : commands) {
             ti.toStringSemicoloned(writer, localData).newLine();
         }
-        writer.unindent();
-        writer.append("}");
+        writer.endBlock();
         if (writer instanceof NulWriter) {
             LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
             labelUsed = loopOjb.used;

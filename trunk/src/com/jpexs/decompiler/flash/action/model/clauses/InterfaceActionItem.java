@@ -59,8 +59,7 @@ public class InterfaceActionItem extends ActionItem {
             Action.getWithoutGlobal(ti).toStringNoQuotes(writer, localData);
         }
         writer.newLine();
-        writer.append("{").newLine();
-        return writer.append("}").newLine();
+        return writer.append("{").startBlock();
     }
 
     @Override

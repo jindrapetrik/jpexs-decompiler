@@ -52,16 +52,13 @@ public class UniversalLoopItem extends LoopItem implements Block {
         if (labelUsed) {
             writer.append("loop" + loop.id + ":").newLine();
         }
-        writer.append("while(true)").newLine();
-        writer.append("{").newLine();
-        writer.indent();
+        writer.append("while(true)").startBlock();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();
             }
         }
-        writer.unindent();
-        writer.append("}").newLine();
+        writer.endBlock();
         if (writer instanceof NulWriter) {
             LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
             labelUsed = loopOjb.used;

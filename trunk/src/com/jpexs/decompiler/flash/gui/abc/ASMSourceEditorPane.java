@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedText;
@@ -66,7 +67,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     }
 
     private HilightedText getHilightedText(ExportMode exportMode) {
-        HilightedTextWriter writer = new HilightedTextWriter(true);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),true);
         abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], exportMode, writer);
         return new HilightedText(writer);
     }
@@ -92,7 +93,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         } else {
             setContentType("text/plain");
             if (textHexOnly == null) {
-                HilightedTextWriter writer = new HilightedTextWriter(true);
+                HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),true);
                 Helper.byteArrayToHexWithHeader(writer, abc.bodies[bodyIndex].code.getBytes());
                 textHexOnly = new HilightedText(writer);
             }

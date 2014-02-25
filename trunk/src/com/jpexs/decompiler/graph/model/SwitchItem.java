@@ -71,9 +71,7 @@ public class SwitchItem extends LoopItem implements Block {
         }
         writer.append("switch(");
         switchedObject.toString(writer, localData);
-        writer.append(")").newLine();
-        writer.append("{").newLine();
-        writer.indent();
+        writer.append(")").startBlock();
         for (int i = 0; i < caseCommands.size(); i++) {
             for (int k = 0; k < valuesMapping.size(); k++) {
                 if (valuesMapping.get(k) == i) {
@@ -103,8 +101,7 @@ public class SwitchItem extends LoopItem implements Block {
                 writer.unindent();
             }
         }
-        writer.unindent();
-        writer.append("}").newLine();
+        writer.endBlock();
         if (writer instanceof NulWriter) {
             LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
             labelUsed = loopOjb.used;

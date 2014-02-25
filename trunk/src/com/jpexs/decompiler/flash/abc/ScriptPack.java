@@ -188,7 +188,7 @@ public class ScriptPack implements TreeElementItem {
         String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + ".as";
 
         File file = new File(fileName);
-        try (FileTextWriter writer = new FileTextWriter(new FileOutputStream(file))) {
+        try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(),new FileOutputStream(file))) {
             try {
                 toSource(writer, abcList, abc.script_info[scriptIndex].traits.traits, exportMode, parallel);
             } catch (InterruptedException ex) {

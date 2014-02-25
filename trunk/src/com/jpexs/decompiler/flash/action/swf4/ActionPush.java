@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -297,7 +298,7 @@ public class ActionPush extends Action {
 
     @Override
     public String toString() {
-        HilightedTextWriter writer = new HilightedTextWriter(false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
         toString(writer);
         return writer.toString();
     }

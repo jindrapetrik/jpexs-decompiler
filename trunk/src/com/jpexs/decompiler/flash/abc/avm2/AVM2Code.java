@@ -2247,7 +2247,7 @@ public class AVM2Code implements Serializable {
         invalidateCache();
         try {
             List<Integer> outputMap = new ArrayList<>();
-            HilightedTextWriter writer = new HilightedTextWriter(false);
+            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
             toASMSource(constants, trait, info, body, outputMap, ExportMode.PCODE, writer);
             String src = writer.toString();
 
@@ -2289,7 +2289,7 @@ public class AVM2Code implements Serializable {
     public void removeIgnored(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
         try {
             List<Integer> outputMap = new ArrayList<>();
-            HilightedTextWriter writer = new HilightedTextWriter(false);
+            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
             toASMSource(constants, trait, info, body, outputMap, ExportMode.PCODE, writer);
             String src = writer.toString();
             AVM2Code acode = ASM3Parser.parse(new StringReader(src), constants, trait, body, info);

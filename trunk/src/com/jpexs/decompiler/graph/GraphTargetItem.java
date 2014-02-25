@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.graph.model.BinaryOp;
@@ -116,7 +117,7 @@ public abstract class GraphTargetItem implements Serializable {
     public abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
 
     public String toString(LocalData localData) throws InterruptedException {
-        HilightedTextWriter writer = new HilightedTextWriter(false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
         toString(writer, localData);
         return writer.toString();
     }

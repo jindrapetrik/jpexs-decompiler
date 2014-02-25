@@ -664,24 +664,6 @@ public class ABC {
         return null;
     }
 
-    public static String addTabs(String s, int tabs) {
-        String[] parts = s.split("\r\n");
-        if (!s.contains("\r\n")) {
-            parts = s.split("\n");
-        }
-        StringBuilder ret = new StringBuilder();
-        for (int i = 0; i < parts.length; i++) {
-            for (int t = 0; t < tabs; t++) {
-                ret.append(HilightedTextWriter.INDENT_STRING);
-            }
-            ret.append(parts[i]);
-            if (i < parts.length - 1) {
-                ret.append("\r\n");
-            }
-        }
-        return ret.toString();
-    }
-
     public boolean isStaticTraitId(int classIndex, int traitId) {
         if (traitId < class_info[classIndex].static_traits.traits.length) {
             return true;

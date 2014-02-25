@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -49,7 +50,7 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         }
         ((TraitSlotConst) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
 
-        HilightedTextWriter writer = new HilightedTextWriter(false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
         writer.appendNoHilight(super.toString(abcTags, abc) + " ");
         if (parentTraitIndex > -1) {
             if (isStatic) {

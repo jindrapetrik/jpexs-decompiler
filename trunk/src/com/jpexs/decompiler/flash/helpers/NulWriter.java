@@ -30,6 +30,7 @@ public class NulWriter extends GraphTextWriter {
     private boolean stringAdded = false;
 
     public NulWriter() {
+       super(new CodeFormatting());
     }
 
     public void startLoop(long loopId, int loopType) {

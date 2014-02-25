@@ -97,13 +97,11 @@ public class FunctionActionItem extends ActionItem {
             }
             writer.append(pname);
         }
-        writer.append(")").newLine();
-        writer.append("{").newLine();
-        writer.indent();
+        writer.append(")").startBlock();
 
         Graph.graphToString(actions, writer, localData);
-        writer.unindent();
-        return writer.append("}");
+       
+        return writer.endBlock();
     }
 
     @Override

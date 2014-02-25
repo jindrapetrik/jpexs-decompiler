@@ -161,9 +161,7 @@ public class ClassActionItem extends ActionItem implements Block {
                 Action.getWithoutGlobal(t).toString(writer, localData);
             }
         }
-        writer.newLine();
-        writer.append("{").newLine();
-        writer.indent();
+        writer.startBlock();
 
         if (constructor != null) {
             constructor.toString(writer, localData).newLine();
@@ -197,8 +195,8 @@ public class ClassActionItem extends ActionItem implements Block {
             f.toString(writer, localData).newLine();
         }
 
-        writer.unindent();
-        return writer.append("}").newLine();
+        
+        return writer.endBlock();
     }
 
     @Override

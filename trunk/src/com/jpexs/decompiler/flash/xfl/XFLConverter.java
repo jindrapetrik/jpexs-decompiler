@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -1156,7 +1157,7 @@ public class XFLConverter {
     }
 
     private static String convertActionScript(ASMSource as) {
-        HilightedTextWriter writer = new HilightedTextWriter(false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
         try {
             Action.actionsToSource(as, as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString(), writer);
         } catch (InterruptedException ex) {

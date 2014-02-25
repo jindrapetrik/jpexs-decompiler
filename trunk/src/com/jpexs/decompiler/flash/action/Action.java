@@ -1213,7 +1213,7 @@ public class Action implements GraphSourceItem {
         }
         String s = null;
         try {
-            HilightedTextWriter writer = new HilightedTextWriter(false);
+            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
             Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, ExportMode.PCODE, writer, swfPos, path);
             s = writer.toString();
             ret = ASMParser.parse(address, swfPos, true, s, SWF.DEFAULT_VERSION, false);

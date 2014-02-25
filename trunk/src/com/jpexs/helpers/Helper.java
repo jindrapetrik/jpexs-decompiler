@@ -220,7 +220,7 @@ public class Helper {
         Scanner scanner = new Scanner(text);
         String indentStr = "";
         for (int i = 0; i < level; i++) {
-            indentStr += HilightedTextWriter.INDENT_STRING;
+            indentStr += Configuration.getCodeFormatting().indentString;
         }
         int indentLength = indentStr.length();
         for (int i = 0; i < prefixLineCount; i++) {
@@ -229,7 +229,7 @@ public class Helper {
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             if (line.startsWith(indentStr)) {
-                sb.append(line.substring(indentLength)).append(HilightedTextWriter.NEW_LINE);
+                sb.append(line.substring(indentLength)).append(Configuration.getCodeFormatting().newLineChars);
             } else {
                 return sb.toString();
             }
@@ -706,7 +706,7 @@ public class Helper {
     }
 
     public static String byteArrayToHex(byte[] data, int bytesPerRow) {
-        HilightedTextWriter writer = new HilightedTextWriter(false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
         byteArrayToHex(writer, data, bytesPerRow, 8, true, true);
         return writer.toString();
     }

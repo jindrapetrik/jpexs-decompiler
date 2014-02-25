@@ -25,13 +25,17 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
  */
 public class GraphTextWriter {
 
-    public static final String INDENT_STRING = "   ";
-    public static final String NEW_LINE = "\r\n";
     protected long startTime;
     protected long suspendTime;
+    protected CodeFormatting formatting;
 
-    public GraphTextWriter() {
-        startTime = System.currentTimeMillis();
+   public CodeFormatting getFormatting() {
+      return formatting;
+   }
+    
+    public GraphTextWriter(CodeFormatting formatting) {
+       startTime = System.currentTimeMillis();
+       this.formatting = formatting;
     }
 
     public boolean getIsHighlighted() {
@@ -159,5 +163,26 @@ public class GraphTextWriter {
     @Override
     public String toString() {
         return "";
+    }
+    
+    public GraphTextWriter startBlock(String opening) {
+         if(formatting.beginBlockOnNewLine){
+            newLine();
+         }else{
+            append(" ");
+         }
+        return append(opening).newLine().indent();
+    }
+    
+    public GraphTextWriter startBlock() {
+        return startBlock("{");
+    }
+    
+    public GraphTextWriter endBlock(String closing) {
+        return unindent().append(closing);
+    }
+    
+    public GraphTextWriter endBlock() {
+        return endBlock("}");
     }
 }

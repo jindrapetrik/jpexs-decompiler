@@ -49,12 +49,9 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("ifFrameLoaded(");
         frame.toString(writer, localData);
-        writer.append(")").newLine();
-        writer.append("{").newLine();
-        writer.indent();
-        Graph.graphToString(actions, writer, localData);
-        writer.unindent();
-        return writer.append("}");
+        writer.append(")").startBlock();
+        Graph.graphToString(actions, writer, localData);        
+        return writer.endBlock();
     }
 
     @Override

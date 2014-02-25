@@ -39,12 +39,9 @@ public class BlockItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("{").newLine();
-        writer.indent();
+        writer.startBlock();
         Graph.graphToString(commands, writer, localData);
-        writer.newLine();
-        writer.unindent();
-        return writer.append("}");
+        return writer.endBlock();
     }
 
     @Override

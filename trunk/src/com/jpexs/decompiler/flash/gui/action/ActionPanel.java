@@ -189,7 +189,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             if (actions == null) {
                 actions = src.getActions(SWF.DEFAULT_VERSION);
             }
-            HilightedTextWriter writer = new HilightedTextWriter(true);
+            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),true);
             Action.actionsToSource(src, actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, writer);
             List<Highlighting> hilights = writer.instructionHilights;
             String srcNoHex = writer.toString();
@@ -309,7 +309,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         ASMSource asm = (ASMSource) src;
         DisassemblyListener listener = getDisassemblyListener();
         asm.addDisassemblyListener(listener);
-        HilightedTextWriter writer = new HilightedTextWriter(true);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),true);
         try {
             asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, lastCode);
         } catch (InterruptedException ex) {
@@ -334,7 +334,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             }
         } else {
             if (srcHexOnly == null) {
-                HilightedTextWriter writer = new HilightedTextWriter(true);
+                HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),true);
                 Helper.byteArrayToHexWithHeader(writer, src.getActionBytes());
                 srcHexOnly = new HilightedText(writer);
             }

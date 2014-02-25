@@ -48,11 +48,13 @@ public class HilightedTextWriter extends GraphTextWriter {
     public List<Highlighting> instructionHilights = new ArrayList<>();
     public List<Highlighting> specialHilights = new ArrayList<>();
 
-    public HilightedTextWriter(boolean hilight) {
+    public HilightedTextWriter(CodeFormatting formatting,boolean hilight) {
+        super(formatting);
         this.hilight = hilight;
     }
 
-    public HilightedTextWriter(boolean hilight, int indent) {
+    public HilightedTextWriter(CodeFormatting formatting,boolean hilight, int indent) {
+        super(formatting);
         this.hilight = hilight;
         this.indent = indent;
     }
@@ -214,7 +216,7 @@ public class HilightedTextWriter extends GraphTextWriter {
 
     @Override
     public HilightedTextWriter newLine() {
-        appendToSb(NEW_LINE);
+        appendToSb(formatting.newLineChars);
         newLine = true;
         newLineCount++;
         return this;
@@ -305,7 +307,7 @@ public class HilightedTextWriter extends GraphTextWriter {
 
     private void appendIndent() {
         for (int i = 0; i < indent; i++) {
-            appendNoHilight(INDENT_STRING);
+            appendNoHilight(formatting.indentString);
         }
     }
 }

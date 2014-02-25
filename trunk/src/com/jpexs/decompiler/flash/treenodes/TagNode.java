@@ -138,7 +138,7 @@ public class TagNode extends ContainerNode {
 
                             File file = new File(f);
                             ASMSource asm = ((ASMSource) node.item);
-                            try (FileTextWriter writer = new FileTextWriter(new FileOutputStream(f))) {
+                            try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(),new FileOutputStream(f))) {
                                 if (exportMode == ExportMode.HEX) {
                                     asm.getActionSourcePrefix(writer);
                                     asm.getActionBytesAsHex(writer);
