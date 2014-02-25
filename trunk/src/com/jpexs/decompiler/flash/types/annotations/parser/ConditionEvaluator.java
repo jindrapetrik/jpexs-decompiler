@@ -62,7 +62,7 @@ public class ConditionEvaluator {
     }
 
     private void expression(Map<String, Boolean> fields, Stack<Boolean> stack, ConditionLexer lex) throws IOException, ParseException {
-        ConditionToken tok = lex.yylex();
+        ConditionToken tok = lex.lex();
         if (tok == null) {
             return;
         }
@@ -82,7 +82,7 @@ public class ConditionEvaluator {
                 break;
             case PARENT_OPEN:
                 expression(fields, stack, lex);
-                tok = lex.yylex();
+                tok = lex.lex();
                 if (tok.type != ConditionTokenType.PARENT_CLOSE) {
                     throw new ParseException("End of parent expected", lex.yyline());
                 }
@@ -130,7 +130,7 @@ public class ConditionEvaluator {
         ConditionLexer lex = new ConditionLexer(new StringReader(prepareCond()));
         ConditionToken tok;
         try {
-            while ((tok = lex.yylex()) != null) {
+            while ((tok = lex.lex()) != null) {
                 if (tok.type == ConditionTokenType.FIELD) {
                     ret.add(tok.value);
                 }
