@@ -33,6 +33,10 @@ import java.awt.event.WindowStateListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.pushingpixels.flamingo.api.common.AbstractCommandButton;
@@ -160,11 +164,16 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
 
         final MainFrameRibbon t = this;
 
-        SwingUtilities.invokeLater(new Runnable() {
+        //TODO: Handle this better. This is awful :-(
+        new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 List<JRibbonApplicationMenuButton> mbuttons = new ArrayList<>();
                 getApplicationMenuButtons(t, mbuttons);
+                if (mbuttons.size() < 2) {
+                    //return, task will run again
+                    return;
+                }
 
                 for (final JRibbonApplicationMenuButton mbutton : mbuttons) {
                     mbutton.setIcon(View.getResizableIcon("buttonicon_256"));
@@ -222,9 +231,10 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
                     mui.setHoverIcon(View.getResizableIcon("buttonicon_hover_256"));
                     mui.setNormalIcon(View.getResizableIcon("buttonicon_256"));
                     mui.setClickIcon(View.getResizableIcon("buttonicon_down_256"));
+                    cancel(); //cancel task so it does not run again
                 }
             }
-        });
+        }, 50, 50);
 
         panel.setVisible(b);
     }
