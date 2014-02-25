@@ -335,7 +335,7 @@ public final class SWF implements TreeItem {
      * @throws java.lang.InterruptedException
      */
     public SWF(InputStream is, ProgressListener listener, boolean parallelRead) throws IOException, InterruptedException {
-        this(is, listener, parallelRead, false);
+        this(is, listener, parallelRead, false, false);
     }
 
     /**
@@ -348,7 +348,7 @@ public final class SWF implements TreeItem {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException, InterruptedException {
+    public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean skipTagReading) throws IOException, InterruptedException {
         byte[] hdr = new byte[3];
         is.read(hdr);
         String shdr = new String(hdr, Utf8Helper.charset);
@@ -411,8 +411,8 @@ public final class SWF implements TreeItem {
         sis.readUI8(); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        if (checkOnly) {
-            //return;
+        if (skipTagReading) {
+            return;
         }
         tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, gfx);
         if (!checkOnly) {

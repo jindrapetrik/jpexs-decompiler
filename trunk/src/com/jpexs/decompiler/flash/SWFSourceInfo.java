@@ -76,7 +76,7 @@ public class SWFSourceInfo {
         return false;
     }
 
-    public SWFBundle getBundle() throws IOException {
+    public SWFBundle getBundle(boolean noCheck) throws IOException {
         if (!isBundle()) {
             return null;
         }
@@ -89,7 +89,7 @@ public class SWFSourceInfo {
             case ".zip":
                 return new ZippedSWFBundle(is);
             default:
-                return new BinarySWFBundle(is);
+                return new BinarySWFBundle(is, noCheck);
         }
     }
 }

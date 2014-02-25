@@ -122,7 +122,7 @@ public class CommandLineArgumentParser {
         System.out.println("  ...Compress SWF <infile> and save it to <outfile>");
         System.out.println(" 8) -decompress <infile> <outfile>");
         System.out.println("  ...Decompress <infile> and save it to <outfile>");
-        System.out.println(" 9) -extract <infile> [(all|biggest)]");
+        System.out.println(" 9) -extract <infile> [nocheck] [(all|biggest)]");
         System.out.println("  ...Extracts SWF files from ZIP or other binary files");
         System.out.println(" 10) -renameInvalidIdentifiers (typeNumber|randomWord) <infile> <outfil>e");
         System.out.println("  ...Renames the invalid identifiers in <infile> and save it to <outfile>");
@@ -755,6 +755,15 @@ public class CommandLineArgumentParser {
 
         String fileName = args.remove();
         ExtractMode mode = ExtractMode.ALL;
+
+        boolean noCheck = false;
+        if (args.size() > 0) {
+            if (args.peek().toLowerCase().equals("nocheck")) {
+                noCheck = true;
+                args.remove();
+            }
+        }
+        
         if (args.size() > 0) {
             String modeStr = args.remove().toLowerCase();
             switch (modeStr) {
@@ -770,7 +779,7 @@ public class CommandLineArgumentParser {
                 System.err.println("Error: <infile> should be a bundle. (ZIP or non SWF binary file)");
                 System.exit(1);
             }
-            SWFBundle bundle = sourceInfo.getBundle();
+            SWFBundle bundle = sourceInfo.getBundle(noCheck);
             List<Map.Entry<String, SeekableInputStream>> streamsToExtract = new ArrayList<>();
             Map.Entry<String, SeekableInputStream> biggest = null;
             int biggestSize = 0;

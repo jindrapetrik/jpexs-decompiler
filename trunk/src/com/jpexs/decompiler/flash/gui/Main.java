@@ -230,7 +230,7 @@ public class Main {
         SWFBundle bundle = null;
         if (inputStream == null) {
             inputStream = new BufferedInputStream(new FileInputStream(sourceInfo.getFile()));
-            bundle = sourceInfo.getBundle();
+            bundle = sourceInfo.getBundle(false);
             logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
         } else if (inputStream instanceof SeekableInputStream
                 || inputStream instanceof BufferedInputStream) {

@@ -34,12 +34,14 @@ import java.util.Set;
 public class SWFSearch {
 
     protected Searchable s;
+    private boolean noCheck;
     private boolean processed = false;
     private final Set<ProgressListener> listeners = new HashSet<>();
     private final Map<Long, MemoryInputStream> swfStreams = new HashMap<>();
 
-    public SWFSearch(Searchable s) {
+    public SWFSearch(Searchable s, boolean noCheck) {
         this.s = s;
+        this.noCheck = noCheck;
     }
 
     public void addProgressListener(ProgressListener l) {
@@ -77,7 +79,7 @@ public class SWFSearch {
                 MemoryInputStream mis = (MemoryInputStream) ret.get(addr);
                 mis.reset();
                 PosMarkedInputStream pmi = new PosMarkedInputStream(mis);
-                SWF swf = new SWF(pmi, null, false, true);
+                SWF swf = new SWF(pmi, null, false, true, noCheck);
                 long limit = pmi.getPos();
                 MemoryInputStream is = new MemoryInputStream(mis.getAllRead(), (int) (long) addr, (int) limit);
                 if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
