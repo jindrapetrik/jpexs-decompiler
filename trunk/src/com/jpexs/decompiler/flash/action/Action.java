@@ -1213,7 +1213,7 @@ public class Action implements GraphSourceItem {
         }
         String s = null;
         try {
-            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
             Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, ExportMode.PCODE, writer, swfPos, path);
             s = writer.toString();
             ret = ASMParser.parse(address, swfPos, true, s, SWF.DEFAULT_VERSION, false);
@@ -1268,12 +1268,12 @@ public class Action implements GraphSourceItem {
         return 0;
     }
 
-    public static GraphTargetItem gettoset(GraphTargetItem get, GraphTargetItem value,List<VariableActionItem> variables) {
+    public static GraphTargetItem gettoset(GraphTargetItem get, GraphTargetItem value, List<VariableActionItem> variables) {
         GraphTargetItem ret = get;
         boolean boxed = false;
-        if(get instanceof VariableActionItem){
+        if (get instanceof VariableActionItem) {
             boxed = true;
-           ret = ((VariableActionItem)ret).getBoxedValue();
+            ret = ((VariableActionItem) ret).getBoxedValue();
         }
         if (ret instanceof GetVariableActionItem) {
             GetVariableActionItem gv = (GetVariableActionItem) ret;
@@ -1287,12 +1287,12 @@ public class Action implements GraphSourceItem {
             GetPropertyActionItem gp = (GetPropertyActionItem) ret;
             ret = new SetPropertyActionItem(null, gp.target, gp.propertyIndex, value);
         }
-        if(boxed){
-            GraphTargetItem b=ret;
-            ret = new VariableActionItem(((VariableActionItem)get).getVariableName(), value,((VariableActionItem)get).isDefinition());
-            ((VariableActionItem)ret).setBoxedValue((ActionItem)b);
-            variables.remove((VariableActionItem)get);
-            variables.add((VariableActionItem)ret);
+        if (boxed) {
+            GraphTargetItem b = ret;
+            ret = new VariableActionItem(((VariableActionItem) get).getVariableName(), value, ((VariableActionItem) get).isDefinition());
+            ((VariableActionItem) ret).setBoxedValue((ActionItem) b);
+            variables.remove((VariableActionItem) get);
+            variables.add((VariableActionItem) ret);
         }
         return ret;
     }

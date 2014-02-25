@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.types.annotations.parser;
 
 /**
@@ -22,19 +21,18 @@ package com.jpexs.decompiler.flash.types.annotations.parser;
  * @author JPEXS
  */
 public class ConditionToken {
+
     public String value;
     public ConditionTokenType type;
 
-    public ConditionToken(ConditionTokenType type,String value) {
+    public ConditionToken(ConditionTokenType type, String value) {
         this.value = value;
         this.type = type;
     }
 
     @Override
     public String toString() {
-        return type.toString()+(value!=null?"["+value+"]":"");
+        return type.toString() + (value != null ? "[" + value + "]" : "");
     }
-    
-    
-    
+
 }

@@ -44,7 +44,7 @@ public class CSMTextSettingsTag extends Tag {
     public int gridFit;
 
     @Reserved
-    @SWFType(value = BasicType.UB, count=3)
+    @SWFType(value = BasicType.UB, count = 3)
     public int reserved;
 
     @SWFType(value = BasicType.FLOAT)  //F32 = FLOAT

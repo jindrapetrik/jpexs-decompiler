@@ -309,7 +309,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited, image, transformation);
         visited.pop();
     }
-    
+
     @Override
     public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         RECT r = getRect(characters, visited);

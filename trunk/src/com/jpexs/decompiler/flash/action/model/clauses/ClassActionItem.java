@@ -195,7 +195,6 @@ public class ClassActionItem extends ActionItem implements Block {
             f.toString(writer, localData).newLine();
         }
 
-        
         return writer.endBlock();
     }
 

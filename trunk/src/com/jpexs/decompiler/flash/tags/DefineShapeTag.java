@@ -114,7 +114,7 @@ public class DefineShapeTag extends CharacterTag implements ShapeTag {
     public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
         BitmapExporter.exportTo(swf, getShapes(), null, image, transformation);
     }
-    
+
     @Override
     public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(shapeBounds.Xmin / SWF.unitDivisor, shapeBounds.Ymin / SWF.unitDivisor);

@@ -29,7 +29,6 @@ public class SourceGeneratorLocalData implements Serializable {
     public Integer inFunction;
     public Boolean inMethod;
     public Integer forInLevel;
-    
 
     public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {
         this.registerVars = registerVars;

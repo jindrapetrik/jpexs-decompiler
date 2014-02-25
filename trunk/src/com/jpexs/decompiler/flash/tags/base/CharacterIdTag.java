@@ -61,10 +61,10 @@ public abstract class CharacterIdTag extends Tag {
         if (className != null) {
             nameAppend = ": " + className;
         }
-        if(getCharacterId()!=-1) {
+        if (getCharacterId() != -1) {
             return super.getName() + " (" + getCharacterId() + nameAppend + ")";
         }
-        if(!nameAppend.equals("")){
+        if (!nameAppend.equals("")) {
             return super.getName() + " (" + nameAppend + ")";
         }
         return super.getName();

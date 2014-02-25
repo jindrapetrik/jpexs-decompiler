@@ -2133,7 +2133,7 @@ public final class SWF implements TreeItem {
 
     public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
         String key = "frame_" + frame + "_" + containerId + "_" + allTags.get(0).getSwf().hashCode();
-        SerializableImage image = getFromCache(key); 
+        SerializableImage image = getFromCache(key);
         if (image != null) {
             return image;
         }
@@ -2142,11 +2142,11 @@ public final class SWF implements TreeItem {
         if (frameInfos.isEmpty()) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
-        
+
         FrameInfo fi = frameInfos.get(0);
-    
+
         RECT rect = displayRect;
-        image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
+        image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                 (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
@@ -2275,15 +2275,15 @@ public final class SWF implements TreeItem {
                 }
             }
         }
-        
+
         return ret;
     }
-    
+
     public static void framesToImage(int containerId, List<SerializableImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
         List<FrameInfo> frameInfos = getFrameInfo(startFrame, stopFrame, allTags, controlTags, totalFrameCount);
         RECT rect = displayRect;
         for (FrameInfo fi : frameInfos) {
-            SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
+            SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                     (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
@@ -2333,7 +2333,7 @@ public final class SWF implements TreeItem {
                         // needs the whole size because of the filters
                         img = new SerializableImage(image.getWidth(), image.getHeight(), SerializableImage.TYPE_INT_ARGB);
                     } else {
-                        img = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1, 
+                        img = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                                 (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
                         m.translate(-rect.xMin, -rect.yMin);
                         drawMatrix.translate(rect.xMin, rect.yMin);
@@ -2427,7 +2427,7 @@ public final class SWF implements TreeItem {
                 g.drawLine(r.Xmin / div, r.Ymin / div, r.Xmax / div, r.Ymax / div);
                 g.drawLine(r.Xmax / div, r.Ymin / div, r.Xmin / div, r.Ymax / div);
                 g.setComposite(AlphaComposite.Dst);
-            }            
+            }
         }
         g.setTransform(AffineTransform.getScaleInstance(1, 1));
     }

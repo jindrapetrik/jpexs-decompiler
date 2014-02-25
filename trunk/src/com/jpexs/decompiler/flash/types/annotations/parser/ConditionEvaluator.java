@@ -101,13 +101,13 @@ public class ConditionEvaluator {
         try {
             expression(fields, stack, lex);
         } catch (IOException | EmptyStackException ex) {
-            throw new ParseException("Invalid condition:"+prepareCond(), lex.yyline());
+            throw new ParseException("Invalid condition:" + prepareCond(), lex.yyline());
         }
-        if(prepareCond().equals("")){
+        if (prepareCond().equals("")) {
             return true;
         }
         if (stack.size() != 1) {
-            throw new ParseException("Invalid condition:"+prepareCond(), lex.yyline());
+            throw new ParseException("Invalid condition:" + prepareCond(), lex.yyline());
         }
 
         return stack.pop();
@@ -136,7 +136,7 @@ public class ConditionEvaluator {
                 }
             }
         } catch (IOException ex) {
-            throw new ParseException("Invalid condition:"+prepareCond(), lex.yyline());
+            throw new ParseException("Invalid condition:" + prepareCond(), lex.yyline());
         }
         return ret;
     }

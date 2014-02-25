@@ -58,7 +58,7 @@ public class VariableActionItem extends ActionItem {
 
     public void setBoxedValue(ActionItem it) {
         this.it = it;
-        if(it!=null){
+        if (it != null) {
             this.precedence = it.getPrecedence();
         }
     }
@@ -111,5 +111,5 @@ public class VariableActionItem extends ActionItem {
         }
         return it.needsSemicolon();
     }
-    
+
 }

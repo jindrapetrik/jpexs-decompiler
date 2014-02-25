@@ -40,17 +40,17 @@ public class ExportAssetsTag extends Tag {
      * HashMap with assets
      */
     @SWFType(value = BasicType.UI16)
-    @SWFArray(value="tag",countField = "count")
+    @SWFArray(value = "tag", countField = "count")
     public List<Integer> tags;
-    
-    @SWFArray(value="name",countField = "count")
+
+    @SWFArray(value = "name", countField = "count")
     public List<String> names;
     public static final int ID = 56;
 
     public ExportAssetsTag() {
         super(null, ID, "ExportAssets", new byte[]{}, 0);
         tags = new ArrayList<>();
-        names = new ArrayList<>();        
+        names = new ArrayList<>();
     }
 
     /**

@@ -71,7 +71,7 @@ public class ProtectTag extends Tag {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         if (sis.available() > 0) {
             passwordHash = sis.readString();
-        }else{
+        } else {
             passwordHash = "";
         }
     }

@@ -50,7 +50,7 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         }
         ((TraitSlotConst) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
 
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         writer.appendNoHilight(super.toString(abcTags, abc) + " ");
         if (parentTraitIndex > -1) {
             if (isStatic) {

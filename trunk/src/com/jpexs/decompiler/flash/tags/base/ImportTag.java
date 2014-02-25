@@ -25,6 +25,6 @@ import java.util.Map;
 public interface ImportTag {
 
     public String getUrl();
-    
+
     public Map<Integer, String> getAssets();
 }

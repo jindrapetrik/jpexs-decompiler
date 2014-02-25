@@ -27,7 +27,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class MORPHFILLSTYLE implements NeedsCharacters,Serializable {
+public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
 
     @SWFType(BasicType.UI8)
     public int fillStyleType;

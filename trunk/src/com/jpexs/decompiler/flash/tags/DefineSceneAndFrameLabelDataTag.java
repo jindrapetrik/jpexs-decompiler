@@ -34,14 +34,14 @@ import java.io.OutputStream;
  */
 public class DefineSceneAndFrameLabelDataTag extends Tag {
 
-    @SWFType(value=BasicType.EncodedU32)
-    @SWFArray(value="offset",countField="sceneCount")
+    @SWFType(value = BasicType.EncodedU32)
+    @SWFArray(value = "offset", countField = "sceneCount")
     public long[] sceneOffsets;
-    @SWFArray(value="name",countField="sceneCount")
+    @SWFArray(value = "name", countField = "sceneCount")
     public String[] sceneNames;
 
-    @SWFType(value=BasicType.EncodedU32)
-    @SWFArray(value="frameNum", countField="frameLabelCount")
+    @SWFType(value = BasicType.EncodedU32)
+    @SWFArray(value = "frameNum", countField = "frameLabelCount")
     public long[] frameNums;
 
     @SWFArray(countField = "frameLabelCount")

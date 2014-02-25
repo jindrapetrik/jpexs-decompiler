@@ -24,7 +24,7 @@ import java.io.Serializable;
  *
  * @author JPEXS
  */
-public class ZONEDATA implements Serializable{
+public class ZONEDATA implements Serializable {
 
     @SWFType(BasicType.FLOAT16)
     public int alignmentCoordinate;

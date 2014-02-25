@@ -100,7 +100,7 @@ public class FunctionActionItem extends ActionItem {
         writer.append(")").startBlock();
 
         Graph.graphToString(actions, writer, localData);
-       
+
         return writer.endBlock();
     }
 

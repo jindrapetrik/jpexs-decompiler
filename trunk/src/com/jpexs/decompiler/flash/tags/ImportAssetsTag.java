@@ -43,10 +43,10 @@ public class ImportAssetsTag extends Tag implements ImportTag {
     /**
      * HashMap with assets
      */
-    @SWFType(value=BasicType.UI16)
-    @SWFArray(value="tag",countField = "count")
+    @SWFType(value = BasicType.UI16)
+    @SWFArray(value = "tag", countField = "count")
     public List<Integer> tags;
-    @SWFArray(value="name",countField = "count")
+    @SWFArray(value = "name", countField = "count")
     public List<String> names;
     public static final int ID = 57;
 

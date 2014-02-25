@@ -39,7 +39,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
     /**
      * Gradient ratios
      */
-    @SWFType(value=BasicType.UI8,countField = "numColors")
+    @SWFType(value = BasicType.UI8, countField = "numColors")
     public int[] gradientRatio = new int[0];
     /**
      * Horizontal blur amount

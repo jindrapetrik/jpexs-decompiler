@@ -28,7 +28,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class SHAPE implements NeedsCharacters,Serializable {
+public class SHAPE implements NeedsCharacters, Serializable {
 
     @SWFType(value = BasicType.UB, count = 4)
     public int numFillBits;

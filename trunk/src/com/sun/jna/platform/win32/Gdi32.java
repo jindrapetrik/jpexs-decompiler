@@ -308,7 +308,7 @@ public interface Gdi32 extends StdCallLibrary {
      * the desired format for the DIB data.
      * @param uUsage The format of the bmiColors member of the {@link
      * BITMAPINFO} structure.
-     * @return 
+     * @return
      */
     int GetDIBits(HDC hdc, HBITMAP hbmp, int uStartScan, int cScanLines, Pointer lpvBits, BITMAPINFO lpbi, int uUsage);
 

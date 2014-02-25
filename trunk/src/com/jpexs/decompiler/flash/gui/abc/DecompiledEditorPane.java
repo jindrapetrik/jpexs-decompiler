@@ -446,7 +446,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         if (!cache.contains(scriptLeaf)) {
             boolean parallel = Configuration.parallelSpeedUp.get();
-            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),true);
+            HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
             scriptLeaf.toSource(writer, abcList, script.traits.traits, ExportMode.SOURCE, parallel);
             hilightedCode = new HilightedText(writer);
             cache.put(scriptLeaf, new CachedDecompilation(hilightedCode));

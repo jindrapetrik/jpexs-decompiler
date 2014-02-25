@@ -252,9 +252,9 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     @Override
     public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
-        
+
     }
-    
+
     @Override
     public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(0, 0);

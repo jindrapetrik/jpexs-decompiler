@@ -25,7 +25,7 @@ import java.io.Serializable;
  *
  * @author JPEXS
  */
-public class RGBA extends RGB implements Serializable{
+public class RGBA extends RGB implements Serializable {
 
     /**
      * Alpha value defining opacity

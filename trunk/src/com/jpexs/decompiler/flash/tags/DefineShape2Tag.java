@@ -80,7 +80,7 @@ public class DefineShape2Tag extends CharacterTag implements ShapeTag {
     public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
         BitmapExporter.exportTo(swf, getShapes(), null, image, transformation);
     }
-    
+
     @Override
     public int getCharacterId() {
         return shapeId;

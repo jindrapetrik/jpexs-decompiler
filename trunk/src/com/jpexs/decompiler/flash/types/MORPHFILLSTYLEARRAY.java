@@ -25,7 +25,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class MORPHFILLSTYLEARRAY implements NeedsCharacters,Serializable {
+public class MORPHFILLSTYLEARRAY implements NeedsCharacters, Serializable {
 
     public MORPHFILLSTYLE[] fillStyles;
 

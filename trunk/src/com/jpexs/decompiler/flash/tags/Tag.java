@@ -62,7 +62,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     private final long pos;
     protected String name;
     @Internal
-    public Tag previousTag;    
+    public Tag previousTag;
     @Internal
     protected transient SWF swf;
     @Internal

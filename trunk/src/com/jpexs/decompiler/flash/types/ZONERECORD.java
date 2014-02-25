@@ -24,9 +24,9 @@ import java.io.Serializable;
  *
  * @author JPEXS
  */
-public class ZONERECORD implements Serializable{
+public class ZONERECORD implements Serializable {
 
-    @SWFArray(value="zone",countField = "numZoneData")
+    @SWFArray(value = "zone", countField = "numZoneData")
     public ZONEDATA[] zonedata = new ZONEDATA[0];
     public boolean zoneMaskX;
     public boolean zoneMaskY;

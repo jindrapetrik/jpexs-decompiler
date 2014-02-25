@@ -67,7 +67,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     }
 
     private HilightedText getHilightedText(ExportMode exportMode) {
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),true);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
         abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], exportMode, writer);
         return new HilightedText(writer);
     }
@@ -93,7 +93,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         } else {
             setContentType("text/plain");
             if (textHexOnly == null) {
-                HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),true);
+                HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
                 Helper.byteArrayToHexWithHeader(writer, abc.bodies[bodyIndex].code.getBytes());
                 textHexOnly = new HilightedText(writer);
             }

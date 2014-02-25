@@ -203,7 +203,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
     @Override
     public void translateContainer(List<List<GraphTargetItem>> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        FunctionActionItem fti = new FunctionActionItem(this, functionName, paramNames, content.get(0), constantPool, 1,new ArrayList<VariableActionItem>());
+        FunctionActionItem fti = new FunctionActionItem(this, functionName, paramNames, content.get(0), constantPool, 1, new ArrayList<VariableActionItem>());
         //ActionGraph.translateViaGraph(regNames, variables, functions, code, version)
         stack.push(fti);
         functions.put(functionName, fti);

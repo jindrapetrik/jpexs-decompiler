@@ -50,10 +50,10 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
     /**
      * HashMap with assets
      */
-    @SWFType(value=BasicType.UI16)
-    @SWFArray(value="tag",countField = "count")
+    @SWFType(value = BasicType.UI16)
+    @SWFArray(value = "tag", countField = "count")
     public List<Integer> tags;
-    @SWFArray(value="name",countField = "count")
+    @SWFArray(value = "name", countField = "count")
     public List<String> names;
     public static final int ID = 71;
 
@@ -99,7 +99,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
             sos.writeUI8(reserved1);
             sos.writeUI8(reserved2);
             sos.writeUI16(tags.size());
-            for (int i=0;i<tags.size();i++) {
+            for (int i = 0; i < tags.size(); i++) {
                 sos.writeUI16(tags.get(i));
                 sos.writeString(names.get(i));
             }

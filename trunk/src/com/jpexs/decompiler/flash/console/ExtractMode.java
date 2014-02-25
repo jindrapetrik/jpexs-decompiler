@@ -21,6 +21,6 @@ package com.jpexs.decompiler.flash.console;
  * @author JPEXS
  */
 public enum ExtractMode {
-    
+
     ALL, BIGGEST
 }

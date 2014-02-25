@@ -531,7 +531,7 @@ public class ActionListReader {
      * @param index
      * @param version
      * @param removeWhenLast
-     * @return 
+     * @return
      */
     public static boolean removeAction(List<Action> actions, int index, int version, boolean removeWhenLast) {
 

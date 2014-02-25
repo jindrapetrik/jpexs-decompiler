@@ -763,7 +763,7 @@ public class CommandLineArgumentParser {
                     break;
             }
         }
-        
+
         try {
             SWFSourceInfo sourceInfo = new SWFSourceInfo(null, fileName, null);
             if (!sourceInfo.isBundle()) {
@@ -791,11 +791,11 @@ public class CommandLineArgumentParser {
                         break;
                 }
             }
-            
+
             if (mode == ExtractMode.BIGGEST && biggest != null) {
                 streamsToExtract.add(biggest);
             }
-            
+
             for (Map.Entry<String, SeekableInputStream> streamEntry : streamsToExtract) {
                 InputStream stream = streamEntry.getValue();
                 stream.reset();

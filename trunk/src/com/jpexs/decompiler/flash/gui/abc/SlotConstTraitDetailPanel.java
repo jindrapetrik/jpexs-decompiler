@@ -93,7 +93,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     public void load(TraitSlotConst trait, ABC abc, boolean isStatic) {
         this.abc = abc;
         this.trait = trait;
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),true);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
         writer.appendNoHilight("trait ");
         writer.hilightSpecial(abc.constants.multinameToString(trait.name_index), "traitname");
         writer.appendNoHilight(" ");

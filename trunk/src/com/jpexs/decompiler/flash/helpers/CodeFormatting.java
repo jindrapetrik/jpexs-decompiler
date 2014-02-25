@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.helpers;
 
 /**
@@ -22,7 +21,8 @@ package com.jpexs.decompiler.flash.helpers;
  * @author JPEXS
  */
 public class CodeFormatting {
-   public String newLineChars = "\r\n";
-   public String indentString = "   "; 
-   public boolean beginBlockOnNewLine = true;
+
+    public String newLineChars = "\r\n";
+    public String indentString = "   ";
+    public boolean beginBlockOnNewLine = true;
 }

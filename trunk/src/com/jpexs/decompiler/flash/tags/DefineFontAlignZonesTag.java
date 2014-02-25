@@ -40,7 +40,7 @@ public class DefineFontAlignZonesTag extends Tag {
     @Reserved
     @SWFType(value = BasicType.UB, count = 6)
     public int reserved;
-    @SWFArray(value="zone",countField = "glyphCount")
+    @SWFArray(value = "zone", countField = "glyphCount")
     public List<ZONERECORD> zoneTable;
     public static final int ID = 73;
 

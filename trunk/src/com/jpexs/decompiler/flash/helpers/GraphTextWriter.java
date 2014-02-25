@@ -29,13 +29,13 @@ public class GraphTextWriter {
     protected long suspendTime;
     protected CodeFormatting formatting;
 
-   public CodeFormatting getFormatting() {
-      return formatting;
-   }
-    
+    public CodeFormatting getFormatting() {
+        return formatting;
+    }
+
     public GraphTextWriter(CodeFormatting formatting) {
-       startTime = System.currentTimeMillis();
-       this.formatting = formatting;
+        startTime = System.currentTimeMillis();
+        this.formatting = formatting;
     }
 
     public boolean getIsHighlighted() {
@@ -164,24 +164,24 @@ public class GraphTextWriter {
     public String toString() {
         return "";
     }
-    
+
     public GraphTextWriter startBlock(String opening) {
-         if(formatting.beginBlockOnNewLine){
+        if (formatting.beginBlockOnNewLine) {
             newLine();
-         }else{
+        } else {
             append(" ");
-         }
+        }
         return append(opening).newLine().indent();
     }
-    
+
     public GraphTextWriter startBlock() {
         return startBlock("{");
     }
-    
+
     public GraphTextWriter endBlock(String closing) {
         return unindent().append(closing);
     }
-    
+
     public GraphTextWriter endBlock() {
         return endBlock("}");
     }

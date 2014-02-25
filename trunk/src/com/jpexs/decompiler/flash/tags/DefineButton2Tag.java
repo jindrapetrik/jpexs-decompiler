@@ -285,7 +285,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         visited.push(buttonId);
         SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited, image, transformation);
     }
-    
+
     @Override
     public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         RECT r = getRect(characters, visited);

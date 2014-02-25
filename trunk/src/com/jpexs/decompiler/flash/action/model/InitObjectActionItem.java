@@ -51,8 +51,8 @@ public class InitObjectActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("{");
-        for (int i = values.size()-1;i>=0; i--) {
-            if (i < values.size()-1) {
+        for (int i = values.size() - 1; i >= 0; i--) {
+            if (i < values.size() - 1) {
                 writer.append(",");
             }
             names.get(i).toStringNoQuotes(writer, localData); //AS1/2 do not allow quotes in name here

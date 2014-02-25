@@ -67,7 +67,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     public RECT startEdgeBounds;
     public RECT endEdgeBounds;
     @Reserved
-    @SWFType(value = BasicType.UB, count=6)
+    @SWFType(value = BasicType.UB, count = 6)
     public int reserved;
     public boolean usesNonScalingStrokes;
     public boolean usesScalingStrokes;
@@ -205,10 +205,10 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
         int startPosX = 0, startPosY = 0;
         int endPosX = 0, endPosY = 0;
         int posX = 0, posY = 0;
-        
+
         for (int startIndex = 0, endIndex = 0;
-            startIndex < startEdges.shapeRecords.size() &&
-            endIndex < endEdges.shapeRecords.size(); startIndex++, endIndex++) {
+                startIndex < startEdges.shapeRecords.size()
+                && endIndex < endEdges.shapeRecords.size(); startIndex++, endIndex++) {
 
             SHAPERECORD edge1 = startEdges.shapeRecords.get(startIndex);
             SHAPERECORD edge2 = endEdges.shapeRecords.get(endIndex);
@@ -314,7 +314,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
         shape.shapeRecords = finalRecords;
         return shape;
     }
-    
+
     @Override
     public SerializableImage toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
         throw new Error("this overload of toImage call is not supported on BoundedTag");
@@ -329,7 +329,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
         // recreated
         BitmapExporter.exportTo(swf, shape, null, image, transformation);
     }
-    
+
     @Override
     public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(

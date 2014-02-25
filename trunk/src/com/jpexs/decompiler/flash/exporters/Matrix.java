@@ -50,7 +50,7 @@ public class Matrix {
     }
 
     public Matrix(MATRIX matrix) {
-        if(matrix == null){
+        if (matrix == null) {
             matrix = new MATRIX();
         }
         translateX = matrix.translateX;
@@ -86,11 +86,11 @@ public class Matrix {
                 rotateSkew0 * x + scaleY * y + translateY);
         return result;
     }
-    
+
     public Point transform(Point point) {
         return transform(point.x, point.y);
     }
-    
+
     public ExportRectangle transform(ExportRectangle rect) {
         double minX = Double.MAX_VALUE;
         double minY = Double.MAX_VALUE;
@@ -98,28 +98,60 @@ public class Matrix {
         double maxY = Double.MIN_VALUE;
         Point point;
         point = transform(rect.xMin, rect.yMin);
-        if (point.x < minX) minX = point.x;
-        if (point.x > maxX) maxX = point.x;
-        if (point.y < minY) minY = point.y;
-        if (point.y > maxY) maxY = point.y;
+        if (point.x < minX) {
+            minX = point.x;
+        }
+        if (point.x > maxX) {
+            maxX = point.x;
+        }
+        if (point.y < minY) {
+            minY = point.y;
+        }
+        if (point.y > maxY) {
+            maxY = point.y;
+        }
         point = transform(rect.xMax, rect.yMin);
-        if (point.x < minX) minX = point.x;
-        if (point.x > maxX) maxX = point.x;
-        if (point.y < minY) minY = point.y;
-        if (point.y > maxY) maxY = point.y;
+        if (point.x < minX) {
+            minX = point.x;
+        }
+        if (point.x > maxX) {
+            maxX = point.x;
+        }
+        if (point.y < minY) {
+            minY = point.y;
+        }
+        if (point.y > maxY) {
+            maxY = point.y;
+        }
         point = transform(rect.xMin, rect.yMax);
-        if (point.x < minX) minX = point.x;
-        if (point.x > maxX) maxX = point.x;
-        if (point.y < minY) minY = point.y;
-        if (point.y > maxY) maxY = point.y;
+        if (point.x < minX) {
+            minX = point.x;
+        }
+        if (point.x > maxX) {
+            maxX = point.x;
+        }
+        if (point.y < minY) {
+            minY = point.y;
+        }
+        if (point.y > maxY) {
+            maxY = point.y;
+        }
         point = transform(rect.xMax, rect.yMax);
-        if (point.x < minX) minX = point.x;
-        if (point.x > maxX) maxX = point.x;
-        if (point.y < minY) minY = point.y;
-        if (point.y > maxY) maxY = point.y;
+        if (point.x < minX) {
+            minX = point.x;
+        }
+        if (point.x > maxX) {
+            maxX = point.x;
+        }
+        if (point.y < minY) {
+            minY = point.y;
+        }
+        if (point.y > maxY) {
+            maxY = point.y;
+        }
         return new ExportRectangle(minX, minY, maxX, maxY);
     }
-    
+
     public void translate(double x, double y) {
         translateX += x;
         translateY += y;

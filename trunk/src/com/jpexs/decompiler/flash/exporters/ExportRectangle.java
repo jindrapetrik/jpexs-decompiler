@@ -42,15 +42,15 @@ public class ExportRectangle {
         this.xMax = rect.Xmax;
         this.yMax = rect.Ymax;
     }
-    
+
     public double getWidth() {
         return xMax - xMin;
-    } 
-    
+    }
+
     public double getHeight() {
         return yMax - yMin;
-    } 
-    
+    }
+
     @Override
     public int hashCode() {
         long bits = Double.doubleToLongBits(xMin);

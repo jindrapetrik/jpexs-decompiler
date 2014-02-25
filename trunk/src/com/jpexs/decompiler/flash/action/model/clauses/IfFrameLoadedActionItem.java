@@ -50,7 +50,7 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
         writer.append("ifFrameLoaded(");
         frame.toString(writer, localData);
         writer.append(")").startBlock();
-        Graph.graphToString(actions, writer, localData);        
+        Graph.graphToString(actions, writer, localData);
         return writer.endBlock();
     }
 

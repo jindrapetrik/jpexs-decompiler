@@ -39,7 +39,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
     /**
      * Gradient ratios
      */
-    @SWFType(value=BasicType.UI8,countField = "numColors")
+    @SWFType(value = BasicType.UI8, countField = "numColors")
     public int[] gradientRatio;
     /**
      * Horizontal blur amount

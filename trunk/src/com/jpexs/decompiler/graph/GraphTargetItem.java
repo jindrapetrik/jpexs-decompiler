@@ -117,7 +117,7 @@ public abstract class GraphTargetItem implements Serializable {
     public abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
 
     public String toString(LocalData localData) throws InterruptedException {
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         toString(writer, localData);
         return writer.toString();
     }

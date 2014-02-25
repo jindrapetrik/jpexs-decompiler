@@ -298,7 +298,7 @@ public class ActionPush extends Action {
 
     @Override
     public String toString() {
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         toString(writer);
         return writer.toString();
     }

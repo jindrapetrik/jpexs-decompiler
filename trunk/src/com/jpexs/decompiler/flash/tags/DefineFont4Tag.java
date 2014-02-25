@@ -34,7 +34,7 @@ public class DefineFont4Tag extends CharacterTag {
     public int fontID;
 
     @Reserved
-    @SWFType(value = BasicType.UB, count=5)
+    @SWFType(value = BasicType.UB, count = 5)
     public int reserved;
     public boolean fontFlagsHasFontData;
     public boolean fontFlagsItalic;

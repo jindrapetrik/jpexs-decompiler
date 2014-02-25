@@ -58,7 +58,7 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
             ((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ExportMode.SOURCE, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
         }
 
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         writer.appendNoHilight(super.toString(abcTags, abc));
         writer.appendNoHilight(" ");
         if (isInitializer) {

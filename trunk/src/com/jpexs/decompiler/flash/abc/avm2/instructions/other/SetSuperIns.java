@@ -55,7 +55,7 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
     public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) throws InterruptedException {
         int multinameIndex = ins.operands[0];
         String multiname = resolveMultinameNoPop(1, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
         String obj = writer.toString();
         return obj + ".super." + multiname;

@@ -29,10 +29,10 @@ import java.io.OutputStream;
 
 public class SymbolClassTag extends Tag {
 
-    @SWFType(value=BasicType.UI16)
-    @SWFArray(value="tag",countField = "numSymbols")
+    @SWFType(value = BasicType.UI16)
+    @SWFArray(value = "tag", countField = "numSymbols")
     public int[] tags;
-    @SWFArray(value="name",countField = "numSymbols")
+    @SWFArray(value = "name", countField = "numSymbols")
     public String[] names;
     public static final int ID = 76;
 

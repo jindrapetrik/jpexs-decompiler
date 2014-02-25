@@ -36,7 +36,7 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
     private int indent;
     private int writtenBytes;
 
-    public FileTextWriter(CodeFormatting formatting,FileOutputStream fos) {
+    public FileTextWriter(CodeFormatting formatting, FileOutputStream fos) {
         super(formatting);
         this.writer = new BufferedWriter(new Utf8OutputStreamWriter(fos));
     }

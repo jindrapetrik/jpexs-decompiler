@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.types.annotations;
 
 /**
@@ -23,5 +22,5 @@ package com.jpexs.decompiler.flash.types.annotations;
  * @author JPEXS
  */
 public @interface Multiline {
-    
+
 }

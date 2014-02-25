@@ -706,7 +706,7 @@ public class Helper {
     }
 
     public static String byteArrayToHex(byte[] data, int bytesPerRow) {
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         byteArrayToHex(writer, data, bytesPerRow, 8, true, true);
         return writer.toString();
     }
@@ -793,11 +793,11 @@ public class Helper {
                 appendNoHilight(AppStrings.translate("decompilationError.error.description")).
                 appendNoHilight("\");").newLine();
     }
-        
-     public static String escapeHTML(String text){
+
+    public static String escapeHTML(String text) {
         String from[] = new String[]{"&", "<", ">", "\"", "'", "/"};
         String to[] = new String[]{"&amp;", "&lt;", "&gt;", "&quot;", "&#x27;", "&#x2F;"};
-        for(int i=0;i<from.length;i++){
+        for (int i = 0; i < from.length; i++) {
             text = text.replace(from[i], to[i]);
         }
         return text;

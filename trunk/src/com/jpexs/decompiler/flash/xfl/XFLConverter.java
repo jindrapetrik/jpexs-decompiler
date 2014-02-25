@@ -448,13 +448,9 @@ public class XFLConverter {
 
     /**
      * Remove bugs in shape:
-     * 
-     * ...
-     * straightrecord
-     * straightrecord
-     * stylechange
-     * straightrecord (-2,0)   <-- merge this with previous
-     * stylegchange
+     *
+     * ... straightrecord straightrecord stylechange straightrecord (-2,0) <--
+     * merge this with previous stylegchange
      *
      * @param shapeRecords
      * @return
@@ -497,7 +493,7 @@ public class XFLConverter {
                                 scr2.stateLineStyle = true;
                                 scr2.lineStyle = scr.lineStyle;
                             }
-                            i-=2;
+                            i -= 2;
                         }
 
                     }
@@ -1157,7 +1153,7 @@ public class XFLConverter {
     }
 
     private static String convertActionScript(ASMSource as) {
-        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+        HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         try {
             Action.actionsToSource(as, as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString(), writer);
         } catch (InterruptedException ex) {
@@ -1871,7 +1867,7 @@ public class XFLConverter {
             if (t instanceof ShowFrameTag) {
                 elements = "";
 
-                if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId)||shapeTweener!=null)) {
+                if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId) || shapeTweener != null)) {
                     ShapeTag shape = (ShapeTag) character;
                     elements += convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false);
                     shapeTween = false;

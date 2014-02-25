@@ -90,10 +90,10 @@ public class IfItem extends GraphTargetItem implements Block {
         }
         writer.endBlock();
         if (elseBranch.size() > 0) {
-            if(writer.getFormatting().beginBlockOnNewLine){
-               writer.newLine();
-            }else{
-               writer.append(" ");
+            if (writer.getFormatting().beginBlockOnNewLine) {
+                writer.newLine();
+            } else {
+                writer.append(" ");
             }
             writer.append("else").startBlock();
             for (GraphTargetItem ti : elseBranch) {

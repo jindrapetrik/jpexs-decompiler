@@ -224,7 +224,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
             }
 
             double rat = textHeight / 1024.0 / font.getDivider();
-            
+
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 Matrix mat = transformation.clone();
                 mat = mat.concatenate(new Matrix(textMatrix));

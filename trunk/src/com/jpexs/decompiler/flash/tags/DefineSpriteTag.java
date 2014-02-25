@@ -299,7 +299,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
         SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited, image, transformation);
         visited.pop();
     }
-    
+
     @Override
     public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         //RECT displayRect = getRect(characters, visited); //use visited

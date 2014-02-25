@@ -121,7 +121,7 @@ public class CLIPEVENTFLAGS implements Serializable {
      */
     @Conditional(minSwfVersion = 6)
     public boolean clipEventDragOut = false;
-    
+
     @Reserved
     @SWFType(value = BasicType.UB, count = 8)
     @Conditional(minSwfVersion = 6)

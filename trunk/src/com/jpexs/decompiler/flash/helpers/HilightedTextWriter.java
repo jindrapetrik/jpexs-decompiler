@@ -48,12 +48,12 @@ public class HilightedTextWriter extends GraphTextWriter {
     public List<Highlighting> instructionHilights = new ArrayList<>();
     public List<Highlighting> specialHilights = new ArrayList<>();
 
-    public HilightedTextWriter(CodeFormatting formatting,boolean hilight) {
+    public HilightedTextWriter(CodeFormatting formatting, boolean hilight) {
         super(formatting);
         this.hilight = hilight;
     }
 
-    public HilightedTextWriter(CodeFormatting formatting,boolean hilight, int indent) {
+    public HilightedTextWriter(CodeFormatting formatting, boolean hilight, int indent) {
         super(formatting);
         this.hilight = hilight;
         this.indent = indent;

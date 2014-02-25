@@ -23,7 +23,7 @@ import java.io.Serializable;
  *
  * @author JPEXS
  */
-public class GLYPHIDX  implements Serializable {
+public class GLYPHIDX implements Serializable {
 
     public int indexInFont;
     public int indexInTexture;

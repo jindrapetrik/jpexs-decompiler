@@ -65,8 +65,8 @@ public class SerializableImage implements Serializable {
     public BufferedImage getBufferedImage() {
         /*try {
          ImageIO.write(image, "png", new File("c:\\10\\x\\imageid" + String.format("%03d", imageid++) + ".png"));
-        } catch (IOException ex) {
-        }*/
+         } catch (IOException ex) {
+         }*/
         return image;
     }
 
