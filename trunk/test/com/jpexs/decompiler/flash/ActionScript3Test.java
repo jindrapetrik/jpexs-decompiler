@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
@@ -71,7 +72,7 @@ public class ActionScript3Test {
         HilightedTextWriter writer = null;
         try {
             abc.bodies[bodyIndex].convert(methodName, ExportMode.SOURCE, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits, true);
-            writer = new HilightedTextWriter(false);
+            writer = new HilightedTextWriter(new CodeFormatting(), false);
             abc.bodies[bodyIndex].toString(methodName, ExportMode.SOURCE, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
         } catch (InterruptedException ex) {
             fail();
@@ -892,7 +893,7 @@ public class ActionScript3Test {
         int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
         assertTrue(methodInfo > -1);
         assertTrue(bodyIndex > -1);
-        HilightedTextWriter writer = new HilightedTextWriter(false);
+        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
         abc.method_info[methodInfo].getParamStr(writer, abc.constants, abc.bodies[bodyIndex], abc, new ArrayList<String>());
         String actualResult = writer.toString().replaceAll("[ \r\n]", "");
         String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";

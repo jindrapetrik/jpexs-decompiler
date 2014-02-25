@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.generators;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -53,7 +54,7 @@ public class AS2Generator {
                 if (doa == null) {
                     continue;
                 }
-                HilightedTextWriter writer = new HilightedTextWriter(false);
+                HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
                 Action.actionsToSource(doa, doa.getActions(swf.version), swf.version, "", writer);
                 String src = writer.toString();
                 if (src.trim().isEmpty()) {

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.graph.ExportMode;
@@ -60,10 +61,10 @@ public class ActionScript2AssemblerTest extends ActionStript2TestBase {
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
-            HilightedTextWriter writer = new HilightedTextWriter(false);
+            HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
             Action.actionsToSource(doa, doa.getActions(swf.version), swf.version, "", writer);
             String actualResult = writer.toString();
-            writer = new HilightedTextWriter(false);
+            writer = new HilightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(swf.version, ExportMode.PCODE, writer, null);
             String decompiled = writer.toString();
 
