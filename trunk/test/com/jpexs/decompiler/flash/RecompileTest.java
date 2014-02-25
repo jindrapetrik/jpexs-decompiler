@@ -29,7 +29,6 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.TranslateException;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,8 +38,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
@@ -92,27 +89,24 @@ public class RecompileTest {
                         try {
                             ASMSource asm = ((ASMSource) item);
                             HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
-                            asm.getActionSourcePrefix(writer);
-                            asm.getASMSource(ExportMode.SOURCE, writer, null);
-                            asm.getActionSourceSuffix(writer);
+                            Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                             String as = writer.toString();
                             ActionScriptParser par = new ActionScriptParser();
-                            List<Action> actions = null;
                             try {
-                                actions = par.actionsFromString(as);
+                                asm.setActions(par.actionsFromString(as));
                             } catch (ParseException ex) {
                                 fail("Unable to parse: " + item.getSwf().getShortFileName() + "/" + item.toString());
                             }
                             writer = new HilightedTextWriter(new CodeFormatting(), false);
-                            Action.actionsToSource(asm, actions, asm.toString()/*FIXME?*/, writer);
+                            Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                             String as2 = writer.toString();
                             try {
-                                actions = par.actionsFromString(as2);
+                                asm.setActions(par.actionsFromString(as2));
                             } catch (ParseException ex) {
                                 fail("Unable to parse: " + item.getSwf().getShortFileName() + "/" + item.toString());
                             }
                             writer = new HilightedTextWriter(new CodeFormatting(), false);
-                            Action.actionsToSource(asm, actions, asm.toString()/*FIXME?*/, writer);
+                            Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                             String as3 = writer.toString();
                             if (!as3.equals(as2)) {
                                 fail("ActionScript is diffrent: " + item.getSwf().getShortFileName() + "/" + item.toString());
