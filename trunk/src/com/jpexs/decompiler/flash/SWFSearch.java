@@ -34,7 +34,7 @@ import java.util.Set;
 public class SWFSearch {
 
     protected Searchable s;
-    private boolean noCheck;
+    private final boolean noCheck;
     private boolean processed = false;
     private final Set<ProgressListener> listeners = new HashSet<>();
     private final Map<Long, MemoryInputStream> swfStreams = new HashMap<>();

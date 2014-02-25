@@ -62,10 +62,10 @@ public class ActionScript2AssemblerTest extends ActionStript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(doa, doa.getActions(swf.version), swf.version, "", writer);
+            Action.actionsToSource(doa, doa.getActions(), "", writer);
             String actualResult = writer.toString();
             writer = new HilightedTextWriter(new CodeFormatting(), false);
-            doa.getASMSource(swf.version, ExportMode.PCODE, writer, null);
+            doa.getASMSource(ExportMode.PCODE, writer, null);
             String decompiled = writer.toString();
 
             assertEquals(actualResult.trim(), "ok = false;");

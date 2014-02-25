@@ -71,14 +71,13 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(fontId);
             for (FontType ft : fonts) {

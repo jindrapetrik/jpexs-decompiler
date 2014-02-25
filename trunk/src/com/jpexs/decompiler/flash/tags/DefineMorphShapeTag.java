@@ -86,20 +86,19 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(characterId);
             sos.writeRECT(startBounds);
             sos.writeRECT(endBounds);
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-            SWFOutputStream sos2 = new SWFOutputStream(baos2, version);
+            SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
             sos2.writeMORPHFILLSTYLEARRAY(morphFillStyles, 1);
             sos2.writeMORPHLINESTYLEARRAY(morphLineStyles, 1);
             sos2.writeSHAPE(startEdges, 1);

@@ -51,7 +51,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
         assertNotNull(doa);
         HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
         try {
-            Action.actionsToSource(doa, doa.getActions(swf.version), swf.version, "", writer);
+            Action.actionsToSource(doa, doa.getActions(), "", writer);
         } catch (InterruptedException ex) {
             fail();
         }

@@ -710,12 +710,11 @@ public class Action implements GraphSourceItem {
      *
      * @param asm
      * @param actions List of actions
-     * @param version SWF version
      * @param path
      * @param writer
      * @throws java.lang.InterruptedException
      */
-    public static void actionsToSource(ASMSource asm, final List<Action> actions, final int version, final String path, GraphTextWriter writer) throws InterruptedException {
+    public static void actionsToSource(final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer) throws InterruptedException {
         writer.suspendMeasure();
         List<GraphTargetItem> tree = null;
         Throwable convertException = null;
@@ -725,7 +724,7 @@ public class Action implements GraphSourceItem {
                 @Override
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
-                    List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
+                    List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, asm.getSwf().version, staticOperation, path);
                     Graph.graphToString(tree, new NulWriter(), new LocalData());
                     return tree;
                 }

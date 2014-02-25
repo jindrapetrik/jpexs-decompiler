@@ -43,14 +43,13 @@ public class VideoFrameTag extends Tag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(streamID);
             sos.writeUI16(frameNum);

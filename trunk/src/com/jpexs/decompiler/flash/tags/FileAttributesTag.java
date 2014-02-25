@@ -68,14 +68,13 @@ public class FileAttributesTag extends Tag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUB(1, reserved1 ? 1 : 0); //reserved
             sos.writeUB(1, useDirectBlit ? 1 : 0);

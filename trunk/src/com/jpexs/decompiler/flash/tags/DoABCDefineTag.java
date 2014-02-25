@@ -85,18 +85,17 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             OutputStream os = bos;
             if (Configuration.debugCopy.get()) {
                 os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
             }
-            try (SWFOutputStream sos = new SWFOutputStream(os, version)) {
+            try (SWFOutputStream sos = new SWFOutputStream(os, getVersion())) {
                 sos.writeUI32(flags);
                 sos.writeString(name);
                 abc.saveToStream(sos);

@@ -145,12 +145,12 @@ public class TagNode extends ContainerNode {
                                     asm.getActionSourceSuffix(writer);
                                 } else if (exportMode != ExportMode.SOURCE) {
                                     asm.getActionSourcePrefix(writer);
-                                    asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, null);
+                                    asm.getASMSource(exportMode, writer, null);
                                     asm.getActionSourceSuffix(writer);
                                 } else {
-                                    List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
-                                    Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                                    Action.actionsToSource(asm, as, SWF.DEFAULT_VERSION, ""/*FIXME*/, writer);
+                                    List<Action> as = asm.getActions();
+                                    Action.setActionsAddresses(as, 0, asm.getSwf().version);
+                                    Action.actionsToSource(asm, as, ""/*FIXME*/, writer);
                                 }
                             }
 

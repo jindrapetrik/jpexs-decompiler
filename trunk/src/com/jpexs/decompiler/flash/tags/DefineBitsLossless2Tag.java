@@ -98,10 +98,10 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
             }
         }
         ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, SWF.DEFAULT_VERSION);
+        SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, getVersion());
         sos.writeALPHABITMAPDATA(bitmapData, bitmapFormat, bitmapWidth, bitmapHeight);
         ByteArrayOutputStream zlibOS = new ByteArrayOutputStream();
-        SWFOutputStream sos2 = new SWFOutputStream(zlibOS, SWF.DEFAULT_VERSION);
+        SWFOutputStream sos2 = new SWFOutputStream(zlibOS, getVersion());
         sos2.writeBytesZlib(bitmapDataOS.toByteArray());
         zlibBitmapData = zlibOS.toByteArray();
         decompressed = false;
@@ -154,14 +154,13 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(characterID);
             sos.writeUI8(bitmapFormat);

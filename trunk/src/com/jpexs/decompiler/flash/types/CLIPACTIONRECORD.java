@@ -165,18 +165,17 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     /**
      * Converts actions to ASM source
      *
-     * @param version SWF version
      * @param actions
      * @param writer
      * @return ASM source
      * @throws java.lang.InterruptedException
      */
     @Override
-    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
+    public GraphTextWriter getASMSource(ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
         if (actions == null) {
-            actions = getActions(version);
+            actions = getActions();
         }
-        return Action.actionsToString(listeners, 0, actions, null, version, exportMode, writer, getPos() + hdrPos, toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, getPos() + hdrPos, toString()/*FIXME?*/);
     }
 
     /**
@@ -190,9 +189,9 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     }
 
     @Override
-    public List<Action> getActions(int version) throws InterruptedException {
+    public List<Action> getActions() throws InterruptedException {
         try {
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + hdrPos, new MemoryInputStream(actionBytes), version, 0, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + hdrPos, new MemoryInputStream(actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;
@@ -203,8 +202,8 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     }
 
     @Override
-    public void setActions(List<Action> actions, int version) {
-        actionBytes = Action.actionsToBytes(actions, true, version);
+    public void setActions(List<Action> actions) {
+        actionBytes = Action.actionsToBytes(actions, true, swf.version);
     }
 
     @Override

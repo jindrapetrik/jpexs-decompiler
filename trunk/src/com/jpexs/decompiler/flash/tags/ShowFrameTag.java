@@ -65,12 +65,11 @@ public class ShowFrameTag extends Tag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
-        return super.getData(version);
+    public byte[] getData() {
+        return super.getData();
     }
 
     public static boolean isNestedTagType(int tagTypeId) {

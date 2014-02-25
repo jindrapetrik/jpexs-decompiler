@@ -109,19 +109,18 @@ public class DefineFontTag extends FontTag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(fontId);
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
             List<Integer> offsetTable = new ArrayList<>();
-            SWFOutputStream sos2 = new SWFOutputStream(baos2, version);
+            SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
             for (SHAPE shape : glyphShapeTable) {
                 offsetTable.add(glyphShapeTable.size() * 2 + (int) sos2.getPos());
                 sos2.writeSHAPE(shape, 1);

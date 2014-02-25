@@ -179,14 +179,13 @@ public class DefineFont3Tag extends FontTag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         if (Configuration.debugCopy.get()) {
             sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(data)), 10);
         }
@@ -209,7 +208,7 @@ public class DefineFont3Tag extends FontTag {
             List<Long> offsetTable = new ArrayList<>();
             ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
 
-            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, version);
+            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
             for (int i = 0; i < numGlyphs; i++) {
                 offsetTable.add((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
                 sos3.writeSHAPE(glyphShapeTable.get(i), 1);

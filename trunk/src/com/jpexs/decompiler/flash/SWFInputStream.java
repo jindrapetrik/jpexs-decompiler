@@ -790,7 +790,7 @@ public class SWFInputStream extends InputStream {
         sb.append(" len=");
         sb.append(Helper.formatInt((int) tag.getOrigDataLength(), 8));
         sb.append("  ");
-        sb.append(Helper.bytesToHexString(64, tag.getData(version), 0));
+        sb.append(Helper.bytesToHexString(64, tag.getData(), 0));
         out.println(sb.toString());
 //        out.println(Utils.formatHex((int)tag.getPos(), 8) + ": " + Utils.indent(level, "") + Utils.format(tag.toString(), 25 - 2*level) + " tagId="+tag.getId()+" len="+tag.getOrigDataLength()+": "+Utils.bytesToHexString(64, tag.getData(version), 0));
         if (tag.hasSubTags()) {
@@ -951,7 +951,7 @@ public class SWFInputStream extends InputStream {
     public static Tag resolveTag(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags, boolean gfx) throws InterruptedException {
         Tag ret;
 
-        byte[] data = tag.getData(version);
+        byte[] data = tag.getData();
         long pos = tag.getPos();
         try {
             switch (tag.getId()) {
@@ -1265,7 +1265,7 @@ public class SWFInputStream extends InputStream {
         byte[] data = readBytes((int) tagLength);
         Tag ret = new Tag(swf, tagID, "Unresolved", data, pos);
         ret.forceWriteAsLong = readLong;
-        byte[] dataNew = ret.getData(version);
+        byte[] dataNew = ret.getData();
 
         int ignoreFirst = 0;
         for (int i = 0; i < data.length; i++) {

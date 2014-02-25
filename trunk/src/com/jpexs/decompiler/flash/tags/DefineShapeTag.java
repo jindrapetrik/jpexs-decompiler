@@ -77,13 +77,12 @@ public class DefineShapeTag extends CharacterTag implements ShapeTag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        SWFOutputStream sos = new SWFOutputStream(baos, getVersion());
         try {
             sos.writeUI16(shapeId);
             sos.writeRECT(shapeBounds);

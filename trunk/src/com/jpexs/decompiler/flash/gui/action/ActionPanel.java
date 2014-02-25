@@ -187,10 +187,10 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     private void cacheScript(ASMSource src, List<Action> actions) throws InterruptedException {
         if (!cache.contains(src)) {
             if (actions == null) {
-                actions = src.getActions(SWF.DEFAULT_VERSION);
+                actions = src.getActions();
             }
             HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
-            Action.actionsToSource(src, actions, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/, writer);
+            Action.actionsToSource(src, actions, src.toString()/*FIXME?*/, writer);
             List<Highlighting> hilights = writer.instructionHilights;
             String srcNoHex = writer.toString();
             cache.put(src, new CachedScript(srcNoHex, hilights));
@@ -311,7 +311,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         asm.addDisassemblyListener(listener);
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
         try {
-            asm.getASMSource(SWF.DEFAULT_VERSION, exportMode, writer, lastCode);
+            asm.getASMSource(exportMode, writer, lastCode);
         } catch (InterruptedException ex) {
             Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -382,7 +382,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 }
                 DisassemblyListener listener = getDisassemblyListener();
                 asm.addDisassemblyListener(listener);
-                List<Action> actions = asm.getActions(SWF.DEFAULT_VERSION);
+                List<Action> actions = asm.getActions();
                 lastCode = actions;
                 asm.removeDisassemblyListener(listener);
                 srcWithHex = null;
@@ -725,7 +725,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     if (text.trim().startsWith("#hexdata")) {
                         src.setActionBytes(Helper.getBytesFromHexaText(text));
                     } else {
-                        src.setActions(ASMParser.parse(0, src.getPos(), true, text, SWF.DEFAULT_VERSION, false), SWF.DEFAULT_VERSION);
+                        src.setActions(ASMParser.parse(0, src.getPos(), true, text, src.getSwf().version, false));
                     }
                     setSource(this.src, false);
                     View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
@@ -748,8 +748,8 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             case ACTION_SAVE_DECOMPILED:
                 try {
                     ActionScriptParser par = new ActionScriptParser();
-                    src.setActions(par.actionsFromString(decompiledEditor.getText()), SWF.DEFAULT_VERSION);
-                    setSource(this.src, false);
+                    src.setActions(par.actionsFromString(decompiledEditor.getText()));
+                    setSource(src, false);
 
                     View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
                     setDecompiledEditMode(false);

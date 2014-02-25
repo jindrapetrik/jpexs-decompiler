@@ -29,11 +29,10 @@ public class EndTag extends Tag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         return new byte[0];
     }
     public static final int ID = 0;

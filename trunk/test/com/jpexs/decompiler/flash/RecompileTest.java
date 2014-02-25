@@ -63,4 +63,29 @@ public class RecompileTest {
             testRecompileOne(f.getName());
         }
     }
+
+    private void testAS2DirectEditingOne(String filename) {
+        try {
+            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
+        } catch (IOException | InterruptedException ex) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testAS2DirectEditing() {
+        File dir = new File(TESTDATADIR);
+        if (!dir.exists()) {
+            return;
+        }
+        File[] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(".swf");
+            }
+        });
+        for (File f : files) {
+            testAS2DirectEditingOne(f.getName());
+        }
+    }
 }

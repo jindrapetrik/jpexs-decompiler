@@ -83,7 +83,7 @@ public class DefineBitsTag extends ImageTag {
         getJPEGTables(tags);
         if ((jtt != null)) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                byte[] jttdata = jtt.getData(swf.version);
+                byte[] jttdata = jtt.getData();
                 if (jttdata.length != 0) {
                     baos.write(jttdata, SWF.hasErrorHeader(jttdata) ? 4 : 0, jttdata.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
                     baos.write(jpegData, SWF.hasErrorHeader(jpegData) ? 6 : 2, jpegData.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
@@ -101,14 +101,13 @@ public class DefineBitsTag extends ImageTag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(characterID);
             sos.write(jpegData);

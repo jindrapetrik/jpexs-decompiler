@@ -120,13 +120,12 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         if (Configuration.disableDangerous.get()) {
-            return super.getData(version);
+            return super.getData();
         }
 
         ByteArrayInputStream bais = new ByteArrayInputStream(super.data);
@@ -136,7 +135,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         if (Configuration.debugCopy.get()) {
             os = new CopyOutputStream(os, bais);
         }
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(buttonId);
             sos.writeUB(7, reserved);
@@ -146,14 +145,14 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
             OutputStream os2 = baos2;
             byte[] origbrdata = null;
             if (Configuration.debugCopy.get()) {
-                SWFInputStream sis = new SWFInputStream(bais, version);
+                SWFInputStream sis = new SWFInputStream(bais, getVersion());
                 int len = sis.readUI16();
                 if (len != 0) {
                     origbrdata = sis.readBytesEx(len - 2);
                     os2 = new CopyOutputStream(os2, new ByteArrayInputStream(origbrdata));
                 }
             }
-            try (SWFOutputStream sos2 = new SWFOutputStream(os2, version)) {
+            try (SWFOutputStream sos2 = new SWFOutputStream(os2, getVersion())) {
                 sos2.writeBUTTONRECORDList(characters, true);
             }
             byte[] brdata = baos2.toByteArray();
@@ -165,7 +164,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
                 }
             }
             if (Configuration.debugCopy.get()) {
-                sos = new SWFOutputStream(baos, version);
+                sos = new SWFOutputStream(baos, getVersion());
             }
             if ((actions == null) || (actions.isEmpty())) {
                 sos.writeUI16(0);
@@ -174,7 +173,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
             }
             sos.write(brdata);
             if (Configuration.debugCopy.get()) {
-                sos = new SWFOutputStream(new CopyOutputStream(baos, bais), version);
+                sos = new SWFOutputStream(new CopyOutputStream(baos, bais), getVersion());
             }
             sos.writeBUTTONCONDACTIONList(actions);
             sos.close();

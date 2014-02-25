@@ -1155,7 +1155,7 @@ public class XFLConverter {
     private static String convertActionScript(ASMSource as) {
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         try {
-            Action.actionsToSource(as, as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString(), writer);
+            Action.actionsToSource(as, as.getActions(), as.toString(), writer);
         } catch (InterruptedException ex) {
             Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1382,7 +1382,7 @@ public class XFLConverter {
                     for (Tag t : tags) {
                         if (found && (t instanceof SoundStreamBlockTag)) {
                             SoundStreamBlockTag bl = (SoundStreamBlockTag) t;
-                            soundData = bl.getData(SWF.DEFAULT_VERSION);
+                            soundData = bl.getData();
                             break;
                         }
                         if (t == symbol) {
@@ -1425,7 +1425,7 @@ public class XFLConverter {
                     bits = 18;
                 }
                 if (soundFormat == DefineSoundTag.FORMAT_ADPCM) {
-                    SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), SWF.DEFAULT_VERSION);
+                    SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), swf.version);
                     exportFormat = "wav";
                     try {
                         int adpcmCodeSize = (int) sis.readUB(2);
@@ -1440,7 +1440,7 @@ public class XFLConverter {
                         format += 1;
                     }
                     format += 4; //quality best
-                    SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), SWF.DEFAULT_VERSION);
+                    SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), swf.version);
                     try {
                         sis.readSI16();
                         MP3FRAME frame = new MP3FRAME(sis);

@@ -104,14 +104,13 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(characterId);
             sos.writeRECT(startBounds);
@@ -122,7 +121,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
             sos.writeUB(1, usesNonScalingStrokes ? 1 : 0);
             sos.writeUB(1, usesScalingStrokes ? 1 : 0);
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-            SWFOutputStream sos2 = new SWFOutputStream(baos2, version);
+            SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
             sos2.writeMORPHFILLSTYLEARRAY(morphFillStyles, 2);
             sos2.writeMORPHLINESTYLEARRAY(morphLineStyles, 2);
             sos2.writeSHAPE(startEdges, 1);

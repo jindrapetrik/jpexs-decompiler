@@ -345,6 +345,7 @@ public final class SWF implements TreeItem {
      * @param listener
      * @param parallelRead Use parallel threads?
      * @param checkOnly Check only file validity
+     * @param skipTagReading
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
@@ -439,7 +440,7 @@ public final class SWF implements TreeItem {
         } else {
             boolean hasNonUnknownTag = false;
             for (Tag tag : tags) {
-                if (tag.getData(version).length > 0 && Tag.getRequiredTags().contains(tag.getId())) {
+                if (tag.getData().length > 0 && Tag.getRequiredTags().contains(tag.getId())) {
                     hasNonUnknownTag = true;
                 }
             }
@@ -1110,13 +1111,13 @@ public final class SWF implements TreeItem {
                 if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     for (int b = 0; b < blocks.size(); b++) {
-                        byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                        byte[] data = blocks.get(b).getData();
                         baos.write(data);
                     }
                     createWavFromAdpcm(fos, shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), baos.toByteArray());
                 } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
                     for (int b = 0; b < blocks.size(); b++) {
-                        byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                        byte[] data = blocks.get(b).getData();
                         fos.write(data, 4, data.length - 4);
                     }
                 } else {
@@ -1125,7 +1126,7 @@ public final class SWF implements TreeItem {
 
                     int ms = (int) (1000.0f / ((float) frameRate));
                     for (int b = 0; b < blocks.size(); b++) {
-                        byte[] data = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                        byte[] data = blocks.get(b).getData();
                         if (shead.getSoundFormat() == 2) { //MP3
                             data = Arrays.copyOfRange(data, 4, data.length);
                         }
@@ -1249,7 +1250,7 @@ public final class SWF implements TreeItem {
                 if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
                     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     for (int b = 0; b < blocks.size(); b++) {
-                        byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                        byte data[] = blocks.get(b).getData();
                         baos.write(data);
                     }
                     final File file = new File(outdir + File.separator + id + ".wav");
@@ -1270,7 +1271,7 @@ public final class SWF implements TreeItem {
                         public void run() throws IOException {
                             try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
                                 for (int b = 0; b < blocks.size(); b++) {
-                                    byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                                    byte data[] = blocks.get(b).getData();
                                     os.write(data, 2, data.length - 2);
                                 }
                             }
@@ -1288,7 +1289,7 @@ public final class SWF implements TreeItem {
 
                                 int ms = (int) (1000.0f / ((float) frameRate));
                                 for (int b = 0; b < blocks.size(); b++) {
-                                    byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                                    byte data[] = blocks.get(b).getData();
                                     if (shead.getSoundFormat() == 2) { //MP3
                                         data = Arrays.copyOfRange(data, 4, data.length);
                                     }
@@ -1330,7 +1331,7 @@ public final class SWF implements TreeItem {
 
             if ((videoStream.codecID == DefineVideoStreamTag.CODEC_VP6)
                     || (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA)) {
-                SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), SWF.DEFAULT_VERSION);
+                SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), version);
                 if (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA) {
                     sis.readUI24(); //offsetToAlpha
                 }
@@ -1359,12 +1360,12 @@ public final class SWF implements TreeItem {
 
                 }
 
-                SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+                SWFOutputStream sos = new SWFOutputStream(baos, version);
                 sos.writeUB(4, horizontalAdjustment);
                 sos.writeUB(4, verticalAdjustment);
             }
             if (videoStream.codecID == DefineVideoStreamTag.CODEC_SORENSON_H263) {
-                SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), SWF.DEFAULT_VERSION);
+                SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), version);
                 sis.readUB(17);//pictureStartCode
                 sis.readUB(5); //version
                 sis.readUB(8); //temporalReference
@@ -1751,7 +1752,7 @@ public final class SWF implements TreeItem {
 
     private List<MyEntry<DirectValueActionItem, ConstantPool>> getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageType, ASMSource src, String path) throws InterruptedException {
         List<MyEntry<DirectValueActionItem, ConstantPool>> ret = new ArrayList<>();
-        List<Action> actions = src.getActions(version);
+        List<Action> actions = src.getActions();
         actionsMap.put(src, actions);
         getVariables(variables, functions, strings, usageType, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, path);
         return ret;
@@ -1875,7 +1876,7 @@ public final class SWF implements TreeItem {
                 int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                 List<GraphTargetItem> dec;
                 try {
-                    dec = Action.actionsToTree(dia.getActions(version), version, staticOperation, ""/*FIXME*/);
+                    dec = Action.actionsToTree(dia.getActions(), version, staticOperation, ""/*FIXME*/);
                 } catch (EmptyStackException ex) {
                     continue;
                 }
@@ -2059,7 +2060,7 @@ public final class SWF implements TreeItem {
         }
         for (ASMSource src : actionsMap.keySet()) {
             actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, 0, ""/*FIXME path*/));
-            src.setActions(actionsMap.get(src), version);
+            src.setActions(actionsMap.get(src));
         }
         deobfuscation.deobfuscateInstanceNames(deobfuscated, renameType, tags, selected);
         return ret;

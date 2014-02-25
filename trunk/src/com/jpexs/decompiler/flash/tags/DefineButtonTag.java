@@ -115,20 +115,19 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         if (Configuration.disableDangerous.get()) {
-            return super.getData(version);
+            return super.getData();
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
             os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
         }
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUI16(buttonId);
             sos.writeBUTTONRECORDList(characters, false);
@@ -143,18 +142,17 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     /**
      * Converts actions to ASM source
      *
-     * @param version SWF version
      * @param actions
      * @param writer
      * @return ASM source
      * @throws java.lang.InterruptedException
      */
     @Override
-    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
+    public GraphTextWriter getASMSource(ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
         if (actions == null) {
-            actions = getActions(version);
+            actions = getActions();
         }
-        return Action.actionsToString(listeners, 0, actions, null, version, exportMode, writer, getPos() + hdrSize, toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, getPos() + hdrSize, toString()/*FIXME?*/);
     }
 
     /**
@@ -170,17 +168,16 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     /**
      * Returns actions associated with this object
      *
-     * @param version Version
      * @return List of actions
      * @throws java.lang.InterruptedException
      */
     @Override
-    public List<Action> getActions(int version) throws InterruptedException {
+    public List<Action> getActions() throws InterruptedException {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int prevLength = 0;
             if (previousTag != null) {
-                byte[] prevData = previousTag.getData(version);
+                byte[] prevData = previousTag.getData();
                 baos.write(prevData);
                 prevLength = prevData.length;
             }
@@ -188,7 +185,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             MemoryInputStream rri = new MemoryInputStream(baos.toByteArray());
             rri.seek(prevLength);
 
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + hdrSize - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + hdrSize - prevLength, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;
@@ -199,8 +196,8 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     }
 
     @Override
-    public void setActions(List<Action> actions, int version) {
-        actionBytes = Action.actionsToBytes(actions, true, version);
+    public void setActions(List<Action> actions) {
+        actionBytes = Action.actionsToBytes(actions, true, swf.version);
     }
 
     @Override

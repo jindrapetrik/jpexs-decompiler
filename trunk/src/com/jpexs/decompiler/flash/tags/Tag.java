@@ -261,11 +261,17 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
-    public byte[] getData(int version) {
+    public byte[] getData() {
         return data;
+    }
+    
+    public int getVersion() {
+        if (swf == null) {
+            return SWF.DEFAULT_VERSION;
+        }
+        return swf.version;
     }
 
     /**

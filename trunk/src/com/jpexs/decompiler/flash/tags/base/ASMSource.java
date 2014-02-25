@@ -33,14 +33,13 @@ public interface ASMSource extends TreeItem {
     /**
      * Converts actions to ASM source
      *
-     * @param version SWF version
      * @param exportMode PCode or hex?
      * @param writer
      * @param actions
      * @return ASM source
      * @throws java.lang.InterruptedException
      */
-    public GraphTextWriter getASMSource(int version, ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException;
+    public GraphTextWriter getASMSource(ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException;
 
     /**
      * Whether or not this object contains ASM source
@@ -52,11 +51,10 @@ public interface ASMSource extends TreeItem {
     /**
      * Returns actions associated with this object
      *
-     * @param version Version
      * @return List of actions
      * @throws java.lang.InterruptedException
      */
-    public List<Action> getActions(int version) throws InterruptedException;
+    public List<Action> getActions() throws InterruptedException;
 
     /**
      * Sets actions associated with this object
@@ -64,7 +62,7 @@ public interface ASMSource extends TreeItem {
      * @param version Version
      * @param actions Action list
      */
-    public void setActions(List<Action> actions, int version);
+    public void setActions(List<Action> actions);
 
     public byte[] getActionBytes();
 

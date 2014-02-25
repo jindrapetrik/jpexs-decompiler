@@ -109,13 +109,12 @@ public class DefineFont2Tag extends FontTag {
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        SWFOutputStream sos = new SWFOutputStream(baos, getVersion());
         try {
             sos.writeUI16(fontId);
             sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
@@ -135,7 +134,7 @@ public class DefineFont2Tag extends FontTag {
             List<Long> offsetTable = new ArrayList<>();
             ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
 
-            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, version);
+            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
             for (int i = 0; i < numGlyphs; i++) {
                 offsetTable.add((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
                 sos3.writeSHAPE(glyphShapeTable.get(i), 1);

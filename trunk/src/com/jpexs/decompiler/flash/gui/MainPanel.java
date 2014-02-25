@@ -2718,7 +2718,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         List<Action> actions;
                         DoActionTag doa;
 
-                        doa = new DoActionTag(null, new byte[]{}, SWF.DEFAULT_VERSION, 0);
+                        doa = new DoActionTag(null, new byte[]{}, swf.version, 0);
                         actions = ASMParser.parse(0, 0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
                                 + "Push \"_root\"\n"
@@ -2733,8 +2733,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 + "Push \"attachSound\"\n"
                                 + "CallMethod\n"
                                 + "Pop\n"
-                                + "Stop", SWF.DEFAULT_VERSION, false);
-                        doa.setActions(actions, SWF.DEFAULT_VERSION);
+                                + "Stop", swf.version, false);
+                        doa.setActions(actions);
                         sos2.writeTag(doa);
                         sos2.writeTag(new ShowFrameTag(null));
 
@@ -2760,8 +2760,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 + "Push \"start\"\n"
                                 + "CallMethod\n"
                                 + "Pop\n"
-                                + "Stop", SWF.DEFAULT_VERSION, false);
-                        doa.setActions(actions, SWF.DEFAULT_VERSION);
+                                + "Stop", swf.version, false);
+                        doa.setActions(actions);
                         sos2.writeTag(doa);
                         sos2.writeTag(new ShowFrameTag(null));
 
@@ -2804,15 +2804,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 + "Push \"start\"\n"
                                 + "CallMethod\n"
                                 + "Pop\n"
-                                + "Stop", SWF.DEFAULT_VERSION, false);
-                        doa.setActions(actions, SWF.DEFAULT_VERSION);
+                                + "Stop", swf.version, false);
+                        doa.setActions(actions);
                         sos2.writeTag(doa);
                         sos2.writeTag(new ShowFrameTag(null));
 
                         actions = ASMParser.parse(0, 0, false,
                                 "StopSounds\n"
-                                + "Stop", SWF.DEFAULT_VERSION, false);
-                        doa.setActions(actions, SWF.DEFAULT_VERSION);
+                                + "Stop", swf.version, false);
+                        doa.setActions(actions);
                         sos2.writeTag(doa);
                         sos2.writeTag(new ShowFrameTag(null));
 

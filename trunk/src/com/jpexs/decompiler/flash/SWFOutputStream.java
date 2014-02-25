@@ -454,7 +454,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeTag(Tag tag) throws IOException {
-        byte[] data = tag.getData(version);
+        byte[] data = tag.getData();
         write(getTagHeader(tag, data, version));
         write(data);
     }

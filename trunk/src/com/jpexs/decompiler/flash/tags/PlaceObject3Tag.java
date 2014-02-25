@@ -219,20 +219,19 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
     /**
      * Gets data bytes
      *
-     * @param version SWF version
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData() {
         if (Configuration.disableDangerous.get()) {
-            return super.getData(version);
+            return super.getData();
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
             os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
         }
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeUB(1, placeFlagHasClipActions ? 1 : 0);
             sos.writeUB(1, placeFlagHasClipDepth ? 1 : 0);
