@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
+import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -230,7 +231,7 @@ public class Main {
         SWFBundle bundle = null;
         if (inputStream == null) {
             inputStream = new BufferedInputStream(new FileInputStream(sourceInfo.getFile()));
-            bundle = sourceInfo.getBundle(false);
+            bundle = sourceInfo.getBundle(false, SearchMode.ALL);
             logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
         } else if (inputStream instanceof SeekableInputStream
                 || inputStream instanceof BufferedInputStream) {

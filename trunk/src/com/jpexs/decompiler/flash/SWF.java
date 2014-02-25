@@ -413,6 +413,10 @@ public final class SWF implements TreeItem {
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
         if (skipTagReading) {
+            long toRead = fileSize - sis.getPos();
+            if (toRead > 0) {
+                sis.readBytes(toRead);
+            }
             return;
         }
         tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, gfx);

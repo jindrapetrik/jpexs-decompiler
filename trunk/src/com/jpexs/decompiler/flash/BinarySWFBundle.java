@@ -33,8 +33,8 @@ public class BinarySWFBundle implements SWFBundle {
 
     private final SWFSearch search;
 
-    public BinarySWFBundle(InputStream is, boolean noCheck) {
-        search = new SWFSearch(new StreamSearch(is), noCheck);
+    public BinarySWFBundle(InputStream is, boolean noCheck, SearchMode searchMode) {
+        search = new SWFSearch(new StreamSearch(is), noCheck, searchMode);
         search.process();
     }
 

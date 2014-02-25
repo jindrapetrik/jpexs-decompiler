@@ -35,13 +35,15 @@ public class SWFSearch {
 
     protected Searchable s;
     private final boolean noCheck;
+    private final SearchMode searchMode;
     private boolean processed = false;
     private final Set<ProgressListener> listeners = new HashSet<>();
     private final Map<Long, MemoryInputStream> swfStreams = new HashMap<>();
 
-    public SWFSearch(Searchable s, boolean noCheck) {
+    public SWFSearch(Searchable s, boolean noCheck, SearchMode searchMode) {
         this.s = s;
         this.noCheck = noCheck;
+        this.searchMode = searchMode;
     }
 
     public void addProgressListener(ProgressListener l) {
@@ -72,6 +74,7 @@ public class SWFSearch {
                 "GFX".getBytes(), //Uncompressed ScaleForm GFx
                 "CFX".getBytes());   //Compressed ScaleForm GFx
         int pos = 0;
+        long biggestSize = 0;
         for (Long addr : ret.keySet()) {
             setProgress(pos * 100 / ret.size());
             pos++;
@@ -80,17 +83,29 @@ public class SWFSearch {
                 mis.reset();
                 PosMarkedInputStream pmi = new PosMarkedInputStream(mis);
                 SWF swf = new SWF(pmi, null, false, true, noCheck);
-                long limit = pmi.getPos();
-                MemoryInputStream is = new MemoryInputStream(mis.getAllRead(), (int) (long) addr, (int) limit);
-                if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
-                    swfStreams.put(addr, is);
+                boolean valid = swf.fileSize > 0 
+                        && swf.version > 0 
+                        && (!swf.tags.isEmpty() || noCheck)
+                        && swf.version < 25; // Needs to be fixed when SWF versions reaches this value
+                if (valid) {
+                    long limit = pmi.getPos();
+                    MemoryInputStream is = new MemoryInputStream(mis.getAllRead(), (int) (long) addr, (int) limit);
+                    switch (searchMode) {
+                        case ALL:
+                            swfStreams.put(addr, is);
+                            break;
+                        case BIGGEST:
+                            if (limit > biggestSize) {
+                                biggestSize = limit;
+                                swfStreams.clear();
+                                swfStreams.put(addr, is);
+                            }
+                    }
                 }
-
             } catch (OutOfMemoryError ome) {
                 System.gc();
             } catch (Exception | Error ex) {
             }
-
         }
         setProgress(100);
         processed = true;

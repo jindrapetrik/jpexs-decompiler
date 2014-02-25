@@ -16,14 +16,31 @@
  */
 package com.jpexs.decompiler.flash;
 
+import static com.jpexs.decompiler.flash.SWF.createASTagList;
 import com.jpexs.decompiler.flash.abc.NotSameException;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.helpers.CodeFormatting;
+import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.treenodes.TagNode;
+import com.jpexs.decompiler.flash.treenodes.TreeNode;
+import com.jpexs.decompiler.graph.ExportMode;
+import com.jpexs.decompiler.graph.TranslateException;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
@@ -64,9 +81,61 @@ public class RecompileTest {
         }
     }
 
+    private void testAS2DirectEditingOneRecursive(List<TreeNode> nodeList) {
+        for (TreeNode node : nodeList) {
+            if (node.subNodes.isEmpty()) {
+                TreeItem item = node.getItem();
+                if ((item instanceof ASMSource) && (node.export)) {
+                    boolean retry;
+                    do {
+                        retry = false;
+                        try {
+                            ASMSource asm = ((ASMSource) item);
+                            HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+                            asm.getActionSourcePrefix(writer);
+                            asm.getASMSource(ExportMode.SOURCE, writer, null);
+                            asm.getActionSourceSuffix(writer);
+                            String as = writer.toString();
+                            ActionScriptParser par = new ActionScriptParser();
+                            List<Action> actions = null;
+                            try {
+                                actions = par.actionsFromString(as);
+                            } catch (ParseException ex) {
+                                fail("Unable to parse: " + item.getSwf().getShortFileName() + "/" + item.toString());
+                            }
+                            writer = new HilightedTextWriter(new CodeFormatting(), false);
+                            Action.actionsToSource(asm, actions, asm.toString()/*FIXME?*/, writer);
+                            String as2 = writer.toString();
+                            try {
+                                actions = par.actionsFromString(as2);
+                            } catch (ParseException ex) {
+                                fail("Unable to parse: " + item.getSwf().getShortFileName() + "/" + item.toString());
+                            }
+                            writer = new HilightedTextWriter(new CodeFormatting(), false);
+                            Action.actionsToSource(asm, actions, asm.toString()/*FIXME?*/, writer);
+                            String as3 = writer.toString();
+                            if (!as3.equals(as2)) {
+                                fail("ActionScript is diffrent: " + item.getSwf().getShortFileName() + "/" + item.toString());
+                            }
+                        } catch (InterruptedException | IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
+                        }
+                    } while (retry);
+                }
+            } else {
+                testAS2DirectEditingOneRecursive(node.subNodes);
+            }
+        }
+    }
+    
     private void testAS2DirectEditingOne(String filename) {
         try {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
+            List<ContainerItem> list2 = new ArrayList<>();
+            list2.addAll(swf.tags);
+            List<TreeNode> list = createASTagList(list2, null);
+
+            TagNode.setExport(list, true);
+            testAS2DirectEditingOneRecursive(list);
         } catch (IOException | InterruptedException ex) {
             fail();
         }

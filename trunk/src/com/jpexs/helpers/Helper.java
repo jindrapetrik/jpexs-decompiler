@@ -772,6 +772,17 @@ public class Helper {
         return ext;
     }
 
+    public static String getWithoutExtension(File f) {
+        String ext = null;
+        String s = f.getName();
+        int i = s.lastIndexOf('.');
+
+        if (i > 0 && i < s.length() - 1) {
+            ext = s.substring(0, i).toLowerCase();
+        }
+        return ext;
+    }
+    
     public static void appendTimeoutComment(GraphTextWriter writer, int timeout) {
         writer.appendNoHilight("/*").newLine();
         writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();

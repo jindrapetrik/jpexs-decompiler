@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
+import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
@@ -754,7 +755,7 @@ public class CommandLineArgumentParser {
         }
 
         String fileName = args.remove();
-        ExtractMode mode = ExtractMode.ALL;
+        SearchMode mode = SearchMode.ALL;
 
         boolean noCheck = false;
         if (args.size() > 0) {
@@ -768,7 +769,7 @@ public class CommandLineArgumentParser {
             String modeStr = args.remove().toLowerCase();
             switch (modeStr) {
                 case "biggest":
-                    mode = ExtractMode.BIGGEST;
+                    mode = SearchMode.BIGGEST;
                     break;
             }
         }
@@ -779,36 +780,25 @@ public class CommandLineArgumentParser {
                 System.err.println("Error: <infile> should be a bundle. (ZIP or non SWF binary file)");
                 System.exit(1);
             }
-            SWFBundle bundle = sourceInfo.getBundle(noCheck);
+            SWFBundle bundle = sourceInfo.getBundle(noCheck, mode);
             List<Map.Entry<String, SeekableInputStream>> streamsToExtract = new ArrayList<>();
-            Map.Entry<String, SeekableInputStream> biggest = null;
-            int biggestSize = 0;
             for (Map.Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
                 InputStream stream = streamEntry.getValue();
                 stream.reset();
-                switch (mode) {
-                    case ALL:
-                        streamsToExtract.add(streamEntry);
-                        break;
-                    case BIGGEST:
-                        byte[] swfData = new byte[stream.available()];
-                        int available = stream.read(swfData); // stream.available() reports wrong value
-                        if (available > biggestSize) {
-                            biggest = streamEntry;
-                            biggestSize = available;
-                        }
-                        break;
-                }
-            }
-
-            if (mode == ExtractMode.BIGGEST && biggest != null) {
-                streamsToExtract.add(biggest);
+                streamsToExtract.add(streamEntry);
             }
 
             for (Map.Entry<String, SeekableInputStream> streamEntry : streamsToExtract) {
                 InputStream stream = streamEntry.getValue();
                 stream.reset();
-                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(streamEntry.getKey() + ".swf"))) {
+                String fileNameOut;
+                if (mode == SearchMode.BIGGEST) {
+                    fileNameOut = Helper.getWithoutExtension(new File(fileName)) + ".swf";
+                } else {
+                    fileNameOut = streamEntry.getKey() + ".swf";
+                }
+                
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileNameOut))) {
                     byte[] swfData = new byte[stream.available()];
                     int cnt = stream.read(swfData);
                     fos.write(swfData, 0, cnt);
