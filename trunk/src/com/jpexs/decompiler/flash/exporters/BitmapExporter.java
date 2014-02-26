@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -376,6 +377,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
             if (fillPaint != null) {
                 if (fillPaint instanceof MultipleGradientPaint) {
                     AffineTransform oldAf = graphics.getTransform();
+                    graphics.setComposite(AlphaComposite.Src);
                     if (fillPathPaint != null) {
                         graphics.setPaint(fillPathPaint);
                     }
