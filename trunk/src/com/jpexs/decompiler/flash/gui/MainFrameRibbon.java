@@ -231,10 +231,11 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
                     mui.setHoverIcon(View.getResizableIcon("buttonicon_hover_256"));
                     mui.setNormalIcon(View.getResizableIcon("buttonicon_256"));
                     mui.setClickIcon(View.getResizableIcon("buttonicon_down_256"));
-                    cancel(); //cancel task so it does not run again
+                    mbutton.repaint();                    
                 }
+                cancel(); //cancel task so it does not run again
             }
-        }, 50, 50);
+        }, 1, 50);
 
         panel.setVisible(b);
     }
