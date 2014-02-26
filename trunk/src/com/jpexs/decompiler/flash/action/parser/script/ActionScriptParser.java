@@ -381,8 +381,8 @@ public class ActionScriptParser {
             GetMemberActionItem mem = (GetMemberActionItem) nameStr;
             if (mem.memberName instanceof VariableActionItem) {
                 classNameStr = ((VariableActionItem) mem.memberName).getVariableName();
-            }else if(mem.memberName instanceof DirectValueActionItem){
-                classNameStr = ((DirectValueActionItem)mem.memberName).toStringNoQuotes(LocalData.empty);
+            } else if (mem.memberName instanceof DirectValueActionItem) {
+                classNameStr = ((DirectValueActionItem) mem.memberName).toStringNoQuotes(LocalData.empty);
             }
         } else if (nameStr instanceof VariableActionItem) {
             VariableActionItem var = (VariableActionItem) nameStr;
@@ -1338,7 +1338,7 @@ public class ActionScriptParser {
     private GraphTargetItem expressionRemainder(GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ParseException {
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
-        switch (s.type) {           
+        switch (s.type) {
             case DOT:
                 lexer.pushback(s);
                 ret = memberOrCall(expr, registerVars, inFunction, inMethod, variables);
@@ -1350,10 +1350,10 @@ public class ActionScriptParser {
                 ret = new TernarOpItem(null, expr, terOnTrue, terOnFalse);
                 break;
             case SHIFT_LEFT:
-                ret  = new LShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
+                ret = new LShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
                 break;
             case SHIFT_RIGHT:
-                ret  = new RShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
+                ret = new RShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
                 break;
             case BITAND:
                 ret = new BitAndActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
@@ -1481,26 +1481,36 @@ public class ActionScriptParser {
         boolean assocRight = false;
         switch (s.type) {
             case MINUS:
-                GraphTargetItem num = expression(registerVars, inFunction, inMethod, true, variables);
-                if ((num instanceof DirectValueActionItem)
-                        && (((DirectValueActionItem) num).value instanceof Long)) {
-                    ((DirectValueActionItem) num).value = -(Long) ((DirectValueActionItem) num).value;
-                    ret = num;
-                } else if ((num instanceof DirectValueActionItem)
-                        && (((DirectValueActionItem) num).value instanceof Double)) {
-                    Double d = (Double) ((DirectValueActionItem) num).value;
-                    if (d.isInfinite()) {
-                        ((DirectValueActionItem) num).value = Double.NEGATIVE_INFINITY;
-                    } else {
-                        ((DirectValueActionItem) num).value = -d;
+                s = lex();
+                if (s.isType(SymbolType.DOUBLE)) {
+                    ret = new DirectValueActionItem(null, 0, -(double) (Double) s.value, new ArrayList<String>());
+                    existsRemainder = true;
+                } else if (s.isType(SymbolType.INTEGER)) {
+                    ret = new DirectValueActionItem(null, 0, -(long) (Long) s.value, new ArrayList<String>());
+                    existsRemainder = true;
+                } else {
+                    lexer.pushback(s);
+                    GraphTargetItem num = expression(registerVars, inFunction, inMethod, true, variables);
+                    if ((num instanceof DirectValueActionItem)
+                            && (((DirectValueActionItem) num).value instanceof Long)) {
+                        ((DirectValueActionItem) num).value = -(Long) ((DirectValueActionItem) num).value;
+                        ret = num;
+                    } else if ((num instanceof DirectValueActionItem)
+                            && (((DirectValueActionItem) num).value instanceof Double)) {
+                        Double d = (Double) ((DirectValueActionItem) num).value;
+                        if (d.isInfinite()) {
+                            ((DirectValueActionItem) num).value = Double.NEGATIVE_INFINITY;
+                        } else {
+                            ((DirectValueActionItem) num).value = -d;
+                        }
+                        ret = (num);
+                    } else if ((num instanceof DirectValueActionItem)
+                            && (((DirectValueActionItem) num).value instanceof Float)) {
+                        ((DirectValueActionItem) num).value = -(Float) ((DirectValueActionItem) num).value;
+                        ret = (num);
+                    } else {;
+                        ret = (new SubtractActionItem(null, new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>()), num));
                     }
-                    ret = (num);
-                } else if ((num instanceof DirectValueActionItem)
-                        && (((DirectValueActionItem) num).value instanceof Float)) {
-                    ((DirectValueActionItem) num).value = -(Float) ((DirectValueActionItem) num).value;
-                    ret = (num);
-                } else {;
-                    ret = (new SubtractActionItem(null, new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>()), num));
                 }
                 break;
             case TYPEOF:
