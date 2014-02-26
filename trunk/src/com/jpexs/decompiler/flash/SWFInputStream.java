@@ -854,7 +854,7 @@ public class SWFInputStream extends InputStream {
         while (true) {
             long pos = getPos();
             try {
-                tag = readTag(swf, level, pos, parseTags && !parallel, parallel, skipUnusualTags, gfx);
+                tag = readTag(swf, level, pos, parseTags && !parallel, parallel, skipUnusualTags, gfx);                
             } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
@@ -908,6 +908,7 @@ public class SWFInputStream extends InputStream {
                     case SoundStreamHeadTag.ID:
                     case SoundStreamHead2Tag.ID:
                     case SoundStreamBlockTag.ID:
+                    case VideoFrameTag.ID:
                         doParse = true;
                         break;
                     default:
@@ -941,7 +942,7 @@ public class SWFInputStream extends InputStream {
                 } catch (ExecutionException e) {
                     Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", e);
                 }
-            }
+            }            
 
             executor.shutdown();
         }
