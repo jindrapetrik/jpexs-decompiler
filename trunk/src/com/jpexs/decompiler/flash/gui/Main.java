@@ -883,7 +883,6 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-        args = "-extract C:\\Projectek\\ffdec\\FFDec\\lwt.exe  nocheck biggest".split(" ");
         startFreeMemThread();
         initLogging(Configuration.debugMode.get());
         initLang();
