@@ -412,6 +412,10 @@ public class Helper {
     }
 
     public static byte[] readStream(InputStream is) {
+        if (is instanceof MemoryInputStream) {
+            return ((MemoryInputStream) is).getAllRead();
+        }
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             byte[] buf = new byte[4096];

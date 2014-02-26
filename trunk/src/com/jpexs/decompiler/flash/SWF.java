@@ -335,9 +335,83 @@ public final class SWF implements TreeItem {
      * @throws java.lang.InterruptedException
      */
     public SWF(InputStream is, ProgressListener listener, boolean parallelRead) throws IOException, InterruptedException {
-        this(is, listener, parallelRead, false, false);
+        this(is, listener, parallelRead, false);
     }
 
+    /**
+     * Faster constructor to check SWF only
+     * @param is
+     */
+    public SWF(InputStream is) throws IOException {
+        byte[] hdr = new byte[3];
+        is.read(hdr);
+        String shdr = new String(hdr, Utf8Helper.charset);
+        if (!Arrays.asList(
+                "FWS", //Uncompressed Flash
+                "CWS", //ZLib compressed Flash
+                "ZWS", //LZMA compressed Flash
+                "GFX", //Uncompressed ScaleForm GFx
+                "CFX" //Compressed ScaleForm GFx
+        ).contains(shdr)) {
+            throw new IOException("Invalid SWF file");
+        }
+        version = is.read();
+        fileSize = (is.read() + (is.read() << 8) + (is.read() << 16) + (is.read() << 24)) & 0xffffffff;
+
+        if (hdr[0] == 'C') {
+            is = new InflaterInputStream(is);
+        }
+
+        if (hdr[0] == 'Z') {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            //outSize
+            is.read();
+            is.read();
+            is.read();
+            is.read();
+            int propertiesSize = 5;
+            lzmaProperties = new byte[propertiesSize];
+            if (is.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
+                throw new IOException("LZMA:input .lzma file is too short");
+            }
+            long dictionarySize = 0;
+            for (int i = 0; i < 4; i++) {
+                dictionarySize += ((int) (lzmaProperties[1 + i]) & 0xFF) << (i * 8);
+                if (dictionarySize > Runtime.getRuntime().freeMemory()) {
+                    throw new IOException("LZMA: Too large dictionary size");
+                }
+            }
+
+            SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
+            if (!decoder.SetDecoderProperties(lzmaProperties)) {
+                throw new IOException("LZMA:Incorrect stream properties");
+            }
+
+            if (!decoder.Code(is, baos, fileSize - 8)) {
+                throw new IOException("LZMA:Error in data stream");
+            }
+        } else {
+            long toRead = fileSize - 8;
+            if (toRead > 0) {
+                byte[] bytes = new byte[4096];
+                while (toRead > 4096) {
+                    int read = is.read(bytes);
+                    if (read == -1) {
+                        throw new IOException("Invalid SWF file");
+                    }
+                    toRead -= read;
+                }
+                while (toRead > 0) {
+                    int read = is.read(bytes, 0, (int) toRead);
+                    if (read == -1) {
+                        throw new IOException("Invalid SWF file");
+                    }
+                    toRead -= read;
+                }
+            }
+        }
+    }
+    
     /**
      * Construct SWF from stream
      *
@@ -345,11 +419,10 @@ public final class SWF implements TreeItem {
      * @param listener
      * @param parallelRead Use parallel threads?
      * @param checkOnly Check only file validity
-     * @param skipTagReading
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean skipTagReading) throws IOException, InterruptedException {
+    public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException, InterruptedException {
         byte[] hdr = new byte[3];
         is.read(hdr);
         String shdr = new String(hdr, Utf8Helper.charset);
@@ -412,13 +485,6 @@ public final class SWF implements TreeItem {
         sis.readUI8(); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        if (skipTagReading) {
-            long toRead = fileSize - sis.getPos();
-            if (toRead > 0) {
-                sis.readBytes(toRead);
-            }
-            return;
-        }
         tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, gfx);
         if (!checkOnly) {
             Map<Long, Tag> tagMap = new HashMap<>();

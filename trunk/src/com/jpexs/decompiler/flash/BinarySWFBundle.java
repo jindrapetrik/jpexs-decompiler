@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.helpers.StreamSearch;
+import com.jpexs.helpers.SwfHeaderStreamSearch;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ public class BinarySWFBundle implements SWFBundle {
     private final SWFSearch search;
 
     public BinarySWFBundle(InputStream is, boolean noCheck, SearchMode searchMode) {
-        search = new SWFSearch(new StreamSearch(is), noCheck, searchMode);
+        search = new SWFSearch(new SwfHeaderStreamSearch(is), noCheck, searchMode);
         search.process();
     }
 

@@ -82,7 +82,7 @@ public class SWFSearch {
                 MemoryInputStream mis = (MemoryInputStream) ret.get(addr);
                 mis.reset();
                 PosMarkedInputStream pmi = new PosMarkedInputStream(mis);
-                SWF swf = new SWF(pmi, null, false, true, noCheck);
+                SWF swf = noCheck ? new SWF(pmi) : new SWF(pmi, null, false, true);
                 boolean valid = swf.fileSize > 0 
                         && swf.version > 0 
                         && (!swf.tags.isEmpty() || noCheck)

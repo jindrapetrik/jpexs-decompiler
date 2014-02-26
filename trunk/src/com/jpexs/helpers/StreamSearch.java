@@ -54,8 +54,8 @@ public class StreamSearch implements Searchable {
         try {
             is.seek(0);
 
-            byte buf[] = new byte[4096];
-            byte last[] = null;
+            byte[] buf = new byte[4096];
+            byte[] last = null;
             int cnt = 0;
             long pos = 0;
             while ((cnt = is.read(buf)) > 0) {
@@ -63,7 +63,7 @@ public class StreamSearch implements Searchable {
                 for (int i = -maxFindLen + 1; i < cnt; i++) {
 
                     loopdata:
-                    for (byte onedata[] : data) {
+                    for (byte[] onedata : data) {
                         boolean match = true;
                         for (int d = 0; d < onedata.length; d++) {
                             byte b;
@@ -71,7 +71,7 @@ public class StreamSearch implements Searchable {
                                 if (last != null) {
                                     b = last[last.length + i + d];
                                 } else {
-                                    continue;
+                                continue;
                                 }
                             } else if (i + d >= buf.length) {
                                 continue;
@@ -81,6 +81,7 @@ public class StreamSearch implements Searchable {
 
                             if (b != onedata[d]) {
                                 match = false;
+                                break;
                             }
                         }
                         if (match) {
@@ -90,7 +91,6 @@ public class StreamSearch implements Searchable {
                             continue loopdata;
                         }
                     }
-
                 }
                 pos = pos + cnt;
             }
