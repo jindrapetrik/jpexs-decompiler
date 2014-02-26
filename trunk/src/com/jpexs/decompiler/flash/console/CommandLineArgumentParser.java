@@ -173,7 +173,12 @@ public class CommandLineArgumentParser {
      */
     public static String parseArguments(String[] arguments) throws IOException {
         Level traceLevel = Level.WARNING;
-        Queue<String> args = new LinkedList<>(Arrays.asList(arguments));
+        Queue<String> args = new LinkedList<>();
+        for (String arg : arguments) {
+            if (arg.length() > 0) {
+                args.add(arg);
+            }
+        }
         AbortRetryIgnoreHandler handler = null;
         Map<String, String> format = new HashMap<>();
 
