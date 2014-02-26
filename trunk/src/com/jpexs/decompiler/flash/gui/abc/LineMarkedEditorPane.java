@@ -60,12 +60,14 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane {
     public void setText(String t) {
         lastLine = -1;
         super.setText(t);
+        setCaretPosition(0); //scroll to top
     }
 
     @Override
     public void setText(String t, String contentType) {
         lastLine = -1;
         super.setText(t, contentType);
+        setCaretPosition(0); //scroll to top
     }
 
     @Override
