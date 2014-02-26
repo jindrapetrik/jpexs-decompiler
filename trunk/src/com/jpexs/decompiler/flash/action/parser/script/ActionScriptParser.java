@@ -92,6 +92,7 @@ import com.jpexs.decompiler.flash.action.model.operations.EqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.GeActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.GtActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.InstanceOfActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.LShiftActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.LeActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.LtActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.ModuloActionItem;
@@ -99,6 +100,7 @@ import com.jpexs.decompiler.flash.action.model.operations.MultiplyActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.RShiftActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictEqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictNeqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.SubtractActionItem;
@@ -121,6 +123,7 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.ParenthesisItem;
@@ -173,13 +176,13 @@ public class ActionScriptParser {
         GraphTargetItem ret = null;
 
         ParsedSymbol s = lex();
-        expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+        expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING_OP);
         ret = new VariableActionItem(s.value.toString(), null, false);
         variables.add((VariableActionItem) ret);
         s = lex();
         while (s.type == SymbolType.DOT) {
             s = lex();
-            expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+            expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING_OP);
             ret = new GetMemberActionItem(null, ret, pushConst(s.value.toString()));
             s = lex();
         }
@@ -243,7 +246,7 @@ public class ActionScriptParser {
     private GraphTargetItem variable(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ParseException {
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
-        expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER);
+        expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
         ret = new VariableActionItem(s.value.toString(), null, false);
         variables.add((VariableActionItem) ret);
         ret = (member(ret, registerVars, inFunction, inMethod, variables));
@@ -378,6 +381,8 @@ public class ActionScriptParser {
             GetMemberActionItem mem = (GetMemberActionItem) nameStr;
             if (mem.memberName instanceof VariableActionItem) {
                 classNameStr = ((VariableActionItem) mem.memberName).getVariableName();
+            }else if(mem.memberName instanceof DirectValueActionItem){
+                classNameStr = ((DirectValueActionItem)mem.memberName).toStringNoQuotes(LocalData.empty);
             }
         } else if (nameStr instanceof VariableActionItem) {
             VariableActionItem var = (VariableActionItem) nameStr;
@@ -1333,7 +1338,7 @@ public class ActionScriptParser {
     private GraphTargetItem expressionRemainder(GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables) throws IOException, ParseException {
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
-        switch (s.type) {
+        switch (s.type) {           
             case DOT:
                 lexer.pushback(s);
                 ret = memberOrCall(expr, registerVars, inFunction, inMethod, variables);
@@ -1343,6 +1348,12 @@ public class ActionScriptParser {
                 expectedType(SymbolType.COLON);
                 GraphTargetItem terOnFalse = expression(registerVars, inFunction, inMethod, false, variables);
                 ret = new TernarOpItem(null, expr, terOnTrue, terOnFalse);
+                break;
+            case SHIFT_LEFT:
+                ret  = new LShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
+                break;
+            case SHIFT_RIGHT:
+                ret  = new RShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
                 break;
             case BITAND:
                 ret = new BitAndActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
