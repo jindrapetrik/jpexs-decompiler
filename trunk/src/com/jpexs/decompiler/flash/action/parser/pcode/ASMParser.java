@@ -137,9 +137,6 @@ public class ASMParser {
     public static List<Action> parse(long containerSWFOffset, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
         List<Action> list = new ArrayList<>();
         Stack<GraphSourceItemContainer> containers = new Stack<>();
-        Stack<ActionStore> stores = new Stack<>();
-        Stack<Integer> storeLengths = new Stack<>();
-        int actualLen = 0;
 
         ActionConstantPool cpool = new ActionConstantPool(constantPool);
         cpool.containerSWFOffset = containerSWFOffset;
@@ -197,30 +194,6 @@ public class ASMParser {
                 }
                 if (a != null) {
                     list.add(a);
-                    if (!stores.isEmpty()) {
-                        actualLen++;
-                        if (actualLen == stores.peek().getStoreSize()) {
-                            ActionStore st = stores.pop();
-                            List<Action> sl = new ArrayList<>();
-                            sl.addAll(list.subList(list.size() - actualLen, list.size()));
-                            st.setStore(sl);
-
-                            List<Action> sl2 = list.subList(0, list.size() - actualLen);
-                            list = new ArrayList<>();
-                            list.addAll(sl2);
-                            if (!stores.isEmpty()) {
-                                actualLen = storeLengths.pop();
-                            }
-                        }
-                    }
-                    if (a instanceof ActionStore) {
-                        if (!stores.isEmpty()) {
-                            storeLengths.push(actualLen);
-                        }
-                        stores.push((ActionStore) a);
-                        actualLen = 0;
-
-                    }
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_EOL) {
             } else if ((symb.type == ASMParsedSymbol.TYPE_BLOCK_END) || (symb.type == ASMParsedSymbol.TYPE_EOF)) {

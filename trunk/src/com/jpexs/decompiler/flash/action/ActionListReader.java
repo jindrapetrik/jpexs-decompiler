@@ -190,7 +190,7 @@ public class ActionListReader {
         }
 
         updateJumps(actions, jumps, containerLastActions, endAddress, version);
-        updateActionStores(actions, jumps);
+        //updateActionStores(actions, jumps);
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
 
@@ -589,7 +589,7 @@ public class ActionListReader {
 
         updateAddresses(actions, startIp, version);
         updateJumps(actions, jumps, containerLastActions, endAddress, version);
-        updateActionStores(actions, jumps);
+        //updateActionStores(actions, jumps);
         updateContainerSizes(actions, containerLastActions);
         updateActionLengths(actions, version);
 

@@ -26,6 +26,6 @@ import java.util.List;
 public interface ActionStore {
 
     public int getStoreSize();
-
+    
     public void setStore(List<Action> store);
 }

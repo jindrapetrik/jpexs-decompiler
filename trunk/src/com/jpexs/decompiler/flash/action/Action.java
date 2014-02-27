@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
+import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
@@ -1006,7 +1007,14 @@ public class Action implements GraphSourceItem {
              action.translate(stack, constants, output, registerNames);
              }
              } */ else {
-                try {
+                
+                if(action instanceof ActionStore){
+                   ActionStore store=(ActionStore)action;
+                   store.setStore(actions.subList(ip+1, ip+1+store.getStoreSize()));
+                   ip = ip + 1 + store.getStoreSize() -1/*ip++ will be next*/;
+                }
+                
+                try {                   
                     action.translate(localData, stack, output, staticOperation, path);
                 } catch (EmptyStackException ese) {
                     Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ese);
