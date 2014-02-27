@@ -75,6 +75,8 @@ public class SWFSearch {
                 "CFX".getBytes());   //Compressed ScaleForm GFx
         int pos = 0;
         long biggestSize = 0;
+        long smallestSize = Long.MAX_VALUE;
+        addressLoop:
         for (Long addr : ret.keySet()) {
             setProgress(pos * 100 / ret.size());
             pos++;
@@ -100,6 +102,21 @@ public class SWFSearch {
                                 swfStreams.clear();
                                 swfStreams.put(addr, is);
                             }
+                            break;
+                        case SMALLEST:
+                            if (limit < smallestSize) {
+                                smallestSize = limit;
+                                swfStreams.clear();
+                                swfStreams.put(addr, is);
+                            }
+                            break;
+                        case FIRST:
+                            swfStreams.put(addr, is);
+                            break addressLoop;
+                        case LAST:
+                            swfStreams.clear();
+                            swfStreams.put(addr, is);
+                            break;
                     }
                 }
             } catch (OutOfMemoryError ome) {

@@ -22,5 +22,5 @@ package com.jpexs.decompiler.flash;
  */
 public enum SearchMode {
     
-    ALL, BIGGEST
+    ALL, BIGGEST, SMALLEST, FIRST, LAST
 }

@@ -124,7 +124,7 @@ public class CommandLineArgumentParser {
         System.out.println("  ...Compress SWF <infile> and save it to <outfile>");
         System.out.println(" 8) -decompress <infile> <outfile>");
         System.out.println("  ...Decompress <infile> and save it to <outfile>");
-        System.out.println(" 9) -extract <infile> [-o <outpath>|<outfile>] [nocheck] [(all|biggest|first)]");
+        System.out.println(" 9) -extract <infile> [-o <outpath>|<outfile>] [nocheck] [(all|biggest|smallest|first|last)]");
         System.out.println("  ...Extracts SWF files from ZIP or other binary files");
         System.out.println("  ...-o parameter should contain a file path when \"biggest\" or \"first\" parameter is specified");
         System.out.println("  ...-o parameter should contain a folder path when no exctaction mode or \"all\" parameter is specified");
@@ -787,6 +787,15 @@ public class CommandLineArgumentParser {
                 case "biggest":
                     mode = SearchMode.BIGGEST;
                     break;
+                case "smallest":
+                    mode = SearchMode.SMALLEST;
+                    break;
+                case "first":
+                    mode = SearchMode.FIRST;
+                    break;
+                case "last":
+                    mode = SearchMode.LAST;
+                    break;
             }
         }
 
@@ -808,7 +817,7 @@ public class CommandLineArgumentParser {
                 InputStream stream = streamEntry.getValue();
                 stream.reset();
                 String fileNameOut;
-                if (mode == SearchMode.BIGGEST) {
+                if (mode != SearchMode.ALL) {
                     if (output == null) {
                         fileNameOut = Path.getFileNameWithoutExtension(new File(fileName)) + ".swf";
                     } else {
