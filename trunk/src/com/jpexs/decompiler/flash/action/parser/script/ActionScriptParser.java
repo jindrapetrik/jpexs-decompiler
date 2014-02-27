@@ -67,6 +67,7 @@ import com.jpexs.decompiler.flash.action.model.StopAllSoundsActionItem;
 import com.jpexs.decompiler.flash.action.model.StopDragActionItem;
 import com.jpexs.decompiler.flash.action.model.StringExtractActionItem;
 import com.jpexs.decompiler.flash.action.model.StringLengthActionItem;
+import com.jpexs.decompiler.flash.action.model.TargetPathActionItem;
 import com.jpexs.decompiler.flash.action.model.ThrowActionItem;
 import com.jpexs.decompiler.flash.action.model.ToIntegerActionItem;
 import com.jpexs.decompiler.flash.action.model.ToNumberActionItem;
@@ -724,6 +725,12 @@ public class ActionScriptParser {
                 expectedType(SymbolType.PARENT_OPEN);
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new StopDragActionItem(null);
+                break;
+
+            case TARGETPATH:
+                expectedType(SymbolType.PARENT_OPEN);
+                ret = new TargetPathActionItem(null, (expression(registerVars, inFunction, inMethod, true, variables)));
+                expectedType(SymbolType.PARENT_CLOSE);
                 break;
 
             case UNLOADMOVIE:
