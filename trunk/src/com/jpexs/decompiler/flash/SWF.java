@@ -341,6 +341,7 @@ public final class SWF implements TreeItem {
     /**
      * Faster constructor to check SWF only
      * @param is
+     * @throws java.io.IOException
      */
     public SWF(InputStream is) throws IOException {
         byte[] hdr = new byte[3];

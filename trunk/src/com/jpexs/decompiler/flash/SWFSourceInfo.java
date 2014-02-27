@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,7 +70,7 @@ public class SWFSourceInfo {
             if (fileName.startsWith("asdec_") && fileName.endsWith(".tmp")) {
                 return false;
             }
-            String extension = Helper.getExtension(fileObj);
+            String extension = Path.getExtension(fileObj);
             return !(extension.equals(".swf") || extension.equals(".gfx"));
         }
         return false;
@@ -81,7 +81,7 @@ public class SWFSourceInfo {
             return null;
         }
 
-        String extension = Helper.getExtension(new File(file));
+        String extension = Path.getExtension(new File(file));
         InputStream is = new BufferedInputStream(new FileInputStream(file));
         switch (extension) {
             case ".swc":

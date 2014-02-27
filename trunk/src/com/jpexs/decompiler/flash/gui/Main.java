@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Stopwatch;
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -529,7 +530,7 @@ public class Main {
             case SAVE:
             case SAVEAS:
                 if (swf.file != null) {
-                    ext = Helper.getExtension(swf.file);
+                    ext = Path.getExtension(swf.file);
                 }
                 break;
             case EXE:

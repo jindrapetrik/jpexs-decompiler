@@ -469,7 +469,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         private final Object mtroot;
         private final List<TreeModelListener> listeners = new ArrayList<>();
-        private Map<String, Object> nodeCache = new HashMap<>();
+        private final Map<String, Object> nodeCache = new HashMap<>();
 
         private Object getNodeByPath(String path) {
             if (nodeCache.containsKey(path)) {

@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Kernel32;
@@ -123,8 +124,10 @@ public class CommandLineArgumentParser {
         System.out.println("  ...Compress SWF <infile> and save it to <outfile>");
         System.out.println(" 8) -decompress <infile> <outfile>");
         System.out.println("  ...Decompress <infile> and save it to <outfile>");
-        System.out.println(" 9) -extract <infile> [nocheck] [(all|biggest)]");
+        System.out.println(" 9) -extract <infile> [-o <outpath>|<outfile>] [nocheck] [(all|biggest|first)]");
         System.out.println("  ...Extracts SWF files from ZIP or other binary files");
+        System.out.println("  ...-o parameter should contain a file path when \"biggest\" or \"first\" parameter is specified");
+        System.out.println("  ...-o parameter should contain a folder path when no exctaction mode or \"all\" parameter is specified");
         System.out.println(" 10) -renameInvalidIdentifiers (typeNumber|randomWord) <infile> <outfil>e");
         System.out.println("  ...Renames the invalid identifiers in <infile> and save it to <outfile>");
         System.out.println(" 11) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
@@ -763,11 +766,19 @@ public class CommandLineArgumentParser {
         SearchMode mode = SearchMode.ALL;
 
         boolean noCheck = false;
-        if (args.size() > 0) {
-            if (args.peek().toLowerCase().equals("nocheck")) {
-                noCheck = true;
-                args.remove();
+        String output = null;
+        
+        if (args.size() > 0 && args.peek().toLowerCase().equals("-o")) {
+            args.remove();
+            if (args.size() < 1) {
+                badArguments();
             }
+            output = args.remove();
+        }
+
+        if (args.size() > 0 && args.peek().toLowerCase().equals("nocheck")) {
+            noCheck = true;
+            args.remove();
         }
 
         if (args.size() > 0) {
@@ -798,9 +809,16 @@ public class CommandLineArgumentParser {
                 stream.reset();
                 String fileNameOut;
                 if (mode == SearchMode.BIGGEST) {
-                    fileNameOut = Helper.getWithoutExtension(new File(fileName)) + ".swf";
+                    if (output == null) {
+                        fileNameOut = Path.getFileNameWithoutExtension(new File(fileName)) + ".swf";
+                    } else {
+                        fileNameOut = output;
+                    }
                 } else {
                     fileNameOut = streamEntry.getKey() + ".swf";
+                    if (output != null) {
+                        fileNameOut = Path.combine(output, fileNameOut);
+                    }
                 }
                 
                 try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileNameOut))) {
