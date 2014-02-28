@@ -321,7 +321,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
         thickness /= unitDivisor;
-        lineColor = color.toColor();
+        lineColor = color == null ? null : color.toColor();
         int capStyle = BasicStroke.CAP_ROUND;
         switch (startCaps) {
             case LINESTYLE2.NO_CAP:

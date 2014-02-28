@@ -822,7 +822,12 @@ public class SWFInputStream extends InputStream {
 
         @Override
         public Tag call() throws Exception {
-            return SWFInputStream.resolveTag(swf, tag, version, level, parallel, skipUnusualTags, gfx);
+            try {
+                return SWFInputStream.resolveTag(swf, tag, version, level, parallel, skipUnusualTags, gfx);
+            } catch (EndOfStreamException ex) {
+                Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, null, ex);
+                return tag;
+            }
         }
     }
 
@@ -1303,6 +1308,7 @@ public class SWFInputStream extends InputStream {
             try {
                 return resolveTag(swf, ret, version, level, parallel, skipUnusualTags, gfx);
             } catch (EndOfStreamException ex) {
+                Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, null, ex);
                 return ret;
             }
         }

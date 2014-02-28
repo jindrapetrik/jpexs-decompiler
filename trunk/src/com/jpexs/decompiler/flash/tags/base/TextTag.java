@@ -231,10 +231,12 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 Matrix matTr = Matrix.getTranslateInstance(x, y);
                 mat = mat.concatenate(matTr);
                 mat = mat.concatenate(Matrix.getScaleInstance(rat));
-                // shapeNum: 1
-                SHAPE shape = glyphs.get(entry.glyphIndex);
-                BitmapExporter.exportTo(swf, shape, textColor, image, mat);
-                x += entry.glyphAdvance;
+                if (entry.glyphIndex != -1) {
+                    // shapeNum: 1
+                    SHAPE shape = glyphs.get(entry.glyphIndex);
+                    BitmapExporter.exportTo(swf, shape, textColor, image, mat);
+                    x += entry.glyphAdvance;
+                }
             }
         }
     }

@@ -327,7 +327,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
         placeFlagHasFilterList = sis.readUB(1) == 1;
 
         depth = sis.readUI16();
-        if (placeFlagHasClassName || (placeFlagHasImage && placeFlagHasCharacter)) {
+        if (placeFlagHasClassName) {
             className = sis.readString();
         }
         if (placeFlagHasCharacter) {
@@ -464,7 +464,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
 
     @Override
     public String getClassName() {
-        if (placeFlagHasClassName || (placeFlagHasImage && placeFlagHasCharacter)) {
+        if (placeFlagHasClassName) {
             return className;
         }
         return null;

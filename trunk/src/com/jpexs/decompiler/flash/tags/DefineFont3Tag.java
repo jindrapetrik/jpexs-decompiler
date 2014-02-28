@@ -93,7 +93,7 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public double getGlyphAdvance(int glyphIndex) {
-        if (fontFlagsHasLayout) {
+        if (fontFlagsHasLayout && glyphIndex != -1) {
             return fontAdvanceTable.get(glyphIndex) / SWF.unitDivisor;
         } else {
             return -1;
@@ -423,6 +423,9 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public int getGlyphKerningAdjustment(List<Tag> tags, int glyphIndex, int nextGlyphIndex) {
+        if (glyphIndex == -1 || nextGlyphIndex == -1) {
+            return 0;
+        }
         char c1 = glyphToChar(tags, glyphIndex);
         char c2 = glyphToChar(tags, nextGlyphIndex);
         int kerningAdjustment = 0;

@@ -637,13 +637,9 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
             tr.textHeight = fontHeight;
             tr.styleFlagsHasYOffset = true;
             tr.yOffset = fontHeight;
-            String txt;
-            if (html) {
-                txt = getInnerText(initialText);
-            } else {
-                txt = initialText;
-            }
+            String txt = getText();
             tr.glyphEntries = new GLYPHENTRY[txt.length()];
+            int width = 0;
             for (int i = 0; i < txt.length(); i++) {
                 char c = txt.charAt(i);
                 Character nextChar = null;
@@ -665,26 +661,28 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                     advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (fontHeight / SWF.unitDivisor), c, nextChar));
                 }
                 tr.glyphEntries[i].glyphAdvance = advance;
+                width += advance;
+            }
+            switch (align) {
+                case 1: // right
+                    tr.styleFlagsHasXOffset = true;
+                    tr.xOffset = bounds.getWidth() - width;
+                    break;
+                case 2: // center
+                    tr.styleFlagsHasXOffset = true;
+                    tr.xOffset = (int) ((bounds.getWidth() - width) / 2);
+                    break;
+                case 3: // justify
+                    // todo;
+                    break;
+            }
+            if (hasTextColor) {
+                tr.styleFlagsHasColor = true;
+                tr.textColorA = textColor;
             }
             textRecords.add(tr);
-            staticTextToImage(swf, characters, textRecords, 1, image, getTextMatrix(), transformation);
+            staticTextToImage(swf, characters, textRecords, 2, image, getTextMatrix(), transformation);
         }
-    }
-
-    private String getInnerText(String html) {
-        String result = "";
-        boolean inTag = false;
-        for (int i = 0; i < html.length(); i++) {
-            char c = html.charAt(i);
-            if (c == '<') {
-                inTag = true;
-            } else if (inTag && c == '>') {
-                inTag = false;
-            } else if (!inTag) {
-                result += c;
-            }
-        }
-        return result;
     }
 
     @Override
