@@ -628,6 +628,9 @@ public class ActionScriptParser {
                 if (varDel instanceof GetMemberActionItem) {
                     GetMemberActionItem gm = (GetMemberActionItem) varDel;
                     ret = new DeleteActionItem(null, gm.object, gm.memberName);
+                } else if (varDel instanceof VariableActionItem) {
+                    variables.remove(varDel);
+                    ret = new DeleteActionItem(null, null, pushConst(((VariableActionItem) varDel).getVariableName()));
                 } else {
                     throw new ParseException("Not a property", lexer.yyline());
                 }
@@ -1020,6 +1023,7 @@ public class ActionScriptParser {
                 } else {
                     lexer.pushback(s);
                     var = variable(registerVars, inFunction, inMethod, variables);
+                    var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
                 }
                 s = lex();
                 switch (s.type) {
@@ -1295,10 +1299,10 @@ public class ActionScriptParser {
                 if (s.type != SymbolType.SEMICOLON) {
                     lexer.pushback(s);
                 }
+                ret = expression(registerVars, inFunction, inMethod, true, variables);
                 if (debugMode) {
                     System.out.println("/command");
                 }
-                return null;
         }
         if (debugMode) {
             System.out.println("/command");
