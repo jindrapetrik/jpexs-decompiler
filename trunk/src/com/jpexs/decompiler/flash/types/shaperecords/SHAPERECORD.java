@@ -25,9 +25,11 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.font.GlyphVector;
 import java.awt.geom.PathIterator;
@@ -124,7 +126,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
 
     public static SerializableImage shapeListToImage(SWF swf, List<SHAPE> shapes, int prevWidth, int prevHeight, Color color) {
         if (shapes.isEmpty()) {
-            return new SerializableImage(1, 1, BufferedImage.TYPE_INT_RGB);
+            SerializableImage image = new SerializableImage(1, 1, BufferedImage.TYPE_INT_RGB);
+            //Make all pixels transparent
+            Graphics2D g = (Graphics2D)image.getGraphics();
+            g.setComposite(AlphaComposite.Src);
+            g.setColor(new Color(0, 0, 0, 0f));
+            g.fillRect(0, 0, image.getWidth(), image.getHeight());
+            return image;
         }
         SerializableImage ret = new SerializableImage(prevWidth, prevHeight, SerializableImage.TYPE_INT_ARGB);
         Graphics g = ret.getGraphics();

@@ -109,6 +109,11 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graphics.setComposite(AlphaComposite.Src);
+
+        //Make all pixels transparent
+        graphics.setColor(new Color(0, 0, 0, 0f));
+        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+
         defaultStroke = graphics.getStroke();
         super.export();
     }
@@ -116,10 +121,6 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private void exportTo(SerializableImage image, Matrix transformation) {
         this.image = image;
         graphics = (Graphics2D) image.getGraphics();
-        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics.setComposite(AlphaComposite.Src);
         AffineTransform at = transformation.toTransform();
         at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
         unitDivisor = 1;

@@ -25,9 +25,14 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -134,6 +139,14 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     RECT rect = bounded.getRect(characters, new Stack<Integer>());
                     SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                             (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                    //Make all pixels transparent
+                    Graphics2D g = (Graphics2D) image.getGraphics();
+                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g.setComposite(AlphaComposite.Src);
+                    g.setColor(new Color(0, 0, 0, 0f));
+                    g.fillRect(0, 0, image.getWidth(), image.getHeight());
                     Matrix m = new Matrix();
                     m.translate(-rect.Xmin, -rect.Ymin);
                     drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), image, m);
@@ -204,6 +217,14 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     RECT rect = bounded.getRect(characters, new Stack<Integer>());
                     SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                             (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                    //Make all pixels transparent
+                    Graphics2D g = (Graphics2D) image.getGraphics();
+                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g.setComposite(AlphaComposite.Src);
+                    g.setColor(new Color(0, 0, 0, 0f));
+                    g.fillRect(0, 0, image.getWidth(), image.getHeight());
                     Matrix m = new Matrix();
                     m.translate(-rect.Xmin, -rect.Ymin);
                     drawable.toImage(nframe, swf.tags, characters, new Stack<Integer>(), image, m);

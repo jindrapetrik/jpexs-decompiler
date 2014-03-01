@@ -41,6 +41,7 @@ public class SerializableImage implements Serializable {
 
     static int imageid = 0;
     private BufferedImage image;
+    private transient Graphics graphics;
 
     public SerializableImage() {
     }
@@ -77,7 +78,11 @@ public class SerializableImage implements Serializable {
     }
 
     public Graphics getGraphics() {
-        return image.getGraphics();
+        //One graphics rule them all
+        if (graphics != null) {
+            return graphics;
+        }
+        return graphics = image.getGraphics();
     }
 
     public int getType() {

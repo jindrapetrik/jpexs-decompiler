@@ -198,10 +198,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         int textHeight = 12;
         int x = 0;
         int y = 0;
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Graphics2D g = (Graphics2D) image.getGraphics();        
         List<SHAPE> glyphs = new ArrayList<>();
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {

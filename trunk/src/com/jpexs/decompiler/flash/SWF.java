@@ -2220,6 +2220,14 @@ public final class SWF implements TreeItem {
         RECT rect = displayRect;
         image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                 (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+        //Make all pixels transparent
+        Graphics2D g = (Graphics2D)image.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);                    
+        g.setComposite(AlphaComposite.Src);
+        g.setColor(new Color(0,0,0,0f));
+        g.fillRect(0, 0, image.getWidth(), image.getHeight());
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
         frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m);
@@ -2357,6 +2365,14 @@ public final class SWF implements TreeItem {
         for (FrameInfo fi : frameInfos) {
             SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                     (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+            //Make all pixels transparent
+            Graphics2D g = (Graphics2D)image.getGraphics();
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);                    
+            g.setComposite(AlphaComposite.Src);
+            g.setColor(new Color(0,0,0,0f));
+            g.fillRect(0, 0, image.getWidth(), image.getHeight());
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
             frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m);
@@ -2410,6 +2426,14 @@ public final class SWF implements TreeItem {
                         m.translate(-rect.xMin, -rect.yMin);
                         drawMatrix.translate(rect.xMin, rect.yMin);
                     }
+                     //Make all pixels transparent
+                    Graphics2D gr = (Graphics2D)img.getGraphics();
+                    gr.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    gr.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    gr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);                    
+                    gr.setComposite(AlphaComposite.Src);
+                    gr.setColor(new Color(0,0,0,0f));
+                    gr.fillRect(0, 0, img.getWidth(), image.getHeight());
                     drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, img, m);
                 } else {
                     // only DefineFont tags
