@@ -1356,9 +1356,9 @@ public class ActionScriptParser {
                 ret = memberOrCall(expr, registerVars, inFunction, inMethod, variables);
                 break;
             case TERNAR:
-                GraphTargetItem terOnTrue = expression(registerVars, inFunction, inMethod, false, variables);
+                GraphTargetItem terOnTrue = expression(registerVars, inFunction, inMethod, true, variables);
                 expectedType(SymbolType.COLON);
-                GraphTargetItem terOnFalse = expression(registerVars, inFunction, inMethod, false, variables);
+                GraphTargetItem terOnFalse = expression(registerVars, inFunction, inMethod, true, variables);
                 ret = new TernarOpItem(null, expr, terOnTrue, terOnFalse);
                 break;
             case SHIFT_LEFT:

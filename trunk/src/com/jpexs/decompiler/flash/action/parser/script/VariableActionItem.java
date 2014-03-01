@@ -97,19 +97,18 @@ public class VariableActionItem extends ActionItem {
 
     @Override
     public boolean hasReturnValue() {
-        if (it == null) {
+        if (definition) {
             return false;
-        } else {
-            return it.hasReturnValue();
         }
+        return true;
     }
 
     @Override
     public boolean needsSemicolon() {
-        if (it == null) {
-            return super.needsSemicolon();
+        if (definition) {
+            return true;
         }
-        return it.needsSemicolon();
+        return false;
     }
 
 }
