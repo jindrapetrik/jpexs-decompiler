@@ -225,12 +225,18 @@ public class ASM3Parser {
 
         expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
         ParsedSymbol name = lexer.lex();
-        expected(name, ParsedSymbol.TYPE_STRING, "String");
+        if (name.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+
+        } else if (name.type == ParsedSymbol.TYPE_STRING) {
+
+        } else {
+            throw new ParseException("String or null expected", lexer.yyline());
+        }
         ParsedSymbol c = lexer.lex();
         int index = 0;
         if (c.type == ParsedSymbol.TYPE_COMMA) {
             ParsedSymbol extra = lexer.lex();
-            expected(name, ParsedSymbol.TYPE_STRING, "String");
+            expected(extra, ParsedSymbol.TYPE_STRING, "String");
             try {
                 index = Integer.parseInt((String) extra.value);
             } catch (NumberFormatException nfe) {
@@ -241,7 +247,7 @@ public class ASM3Parser {
         }
         expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
 
-        return constants.getNamespaceId(new Namespace(kind, constants.getStringId((String) name.value, true)), index, true);
+        return constants.getNamespaceId(new Namespace(kind, name.type == ParsedSymbol.TYPE_KEYWORD_NULL ? 0 : constants.getStringId((String) name.value, true)), index, true);
     }
 
     private static int parseMultiName(ConstantPool constants, Flasm3Lexer lexer) throws ParseException, IOException {

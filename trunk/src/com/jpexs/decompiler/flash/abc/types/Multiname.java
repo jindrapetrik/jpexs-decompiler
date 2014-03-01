@@ -141,17 +141,18 @@ public class Multiname {
             return "null";
         }
         int type = constants.getNamespace(index).kind;
-        String name = constants.getNamespace(index).getName(constants);
+        int name_index = constants.getNamespace(index).name_index;
+        String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants);
         int sub = -1;
         for (int n = 1; n < constants.getNamespaceCount(); n++) {
-            if (constants.getNamespace(n).kind == type && constants.getNamespace(n).getName(constants).equals(name)) {
+            if (constants.getNamespace(n).kind == type && constants.getNamespace(n).getName(constants).equals(constants.getNamespace(index).getName(constants))) {
                 sub++;
             }
             if (n == index) {
                 break;
             }
         }
-        return constants.getNamespace(index).getKindStr() + "(" + "\"" + Helper.escapeString(name) + "\"" + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
+        return constants.getNamespace(index).getKindStr() + "(" + (name == null ? "null" : "\"" + Helper.escapeString(name) + "\"") + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
     }
 
     private static String namespaceSetToString(ConstantPool constants, int index) {
