@@ -42,4 +42,5 @@ public class Layer {
     public int ratio = -1;
     public int duration = 0;
     public boolean visible = true;
+    public int clipDepth = -1;
 }

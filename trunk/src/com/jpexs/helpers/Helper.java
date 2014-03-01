@@ -25,6 +25,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Component;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -415,7 +419,7 @@ public class Helper {
         if (is instanceof MemoryInputStream) {
             return ((MemoryInputStream) is).getAllRead();
         }
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             byte[] buf = new byte[4096];
@@ -784,5 +788,36 @@ public class Helper {
             text = text.replace(from[i], to[i]);
         }
         return text;
+    }
+
+    public static Shape imageToShape(BufferedImage image) {
+        Area area = new Area();
+        Rectangle rectangle = new Rectangle();
+        int y1, y2;
+        for (int x = 0; x < image.getWidth(); x++) {
+            y1 = 99;
+            y2 = -1;
+            for (int y = 0; y < image.getHeight(); y++) {
+                int rgb = image.getRGB(x, y);
+                rgb = rgb >>> 24;
+                if (rgb > 0) {
+                    if (y1 == 99) {
+                        y1 = y;
+                        y2 = y;
+                    }
+                    if (y > (y2 + 1)) {
+                        rectangle.setBounds(x, y1, 1, y2 - y1);
+                        area.add(new Area(rectangle));
+                        y1 = y;
+                    }
+                    y2 = y;
+                }
+            }
+            if ((y2 - y1) >= 0) {
+                rectangle.setBounds(x, y1, 1, y2 - y1);
+                area.add(new Area(rectangle));
+            }
+        }
+        return area;
     }
 }

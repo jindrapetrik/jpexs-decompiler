@@ -125,7 +125,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -340,6 +343,7 @@ public final class SWF implements TreeItem {
 
     /**
      * Faster constructor to check SWF only
+     *
      * @param is
      * @throws java.io.IOException
      */
@@ -412,7 +416,7 @@ public final class SWF implements TreeItem {
             }
         }
     }
-    
+
     /**
      * Construct SWF from stream
      *
@@ -2221,12 +2225,12 @@ public final class SWF implements TreeItem {
         image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                 (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
         //Make all pixels transparent
-        Graphics2D g = (Graphics2D)image.getGraphics();
+        Graphics2D g = (Graphics2D) image.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);                    
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setComposite(AlphaComposite.Src);
-        g.setColor(new Color(0,0,0,0f));
+        g.setColor(new Color(0, 0, 0, 0f));
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
@@ -2319,6 +2323,10 @@ public final class SWF implements TreeItem {
                     if (ratio != -1) {
                         layer.ratio = ratio;
                     }
+                    int clipDepth = po.getClipDepth();
+                    if (clipDepth != -1) {
+                        layer.clipDepth = clipDepth;
+                    }
                 } else {
                     layer.matrix = po.getMatrix();
                     layer.instanceName = po.getInstanceName();
@@ -2328,6 +2336,7 @@ public final class SWF implements TreeItem {
                     layer.blendMode = po.getBlendMode();
                     layer.filters = po.getFilters();
                     layer.ratio = po.getRatio();
+                    layer.clipDepth = po.getClipDepth();
                 }
             }
 
@@ -2366,12 +2375,12 @@ public final class SWF implements TreeItem {
             SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                     (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
             //Make all pixels transparent
-            Graphics2D g = (Graphics2D)image.getGraphics();
+            Graphics2D g = (Graphics2D) image.getGraphics();
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);                    
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setComposite(AlphaComposite.Src);
-            g.setColor(new Color(0,0,0,0f));
+            g.setColor(new Color(0, 0, 0, 0f));
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
@@ -2380,18 +2389,37 @@ public final class SWF implements TreeItem {
         }
     }
 
+    private static class Clip {
+
+        public Shape shape;
+        public int clipDepth;
+
+        public Clip(Shape clip, int clipDepth) {
+            this.shape = clip;
+            this.clipDepth = clipDepth;
+        }
+
+    }
+
     public static void frameToImage(int containerId, int maxDepth, Map<Integer, Layer> layers, Color backgroundColor, Map<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
         float unzoom = (float) SWF.unitDivisor;
 
         Graphics2D g = (Graphics2D) image.getGraphics();
         g.setPaint(backgroundColor);
         g.fill(new Rectangle(image.getWidth(), image.getHeight()));
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setTransform(transformation.toTransform());
+        List<Clip> clips = new ArrayList<>();
+        List<Shape> prevClips = new ArrayList<>();
 
         for (int i = 1; i <= maxDepth; i++) {
+
+            for (int c = 0; c < clips.size(); c++) {
+                if (clips.get(c).clipDepth == i) {
+                    g.setClip(prevClips.get(c));
+                    prevClips.remove(c);
+                    clips.remove(c);
+                }
+            }
             if (!layers.containsKey(i)) {
                 continue;
             }
@@ -2426,13 +2454,13 @@ public final class SWF implements TreeItem {
                         m.translate(-rect.xMin, -rect.yMin);
                         drawMatrix.translate(rect.xMin, rect.yMin);
                     }
-                     //Make all pixels transparent
-                    Graphics2D gr = (Graphics2D)img.getGraphics();
+                    //Make all pixels transparent
+                    Graphics2D gr = (Graphics2D) img.getGraphics();
                     gr.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                     gr.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                    gr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);                    
+                    gr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     gr.setComposite(AlphaComposite.Src);
-                    gr.setColor(new Color(0,0,0,0f));
+                    gr.setColor(new Color(0, 0, 0, 0f));
                     gr.fillRect(0, 0, img.getWidth(), image.getHeight());
                     drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, img, m);
                 } else {
@@ -2502,8 +2530,28 @@ public final class SWF implements TreeItem {
 
                 drawMatrix.translateX /= unzoom;
                 drawMatrix.translateY /= unzoom;
-                g.setTransform(drawMatrix.toTransform());
-                g.drawImage(img.getBufferedImage(), 0, 0, null);
+                AffineTransform trans = drawMatrix.toTransform();
+
+                if (layer.clipDepth > -1) {
+                    BufferedImage mask = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+                    Graphics2D gm = (Graphics2D) mask.getGraphics();
+                    gm.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    gm.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    gm.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    gm.setComposite(AlphaComposite.Src);
+                    gm.setColor(new Color(0, 0, 0, 0f));
+                    gm.fillRect(0, 0, image.getWidth(), image.getHeight());
+                    gm.setTransform(trans);
+                    gm.drawImage(img.getBufferedImage(), 0, 0, null);
+                    Clip clip = new Clip(Helper.imageToShape(mask), layer.clipDepth); //Maybe we can get corrent outline instead converting from image (?)
+                    clips.add(clip);
+                    prevClips.add(g.getClip());
+                    g.setTransform(AffineTransform.getTranslateInstance(0, 0));
+                    g.setClip(clip.shape);
+                } else {
+                    g.setTransform(trans);
+                    g.drawImage(img.getBufferedImage(), 0, 0, null);
+                }
             } else if (character instanceof BoundedTag) {
                 showPlaceholder = true;
             }
