@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
@@ -253,12 +254,12 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     }
 
     @Override
-    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation,ColorTransform colorTransform) {
         throw new Error("this overload of toImage call is not supported on BoundedTag");
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation,ColorTransform colorTransform) {
         if (visited.contains(buttonId)) {
             return;
         }
@@ -268,7 +269,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         for (BUTTONRECORD r : this.characters) {
             if (r.buttonStateUp) {
                 Layer layer = new Layer();
-                layer.colorTransFormAlpha = r.colorTransform;
+                layer.colorTransForm = r.colorTransform;
                 layer.blendMode = r.blendMode;
                 layer.filters = r.filterList;
                 layer.matrix = r.placeMatrix;
@@ -282,7 +283,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         visited.pop();
         RECT displayRect = getRect(characters, visited);
         visited.push(buttonId);
-        SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited, image, transformation);
+        SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited, image, transformation,colorTransform);
     }
 
     @Override

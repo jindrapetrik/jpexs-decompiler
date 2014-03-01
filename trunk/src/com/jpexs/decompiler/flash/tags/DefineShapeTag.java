@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -99,19 +100,19 @@ public class DefineShapeTag extends CharacterTag implements ShapeTag {
 
     @Override
     public String toSVG() {
-        SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes());
+        SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(),new ColorTransform() /*FIXME?*/);
         exporter.export();
         return exporter.getSVG();
     }
 
     @Override
-    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
         throw new Error("this overload of toImage call is not supported on BoundedTag");
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
-        BitmapExporter.exportTo(swf, getShapes(), null, image, transformation);
+    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        BitmapExporter.exportTo(swf, getShapes(), null, image, transformation,colorTransform);
     }
 
     @Override

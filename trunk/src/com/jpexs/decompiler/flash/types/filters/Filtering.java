@@ -167,7 +167,7 @@ public class Filtering {
         }
     }
 
-    private static void premultiply(int[] p) {
+    public static void premultiply(int[] p) {
         int length = p.length;
         int offset = 0;
         length += offset;
@@ -185,7 +185,7 @@ public class Filtering {
         }
     }
 
-    private static void unpremultiply(int[] p) {
+    public static void unpremultiply(int[] p) {
         int length = p.length;
         int offset = 0;
         length += offset;
@@ -453,6 +453,21 @@ public class Filtering {
             i = 255;
         }
         return i;
+    }
+
+    public static Color colorEffect(Color color, 
+            int redAddTerm, int greenAddTerm, int blueAddTerm, int alphaAddTerm,
+            int redMultTerm, int greenMultTerm, int blueMultTerm, int alphaMultTerm) {
+        int rgb = color.getRGB();
+        int a = (rgb >> 24) & 0xff;
+        int r = (rgb >> 16) & 0xff;
+        int g = (rgb >> 8) & 0xff;
+        int b = (rgb) & 0xff;
+        r = Math.max(0, Math.min(((r * redMultTerm) / 255) + redAddTerm, 255));
+        g = Math.max(0, Math.min(((g * greenMultTerm) / 255) + greenAddTerm, 255));
+        b = Math.max(0, Math.min(((b * blueMultTerm) / 255) + blueAddTerm, 255));
+        a = Math.max(0, Math.min(((a * alphaMultTerm) / 255) + alphaAddTerm, 255));
+        return new Color(r,g,b,a);
     }
 
     public static SerializableImage colorEffect(SerializableImage src,

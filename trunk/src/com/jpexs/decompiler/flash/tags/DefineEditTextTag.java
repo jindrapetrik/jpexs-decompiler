@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -722,12 +723,12 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
     }
 
     @Override
-    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation,ColorTransform colorTransform) {
         throw new Error("this overload of toImage call is not supported on BoundedTag");
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation,ColorTransform colorTransform) {
         FontTag font = null;
         for (Tag tag : tags) {
             if (tag instanceof FontTag) {
@@ -808,7 +809,7 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                     // todo;
                     break;
             }
-            staticTextToImage(swf, characters, textRecords, 2, image, getTextMatrix(), transformation);
+            staticTextToImage(swf, characters, textRecords, 2, image, getTextMatrix(), transformation,colorTransform);
         }
     }
 

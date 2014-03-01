@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
@@ -33,8 +34,8 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     protected String currentDrawCommand = "";
     protected String pathData;
 
-    public DefaultSVGShapeExporter(SHAPE shape) {
-        super(shape);
+    public DefaultSVGShapeExporter(SHAPE shape,ColorTransform colorTransform) {
+        super(shape,colorTransform);
     }
 
     @Override
@@ -73,7 +74,7 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     }
 
     @Override
-    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth) {
+    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth,ColorTransform colorTransform) {
         finalizePath();
     }
 

@@ -63,6 +63,7 @@ import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
@@ -793,9 +794,6 @@ public class XFLConverter {
                     if (po.getColorTransform() != null) {
                         usageCount++;
                     }
-                    if (po.getColorTransformWithAlpha() != null) {
-                        usageCount++;
-                    }
                     if (po.cacheAsBitmap()) {
                         usageCount++;
                     }
@@ -1030,7 +1028,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertSymbolInstance(String name, MATRIX matrix, CXFORM colorTransform, CXFORMWITHALPHA colorTransformAlpha, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, CharacterTag tag, HashMap<Integer, CharacterTag> characters, List<Tag> tags, FLAVersion flaVersion) {
+    public static String convertSymbolInstance(String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, CharacterTag tag, HashMap<Integer, CharacterTag> characters, List<Tag> tags, FLAVersion flaVersion) {
         String ret = "";
         if (matrix == null) {
             matrix = new MATRIX();
@@ -1090,31 +1088,32 @@ public class XFLConverter {
         }
         if (colorTransform != null) {
             ret += "<color><Color";
-            if (colorTransform.hasMultTerms) {
-                ret += " redMultiplier=\"" + (((float) colorTransform.redMultTerm) / 256.0f) + "\"";
-                ret += " greenMultiplier=\"" + (((float) colorTransform.greenMultTerm) / 256.0f) + "\"";
-                ret += " blueMultiplier=\"" + (((float) colorTransform.blueMultTerm) / 256.0f) + "\"";
+            if (colorTransform.getRedMulti() != 255) {
+                ret += " redMultiplier=\"" + (((float) colorTransform.getRedMulti()) / 255.0f) + "\"";
             }
-            if (colorTransform.hasAddTerms) {
-                ret += " redOffset=\"" + colorTransform.redAddTerm + "\"";
-                ret += " greenOffset=\"" + colorTransform.greenAddTerm + "\"";
-                ret += " blueOffset=\"" + colorTransform.blueAddTerm + "\"";
+            if (colorTransform.getGreenMulti() != 255) {
+                ret += " greenMultiplier=\"" + (((float) colorTransform.getGreenMulti()) / 255.0f) + "\"";
             }
-            ret += "/></color>";
-        } else if (colorTransformAlpha != null) {
-            ret += "<color><Color";
-            if (colorTransformAlpha.hasMultTerms) {
-                ret += " alphaMultiplier=\"" + (((float) colorTransformAlpha.alphaMultTerm) / 256.0f) + "\"";
-                ret += " redMultiplier=\"" + (((float) colorTransformAlpha.redMultTerm) / 256.0f) + "\"";
-                ret += " greenMultiplier=\"" + (((float) colorTransformAlpha.greenMultTerm) / 256.0f) + "\"";
-                ret += " blueMultiplier=\"" + (((float) colorTransformAlpha.blueMultTerm) / 256.0f) + "\"";
+            if (colorTransform.getBlueMulti() != 255) {
+                ret += " blueMultiplier=\"" + (((float) colorTransform.getBlueMulti()) / 255.0f) + "\"";
             }
-            if (colorTransformAlpha.hasAddTerms) {
-                ret += " alphaOffset=\"" + colorTransformAlpha.alphaAddTerm + "\"";
-                ret += " redOffset=\"" + colorTransformAlpha.redAddTerm + "\"";
-                ret += " greenOffset=\"" + colorTransformAlpha.greenAddTerm + "\"";
-                ret += " blueOffset=\"" + colorTransformAlpha.blueAddTerm + "\"";
+            if (colorTransform.getAlphaMulti() != 255) {
+                ret += " alphaMultiplier=\"" + (((float) colorTransform.getAlphaMulti()) / 255.0f) + "\"";
             }
+
+            if (colorTransform.getRedAdd() != 0) {
+                ret += " redOffset=\"" + colorTransform.getRedAdd() + "\"";
+            }
+            if (colorTransform.getGreenAdd() != 0) {
+                ret += " greenOffset=\"" + colorTransform.getGreenAdd() + "\"";
+            }
+            if (colorTransform.getBlueAdd() != 0) {
+                ret += " blueOffset=\"" + colorTransform.getBlueAdd() + "\"";
+            }
+            if (colorTransform.getAlphaAdd() != 0) {
+                ret += " alphaOffset=\"" + colorTransform.getAlphaAdd() + "\"";
+            }
+
             ret += "/></color>";
         }
         if (filters != null) {
@@ -1270,7 +1269,7 @@ public class XFLConverter {
                                     } else if (character instanceof DefineVideoStreamTag) {
                                         recCharStr = convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null);
                                     } else {
-                                        recCharStr = convertSymbolInstance(null, matrix, null, colorTransformAlpha, false, blendMode, filters, true, null, null, characters.get(rec.characterId), characters, tags, flaVersion);
+                                        recCharStr = convertSymbolInstance(null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, characters.get(rec.characterId), characters, tags, flaVersion);
                                     }
                                     int duration = frame - lastFrame;
                                     lastFrame = frame;
@@ -1762,8 +1761,7 @@ public class XFLConverter {
         CharacterTag character = null;
         MATRIX matrix = null;
         String instanceName = null;
-        CXFORM colorTransForm = null;
-        CXFORMWITHALPHA colorTransFormAlpha = null;
+        ColorTransform colorTransForm = null;
         boolean cacheAsBitmap = false;
         int blendMode = 0;
         List<FILTER> filters = new ArrayList<>();
@@ -1796,14 +1794,9 @@ public class XFLConverter {
                             if (instanceName2 != null) {
                                 instanceName = instanceName2;
                             }
-                            CXFORM colorTransForm2 = po.getColorTransform();
+                            ColorTransform colorTransForm2 = po.getColorTransform();
                             if (colorTransForm2 != null) {
                                 colorTransForm = colorTransForm2;
-                            }
-
-                            CXFORMWITHALPHA colorTransFormAlpha2 = po.getColorTransformWithAlpha();
-                            if (colorTransFormAlpha2 != null) {
-                                colorTransFormAlpha = colorTransFormAlpha2;
                             }
 
                             CLIPACTIONS clipActions2 = po.getClipActions();
@@ -1829,7 +1822,6 @@ public class XFLConverter {
                             matrix = po.getMatrix();
                             instanceName = po.getInstanceName();
                             colorTransForm = po.getColorTransform();
-                            colorTransFormAlpha = po.getColorTransformWithAlpha();
                             cacheAsBitmap = po.cacheAsBitmap();
                             blendMode = po.getBlendMode();
                             filters = po.getFilters();
@@ -1853,7 +1845,6 @@ public class XFLConverter {
                     matrix = null;
                     instanceName = null;
                     colorTransForm = null;
-                    colorTransFormAlpha = null;
                     cacheAsBitmap = false;
                     blendMode = 0;
                     filters = new ArrayList<>();
@@ -1884,7 +1875,7 @@ public class XFLConverter {
                         } else if (character instanceof DefineVideoStreamTag) {
                             elements += convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions);
                         } else {
-                            elements += convertSymbolInstance(instanceName, matrix, colorTransForm, colorTransFormAlpha, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, character, characters, tags, flaVersion);
+                            elements += convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, character, characters, tags, flaVersion);
                         }
                     }
                 }

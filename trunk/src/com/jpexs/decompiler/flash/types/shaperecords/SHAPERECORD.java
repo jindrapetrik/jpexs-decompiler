@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
@@ -124,7 +125,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return ret;
     }
 
-    public static SerializableImage shapeListToImage(SWF swf, List<SHAPE> shapes, int prevWidth, int prevHeight, Color color) {
+    public static SerializableImage shapeListToImage(SWF swf, List<SHAPE> shapes, int prevWidth, int prevHeight, Color color, ColorTransform colorTransform) {
         if (shapes.isEmpty()) {
             SerializableImage image = new SerializableImage(1, 1, BufferedImage.TYPE_INT_RGB);
             //Make all pixels transparent
@@ -176,7 +177,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 }
 
                 // shapeNum: 1
-                SerializableImage img = BitmapExporter.export(swf, shapes.get(pos), color);
+                SerializableImage img = BitmapExporter.export(swf, shapes.get(pos), color, colorTransform);
 
                 int w1 = img.getWidth();
                 int h1 = img.getHeight();

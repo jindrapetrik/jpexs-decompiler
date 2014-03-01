@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 import java.io.Serializable;
 
 /**
@@ -28,7 +29,7 @@ import java.io.Serializable;
  *
  * @author JPEXS
  */
-public class CXFORM implements Serializable {
+public class CXFORM extends ColorTransform implements Serializable {
 
     /**
      * Has color addition values
@@ -72,7 +73,34 @@ public class CXFORM implements Serializable {
     @SWFType(value = BasicType.SB, countField = "nbits")
     public int blueAddTerm;
 
-    public SerializableImage apply(SerializableImage src) {
-        return Filtering.colorEffect(src, hasAddTerms ? redAddTerm : 0, hasAddTerms ? greenAddTerm : 0, hasAddTerms ? blueAddTerm : 0, 0, hasMultTerms ? redMultTerm : 255, hasMultTerms ? greenMultTerm : 255, hasMultTerms ? blueMultTerm : 255, 1);
+    @Override
+    public int getRedAdd() {
+        return hasAddTerms?redAddTerm:super.getRedAdd();
     }
+
+    @Override
+    public int getGreenAdd() {
+        return hasAddTerms?greenAddTerm:super.getGreenAdd();
+    }
+    
+    @Override
+    public int getBlueAdd() {
+        return hasAddTerms?blueAddTerm:super.getBlueAdd();
+    }
+
+    @Override
+    public int getRedMulti() {
+        return hasMultTerms?redMultTerm:super.getRedMulti();
+    }
+    
+    @Override
+    public int getGreenMulti() {
+        return hasMultTerms?greenMultTerm:super.getGreenMulti();
+    }
+    
+    @Override
+    public int getBlueMulti() {
+        return hasMultTerms?blueMultTerm:super.getBlueMulti();
+    }
+    
 }

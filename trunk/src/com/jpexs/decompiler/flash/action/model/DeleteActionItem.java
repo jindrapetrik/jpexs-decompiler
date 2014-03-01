@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionDelete;
+import com.jpexs.decompiler.flash.action.swf5.ActionDelete2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -50,11 +51,11 @@ public class DeleteActionItem extends ActionItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("delete ");
         if (object == null) {
-            return propertyName.toString(writer, localData);
+            return propertyName.toStringNoQuotes(writer, localData);
         }
-        object.toString(writer, localData);
+        object.toStringNoQuotes(writer, localData);
         writer.append(".");
-        return stripQuotes(propertyName, localData, writer);
+        return propertyName.toStringNoQuotes(writer, localData);
     }
 
     @Override
@@ -67,6 +68,9 @@ public class DeleteActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        if(object == null){
+            return toSourceMerge(localData, generator, propertyName, new ActionDelete2());
+        }
         return toSourceMerge(localData, generator, object, propertyName, new ActionDelete());
     }
 

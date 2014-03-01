@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 import java.io.Serializable;
 
 /**
@@ -29,7 +30,7 @@ import java.io.Serializable;
  *
  * @author JPEXS
  */
-public class CXFORMWITHALPHA implements Serializable {
+public class CXFORMWITHALPHA extends ColorTransform implements Serializable {
 
     /**
      * Has color addition values
@@ -92,7 +93,44 @@ public class CXFORMWITHALPHA implements Serializable {
     @SWFType(value = BasicType.UB, count = 4)
     public int nbits;
 
-    public SerializableImage apply(SerializableImage src) {
-        return Filtering.colorEffect(src, hasAddTerms ? redAddTerm : 0, hasAddTerms ? greenAddTerm : 0, hasAddTerms ? blueAddTerm : 0, hasAddTerms ? alphaAddTerm : 0, hasMultTerms ? redMultTerm : 255, hasMultTerms ? greenMultTerm : 255, hasMultTerms ? blueMultTerm : 255, hasMultTerms ? alphaMultTerm : 255);
+    @Override
+    public int getRedAdd() {
+        return hasAddTerms?redAddTerm:super.getRedAdd();
     }
+
+    @Override
+    public int getGreenAdd() {
+        return hasAddTerms?greenAddTerm:super.getGreenAdd();
+    }
+    
+    @Override
+    public int getBlueAdd() {
+        return hasAddTerms?blueAddTerm:super.getBlueAdd();
+    }
+    
+    @Override
+    public int getAlphaAdd() {
+        return hasAddTerms?alphaAddTerm:super.getAlphaAdd();
+    }
+
+    @Override
+    public int getRedMulti() {
+        return hasMultTerms?redMultTerm:super.getRedMulti();
+    }
+    
+    @Override
+    public int getGreenMulti() {
+        return hasMultTerms?greenMultTerm:super.getGreenMulti();
+    }
+    
+    @Override
+    public int getBlueMulti() {
+        return hasMultTerms?blueMultTerm:super.getBlueMulti();
+    }
+    
+    @Override
+    public int getAlphaMulti() {
+        return hasMultTerms?alphaMultTerm:super.getAlphaMulti();
+    }
+    
 }

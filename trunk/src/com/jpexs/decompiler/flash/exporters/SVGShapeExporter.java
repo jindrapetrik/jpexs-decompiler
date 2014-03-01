@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
@@ -72,8 +73,8 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     private final SWF swf;
     private double maxLineWidth;
 
-    public SVGShapeExporter(SWF swf, SHAPE shape) {
-        super(shape);
+    public SVGShapeExporter(SWF swf, SHAPE shape, ColorTransform colorTransform) {
+        super(shape, colorTransform);
         this.swf = swf;
     }
 
@@ -160,7 +161,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     }
 
     @Override
-    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth) {
+    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
         ImageTag image = null;
         for (Tag t : swf.tags) {
@@ -175,6 +176,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         if (image != null) {
             SerializableImage img = image.getImage(swf.tags);
             if (img != null) {
+                colorTransform.apply(img);
                 int width = img.getWidth();
                 int height = img.getHeight();
                 lastPatternId++;

@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -324,18 +325,14 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
     }
 
     @Override
-    public CXFORM getColorTransform() {
-        return null;
-    }
-
-    @Override
-    public CXFORMWITHALPHA getColorTransformWithAlpha() {
+    public ColorTransform getColorTransform() {
         if (placeFlagHasColorTransform) {
             return colorTransform;
         } else {
             return null;
         }
     }
+
 
     @Override
     public int getBlendMode() {

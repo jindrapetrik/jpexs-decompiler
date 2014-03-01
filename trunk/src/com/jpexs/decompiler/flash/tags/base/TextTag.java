@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -192,7 +193,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         return att;
     }
 
-    public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation) {
+    public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation,ColorTransform colorTransform) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
         int textHeight = 12;
@@ -203,9 +204,9 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
-                    textColor = rec.textColorA.toColor();
+                    textColor = colorTransform.apply(rec.textColorA.toColor());
                 } else {
-                    textColor = rec.textColor.toColor();
+                    textColor = colorTransform.apply(rec.textColor.toColor());
                 }
             }
             if (rec.styleFlagsHasFont) {
@@ -231,7 +232,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
-                    BitmapExporter.exportTo(swf, shape, textColor, image, mat);
+                    BitmapExporter.exportTo(swf, shape, textColor, image, mat,colorTransform);
                     x += entry.glyphAdvance;
                 }
             }
