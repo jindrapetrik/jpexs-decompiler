@@ -21,13 +21,14 @@ import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class Layer {
+public class Layer implements Serializable {
 
     public MATRIX matrix;
     public String instanceName = null;
@@ -40,7 +41,7 @@ public class Layer {
     public RGBA backGroundColor = null;
     public int characterId = -1;
     public int ratio = -1;
-    public int duration = 0;
+    public int time = 0;
     public boolean visible = true;
-    public int clipDepth = -1;
+    public int clipDepth = -1;    
 }

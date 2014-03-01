@@ -2239,6 +2239,7 @@ public final class SWF implements TreeItem {
         return image;
     }
 
+    @SuppressWarnings("unchecked")
     private static List<FrameInfo> getFrameInfo(int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, int totalFrameCount) {
         List<FrameInfo> ret = new ArrayList<>();
         if (startFrame > stopFrame) {
@@ -2337,6 +2338,7 @@ public final class SWF implements TreeItem {
                     layer.filters = po.getFilters();
                     layer.ratio = po.getRatio();
                     layer.clipDepth = po.getClipDepth();
+                    layer.time = 0;
                 }
             }
 
@@ -2345,10 +2347,10 @@ public final class SWF implements TreeItem {
                 layers.remove(rt.getDepth());
 
             }
-            for (Layer l : layers.values()) {
-                l.duration++;
-            }
             if (t instanceof ShowFrameTag) {
+                for (Layer l : layers.values()) {
+                    l.time++;
+                }
                 if ((f >= startFrame) && (f <= stopFrame)) {
                     FrameInfo fi = new FrameInfo();
                     fi.maxDepth = maxDepth;
@@ -2357,6 +2359,9 @@ public final class SWF implements TreeItem {
                     fi.characters = characters;
                     fi.frame = f;
                     ret.add(fi);
+                    if (f < stopFrame) {
+                        layers = (Map<Integer, Layer>) Helper.deepCopy(layers);
+                    }
                 }
                 f++;
                 if (f > stopFrame) {
@@ -2439,6 +2444,7 @@ public final class SWF implements TreeItem {
                 DrawableTag drawable = (DrawableTag) character;
                 SerializableImage img;
                 Matrix drawMatrix = new Matrix();
+                int dframe = 1 + layer.time % drawable.getNumFrames();
                 if (drawable instanceof BoundedTag) {
                     BoundedTag bounded = (BoundedTag) drawable;
                     RECT boundRect = bounded.getRect(characters, new Stack<Integer>());
@@ -2462,10 +2468,10 @@ public final class SWF implements TreeItem {
                     gr.setComposite(AlphaComposite.Src);
                     gr.setColor(new Color(0, 0, 0, 0f));
                     gr.fillRect(0, 0, img.getWidth(), image.getHeight());
-                    drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, img, m);
+                    drawable.toImage(dframe, layer.ratio, allTags, characters, visited, img, m);
                 } else {
                     // only DefineFont tags
-                    img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, characters, visited, transformation);
+                    img = drawable.toImage(dframe, layer.ratio, allTags, characters, visited, transformation);
                 }
                 if (layer.filters != null) {
                     for (FILTER filter : layer.filters) {

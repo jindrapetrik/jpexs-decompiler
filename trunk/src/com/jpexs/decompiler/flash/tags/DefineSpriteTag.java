@@ -277,22 +277,15 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
         throw new Error("this overload of toImage call is not supported on BoundedTag");
     }
 
     @Override
-    public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
         if (visited.contains(spriteId)) {
             return;
         }
-        /* 
-         rect.Xmax=displayRect.Xmin+rect.getWidth();
-         rect.Ymax=displayRect.Ymin+rect.getWidth();
-         rect.Xmin=displayRect.Xmin;
-         rect.Ymin=displayRect.Ymin;
-         RECT rect=getRect(characters);
-         SWF.fixRect(rect);*/
         RECT rect = getRect(characters, visited);
         visited.push(spriteId);
         SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited, image, transformation);
@@ -301,8 +294,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
 
     @Override
     public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
-        //RECT displayRect = getRect(characters, visited); //use visited
-        return new Point(0, 0); //displayRect.Xmin,displayRect.Ymin);
+        return new Point(0, 0);
     }
 
     @Override

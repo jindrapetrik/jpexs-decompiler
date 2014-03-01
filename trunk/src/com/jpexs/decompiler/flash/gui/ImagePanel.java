@@ -149,10 +149,10 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     g.fillRect(0, 0, image.getWidth(), image.getHeight());
                     Matrix m = new Matrix();
                     m.translate(-rect.Xmin, -rect.Ymin);
-                    drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), image, m);
+                    drawable.toImage(0, 0, swf.tags, characters, new Stack<Integer>(), image, m);
                     img = image;
                 } else {
-                    img = drawable.toImage(0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+                    img = drawable.toImage(0, 0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
                 }
                 SWF.putToCache(key, img);
             }
@@ -227,11 +227,11 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     g.fillRect(0, 0, image.getWidth(), image.getHeight());
                     Matrix m = new Matrix();
                     m.translate(-rect.Xmin, -rect.Ymin);
-                    drawable.toImage(nframe, swf.tags, characters, new Stack<Integer>(), image, m);
+                    drawable.toImage(nframe, nframe, swf.tags, characters, new Stack<Integer>(), image, m);
                     img = image;
 
                 } else {
-                    img = drawable.toImage(nframe, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+                    img = drawable.toImage(nframe, nframe, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
                 }
                 SWF.putToCache(key, img);
             }

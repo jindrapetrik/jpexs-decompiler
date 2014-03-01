@@ -179,10 +179,10 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
         return 1;
     }
 
-    private SHAPEWITHSTYLE getFrame(int frame) {
+    private SHAPEWITHSTYLE getShapeAtRatio(int ratio) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
-        FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(frame);
-        LINESTYLEARRAY lineStyles = morphLineStyles.getLineStylesAt(getShapeNum(), frame);
+        FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(ratio);
+        LINESTYLEARRAY lineStyles = morphLineStyles.getLineStylesAt(getShapeNum(), ratio);
 
         int startPosX = 0, startPosY = 0;
         int endPosX = 0, endPosY = 0;
@@ -219,8 +219,8 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
                 }
                 StyleChangeRecord scr = (StyleChangeRecord) scr1.clone();
                 if (scr1.stateMoveTo || scr2.stateMoveTo) {
-                    scr.moveDeltaX = startPosX + (endPosX - startPosX) * frame / 65535;
-                    scr.moveDeltaY = startPosY + (endPosY - startPosY) * frame / 65535;
+                    scr.moveDeltaX = startPosX + (endPosX - startPosX) * ratio / 65535;
+                    scr.moveDeltaY = startPosY + (endPosY - startPosY) * ratio / 65535;
                     scr.stateMoveTo = scr.moveDeltaX != posX || scr.moveDeltaY != posY;
                 }
                 finalRecords.add(scr);
@@ -253,10 +253,10 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
                     continue;
                 }
                 CurvedEdgeRecord cer = new CurvedEdgeRecord();
-                cer.controlDeltaX = cer1.controlDeltaX + (cer2.controlDeltaX - cer1.controlDeltaX) * frame / 65535;
-                cer.controlDeltaY = cer1.controlDeltaY + (cer2.controlDeltaY - cer1.controlDeltaY) * frame / 65535;
-                cer.anchorDeltaX = cer1.anchorDeltaX + (cer2.anchorDeltaX - cer1.anchorDeltaX) * frame / 65535;
-                cer.anchorDeltaY = cer1.anchorDeltaY + (cer2.anchorDeltaY - cer1.anchorDeltaY) * frame / 65535;
+                cer.controlDeltaX = cer1.controlDeltaX + (cer2.controlDeltaX - cer1.controlDeltaX) * ratio / 65535;
+                cer.controlDeltaY = cer1.controlDeltaY + (cer2.controlDeltaY - cer1.controlDeltaY) * ratio / 65535;
+                cer.anchorDeltaX = cer1.anchorDeltaX + (cer2.anchorDeltaX - cer1.anchorDeltaX) * ratio / 65535;
+                cer.anchorDeltaY = cer1.anchorDeltaY + (cer2.anchorDeltaY - cer1.anchorDeltaY) * ratio / 65535;
                 startPosX += cer1.controlDeltaX + cer1.anchorDeltaX;
                 startPosY += cer1.controlDeltaY + cer1.anchorDeltaY;
                 endPosX += cer2.controlDeltaX + cer2.anchorDeltaX;
@@ -279,8 +279,8 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
                 StraightEdgeRecord ser = new StraightEdgeRecord();
                 ser.generalLineFlag = true;
                 ser.vertLineFlag = false;
-                ser.deltaX = ser1.deltaX + (ser2.deltaX - ser1.deltaX) * frame / 65535;
-                ser.deltaY = ser1.deltaY + (ser2.deltaY - ser1.deltaY) * frame / 65535;
+                ser.deltaX = ser1.deltaX + (ser2.deltaX - ser1.deltaX) * ratio / 65535;
+                ser.deltaY = ser1.deltaY + (ser2.deltaY - ser1.deltaY) * ratio / 65535;
                 startPosX += ser1.deltaX;
                 startPosY += ser1.deltaY;
                 endPosX += ser2.deltaX;
@@ -298,13 +298,13 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
         throw new Error("this overload of toImage call is not supported on BoundedTag");
     }
 
     @Override
-    public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
-        SHAPEWITHSTYLE shape = getFrame(frame);
+    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+        SHAPEWITHSTYLE shape = getShapeAtRatio(ratio);
         // shapeNum: 3
         // todo: Currently the generated image is not cached, because the cache 
         // key contains the hashCode of the finalRecord object, and it is always 

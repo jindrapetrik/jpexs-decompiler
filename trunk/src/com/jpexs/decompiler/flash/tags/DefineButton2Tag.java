@@ -253,12 +253,12 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     }
 
     @Override
-    public SerializableImage toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
         throw new Error("this overload of toImage call is not supported on BoundedTag");
     }
 
     @Override
-    public void toImage(int frame, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
         if (visited.contains(buttonId)) {
             return;
         }
