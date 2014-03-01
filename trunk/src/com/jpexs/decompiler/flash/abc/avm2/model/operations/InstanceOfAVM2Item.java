@@ -23,6 +23,6 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 public class InstanceOfAVM2Item extends BinaryOpItem {
 
     public InstanceOfAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem type) {
-        super(instruction, PRECEDENCE_RELATIONAL, value, type, " instanceof ");
+        super(instruction, PRECEDENCE_RELATIONAL, value, type, "instanceof");
     }
 }

@@ -23,6 +23,6 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 public class InAVM2Item extends BinaryOpItem {
 
     public InAVM2Item(AVM2Instruction instruction, GraphTargetItem name, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_RELATIONAL, name, object, " in ");
+        super(instruction, PRECEDENCE_RELATIONAL, name, object, "in");
     }
 }

@@ -28,7 +28,7 @@ import java.util.Set;
 public class InstanceOfActionItem extends BinaryOpItem {
 
     public InstanceOfActionItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem type) {
-        super(instruction, PRECEDENCE_RELATIONAL, value, type, " instanceof ");
+        super(instruction, PRECEDENCE_RELATIONAL, value, type, "instanceof");
     }
 
     @Override

@@ -25,7 +25,7 @@ import java.util.Set;
 public class InActionItem extends BinaryOpItem {
 
     public InActionItem(GraphSourceItem instruction, ActionItem name, ActionItem object) {
-        super(instruction, PRECEDENCE_RELATIONAL, name, object, " in ");
+        super(instruction, PRECEDENCE_RELATIONAL, name, object, "in");
     }
 
     @Override
