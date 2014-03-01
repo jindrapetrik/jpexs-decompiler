@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
-import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -120,11 +119,11 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
     public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode) {
         String ret = "WaitForFrame2 " + skipCount;
         /*for (int i = 0; i < skipped.size(); i++) {
-            if (skipped.get(i) instanceof ActionEnd) {
-                break;
-            }
-            ret += "\r\n" + skipped.get(i).getASMSource(container, knownAddreses, constantPool, version, exportMode);
-        }*/
+         if (skipped.get(i) instanceof ActionEnd) {
+         break;
+         }
+         ret += "\r\n" + skipped.get(i).getASMSource(container, knownAddreses, constantPool, version, exportMode);
+         }*/
         return ret;
     }
 

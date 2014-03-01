@@ -68,7 +68,7 @@ public class DeleteActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        if(object == null){
+        if (object == null) {
             return toSourceMerge(localData, generator, propertyName, new ActionDelete2());
         }
         return toSourceMerge(localData, generator, object, propertyName, new ActionDelete());

@@ -23,8 +23,6 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
-import com.jpexs.decompiler.flash.types.CXFORM;
-import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
@@ -85,7 +83,6 @@ public class Timeline {
                     if (colorTransForm2 != null) {
                         fl.colorTransForm = colorTransForm2;
                     }
-
 
                     CLIPACTIONS clipActions2 = po.getClipActions();
                     if (clipActions2 != null) {

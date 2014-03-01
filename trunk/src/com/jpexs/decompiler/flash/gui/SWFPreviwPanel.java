@@ -68,7 +68,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
             @Override
             public void run() {
                 buffering.setVisible(true);
-                SWF.framesToImage(0, frameImages, 0, swf.frameCount - 1, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor),new ColorTransform());
+                SWF.framesToImage(0, frameImages, 0, swf.frameCount - 1, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
                 buffering.setVisible(false);
             }
         }.start();

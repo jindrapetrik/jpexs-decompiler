@@ -71,7 +71,7 @@ public class StreamSearch implements Searchable {
                                 if (last != null) {
                                     b = last[last.length + i + d];
                                 } else {
-                                continue;
+                                    continue;
                                 }
                             } else if (i + d >= buf.length) {
                                 continue;

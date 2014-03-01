@@ -23,7 +23,7 @@ import java.io.File;
  * @author JPEXS
  */
 public class Path {
-    
+
     public static String combine(String... paths) {
         String result = "";
         String separator = File.separator;

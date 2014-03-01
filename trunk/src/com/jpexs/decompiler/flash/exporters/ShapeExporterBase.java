@@ -59,7 +59,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private boolean edgeMapsCreated;
     protected ColorTransform colorTransform;
 
-    public ShapeExporterBase(SHAPE shape,ColorTransform colorTransform) {
+    public ShapeExporterBase(SHAPE shape, ColorTransform colorTransform) {
         this.shape = shape;
         this.colorTransform = colorTransform;
         _fillStyles = new ArrayList<>();

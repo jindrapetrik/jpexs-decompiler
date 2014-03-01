@@ -85,8 +85,8 @@ public class SWFSearch {
                 mis.reset();
                 PosMarkedInputStream pmi = new PosMarkedInputStream(mis);
                 SWF swf = noCheck ? new SWF(pmi) : new SWF(pmi, null, false, true);
-                boolean valid = swf.fileSize > 0 
-                        && swf.version > 0 
+                boolean valid = swf.fileSize > 0
+                        && swf.version > 0
                         && (!swf.tags.isEmpty() || noCheck)
                         && swf.version < 25; // Needs to be fixed when SWF versions reaches this value
                 if (valid) {

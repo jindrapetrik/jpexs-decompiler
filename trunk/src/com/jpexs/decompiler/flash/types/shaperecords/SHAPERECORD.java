@@ -129,7 +129,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         if (shapes.isEmpty()) {
             SerializableImage image = new SerializableImage(1, 1, BufferedImage.TYPE_INT_RGB);
             //Make all pixels transparent
-            Graphics2D g = (Graphics2D)image.getGraphics();
+            Graphics2D g = (Graphics2D) image.getGraphics();
             g.setComposite(AlphaComposite.Src);
             g.setColor(new Color(0, 0, 0, 0f));
             g.fillRect(0, 0, image.getWidth(), image.getHeight());

@@ -1007,14 +1007,14 @@ public class Action implements GraphSourceItem {
              action.translate(stack, constants, output, registerNames);
              }
              } */ else {
-                
-                if(action instanceof ActionStore){
-                   ActionStore store=(ActionStore)action;
-                   store.setStore(actions.subList(ip+1, ip+1+store.getStoreSize()));
-                   ip = ip + 1 + store.getStoreSize() -1/*ip++ will be next*/;
+
+                if (action instanceof ActionStore) {
+                    ActionStore store = (ActionStore) action;
+                    store.setStore(actions.subList(ip + 1, ip + 1 + store.getStoreSize()));
+                    ip = ip + 1 + store.getStoreSize() - 1/*ip++ will be next*/;
                 }
-                
-                try {                   
+
+                try {
                     action.translate(localData, stack, output, staticOperation, path);
                 } catch (EmptyStackException ese) {
                     Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error in: " + path, ese);

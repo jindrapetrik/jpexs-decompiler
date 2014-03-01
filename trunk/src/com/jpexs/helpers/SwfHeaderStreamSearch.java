@@ -36,12 +36,14 @@ public class SwfHeaderStreamSearch implements Searchable {
     }
 
     @Override
-    public Map<Long, InputStream> search(byte[]... data) {
+    public Map<Long, InputStream> search(byte[]  
+        ... data) {
         return search(null, data);
     }
 
     @Override
-    public Map<Long, InputStream> search(ProgressListener progListener, byte[]... data) {
+    public Map<Long, InputStream> search(ProgressListener progListener, byte[]  
+        ... data) {
         // Ignore data parameter, find only FWS, CWS, ZWS, GFX and CFX
         
         Map<Long, InputStream> ret = new HashMap<>();

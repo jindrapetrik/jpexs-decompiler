@@ -100,7 +100,7 @@ public class DefineShapeTag extends CharacterTag implements ShapeTag {
 
     @Override
     public String toSVG() {
-        SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(),new ColorTransform() /*FIXME?*/);
+        SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(), new ColorTransform() /*FIXME?*/);
         exporter.export();
         return exporter.getSVG();
     }
@@ -112,7 +112,7 @@ public class DefineShapeTag extends CharacterTag implements ShapeTag {
 
     @Override
     public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        BitmapExporter.exportTo(swf, getShapes(), null, image, transformation,colorTransform);
+        BitmapExporter.exportTo(swf, getShapes(), null, image, transformation, colorTransform);
     }
 
     @Override

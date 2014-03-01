@@ -29,9 +29,7 @@ import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -150,10 +148,10 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     g.fillRect(0, 0, image.getWidth(), image.getHeight());
                     Matrix m = new Matrix();
                     m.translate(-rect.Xmin, -rect.Ymin);
-                    drawable.toImage(0, 0, swf.tags, characters, new Stack<Integer>(), image, m,new ColorTransform());
+                    drawable.toImage(0, 0, swf.tags, characters, new Stack<Integer>(), image, m, new ColorTransform());
                     img = image;
                 } else {
-                    img = drawable.toImage(0, 0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor),new ColorTransform());
+                    img = drawable.toImage(0, 0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
                 }
                 SWF.putToCache(key, img);
             }
@@ -228,11 +226,11 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     g.fillRect(0, 0, image.getWidth(), image.getHeight());
                     Matrix m = new Matrix();
                     m.translate(-rect.Xmin, -rect.Ymin);
-                    drawable.toImage(nframe, nframe, swf.tags, characters, new Stack<Integer>(), image, m,new ColorTransform());
+                    drawable.toImage(nframe, nframe, swf.tags, characters, new Stack<Integer>(), image, m, new ColorTransform());
                     img = image;
 
                 } else {
-                    img = drawable.toImage(nframe, nframe, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor),new ColorTransform());
+                    img = drawable.toImage(nframe, nframe, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
                 }
                 SWF.putToCache(key, img);
             }

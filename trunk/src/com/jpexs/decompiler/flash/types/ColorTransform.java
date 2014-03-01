@@ -28,11 +28,10 @@ import java.io.Serializable;
  * @author JPEXS
  */
 public class ColorTransform implements Serializable {
-    
-    public RescaleOp toRescaleOp(){
-        return new RescaleOp(new float[]{getRedMulti()/255f,getGreenMulti()/255f,getBlueMulti()/255f,getAlphaMulti()/255f},
-                new float[]{getRedAdd(),getGreenAdd(),getBlueAdd(),getAlphaAdd()}
-                , null);
+
+    public RescaleOp toRescaleOp() {
+        return new RescaleOp(new float[]{getRedMulti() / 255f, getGreenMulti() / 255f, getBlueMulti() / 255f, getAlphaMulti() / 255f},
+                new float[]{getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd()}, null);
     }
 
     public SerializableImage apply(SerializableImage src) {
@@ -46,20 +45,20 @@ public class ColorTransform implements Serializable {
     public RGB apply(RGB color) {
         return new RGBA(Filtering.colorEffect(color.toColor(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
     }
-    
+
     public RGBA apply(RGBA color) {
         return new RGBA(Filtering.colorEffect(color.toColor(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
     }
-    
-    public GRADRECORD[] apply(GRADRECORD[] gradRecords){
+
+    public GRADRECORD[] apply(GRADRECORD[] gradRecords) {
         @SuppressWarnings("unchecked")
-        GRADRECORD[] ret=(GRADRECORD[])Helper.deepCopy(gradRecords);
-        for(GRADRECORD r:ret){
-            r.color = apply(r.color);            
+        GRADRECORD[] ret = (GRADRECORD[]) Helper.deepCopy(gradRecords);
+        for (GRADRECORD r : ret) {
+            r.color = apply(r.color);
         }
         return ret;
     }
-    
+
     public int getRedAdd() {
         return 0;
     }
@@ -118,31 +117,30 @@ public class ColorTransform implements Serializable {
 
             @Override
             public int getRedMulti() {
-                return (int)((float)t.getRedMulti() / 255f * c.getRedMulti());
+                return (int) ((float) t.getRedMulti() / 255f * c.getRedMulti());
             }
 
             @Override
             public int getGreenMulti() {
-                return (int)((float)t.getGreenMulti()/ 255f * c.getGreenMulti());
+                return (int) ((float) t.getGreenMulti() / 255f * c.getGreenMulti());
             }
 
             @Override
             public int getBlueMulti() {
-                return (int)((float)t.getBlueMulti()/ 255f * c.getBlueMulti());
+                return (int) ((float) t.getBlueMulti() / 255f * c.getBlueMulti());
             }
 
             @Override
             public int getAlphaMulti() {
-                return (int)((float)t.getAlphaMulti()/ 255f * c.getAlphaMulti());
+                return (int) ((float) t.getAlphaMulti() / 255f * c.getAlphaMulti());
             }
         };
     }
 
     @Override
     public String toString() {
-        return "[colorTransform redAdd="+getRedAdd()+", greenAdd="+getGreenAdd()+", blueAdd="+getBlueAdd()+", alphaAdd="+getAlphaAdd()+
-                ", redMulti="+getRedMulti()+", greenMulti="+getGreenMulti()+", blueMulti="+getBlueMulti()+", alphaMulti="+getAlphaMulti()+"]";
+        return "[colorTransform redAdd=" + getRedAdd() + ", greenAdd=" + getGreenAdd() + ", blueAdd=" + getBlueAdd() + ", alphaAdd=" + getAlphaAdd()
+                + ", redMulti=" + getRedMulti() + ", greenMulti=" + getGreenMulti() + ", blueMulti=" + getBlueMulti() + ", alphaMulti=" + getAlphaMulti() + "]";
     }
-    
-    
+
 }

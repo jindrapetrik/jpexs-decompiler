@@ -21,6 +21,6 @@ package com.jpexs.decompiler.flash;
  * @author JPEXS
  */
 public enum SearchMode {
-    
+
     ALL, BIGGEST, SMALLEST, FIRST, LAST
 }

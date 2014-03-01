@@ -33,7 +33,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.font.LineMetrics;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -193,13 +192,13 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         return att;
     }
 
-    public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation,ColorTransform colorTransform) {
+    public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
         int textHeight = 12;
         int x = 0;
         int y = 0;
-        Graphics2D g = (Graphics2D) image.getGraphics();        
+        Graphics2D g = (Graphics2D) image.getGraphics();
         List<SHAPE> glyphs = new ArrayList<>();
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
@@ -232,7 +231,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
-                    BitmapExporter.exportTo(swf, shape, textColor, image, mat,colorTransform);
+                    BitmapExporter.exportTo(swf, shape, textColor, image, mat, colorTransform);
                     x += entry.glyphAdvance;
                 }
             }

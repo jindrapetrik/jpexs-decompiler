@@ -67,7 +67,6 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private Stroke lineStroke;
     private Stroke defaultStroke;
     private double unitDivisor;
-    
 
     public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, colorTransform);
@@ -76,12 +75,12 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     }
 
     public static void exportTo(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor,colorTransform);
+        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, colorTransform);
         exporter.exportTo(image, transformation);
     }
 
     private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
-        super(shape,colorTransform);
+        super(shape, colorTransform);
         this.swf = swf;
         this.defaultColor = defaultColor;
     }
@@ -304,7 +303,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
             }
         }
         if (image != null) {
-            SerializableImage img = image.getImage(swf.tags);            
+            SerializableImage img = image.getImage(swf.tags);
             if (img != null) {
                 img = colorTransform.apply(img);
                 fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));

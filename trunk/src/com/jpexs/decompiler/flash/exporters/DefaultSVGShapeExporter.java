@@ -34,8 +34,8 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     protected String currentDrawCommand = "";
     protected String pathData;
 
-    public DefaultSVGShapeExporter(SHAPE shape,ColorTransform colorTransform) {
-        super(shape,colorTransform);
+    public DefaultSVGShapeExporter(SHAPE shape, ColorTransform colorTransform) {
+        super(shape, colorTransform);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class DefaultSVGShapeExporter extends ShapeExporterBase implements IShape
     }
 
     @Override
-    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth,ColorTransform colorTransform) {
+    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
     }
 

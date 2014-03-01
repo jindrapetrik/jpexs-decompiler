@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.special.ActionDeobfuscatePop;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
-import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
 import com.jpexs.decompiler.flash.action.swf3.ActionGoToLabel;
 import com.jpexs.decompiler.flash.action.swf3.ActionGotoFrame;

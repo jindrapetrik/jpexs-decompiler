@@ -767,7 +767,7 @@ public class CommandLineArgumentParser {
 
         boolean noCheck = false;
         String output = null;
-        
+
         if (args.size() > 0 && args.peek().toLowerCase().equals("-o")) {
             args.remove();
             if (args.size() < 1) {
@@ -829,7 +829,7 @@ public class CommandLineArgumentParser {
                         fileNameOut = Path.combine(output, fileNameOut);
                     }
                 }
-                
+
                 try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileNameOut))) {
                     byte[] swfData = new byte[stream.available()];
                     int cnt = stream.read(swfData);

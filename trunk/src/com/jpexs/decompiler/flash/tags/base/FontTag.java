@@ -248,7 +248,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     @Override
     public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
-        return SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), 500, 500, Color.black,colorTransform);
+        return SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), 500, 500, Color.black, colorTransform);
     }
 
     @Override

@@ -19,9 +19,6 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import com.jpexs.decompiler.flash.types.filters.Filtering;
-import com.jpexs.helpers.SerializableImage;
-import java.awt.Color;
 import java.io.Serializable;
 
 /**
@@ -95,42 +92,42 @@ public class CXFORMWITHALPHA extends ColorTransform implements Serializable {
 
     @Override
     public int getRedAdd() {
-        return hasAddTerms?redAddTerm:super.getRedAdd();
+        return hasAddTerms ? redAddTerm : super.getRedAdd();
     }
 
     @Override
     public int getGreenAdd() {
-        return hasAddTerms?greenAddTerm:super.getGreenAdd();
+        return hasAddTerms ? greenAddTerm : super.getGreenAdd();
     }
-    
+
     @Override
     public int getBlueAdd() {
-        return hasAddTerms?blueAddTerm:super.getBlueAdd();
+        return hasAddTerms ? blueAddTerm : super.getBlueAdd();
     }
-    
+
     @Override
     public int getAlphaAdd() {
-        return hasAddTerms?alphaAddTerm:super.getAlphaAdd();
+        return hasAddTerms ? alphaAddTerm : super.getAlphaAdd();
     }
 
     @Override
     public int getRedMulti() {
-        return hasMultTerms?redMultTerm:super.getRedMulti();
+        return hasMultTerms ? redMultTerm : super.getRedMulti();
     }
-    
+
     @Override
     public int getGreenMulti() {
-        return hasMultTerms?greenMultTerm:super.getGreenMulti();
+        return hasMultTerms ? greenMultTerm : super.getGreenMulti();
     }
-    
+
     @Override
     public int getBlueMulti() {
-        return hasMultTerms?blueMultTerm:super.getBlueMulti();
+        return hasMultTerms ? blueMultTerm : super.getBlueMulti();
     }
-    
+
     @Override
     public int getAlphaMulti() {
-        return hasMultTerms?alphaMultTerm:super.getAlphaMulti();
+        return hasMultTerms ? alphaMultTerm : super.getAlphaMulti();
     }
-    
+
 }

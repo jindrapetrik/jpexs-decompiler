@@ -280,7 +280,7 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
         }
         return ret;
     }
-    
+
     private void addCharacters(List<CharacterWithStyle> list, String str, TextStyle style) {
         for (int i = 0; i < str.length(); i++) {
             char ch = str.charAt(i);
@@ -723,12 +723,12 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
     }
 
     @Override
-    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation,ColorTransform colorTransform) {
+    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
         throw new Error("this overload of toImage call is not supported on BoundedTag");
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation,ColorTransform colorTransform) {
+    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         FontTag font = null;
         for (Tag tag : tags) {
             if (tag instanceof FontTag) {
@@ -809,7 +809,7 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                     // todo;
                     break;
             }
-            staticTextToImage(swf, characters, textRecords, 2, image, getTextMatrix(), transformation,colorTransform);
+            staticTextToImage(swf, characters, textRecords, 2, image, getTextMatrix(), transformation, colorTransform);
         }
     }
 
@@ -822,19 +822,20 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
     public int getNumFrames() {
         return 1;
     }
-    
+
     private class TextStyle {
-        
+
         public int fontHeight;
-        
+
         public boolean bold;
-        
+
         public boolean italic;
 
         public boolean underlined;
 
         public RGBA textColor;
-        
+
+        @Override
         public TextStyle clone() {
             TextStyle result = new TextStyle();
             result.fontHeight = fontHeight;
@@ -845,11 +846,11 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
             return result;
         }
     }
-    
+
     private class CharacterWithStyle {
-        
+
         public char character;
-        
+
         public TextStyle style;
     }
 }

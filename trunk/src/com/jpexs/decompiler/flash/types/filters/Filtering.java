@@ -455,7 +455,7 @@ public class Filtering {
         return i;
     }
 
-    public static Color colorEffect(Color color, 
+    public static Color colorEffect(Color color,
             int redAddTerm, int greenAddTerm, int blueAddTerm, int alphaAddTerm,
             int redMultTerm, int greenMultTerm, int blueMultTerm, int alphaMultTerm) {
         int rgb = color.getRGB();
@@ -467,7 +467,7 @@ public class Filtering {
         g = Math.max(0, Math.min(((g * greenMultTerm) / 255) + greenAddTerm, 255));
         b = Math.max(0, Math.min(((b * blueMultTerm) / 255) + blueAddTerm, 255));
         a = Math.max(0, Math.min(((a * alphaMultTerm) / 255) + alphaAddTerm, 255));
-        return new Color(r,g,b,a);
+        return new Color(r, g, b, a);
     }
 
     public static SerializableImage colorEffect(SerializableImage src,
