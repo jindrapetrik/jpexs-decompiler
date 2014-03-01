@@ -208,7 +208,7 @@ public class ActionScriptParser {
                         ret = new CallMethodActionItem(null, mem.object, mem.memberName, call(registerVars, inFunction, inMethod, variables));
                     } else if (ret instanceof VariableActionItem) {
                         VariableActionItem var = (VariableActionItem) ret;
-                        ret = new CallFunctionActionItem(null, var, call(registerVars, inFunction, inMethod, variables));
+                        ret = new CallFunctionActionItem(null, pushConst(var.getVariableName()), call(registerVars, inFunction, inMethod, variables));
                     } else {
                         ret = new CallFunctionActionItem(null, ret, call(registerVars, inFunction, inMethod, variables));
                     }
