@@ -134,7 +134,10 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
 
     @Override
     public MATRIX getTextMatrix() {
-        return new MATRIX();
+        MATRIX matrix = new MATRIX();
+        matrix.translateX = bounds.Xmin;
+        matrix.translateY = bounds.Ymin;
+        return matrix;
     }
 
     @Override
@@ -670,7 +673,7 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                     break;
                 case 2: // center
                     tr.styleFlagsHasXOffset = true;
-                    tr.xOffset = (int) ((bounds.getWidth() - width) / 2);
+                    tr.xOffset = (bounds.getWidth() - width) / 2;
                     break;
                 case 3: // justify
                     // todo;
