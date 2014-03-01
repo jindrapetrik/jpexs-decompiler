@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.model.AsciiToCharActionItem;
 import com.jpexs.decompiler.flash.action.model.CallActionItem;
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
+import com.jpexs.decompiler.flash.action.model.CastOpActionItem;
 import com.jpexs.decompiler.flash.action.model.CharToAsciiActionItem;
 import com.jpexs.decompiler.flash.action.model.CloneSpriteActionItem;
 import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
@@ -1431,9 +1432,31 @@ public class ActionScriptParser {
                 break;
             default:
                 lexer.pushback(s);
+                if (expr instanceof ParenthesisItem) {
+                    if (isType(((ParenthesisItem) expr).value)) {
+                        GraphTargetItem expr2 = expression(false, registerVars, inFunction, inMethod, true, variables);
+                        if (expr2 != null) {
+                            ret = new CastOpActionItem(null, ((ParenthesisItem) expr).value, expr2);
+                        }
+                    }
+                }
+
         }
         ret = fixPrecedence(ret);
         return ret;
+    }
+
+    private boolean isType(GraphTargetItem item) {
+        if (item == null) {
+            return false;
+        }
+        while (item instanceof GetMemberActionItem) {
+            item = ((GetMemberActionItem) item).object;
+        }
+        if (item instanceof VariableActionItem) {
+            return true;
+        }
+        return false;
     }
 
     private int brackets(List<GraphTargetItem> ret, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ParseException {
