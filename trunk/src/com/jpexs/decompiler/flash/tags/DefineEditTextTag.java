@@ -245,7 +245,10 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                                 styles.add(style);
                                 break;
                             case "br":
-                                // todo
+                                CharacterWithStyle cs = new CharacterWithStyle();
+                                cs.character = '\n';
+                                cs.style = style;
+                                ret.add(cs);
                                 break;
                         }
                         //ret = entitiesReplace(ret);
@@ -259,6 +262,13 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                             case "u":
                             case "font":
                                 styles.pop();
+                                break;
+                            case "p":
+                                TextStyle style = styles.peek();
+                                CharacterWithStyle cs = new CharacterWithStyle();
+                                cs.character = '\n';
+                                cs.style = style;
+                                ret.add(cs);
                                 break;
                         }
                     }
@@ -738,78 +748,105 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
             }
         }
         if (hasText) {
-            List<TEXTRECORD> textRecords = new ArrayList<>();
-            TEXTRECORD tr = null;
+            List<List<SameStyleTextRecord>> paragraphs = new ArrayList<>();
+            List<SameStyleTextRecord> textRecords = new ArrayList<>();
+            paragraphs.add(textRecords);
+            SameStyleTextRecord tr = null;
             List<CharacterWithStyle> txt = getTextWithStyle();
-            List<GLYPHENTRY> glyphEntries = new ArrayList<>();
-            int width = 0;
             TextStyle lastStyle = null;
             for (int i = 0; i < txt.size(); i++) {
                 CharacterWithStyle cs = txt.get(i);
-                if (cs.style != lastStyle) {
-                    if (tr != null) {
-                        tr.glyphEntries = glyphEntries.toArray(new GLYPHENTRY[glyphEntries.size()]);
-                        textRecords.add(tr);
-                        glyphEntries.clear();
-                        tr = null;
-                    }
-                    tr = new TEXTRECORD();
-                    tr.styleFlagsHasFont = true;
-                    tr.fontId = fontId;
-                    tr.textHeight = fontHeight;
-                    tr.styleFlagsHasYOffset = true;
-                    tr.yOffset = fontHeight;
-                    if (cs.style.textColor != null) {
-                        tr.styleFlagsHasColor = true;
-                        tr.textColorA = cs.style.textColor;
-                    }
-                    lastStyle = cs.style;
-                }
                 char c = cs.character;
-                Character nextChar = null;
-                if (i + 1 < txt.size()) {
-                    nextChar = txt.get(i + 1).character;
-                }
-                int advance;
-                GLYPHENTRY ge = new GLYPHENTRY();
-                ge.glyphIndex = font.charToGlyph(tags, c);
-                if (font.hasLayout()) {
-                    int kerningAdjustment = 0;
-                    if (nextChar != null) {
-                        kerningAdjustment = font.getGlyphKerningAdjustment(tags, ge.glyphIndex, font.charToGlyph(tags, nextChar));
-                        kerningAdjustment /= font.getDivider();
+                if (c != '\n') {
+                    if (cs.style != lastStyle) {
+                        lastStyle = cs.style;
+                        tr = new SameStyleTextRecord();
+                        tr.style = lastStyle;
+                        textRecords.add(tr);
                     }
-                    advance = (int) Math.round(font.getDivider() * Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
+                    Character nextChar = null;
+                    if (i + 1 < txt.size()) {
+                        nextChar = txt.get(i + 1).character;
+                    }
+                    int advance;
+                    GLYPHENTRY ge = new GLYPHENTRY();
+                    ge.glyphIndex = font.charToGlyph(tags, c);
+                    if (font.hasLayout()) {
+                        int kerningAdjustment = 0;
+                        if (nextChar != null) {
+                            kerningAdjustment = font.getGlyphKerningAdjustment(tags, ge.glyphIndex, font.charToGlyph(tags, nextChar));
+                            kerningAdjustment /= font.getDivider();
+                        }
+                        advance = (int) Math.round(font.getDivider() * Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
+                    } else {
+                        String fontName = FontTag.defaultFontName;
+                        advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
+                    }
+                    ge.glyphAdvance = advance;
+                    tr.glyphEntries.add(ge);
                 } else {
-                    String fontName = FontTag.defaultFontName;
-                    advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
+                    if (multiline) {
+                        textRecords = new ArrayList<>();
+                        lastStyle = null;
+                        tr = null;
+                        paragraphs.add(textRecords);
+                    }
                 }
-                ge.glyphAdvance = advance;
-                glyphEntries.add(ge);
-                width += advance;
             }
-            if (tr != null && glyphEntries.size() > 0) {
-                tr.glyphEntries = glyphEntries.toArray(new GLYPHENTRY[glyphEntries.size()]);
-                textRecords.add(tr);
-            }
-            switch (align) {
-                case 1: // right
-                    for (TEXTRECORD tr1 : textRecords) {
-                        tr1.styleFlagsHasXOffset = true;
-                        tr1.xOffset += bounds.getWidth() - width;
+            List<TEXTRECORD> allTextRecords = new ArrayList<>();
+            int yOffset = 0;
+            for (List<SameStyleTextRecord> paragraph : paragraphs) {
+                yOffset += fontHeight;
+                int width = 0;
+                for (SameStyleTextRecord tr1 : paragraph) {
+                    int trWidth = 0;
+                    for (GLYPHENTRY ge : tr1.glyphEntries) {
+                        trWidth += ge.glyphAdvance;
                     }
-                    break;
-                case 2: // center
-                    for (TEXTRECORD tr1 : textRecords) {
-                        tr1.styleFlagsHasXOffset = true;
-                        tr1.xOffset = (bounds.getWidth() - width) / 2;
+                    tr1.width = trWidth;
+                    width += trWidth;
+                }
+                int alignOffset = 0;
+                switch (align) {
+                    case 0: // left
+                        alignOffset = 0;
+                        break;
+                    case 1: // right
+                        alignOffset = bounds.getWidth() - width;
+                        break;
+                    case 2: // center
+                        alignOffset = (bounds.getWidth() - width) / 2;
+                        break;
+                    case 3: // justify
+                        // todo;
+                        break;
+                }
+                for (SameStyleTextRecord tr1 : paragraph) {
+                    tr1.xOffset = alignOffset;
+                    alignOffset += tr1.width;
+                }
+                for (SameStyleTextRecord tr1 : paragraph) {
+                    TEXTRECORD tr2 = new TEXTRECORD();
+                    tr2.styleFlagsHasFont = true;
+                    tr2.fontId = fontId;
+                    tr2.textHeight = fontHeight;
+                    if (tr1.style.textColor != null) {
+                        tr2.styleFlagsHasColor = true;
+                        tr2.textColorA = tr1.style.textColor;
                     }
-                    break;
-                case 3: // justify
-                    // todo;
-                    break;
+                    // always add xOffset, because no xOffset and 0 xOffset is diffrent in text rendering
+                    tr2.styleFlagsHasXOffset = true;
+                    tr2.xOffset = tr1.xOffset;
+                    if (yOffset != 0) {
+                        tr2.styleFlagsHasYOffset = true;
+                        tr2.yOffset = yOffset;
+                    }
+                    tr2.glyphEntries = tr1.glyphEntries.toArray(new GLYPHENTRY[tr1.glyphEntries.size()]);
+                    allTextRecords.add(tr2);
+                }
             }
-            staticTextToImage(swf, characters, textRecords, 2, image, getTextMatrix(), transformation, colorTransform);
+
+            staticTextToImage(swf, characters, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
         }
     }
 
@@ -852,5 +889,16 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
         public char character;
 
         public TextStyle style;
+    }
+
+    private class SameStyleTextRecord {
+
+        public TextStyle style;
+
+        public int xOffset;
+
+        public int width;
+
+        public List<GLYPHENTRY> glyphEntries = new ArrayList<>();
     }
 }

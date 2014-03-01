@@ -43,10 +43,16 @@ public class ColorTransform implements Serializable {
     }
 
     public RGB apply(RGB color) {
+        if (color == null) {
+            return null;
+        }
         return new RGBA(Filtering.colorEffect(color.toColor(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
     }
 
     public RGBA apply(RGBA color) {
+        if (color == null) {
+            return null;
+        }
         return new RGBA(Filtering.colorEffect(color.toColor(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
     }
 
