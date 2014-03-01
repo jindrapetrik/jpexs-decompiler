@@ -38,6 +38,8 @@ import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,6 +55,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
@@ -184,6 +192,102 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
             ret = entitiesReplace(ret);
         }
         return ret;
+    }
+
+    private List<CharacterWithStyle> getTextWithStyle() {
+        String str = "";
+        TextStyle style = new TextStyle();
+        style.fontHeight = fontHeight;
+        if (hasTextColor) {
+            style.textColor = textColor;
+        }
+        if (hasText) {
+            str = initialText;
+        }
+        final List<CharacterWithStyle> ret = new ArrayList<>();
+        if (html) {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser saxParser;
+            final Stack<TextStyle> styles = new Stack<>();
+            styles.add(style);
+            try {
+                saxParser = factory.newSAXParser();
+                DefaultHandler handler = new DefaultHandler() {
+
+                    @Override
+                    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+                        TextStyle style = styles.peek();
+                        switch (qName) {
+                            case "b":
+                                style = style.clone();
+                                style.bold = true;
+                                styles.add(style);
+                                break;
+                            case "i":
+                                style = style.clone();
+                                style.italic = true;
+                                styles.add(style);
+                                break;
+                            case "u":
+                                style = style.clone();
+                                style.underlined = true;
+                                styles.add(style);
+                                break;
+                            case "font":
+                                style = style.clone();
+                                String color = attributes.getValue("color");
+                                if (color != null) {
+                                    if (color.startsWith("#")) {
+                                        style.textColor = new RGBA(Color.decode(color));
+                                    }
+                                }
+                                styles.add(style);
+                                break;
+                            case "br":
+                                // todo
+                                break;
+                        }
+                        //ret = entitiesReplace(ret);
+                    }
+
+                    @Override
+                    public void endElement(String uri, String localName, String qName) throws SAXException {
+                        switch (qName) {
+                            case "b":
+                            case "i":
+                            case "u":
+                            case "font":
+                                styles.pop();
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void characters(char[] ch, int start, int length) throws SAXException {
+                        String txt = new String(ch, start, length);
+                        TextStyle style = styles.peek();
+                        addCharacters(ret, txt, style);
+                    }
+                };
+                str = "<root>" + str + "</root>";
+                saxParser.parse(new ByteArrayInputStream(str.getBytes(Utf8Helper.charset)), handler);
+            } catch (ParserConfigurationException | SAXException | IOException ex) {
+                Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            addCharacters(ret, str, style);
+        }
+        return ret;
+    }
+    
+    private void addCharacters(List<CharacterWithStyle> list, String str, TextStyle style) {
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            CharacterWithStyle cs = new CharacterWithStyle();
+            cs.character = ch;
+            cs.style = style;
+            list.add(cs);
+        }
     }
 
     @Override
@@ -634,56 +738,76 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
         }
         if (hasText) {
             List<TEXTRECORD> textRecords = new ArrayList<>();
-            TEXTRECORD tr = new TEXTRECORD();
-            tr.styleFlagsHasFont = true;
-            tr.fontId = fontId;
-            tr.textHeight = fontHeight;
-            tr.styleFlagsHasYOffset = true;
-            tr.yOffset = fontHeight;
-            String txt = getText();
-            tr.glyphEntries = new GLYPHENTRY[txt.length()];
+            TEXTRECORD tr = null;
+            List<CharacterWithStyle> txt = getTextWithStyle();
+            List<GLYPHENTRY> glyphEntries = new ArrayList<>();
             int width = 0;
-            for (int i = 0; i < txt.length(); i++) {
-                char c = txt.charAt(i);
+            TextStyle lastStyle = null;
+            for (int i = 0; i < txt.size(); i++) {
+                CharacterWithStyle cs = txt.get(i);
+                if (cs.style != lastStyle) {
+                    if (tr != null) {
+                        tr.glyphEntries = glyphEntries.toArray(new GLYPHENTRY[glyphEntries.size()]);
+                        textRecords.add(tr);
+                        glyphEntries.clear();
+                        tr = null;
+                    }
+                    tr = new TEXTRECORD();
+                    tr.styleFlagsHasFont = true;
+                    tr.fontId = fontId;
+                    tr.textHeight = fontHeight;
+                    tr.styleFlagsHasYOffset = true;
+                    tr.yOffset = fontHeight;
+                    if (cs.style.textColor != null) {
+                        tr.styleFlagsHasColor = true;
+                        tr.textColorA = cs.style.textColor;
+                    }
+                    lastStyle = cs.style;
+                }
+                char c = cs.character;
                 Character nextChar = null;
-                if (i + 1 < txt.length()) {
-                    nextChar = txt.charAt(i + 1);
+                if (i + 1 < txt.size()) {
+                    nextChar = txt.get(i + 1).character;
                 }
                 int advance;
-                tr.glyphEntries[i] = new GLYPHENTRY();
-                tr.glyphEntries[i].glyphIndex = font.charToGlyph(tags, c);
+                GLYPHENTRY ge = new GLYPHENTRY();
+                ge.glyphIndex = font.charToGlyph(tags, c);
                 if (font.hasLayout()) {
                     int kerningAdjustment = 0;
                     if (nextChar != null) {
-                        kerningAdjustment = font.getGlyphKerningAdjustment(tags, tr.glyphEntries[i].glyphIndex, font.charToGlyph(tags, nextChar));
+                        kerningAdjustment = font.getGlyphKerningAdjustment(tags, ge.glyphIndex, font.charToGlyph(tags, nextChar));
                         kerningAdjustment /= font.getDivider();
                     }
-                    advance = (int) Math.round(font.getDivider() * Math.round((double) fontHeight * (font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
+                    advance = (int) Math.round(font.getDivider() * Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
                 } else {
                     String fontName = FontTag.defaultFontName;
-                    advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (fontHeight / SWF.unitDivisor), c, nextChar));
+                    advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
                 }
-                tr.glyphEntries[i].glyphAdvance = advance;
+                ge.glyphAdvance = advance;
+                glyphEntries.add(ge);
                 width += advance;
+            }
+            if (tr != null && glyphEntries.size() > 0) {
+                tr.glyphEntries = glyphEntries.toArray(new GLYPHENTRY[glyphEntries.size()]);
+                textRecords.add(tr);
             }
             switch (align) {
                 case 1: // right
-                    tr.styleFlagsHasXOffset = true;
-                    tr.xOffset = bounds.getWidth() - width;
+                    for (TEXTRECORD tr1 : textRecords) {
+                        tr1.styleFlagsHasXOffset = true;
+                        tr1.xOffset += bounds.getWidth() - width;
+                    }
                     break;
                 case 2: // center
-                    tr.styleFlagsHasXOffset = true;
-                    tr.xOffset = (bounds.getWidth() - width) / 2;
+                    for (TEXTRECORD tr1 : textRecords) {
+                        tr1.styleFlagsHasXOffset = true;
+                        tr1.xOffset = (bounds.getWidth() - width) / 2;
+                    }
                     break;
                 case 3: // justify
                     // todo;
                     break;
             }
-            if (hasTextColor) {
-                tr.styleFlagsHasColor = true;
-                tr.textColorA = textColor;
-            }
-            textRecords.add(tr);
             staticTextToImage(swf, characters, textRecords, 2, image, getTextMatrix(), transformation);
         }
     }
@@ -696,5 +820,35 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
     @Override
     public int getNumFrames() {
         return 1;
+    }
+    
+    private class TextStyle {
+        
+        public int fontHeight;
+        
+        public boolean bold;
+        
+        public boolean italic;
+
+        public boolean underlined;
+
+        public RGBA textColor;
+        
+        public TextStyle clone() {
+            TextStyle result = new TextStyle();
+            result.fontHeight = fontHeight;
+            result.bold = bold;
+            result.italic = italic;
+            result.underlined = underlined;
+            result.textColor = textColor;
+            return result;
+        }
+    }
+    
+    private class CharacterWithStyle {
+        
+        public char character;
+        
+        public TextStyle style;
     }
 }
