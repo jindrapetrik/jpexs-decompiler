@@ -250,7 +250,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
             sos.writeUB(1, placeFlagHasBlendMode ? 1 : 0);
             sos.writeUB(1, placeFlagHasFilterList ? 1 : 0);
             sos.writeUI16(depth);
-            if (placeFlagHasClassName || (placeFlagHasImage && placeFlagHasCharacter)) {
+            if (placeFlagHasClassName) {
                 sos.writeString(className);
             }
             if (placeFlagHasCharacter) {
