@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
@@ -56,9 +57,11 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private final ExportRectangle bounds = new ExportRectangle(Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
 
     private boolean edgeMapsCreated;
+    protected ColorTransform colorTransform;
 
-    public ShapeExporterBase(SHAPE shape) {
+    public ShapeExporterBase(SHAPE shape,ColorTransform colorTransform) {
         this.shape = shape;
+        this.colorTransform = colorTransform;
         _fillStyles = new ArrayList<>();
         _lineStyles = new ArrayList<>();
         if (shape instanceof SHAPEWITHSTYLE) {
@@ -270,7 +273,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         switch (fillStyle.fillStyleType) {
                             case FILLSTYLE.SOLID:
                                 // Solid fill
-                                beginFill(fillStyle.color);
+                                beginFill(colorTransform.apply(fillStyle.color));
                                 break;
                             case FILLSTYLE.LINEAR_GRADIENT:
                             case FILLSTYLE.RADIAL_GRADIENT:
@@ -279,7 +282,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                 matrix = new Matrix(fillStyle.gradientMatrix);
                                 beginGradientFill(
                                         fillStyle.fillStyleType,
-                                        fillStyle.gradient.gradientRecords,
+                                        colorTransform.apply(fillStyle.gradient.gradientRecords),
                                         matrix,
                                         fillStyle.gradient.spreadMode,
                                         fillStyle.gradient.interpolationMode,
@@ -296,7 +299,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                         fillStyle.bitmapId,
                                         matrix,
                                         (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP),
-                                        (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.CLIPPED_BITMAP)
+                                        (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.CLIPPED_BITMAP),
+                                        colorTransform
                                 );
                                 break;
                         }
@@ -368,7 +372,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         }
                         lineStyle(
                                 lineStyle.width,
-                                lineStyle.color,
+                                colorTransform.apply(lineStyle.color),
                                 pixelHintingFlag,
                                 scaleMode,
                                 startCapStyle,

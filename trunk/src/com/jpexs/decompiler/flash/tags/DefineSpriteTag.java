@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -277,18 +278,18 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     }
 
     @Override
-    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
+    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
         throw new Error("this overload of toImage call is not supported on BoundedTag");
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         if (visited.contains(spriteId)) {
             return;
         }
         RECT rect = getRect(characters, visited);
         visited.push(spriteId);
-        SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited, image, transformation);
+        SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited, image, transformation, colorTransform);
         visited.pop();
     }
 

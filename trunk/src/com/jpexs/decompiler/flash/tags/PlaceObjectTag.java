@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Optional;
@@ -154,13 +155,8 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
     }
 
     @Override
-    public CXFORM getColorTransform() {
+    public ColorTransform getColorTransform() {
         return colorTransform;
-    }
-
-    @Override
-    public CXFORMWITHALPHA getColorTransformWithAlpha() {
-        return null;
     }
 
     @Override

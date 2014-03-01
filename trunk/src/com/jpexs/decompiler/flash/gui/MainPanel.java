@@ -99,6 +99,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.ContainerNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -2462,7 +2463,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 rect = ((DefineSpriteTag) fn.getParent()).getRect(swf.characters, new Stack<Integer>());
                 totalFrameCount = ((DefineSpriteTag) fn.getParent()).frameCount;
             }
-            previewImagePanel.setImage(SWF.frameToImage(containerId, fn.getFrame() - 1, swf.tags, controlTags, rect, totalFrameCount, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor)));
+            previewImagePanel.setImage(SWF.frameToImage(containerId, fn.getFrame() - 1, swf.tags, controlTags, rect, totalFrameCount, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor),new ColorTransform()));
         } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             createAndShowTempSwf(tagObj);

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
@@ -66,20 +67,21 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private Stroke lineStroke;
     private Stroke defaultStroke;
     private double unitDivisor;
+    
 
-    public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor) {
-        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor);
+    public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
+        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, colorTransform);
         exporter.export();
         return exporter.getImage();
     }
 
-    public static void exportTo(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation) {
-        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor);
+    public static void exportTo(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor,colorTransform);
         exporter.exportTo(image, transformation);
     }
 
-    private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor) {
-        super(shape);
+    private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
+        super(shape,colorTransform);
         this.swf = swf;
         this.defaultColor = defaultColor;
     }
@@ -283,7 +285,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     }
 
     @Override
-    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth) {
+    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
         matrix.translateX /= unitDivisor;
         matrix.translateY /= unitDivisor;
@@ -302,8 +304,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
             }
         }
         if (image != null) {
-            SerializableImage img = image.getImage(swf.tags);
+            SerializableImage img = image.getImage(swf.tags);            
             if (img != null) {
+                img = colorTransform.apply(img);
                 fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
                 matrix.translateX -= deltaX;
                 matrix.translateY -= deltaY;

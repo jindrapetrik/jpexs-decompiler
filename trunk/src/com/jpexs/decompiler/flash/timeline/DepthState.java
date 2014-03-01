@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.timeline;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
@@ -34,8 +35,7 @@ public class DepthState {
     public int characterId;
     public MATRIX matrix = null;
     public String instanceName = null;
-    public CXFORM colorTransForm = null;
-    public CXFORMWITHALPHA colorTransFormAlpha = null;
+    public ColorTransform colorTransForm = null;
     public boolean cacheAsBitmap = false;
     public int blendMode = 0;
     public List<FILTER> filters = new ArrayList<>();
@@ -54,7 +54,6 @@ public class DepthState {
         matrix = obj.matrix;
         instanceName = obj.instanceName;
         colorTransForm = obj.colorTransForm;
-        colorTransFormAlpha = obj.colorTransFormAlpha;
         cacheAsBitmap = obj.cacheAsBitmap;
         blendMode = obj.blendMode;
         filters = obj.filters;

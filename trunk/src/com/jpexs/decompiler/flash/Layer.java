@@ -16,8 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.types.CXFORM;
-import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
@@ -32,8 +31,7 @@ public class Layer implements Serializable {
 
     public MATRIX matrix;
     public String instanceName = null;
-    public CXFORM colorTransForm = null;
-    public CXFORMWITHALPHA colorTransFormAlpha = null;
+    public ColorTransform colorTransForm = null;
     public boolean cacheAsBitmap = false;
     public int blendMode = 0;
     public List<FILTER> filters = null;
@@ -43,5 +41,5 @@ public class Layer implements Serializable {
     public int ratio = -1;
     public int time = 0;
     public boolean visible = true;
-    public int clipDepth = -1;    
+    public int clipDepth = -1;
 }

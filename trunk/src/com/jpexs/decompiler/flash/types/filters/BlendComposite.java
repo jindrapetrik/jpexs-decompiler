@@ -162,6 +162,7 @@ public final class BlendComposite implements Composite {
             int[] result = new int[4];
             int[] srcPixel = new int[4];
             int[] dstPixel = new int[4];
+            int[] retPixel = new int[4];
             int[] srcPixels = new int[width];
             int[] dstPixels = new int[width];
 
@@ -182,12 +183,23 @@ public final class BlendComposite implements Composite {
                     dstPixel[3] = (pixel >> 24) & 0xFF;
 
                     blender.blend(srcPixel, dstPixel, result);
-
-                    dstPixels[x] = ((int) (dstPixel[3] + (result[3] - dstPixel[3]) * alpha) & 0xFF) << 24
-                            | ((int) (dstPixel[0] + (result[0] - dstPixel[0]) * alpha) & 0xFF) << 16
-                            | ((int) (dstPixel[1] + (result[1] - dstPixel[1]) * alpha) & 0xFF) << 8
-                            | (int) (dstPixel[2] + (result[2] - dstPixel[2]) * alpha) & 0xFF;
-                }
+                    
+                    retPixel[0] = ((int) (dstPixel[0] + (result[0] - dstPixel[0]) * alpha) & 0xFF);
+                    retPixel[1] = ((int) (dstPixel[1] + (result[1] - dstPixel[1]) * alpha) & 0xFF);
+                    retPixel[2] = (int) (dstPixel[2] + (result[2] - dstPixel[2]) * alpha)& 0xFF;
+                    retPixel[3] = ((int) (dstPixel[3] + (result[3] - dstPixel[3]) * alpha) & 0xFF);       
+                    
+                    float af=((float)srcPixel[3])/255f;
+                    retPixel[0] = (int)((1f-af)*dstPixel[0]+af*retPixel[0]);
+                    retPixel[1] = (int)((1f-af)*dstPixel[1]+af*retPixel[1]);
+                    retPixel[2] = (int)((1f-af)*dstPixel[2]+af*retPixel[2]);
+                    retPixel[3] = (int)((1f-af)*dstPixel[3]+af*retPixel[3]); 
+                    
+                    dstPixels[x] = (retPixel[3] << 24)
+                            |  retPixel[0] << 16
+                            |  retPixel[1] << 8
+                            |  retPixel[2];
+                }                
                 dstOut.setDataElements(0, y, width, 1, dstPixels);
             }
         }
@@ -246,8 +258,8 @@ public final class BlendComposite implements Composite {
                         public void blend(int[] src, int[] dst, int[] result) {
                             result[0] = Math.min(src[0], dst[0]);
                             result[1] = Math.min(src[1], dst[1]);
-                            result[2] = Math.min(src[2], dst[2]);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+                            result[2] = Math.min(src[2], dst[2]);                          
+                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);                            
                         }
                     };
                 case DIFFERENCE:

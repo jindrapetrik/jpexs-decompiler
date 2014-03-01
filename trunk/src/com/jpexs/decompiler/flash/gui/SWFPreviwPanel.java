@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
             @Override
             public void run() {
                 buffering.setVisible(true);
-                SWF.framesToImage(0, frameImages, 0, swf.frameCount - 1, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor));
+                SWF.framesToImage(0, frameImages, 0, swf.frameCount - 1, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor),new ColorTransform());
                 buffering.setVisible(false);
             }
         }.start();

@@ -101,6 +101,7 @@ import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
@@ -2207,7 +2208,7 @@ public final class SWF implements TreeItem {
         return ret;
     }
 
-    public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
+    public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
         String key = "frame_" + frame + "_" + containerId + "_" + allTags.get(0).getSwf().hashCode();
         SerializableImage image = getFromCache(key);
         if (image != null) {
@@ -2234,7 +2235,7 @@ public final class SWF implements TreeItem {
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
-        frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m);
+        frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m, colorTransform);
         putToCache(key, image);
         return image;
     }
@@ -2301,13 +2302,9 @@ public final class SWF implements TreeItem {
                     if (instanceName != null) {
                         layer.instanceName = instanceName;
                     }
-                    CXFORM colorTransForm = po.getColorTransform();
+                    ColorTransform colorTransForm = po.getColorTransform();
                     if (colorTransForm != null) {
                         layer.colorTransForm = colorTransForm;
-                    }
-                    CXFORMWITHALPHA colorTransFormAlpha = po.getColorTransformWithAlpha();
-                    if (colorTransFormAlpha != null) {
-                        layer.colorTransFormAlpha = colorTransFormAlpha;
                     }
                     if (po.cacheAsBitmap()) {
                         layer.cacheAsBitmap = true;
@@ -2332,7 +2329,6 @@ public final class SWF implements TreeItem {
                     layer.matrix = po.getMatrix();
                     layer.instanceName = po.getInstanceName();
                     layer.colorTransForm = po.getColorTransform();
-                    layer.colorTransFormAlpha = po.getColorTransformWithAlpha();
                     layer.cacheAsBitmap = po.cacheAsBitmap();
                     layer.blendMode = po.getBlendMode();
                     layer.filters = po.getFilters();
@@ -2373,7 +2369,7 @@ public final class SWF implements TreeItem {
         return ret;
     }
 
-    public static void framesToImage(int containerId, List<SerializableImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation) {
+    public static void framesToImage(int containerId, List<SerializableImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
         List<FrameInfo> frameInfos = getFrameInfo(startFrame, stopFrame, allTags, controlTags, totalFrameCount);
         RECT rect = displayRect;
         for (FrameInfo fi : frameInfos) {
@@ -2389,7 +2385,7 @@ public final class SWF implements TreeItem {
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
-            frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m);
+            frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m, colorTransform);
             ret.add(image);
         }
     }
@@ -2406,7 +2402,7 @@ public final class SWF implements TreeItem {
 
     }
 
-    public static void frameToImage(int containerId, int maxDepth, Map<Integer, Layer> layers, Color backgroundColor, Map<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+    public static void frameToImage(int containerId, int maxDepth, Map<Integer, Layer> layers, Color backgroundColor, Map<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         float unzoom = (float) SWF.unitDivisor;
 
         Graphics2D g = (Graphics2D) image.getGraphics();
@@ -2439,6 +2435,15 @@ public final class SWF implements TreeItem {
             Matrix mat = new Matrix(layer.matrix);
             mat = mat.preConcatenate(transformation);
 
+            if (colorTransform == null) {
+                colorTransform = new ColorTransform();
+            }
+
+            ColorTransform clrTrans = (ColorTransform) Helper.deepCopy(colorTransform);
+            if (layer.colorTransForm != null && layer.blendMode <= 1) { //Normal blend mode
+                clrTrans = colorTransform.merge(layer.colorTransForm);
+            }
+
             boolean showPlaceholder = false;
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
@@ -2468,29 +2473,32 @@ public final class SWF implements TreeItem {
                     gr.setComposite(AlphaComposite.Src);
                     gr.setColor(new Color(0, 0, 0, 0f));
                     gr.fillRect(0, 0, img.getWidth(), image.getHeight());
-                    drawable.toImage(dframe, layer.ratio, allTags, characters, visited, img, m);
+                    drawable.toImage(dframe, layer.ratio, allTags, characters, visited, img, m, clrTrans);
                 } else {
                     // only DefineFont tags
-                    img = drawable.toImage(dframe, layer.ratio, allTags, characters, visited, transformation);
+                    img = drawable.toImage(dframe, layer.ratio, allTags, characters, visited, transformation, clrTrans);
                 }
                 if (layer.filters != null) {
                     for (FILTER filter : layer.filters) {
                         img = filter.apply(img);
                     }
                 }
-                if (layer.colorTransForm != null) {
-                    img = layer.colorTransForm.apply(img);
+                if (layer.blendMode > 1) {
+                    if (layer.colorTransForm != null) {
+                        img = layer.colorTransForm.apply(img);
+                    }
                 }
 
-                if (layer.colorTransFormAlpha != null) {
-                    img = layer.colorTransFormAlpha.apply(img);
-                }
+                drawMatrix.translateX /= unzoom;
+                drawMatrix.translateY /= unzoom;
+                AffineTransform trans = drawMatrix.toTransform();
+
                 switch (layer.blendMode) {
                     case 0:
                     case 1:
                         g.setComposite(AlphaComposite.SrcOver);
                         break;
-                    case 2: //TODO:Layer
+                    case 2://Layer
                         g.setComposite(AlphaComposite.SrcOver);
                         break;
                     case 3:
@@ -2533,10 +2541,6 @@ public final class SWF implements TreeItem {
                         g.setComposite(AlphaComposite.SrcOver);
                         break;
                 }
-
-                drawMatrix.translateX /= unzoom;
-                drawMatrix.translateY /= unzoom;
-                AffineTransform trans = drawMatrix.toTransform();
 
                 if (layer.clipDepth > -1) {
                     BufferedImage mask = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
@@ -2582,11 +2586,11 @@ public final class SWF implements TreeItem {
         g.setTransform(AffineTransform.getScaleInstance(1, 1));
     }
 
-    public static void frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+    public static void frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         List<FrameInfo> frameInfos = getFrameInfo(frame, frame, allTags, controlTags, totalFrameCount);
         if (!frameInfos.isEmpty()) {
             FrameInfo fi = frameInfos.get(0);
-            frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, transformation);
+            frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, transformation, colorTransform);
         }
     }
 

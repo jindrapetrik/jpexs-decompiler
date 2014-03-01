@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
@@ -246,12 +247,12 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     @Override
-    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation) {
-        return SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), 500, 500, Color.black);
+    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
+        return SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), 500, 500, Color.black,colorTransform);
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation) {
+    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
 
     }
 
