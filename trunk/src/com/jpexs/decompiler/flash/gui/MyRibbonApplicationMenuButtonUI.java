@@ -211,8 +211,8 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
                     this.applicationMenuButton, g));
 
             if (!useThemed) {
-                regular.paintIcon(this.applicationMenuButton, g2d, iconRect.x,
-                        iconRect.y);
+                regular.paintIcon(this.applicationMenuButton, g2d, iconRect.x - 1,
+                        iconRect.y - 1);
             } else {
                 CommandButtonBackgroundDelegate.paintThemedCommandButtonIcon(
                         g2d, iconRect, this.applicationMenuButton, regular,
