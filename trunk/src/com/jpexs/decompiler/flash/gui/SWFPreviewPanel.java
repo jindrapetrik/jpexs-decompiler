@@ -98,18 +98,24 @@ public class SWFPreviewPanel extends JPanel implements FlashDisplay {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                int newframe = (frame == swf.frameCount ? 1 : frame + 1);
-                if (frameImages != null && frameImages.size() >= newframe) {
-                    frame = newframe;
-                    drawFrame();
-                    pan.setBackground(View.swfBackgroundColor);
-                }
+                nextFrame();
             }
         }, 0, 1000 / swf.frameRate);
     }
 
+    private void nextFrame() {
+        int newframe = frame == swf.frameCount - 1 ? 0 : frame + 1;
+        if (newframe != frame) {
+            if (frameImages != null && frameImages.size() > newframe) {
+                frame = newframe;
+                drawFrame();
+                pan.setBackground(View.swfBackgroundColor);
+            }
+        }
+    }
+    
     private void drawFrame() {
-        pan.setImage(frameImages.get(frame - 1));
+        pan.setImage(frameImages.get(frame));
     }
 
     @Override
@@ -135,7 +141,7 @@ public class SWFPreviewPanel extends JPanel implements FlashDisplay {
 
     @Override
     public void rewind() {
-        frame = 1;
+        frame = 0;
         drawFrame();
     }
 

@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.SerializableImage;
@@ -47,21 +49,24 @@ import javax.swing.JPanel;
 public final class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
 
     static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
+    static final int frameRate = 25;
+    // play morph shape in 2 second(s)
+    // this settings should be synchronized with frameCount and frameRate
+    // settings in Mainpanel.createAndShowTempSwf
+    static final int morphShapeAnimationLength = 2;
 
     public JLabel label = new JLabel();
     public DrawableTag drawable;
     private Timer timer;
-    private int percent;
     private int frame = -1;
     private SWF swf;
     private HashMap<Integer, CharacterTag> characters;
-    private int frameRate;
     private boolean loaded;
 
     @Override
     public void setBackground(Color bg) {
         if (label != null) {
-            label.setBackground(bg);//bg);            
+            label.setBackground(bg);            
         }
         super.setBackground(bg);
     }
@@ -125,7 +130,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             label.setIcon(null);
             return;
         }
-        percent = 0;
+        frame = 0;
         if (drawable.getNumFrames() == 1) {
             Matrix mat = new Matrix();
             mat.translateX = swf.displayRect.Xmin;
@@ -150,8 +155,10 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     m.translate(-rect.Xmin, -rect.Ymin);
                     drawable.toImage(0, 0, swf.tags, characters, new Stack<Integer>(), image, m, new ColorTransform());
                     img = image;
-                } else {
-                    img = drawable.toImage(0, 0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
+                } else if (drawable instanceof FontTag) {
+                    // only DefineFont tags
+                    FontTag fontTag = (FontTag) drawable;
+                    img = fontTag.toImage(0, 0, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
                 }
                 SWF.putToCache(key, img);
             }
@@ -176,11 +183,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
 
     @Override
     public int getCurrentFrame() {
-        if (drawable == null) {
-            return 0;
-        }
-        int ret = percent * (drawable.getNumFrames() - 1) / 100;
-        return ret;
+        return frame;
     }
 
     @Override
@@ -199,44 +202,62 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         }
     }
 
+    private void nextFrame() {
+        int newframe = frame == drawable.getNumFrames() - 1 ? 0 : frame + 1;
+        if (drawable instanceof MorphShapeTag) {
+            newframe = frame + drawable.getNumFrames() / frameRate / morphShapeAnimationLength;
+            if (newframe > drawable.getNumFrames()) {
+                newframe = 0;
+            }
+        }
+        if (newframe != frame) {
+            frame = newframe;
+            drawFrame();
+        }
+    }
+    
     private void drawFrame() {
         if (drawable == null) {
             return;
         }
-        int nframe = percent * (drawable.getNumFrames() - 1) / 100;
-        if (nframe != frame) {
-            Matrix mat = new Matrix();
-            mat.translateX = swf.displayRect.Xmin;
-            mat.translateY = swf.displayRect.Ymin;
-            String key = "drawable_" + nframe + "_" + drawable.hashCode();
-            SerializableImage img = SWF.getFromCache(key);
-            if (img == null) {
-                if (drawable instanceof BoundedTag) {
-                    BoundedTag bounded = (BoundedTag) drawable;
-                    RECT rect = bounded.getRect(characters, new Stack<Integer>());
-                    SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
-                            (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
-                    //Make all pixels transparent
-                    Graphics2D g = (Graphics2D) image.getGraphics();
-                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g.setComposite(AlphaComposite.Src);
-                    g.setColor(new Color(0, 0, 0, 0f));
-                    g.fillRect(0, 0, image.getWidth(), image.getHeight());
-                    Matrix m = new Matrix();
-                    m.translate(-rect.Xmin, -rect.Ymin);
-                    drawable.toImage(nframe, nframe, swf.tags, characters, new Stack<Integer>(), image, m, new ColorTransform());
-                    img = image;
-
-                } else {
-                    img = drawable.toImage(nframe, nframe, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
-                }
-                SWF.putToCache(key, img);
+        Matrix mat = new Matrix();
+        mat.translateX = swf.displayRect.Xmin;
+        mat.translateY = swf.displayRect.Ymin;
+        String key = "drawable_" + frame + "_" + drawable.hashCode();
+        SerializableImage img = SWF.getFromCache(key);
+        if (img == null) {
+            if (drawable instanceof BoundedTag) {
+                BoundedTag bounded = (BoundedTag) drawable;
+                RECT rect = bounded.getRect(characters, new Stack<Integer>());
+                SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
+                        (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                //Make all pixels transparent
+                Graphics2D g = (Graphics2D) image.getGraphics();
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g.setComposite(AlphaComposite.Src);
+                g.setColor(new Color(0, 0, 0, 0f));
+                g.fillRect(0, 0, image.getWidth(), image.getHeight());
+                Matrix m = new Matrix();
+                m.translate(-rect.Xmin, -rect.Ymin);
+                drawable.toImage(frame, frame, swf.tags, characters, new Stack<Integer>(), image, m, new ColorTransform());
+                img = image;
+            } else if (drawable instanceof FontTag) {
+                // only DefineFont tags
+                FontTag fontTag = (FontTag) drawable;
+                img = fontTag.toImage(frame, frame, swf.tags, characters, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
             }
-            ImageIcon icon = new ImageIcon(img.getBufferedImage());
-            label.setIcon(icon);
-            frame = nframe;
+            SWF.putToCache(key, img);
+        }
+        ImageIcon icon = new ImageIcon(img.getBufferedImage());
+        label.setIcon(icon);
+    }
+
+    public void stop() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
         }
     }
 
@@ -249,21 +270,15 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    drawFrame();
-                    if (percent == 100) {
-                        percent = 0;
-                    } else {
-                        percent++;
-                    }
-
+                    nextFrame();
                 }
-            }, 0, 20);
+            }, 0, 1000 / frameRate);
         }
     }
 
     @Override
     public void rewind() {
-        percent = 0;
+        frame = 0;
         drawFrame();
     }
 
@@ -277,11 +292,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
 
     @Override
     public void gotoFrame(int frame) {
-        if (drawable == null) {
-            percent = 0;
-        } else {
-            percent = frame * 100 / drawable.getNumFrames();
-        }
+        this.frame = frame;
         drawFrame();
     }
 
@@ -290,7 +301,10 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         if (drawable == null) {
             return 1;
         }
-        return drawable.getNumFrames() / 2;
+        if (drawable instanceof MorphShapeTag) {
+            return drawable.getNumFrames() / morphShapeAnimationLength;
+        }
+        return frameRate;
     }
 
     @Override

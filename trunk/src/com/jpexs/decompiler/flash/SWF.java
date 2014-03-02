@@ -84,6 +84,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
@@ -2471,9 +2472,12 @@ public final class SWF implements TreeItem {
                     gr.setColor(new Color(0, 0, 0, 0f));
                     gr.fillRect(0, 0, img.getWidth(), image.getHeight());
                     drawable.toImage(dframe, layer.ratio, allTags, characters, visited, img, m, clrTrans);
-                } else {
+                } else if (drawable instanceof FontTag) {
                     // only DefineFont tags
-                    img = drawable.toImage(dframe, layer.ratio, allTags, characters, visited, transformation, clrTrans);
+                    FontTag fontTag = (FontTag) drawable;
+                    img = fontTag.toImage(dframe, layer.ratio, allTags, characters, visited, transformation, clrTrans);
+                } else {
+                    throw new Error("Unsupported drawable.");
                 }
                 if (layer.filters != null) {
                     for (FILTER filter : layer.filters) {

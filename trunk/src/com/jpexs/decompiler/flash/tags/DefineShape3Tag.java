@@ -78,11 +78,6 @@ public class DefineShape3Tag extends CharacterTag implements ShapeTag {
     }
 
     @Override
-    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
-        throw new Error("this overload of toImage call is not supported on BoundedTag");
-    }
-
-    @Override
     public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter.exportTo(swf, getShapes(), null, image, transformation, colorTransform);
     }

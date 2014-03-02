@@ -246,14 +246,13 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         return defaultFontName;
     }
 
-    @Override
     public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
         return SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), 500, 500, Color.black, colorTransform);
     }
 
     @Override
     public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-
+        throw new Error("this overload of toImage call is not supported on FontTag");
     }
 
     @Override

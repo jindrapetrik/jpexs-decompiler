@@ -893,6 +893,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public void load(SWFList newSwfs, boolean first) {
         
         swfPreviewPanel.stop();
+        imagePanel.stop();
         
         swfs.add(newSwfs);
 
@@ -2333,6 +2334,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             flashPanel.specialPlayback = false;
         }
         swfPreviewPanel.stop();
+        imagePanel.stop();
         stopFlashPlayer();
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
@@ -2542,6 +2544,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
 
             if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
+                // this setting should be synchronized with ImagePanel.morphShapeAnimationLength
                 frameCount = 100;
                 frameRate = 50;
             }
