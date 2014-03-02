@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.Version;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -57,7 +59,7 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
         setSize(new Dimension(500, 300));
         Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.PAGE_AXIS));
-        JTextArea changesText = new JTextArea();
+        JEditorPane changesText = new JEditorPane();
         changesText.setEditable(false);
         changesText.setFont(UIManager.getFont("TextField.font"));
         String changesStr = "";
@@ -69,9 +71,13 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
         } else {
             formatter = new SimpleDateFormat(customFormat);
         }
+        boolean first = true;
         for (Version v : versions) {
-            changesStr += translate("version") + " " + v.versionName + "\r\n";
-            changesStr += "-----------------------\r\n";
+            if (!first) {
+                changesStr += "<hr />";
+            }
+            first = false;
+            changesStr += "<b>" + translate("version") + " " + v.versionName + (v.nightly ? " nightly " + v.revision : "") + "</b><br />";
             String releaseDate = v.releaseDate;
             try {
                 Date date = serverFormatter.parse(releaseDate);
@@ -79,21 +85,26 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
             } catch (ParseException ex) {
                 Logger.getLogger(NewVersionDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
-            changesStr += translate("releasedate") + " " + releaseDate + "\r\n";
-            for (String type : v.changes.keySet()) {
-                changesStr += type + ":" + "\r\n";
-                for (String ch : v.changes.get(type)) {
-                    changesStr += " - " + ch + "\r\n";
+            changesStr += translate("releasedate") + " " + releaseDate;
+            if (!v.changes.isEmpty()) {
+                changesStr += "<br />";
+                changesStr += "<pre>";
+                for (String type : v.changes.keySet()) {
+                    changesStr += type + ":" + "<br />";
+                    for (String ch : v.changes.get(type)) {
+                        changesStr += " - " + ch + "<br />";
+                    }
                 }
+                changesStr += "</pre>";
             }
-            changesStr += "\r\n";
         }
         latestVersion = null;
         if (!versions.isEmpty()) {
             latestVersion = versions.get(0);
         }
-        changesText.setText(changesStr);
-        JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.appName + " " + translate("version") + " " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
+        changesText.setContentType("text/html");
+        changesText.setText("<html>" + changesStr + "</html>");
+        JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.appName + " " + translate("version") + " " + latestVersion.versionName + (latestVersion.nightly ? " " + latestVersion.revision : "") + "</center></b></html>", SwingConstants.CENTER);
         newAvailableLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         cnt.add(newAvailableLabel);
 
@@ -128,6 +139,7 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
         View.centerScreen(this);
         setModalityType(ModalityType.APPLICATION_MODAL);
         changesText.setCaretPosition(0);
+        View.setWindowIcon(this);
     }
 
     @Override

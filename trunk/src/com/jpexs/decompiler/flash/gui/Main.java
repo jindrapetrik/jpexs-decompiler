@@ -100,8 +100,8 @@ public class Main {
     private static TrayIcon trayIcon;
     private static MenuItem stopMenuItem;
     private static MainFrame mainFrame;
-    private static final int UPDATE_SYSTEM_MAJOR = 1;
-    private static final int UPDATE_SYSTEM_MINOR = 0;
+    public static final int UPDATE_SYSTEM_MAJOR = 1;
+    public static final int UPDATE_SYSTEM_MINOR = 1;
     public static LoadFromMemoryFrame loadFromMemoryFrame;
     public static LoadFromCacheFrame loadFromCacheFrame;
     private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -1053,6 +1053,8 @@ public class Main {
             os.write(("GET /flash/update.html?action=check&currentVersion=" + ApplicationInfo.version + "&currentBuild=" + ApplicationInfo.build + "&currentNightly=" + ApplicationInfo.nightly + " HTTP/1.1\r\n"
                     + "Host: www.free-decompiler.com\r\n"
                     + "X-Accept-Versions: " + acceptVersions + "\r\n"
+                    + "X-Update-Major: " + UPDATE_SYSTEM_MAJOR + "\r\n"
+                    + "X-Update-Minor: " + UPDATE_SYSTEM_MINOR + "\r\n"
                     + "User-Agent: " + ApplicationInfo.shortApplicationVerName + "\r\n"
                     + "Accept-Language: " + currentLoc + ("en".equals(currentLoc) ? "" : ", en;q=0.8") + "\r\n"
                     + "Connection: close\r\n"
@@ -1060,7 +1062,7 @@ public class Main {
             BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             String s;
             boolean start = false;
-            java.util.List<Version> versions = new ArrayList<>();
+            final java.util.List<Version> versions = new ArrayList<>();
             String header = "";
             Pattern headerPat = Pattern.compile("\\[([a-zA-Z0-9]+)\\]");
             int updateMajor = 0;
@@ -1100,6 +1102,12 @@ public class Main {
                                 if (key.equals("versionName")) {
                                     ver.versionName = val;
                                 }
+                                if (key.equals("nightly")) {
+                                    ver.nightly = val.equals("true");
+                                }
+                                if (key.equals("revision")) {
+                                    ver.revision = val;
+                                }
                                 if (key.equals("longVersionName")) {
                                     ver.longVersionName = val;
                                 }
@@ -1134,9 +1142,15 @@ public class Main {
             }
 
             if (!versions.isEmpty()) {
-                NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
-                newVersionDialog.setVisible(true);
-                Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
+                View.execInEventDispatch(new Runnable() {
+                    @Override
+                    public void run() {
+                        NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
+                        newVersionDialog.setVisible(true);
+                        Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
+                    }
+                });
+
                 return true;
             }
         } catch (IOException | NumberFormatException ex) {
