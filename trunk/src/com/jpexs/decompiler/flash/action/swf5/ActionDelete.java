@@ -41,7 +41,6 @@ public class ActionDelete extends Action {
         GraphTargetItem propertyName = stack.pop();
         GraphTargetItem object = stack.pop();
 
-        output.add(new DeleteActionItem(this, object, propertyName));
-        stack.push(new DirectValueActionItem(this, -1, Boolean.TRUE, new ArrayList<String>()));
+        stack.push(new DeleteActionItem(this, object, propertyName));
     }
 }

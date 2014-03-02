@@ -76,6 +76,6 @@ public class DeleteActionItem extends ActionItem {
 
     @Override
     public boolean hasReturnValue() {
-        return false;
+        return true;
     }
 }

@@ -40,7 +40,6 @@ public class ActionDelete2 extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem propertyName = stack.pop();
 
-        output.add(new DeleteActionItem(this, null, propertyName));
-        stack.push(new DirectValueActionItem(this, -1, Boolean.TRUE, new ArrayList<String>()));
+        stack.push(new DeleteActionItem(this, null, propertyName));
     }
 }
