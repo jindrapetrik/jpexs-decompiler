@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -56,6 +57,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
     private MyResizableIcon hoverIcon = null;
     private MyResizableIcon clickIcon = null;
     private MyResizableIcon normalIcon = null;
+    private boolean buttonResized = false;
 
     public MyResizableIcon getClickIcon() {
         return clickIcon;
@@ -117,15 +119,24 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
 
     private void updateIcons(JComponent c) {
 
+        int border = 1;
         Dimension dim = c.getPreferredSize();
-
-        //Add border:
-        dim.width += 2;
-        dim.height += 2;
+        if (!buttonResized) {
+            dim.width += 2 * border;
+            dim.height += 2 * border;
+            c.setPreferredSize(dim);
+            c.setSize(dim);
+            Point loc = c.getLocation();
+            loc.x -= border;
+            loc.y -= border;
+            c.setLocation(loc);
+            buttonResized = true;
+        }
 
         hoverIcon.setDimension(dim);
         clickIcon.setDimension(dim);
         normalIcon.setDimension(dim);
+
     }
 
     /*
@@ -144,14 +155,6 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
         commandButton.putClientProperty("icon.bounds", layoutInfo.iconRect);
 
         Graphics2D g2d = (Graphics2D) g.create();
-        SubstanceFillPainter fillPainter = SubstanceCoreUtilities
-                .getFillPainter(commandButton);
-        SubstanceBorderPainter borderPainter = SubstanceCoreUtilities
-                .getBorderPainter(commandButton);
-        BufferedImage fullAlphaBackground = RibbonApplicationMenuButtonBackgroundDelegate
-                .getFullAlphaBackground(b, fillPainter, borderPainter,
-                        commandButton.getWidth(), commandButton.getHeight());
-        g2d.drawImage(fullAlphaBackground, 0, 0, null);
 
         // Paint the icon
         Icon icon = getCurrentIcon(b);
@@ -159,8 +162,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
         if (icon != null) {
             int iconWidth = icon.getIconWidth();
             int iconHeight = icon.getIconHeight();
-            Rectangle iconRect = new Rectangle((c.getWidth() - iconWidth) / 2,
-                    (c.getHeight() - iconHeight) / 2, iconWidth, iconHeight);
+            Rectangle iconRect = new Rectangle(0, 0, iconWidth, iconHeight);
             paintButtonIcon(g2d, iconRect);
         }
 
@@ -210,16 +212,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
             g2d.setComposite(LafWidgetUtilities.getAlphaComposite(
                     this.applicationMenuButton, g));
 
-            if (!useThemed) {
-                regular.paintIcon(this.applicationMenuButton, g2d, iconRect.x - 1,
-                        iconRect.y - 1);
-            } else {
-                CommandButtonBackgroundDelegate.paintThemedCommandButtonIcon(
-                        g2d, iconRect, this.applicationMenuButton, regular,
-                        this.applicationMenuButton.getPopupModel(),
-                        this.substanceVisualStateTracker
-                        .getPopupStateTransitionTracker());
-            }
+            regular.paintIcon(this.applicationMenuButton, g2d, iconRect.x, iconRect.y);
             g2d.dispose();
         }
     }
