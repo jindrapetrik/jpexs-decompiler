@@ -26,6 +26,12 @@ import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.dynamictext.CharacterWithStyle;
+import com.jpexs.decompiler.flash.tags.dynamictext.DynamicTextModel;
+import com.jpexs.decompiler.flash.tags.dynamictext.Paragraph;
+import com.jpexs.decompiler.flash.tags.dynamictext.SameStyleTextRecord;
+import com.jpexs.decompiler.flash.tags.dynamictext.TextStyle;
+import com.jpexs.decompiler.flash.tags.dynamictext.Word;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
@@ -198,6 +204,7 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
     private List<CharacterWithStyle> getTextWithStyle() {
         String str = "";
         TextStyle style = new TextStyle();
+        style.font = getFontTag();
         style.fontHeight = fontHeight;
         if (hasTextColor) {
             style.textColor = textColor;
@@ -219,6 +226,10 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
                         TextStyle style = styles.peek();
                         switch (qName) {
+                            case "p":
+                                // todo: parse the following attribute:
+                                // align
+                                break;
                             case "b":
                                 style = style.clone();
                                 style.bold = true;
@@ -242,9 +253,22 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                                         style.textColor = new RGBA(Color.decode(color));
                                     }
                                 }
+                                String size = attributes.getValue("size");
+                                if (size != null && size.length() > 0) {
+                                    char firstChar = size.charAt(0);
+                                    if (firstChar != '+' && firstChar != '-') {
+                                        int fontSize = Integer.parseInt(size);
+                                        style.fontHeight = fontSize * style.font.getDivider();
+                                    } else {
+                                        // todo: parse relative sizes
+                                    }
+                                }
+                                // todo: parse the following attributes:
+                                // face, letterSpacing, kerning
                                 styles.add(style);
                                 break;
                             case "br":
+                            case "sbr": // what's this?
                                 CharacterWithStyle cs = new CharacterWithStyle();
                                 cs.character = '\n';
                                 cs.style = style;
@@ -739,36 +763,31 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
 
     @Override
     public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        FontTag font = null;
-        for (Tag tag : tags) {
-            if (tag instanceof FontTag) {
-                if (((FontTag) tag).getFontId() == fontId) {
-                    font = (FontTag) tag;
-                }
-            }
-        }
         if (hasText) {
-            List<List<SameStyleTextRecord>> paragraphs = new ArrayList<>();
-            List<SameStyleTextRecord> textRecords = new ArrayList<>();
-            paragraphs.add(textRecords);
-            SameStyleTextRecord tr = null;
+            DynamicTextModel textModel = new DynamicTextModel();
             List<CharacterWithStyle> txt = getTextWithStyle();
             TextStyle lastStyle = null;
+            boolean lastWasWhiteSpace = false;
             for (int i = 0; i < txt.size(); i++) {
                 CharacterWithStyle cs = txt.get(i);
                 char c = cs.character;
                 if (c != '\n') {
+                    // create new SameStyleTextRecord for all words and all diffrent style text parts
+                    if (lastWasWhiteSpace && !Character.isWhitespace(c)) {
+                        textModel.newWord();
+                        lastWasWhiteSpace = false;
+                    }
                     if (cs.style != lastStyle) {
                         lastStyle = cs.style;
-                        tr = new SameStyleTextRecord();
-                        tr.style = lastStyle;
-                        textRecords.add(tr);
+                        textModel.style = lastStyle;
+                        textModel.newRecord();
                     }
                     Character nextChar = null;
                     if (i + 1 < txt.size()) {
                         nextChar = txt.get(i + 1).character;
                     }
                     int advance;
+                    FontTag font = lastStyle.font;
                     GLYPHENTRY ge = new GLYPHENTRY();
                     ge.glyphIndex = font.charToGlyph(tags, c);
                     if (font.hasLayout()) {
@@ -783,28 +802,77 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                         advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
                     }
                     ge.glyphAdvance = advance;
-                    tr.glyphEntries.add(ge);
+                    textModel.addGlyph(c, ge);
+                    if (Character.isWhitespace(c)) {
+                        lastWasWhiteSpace = true;
+                    }
                 } else {
                     if (multiline) {
-                        textRecords = new ArrayList<>();
-                        lastStyle = null;
-                        tr = null;
-                        paragraphs.add(textRecords);
+                        textModel.newParagraph();
                     }
                 }
             }
+
+            textModel.calculateTexWidths();
+            List<List<SameStyleTextRecord>> lines;
+            if (multiline && wordWrap) {
+                lines = new ArrayList<>();
+                int lineLength = 0;
+                for (Paragraph paragraph : textModel.paragraphs) {
+                    List<SameStyleTextRecord> line = new ArrayList<>();
+                    for (Word word : paragraph.words) {
+                        if (lineLength + word.width <= bounds.getWidth()) {
+                            line.addAll(word.records);
+                        } else {
+                            lines.add(line);
+                            line = new ArrayList<>();
+                            line.addAll(word.records);
+                        }
+                    }
+                    if (!line.isEmpty()) {
+                        lines.add(line);
+                    }
+                }
+            } else {
+                lines = new ArrayList<>();
+                for (Paragraph paragraph : textModel.paragraphs) {
+                    List<SameStyleTextRecord> line = new ArrayList<>();
+                    for (Word word : paragraph.words) {
+                        for (SameStyleTextRecord tr : word.records) {
+                            line.add(tr);
+                        }
+                    }
+                    lines.add(line);
+                }
+            }
+            
+            // remove spaces after last word
+            for (List<SameStyleTextRecord> line : lines) {
+                boolean removed = true;
+                while (removed) {
+                    removed = false;
+                    while (line.size() > 0 && line.get(line.size() - 1).glyphEntries.isEmpty()) {
+                        line.remove(line.size() - 1);
+                        removed = true;
+                    }
+                    SameStyleTextRecord lastRecord = line.get(line.size() - 1);
+                    while (lastRecord.glyphEntries.size() > 0 &&
+                           Character.isWhitespace(lastRecord.glyphEntries.get(lastRecord.glyphEntries.size() - 1).character)) {
+                        lastRecord.glyphEntries.remove(lastRecord.glyphEntries.size() -1);
+                        removed = true;
+                    }
+                }
+            }
+            
+            textModel.calculateTexWidths();
+            
             List<TEXTRECORD> allTextRecords = new ArrayList<>();
             int yOffset = 0;
-            for (List<SameStyleTextRecord> paragraph : paragraphs) {
+            for (List<SameStyleTextRecord> line : lines) {
                 yOffset += fontHeight;
                 int width = 0;
-                for (SameStyleTextRecord tr1 : paragraph) {
-                    int trWidth = 0;
-                    for (GLYPHENTRY ge : tr1.glyphEntries) {
-                        trWidth += ge.glyphAdvance;
-                    }
-                    tr1.width = trWidth;
-                    width += trWidth;
+                for (SameStyleTextRecord tr : line) {
+                    width += tr.width;
                 }
                 int alignOffset = 0;
                 switch (align) {
@@ -821,27 +889,30 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                         // todo;
                         break;
                 }
-                for (SameStyleTextRecord tr1 : paragraph) {
-                    tr1.xOffset = alignOffset;
-                    alignOffset += tr1.width;
+                for (SameStyleTextRecord tr : line) {
+                    tr.xOffset = alignOffset;
+                    alignOffset += tr.width;
                 }
-                for (SameStyleTextRecord tr1 : paragraph) {
+                for (SameStyleTextRecord tr : line) {
                     TEXTRECORD tr2 = new TEXTRECORD();
                     tr2.styleFlagsHasFont = true;
                     tr2.fontId = fontId;
-                    tr2.textHeight = fontHeight;
-                    if (tr1.style.textColor != null) {
+                    tr2.textHeight = tr.style.fontHeight;
+                    if (tr.style.textColor != null) {
                         tr2.styleFlagsHasColor = true;
-                        tr2.textColorA = tr1.style.textColor;
+                        tr2.textColorA = tr.style.textColor;
                     }
                     // always add xOffset, because no xOffset and 0 xOffset is diffrent in text rendering
                     tr2.styleFlagsHasXOffset = true;
-                    tr2.xOffset = tr1.xOffset;
+                    tr2.xOffset = tr.xOffset;
                     if (yOffset != 0) {
                         tr2.styleFlagsHasYOffset = true;
                         tr2.yOffset = yOffset;
                     }
-                    tr2.glyphEntries = tr1.glyphEntries.toArray(new GLYPHENTRY[tr1.glyphEntries.size()]);
+                    tr2.glyphEntries = new GLYPHENTRY[tr.glyphEntries.size()];
+                    for (int i = 0; i < tr2.glyphEntries.length; i++) {
+                        tr2.glyphEntries[i] = tr.glyphEntries.get(i).glyphEntry;
+                    }
                     allTextRecords.add(tr2);
                 }
             }
@@ -850,6 +921,18 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
         }
     }
 
+    private FontTag getFontTag() {
+        FontTag font = null;
+        for (Tag tag : swf.tags) {
+            if (tag instanceof FontTag) {
+                if (((FontTag) tag).getFontId() == fontId) {
+                    font = (FontTag) tag;
+                }
+            }
+        }
+        return font;
+    }
+    
     @Override
     public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(bounds.Xmin / SWF.unitDivisor, bounds.Ymin / SWF.unitDivisor);
@@ -858,47 +941,5 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
     @Override
     public int getNumFrames() {
         return 1;
-    }
-
-    private class TextStyle {
-
-        public int fontHeight;
-
-        public boolean bold;
-
-        public boolean italic;
-
-        public boolean underlined;
-
-        public RGBA textColor;
-
-        @Override
-        public TextStyle clone() {
-            TextStyle result = new TextStyle();
-            result.fontHeight = fontHeight;
-            result.bold = bold;
-            result.italic = italic;
-            result.underlined = underlined;
-            result.textColor = textColor;
-            return result;
-        }
-    }
-
-    private class CharacterWithStyle {
-
-        public char character;
-
-        public TextStyle style;
-    }
-
-    private class SameStyleTextRecord {
-
-        public TextStyle style;
-
-        public int xOffset;
-
-        public int width;
-
-        public List<GLYPHENTRY> glyphEntries = new ArrayList<>();
     }
 }
