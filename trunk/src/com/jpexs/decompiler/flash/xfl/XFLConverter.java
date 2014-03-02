@@ -57,6 +57,7 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
@@ -1904,6 +1905,75 @@ public class XFLConverter {
         return ret;
     }
 
+    public static String convertFonts(List<Tag> tags) {
+        String ret = "";
+        for (Tag t : tags) {
+            if (t instanceof FontTag) {
+                FontTag font = (FontTag) t;
+                int fontId = font.getFontId();
+                String fontName = null;
+                for (Tag t2 : tags) {
+                    if (t2 instanceof DefineFontNameTag) {
+                        if (((DefineFontNameTag) t2).fontId == fontId) {
+                            fontName = ((DefineFontNameTag) t2).fontName;
+                        }
+                    }
+                }
+                if (fontName == null) {
+                    fontName = font.getFontName();
+                }
+                int fontStyle = font.getFontStyle();
+                String installedFont;
+                if ((installedFont = FontTag.isFontInstalled(fontName)) != null) {
+                    fontName = new Font(installedFont, fontStyle, 10).getPSName();
+                }
+                String embedRanges = "";
+
+                String fontChars = font.getCharacters(tags);
+                if ("".equals(fontChars)) {
+                    continue;
+                }
+                String embeddedCharacters = fontChars;
+                embeddedCharacters = embeddedCharacters.replace("\u00A0", ""); //nonbreak space
+                embeddedCharacters = embeddedCharacters.replace(".", "");
+                boolean hasAllRanges = false;
+                for (int r = 0; r < CharacterRanges.rangeCount(); r++) {
+                    int codes[] = CharacterRanges.rangeCodes(r);
+                    boolean hasAllInRange = true;
+                    for (int i = 0; i < codes.length; i++) {
+                        if (!fontChars.contains("" + (char) codes[i])) {
+                            hasAllInRange = false;
+                            break;
+                        }
+                    }
+                    if (hasAllInRange) {
+                        //remove all found characters
+                        for (int i = 0; i < codes.length; i++) {
+                            embeddedCharacters = embeddedCharacters.replace("" + (char) codes[i], "");
+                        }
+                        if (!"".equals(embedRanges)) {
+                            embedRanges += "|";
+                        }
+                        embedRanges += (r + 1);
+                    } else {
+                        hasAllRanges = false;
+                    }
+                }
+                if (hasAllRanges) {
+                    embedRanges = "9999";
+                }
+                ret += "<DOMFontItem name=\"Font " + fontId + "\" font=\"" + xmlString(fontName) + "\" size=\"0\" id=\"" + fontId + "\" embedRanges=\"" + embedRanges + "\"" + (!"".equals(embeddedCharacters) ? " embeddedCharacters=\"" + xmlString(embeddedCharacters) + "\"" : "") + " />";
+            }
+
+        }
+
+        if (!"".equals(ret)) {
+            ret = "<fonts>" + ret + "</fonts>";
+        }
+
+        return ret;
+    }
+
     public static String convertActionScriptLayer(int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
         String ret = "";
 
@@ -2623,7 +2693,7 @@ public class XFLConverter {
             domDocument += " height=\"" + doubleToString(height) + "\"";
         }
         domDocument += ">";
-
+        domDocument += convertFonts(swf.tags);
         domDocument += convertLibrary(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, swf.tags, characters, files, datfiles, flaVersion);
         domDocument += "<timelines>";
         domDocument += convertTimeline(0, nonLibraryShapes, backgroundColor, swf.tags, swf.tags, characters, "Scene 1", flaVersion, files);
