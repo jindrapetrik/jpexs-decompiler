@@ -69,7 +69,7 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> parallelSpeedUp = null;
     @ConfigurationDefaultInt(20)
     public static final ConfigurationItem<Integer> parallelThreadCount = null;
-    @ConfigurationDefaultBoolean(true)
+    @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> autoDeobfuscate = null;
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> cacheOnDisk = null;
