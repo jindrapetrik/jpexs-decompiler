@@ -81,4 +81,19 @@ public class ActionScript2ParserTest extends ActionStript2TestBase {
             "   }\n" +
             "}");
     }
+
+    @Test
+    private void testAS2Parse5() {
+        parseAS2(
+            "if(!test.T1)\n" +
+            "{\n" +
+            "   test.T1 = function()\n" +
+            "   {\n" +
+            "      super();\n" +
+            "   }.Initialize = function(obj)\n" +
+            "   {\n" +
+            "      var x = 1;\n" +
+            "   };\n" +
+            "}");
+    }
 }

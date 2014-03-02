@@ -88,7 +88,7 @@ public class RecompileTest {
                         HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
                         Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                         String as = writer.toString();
-                        asm.removePrefixAndSuffix(as);
+                        as = asm.removePrefixAndSuffix(as);
                         ActionScriptParser par = new ActionScriptParser();
                         try {
                             asm.setActions(par.actionsFromString(as));
@@ -98,7 +98,7 @@ public class RecompileTest {
                         writer = new HilightedTextWriter(new CodeFormatting(), false);
                         Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                         String as2 = writer.toString();
-                        asm.removePrefixAndSuffix(as2);
+                        as2 = asm.removePrefixAndSuffix(as2);
                         try {
                             asm.setActions(par.actionsFromString(as2));
                         } catch (ParseException ex) {
@@ -107,7 +107,7 @@ public class RecompileTest {
                         writer = new HilightedTextWriter(new CodeFormatting(), false);
                         Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                         String as3 = writer.toString();
-                        asm.removePrefixAndSuffix(as3);
+                        as3 = asm.removePrefixAndSuffix(as3);
                         if (!as3.equals(as2)) {
                             fail("ActionScript is diffrent: " + item.getSwf().getShortFileName() + "/" + item.toString());
                         }
