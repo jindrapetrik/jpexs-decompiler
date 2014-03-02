@@ -95,6 +95,14 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     @Internal
     private long hdrPos;
 
+    //Constructor for Generic tag editor. TODO:Handle this somehow better
+    public CLIPACTIONRECORD(){
+        swf = null;
+        eventFlags = new CLIPEVENTFLAGS();
+        actionBytes = new byte[0];
+        hdrPos = 0;
+    }
+    
     public CLIPACTIONRECORD(SWF swf, InputStream is, int version, long pos) throws IOException {
         this.swf = swf;
         SWFInputStream sis = new SWFInputStream(is, version);

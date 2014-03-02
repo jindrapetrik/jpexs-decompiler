@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.io.ByteArrayInputStream;
@@ -123,6 +124,7 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     @Conditional("placeFlagHasClipActions")
+    @Internal //TODO: make editable
     public CLIPACTIONS clipActions;
     public static final int ID = 26;
 

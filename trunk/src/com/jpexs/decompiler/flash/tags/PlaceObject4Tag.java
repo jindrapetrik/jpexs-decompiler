@@ -181,6 +181,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     @Conditional(value = "placeFlagHasClipActions", minSwfVersion = 5)
+    @Internal //TODO: make editable
     public CLIPACTIONS clipActions;
     /**
      * If PlaceFlagHasVisible, 0 = Place invisible, 1 = Place visible

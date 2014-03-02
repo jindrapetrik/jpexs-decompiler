@@ -61,6 +61,7 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -242,6 +243,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                     itemStr = AppStrings.translate("generictag.array.item");
                                 }
                                 if (ReflectionTools.needsIndex(fnode.field)) {
+
+                                    boolean canAdd = true;
+                                    if (!ReflectionTools.canAddToField(fnode.obj, fnode.field)) {
+                                        canAdd = false;
+                                    }
                                     JPopupMenu p = new JPopupMenu();
                                     JMenuItem mi;
                                     mi = new JMenuItem(AppStrings.translate("generictag.array.insertbeginning").replace("%item%", itemStr));
@@ -252,6 +258,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                             addItem(fnode.obj, fnode.field, 0);
                                         }
                                     });
+                                    if (!canAdd) {
+                                        mi.setEnabled(false);
+                                    }
                                     p.add(mi);
 
                                     if (fnode.index > -1) {
@@ -263,6 +272,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                                 addItem(fnode.obj, fnode.field, fnode.index);
                                             }
                                         });
+                                        if (!canAdd) {
+                                            mi.setEnabled(false);
+                                        }
                                         p.add(mi);
 
                                         mi = new JMenuItem(AppStrings.translate("generictag.array.remove").replace("%item%", itemStr));
@@ -283,6 +295,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                                 addItem(fnode.obj, fnode.field, fnode.index + 1);
                                             }
                                         });
+                                        if (!canAdd) {
+                                            mi.setEnabled(false);
+                                        }
                                         p.add(mi);
                                     }
 
@@ -294,6 +309,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                             addItem(fnode.obj, fnode.field, ReflectionTools.getFieldSubSize(fnode.obj, fnode.field));
                                         }
                                     });
+                                    if (!canAdd) {
+                                        mi.setEnabled(false);
+                                    }
                                     p.add(mi);
                                     //}
                                     p.show(tree, e.getX(), e.getY());
@@ -789,11 +807,20 @@ public class GenericTagTreePanel extends GenericTagPanel {
         SWFArray swfArray = field.getAnnotation(SWFArray.class);
         if (swfArray != null && !swfArray.countField().equals("")) { //Fields with same countField must be enlarged too
             Field fields[] = obj.getClass().getDeclaredFields();
+            List<Integer> sameFlds = new ArrayList<>();
             for (int f = 0; f < fields.length; f++) {
                 SWFArray fieldSwfArray = fields[f].getAnnotation(SWFArray.class);
                 if (fieldSwfArray != null && fieldSwfArray.countField().equals(swfArray.countField())) {
-                    ReflectionTools.addToField(obj, fields[f], index, true);
+                    sameFlds.add(f);
+                    if (!ReflectionTools.canAddToField(obj, fields[f])) {
+                        JOptionPane.showMessageDialog(this, "This field is abstract, cannot be instantiated, sorry."); //TODO!!!
+                        return;
+                    }
+
                 }
+            }
+            for (int f : sameFlds) {
+                ReflectionTools.addToField(obj, fields[f], index, true);
             }
             try {
                 //If countField exists, increment, otherwise do nothing
@@ -807,6 +834,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 //ignored
             }
         } else {
+            if (!ReflectionTools.canAddToField(obj, field)) {
+                JOptionPane.showMessageDialog(this, "This field is abstract, cannot be instantiated, sorry."); //TODO!!!
+                return;
+            }
             ReflectionTools.addToField(obj, field, index, true);
         }
         refreshTree();

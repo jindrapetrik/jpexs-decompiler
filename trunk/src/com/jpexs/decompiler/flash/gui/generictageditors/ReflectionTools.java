@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.logging.Level;
@@ -85,6 +86,42 @@ public class ReflectionTools {
         }
     }
 
+    public static boolean canInstantiate(Class cls) {
+        if (cls.isInterface()) {
+            return false;
+        }
+        if (Modifier.isAbstract(cls.getModifiers())) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean canAddToField(Object object, Field field) {
+        if (List.class.isAssignableFrom(field.getType())) {
+
+            ParameterizedType listType = (ParameterizedType) field.getGenericType();
+            Class<?> parameterClass = (Class<?>) listType.getActualTypeArguments()[0];
+            return canInstantiate(parameterClass);
+        }
+
+        if (field.getType().isArray()) {
+            Object arrValue;
+            try {
+                arrValue = field.get(object);
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
+            }
+            Class componentClass = arrValue.getClass().getComponentType();
+            if (componentClass.isPrimitive()) {
+                return true;
+            }
+            return canInstantiate(componentClass);
+        }
+        return false;
+
+    }
+
     public static Object newInstanceOf(Class cls) throws InstantiationException, IllegalAccessException {
         if (cls == Integer.class || cls == int.class) {
             return new Integer(0);
@@ -94,6 +131,12 @@ public class ReflectionTools {
             return new Double(0);
         } else if (cls == Long.class || cls == long.class) {
             return new Long(0L);
+        }
+        if (cls.isInterface()) {
+            return null;
+        }
+        if (Modifier.isAbstract(cls.getModifiers())) {
+            return null;
         }
         return cls.newInstance();
     }
@@ -114,6 +157,9 @@ public class ReflectionTools {
         Class<?> parameterClass = (Class<?>) listType.getActualTypeArguments()[0];
         try {
             Object val = newInstanceOf(parameterClass);
+            if (val == null) {
+                return false;
+            }
             list.add(index, val);
         } catch (InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
@@ -151,19 +197,28 @@ public class ReflectionTools {
             return false;
         }
         Class componentClass = arrValue.getClass().getComponentType();
-        int originalSize = Array.getLength(arrValue);
-        Object copy = Array.newInstance(componentClass, originalSize + 1);
-        //Copy items before
-        for (int i = 0; i < index; i++) {
-            Array.set(copy, i, Array.get(arrValue, i));
-        }
+        Object val = null;
         if (!componentClass.isPrimitive()) {
             try {
-                Array.set(copy, index, componentClass.newInstance());
+                val = newInstanceOf(componentClass);
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
+            if (val == null) {
+                return false;
+            }
+        }
+
+        int originalSize = Array.getLength(arrValue);
+        Object copy = Array.newInstance(componentClass, originalSize + 1);
+
+        //Copy items before
+        for (int i = 0; i < index; i++) {
+            Array.set(copy, i, Array.get(arrValue, i));
+        }
+        if (val != null) {
+            Array.set(copy, index, val);
         }
         //Copy items after
         for (int i = index; i < originalSize; i++) {
