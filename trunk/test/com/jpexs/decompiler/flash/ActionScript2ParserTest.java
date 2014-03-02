@@ -16,14 +16,10 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.helpers.CodeFormatting;
-import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
-import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,13 +41,10 @@ public class ActionScript2ParserTest extends ActionStript2TestBase {
 
     private void parseAS2(String script) {
         DoActionTag asm = getFirstActionTag();
-        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
         try {
-            Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
-            String as = writer.toString();
             ActionScriptParser par = new ActionScriptParser();
-            asm.setActions(par.actionsFromString(as));
-        } catch (InterruptedException | IOException | ParseException ex) {
+            asm.setActions(par.actionsFromString(script));
+        } catch (IOException | ParseException ex) {
             fail("Unable to parse: " + script);
         }
     }
