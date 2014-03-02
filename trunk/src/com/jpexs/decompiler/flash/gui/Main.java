@@ -1018,19 +1018,41 @@ public class Main {
     }
 
     public static void autoCheckForUpdates() {
-        Calendar lastUpdatesCheckDate = Configuration.lastUpdatesCheckDate.get();
-        if ((lastUpdatesCheckDate == null) || (lastUpdatesCheckDate.getTime().getTime() < Calendar.getInstance().getTime().getTime() - 1000 * 60 * 60 * 24)) {
-            checkForUpdates();
+        if (Configuration.checkForUpdatesAuto.get()) {
+            Calendar lastUpdatesCheckDate = Configuration.lastUpdatesCheckDate.get();
+            if ((lastUpdatesCheckDate == null) || (lastUpdatesCheckDate.getTime().getTime() < Calendar.getInstance().getTime().getTime() - Configuration.checkForUpdatesDelay.get())) {
+                checkForUpdates();
+            }
         }
     }
 
     public static boolean checkForUpdates() {
+        List<String> accepted = new ArrayList<>();
+        if (Configuration.checkForUpdatesStable.get()) {
+            accepted.add("stable");
+        }
+        if (Configuration.checkForUpdatesNightly.get()) {
+            accepted.add("nightly");
+        }
+
+        if (accepted.isEmpty()) {
+            return false;
+        }
+
+        String acceptVersions = "";
+        for (String a : accepted) {
+            if (!acceptVersions.equals("")) {
+                acceptVersions += ",";
+            }
+            acceptVersions += a;
+        }
         try {
             Socket sock = new Socket("www.free-decompiler.com", 80);
             OutputStream os = sock.getOutputStream();
             String currentLoc = Configuration.locale.get("en");
-            os.write(("GET /flash/update.html?action=check&currentVersion=" + ApplicationInfo.version + " HTTP/1.1\r\n"
+            os.write(("GET /flash/update.html?action=check&currentVersion=" + ApplicationInfo.version + "&currentBuild=" + ApplicationInfo.build + "&currentNightly=" + ApplicationInfo.nightly + " HTTP/1.1\r\n"
                     + "Host: www.free-decompiler.com\r\n"
+                    + "X-Accept-Versions: " + acceptVersions + "\r\n"
                     + "User-Agent: " + ApplicationInfo.shortApplicationVerName + "\r\n"
                     + "Accept-Language: " + currentLoc + ("en".equals(currentLoc) ? "" : ", en;q=0.8") + "\r\n"
                     + "Connection: close\r\n"

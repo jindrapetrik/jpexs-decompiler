@@ -224,6 +224,26 @@ public class Configuration {
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> beginBlockOnNewLine = null;
 
+    @ConfigurationDefaultInt(1000 * 60 * 60 * 24)
+    @ConfigurationDescription("Minimum time between automatic checks for updates on application start")
+    @ConfigurationName("check.updates.delay")
+    public static final ConfigurationItem<Integer> checkForUpdatesDelay = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationDescription("Checking for stable version updates")
+    @ConfigurationName("check.updates.stable")
+    public static final ConfigurationItem<Boolean> checkForUpdatesStable = null;
+
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationDescription("Checking for nightly version updates")
+    @ConfigurationName("check.updates.nightly")
+    public static final ConfigurationItem<Boolean> checkForUpdatesNightly = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationDescription("Automatic checking for updates on application start")
+    @ConfigurationName("check.updates.enabled")
+    public static final ConfigurationItem<Boolean> checkForUpdatesAuto = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
