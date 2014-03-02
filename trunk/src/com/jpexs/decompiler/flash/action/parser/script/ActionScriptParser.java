@@ -106,10 +106,10 @@ import com.jpexs.decompiler.flash.action.model.operations.RShiftActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictEqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictNeqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.SubtractActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.URShiftActionItem;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
@@ -165,13 +165,6 @@ public class ActionScriptParser {
             System.out.println("/commands");
         }
         return ret;
-    }
-
-    private List<GraphTargetItem> nonempty(List<GraphTargetItem> list) {
-        if (list == null) {
-            return new ArrayList<>();
-        }
-        return list;
     }
 
     private GraphTargetItem type(List<VariableActionItem> variables) throws IOException, ParseException {
@@ -515,13 +508,6 @@ public class ActionScriptParser {
                 ret = new ToIntegerActionItem(null, expression(registerVars, inFunction, inMethod, true, variables));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
-
-            /*case TARGETPATH:
-             expectedType(SymbolType.PARENT_OPEN);
-             ret.addAll(expression(registerVars, inFunction, inMethod, true));
-             expectedType(SymbolType.PARENT_CLOSE);
-             ret.add(new ActionTargetPath());
-             break;*/
             case NUMBER_OP:
                 s = lex();
                 if (s.type == SymbolType.DOT) {
@@ -954,36 +940,10 @@ public class ActionScriptParser {
                 }
 
                 if (s.type == SymbolType.ASSIGN) {
-
-                    if (!inFunction) {
-                        //ret.add(pushConst(varIdentifier));
-                    }
                     GraphTargetItem varval = (expression(registerVars, inFunction, inMethod, true, variables));
                     ret = new VariableActionItem(varIdentifier, varval, true);
                     variables.add((VariableActionItem) ret);
-                    /*if (inFunction) {
-                     for (int i = 1; i < 256; i++) {
-                     if (!registerVars.containsValue(i)) {
-                     registerVars.put(varIdentifier, i);
-                     ret = new StoreRegisterActionItem(null, new RegisterNumber(i), varval, true);
-                     break;
-                     }
-                     }
-                     } else {
-                     ret = new DefineLocalActionItem(null, pushConst(varIdentifier), varval);
-                     }*/
                 } else {
-                    /*if (inFunction) {
-                     for (int i = 1; i < 256; i++) {
-                     if (!registerVars.containsValue(i)) {
-                     registerVars.put(varIdentifier, i);
-                     ret = new DefineRegisterActionItem(varIdentifier, i);
-                     break;
-                     }
-                     }
-                     } else {
-                     ret = new DefineLocalActionItem(null, pushConst(varIdentifier), null);
-                     }*/
                     ret = new VariableActionItem(varIdentifier, null, true);
                     variables.add((VariableActionItem) ret);
                     lexer.pushback(s);
@@ -1002,98 +962,16 @@ public class ActionScriptParser {
                     ret = new PreDecrementActionItem(null, varincdec);
                 }
                 break;
-            case IDENTIFIER:
-            case THIS:
-            case SUPER:
-            case PARENT_OPEN:
-            case EVAL:
-                ParsedSymbol varS = s;
-                boolean isEval = false;
-                GraphTargetItem var;
-                if (s.type == SymbolType.PARENT_OPEN) {
-                    var = expression(registerVars, inFunction, inMethod, true, variables);
-                    expectedType(SymbolType.PARENT_CLOSE);
-                    memberOrCall(var, registerVars, inFunction, inMethod, variables);
-                } else if (s.type == SymbolType.EVAL) {
-                    expectedType(SymbolType.PARENT_OPEN);
-                    var = expression(registerVars, inFunction, inMethod, true, variables);
-                    var = new EvalActionItem(null, var);
-                    expectedType(SymbolType.PARENT_CLOSE);
-                    var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
-                    isEval = true;
-                } else {
+            case SUPER: //constructor call
+                ParsedSymbol ss2 = lex();
+                if (ss2.type == SymbolType.PARENT_OPEN) {
+                    List<GraphTargetItem> args = call(registerVars, inFunction, inMethod, variables);
+                    VariableActionItem supItem = new VariableActionItem(s.value.toString(), null, false);
+                    variables.add(supItem);
+                    ret = new CallMethodActionItem(null, supItem, new DirectValueActionItem(null, 0, new Undefined(), constantPool), args);
+                } else {//no costructor call, but it could be calling parent methods... => handle in expression
+                    lexer.pushback(ss2);
                     lexer.pushback(s);
-                    var = variable(registerVars, inFunction, inMethod, variables);
-                    var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
-                }
-                s = lex();
-                switch (s.type) {
-                    case ASSIGN:
-                        ret = var;
-                        ret = Action.gettoset(ret, expression(registerVars, inFunction, inMethod, true, variables), variables);
-                        break;
-                    case ASSIGN_BITAND:
-                    case ASSIGN_BITOR:
-                    case ASSIGN_DIVIDE:
-                    case ASSIGN_MINUS:
-                    case ASSIGN_MODULO:
-                    case ASSIGN_MULTIPLY:
-                    case ASSIGN_PLUS:
-                    case ASSIGN_SHIFT_LEFT:
-                    case ASSIGN_SHIFT_RIGHT:
-                    case ASSIGN_USHIFT_RIGHT:
-                    case ASSIGN_XOR:
-                        GraphTargetItem valtoappend = (expression(registerVars, inFunction, inMethod, true, variables));
-
-                        switch (s.type) {
-                            case ASSIGN_BITAND:
-                                ret = Action.gettoset(var, new BitAndActionItem(null, var, valtoappend), variables);
-                                break;
-                            case ASSIGN_BITOR:
-                                ret = Action.gettoset(var, new BitOrActionItem(null, var, valtoappend), variables);
-                                break;
-                            case ASSIGN_DIVIDE:
-                                ret = Action.gettoset(var, new DivideActionItem(null, var, valtoappend), variables);
-                                break;
-                            case ASSIGN_MINUS:
-                                ret = Action.gettoset(var, new SubtractActionItem(null, var, valtoappend), variables);
-                                break;
-                            case ASSIGN_MODULO:
-                                ret = Action.gettoset(var, new ModuloActionItem(null, var, valtoappend), variables);
-                                break;
-                            case ASSIGN_MULTIPLY:
-                                ret = Action.gettoset(var, new MultiplyActionItem(null, var, valtoappend), variables);
-                                break;
-                            case ASSIGN_PLUS:
-                                ret = Action.gettoset(var, new AddActionItem(null, var, valtoappend, true), variables);
-                                break;
-                        }
-                        break;
-                    case INCREMENT: //postincrement
-                        ret = new PostIncrementActionItem(null, var);
-                        break;
-                    case DECREMENT: //postdecrement
-                        ret = new PostDecrementActionItem(null, var);
-                        break;
-                    case PARENT_OPEN: //function call
-                        ret = var;
-                        if (varS.type == SymbolType.SUPER || varS.type == SymbolType.THIS && (var instanceof VariableActionItem)) {
-                            List<GraphTargetItem> args = call(registerVars, inFunction, inMethod, variables);
-                            ret = new CallMethodActionItem(null, ret, new DirectValueActionItem(null, 0, new Undefined(), constantPool), args);
-                        } else {
-                            lexer.pushback(s);
-                            ret = memberOrCall(ret, registerVars, inFunction, inMethod, variables);
-                        }
-                        break;
-                    default:
-                        if (isEval) {
-                            ret = var;
-                        } else {
-                            ret = null; //expression can be command too
-                            /*if (mustBeCommand) {
-                             throw new ParseException("Not a command", lexer.yyline());
-                             }*/
-                        }
                 }
                 break;
             case IF:
@@ -1183,7 +1061,10 @@ public class ActionScriptParser {
                 GraphTargetItem forExpr = null;
                 List<GraphTargetItem> forFirstCommands = new ArrayList<>();
                 if (!forin) {
-                    forFirstCommands.add((command(registerVars, inFunction, inMethod, forinlevel, true, variables)));
+                    GraphTargetItem fc = command(registerVars, inFunction, inMethod, forinlevel, true, variables);
+                    if (fc != null) { //can be empty command
+                        forFirstCommands.add(fc);
+                    }
                     forExpr = (expression(registerVars, inFunction, inMethod, true, variables));
                     expectedType(SymbolType.SEMICOLON);
                     forFinalCommands.add(command(registerVars, inFunction, inMethod, forinlevel, true, variables));
@@ -1297,9 +1178,10 @@ public class ActionScriptParser {
                     ret = valcmd;
                     break;
                 }
-                if (s.type != SymbolType.SEMICOLON) {
-                    lexer.pushback(s);
+                if (s.type == SymbolType.SEMICOLON) {
+                    return null;
                 }
+                lexer.pushback(s);
                 ret = expression(registerVars, inFunction, inMethod, true, variables);
                 if (debugMode) {
                     System.out.println("/command");
@@ -1326,9 +1208,6 @@ public class ActionScriptParser {
         return expression(false, registerVars, inFunction, inMethod, allowRemainder, variables);
     }
 
-    /*private List<GraphTargetItem> expressionRemainder(GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder) throws IOException, ParseException {
-     return expressionRemainder(null, registerVars, inFunction, inMethod, allowRemainder);
-     }*/
     private GraphTargetItem fixPrecedence(GraphTargetItem expr) {
         GraphTargetItem ret = expr;
         if (expr instanceof BinaryOp) {
@@ -1351,10 +1230,6 @@ public class ActionScriptParser {
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
         switch (s.type) {
-            case DOT:
-                lexer.pushback(s);
-                ret = memberOrCall(expr, registerVars, inFunction, inMethod, variables);
-                break;
             case TERNAR:
                 GraphTargetItem terOnTrue = expression(registerVars, inFunction, inMethod, true, variables);
                 expectedType(SymbolType.COLON);
@@ -1430,6 +1305,87 @@ public class ActionScriptParser {
             case IS:
 
                 break;
+
+            case ASSIGN:
+            case ASSIGN_BITAND:
+            case ASSIGN_BITOR:
+            case ASSIGN_DIVIDE:
+            case ASSIGN_MINUS:
+            case ASSIGN_MODULO:
+            case ASSIGN_MULTIPLY:
+            case ASSIGN_PLUS:
+            case ASSIGN_SHIFT_LEFT:
+            case ASSIGN_SHIFT_RIGHT:
+            case ASSIGN_USHIFT_RIGHT:
+            case ASSIGN_XOR:
+                GraphTargetItem assigned = expression(registerVars, inFunction, inMethod, true, variables);
+                switch (s.type) {
+                    case ASSIGN:
+                        //assigned = assigned;
+                        break;
+                    case ASSIGN_BITAND:
+                        assigned = new BitAndActionItem(null, expr, assigned);
+                        break;
+                    case ASSIGN_BITOR:
+                        assigned = new BitOrActionItem(null, expr, assigned);
+                        break;
+                    case ASSIGN_DIVIDE:
+                        assigned = new DivideActionItem(null, expr, assigned);
+                        break;
+                    case ASSIGN_MINUS:
+                        assigned = new SubtractActionItem(null, expr, assigned);
+                        break;
+                    case ASSIGN_MODULO:
+                        assigned = new ModuloActionItem(null, expr, assigned);
+                        break;
+                    case ASSIGN_MULTIPLY:
+                        assigned = new MultiplyActionItem(null, expr, assigned);
+                        break;
+                    case ASSIGN_PLUS:
+                        assigned = new AddActionItem(null, expr, assigned, true/*TODO:SWF version?*/);
+                        break;
+                    case ASSIGN_SHIFT_LEFT:
+                        assigned = new LShiftActionItem(null, expr, assigned);
+                        break;
+                    case ASSIGN_SHIFT_RIGHT:
+                        assigned = new RShiftActionItem(null, expr, assigned);
+                        break;
+                    case ASSIGN_USHIFT_RIGHT:
+                        assigned = new URShiftActionItem(null, expr, assigned);
+                        break;
+                    case ASSIGN_XOR:
+                        assigned = new BitXorActionItem(null, expr, assigned);
+                        break;
+                }
+                if (expr instanceof VariableActionItem) {
+                    ((VariableActionItem) expr).setStoreValue(assigned);
+                    ((VariableActionItem) expr).setDefinition(false);
+                    ret = expr;
+                } else if (expr instanceof GetMemberActionItem) {
+                    ret = new SetMemberActionItem(null, ((GetMemberActionItem) expr).object, ((GetMemberActionItem) expr).memberName, assigned);
+                } else {
+                    throw new ParseException("Invalid assignment", lexer.yyline());
+                }
+                break;
+            case INCREMENT: //postincrement
+                if (!(expr instanceof VariableActionItem) && !(expr instanceof GetMemberActionItem)) {
+                    throw new ParseException("Invalid assignment", lexer.yyline());
+                }
+                ret = new PostIncrementActionItem(null, expr);
+                break;
+            case DECREMENT: //postdecrement
+                if (!(expr instanceof VariableActionItem) && !(expr instanceof GetMemberActionItem)) {
+                    throw new ParseException("Invalid assignment", lexer.yyline());
+                }
+                ret = new PostDecrementActionItem(null, expr);
+                break;
+            case DOT: //member
+            case BRACKET_OPEN: //member
+            case PARENT_OPEN: //function call
+                lexer.pushback(s);
+                ret = memberOrCall(expr, registerVars, inFunction, inMethod, variables);
+                break;
+
             default:
                 lexer.pushback(s);
                 if (expr instanceof ParenthesisItem) {
@@ -1671,6 +1627,7 @@ public class ActionScriptParser {
                 break;
             case IDENTIFIER:
             case THIS:
+            case SUPER:
             case EVAL:
                 GraphTargetItem var;
                 if (s.type == SymbolType.EVAL) {
@@ -1682,137 +1639,10 @@ public class ActionScriptParser {
                 } else {
                     lexer.pushback(s);
                     var = variable(registerVars, inFunction, inMethod, variables);
+                    var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
                 }
-
-                VariableActionItem gva = null;
-                GetMemberActionItem gmb = null;
-                RegisterNumber reg = null;
-                if (var instanceof VariableActionItem) {
-                    gva = (VariableActionItem) var;
-                } else if (var instanceof GetMemberActionItem) {
-                    gmb = (GetMemberActionItem) var;
-                } /*else if (var instanceof DirectValueActionItem) {
-                 if (((DirectValueActionItem) var).value instanceof RegisterNumber) {
-                 reg = (RegisterNumber) ((DirectValueActionItem) var).value;
-                 }
-                 }*/
-
-                s = lex();
-                switch (s.type) {
-                    case ASSIGN:
-                        GraphTargetItem varval = expression(registerVars, inFunction, inMethod, true, variables);
-                        if (gva != null) {
-                            ret = new VariableActionItem(gva.getVariableName(), varval, false);
-                            variables.add((VariableActionItem) ret);
-                        } else if (gmb != null) {
-                            ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, varval);
-                        } /*else if (reg != null) {
-                         ret = new VariableActionItem(fname, varval, inFunction)StoreRegisterActionItem(null, reg, varval, false);
-                         } */ else {
-                            throw new ParseException("Invalid assignment", lexer.yyline());
-                        }
-                        existsRemainder = true;
-                        assocRight = true;
-                        break;
-                    case ASSIGN_BITAND:
-                    case ASSIGN_BITOR:
-                    case ASSIGN_DIVIDE:
-                    case ASSIGN_MINUS:
-                    case ASSIGN_MODULO:
-                    case ASSIGN_MULTIPLY:
-                    case ASSIGN_PLUS:
-                    case ASSIGN_XOR:
-                        //List<GraphTargetItem> varset = new ArrayList<>();
-                        //varset.addAll(var);
-                        if (gva == null && gmb == null) {
-                            throw new ParseException("Invalid assignment", lexer.yyline());
-                        }
-                        GraphTargetItem varval2 = expression(registerVars, inFunction, inMethod, true, variables);
-
-                        switch (s.type) {
-                            case ASSIGN_BITAND:
-                                if (gva != null) {
-                                    ret = new VariableActionItem(gva.getVariableName(), new BitAndActionItem(null, gva, varval2), false);
-                                    variables.add((VariableActionItem) ret);
-                                } else {
-                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new BitAndActionItem(null, gmb, varval2));
-                                }
-                                break;
-                            case ASSIGN_BITOR:
-                                if (gva != null) {
-                                    ret = new VariableActionItem(gva.getVariableName(), new BitOrActionItem(null, gva, varval2), false);
-                                    variables.add((VariableActionItem) ret);
-                                } else {
-                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new BitOrActionItem(null, gmb, varval2));
-                                }
-                                break;
-                            case ASSIGN_DIVIDE:
-                                if (gva != null) {
-                                    ret = new VariableActionItem(gva.getVariableName(), new DivideActionItem(null, gva, varval2), false);
-                                    variables.add((VariableActionItem) ret);
-                                } else {
-                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new DivideActionItem(null, gmb, varval2));
-                                }
-                                break;
-                            case ASSIGN_MINUS:
-                                if (gva != null) {
-                                    ret = new VariableActionItem(gva.getVariableName(), new SubtractActionItem(null, gva, varval2), false);
-                                    variables.add((VariableActionItem) ret);
-                                } else {
-                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new SubtractActionItem(null, gmb, varval2));
-                                }
-                                break;
-                            case ASSIGN_MODULO:
-                                if (gva != null) {
-                                    ret = new VariableActionItem(gva.getVariableName(), new ModuloActionItem(null, gva, varval2), false);
-                                    variables.add((VariableActionItem) ret);
-                                } else {
-                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new ModuloActionItem(null, gmb, varval2));
-                                }
-                                break;
-                            case ASSIGN_MULTIPLY:
-                                if (gva != null) {
-                                    ret = new VariableActionItem(gva.getVariableName(), new MultiplyActionItem(null, gva, varval2), false);
-                                    variables.add((VariableActionItem) ret);
-                                } else {
-                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new MultiplyActionItem(null, gmb, varval2));
-                                }
-                                break;
-                            case ASSIGN_PLUS:
-                                if (gva != null) {
-                                    ret = new VariableActionItem(gva.getVariableName(), new AddActionItem(null, gva, varval2, true/*TODO:SWF version?*/), false);
-                                    variables.add((VariableActionItem) ret);
-                                } else {
-                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new AddActionItem(null, gmb, varval2, true/*TODO:SWF version?*/));
-                                }
-                                break;
-                        }
-                        existsRemainder = true;
-                        assocRight = true;
-                        break;
-                    case INCREMENT: //postincrement
-                        if (gva == null && gmb == null) {
-                            throw new ParseException("Invalid assignment", lexer.yyline());
-                        }
-                        ret = new PostIncrementActionItem(null, var);
-                        break;
-                    case DECREMENT: //postdecrement
-                        if (gva == null && gmb == null) {
-                            throw new ParseException("Invalid assignment", lexer.yyline());
-                        }
-                        ret = new PostDecrementActionItem(null, var);
-                        break;
-                    case PARENT_OPEN: //function call
-                        lexer.pushback(s);
-                        ret = memberOrCall(var, registerVars, inFunction, inMethod, variables);
-                        existsRemainder = true;
-                        break;
-                    default:
-                        ret = var;
-                        lexer.pushback(s);
-                        existsRemainder = true;
-                    //ret.addAll(expressionRemainder(registerVars, inFunction, inMethod));
-                }
+                ret = var;
+                existsRemainder = true;
                 break;
             default:
                 GraphTargetItem excmd = expressionCommands(s, registerVars, inFunction, inMethod, -1, variables);

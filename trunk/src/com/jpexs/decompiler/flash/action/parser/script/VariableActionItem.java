@@ -36,7 +36,11 @@ public class VariableActionItem extends ActionItem {
 
     private final String variableName;
     private GraphTargetItem storeValue;
-    private final boolean definition;
+    private boolean definition;
+
+    public void setDefinition(boolean definition) {
+        this.definition = definition;
+    }
 
     public void setStoreValue(GraphTargetItem storeValue) {
         this.storeValue = storeValue;
