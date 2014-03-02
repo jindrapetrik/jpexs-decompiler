@@ -119,20 +119,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
 
     private void updateIcons(JComponent c) {
 
-        int border = 1;
         Dimension dim = c.getPreferredSize();
-        if (!buttonResized) {
-            dim.width += 2 * border;
-            dim.height += 2 * border;
-            c.setPreferredSize(dim);
-            c.setSize(dim);
-            Point loc = c.getLocation();
-            loc.x -= border;
-            loc.y -= border;
-            c.setLocation(loc);
-            buttonResized = true;
-        }
-
         hoverIcon.setDimension(dim);
         clickIcon.setDimension(dim);
         normalIcon.setDimension(dim);
@@ -160,10 +147,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
         Icon icon = getCurrentIcon(b);
 
         if (icon != null) {
-            int iconWidth = icon.getIconWidth();
-            int iconHeight = icon.getIconHeight();
-            Rectangle iconRect = new Rectangle(0, 0, iconWidth, iconHeight);
-            paintButtonIcon(g2d, iconRect);
+            paintButtonIcon(g2d);
         }
 
         g2d.dispose();
@@ -194,25 +178,14 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
      * org.jvnet.flamingo.common.ui.BasicCommandButtonUI#paintButtonIcon(java
      * .awt.Graphics, java.awt.Rectangle)
      */
-    @Override
-    protected void paintButtonIcon(Graphics g, Rectangle iconRect) {
-        Icon regular = this.applicationMenuButton.isEnabled() ? getCurrentIcon(this.applicationMenuButton)
-                : this.applicationMenuButton.getDisabledIcon();
+    protected void paintButtonIcon(Graphics g) {
+        Icon regular = getCurrentIcon(this.applicationMenuButton);
         if (regular == null) {
             return;
         }
-        boolean useThemed = SubstanceCoreUtilities
-                .useThemedDefaultIcon(this.applicationMenuButton);
-
         if (regular != null) {
             Graphics2D g2d = (Graphics2D) g.create();
-
-            GhostPaintingUtils.paintGhostIcon(g2d, this.applicationMenuButton,
-                    regular, iconRect);
-            g2d.setComposite(LafWidgetUtilities.getAlphaComposite(
-                    this.applicationMenuButton, g));
-
-            regular.paintIcon(this.applicationMenuButton, g2d, iconRect.x, iconRect.y);
+            regular.paintIcon(this.applicationMenuButton, g2d, 0, 0);
             g2d.dispose();
         }
     }
