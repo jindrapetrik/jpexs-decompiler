@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -24,8 +25,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
-import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
-import org.pushingpixels.flamingo.api.common.icon.ResizableIcon;
 import org.pushingpixels.flamingo.api.common.model.PopupButtonModel;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.BasicRibbonApplicationMenuButtonUI;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
@@ -54,33 +53,21 @@ import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
 public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuButtonUI implements
         ActionPopupTransitionAwareUI {
 
-    private ImageWrapperResizableIcon hoverIcon = null;
-    private ImageWrapperResizableIcon clickIcon = null;
-    private ImageWrapperResizableIcon normalIcon = null;
+    private MyResizableIcon hoverIcon = null;
+    private MyResizableIcon clickIcon = null;
+    private MyResizableIcon normalIcon = null;
 
-    public void setNormalIcon(ImageWrapperResizableIcon normalIcon) {
-        this.normalIcon = normalIcon;
-    }
-
-    public ImageWrapperResizableIcon getHoverIcon() {
-        return hoverIcon;
-    }
-
-    public ImageWrapperResizableIcon getClickIcon() {
+    public MyResizableIcon getClickIcon() {
         return clickIcon;
     }
 
-    public ImageWrapperResizableIcon getNormalIcon() {
-        return normalIcon;
+    public MyRibbonApplicationMenuButtonUI() {
+        super();
+        hoverIcon = View.getMyResizableIcon("buttonicon_hover_256");
+        normalIcon = View.getMyResizableIcon("buttonicon_256");
+        clickIcon = View.getMyResizableIcon("buttonicon_down_256");
     }
 
-    public void setHoverIcon(ImageWrapperResizableIcon hoverIcon) {
-        this.hoverIcon = hoverIcon;
-    }
-
-    public void setClickIcon(ImageWrapperResizableIcon clickIcon) {
-        this.clickIcon = clickIcon;
-    }
     /**
      * Model change listener for ghost image effects.
      */
@@ -128,6 +115,19 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
         super.uninstallListeners();
     }
 
+    private void updateIcons(JComponent c) {
+
+        Dimension dim = c.getPreferredSize();
+
+        //Add border:
+        dim.width += 2;
+        dim.height += 2;
+
+        hoverIcon.setDimension(dim);
+        clickIcon.setDimension(dim);
+        normalIcon.setDimension(dim);
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -138,18 +138,9 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
     public void paint(Graphics g, JComponent c) {
         JRibbonApplicationMenuButton b = (JRibbonApplicationMenuButton) c;
 
-        if (hoverIcon != null) {
-            hoverIcon.setPreferredSize(b.getSize());
-        }
-        if (clickIcon != null) {
-            clickIcon.setPreferredSize(b.getSize());
-        }
-        if (normalIcon != null) {
-            normalIcon.setPreferredSize(b.getSize());
-        }
+        updateIcons(c);
 
-        this.layoutInfo = this.layoutManager.getLayoutInfo(this.commandButton,
-                g);
+        this.layoutInfo = this.layoutManager.getLayoutInfo(this.commandButton, g);
         commandButton.putClientProperty("icon.bounds", layoutInfo.iconRect);
 
         Graphics2D g2d = (Graphics2D) g.create();
@@ -163,12 +154,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
         g2d.drawImage(fullAlphaBackground, 0, 0, null);
 
         // Paint the icon
-        ResizableIcon icon = getCurrentIcon(b);
-        /*if(icon instanceof ImageWrapperResizableIcon){
-         ImageWrapperResizableIcon iw=(ImageWrapperResizableIcon)icon;
-         iw.setPreferredSize(b.getSize());
-         iw.setDimension(b.getSize());                    
-         }*/
+        Icon icon = getCurrentIcon(b);
 
         if (icon != null) {
             int iconWidth = icon.getIconWidth();
@@ -181,7 +167,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
         g2d.dispose();
     }
 
-    private ResizableIcon getCurrentIcon(JRibbonApplicationMenuButton button) {
+    private Icon getCurrentIcon(JRibbonApplicationMenuButton button) {
         PopupButtonModel mod = button.getPopupModel();
         if (mod.isPopupShowing()) {
             if (clickIcon != null) {

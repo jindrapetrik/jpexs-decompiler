@@ -93,7 +93,6 @@ public class MyRibbonApplicationMenuPopupPanelUI extends BasicRibbonApplicationM
                         rendererButton.setPopupKeyTip(appMenuButton.getPopupKeyTip());
                         rendererButton.getPopupModel().setPopupShowing(true);
                         rendererButton.setDisplayState(appMenuButton.getDisplayState());
-                        rendererButton.setIcon(((MyRibbonApplicationMenuButtonUI) appMenuButton.getUI()).getClickIcon());
 
                         rendererButton.getPopupModel().setRollover(false);
                         rendererButton.getPopupModel().setPressed(true);

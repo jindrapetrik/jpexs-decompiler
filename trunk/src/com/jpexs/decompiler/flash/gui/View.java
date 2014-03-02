@@ -28,11 +28,13 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -275,6 +277,15 @@ public class View {
 
     public static ImageWrapperResizableIcon getResizableIcon(String resource) {
         return ImageWrapperResizableIcon.getIcon(View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + resource + ".png"), new Dimension(256, 256));
+    }
+
+    public static MyResizableIcon getMyResizableIcon(String resource) {
+        try {
+            return new MyResizableIcon(ImageIO.read(View.class.getResourceAsStream("/com/jpexs/decompiler/flash/gui/graphics/" + resource + ".png")));
+        } catch (IOException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 
     public static void execInEventDispatch(Runnable r) {
