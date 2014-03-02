@@ -103,9 +103,9 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
         hdrPos = 0;
     }
     
-    public CLIPACTIONRECORD(SWF swf, InputStream is, int version, long pos) throws IOException {
+    public CLIPACTIONRECORD(SWF swf, InputStream is, long pos) throws IOException {
         this.swf = swf;
-        SWFInputStream sis = new SWFInputStream(is, version);
+        SWFInputStream sis = new SWFInputStream(is, swf.version);
         eventFlags = sis.readCLIPEVENTFLAGS();
         if (eventFlags.isClear()) {
             return;

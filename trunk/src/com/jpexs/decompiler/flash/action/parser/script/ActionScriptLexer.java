@@ -1191,12 +1191,12 @@ public final class ActionScriptLexer {
         return yychar;
     }
 
-    private Stack<ParsedSymbol> pushedBack = new Stack<ParsedSymbol>();
+    private final Stack<ParsedSymbol> pushedBack = new Stack<>();
 
     public int yyline() {
         return yyline + 1;
     }
-    private List<LexListener> listeners = new ArrayList<>();
+    private final List<LexListener> listeners = new ArrayList<>();
 
     public void addListener(LexListener listener) {
         listeners.add(listener);
@@ -1333,6 +1333,7 @@ public final class ActionScriptLexer {
 
     /**
      * Closes the input stream.
+     * @throws java.io.IOException
      */
     public final void yyclose() throws java.io.IOException {
         zzAtEOF = true;            /* indicate end of file */
@@ -1373,6 +1374,7 @@ public final class ActionScriptLexer {
 
     /**
      * Returns the current lexical state.
+     * @return 
      */
     public final int yystate() {
         return zzLexicalState;
@@ -1389,6 +1391,7 @@ public final class ActionScriptLexer {
 
     /**
      * Returns the text matched by the current regular expression.
+     * @return 
      */
     public final String yytext() {
         return new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
@@ -1410,6 +1413,7 @@ public final class ActionScriptLexer {
 
     /**
      * Returns the length of the matched text region.
+     * @return 
      */
     public final int yylength() {
         return zzMarkedPos - zzStartRead;
@@ -1461,6 +1465,7 @@ public final class ActionScriptLexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
+     * @throws com.jpexs.decompiler.flash.action.parser.ParseException
      */
     public ParsedSymbol yylex() throws java.io.IOException, ParseException {
         int zzInput;

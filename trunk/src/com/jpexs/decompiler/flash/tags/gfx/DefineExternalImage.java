@@ -70,13 +70,12 @@ public class DefineExternalImage extends Tag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DefineExternalImage(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineExternalImage(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineExternalImage", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterId = sis.readUI16();
         bitmapFormat = sis.readUI16();
         targetWidth = sis.readUI16();

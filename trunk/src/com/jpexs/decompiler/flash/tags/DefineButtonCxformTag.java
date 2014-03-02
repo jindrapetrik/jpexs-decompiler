@@ -62,13 +62,12 @@ public class DefineButtonCxformTag extends Tag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DefineButtonCxformTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineButtonCxformTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineButtonCxform", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         buttonId = sis.readUI16();
         buttonColorTransform = sis.readCXFORM();
     }

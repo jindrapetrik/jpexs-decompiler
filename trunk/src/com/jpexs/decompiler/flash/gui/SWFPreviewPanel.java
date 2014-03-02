@@ -38,15 +38,15 @@ import javax.swing.SwingConstants;
  *
  * @author JPEXS
  */
-public class SWFPreviwPanel extends JPanel implements FlashDisplay {
+public class SWFPreviewPanel extends JPanel implements FlashDisplay {
 
     ImagePanel pan;
     Timer timer;
     int frame = 1;
-    List<SerializableImage> frameImages = new ArrayList<>();
+    List<SerializableImage> frameImages;
     JLabel buffering = new JLabel(AppStrings.translate("work.buffering") + "...");
 
-    public SWFPreviwPanel() {
+    public SWFPreviewPanel() {
         pan = new ImagePanel();
         pan.setBackground(View.swfBackgroundColor);
         setLayout(new BorderLayout());
@@ -64,6 +64,9 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
 
     public void load(final SWF swf) {
         this.swf = swf;
+        List<SerializableImage> frames = new ArrayList<>();
+        frame = 0;
+        frameImages = frames;
         new Thread() {
             @Override
             public void run() {
@@ -96,8 +99,7 @@ public class SWFPreviwPanel extends JPanel implements FlashDisplay {
             @Override
             public void run() {
                 int newframe = (frame == swf.frameCount ? 1 : frame + 1);
-                if (frameImages.size() >= newframe) {
-                    //pan.setImage(frameImages.get(newframe - 1));
+                if (frameImages != null && frameImages.size() >= newframe) {
                     frame = newframe;
                     drawFrame();
                     pan.setBackground(View.swfBackgroundColor);

@@ -52,10 +52,9 @@ public class DoActionTag extends Tag implements ASMSource {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      */
-    public DoActionTag(SWF swf, byte[] data, int version, long pos) {
+    public DoActionTag(SWF swf, byte[] data, long pos) {
         super(swf, ID, "DoAction", data, pos);
         actionBytes = data;
     }

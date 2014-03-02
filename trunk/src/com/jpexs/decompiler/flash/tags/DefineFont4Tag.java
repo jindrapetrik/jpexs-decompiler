@@ -48,9 +48,9 @@ public class DefineFont4Tag extends CharacterTag {
         return fontID;
     }
 
-    public DefineFont4Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineFont4Tag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineFont4", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         fontID = sis.readUI16();
         reserved = (int) sis.readUB(5);
         fontFlagsHasFontData = sis.readUB(1) == 1;

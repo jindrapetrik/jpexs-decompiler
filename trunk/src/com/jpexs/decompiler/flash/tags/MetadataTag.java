@@ -31,10 +31,10 @@ public class MetadataTag extends Tag {
     public String xmlMetadata;
     public static final int ID = 77;
 
-    public MetadataTag(SWF swf, byte[] data, int version, long pos) {
+    public MetadataTag(SWF swf, byte[] data, long pos) {
         super(swf, ID, "Metadata", data, pos);
         try {
-            SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+            SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
             xmlMetadata = sis.readString();
         } catch (IOException ex) {
         }

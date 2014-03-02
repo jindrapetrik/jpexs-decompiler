@@ -118,13 +118,12 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public SoundStreamHeadTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public SoundStreamHeadTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "SoundStreamHead", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         reserved = (int) sis.readUB(4);
         playBackSoundRate = (int) sis.readUB(2);
         playBackSoundSize = sis.readUB(1) == 1;

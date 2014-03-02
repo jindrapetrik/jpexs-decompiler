@@ -30,7 +30,7 @@ public class Paragraph {
     public List<Word> words = new ArrayList<>();
 
     private Word word;
-    private DynamicTextModel model;
+    private final DynamicTextModel model;
     public int width;
 
     public Paragraph(DynamicTextModel model) {

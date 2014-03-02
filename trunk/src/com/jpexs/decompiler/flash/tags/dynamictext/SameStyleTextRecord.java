@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags.dynamictext;
 
-import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import java.util.ArrayList;
 import java.util.List;
 

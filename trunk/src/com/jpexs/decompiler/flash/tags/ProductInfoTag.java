@@ -46,9 +46,9 @@ public class ProductInfoTag extends Tag {
     public long compilationDateHigh;
     public static final int ID = 41;
 
-    public ProductInfoTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public ProductInfoTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "ProductInfo", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         /*
          * 0: Unknown
          * 1: Macromedia Flex for J2EE

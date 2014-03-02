@@ -44,9 +44,9 @@ public class DefineFontAlignZonesTag extends Tag {
     public List<ZONERECORD> zoneTable;
     public static final int ID = 73;
 
-    public DefineFontAlignZonesTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineFontAlignZonesTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineFontAlignZones", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         fontID = sis.readUI16();
         CSMTableHint = (int) sis.readUB(2);
         reserved = (int) sis.readUB(6);

@@ -55,11 +55,10 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DoABCTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DoABCTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DoABC", data, pos);
         InputStream is = new ByteArrayInputStream(data);
         abc = new ABC(is, swf);

@@ -19,27 +19,17 @@ package com.jpexs.decompiler.flash.gui;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import org.pushingpixels.flamingo.api.common.model.PopupButtonModel;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.BasicRibbonApplicationMenuButtonUI;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
-import org.pushingpixels.lafwidget.LafWidgetUtilities;
-import org.pushingpixels.lafwidget.animation.effects.GhostPaintingUtils;
 import org.pushingpixels.lafwidget.animation.effects.GhostingListener;
-import org.pushingpixels.substance.api.painter.border.SubstanceBorderPainter;
-import org.pushingpixels.substance.api.painter.fill.SubstanceFillPainter;
 import org.pushingpixels.substance.flamingo.common.ui.ActionPopupTransitionAwareUI;
-import org.pushingpixels.substance.flamingo.utils.CommandButtonBackgroundDelegate;
 import org.pushingpixels.substance.flamingo.utils.CommandButtonVisualStateTracker;
-import org.pushingpixels.substance.flamingo.utils.RibbonApplicationMenuButtonBackgroundDelegate;
 import org.pushingpixels.substance.internal.animation.StateTransitionTracker;
-import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
 
 /**
  * UI for {@link JRibbonApplicationMenuButton} components in <b>Substance</b>
@@ -57,7 +47,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
     private MyResizableIcon hoverIcon = null;
     private MyResizableIcon clickIcon = null;
     private MyResizableIcon normalIcon = null;
-    private boolean buttonResized = false;
+    private final boolean buttonResized = false;
 
     public MyResizableIcon getClickIcon() {
         return clickIcon;

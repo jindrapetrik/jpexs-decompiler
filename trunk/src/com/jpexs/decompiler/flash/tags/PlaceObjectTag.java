@@ -103,13 +103,12 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public PlaceObjectTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public PlaceObjectTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "PlaceObject", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterId = sis.readUI16();
         depth = sis.readUI16();
         matrix = sis.readMatrix();

@@ -43,7 +43,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public abstract class TextTag extends CharacterTag implements BoundedTag {
+public abstract class TextTag extends CharacterTag implements BoundedTag, DrawableTag {
 
     public TextTag(SWF swf, int id, String name, byte[] data, long pos) {
         super(swf, id, name, data, pos);

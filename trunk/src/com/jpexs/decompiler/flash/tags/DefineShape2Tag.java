@@ -92,9 +92,9 @@ public class DefineShape2Tag extends CharacterTag implements ShapeTag {
         return shapeBounds;
     }
 
-    public DefineShape2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineShape2Tag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineShape2", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();
         shapes = sis.readSHAPEWITHSTYLE(2);

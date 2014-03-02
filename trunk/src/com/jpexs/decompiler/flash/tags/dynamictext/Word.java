@@ -30,7 +30,7 @@ public class Word {
     public List<SameStyleTextRecord> records = new ArrayList<>();
     
     private SameStyleTextRecord record;
-    private DynamicTextModel model;
+    private final DynamicTextModel model;
     public int width;
 
     public Word(DynamicTextModel model) {

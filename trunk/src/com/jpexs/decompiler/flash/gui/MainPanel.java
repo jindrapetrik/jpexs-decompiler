@@ -214,7 +214,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private BinaryPanel binaryPanel;
     private GenericTagPanel genericTagPanel;
     private final ImagePanel previewImagePanel;
-    private final SWFPreviwPanel swfPreviewPanel;
+    private final SWFPreviewPanel swfPreviewPanel;
     private boolean isWelcomeScreen = true;
     private static final String CARDFLASHPANEL = "Flash card";
     private static final String CARDSWFPREVIEWPANEL = "SWF card";
@@ -791,7 +791,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         shapesCard.add(previewPanel, BorderLayout.CENTER);
         displayPanel.add(shapesCard, CARDDRAWPREVIEWPANEL);
 
-        swfPreviewPanel = new SWFPreviwPanel();
+        swfPreviewPanel = new SWFPreviewPanel();
         displayPanel.add(swfPreviewPanel, CARDSWFPREVIEWPANEL);
 
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
@@ -891,6 +891,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void load(SWFList newSwfs, boolean first) {
+        
+        swfPreviewPanel.stop();
+        
         swfs.add(newSwfs);
 
         for (SWF swf : newSwfs) {
@@ -2105,7 +2108,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             try {
                                 SWF swf = it.getSwf();
                                 if (it instanceof DefineBitsTag) {
-                                    DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, it.getOriginalData(), swf.version, it.getPos(), it.getCharacterId(), data);
+                                    DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, it.getOriginalData(), it.getPos(), it.getCharacterId(), data);
                                     swf.tags.set(swf.tags.indexOf(it), jpeg2Tag);
                                     showCard(CARDEMPTYPANEL);
                                     refreshTree();
@@ -2449,6 +2452,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             Tag tag = (Tag) tagObj;
             showCard(CARDFLASHPANEL);
             showFontTag((FontTag) tagObj);
+        } else if ((tagObj instanceof TextTag) && (mainMenu.isInternalFlashViewerSelected())) {
+            Tag tag = (Tag) tagObj;
+            showCard(CARDFLASHPANEL);
+            showTextTag((TextTag) tagObj);
         } else if (tagObj instanceof FrameNodeItem && ((FrameNodeItem) tagObj).isDisplayed() && (mainMenu.isInternalFlashViewerSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             FrameNodeItem fn = (FrameNodeItem) tagObj;
@@ -2469,14 +2476,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             createAndShowTempSwf(tagObj);
 
             if (tagObj instanceof TextTag) {
-                TextTag textTag = (TextTag) tagObj;
-                parametersPanel.setVisible(true);
-                previewSplitPane.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewSplitPane.getWidth() / 2));
-                showDetailWithPreview(CARDTEXTPANEL);
-                textValue.setContentType("text/swf_text");
-                //textValue.setFont(new Font("Monospaced", Font.PLAIN, 13));
-                textValue.setText(textTag.getFormattedText());
-                textValue.setCaretPosition(0);
+                showTextTag((TextTag) tagObj);
             } else if (tagObj instanceof FontTag) {
                 showFontTag((FontTag) tagObj);
             } else {
@@ -2719,7 +2719,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         List<Action> actions;
                         DoActionTag doa;
 
-                        doa = new DoActionTag(null, new byte[]{}, swf.version, 0);
+                        doa = new DoActionTag(null, new byte[]{}, 0);
                         actions = ASMParser.parse(0, 0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
                                 + "Push \"_root\"\n"
@@ -2885,6 +2885,23 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         showDetailWithPreview(CARDFONTPANEL);
     }
 
+    private void showTextTag(TextTag textTag) {
+        if (mainMenu.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
+            ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
+            internelViewerPanel.setDrawable(textTag, textTag.getSwf(), textTag.getSwf().characters, 1);
+        } else {
+            ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
+        }
+
+        parametersPanel.setVisible(true);
+        previewSplitPane.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewSplitPane.getWidth() / 2));
+        showDetailWithPreview(CARDTEXTPANEL);
+        textValue.setContentType("text/swf_text");
+        //textValue.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        textValue.setText(textTag.getFormattedText());
+        textValue.setCaretPosition(0);
+    }
+    
     public void expandSwfNodes() {
         TreeModel model = tagTree.getModel();
         Object node = model.getRoot();

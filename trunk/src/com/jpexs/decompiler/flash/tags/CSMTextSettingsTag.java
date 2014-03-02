@@ -87,13 +87,12 @@ public class CSMTextSettingsTag extends Tag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public CSMTextSettingsTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public CSMTextSettingsTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "CSMTextSettings", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         textID = sis.readUI16();
         useFlashType = (int) sis.readUB(2);
         gridFit = (int) sis.readUB(3);

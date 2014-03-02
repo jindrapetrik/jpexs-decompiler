@@ -194,13 +194,12 @@ public class DefineFont2Tag extends FontTag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DefineFont2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineFont2Tag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineFont2", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         fontId = sis.readUI16();
         fontFlagsHasLayout = sis.readUB(1) == 1;
         fontFlagsShiftJIS = sis.readUB(1) == 1;
@@ -212,7 +211,7 @@ public class DefineFont2Tag extends FontTag {
         fontFlagsBold = sis.readUB(1) == 1;
         languageCode = sis.readLANGCODE();
         int fontNameLen = sis.readUI8();
-        if (version >= 6) {
+        if (swf.version >= 6) {
             fontName = new String(sis.readBytesEx(fontNameLen), Utf8Helper.charset);
         } else {
             fontName = new String(sis.readBytesEx(fontNameLen));

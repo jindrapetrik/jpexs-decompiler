@@ -69,14 +69,13 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DoABCDefineTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DoABCDefineTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DoABCDefine", data, pos);
         InputStream is = new ByteArrayInputStream(data);
-        SWFInputStream sis = new SWFInputStream(is, version);
+        SWFInputStream sis = new SWFInputStream(is, swf.version);
         flags = sis.readUI32();
         name = sis.readString();
         abc = new ABC(is, swf);

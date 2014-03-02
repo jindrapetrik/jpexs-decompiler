@@ -37,9 +37,9 @@ public class DefineScalingGridTag extends Tag {
     public RECT splitter;
     public static final int ID = 78;
 
-    public DefineScalingGridTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineScalingGridTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineScalingGrid", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterId = sis.readUI16();
         splitter = sis.readRECT();
     }

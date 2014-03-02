@@ -101,13 +101,12 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DefineButton2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineButton2Tag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineButton2", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         buttonId = sis.readUI16();
         reserved = (int) sis.readUB(7);
         trackAsMenu = sis.readUB(1) == 1;

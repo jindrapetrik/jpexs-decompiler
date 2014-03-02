@@ -60,13 +60,12 @@ public class DefineGradientMap extends Tag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DefineGradientMap(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineGradientMap(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineGradientMap", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         int numGradients = sis.readUI16();
         indices = new int[numGradients];
         for (int i = 0; i < numGradients; i++) {

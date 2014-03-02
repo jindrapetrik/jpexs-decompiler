@@ -100,9 +100,9 @@ public class DefineShape4Tag extends CharacterTag implements ShapeTag {
         return shapeBounds;
     }
 
-    public DefineShape4Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineShape4Tag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineShape4", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();
         edgeBounds = sis.readRECT();

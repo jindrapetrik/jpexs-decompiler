@@ -70,13 +70,12 @@ public class EnableTelemetryTag extends Tag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public EnableTelemetryTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public EnableTelemetryTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         reserved = (int) sis.readUB(16);
         if (sis.available() > 0) {
             passwordHash = sis.readBytesEx(32);

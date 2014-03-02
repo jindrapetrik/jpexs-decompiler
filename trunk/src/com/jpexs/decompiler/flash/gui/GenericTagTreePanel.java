@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
@@ -36,7 +37,6 @@ import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
 import com.jpexs.decompiler.flash.types.annotations.parser.ParseException;
-import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -646,7 +646,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
             tag = this.tag;
         }
         this.tag = tag;
-        this.editedTag = (Tag) Helper.deepCopy(tag);
+        SWF swf = tag.getSwf();
+        try {
+            this.editedTag = SWFInputStream.resolveTag(swf, tag, 0, false, true, swf.gfx);
+        } catch (InterruptedException ex) {
+        }
         tree.setEditable(edit);
         if (!edit) {
             tree.stopEditing();

@@ -74,7 +74,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author JPEXS
  */
-public class DefineEditTextTag extends TextTag implements DrawableTag {
+public class DefineEditTextTag extends TextTag {
 
     @SWFType(BasicType.UI16)
     public int characterID;
@@ -693,13 +693,12 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DefineEditTextTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineEditTextTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineEditText", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterID = sis.readUI16();
         bounds = sis.readRECT();
         hasText = sis.readUB(1) == 1;

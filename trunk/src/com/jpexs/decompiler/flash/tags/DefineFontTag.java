@@ -139,13 +139,12 @@ public class DefineFontTag extends FontTag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DefineFontTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineFontTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineFont", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         fontId = sis.readUI16();
         int firstOffset = sis.readUI16();
         int nGlyphs = firstOffset / 2;

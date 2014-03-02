@@ -64,13 +64,12 @@ public class VideoFrameTag extends Tag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public VideoFrameTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public VideoFrameTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "VideoFrame", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         streamID = sis.readUI16();
         frameNum = sis.readUI16();
         videoData = sis.readBytesEx(sis.available()); //TODO: Parse video packets

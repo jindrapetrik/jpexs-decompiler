@@ -91,16 +91,15 @@ public class DefineFontInfo2Tag extends Tag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DefineFontInfo2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineFontInfo2Tag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineFontInfo2", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         fontID = sis.readUI16();
         int fontNameLen = sis.readUI8();
-        if (version >= 6) {
+        if (swf.version >= 6) {
             fontName = new String(sis.readBytesEx(fontNameLen), Utf8Helper.charset);
         } else {
             fontName = new String(sis.readBytesEx(fontNameLen));

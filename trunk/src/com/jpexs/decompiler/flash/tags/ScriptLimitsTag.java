@@ -36,9 +36,9 @@ public class ScriptLimitsTag extends Tag {
 
     public static final int ID = 65;
 
-    public ScriptLimitsTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public ScriptLimitsTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "ScriptLimits", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         maxRecursionDepth = sis.readUI16();
         scriptTimeoutSeconds = sis.readUI16();
     }

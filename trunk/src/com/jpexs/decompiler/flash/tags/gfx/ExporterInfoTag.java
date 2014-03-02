@@ -86,11 +86,10 @@ public class ExporterInfoTag extends Tag {
      *
      * @param swf
      * @param data Data bytes
-     * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public ExporterInfoTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public ExporterInfoTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "ExporterInfo", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         this.version = sis.readUI16();

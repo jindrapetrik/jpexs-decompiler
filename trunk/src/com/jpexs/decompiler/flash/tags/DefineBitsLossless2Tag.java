@@ -107,9 +107,9 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         decompressed = false;
     }
 
-    public DefineBitsLossless2Tag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public DefineBitsLossless2Tag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "DefineBitsLossless2", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterID = sis.readUI16();
         bitmapFormat = sis.readUI8();
         bitmapWidth = sis.readUI16();

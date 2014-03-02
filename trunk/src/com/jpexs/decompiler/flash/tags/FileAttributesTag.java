@@ -49,9 +49,9 @@ public class FileAttributesTag extends Tag {
         super(null, ID, "FileAttributes", new byte[]{}, 0);
     }
 
-    public FileAttributesTag(SWF swf, byte[] data, int version, long pos) throws IOException {
+    public FileAttributesTag(SWF swf, byte[] data, long pos) throws IOException {
         super(swf, ID, "FileAttributes", data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         reserved1 = sis.readUB(1) == 1; // reserved
         // UB[1] == 0  (reserved)
         useDirectBlit = sis.readUB(1) != 0;
