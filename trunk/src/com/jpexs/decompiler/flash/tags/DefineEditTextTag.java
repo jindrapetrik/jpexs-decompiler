@@ -855,11 +855,13 @@ public class DefineEditTextTag extends TextTag implements DrawableTag {
                         line.remove(line.size() - 1);
                         removed = true;
                     }
-                    SameStyleTextRecord lastRecord = line.get(line.size() - 1);
-                    while (lastRecord.glyphEntries.size() > 0 &&
-                           Character.isWhitespace(lastRecord.glyphEntries.get(lastRecord.glyphEntries.size() - 1).character)) {
-                        lastRecord.glyphEntries.remove(lastRecord.glyphEntries.size() -1);
-                        removed = true;
+                    if (line.size() > 0) {
+                        SameStyleTextRecord lastRecord = line.get(line.size() - 1);
+                        while (lastRecord.glyphEntries.size() > 0 &&
+                               Character.isWhitespace(lastRecord.glyphEntries.get(lastRecord.glyphEntries.size() - 1).character)) {
+                            lastRecord.glyphEntries.remove(lastRecord.glyphEntries.size() -1);
+                            removed = true;
+                        }
                     }
                 }
             }
