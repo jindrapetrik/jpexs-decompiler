@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
