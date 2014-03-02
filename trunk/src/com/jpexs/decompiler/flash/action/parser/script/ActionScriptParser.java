@@ -397,7 +397,7 @@ public class ActionScriptParser {
             switch (s.type) {
                 case FUNCTION:
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolGroup.GLOBALFUNC);
                     String fname = s.value.toString();
                     if (fname.equals(classNameStr)) { //constructor
                         constr = (function(!isInterface, "", true, variables));
@@ -925,7 +925,7 @@ public class ActionScriptParser {
                 break;
             case FUNCTION:
                 s = lexer.lex();
-                expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolGroup.GLOBALFUNC);
                 ret = (function(true, s.value.toString(), false, variables));
                 break;
             case VAR:
@@ -1553,7 +1553,7 @@ public class ActionScriptParser {
             case FUNCTION:
                 s = lexer.lex();
                 String fname = "";
-                if (s.type == SymbolType.IDENTIFIER) {
+                if (s.isType(SymbolType.IDENTIFIER,SymbolGroup.GLOBALFUNC)) {
                     fname = s.value.toString();
                 } else {
                     lexer.pushback(s);

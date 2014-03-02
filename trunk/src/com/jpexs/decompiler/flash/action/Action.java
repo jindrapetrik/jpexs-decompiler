@@ -109,7 +109,26 @@ public class Action implements GraphSourceItem {
     public int actionLength;
     public long containerSWFOffset;
     private long address;
+    
+    public static final String[] reservedWords = {
+        "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",
+        "extends", "false", "finally", "for", "function", "get", "if", "implements", "import", "in", "instanceof",
+        "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
+        "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
+        "with", "dynamic", "default", "final", "in"};
 
+    public static boolean isReservedWord(String s) {
+        if(s == null){
+            return false;
+        }
+        for (String rw : reservedWords) {
+            if (rw.equals(s.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+                
     public long getFileAddress() {
         return containerSWFOffset + getAddress();
     }

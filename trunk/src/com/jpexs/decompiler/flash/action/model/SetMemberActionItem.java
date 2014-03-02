@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
@@ -81,20 +82,19 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (!((objectName instanceof DirectValueActionItem) && (((DirectValueActionItem) objectName).value instanceof String))) {
-            //if(!(functionName instanceof GetVariableActionItem))
-            object.toString(writer, localData);
-            writer.append("[");
-            stripQuotes(objectName, localData, writer);
-            writer.append("]");
-            writer.append(" = ");
-            return value.toString(writer, localData);
-        }
         object.toString(writer, localData);
-        writer.append(".");
-        stripQuotes(objectName, localData, writer);
+        if ((objectName instanceof DirectValueActionItem) && (((DirectValueActionItem) objectName).value instanceof String) && !Action.isReservedWord((String) ((DirectValueActionItem) objectName).value)) {
+            writer.append(".");
+            stripQuotes(objectName, localData, writer);
+        } else {
+            writer.append("[");
+            objectName.toString(writer, localData);
+            writer.append("]");
+
+        }
         writer.append(" = ");
         return value.toString(writer, localData);
+
     }
 
     @Override

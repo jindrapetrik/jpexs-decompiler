@@ -195,7 +195,7 @@ SingleCharacter = [^\r\n\'\\]
   "stop"                         { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.STOP,yytext()); }
   "stopAllSounds"                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.STOPALLSOUNDS,yytext()); }
   "toggleHighQuality"            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.TOGGLEHIGHQUALITY,yytext()); }
-  "ifFrameLoaded"                 { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.IFFRAMELOADED,yytext()); }
+  "ifFrameLoaded"                { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.IFFRAMELOADED,yytext()); }
   "ord"                          { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.ORD,yytext()); }
   "chr"                          { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.CHR,yytext()); }
   "duplicateMovieClip"           { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.DUPLICATEMOVIECLIP,yytext()); }

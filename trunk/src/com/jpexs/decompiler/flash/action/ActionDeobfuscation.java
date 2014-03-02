@@ -39,25 +39,13 @@ public class ActionDeobfuscation {
     public HashSet<String> allVariableNamesStr = new HashSet<>();
     private final HashMap<String, Integer> typeCounts = new HashMap<>();
 
-    public static final String[] reservedWords = {
-        "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",
-        "extends", "false", "finally", "for", "function", "get", "if", "implements", "import", "in", "instanceof",
-        "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
-        "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
-        "with", "dynamic", "default", "final", "in"};
+    
     public static final String VALID_FIRST_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
     public static final String VALID_NEXT_CHARACTERS = VALID_FIRST_CHARACTERS + "0123456789";
     public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
     public static final String FOO_JOIN_CHARACTERS = "aeiouy";
 
-    private boolean isReserved(String s) {
-        for (String rw : reservedWords) {
-            if (rw.equals(s.trim())) {
-                return true;
-            }
-        }
-        return false;
-    }
+    
 
     private String fooString(HashMap<String, String> deobfuscated, String orig, boolean firstUppercase, int rndSize) {
         boolean exists;
@@ -84,7 +72,7 @@ public class ActionDeobfuscation {
                 rndSize += 1;
                 continue loopfoo;
             }
-            if (isReserved(ret)) {
+            if (Action.isReservedWord(ret)) {
                 exists = true;
                 rndSize += 1;
                 continue;
@@ -200,7 +188,7 @@ public class ActionDeobfuscation {
             }
         }
 
-        if (isReserved(s)) {
+        if (Action.isReservedWord(s)) {
             isValid = false;
         }
 

@@ -43,10 +43,17 @@ public class ParsedSymbol {
         return group.toString() + " " + type.toString() + " " + (value != null ? value.toString() : "");
     }
 
-    public boolean isType(SymbolType... types) {
-        for (SymbolType t : types) {
-            if (type == t) {
-                return true;
+    public boolean isType(Object... types) {
+        for (Object t : types) {
+            if (t instanceof SymbolGroup) {
+                if (group == t) {
+                    return true;
+                }
+            }
+            if (t instanceof SymbolType) {
+                if (type == t) {
+                    return true;
+                }
             }
         }
         return false;
