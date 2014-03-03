@@ -344,7 +344,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         ret.numLineBits = 0;
         List<SHAPERECORD> recs = new ArrayList<>();
         for (SHAPERECORD r : shp.shapeRecords) {
-            SHAPERECORD c = (SHAPERECORD) Helper.deepCopy(r);
+            SHAPERECORD c = Helper.deepCopy(r);
             if (c instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) c;
                 scr.moveDeltaX = resize(scr.moveDeltaX);

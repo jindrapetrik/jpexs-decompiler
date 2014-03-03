@@ -128,7 +128,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         }
 
         this.tag = tag;
-        this.editedTag = (Tag) Helper.deepCopy(tag);
+        this.editedTag = Helper.deepCopy(tag);
         generateEditControls(editedTag, !edit);
 
         if (edit) {

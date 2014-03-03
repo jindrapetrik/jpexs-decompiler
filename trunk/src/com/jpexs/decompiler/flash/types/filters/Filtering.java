@@ -167,7 +167,7 @@ public class Filtering {
         }
     }
 
-    public static void premultiply(int[] p) {
+    private static void premultiply(int[] p) {
         int length = p.length;
         int offset = 0;
         length += offset;
@@ -185,7 +185,7 @@ public class Filtering {
         }
     }
 
-    public static void unpremultiply(int[] p) {
+    private static void unpremultiply(int[] p) {
         int length = p.length;
         int offset = 0;
         length += offset;
@@ -395,7 +395,7 @@ public class Filtering {
         return retImg;
     }
 
-    public static int[] getRGB(SerializableImage image, int x, int y, int width, int height) {
+    private static int[] getRGB(SerializableImage image, int x, int y, int width, int height) {
         int type = image.getType();
         if (type == SerializableImage.TYPE_INT_ARGB || type == SerializableImage.TYPE_INT_RGB) {
             return (int[]) image.getRaster().getDataElements(x, y, width, height, null);
@@ -403,7 +403,7 @@ public class Filtering {
         return image.getRGB(x, y, width, height, null, 0, width);
     }
 
-    public static void setRGB(SerializableImage image, int x, int y, int width, int height, int[] pixels) {
+    private static void setRGB(SerializableImage image, int x, int y, int width, int height, int[] pixels) {
         int type = image.getType();
         if (type == SerializableImage.TYPE_INT_ARGB || type == SerializableImage.TYPE_INT_RGB) {
             image.getRaster().setDataElements(x, y, width, height, pixels);

@@ -362,16 +362,17 @@ public class Helper {
         return ret;
     }
 
-    public static Object deepCopy(Object o) {
+    @SuppressWarnings("unchecked")
+    public static <E> E deepCopy(E o) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
                 oos.writeObject(o);
                 oos.flush();
             }
-            Object copy;
+            E copy;
             try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()))) {
-                copy = ois.readObject();
+                copy = (E) ois.readObject();
             }
             return copy;
         } catch (IOException | ClassNotFoundException ex) {

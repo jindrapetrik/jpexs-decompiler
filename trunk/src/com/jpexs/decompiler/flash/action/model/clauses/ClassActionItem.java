@@ -213,8 +213,7 @@ public class ClassActionItem extends ActionItem implements Block {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         List<GraphSourceItem> ret = new ArrayList<>();
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        @SuppressWarnings("unchecked")
-        SourceGeneratorLocalData localData2 = (SourceGeneratorLocalData) Helper.deepCopy(localData);
+        SourceGeneratorLocalData localData2 = Helper.deepCopy(localData);
         asGenerator.setInMethod(localData2, true);
         ret.addAll(asGenerator.generateTraits(localData2, false, className, extendsOp, implementsOp, constructor, functions, vars, staticFunctions, staticVars));
         return ret;

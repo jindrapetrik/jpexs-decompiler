@@ -159,8 +159,7 @@ public class FunctionActionItem extends ActionItem {
         List<GraphSourceItem> ret = new ArrayList<>();
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         List<Integer> paramRegs = new ArrayList<>();
-        @SuppressWarnings("unchecked")
-        SourceGeneratorLocalData localDataCopy = (SourceGeneratorLocalData) Helper.deepCopy(localData);
+        SourceGeneratorLocalData localDataCopy = Helper.deepCopy(localData);
         localDataCopy.inFunction++;
         boolean preloadParentFlag = false;
         boolean preloadRootFlag = false;

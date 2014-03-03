@@ -391,7 +391,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         ret.numLineBits = shp.numLineBits;
         List<SHAPERECORD> recs = new ArrayList<>();
         for (SHAPERECORD r : shp.shapeRecords) {
-            SHAPERECORD c = (SHAPERECORD) Helper.deepCopy(r);
+            SHAPERECORD c = Helper.deepCopy(r);
             if (c instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) c;
                 scr.moveDeltaX = (int) (multiplier * scr.moveDeltaX);

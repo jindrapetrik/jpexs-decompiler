@@ -2238,7 +2238,6 @@ public final class SWF implements TreeItem {
         return image;
     }
 
-    @SuppressWarnings("unchecked")
     private static List<FrameInfo> getFrameInfo(int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, int totalFrameCount) {
         List<FrameInfo> ret = new ArrayList<>();
         if (startFrame > stopFrame) {
@@ -2354,7 +2353,7 @@ public final class SWF implements TreeItem {
                     fi.frame = f;
                     ret.add(fi);
                     if (f < stopFrame) {
-                        layers = (Map<Integer, Layer>) Helper.deepCopy(layers);
+                        layers = Helper.deepCopy(layers);
                     }
                 }
                 f++;
@@ -2437,7 +2436,7 @@ public final class SWF implements TreeItem {
                 colorTransform = new ColorTransform();
             }
 
-            ColorTransform clrTrans = (ColorTransform) Helper.deepCopy(colorTransform);
+            ColorTransform clrTrans = Helper.deepCopy(colorTransform);
             if (layer.colorTransForm != null && layer.blendMode <= 1) { //Normal blend mode
                 clrTrans = colorTransform.merge(layer.colorTransForm);
             }

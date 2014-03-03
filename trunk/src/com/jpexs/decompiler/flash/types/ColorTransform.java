@@ -57,8 +57,7 @@ public class ColorTransform implements Serializable {
     }
 
     public GRADRECORD[] apply(GRADRECORD[] gradRecords) {
-        @SuppressWarnings("unchecked")
-        GRADRECORD[] ret = (GRADRECORD[]) Helper.deepCopy(gradRecords);
+        GRADRECORD[] ret = Helper.deepCopy(gradRecords);
         for (GRADRECORD r : ret) {
             r.color = apply(r.color);
         }

@@ -189,7 +189,7 @@ public class MethodBody implements Cloneable, Serializable {
     }
 
     public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
-        MethodBody b = (MethodBody) Helper.deepCopy(this);
+        MethodBody b = Helper.deepCopy(this);
         AVM2Code deobfuscated = b.code;
         deobfuscated.markMappedOffsets();
         if (Configuration.autoDeobfuscate.get()) {

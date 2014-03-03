@@ -539,7 +539,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     private GraphTargetItem removeVarLast(GraphTargetItem item, int cnt) {
-        item = (GraphTargetItem) Helper.deepCopy(item);
+        item = Helper.deepCopy(item);
 
         for (int i = 0; i < cnt; i++) {
             if (item instanceof GetMemberActionItem) {
@@ -551,7 +551,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     private GraphTargetItem addGlobalPrefix(GraphTargetItem item) {
-        item = (GraphTargetItem) Helper.deepCopy(item);
+        item = Helper.deepCopy(item);
         GraphTargetItem first = item;
         GetMemberActionItem mem = null;
         do {

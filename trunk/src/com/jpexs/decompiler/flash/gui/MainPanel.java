@@ -2614,7 +2614,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 if (mat == null) {
                                     mat = new MATRIX();
                                 }
-                                mat = (MATRIX) Helper.deepCopy(mat);
+                                mat = Helper.deepCopy(mat);
                                 if (parent instanceof BoundedTag) {
                                     RECT r = ((BoundedTag) parent).getRect(swf.characters, new Stack<Integer>());
                                     mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
