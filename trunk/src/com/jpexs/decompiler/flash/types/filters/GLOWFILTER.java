@@ -76,4 +76,14 @@ public class GLOWFILTER extends FILTER {
     public SerializableImage apply(SerializableImage src) {
         return Filtering.glow(src, (int) blurX, (int) blurY, strength, glowColor.toColor(), innerGlow, knockout, passes);
     }
+
+    @Override
+    public double getDeltaX() {
+        return blurX;
+    }
+    
+    @Override
+    public double getDeltaY() {
+        return blurY;
+    }
 }

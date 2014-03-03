@@ -86,4 +86,14 @@ public class DROPSHADOWFILTER extends FILTER {
     public SerializableImage apply(SerializableImage src) {
         return Filtering.dropShadow(src, (int) blurX, (int) blurY, (int) (angle * 180 / Math.PI), distance, dropShadowColor.toColor(), innerShadow, passes, strength, knockout);
     }
+
+    @Override
+    public double getDeltaX() {
+        return blurX;
+    }
+    
+    @Override
+    public double getDeltaY() {
+        return blurY;
+    }
 }

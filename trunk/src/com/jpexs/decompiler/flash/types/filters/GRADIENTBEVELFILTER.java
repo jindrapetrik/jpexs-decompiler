@@ -117,4 +117,14 @@ public class GRADIENTBEVELFILTER extends FILTER {
 
         return Filtering.gradientBevel(src, colorsArr, ratiosAr, (int) blurX, (int) blurY, strength, type, (int) (angle * 180 / Math.PI), (float) distance, knockout, passes);
     }
+
+    @Override
+    public double getDeltaX() {
+        return blurX;
+    }
+    
+    @Override
+    public double getDeltaY() {
+        return blurY;
+    }
 }

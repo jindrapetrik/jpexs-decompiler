@@ -89,4 +89,14 @@ public class CONVOLUTIONFILTER extends FILTER {
         }
         return Filtering.convolution(src, matrix2, width, height);
     }
+
+    @Override
+    public double getDeltaX() {
+        return 0;
+    }
+    
+    @Override
+    public double getDeltaY() {
+        return 0;
+    }
 }

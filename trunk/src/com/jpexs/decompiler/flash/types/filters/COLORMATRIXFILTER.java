@@ -51,4 +51,14 @@ public class COLORMATRIXFILTER extends FILTER {
         //matrix2[4][4] = 1;
         return Filtering.colorMatrix(src, matrix2);
     }
+
+    @Override
+    public double getDeltaX() {
+        return 0;
+    }
+    
+    @Override
+    public double getDeltaY() {
+        return 0;
+    }
 }

@@ -2454,14 +2454,45 @@ public final class SWF implements TreeItem {
                     rect = mat.transform(rect);
                     Matrix m = mat.clone();
                     if (layer.filters != null) {
-                        // needs the whole size because of the filters
-                        img = new SerializableImage(image.getWidth(), image.getHeight(), SerializableImage.TYPE_INT_ARGB);
-                    } else {
-                        img = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
-                                (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
-                        m.translate(-rect.xMin, -rect.yMin);
-                        drawMatrix.translate(rect.xMin, rect.yMin);
+                        // calculate size after applying the filters
+                        double deltaXMax = 0;
+                        double deltaYMax = 0;
+                        for (FILTER filter : layer.filters) {
+                            double x = filter.getDeltaX();
+                            double y = filter.getDeltaY();
+                            deltaXMax = Math.max(x, deltaXMax);
+                            deltaYMax = Math.max(y, deltaYMax);
+                        }
+                        rect.xMin -= deltaXMax * SWF.unitDivisor;
+                        rect.xMax += deltaXMax * SWF.unitDivisor;
+                        rect.yMin -= deltaYMax * SWF.unitDivisor;
+                        rect.yMax += deltaYMax * SWF.unitDivisor;
                     }
+
+                    // align to whole pixels
+                    rect.xMin = (int) (Math.floor(rect.xMin / SWF.unitDivisor) * SWF.unitDivisor);
+                    rect.yMin = (int) (Math.floor(rect.yMin / SWF.unitDivisor) * SWF.unitDivisor);
+                    rect.xMax = (int) (Math.ceil(rect.xMax / SWF.unitDivisor) * SWF.unitDivisor);
+                    rect.yMax = (int) (Math.ceil(rect.yMax / SWF.unitDivisor) * SWF.unitDivisor);
+
+                    rect.xMin = Math.max(0, rect.xMin);
+                    rect.yMin = Math.max(0, rect.yMin);
+                    
+                    int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
+                    int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
+                    int deltaX = (int) (rect.xMin / SWF.unitDivisor);
+                    int deltaY = (int) (rect.yMin / SWF.unitDivisor);
+                    newWidth = Math.min(image.getWidth() - deltaX, newWidth);
+                    newHeight = Math.min(image.getHeight() - deltaY, newHeight);
+
+                    if (newWidth <= 0 || newHeight <= 0) {
+                        continue;
+                    }
+
+                    img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
+                    m.translate(-rect.xMin, -rect.yMin);
+                    drawMatrix.translate(rect.xMin, rect.yMin);
+                    
                     //Make all pixels transparent
                     Graphics2D gr = (Graphics2D) img.getGraphics();
                     gr.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);

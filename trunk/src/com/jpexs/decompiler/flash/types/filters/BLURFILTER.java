@@ -55,4 +55,14 @@ public class BLURFILTER extends FILTER {
     public SerializableImage apply(SerializableImage src) {
         return Filtering.blur(src, (int) blurX, (int) blurY, passes);
     }
+
+    @Override
+    public double getDeltaX() {
+        return blurX;
+    }
+    
+    @Override
+    public double getDeltaY() {
+        return blurY;
+    }
 }

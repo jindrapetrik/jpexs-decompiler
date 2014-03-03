@@ -101,4 +101,14 @@ public class BEVELFILTER extends FILTER {
         }
         return Filtering.bevel(src, (int) blurX, (int) blurY, strength, type, highlightColor.toColor(), shadowColor.toColor(), (int) (angle * 180 / Math.PI), (float) distance, knockout, passes);
     }
+
+    @Override
+    public double getDeltaX() {
+        return blurX;
+    }
+    
+    @Override
+    public double getDeltaY() {
+        return blurY;
+    }
 }

@@ -26,7 +26,7 @@ import java.io.Serializable;
  *
  * @author JPEXS
  */
-public class FILTER implements Serializable {
+public abstract class FILTER implements Serializable {
 
     /**
      * Identificator of type of the filter
@@ -43,7 +43,9 @@ public class FILTER implements Serializable {
         this.id = id;
     }
 
-    public SerializableImage apply(SerializableImage src) {
-        return src;
-    }
+    public abstract SerializableImage apply(SerializableImage src);
+    
+    public abstract double getDeltaX();
+
+    public abstract double getDeltaY();
 }

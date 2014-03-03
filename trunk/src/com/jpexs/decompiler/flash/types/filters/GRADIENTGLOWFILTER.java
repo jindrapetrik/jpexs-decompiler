@@ -119,4 +119,14 @@ public class GRADIENTGLOWFILTER extends FILTER {
         }
         return Filtering.gradientGlow(src, (int) blurX, (int) blurY, (int) (angle * 180 / Math.PI), distance, colors.toArray(new Color[colors.size()]), ratiosAr, type, passes, strength, knockout);
     }
+
+    @Override
+    public double getDeltaX() {
+        return blurX;
+    }
+    
+    @Override
+    public double getDeltaY() {
+        return blurY;
+    }
 }

@@ -168,7 +168,7 @@ public class Configuration {
     public static final ConfigurationItem<String> locale = null;
     @ConfigurationDefaultString("_loc%d_")
     public static final ConfigurationItem<String> registerNameFormat = null;
-    @ConfigurationDefaultInt(8)
+    @ConfigurationDefaultInt(10)
     public static final ConfigurationItem<Integer> maxRecentFileCount = null;
     public static final ConfigurationItem<String> recentFiles = null;
     public static final ConfigurationItem<String> fontPairing = null;
@@ -338,7 +338,7 @@ public class Configuration {
             recentFilesArray.remove(idx);
         }
         recentFilesArray.add(path);
-        while (recentFilesArray.size() >= maxRecentFileCount.get()) {
+        while (recentFilesArray.size() > maxRecentFileCount.get()) {
             recentFilesArray.remove(0);
         }
         recentFiles.set(Helper.joinStrings(recentFilesArray, "::"));
