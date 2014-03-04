@@ -205,6 +205,7 @@ public class DefineEditTextTag extends TextTag {
         TextStyle style = new TextStyle();
         style.font = getFontTag();
         style.fontHeight = fontHeight;
+        style.fontLeading = leading;
         if (hasTextColor) {
             style.textColor = textColor;
         }
@@ -258,6 +259,7 @@ public class DefineEditTextTag extends TextTag {
                                     if (firstChar != '+' && firstChar != '-') {
                                         int fontSize = Integer.parseInt(size);
                                         style.fontHeight = fontSize * style.font.getDivider();
+                                        style.fontLeading = leading;
                                     } else {
                                         // todo: parse relative sizes
                                     }
@@ -756,15 +758,19 @@ public class DefineEditTextTag extends TextTag {
 
     @Override
     public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        if (border) {
+            drawBorder(swf, image, textColor, getRect(characters, visited), getTextMatrix(), transformation, colorTransform);
+        }
         if (hasText) {
             DynamicTextModel textModel = new DynamicTextModel();
             List<CharacterWithStyle> txt = getTextWithStyle();
             TextStyle lastStyle = null;
+            char prevChar = 0;
             boolean lastWasWhiteSpace = false;
             for (int i = 0; i < txt.size(); i++) {
                 CharacterWithStyle cs = txt.get(i);
                 char c = cs.character;
-                if (c != '\n') {
+                if (c != '\r' && c != '\n') {
                     // create new SameStyleTextRecord for all words and all diffrent style text parts
                     if (lastWasWhiteSpace && !Character.isWhitespace(c)) {
                         textModel.newWord();
@@ -800,10 +806,13 @@ public class DefineEditTextTag extends TextTag {
                         lastWasWhiteSpace = true;
                     }
                 } else {
-                    if (multiline) {
-                        textModel.newParagraph();
+                    if (c == '\r' || prevChar != '\r') {
+                        if (multiline) {
+                            textModel.newParagraph();
+                        }
                     }
                 }
+                prevChar = c;
             }
 
             textModel.calculateTexWidths();
@@ -864,11 +873,15 @@ public class DefineEditTextTag extends TextTag {
             List<TEXTRECORD> allTextRecords = new ArrayList<>();
             int yOffset = 0;
             for (List<SameStyleTextRecord> line : lines) {
-                yOffset += fontHeight;
                 int width = 0;
+                int currentOffset = 0;
                 for (SameStyleTextRecord tr : line) {
                     width += tr.width;
+                    if (tr.style.fontHeight + tr.style.fontLeading > currentOffset) {
+                        currentOffset = tr.style.fontHeight + tr.style.fontLeading;
+                    }
                 }
+                yOffset += currentOffset;
                 int alignOffset = 0;
                 switch (align) {
                     case 0: // left

@@ -33,7 +33,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -145,9 +144,6 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                             (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
                     //Make all pixels transparent
                     Graphics2D g = (Graphics2D) image.getGraphics();
-                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g.setComposite(AlphaComposite.Src);
                     g.setColor(new Color(0, 0, 0, 0f));
                     g.fillRect(0, 0, image.getWidth(), image.getHeight());
@@ -233,9 +229,6 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                         (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
                 //Make all pixels transparent
                 Graphics2D g = (Graphics2D) image.getGraphics();
-                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g.setComposite(AlphaComposite.Src);
                 g.setColor(new Color(0, 0, 0, 0f));
                 g.fillRect(0, 0, image.getWidth(), image.getHeight());

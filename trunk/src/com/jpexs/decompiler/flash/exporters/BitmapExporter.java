@@ -39,7 +39,6 @@ import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
-import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
@@ -106,9 +105,6 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         double height = bounds.getHeight() / unitDivisor + 2 * (maxLineWidth + 1);
         image = new SerializableImage((int) width, (int) height, SerializableImage.TYPE_INT_ARGB);
         graphics = (Graphics2D) image.getGraphics();
-        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graphics.setComposite(AlphaComposite.Src);
 
         //Make all pixels transparent

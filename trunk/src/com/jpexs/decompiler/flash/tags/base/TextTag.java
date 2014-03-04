@@ -23,11 +23,17 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
@@ -192,6 +198,43 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         return att;
     }
 
+    public static void drawBorder(SWF swf, SerializableImage image, RGB color, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
+        Graphics2D g = (Graphics2D) image.getGraphics();
+        Matrix mat = transformation.clone();
+        mat = mat.concatenate(new Matrix(textMatrix));
+        SHAPE shape = new SHAPE();
+        shape.shapeRecords = new ArrayList<>();
+        StyleChangeRecord style = new StyleChangeRecord();
+        style.lineStyle = 1;
+        style.stateLineStyle = true;
+        style.stateMoveTo = true;
+        style.lineStyles = new LINESTYLEARRAY();
+        style.lineStyles.lineStyles = new LINESTYLE[1];
+        LINESTYLE lineStyle = new LINESTYLE();
+        lineStyle.color = color;
+        lineStyle.width = 20;
+        style.lineStyles.lineStyles[0] = lineStyle;
+        shape.shapeRecords.add(style);
+        StraightEdgeRecord top = new StraightEdgeRecord();
+        top.generalLineFlag = true;
+        top.deltaX = rect.getWidth();
+        StraightEdgeRecord right = new StraightEdgeRecord();
+        right.generalLineFlag = true;
+        right.deltaY = rect.getHeight();
+        StraightEdgeRecord bottom = new StraightEdgeRecord();
+        bottom.generalLineFlag = true;
+        bottom.deltaX = -rect.getWidth();
+        StraightEdgeRecord left = new StraightEdgeRecord();
+        left.generalLineFlag = true;
+        left.deltaY = -rect.getHeight();
+        shape.shapeRecords.add(top);
+        shape.shapeRecords.add(right);
+        shape.shapeRecords.add(bottom);
+        shape.shapeRecords.add(left);
+        shape.shapeRecords.add(new EndShapeRecord());
+        BitmapExporter.exportTo(swf, shape, null, image, mat, colorTransform);
+    }
+    
     public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;

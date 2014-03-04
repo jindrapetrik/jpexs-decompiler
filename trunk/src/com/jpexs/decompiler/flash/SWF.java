@@ -2225,9 +2225,6 @@ public final class SWF implements TreeItem {
                 (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
         //Make all pixels transparent
         Graphics2D g = (Graphics2D) image.getGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setComposite(AlphaComposite.Src);
         g.setColor(new Color(0, 0, 0, 0f));
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
@@ -2374,9 +2371,6 @@ public final class SWF implements TreeItem {
                     (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
             //Make all pixels transparent
             Graphics2D g = (Graphics2D) image.getGraphics();
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setComposite(AlphaComposite.Src);
             g.setColor(new Color(0, 0, 0, 0f));
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
@@ -2469,12 +2463,6 @@ public final class SWF implements TreeItem {
                         rect.yMax += deltaYMax * SWF.unitDivisor;
                     }
 
-                    // align to whole pixels
-                    rect.xMin = (int) (Math.floor(rect.xMin / SWF.unitDivisor) * SWF.unitDivisor);
-                    rect.yMin = (int) (Math.floor(rect.yMin / SWF.unitDivisor) * SWF.unitDivisor);
-                    rect.xMax = (int) (Math.ceil(rect.xMax / SWF.unitDivisor) * SWF.unitDivisor);
-                    rect.yMax = (int) (Math.ceil(rect.yMax / SWF.unitDivisor) * SWF.unitDivisor);
-
                     rect.xMin = Math.max(0, rect.xMin);
                     rect.yMin = Math.max(0, rect.yMin);
                     
@@ -2495,12 +2483,9 @@ public final class SWF implements TreeItem {
                     
                     //Make all pixels transparent
                     Graphics2D gr = (Graphics2D) img.getGraphics();
-                    gr.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                    gr.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                    gr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     gr.setComposite(AlphaComposite.Src);
                     gr.setColor(new Color(0, 0, 0, 0f));
-                    gr.fillRect(0, 0, img.getWidth(), image.getHeight());
+                    gr.fillRect(0, 0, img.getWidth(), img.getHeight());
                     drawable.toImage(dframe, layer.ratio, allTags, characters, visited, img, m, clrTrans);
                 } else if (drawable instanceof FontTag) {
                     // only DefineFont tags
@@ -2589,7 +2574,7 @@ public final class SWF implements TreeItem {
                     prevClips.add(g.getClip());
                     g.setTransform(AffineTransform.getTranslateInstance(0, 0));
                     g.setClip(clip.shape);
-                } else {
+                } else { 
                     g.setTransform(trans);
                     g.drawImage(img.getBufferedImage(), 0, 0, null);
                 }

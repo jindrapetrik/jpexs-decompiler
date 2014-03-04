@@ -30,6 +30,8 @@ public class TextStyle {
     
     public int fontHeight;
 
+    public int fontLeading;
+
     public boolean bold;
 
     public boolean italic;
