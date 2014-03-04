@@ -22,6 +22,8 @@ import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
@@ -29,6 +31,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -198,22 +201,36 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         return att;
     }
 
-    public static void drawBorder(SWF swf, SerializableImage image, RGB color, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
+    public static void drawBorder(SWF swf, SerializableImage image, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
         Graphics2D g = (Graphics2D) image.getGraphics();
         Matrix mat = transformation.clone();
         mat = mat.concatenate(new Matrix(textMatrix));
-        SHAPE shape = new SHAPE();
+        SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
+        shape.fillStyles = new FILLSTYLEARRAY();
+        if (fillColor != null) {
+            shape.fillStyles.fillStyles = new FILLSTYLE[1];
+            FILLSTYLE fillStyle = new FILLSTYLE();
+            fillStyle.fillStyleType = FILLSTYLE.SOLID;
+            fillStyle.color = fillColor;
+            shape.fillStyles.fillStyles[0] = fillStyle;
+        } else {
+            shape.fillStyles.fillStyles = new FILLSTYLE[0];
+        }
+        shape.lineStyles = new LINESTYLEARRAY();
+        shape.lineStyles.lineStyles = new LINESTYLE[1];
+        LINESTYLE lineStyle = new LINESTYLE();
+        lineStyle.color = borderColor;
+        lineStyle.width = 20;
+        shape.lineStyles.lineStyles[0] = lineStyle;
         shape.shapeRecords = new ArrayList<>();
         StyleChangeRecord style = new StyleChangeRecord();
         style.lineStyle = 1;
         style.stateLineStyle = true;
+        if (fillColor != null) {
+            style.stateFillStyle0 = true;
+            style.fillStyle0 = 1;
+        }
         style.stateMoveTo = true;
-        style.lineStyles = new LINESTYLEARRAY();
-        style.lineStyles.lineStyles = new LINESTYLE[1];
-        LINESTYLE lineStyle = new LINESTYLE();
-        lineStyle.color = color;
-        lineStyle.width = 20;
-        style.lineStyles.lineStyles[0] = lineStyle;
         shape.shapeRecords.add(style);
         StraightEdgeRecord top = new StraightEdgeRecord();
         top.generalLineFlag = true;

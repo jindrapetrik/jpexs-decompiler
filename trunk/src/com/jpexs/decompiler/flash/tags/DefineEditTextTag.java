@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -759,7 +760,10 @@ public class DefineEditTextTag extends TextTag {
     @Override
     public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         if (border) {
-            drawBorder(swf, image, textColor, getRect(characters, visited), getTextMatrix(), transformation, colorTransform);
+            // todo: how to get the border and fill colors?
+            RGB borderColor = new RGBA(Color.black);
+            RGB fillColor = new RGBA(Color.white);
+            drawBorder(swf, image, borderColor, fillColor, getRect(characters, visited), getTextMatrix(), transformation, colorTransform);
         }
         if (hasText) {
             DynamicTextModel textModel = new DynamicTextModel();
