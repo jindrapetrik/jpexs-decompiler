@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.Layer;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -29,6 +28,10 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -60,7 +63,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButton2Tag extends CharacterTag implements Container, BoundedTag, ButtonTag {
+public class DefineButton2Tag extends CharacterTag implements Container, BoundedTag, ButtonTag, Timelined {
 
     /**
      * ID for this character
@@ -85,6 +88,8 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
      */
     public List<BUTTONCONDACTION> actions = new ArrayList<>();
     public static final int ID = 34;
+
+    private Timeline timeline;
 
     @Override
     public int getCharacterId() {
@@ -258,26 +263,10 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
             return;
         }
         visited.push(buttonId);
-        HashMap<Integer, Layer> layers = new HashMap<>();
-        int maxDepth = 0;
-        for (BUTTONRECORD r : this.characters) {
-            if (r.buttonStateUp) {
-                Layer layer = new Layer();
-                layer.colorTransForm = r.colorTransform;
-                layer.blendMode = r.blendMode;
-                layer.filters = r.filterList;
-                layer.matrix = r.placeMatrix;
-                layer.characterId = r.characterId;
-                if (r.placeDepth > maxDepth) {
-                    maxDepth = r.placeDepth;
-                }
-                layers.put(r.placeDepth, layer);
-            }
-        }
         visited.pop();
         RECT displayRect = getRect(characters, visited);
         visited.push(buttonId);
-        SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited, image, transformation, colorTransform);
+        SWF.frameToImage(getTimeline(), frame, displayRect, visited, image, transformation, colorTransform);
     }
 
     @Override
@@ -289,5 +278,32 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     @Override
     public int getNumFrames() {
         return 1;
+    }
+
+    @Override
+    public Timeline getTimeline() {
+        if (timeline != null) {
+            return timeline;
+        }
+        timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId);
+
+        int maxDepth = 0;
+        Frame fr = new Frame();
+        for (BUTTONRECORD r : this.characters) {
+            if (r.buttonStateUp) {
+                DepthState layer = new DepthState();
+                layer.colorTransForm = r.colorTransform;
+                layer.blendMode = r.blendMode;
+                layer.filters = r.filterList;
+                layer.matrix = r.placeMatrix;
+                layer.characterId = r.characterId;
+                if (r.placeDepth > maxDepth) {
+                    maxDepth = r.placeDepth;
+                }
+                fr.layers.put(r.placeDepth, layer);
+            }
+        }
+        timeline.frames.add(fr);
+        return timeline;
     }
 }

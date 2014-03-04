@@ -91,6 +91,9 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.treeitems.AS2PackageNodeItem;
 import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
@@ -160,13 +163,14 @@ import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 import javax.imageio.ImageIO;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 
 /**
  * Class representing SWF file
  *
  * @author JPEXS
  */
-public final class SWF implements TreeItem {
+public final class SWF implements TreeItem,Timelined {
 
     /**
      * Default version of SWF file format
@@ -229,6 +233,16 @@ public final class SWF implements TreeItem {
     public Map<Integer, String> sourceFontsMap = new HashMap<>();
     public static final double unitDivisor = 20;
 
+    private Timeline timeline;
+    
+    @Override
+    public Timeline getTimeline(){
+        if(timeline == null){
+            timeline = new Timeline(this);
+        }
+        return timeline;
+    }
+    
     /**
      * Gets all tags with specified id
      *
@@ -2206,19 +2220,17 @@ public final class SWF implements TreeItem {
         return ret;
     }
 
-    public static SerializableImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
-        String key = "frame_" + frame + "_" + containerId + "_" + allTags.get(0).getSwf().hashCode();
+    public static SerializableImage frameToImageGet(Timeline timeline,int frame, RECT displayRect, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
+        String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode();
         SerializableImage image = getFromCache(key);
         if (image != null) {
             return image;
         }
 
-        List<FrameInfo> frameInfos = getFrameInfo(frame, frame, allTags, controlTags, totalFrameCount);
-        if (frameInfos.isEmpty()) {
+        
+        if (timeline.frames.isEmpty()) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
-
-        FrameInfo fi = frameInfos.get(0);
 
         RECT rect = displayRect;
         image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
@@ -2230,143 +2242,16 @@ public final class SWF implements TreeItem {
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
-        frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m, colorTransform);
+        frameToImage(timeline, frame, displayRect, visited, image, m, colorTransform);
         putToCache(key, image);
         return image;
     }
 
-    private static List<FrameInfo> getFrameInfo(int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, int totalFrameCount) {
-        List<FrameInfo> ret = new ArrayList<>();
-        if (startFrame > stopFrame) {
-            return ret;
-        }
-        if (totalFrameCount == 0) {
-            return ret;
-        }
+   
 
-        while (startFrame >= totalFrameCount) {
-            startFrame -= totalFrameCount;
-        }
-
-        while (stopFrame >= totalFrameCount) {
-            stopFrame -= totalFrameCount;
-        }
-
-        Map<Integer, CharacterTag> characters = new HashMap<>();
-        for (Tag t : allTags) {
-            if (t instanceof CharacterTag) {
-                CharacterTag ch = (CharacterTag) t;
-                characters.put(ch.getCharacterId(), ch);
-            }
-        }
-
-        Map<Integer, Layer> layers = new HashMap<>();
-
-        int maxDepth = 0;
-        int f = 0;
-        Color backgroundColor = new Color(0, 0, 0, 0);
-        for (Tag t : controlTags) {
-            if (t instanceof SetBackgroundColorTag) {
-                SetBackgroundColorTag c = (SetBackgroundColorTag) t;
-                backgroundColor = new Color(c.backgroundColor.red, c.backgroundColor.green, c.backgroundColor.blue);
-            }
-
-            if (t instanceof PlaceObjectTypeTag) {
-                PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
-                int depth = po.getDepth();
-                if (depth > maxDepth) {
-                    maxDepth = depth;
-                }
-
-                if (!layers.containsKey(depth)) {
-                    layers.put(depth, new Layer());
-                }
-                Layer layer = layers.get(depth);
-                int characterId = po.getCharacterId();
-                if (characterId != -1) {
-                    layer.characterId = characterId;
-                }
-                layer.visible = po.isVisible();
-                if (po.flagMove()) {
-                    MATRIX matrix2 = po.getMatrix();
-                    if (matrix2 != null) {
-                        layer.matrix = matrix2;
-                    }
-                    String instanceName = po.getInstanceName();
-                    if (instanceName != null) {
-                        layer.instanceName = instanceName;
-                    }
-                    ColorTransform colorTransForm = po.getColorTransform();
-                    if (colorTransForm != null) {
-                        layer.colorTransForm = colorTransForm;
-                    }
-                    if (po.cacheAsBitmap()) {
-                        layer.cacheAsBitmap = true;
-                    }
-                    int blendMode = po.getBlendMode();
-                    if (blendMode != 0) {
-                        layer.blendMode = blendMode;
-                    }
-                    List<FILTER> filters = po.getFilters();
-                    if (filters != null) {
-                        layer.filters = filters;
-                    }
-                    int ratio = po.getRatio();
-                    if (ratio != -1) {
-                        layer.ratio = ratio;
-                    }
-                    int clipDepth = po.getClipDepth();
-                    if (clipDepth != -1) {
-                        layer.clipDepth = clipDepth;
-                    }
-                } else {
-                    layer.matrix = po.getMatrix();
-                    layer.instanceName = po.getInstanceName();
-                    layer.colorTransForm = po.getColorTransform();
-                    layer.cacheAsBitmap = po.cacheAsBitmap();
-                    layer.blendMode = po.getBlendMode();
-                    layer.filters = po.getFilters();
-                    layer.ratio = po.getRatio();
-                    layer.clipDepth = po.getClipDepth();
-                    layer.time = 0;
-                }
-            }
-
-            if (t instanceof RemoveTag) {
-                RemoveTag rt = (RemoveTag) t;
-                layers.remove(rt.getDepth());
-
-            }
-            if (t instanceof ShowFrameTag) {
-                for (Layer l : layers.values()) {
-                    l.time++;
-                }
-                if ((f >= startFrame) && (f <= stopFrame)) {
-                    FrameInfo fi = new FrameInfo();
-                    fi.maxDepth = maxDepth;
-                    fi.layers = layers;
-                    fi.backgroundColor = backgroundColor;
-                    fi.characters = characters;
-                    fi.frame = f;
-                    ret.add(fi);
-                    if (f < stopFrame) {
-                        layers = Helper.deepCopy(layers);
-                    }
-                }
-                f++;
-                if (f > stopFrame) {
-                    break;
-                }
-            }
-        }
-
-        return ret;
-    }
-
-    public static void framesToImage(int containerId, List<SerializableImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
-        List<FrameInfo> frameInfos = getFrameInfo(startFrame, stopFrame, allTags, controlTags, totalFrameCount);
+    public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {        
         RECT rect = displayRect;
-        for (FrameInfo fi : frameInfos) {
+        for (int f=0;f<timeline.frames.size();f++) {
             SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                     (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
             //Make all pixels transparent
@@ -2376,7 +2261,7 @@ public final class SWF implements TreeItem {
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
-            frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, m, colorTransform);
+            frameToImage(timeline, f, displayRect, visited, image, m, colorTransform);
             ret.add(image);
         }
     }
@@ -2393,18 +2278,18 @@ public final class SWF implements TreeItem {
 
     }
 
-    public static void frameToImage(int containerId, int maxDepth, Map<Integer, Layer> layers, Color backgroundColor, Map<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public static void frameToImage(Timeline timeline, int frame,RECT displayRect, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         float unzoom = (float) SWF.unitDivisor;
-
+        Frame frameObj = timeline.frames.get(frame);
         Graphics2D g = (Graphics2D) image.getGraphics();
-        g.setPaint(backgroundColor);
+        g.setPaint(frameObj.backgroundColor.toColor());
         g.fill(new Rectangle(image.getWidth(), image.getHeight()));
         g.setTransform(transformation.toTransform());
         List<Clip> clips = new ArrayList<>();
         List<Shape> prevClips = new ArrayList<>();
+        
 
-        for (int i = 1; i <= maxDepth; i++) {
-
+        for (int i = 1; i <= timeline.getMaxDepth(); i++) {           
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).clipDepth == i) {
                     g.setClip(prevClips.get(c));
@@ -2412,17 +2297,17 @@ public final class SWF implements TreeItem {
                     clips.remove(c);
                 }
             }
-            if (!layers.containsKey(i)) {
+            if (!frameObj.layers.containsKey(i)) {
                 continue;
             }
-            Layer layer = layers.get(i);
-            if (!characters.containsKey(layer.characterId)) {
+            DepthState layer = frameObj.layers.get(i);
+            if (!timeline.characters.containsKey(layer.characterId)) {
                 continue;
             }
-            if (!layer.visible) {
+            if (!layer.isVisible) {
                 continue;
             }
-            CharacterTag character = characters.get(layer.characterId);
+            CharacterTag character = timeline.characters.get(layer.characterId);
             Matrix mat = new Matrix(layer.matrix);
             mat = mat.preConcatenate(transformation);
 
@@ -2440,10 +2325,10 @@ public final class SWF implements TreeItem {
                 DrawableTag drawable = (DrawableTag) character;
                 SerializableImage img;
                 Matrix drawMatrix = new Matrix();
-                int dframe = 1 + layer.time % drawable.getNumFrames();
+                int dframe = 0 + layer.time % drawable.getNumFrames();
                 if (drawable instanceof BoundedTag) {
                     BoundedTag bounded = (BoundedTag) drawable;
-                    RECT boundRect = bounded.getRect(characters, new Stack<Integer>());
+                    RECT boundRect = bounded.getRect(timeline.characters, new Stack<Integer>());
                     ExportRectangle rect = new ExportRectangle(boundRect);
                     rect = mat.transform(rect);
                     Matrix m = mat.clone();
@@ -2486,11 +2371,11 @@ public final class SWF implements TreeItem {
                     gr.setComposite(AlphaComposite.Src);
                     gr.setColor(new Color(0, 0, 0, 0f));
                     gr.fillRect(0, 0, img.getWidth(), img.getHeight());
-                    drawable.toImage(dframe, layer.ratio, allTags, characters, visited, img, m, clrTrans);
+                    drawable.toImage(dframe, layer.ratio, timeline.swf.tags, timeline.characters, visited, img, m, clrTrans);
                 } else if (drawable instanceof FontTag) {
                     // only DefineFont tags
-                    FontTag fontTag = (FontTag) drawable;
-                    img = fontTag.toImage(dframe, layer.ratio, allTags, characters, visited, transformation, clrTrans);
+                    FontTag fontTag = (FontTag) drawable;                    
+                    img = fontTag.toImage(dframe, layer.ratio, timeline.swf.tags, timeline.characters, visited, transformation, clrTrans);
                 } else {
                     throw new Error("Unsupported drawable.");
                 }
@@ -2508,7 +2393,7 @@ public final class SWF implements TreeItem {
                 drawMatrix.translateX /= unzoom;
                 drawMatrix.translateY /= unzoom;
                 AffineTransform trans = drawMatrix.toTransform();
-
+                               
                 switch (layer.blendMode) {
                     case 0:
                     case 1:
@@ -2590,7 +2475,7 @@ public final class SWF implements TreeItem {
                 BoundedTag b = (BoundedTag) character;
                 g.setPaint(new Color(255, 255, 255, 128));
                 g.setComposite(BlendComposite.Invert);
-                RECT r = b.getRect(characters, visited);
+                RECT r = b.getRect(timeline.characters, visited);
                 int div = (int) unzoom;
                 g.drawString(character.toString(), r.Xmin / div + 3, r.Ymin / div + 15);
                 g.draw(new Rectangle(r.Xmin / div, r.Ymin / div, r.getWidth() / div, r.getHeight() / div));
@@ -2600,14 +2485,6 @@ public final class SWF implements TreeItem {
             }
         }
         g.setTransform(AffineTransform.getScaleInstance(1, 1));
-    }
-
-    public static void frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        List<FrameInfo> frameInfos = getFrameInfo(frame, frame, allTags, controlTags, totalFrameCount);
-        if (!frameInfos.isEmpty()) {
-            FrameInfo fi = frameInfos.get(0);
-            frameToImage(containerId, fi.maxDepth, fi.layers, fi.backgroundColor, fi.characters, fi.frame, allTags, controlTags, displayRect, visited, image, transformation, colorTransform);
-        }
     }
 
     public void removeTagFromTimeline(Tag toRemove, List<Tag> timeline) {

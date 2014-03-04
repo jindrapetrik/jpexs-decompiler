@@ -1,23 +1,22 @@
 /*
  *  Copyright (C) 2010-2014 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
-import com.jpexs.decompiler.flash.Layer;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -32,6 +31,10 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -64,7 +67,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedTag, ButtonTag {
+public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedTag, ButtonTag, Timelined {
 
     /**
      * ID for this character
@@ -88,6 +91,8 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         return buttonId;
     }
     private final long hdrSize;
+
+    private Timeline timeline;
 
     @Override
     public List<BUTTONRECORD> getRecords() {
@@ -279,26 +284,11 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             return;
         }
         visited.push(buttonId);
-        HashMap<Integer, Layer> layers = new HashMap<>();
-        int maxDepth = 0;
-        for (BUTTONRECORD r : this.characters) {
-            if (r.buttonStateUp) {
-                Layer layer = new Layer();
-                layer.colorTransForm = r.colorTransform;
-                layer.blendMode = r.blendMode;
-                layer.filters = r.filterList;
-                layer.matrix = r.placeMatrix;
-                layer.characterId = r.characterId;
-                if (r.placeDepth > maxDepth) {
-                    maxDepth = r.placeDepth;
-                }
-                layers.put(r.placeDepth, layer);
-            }
-        }
+
         visited.pop();
         RECT displayRect = getRect(characters, visited);
         visited.push(buttonId);
-        SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited, image, transformation, colorTransform);
+        SWF.frameToImage(getTimeline(), frame, displayRect, visited, image, transformation, colorTransform);
         visited.pop();
     }
 
@@ -332,4 +322,32 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     public String removePrefixAndSuffix(String source) {
         return source;
     }
+
+    @Override
+    public Timeline getTimeline() {
+        if (timeline != null) {
+            return timeline;
+        }
+        timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId);
+
+        int maxDepth = 0;
+        Frame fr = new Frame();
+        for (BUTTONRECORD r : this.characters) {
+            if (r.buttonStateUp) {
+                DepthState layer = new DepthState();
+                layer.colorTransForm = r.colorTransform;
+                layer.blendMode = r.blendMode;
+                layer.filters = r.filterList;
+                layer.matrix = r.placeMatrix;
+                layer.characterId = r.characterId;
+                if (r.placeDepth > maxDepth) {
+                    maxDepth = r.placeDepth;
+                }
+                fr.layers.put(r.placeDepth, layer);
+            }
+        }
+        timeline.frames.add(fr);
+        return timeline;
+    }
+
 }

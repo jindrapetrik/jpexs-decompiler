@@ -42,6 +42,8 @@ public class DepthState {
     public CLIPACTIONS clipActions = null;
     public int ratio;
     public boolean key = false;
+    public int clipDepth;
+    public int time = 0;
 
     public DepthState() {
 
@@ -59,5 +61,7 @@ public class DepthState {
         backGroundColor = obj.backGroundColor;
         clipActions = obj.clipActions;
         ratio = obj.ratio;
+        clipDepth = obj.clipDepth;
+        time = obj.time+1;
     }
 }

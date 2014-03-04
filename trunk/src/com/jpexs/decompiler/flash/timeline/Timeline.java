@@ -18,8 +18,10 @@ package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
@@ -27,7 +29,9 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -36,6 +40,9 @@ import java.util.List;
 public class Timeline {
 
     public List<Frame> frames = new ArrayList<>();
+    public int id;
+    public Map<Integer,CharacterTag> characters = new HashMap<>();
+    public SWF swf;
 
     public Timeline() {
     }
@@ -56,9 +63,24 @@ public class Timeline {
         return frames.size();
     }
 
-    public Timeline(SWF swf) {
+    public Timeline(SWF swf){
+        this(swf,swf.tags,0);
+    }
+    
+    public Timeline(SWF swf,List<Tag> tags,int id) {
+        this.id =id;
+        this.swf = swf;
         Frame frame = new Frame();
         for (Tag t : swf.tags) {
+            if(t instanceof CharacterTag){
+                CharacterTag c=(CharacterTag)t;
+                characters.put(c.getCharacterId(), c);
+            }
+        }
+        for (Tag t : tags) {
+            if(t instanceof SetBackgroundColorTag){
+                frame.backgroundColor = ((SetBackgroundColorTag)t).backgroundColor;
+            }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int depth = po.getDepth();
@@ -103,6 +125,10 @@ public class Timeline {
                     if (ratio2 > -1) {
                         fl.ratio = ratio2;
                     }
+                    int clipDepth2 = po.getClipDepth();
+                    if(clipDepth2>-1){
+                        fl.clipDepth = clipDepth2;
+                    }
                 } else {
                     fl.matrix = po.getMatrix();
                     fl.instanceName = po.getInstanceName();
@@ -112,6 +138,7 @@ public class Timeline {
                     fl.filters = po.getFilters();
                     fl.ratio = po.getRatio();
                     fl.clipActions = po.getClipActions();
+                    fl.clipDepth = po.getClipDepth();
                 }
                 fl.key = true;
             }

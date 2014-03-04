@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2014 JPEXS
+ * Copyright (C) 2014 JPEXS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,33 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.timeline;
 
-import com.jpexs.decompiler.flash.tags.DoActionTag;
-import com.jpexs.decompiler.flash.types.RGB;
-import com.jpexs.decompiler.flash.types.RGBA;
-import java.util.HashMap;
-import java.util.Map;
+package com.jpexs.decompiler.flash.timeline;
 
 /**
  *
  * @author JPEXS
  */
-public class Frame {
-
-    public Map<Integer, DepthState> layers = new HashMap<>();
-    public DoActionTag action;
-    public RGB backgroundColor = new RGBA(0,0,0,0);
-
-    public Frame() {
-
-    }
-
-    public Frame(Frame obj) {
-        layers = new HashMap<>();
-        for (int depth : obj.layers.keySet()) {
-            layers.put(depth, new DepthState(obj.layers.get(depth)));
-        }
-    }
-
+public interface Timelined {
+    public Timeline getTimeline();
 }

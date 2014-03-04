@@ -29,6 +29,8 @@ import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -52,7 +54,7 @@ import java.util.Stack;
 /**
  * Defines a sprite character
  */
-public class DefineSpriteTag extends CharacterTag implements Container, BoundedTag, DrawableTag {
+public class DefineSpriteTag extends CharacterTag implements Container, BoundedTag, DrawableTag, Timelined {
 
     /**
      * Character ID of sprite
@@ -70,6 +72,16 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     public List<Tag> subTags;
 
     public static final int ID = 39;
+
+    private Timeline timeline;
+
+    @Override
+    public Timeline getTimeline() {
+        if (timeline == null) {
+            timeline = new Timeline(swf, subTags, spriteId);
+        }
+        return timeline;
+    }
 
     @Override
     public int getCharacterId() {
@@ -283,7 +295,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
         }
         RECT rect = getRect(characters, visited);
         visited.push(spriteId);
-        SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited, image, transformation, colorTransform);
+        SWF.frameToImage(getTimeline(), frame, rect, visited, image, transformation, colorTransform);
         visited.pop();
     }
 
