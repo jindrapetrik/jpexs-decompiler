@@ -829,10 +829,12 @@ public class DefineEditTextTag extends TextTag {
                     for (Word word : paragraph.words) {
                         if (lineLength + word.width <= bounds.getWidth()) {
                             line.addAll(word.records);
+                            lineLength += word.width;
                         } else {
                             lines.add(line);
                             line = new ArrayList<>();
                             line.addAll(word.records);
+                            lineLength = 0;
                         }
                     }
                     if (!line.isEmpty()) {
