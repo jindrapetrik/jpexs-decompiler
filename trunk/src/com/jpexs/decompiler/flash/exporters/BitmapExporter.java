@@ -105,12 +105,9 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         double width = bounds.getWidth() / unitDivisor + 2 * (maxLineWidth + 1);
         double height = bounds.getHeight() / unitDivisor + 2 * (maxLineWidth + 1);
         image = new SerializableImage((int) width, (int) height, SerializableImage.TYPE_INT_ARGB);
-        graphics = (Graphics2D) image.getGraphics();
-        graphics.setComposite(AlphaComposite.Src);
+        image.fillTransparent();
 
-        //Make all pixels transparent
-        graphics.setColor(new Color(0, 0, 0, 0f));
-        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+        graphics = (Graphics2D) image.getGraphics();
 
         defaultStroke = graphics.getStroke();
         super.export();

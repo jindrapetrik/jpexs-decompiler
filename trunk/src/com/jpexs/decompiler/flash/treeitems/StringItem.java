@@ -26,10 +26,16 @@ public class StringItem implements TreeItem {
 
     public SWF swf;
     private final String str;
+    private final String name;
 
-    public StringItem(String str, SWF swf) {
+    public StringItem(String str, String name, SWF swf) {
         this.swf = swf;
         this.str = str;
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

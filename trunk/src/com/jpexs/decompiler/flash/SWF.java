@@ -2233,11 +2233,7 @@ public final class SWF implements TreeItem, Timelined {
         RECT rect = displayRect;
         image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                 (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
-        //Make all pixels transparent
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        g.setComposite(AlphaComposite.Src);
-        g.setColor(new Color(0, 0, 0, 0f));
-        g.fillRect(0, 0, image.getWidth(), image.getHeight());
+        image.fillTransparent();
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
         frameToImage(timeline, frame, displayRect, visited, image, m, colorTransform);
@@ -2250,11 +2246,7 @@ public final class SWF implements TreeItem, Timelined {
         for (int f = 0; f < timeline.frames.size(); f++) {
             SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                     (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
-            // Make all pixels transparent
-            Graphics2D g = (Graphics2D) image.getGraphics();
-            g.setComposite(AlphaComposite.Src);
-            g.setColor(new Color(0, 0, 0, 0f));
-            g.fillRect(0, 0, image.getWidth(), image.getHeight());
+            image.fillTransparent();
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
             frameToImage(timeline, f, displayRect, visited, image, m, colorTransform);
@@ -2343,29 +2335,26 @@ public final class SWF implements TreeItem, Timelined {
                         rect.yMax += deltaYMax * SWF.unitDivisor;
                     }
 
-                    rect.xMin = Math.max(0, rect.xMin - 1);
-                    rect.yMin = Math.max(0, rect.yMin - 1);
+                    rect.xMin = Math.max(0, rect.xMin);
+                    rect.yMin = Math.max(0, rect.yMin);
 
                     int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
                     int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
                     int deltaX = (int) (rect.xMin / SWF.unitDivisor);
                     int deltaY = (int) (rect.yMin / SWF.unitDivisor);
-                    newWidth = Math.min(image.getWidth() - deltaX, newWidth) + 2;
-                    newHeight = Math.min(image.getHeight() - deltaY, newHeight) + 2;
+                    newWidth = Math.min(image.getWidth() - deltaX, newWidth) + 1;
+                    newHeight = Math.min(image.getHeight() - deltaY, newHeight) + 1;
 
                     if (newWidth <= 0 || newHeight <= 0) {
                         continue;
                     }
 
                     img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
+                    img.fillTransparent();
+
                     m.translate(-rect.xMin, -rect.yMin);
                     drawMatrix.translate(rect.xMin, rect.yMin);
 
-                    //Make all pixels transparent
-                    Graphics2D gr = (Graphics2D) img.getGraphics();
-                    gr.setComposite(AlphaComposite.Src);
-                    gr.setColor(new Color(0, 0, 0, 0f));
-                    gr.fillRect(0, 0, img.getWidth(), img.getHeight());
                     drawable.toImage(dframe, layer.ratio, timeline.swf.tags, timeline.characters, visited, img, m, clrTrans);
                 } else if (drawable instanceof FontTag) {
                     // only DefineFont tags

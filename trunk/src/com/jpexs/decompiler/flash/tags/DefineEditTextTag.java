@@ -306,7 +306,9 @@ public class DefineEditTextTag extends TextTag {
                         addCharacters(ret, txt, style);
                     }
                 };
-                str = "<root>" + str + "</root>";
+                str = "<!DOCTYPE html [\n" +
+                      "    <!ENTITY nbsp \"&#160;\"> \n" +
+                      "]><root>" + str + "</root>";
                 saxParser.parse(new ByteArrayInputStream(str.getBytes(Utf8Helper.charset)), handler);
             } catch (ParserConfigurationException | SAXException | IOException ex) {
                 Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, null, ex);

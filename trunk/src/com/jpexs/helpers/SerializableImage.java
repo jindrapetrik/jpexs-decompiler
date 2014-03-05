@@ -16,6 +16,8 @@
  */
 package com.jpexs.helpers;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -23,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -72,6 +75,14 @@ public class SerializableImage implements Serializable {
         return image;
     }
 
+    public void fillTransparent() {
+        // Make all pixels transparent
+        Graphics2D g = (Graphics2D) getGraphics();
+        g.setComposite(AlphaComposite.Src);
+        g.setColor(new Color(0, 0, 0, 0f));
+        g.fillRect(0, 0, getWidth(), getHeight());
+    }
+    
     @Override
     protected Object clone() throws CloneNotSupportedException {
         SerializableImage retImage = new SerializableImage();
