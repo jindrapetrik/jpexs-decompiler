@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public interface ButtonTag extends DrawableTag {
+public interface ButtonTag extends DrawableTag, Timelined {
 
     public List<BUTTONRECORD> getRecords();
 

@@ -196,7 +196,8 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
         return 2;
     }
 
-    private SHAPEWITHSTYLE getShapeAtRatio(int ratio) {
+    @Override
+    public SHAPEWITHSTYLE getShapeAtRatio(int ratio) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(ratio);
         LINESTYLEARRAY lineStyles = morphLineStyles.getLineStylesAt(getShapeNum(), ratio);

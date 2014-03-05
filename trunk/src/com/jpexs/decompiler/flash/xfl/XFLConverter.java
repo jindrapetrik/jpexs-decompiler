@@ -1336,7 +1336,7 @@ public class XFLConverter {
             } else if (symbol instanceof ImageTag) {
                 ImageTag imageTag = (ImageTag) symbol;
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                SerializableImage image = imageTag.getImage(tags);
+                SerializableImage image = imageTag.getImage();
                 String format = imageTag.getImageFormat();
                 try {
                     ImageIO.write(image.getBufferedImage(), format.toUpperCase(), baos);
@@ -1675,7 +1675,7 @@ public class XFLConverter {
                 ret += " soundSync=\"stop\"";
             } else if (startSound.soundInfo.syncNoMultiple) {
                 ret += " soundSync=\"start\"";
-            };
+            }
             soundEnvelopeStr += "<SoundEnvelope>";
             if (startSound.soundInfo.hasEnvelope) {
                 for (SOUNDENVELOPE env : startSound.soundInfo.envelopeRecords) {

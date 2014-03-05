@@ -34,7 +34,6 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
-import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -65,7 +64,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedTag, ButtonTag, Timelined {
+public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedTag, ButtonTag {
 
     /**
      * ID for this character
@@ -328,12 +327,19 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         }
         timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId);
 
+        ColorTransform clrTrans = null;
+        for (Tag t : swf.tags) {
+            if (t instanceof DefineButtonCxformTag) {
+                DefineButtonCxformTag cx = (DefineButtonCxformTag) t;
+                clrTrans = cx.buttonColorTransform;
+            }
+        }
         int maxDepth = 0;
         Frame fr = new Frame();
         for (BUTTONRECORD r : this.characters) {
             if (r.buttonStateUp) {
                 DepthState layer = new DepthState();
-                layer.colorTransForm = r.colorTransform;
+                layer.colorTransForm = clrTrans;
                 layer.blendMode = r.blendMode;
                 layer.filters = r.filterList;
                 layer.matrix = r.placeMatrix;

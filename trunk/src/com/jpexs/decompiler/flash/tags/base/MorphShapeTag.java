@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 
 /**
  *
@@ -40,4 +41,6 @@ public interface MorphShapeTag {
     public SHAPE getEndEdges();
 
     public int getShapeNum();
+
+    public SHAPEWITHSTYLE getShapeAtRatio(int ratio);
 }

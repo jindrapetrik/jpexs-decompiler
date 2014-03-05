@@ -174,7 +174,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             }
         }
         if (image != null) {
-            SerializableImage img = image.getImage(swf.tags);
+            SerializableImage img = image.getImage();
             if (img != null) {
                 colorTransform.apply(img);
                 int width = img.getWidth();

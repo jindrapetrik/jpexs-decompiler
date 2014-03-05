@@ -29,7 +29,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import javax.imageio.ImageIO;
 
 public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
@@ -61,7 +60,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage(List<Tag> tags) {
+    public SerializableImage getImage() {
         try {
             return new SerializableImage(ImageIO.read(getImageData()));
         } catch (IOException ex) {

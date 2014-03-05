@@ -31,7 +31,6 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
-import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -61,7 +60,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButton2Tag extends CharacterTag implements Container, BoundedTag, ButtonTag, Timelined {
+public class DefineButton2Tag extends CharacterTag implements Container, BoundedTag, ButtonTag {
 
     /**
      * ID for this character
