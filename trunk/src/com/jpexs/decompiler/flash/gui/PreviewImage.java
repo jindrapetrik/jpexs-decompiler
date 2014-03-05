@@ -119,7 +119,9 @@ public class PreviewImage extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         if (image != null) {
-            g.drawImage(image, 0, 0, null);
+            int x = (getWidth()- image.getWidth(this)) / 2;
+            int y = (getHeight() - image.getHeight(this)) / 2;
+            g.drawImage(image, x, y, null);
         } else {
             renderImageTask(tag);
         }
