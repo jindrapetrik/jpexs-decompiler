@@ -251,7 +251,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         shape.shapeRecords.add(new EndShapeRecord());
         BitmapExporter.exportTo(swf, shape, null, image, mat, colorTransform);
     }
-    
+
     public static void staticTextToImage(SWF swf, Map<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;

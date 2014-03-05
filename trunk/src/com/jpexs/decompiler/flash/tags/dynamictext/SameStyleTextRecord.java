@@ -25,7 +25,7 @@ import java.util.List;
  * @author JPEXS
  */
 public class SameStyleTextRecord {
-    
+
     public TextStyle style;
 
     public int xOffset;
@@ -35,7 +35,7 @@ public class SameStyleTextRecord {
     public List<GlyphCharacter> glyphEntries = new ArrayList<>();
 
     public int calculateTexWidths() {
-        
+
         int width = 0;
         for (GlyphCharacter gc : glyphEntries) {
             width += gc.glyphEntry.glyphAdvance;

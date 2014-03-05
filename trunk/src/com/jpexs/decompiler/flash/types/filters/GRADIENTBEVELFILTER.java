@@ -122,7 +122,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
     public double getDeltaX() {
         return blurX;
     }
-    
+
     @Override
     public double getDeltaY() {
         return blurY;

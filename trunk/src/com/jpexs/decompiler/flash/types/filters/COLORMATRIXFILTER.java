@@ -56,7 +56,7 @@ public class COLORMATRIXFILTER extends FILTER {
     public double getDeltaX() {
         return 0;
     }
-    
+
     @Override
     public double getDeltaY() {
         return 0;

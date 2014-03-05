@@ -113,7 +113,7 @@ public class SWFPreviewPanel extends JPanel implements FlashDisplay {
             }
         }
     }
-    
+
     private void drawFrame() {
         pan.setImage(frameImages.get(frame));
     }

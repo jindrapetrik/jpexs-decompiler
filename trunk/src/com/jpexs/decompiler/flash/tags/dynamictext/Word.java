@@ -26,9 +26,9 @@ import java.util.List;
  * @author JPEXS
  */
 public class Word {
-    
+
     public List<SameStyleTextRecord> records = new ArrayList<>();
-    
+
     private SameStyleTextRecord record;
     private final DynamicTextModel model;
     public int width;
@@ -36,9 +36,9 @@ public class Word {
     public Word(DynamicTextModel model) {
         this.model = model;
     }
-    
+
     public void addGlyph(char character, GLYPHENTRY glyphEntry) {
-        
+
         if (record == null) {
             record = new SameStyleTextRecord();
             record.style = model.style;
@@ -48,12 +48,12 @@ public class Word {
     }
 
     public void newRecord() {
-    
+
         record = null;
     }
 
     public int calculateTexWidths() {
-        
+
         int width = 0;
         for (SameStyleTextRecord r : records) {
             width += r.calculateTexWidths();

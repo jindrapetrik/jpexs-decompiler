@@ -1553,7 +1553,7 @@ public class ActionScriptParser {
             case FUNCTION:
                 s = lexer.lex();
                 String fname = "";
-                if (s.isType(SymbolType.IDENTIFIER,SymbolGroup.GLOBALFUNC)) {
+                if (s.isType(SymbolType.IDENTIFIER, SymbolGroup.GLOBALFUNC)) {
                     fname = s.value.toString();
                 } else {
                     lexer.pushback(s);

@@ -39,13 +39,10 @@ public class ActionDeobfuscation {
     public HashSet<String> allVariableNamesStr = new HashSet<>();
     private final HashMap<String, Integer> typeCounts = new HashMap<>();
 
-    
     public static final String VALID_FIRST_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
     public static final String VALID_NEXT_CHARACTERS = VALID_FIRST_CHARACTERS + "0123456789";
     public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
     public static final String FOO_JOIN_CHARACTERS = "aeiouy";
-
-    
 
     private String fooString(HashMap<String, String> deobfuscated, String orig, boolean firstUppercase, int rndSize) {
         boolean exists;

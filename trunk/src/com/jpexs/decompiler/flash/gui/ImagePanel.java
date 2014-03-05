@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -63,11 +62,11 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
     private SWF swf;
     private HashMap<Integer, CharacterTag> characters;
     private boolean loaded;
-    
+
     @Override
     public void setBackground(Color bg) {
         if (label != null) {
-            label.setBackground(bg);            
+            label.setBackground(bg);
         }
         super.setBackground(bg);
     }
@@ -164,7 +163,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                 setImage(img);
             }
             return;
-        }              
+        }
         play();
     }
 
@@ -213,16 +212,16 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             drawFrame();
         }
     }
-    
-    private static SerializableImage getFrame(SWF swf,int frame,DrawableTag drawable,Map<Integer,CharacterTag> characters){
+
+    private static SerializableImage getFrame(SWF swf, int frame, DrawableTag drawable, Map<Integer, CharacterTag> characters) {
         String key = "drawable_" + frame + "_" + drawable.hashCode();
         SerializableImage img = SWF.getFromCache(key);
         if (img == null) {
             if (drawable instanceof BoundedTag) {
                 BoundedTag bounded = (BoundedTag) drawable;
                 RECT rect = bounded.getRect(characters, new Stack<Integer>());
-                if(rect == null){ //??? Why?
-                    rect = new RECT(0,0,1,1);
+                if (rect == null) { //??? Why?
+                    rect = new RECT(0, 0, 1, 1);
                 }
                 SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                         (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
@@ -244,15 +243,15 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         }
         return img;
     }
-    
+
     private void drawFrame() {
         if (drawable == null) {
             return;
         }
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;
-        mat.translateY = swf.displayRect.Ymin;                
-        ImageIcon icon = new ImageIcon(getFrame(swf,frame,drawable,characters).getBufferedImage());
+        mat.translateY = swf.displayRect.Ymin;
+        ImageIcon icon = new ImageIcon(getFrame(swf, frame, drawable, characters).getBufferedImage());
         label.setIcon(icon);
     }
 

@@ -892,10 +892,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void load(SWFList newSwfs, boolean first) {
-        
+
         swfPreviewPanel.stop();
         imagePanel.stop();
-        
+
         swfs.add(newSwfs);
 
         for (SWF swf : newSwfs) {
@@ -2467,13 +2467,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             int containerId = 0;
             RECT rect = swf.displayRect;
             int totalFrameCount = swf.frameCount;
-            Timeline timeline=swf.getTimeline();
+            Timeline timeline = swf.getTimeline();
             if (fn.getParent() instanceof DefineSpriteTag) {
                 controlTags = ((DefineSpriteTag) fn.getParent()).subTags;
                 containerId = ((DefineSpriteTag) fn.getParent()).spriteId;
                 rect = ((DefineSpriteTag) fn.getParent()).getRect(swf.characters, new Stack<Integer>());
                 totalFrameCount = ((DefineSpriteTag) fn.getParent()).frameCount;
-                timeline = ((DefineSpriteTag)fn.getParent()).getTimeline();
+                timeline = ((DefineSpriteTag) fn.getParent()).getTimeline();
             }
             previewImagePanel.setImage(SWF.frameToImageGet(timeline, fn.getFrame() - 1, rect, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform()));
         } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
@@ -2907,7 +2907,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         textValue.setText(textTag.getFormattedText());
         textValue.setCaretPosition(0);
     }
-    
+
     public void expandSwfNodes() {
         TreeModel model = tagTree.getModel();
         Object node = model.getRoot();

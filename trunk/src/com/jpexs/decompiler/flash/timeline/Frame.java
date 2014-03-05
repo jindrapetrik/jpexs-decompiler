@@ -30,7 +30,7 @@ public class Frame {
 
     public Map<Integer, DepthState> layers = new HashMap<>();
     public DoActionTag action;
-    public RGB backgroundColor = new RGBA(0,0,0,0);
+    public RGB backgroundColor = new RGBA(0, 0, 0, 0);
 
     public Frame() {
 

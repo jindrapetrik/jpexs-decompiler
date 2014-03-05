@@ -41,7 +41,7 @@ public class Timeline {
 
     public List<Frame> frames = new ArrayList<>();
     public int id;
-    public Map<Integer,CharacterTag> characters = new HashMap<>();
+    public Map<Integer, CharacterTag> characters = new HashMap<>();
     public SWF swf;
 
     public Timeline() {
@@ -63,23 +63,23 @@ public class Timeline {
         return frames.size();
     }
 
-    public Timeline(SWF swf){
-        this(swf,swf.tags,0);
+    public Timeline(SWF swf) {
+        this(swf, swf.tags, 0);
     }
-    
-    public Timeline(SWF swf,List<Tag> tags,int id) {
-        this.id =id;
+
+    public Timeline(SWF swf, List<Tag> tags, int id) {
+        this.id = id;
         this.swf = swf;
         Frame frame = new Frame();
         for (Tag t : swf.tags) {
-            if(t instanceof CharacterTag){
-                CharacterTag c=(CharacterTag)t;
+            if (t instanceof CharacterTag) {
+                CharacterTag c = (CharacterTag) t;
                 characters.put(c.getCharacterId(), c);
             }
         }
         for (Tag t : tags) {
-            if(t instanceof SetBackgroundColorTag){
-                frame.backgroundColor = ((SetBackgroundColorTag)t).backgroundColor;
+            if (t instanceof SetBackgroundColorTag) {
+                frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
             }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
@@ -126,7 +126,7 @@ public class Timeline {
                         fl.ratio = ratio2;
                     }
                     int clipDepth2 = po.getClipDepth();
-                    if(clipDepth2>-1){
+                    if (clipDepth2 > -1) {
                         fl.clipDepth = clipDepth2;
                     }
                 } else {

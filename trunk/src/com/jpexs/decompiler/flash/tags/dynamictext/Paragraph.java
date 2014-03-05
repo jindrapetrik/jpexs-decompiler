@@ -26,7 +26,7 @@ import java.util.List;
  * @author JPEXS
  */
 public class Paragraph {
-    
+
     public List<Word> words = new ArrayList<>();
 
     private Word word;
@@ -39,7 +39,7 @@ public class Paragraph {
     }
 
     public void addGlyph(char character, GLYPHENTRY glyphEntry) {
-        
+
         if (word == null) {
             word = new Word(model);
             words.add(word);
@@ -53,14 +53,14 @@ public class Paragraph {
     }
 
     public void newRecord() {
-        
+
         if (word != null) {
             word.newRecord();
         }
     }
 
     public int calculateTexWidths() {
-        
+
         int width = 0;
         for (Word w : words) {
             width += w.calculateTexWidths();

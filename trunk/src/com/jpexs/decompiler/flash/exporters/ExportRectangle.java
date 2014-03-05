@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.types.RECT;
+import java.awt.geom.Rectangle2D;
 
 /**
  *
@@ -41,6 +42,13 @@ public class ExportRectangle {
         this.yMin = rect.Ymin;
         this.xMax = rect.Xmax;
         this.yMax = rect.Ymax;
+    }
+
+    public ExportRectangle(Rectangle2D rect) {
+        this.xMin = rect.getMinX();
+        this.yMin = rect.getMinY();
+        this.xMax = rect.getMaxX();
+        this.yMax = rect.getMaxY();
     }
 
     public double getWidth() {

@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.tags.dynamictext;
  * @author JPEXS
  */
 public class CharacterWithStyle {
-    
+
     public char character;
 
     public TextStyle style;

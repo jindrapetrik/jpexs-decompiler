@@ -760,7 +760,7 @@ public class DefineEditTextTag extends TextTag {
     @Override
     public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         if (border) {
-            // todo: how to get the border and fill colors?
+            // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
             RGB fillColor = new RGBA(Color.white);
             drawBorder(swf, image, borderColor, fillColor, getRect(characters, visited), getTextMatrix(), transformation, colorTransform);
@@ -853,7 +853,7 @@ public class DefineEditTextTag extends TextTag {
                     lines.add(line);
                 }
             }
-            
+
             // remove spaces after last word
             for (List<SameStyleTextRecord> line : lines) {
                 boolean removed = true;
@@ -865,17 +865,17 @@ public class DefineEditTextTag extends TextTag {
                     }
                     if (line.size() > 0) {
                         SameStyleTextRecord lastRecord = line.get(line.size() - 1);
-                        while (lastRecord.glyphEntries.size() > 0 &&
-                               Character.isWhitespace(lastRecord.glyphEntries.get(lastRecord.glyphEntries.size() - 1).character)) {
-                            lastRecord.glyphEntries.remove(lastRecord.glyphEntries.size() -1);
+                        while (lastRecord.glyphEntries.size() > 0
+                                && Character.isWhitespace(lastRecord.glyphEntries.get(lastRecord.glyphEntries.size() - 1).character)) {
+                            lastRecord.glyphEntries.remove(lastRecord.glyphEntries.size() - 1);
                             removed = true;
                         }
                     }
                 }
             }
-            
+
             textModel.calculateTexWidths();
-            
+
             List<TEXTRECORD> allTextRecords = new ArrayList<>();
             int yOffset = 0;
             for (List<SameStyleTextRecord> line : lines) {
@@ -946,7 +946,7 @@ public class DefineEditTextTag extends TextTag {
         }
         return font;
     }
-    
+
     @Override
     public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(bounds.Xmin / SWF.unitDivisor, bounds.Ymin / SWF.unitDivisor);

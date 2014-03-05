@@ -25,9 +25,9 @@ import com.jpexs.decompiler.flash.types.RGBA;
  * @author JPEXS
  */
 public class TextStyle {
-    
+
     public FontTag font;
-    
+
     public int fontHeight;
 
     public int fontLeading;

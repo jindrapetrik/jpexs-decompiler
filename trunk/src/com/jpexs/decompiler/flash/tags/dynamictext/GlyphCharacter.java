@@ -26,11 +26,11 @@ import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 public class GlyphCharacter {
 
     public GLYPHENTRY glyphEntry;
-    
+
     public char character;
-    
+
     public GlyphCharacter(char character, GLYPHENTRY glyphEntry) {
-        
+
         this.character = character;
         this.glyphEntry = glyphEntry;
     }

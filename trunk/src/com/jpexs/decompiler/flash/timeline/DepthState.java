@@ -62,6 +62,6 @@ public class DepthState {
         clipActions = obj.clipActions;
         ratio = obj.ratio;
         clipDepth = obj.clipDepth;
-        time = obj.time+1;
+        time = obj.time + 1;
     }
 }

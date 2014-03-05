@@ -40,7 +40,7 @@ public class ApplicationInfo {
     static {
         loadProperties();
     }
-    
+
     private static void loadProperties() {
         Properties prop = new Properties();
         try {

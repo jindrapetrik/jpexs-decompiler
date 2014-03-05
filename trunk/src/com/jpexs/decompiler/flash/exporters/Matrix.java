@@ -68,6 +68,18 @@ public class Matrix {
         }
     }
 
+    public Matrix(AffineTransform transform) {
+        this();
+        if (transform != null) {
+            scaleX = transform.getScaleX();
+            rotateSkew1 = transform.getShearX();
+            translateX = transform.getTranslateX();
+            rotateSkew0 = transform.getShearY();
+            scaleY = transform.getScaleY();
+            translateY = transform.getTranslateY();
+        }
+    }
+
     @Override
     public Matrix clone() {
         Matrix mat = new Matrix();

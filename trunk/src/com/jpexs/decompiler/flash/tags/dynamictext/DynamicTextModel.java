@@ -28,7 +28,7 @@ import java.util.List;
 public class DynamicTextModel {
 
     public List<Paragraph> paragraphs = new ArrayList<>();
-    
+
     private Paragraph paragraph;
     public TextStyle style;
     public int width;
@@ -36,18 +36,18 @@ public class DynamicTextModel {
     public DynamicTextModel() {
 
     }
-    
+
     public void addGlyph(char character, GLYPHENTRY glyphEntry) {
-        
+
         if (paragraph == null) {
             paragraph = new Paragraph(this);
             paragraphs.add(paragraph);
         }
         paragraph.addGlyph(character, glyphEntry);
     }
-    
+
     public void newParagraph() {
-        
+
         paragraph = null;
     }
 
@@ -59,14 +59,14 @@ public class DynamicTextModel {
     }
 
     public void newRecord() {
-        
+
         if (paragraph != null) {
             paragraph.newRecord();
         }
     }
-    
+
     public int calculateTexWidths() {
-        
+
         int width = 0;
         for (Paragraph p : paragraphs) {
             width += p.calculateTexWidths();

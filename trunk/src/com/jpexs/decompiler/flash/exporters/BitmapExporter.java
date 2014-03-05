@@ -43,6 +43,7 @@ import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.NoninvertibleTransformException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -373,7 +374,6 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     }
 
     protected void finalizePath() {
-        final int maxRepeat = 10; // TODO: better handle gradient repeating
         if (path != null) {
             if (fillPaint != null) {
                 if (fillPaint instanceof MultipleGradientPaint) {
@@ -383,21 +383,45 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
                     }
                     graphics.fill(path);
                     graphics.setClip(path);
+                    Matrix inverse = null;
+                    try {
+                        inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
+                    } catch (NoninvertibleTransformException ex) {
+                    }
+
                     fillTransform.preConcatenate(oldAf);
                     graphics.setTransform(fillTransform);
-
                     graphics.setPaint(fillPaint);
-                    graphics.fill(new java.awt.Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
+
+                    if (inverse != null) {
+                        ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
+                        double minX = rect.xMin;
+                        double minY = rect.yMin;
+                        graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                    }
+
                     graphics.setTransform(oldAf);
                     graphics.setClip(null);
                 } else if (fillPaint instanceof TexturePaint) {
                     AffineTransform oldAf = graphics.getTransform();
                     graphics.setClip(path);
+                    Matrix inverse = null;
+                    try {
+                        inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
+                    } catch (NoninvertibleTransformException ex) {
+                    }
+
                     fillTransform.preConcatenate(oldAf);
                     graphics.setTransform(fillTransform);
-
                     graphics.setPaint(fillPaint);
-                    graphics.fill(new java.awt.Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
+
+                    if (inverse != null) {
+                        ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
+                        double minX = rect.xMin;
+                        double minY = rect.yMin;
+                        graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                    }
+
                     graphics.setTransform(oldAf);
                     graphics.setClip(null);
                 } else {

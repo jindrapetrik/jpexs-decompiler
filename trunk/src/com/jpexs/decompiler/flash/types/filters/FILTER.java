@@ -44,7 +44,7 @@ public abstract class FILTER implements Serializable {
     }
 
     public abstract SerializableImage apply(SerializableImage src);
-    
+
     public abstract double getDeltaX();
 
     public abstract double getDeltaY();

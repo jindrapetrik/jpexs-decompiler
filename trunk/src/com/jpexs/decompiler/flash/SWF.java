@@ -71,7 +71,6 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
-import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
@@ -170,7 +169,7 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
  *
  * @author JPEXS
  */
-public final class SWF implements TreeItem,Timelined {
+public final class SWF implements TreeItem, Timelined {
 
     /**
      * Default version of SWF file format
@@ -234,15 +233,15 @@ public final class SWF implements TreeItem,Timelined {
     public static final double unitDivisor = 20;
 
     private Timeline timeline;
-    
+
     @Override
-    public Timeline getTimeline(){
-        if(timeline == null){
+    public Timeline getTimeline() {
+        if (timeline == null) {
             timeline = new Timeline(this);
         }
         return timeline;
     }
-    
+
     /**
      * Gets all tags with specified id
      *
@@ -2220,14 +2219,13 @@ public final class SWF implements TreeItem,Timelined {
         return ret;
     }
 
-    public static SerializableImage frameToImageGet(Timeline timeline,int frame, RECT displayRect, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame, RECT displayRect, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
         String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode();
         SerializableImage image = getFromCache(key);
         if (image != null) {
             return image;
         }
 
-        
         if (timeline.frames.isEmpty()) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
@@ -2247,14 +2245,12 @@ public final class SWF implements TreeItem,Timelined {
         return image;
     }
 
-   
-
-    public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {        
+    public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
         RECT rect = displayRect;
-        for (int f=0;f<timeline.frames.size();f++) {
+        for (int f = 0; f < timeline.frames.size(); f++) {
             SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                     (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
-            //Make all pixels transparent
+            // Make all pixels transparent
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setComposite(AlphaComposite.Src);
             g.setColor(new Color(0, 0, 0, 0f));
@@ -2278,7 +2274,7 @@ public final class SWF implements TreeItem,Timelined {
 
     }
 
-    public static void frameToImage(Timeline timeline, int frame,RECT displayRect, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public static void frameToImage(Timeline timeline, int frame, RECT displayRect, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         float unzoom = (float) SWF.unitDivisor;
         Frame frameObj = timeline.frames.get(frame);
         Graphics2D g = (Graphics2D) image.getGraphics();
@@ -2287,9 +2283,8 @@ public final class SWF implements TreeItem,Timelined {
         g.setTransform(transformation.toTransform());
         List<Clip> clips = new ArrayList<>();
         List<Shape> prevClips = new ArrayList<>();
-        
 
-        for (int i = 1; i <= timeline.getMaxDepth(); i++) {           
+        for (int i = 1; i <= timeline.getMaxDepth(); i++) {
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).clipDepth == i) {
                     g.setClip(prevClips.get(c));
@@ -2348,15 +2343,15 @@ public final class SWF implements TreeItem,Timelined {
                         rect.yMax += deltaYMax * SWF.unitDivisor;
                     }
 
-                    rect.xMin = Math.max(0, rect.xMin);
-                    rect.yMin = Math.max(0, rect.yMin);
-                    
+                    rect.xMin = Math.max(0, rect.xMin - 1);
+                    rect.yMin = Math.max(0, rect.yMin - 1);
+
                     int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
                     int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
                     int deltaX = (int) (rect.xMin / SWF.unitDivisor);
                     int deltaY = (int) (rect.yMin / SWF.unitDivisor);
-                    newWidth = Math.min(image.getWidth() - deltaX, newWidth);
-                    newHeight = Math.min(image.getHeight() - deltaY, newHeight);
+                    newWidth = Math.min(image.getWidth() - deltaX, newWidth) + 2;
+                    newHeight = Math.min(image.getHeight() - deltaY, newHeight) + 2;
 
                     if (newWidth <= 0 || newHeight <= 0) {
                         continue;
@@ -2365,7 +2360,7 @@ public final class SWF implements TreeItem,Timelined {
                     img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
                     m.translate(-rect.xMin, -rect.yMin);
                     drawMatrix.translate(rect.xMin, rect.yMin);
-                    
+
                     //Make all pixels transparent
                     Graphics2D gr = (Graphics2D) img.getGraphics();
                     gr.setComposite(AlphaComposite.Src);
@@ -2374,7 +2369,7 @@ public final class SWF implements TreeItem,Timelined {
                     drawable.toImage(dframe, layer.ratio, timeline.swf.tags, timeline.characters, visited, img, m, clrTrans);
                 } else if (drawable instanceof FontTag) {
                     // only DefineFont tags
-                    FontTag fontTag = (FontTag) drawable;                    
+                    FontTag fontTag = (FontTag) drawable;
                     img = fontTag.toImage(dframe, layer.ratio, timeline.swf.tags, timeline.characters, visited, transformation, clrTrans);
                 } else {
                     throw new Error("Unsupported drawable.");
@@ -2393,7 +2388,7 @@ public final class SWF implements TreeItem,Timelined {
                 drawMatrix.translateX /= unzoom;
                 drawMatrix.translateY /= unzoom;
                 AffineTransform trans = drawMatrix.toTransform();
-                               
+
                 switch (layer.blendMode) {
                     case 0:
                     case 1:
@@ -2459,7 +2454,7 @@ public final class SWF implements TreeItem,Timelined {
                     prevClips.add(g.getClip());
                     g.setTransform(AffineTransform.getTranslateInstance(0, 0));
                     g.setClip(clip.shape);
-                } else { 
+                } else {
                     g.setTransform(trans);
                     g.drawImage(img.getBufferedImage(), 0, 0, null);
                 }
