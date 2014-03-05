@@ -219,11 +219,19 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                 if (rect == null) { //??? Why?
                     rect = new RECT(0, 0, 1, 1);
                 }
-                SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
-                        (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                int width = rect.getWidth();
+                int height = rect.getHeight();
+                double scale = 1.0;
+                if (width > swf.displayRect.getWidth()) {
+                    scale = (double) swf.displayRect.getWidth() / (double) width;
+                    width = swf.displayRect.getWidth();
+                }
+                SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
+                        (int) (height / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
                 image.fillTransparent();
                 Matrix m = new Matrix();
                 m.translate(-rect.Xmin, -rect.Ymin);
+                m.scale(scale);
                 drawable.toImage(frame, frame, swf.tags, characters, new Stack<Integer>(), image, m, new ColorTransform());
                 img = image;
             } else if (drawable instanceof FontTag) {

@@ -29,8 +29,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import javax.imageio.ImageIO;
 
 /**
@@ -72,7 +70,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     public void setImage(byte[] data) {
         imageData = data;
         if (ImageTag.getImageFormat(data).equals("jpg")) {
-            SerializableImage image = getImage(new ArrayList<Tag>());
+            SerializableImage image = getImage();
             byte[] ba = new byte[image.getWidth() * image.getHeight()];
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
@@ -89,7 +87,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage(List<Tag> tags) {
+    public SerializableImage getImage() {
         try {
             SerializableImage img = new SerializableImage(ImageIO.read(new ByteArrayInputStream(imageData)));
             if (bitmapAlphaData.length == 0) {

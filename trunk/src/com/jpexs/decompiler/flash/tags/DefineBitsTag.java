@@ -29,7 +29,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import javax.imageio.ImageIO;
 
 public class DefineBitsTag extends ImageTag {
@@ -62,9 +61,9 @@ public class DefineBitsTag extends ImageTag {
         jpegData = sis.readBytesEx(sis.available());
     }
 
-    private void getJPEGTables(List<Tag> tags) {
+    private void getJPEGTables() {
         if (jtt == null) {
-            for (Tag t : tags) {
+            for (Tag t : swf.tags) {
                 if (t instanceof JPEGTablesTag) {
                     jtt = (JPEGTablesTag) t;
                     break;
@@ -79,8 +78,8 @@ public class DefineBitsTag extends ImageTag {
     }
 
     @Override
-    public SerializableImage getImage(List<Tag> tags) {
-        getJPEGTables(tags);
+    public SerializableImage getImage() {
+        getJPEGTables();
         if ((jtt != null)) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 byte[] jttdata = jtt.getData();

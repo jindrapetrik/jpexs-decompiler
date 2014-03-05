@@ -36,7 +36,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.zip.InflaterInputStream;
 import javax.imageio.ImageIO;
 
@@ -112,7 +111,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage(List<Tag> tags) {
+    public SerializableImage getImage() {
         SerializableImage bi = new SerializableImage(bitmapWidth, bitmapHeight, SerializableImage.TYPE_INT_RGB);
         COLORMAPDATA colorMapData = null;
         BITMAPDATA bitmapData = null;

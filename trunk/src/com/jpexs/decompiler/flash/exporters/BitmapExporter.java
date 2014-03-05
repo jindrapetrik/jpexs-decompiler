@@ -297,7 +297,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
             }
         }
         if (image != null) {
-            SerializableImage img = image.getImage(swf.tags);
+            SerializableImage img = image.getImage();
             if (img != null) {
                 img = colorTransform.apply(img);
                 fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));

@@ -93,6 +93,7 @@ import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.AS2PackageNodeItem;
 import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
@@ -162,7 +163,6 @@ import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 import javax.imageio.ImageIO;
-import com.jpexs.decompiler.flash.timeline.Timelined;
 
 /**
  * Class representing SWF file
@@ -1641,7 +1641,7 @@ public final class SWF implements TreeItem, Timelined {
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
-                        ImageIO.write(((ImageTag) t).getImage(ttags).getBufferedImage(), ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH), file);
+                        ImageIO.write(((ImageTag) t).getImage().getBufferedImage(), ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH), file);
                     }
                 }, handler).run();
                 ret.add(file);
