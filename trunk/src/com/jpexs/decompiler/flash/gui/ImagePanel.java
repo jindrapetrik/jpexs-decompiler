@@ -143,11 +143,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     RECT rect = bounded.getRect(characters, new Stack<Integer>());
                     SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                             (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
-                    //Make all pixels transparent
-                    Graphics2D g = (Graphics2D) image.getGraphics();
-                    g.setComposite(AlphaComposite.Src);
-                    g.setColor(new Color(0, 0, 0, 0f));
-                    g.fillRect(0, 0, image.getWidth(), image.getHeight());
+                    image.fillTransparent();
                     Matrix m = new Matrix();
                     m.translate(-rect.Xmin, -rect.Ymin);
                     drawable.toImage(0, 0, swf.tags, characters, new Stack<Integer>(), image, m, new ColorTransform());
@@ -232,11 +228,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                 }
                 SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
                         (int) (height / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
-                //Make all pixels transparent
-                Graphics2D g = (Graphics2D) image.getGraphics();
-                g.setComposite(AlphaComposite.Src);
-                g.setColor(new Color(0, 0, 0, 0f));
-                g.fillRect(0, 0, image.getWidth(), image.getHeight());
+                image.fillTransparent();
                 Matrix m = new Matrix();
                 m.translate(-rect.Xmin, -rect.Ymin);
                 m.scale(scale);

@@ -47,6 +47,19 @@ import javax.swing.tree.TreePath;
 
 public class TagTreeModel implements TreeModel {
 
+    public static final String FOLDER_TEXTS = "texts";
+    public static final String FOLDER_IMAGES = "images";
+    public static final String FOLDER_MOVIES = "movies";
+    public static final String FOLDER_SOUNDS = "sounds";
+    public static final String FOLDER_BINARY_DATA = "binaryData";
+    public static final String FOLDER_FONTS = "fonts";
+    public static final String FOLDER_SPRITES = "sprites";
+    public static final String FOLDER_SHAPES = "shapes";
+    public static final String FOLDER_MORPHSHAPES = "morphshapes";
+    public static final String FOLDER_BUTTONS = "buttons";
+    public static final String FOLDER_FRAMES = "frames";
+    public static final String FOLDER_OTHERS = "others";
+    public static final String FOLDER_SCRIPTS = "scripts";
     private final TagTreeRoot root = new TagTreeRoot();
     private final List<SWFContainerNode> swfs;
     private final Map<SWF, SWFNode> swfToSwfNode;
@@ -165,47 +178,47 @@ public class TagTreeModel implements TreeModel {
             n.subNodes = createSubTagList(((DefineSpriteTag) n.getItem()).subTags, tag, swf, actionScriptTags);
         }
 
-        StringNode textsNode = new StringNode(new StringItem(translate("node.texts"), swf));
+        StringNode textsNode = new StringNode(new StringItem(translate("node.texts"), FOLDER_TEXTS, swf));
         textsNode.subNodes.addAll(texts);
 
-        StringNode imagesNode = new StringNode(new StringItem(translate("node.images"), swf));
+        StringNode imagesNode = new StringNode(new StringItem(translate("node.images"), FOLDER_IMAGES, swf));
         imagesNode.subNodes.addAll(images);
 
-        StringNode moviesNode = new StringNode(new StringItem(translate("node.movies"), swf));
+        StringNode moviesNode = new StringNode(new StringItem(translate("node.movies"), FOLDER_MOVIES, swf));
         moviesNode.subNodes.addAll(movies);
 
-        StringNode soundsNode = new StringNode(new StringItem(translate("node.sounds"), swf));
+        StringNode soundsNode = new StringNode(new StringItem(translate("node.sounds"), FOLDER_SOUNDS, swf));
         soundsNode.subNodes.addAll(sounds);
 
-        StringNode binaryDataNode = new StringNode(new StringItem(translate("node.binaryData"), swf));
+        StringNode binaryDataNode = new StringNode(new StringItem(translate("node.binaryData"), FOLDER_BINARY_DATA, swf));
         binaryDataNode.subNodes.addAll(binaryData);
 
-        StringNode fontsNode = new StringNode(new StringItem(translate("node.fonts"), swf));
+        StringNode fontsNode = new StringNode(new StringItem(translate("node.fonts"), FOLDER_FONTS, swf));
         fontsNode.subNodes.addAll(fonts);
 
-        StringNode spritesNode = new StringNode(new StringItem(translate("node.sprites"), swf));
+        StringNode spritesNode = new StringNode(new StringItem(translate("node.sprites"), FOLDER_SPRITES, swf));
         spritesNode.subNodes.addAll(sprites);
 
-        StringNode shapesNode = new StringNode(new StringItem(translate("node.shapes"), swf));
+        StringNode shapesNode = new StringNode(new StringItem(translate("node.shapes"), FOLDER_SHAPES, swf));
         shapesNode.subNodes.addAll(shapes);
 
-        StringNode morphShapesNode = new StringNode(new StringItem(translate("node.morphshapes"), swf));
+        StringNode morphShapesNode = new StringNode(new StringItem(translate("node.morphshapes"), FOLDER_MORPHSHAPES, swf));
         morphShapesNode.subNodes.addAll(morphShapes);
 
-        StringNode buttonsNode = new StringNode(new StringItem(translate("node.buttons"), swf));
+        StringNode buttonsNode = new StringNode(new StringItem(translate("node.buttons"), FOLDER_BUTTONS, swf));
         buttonsNode.subNodes.addAll(buttons);
 
-        StringNode framesNode = new StringNode(new StringItem(translate("node.frames"), swf));
+        StringNode framesNode = new StringNode(new StringItem(translate("node.frames"), FOLDER_FRAMES, swf));
         framesNode.subNodes.addAll(frames);
 
-        StringNode otherNode = new StringNode(new StringItem(translate("node.others"), swf));
+        StringNode otherNode = new StringNode(new StringItem(translate("node.others"), FOLDER_OTHERS, swf));
         otherNode.subNodes.addAll(others);
 
         TreeNode actionScriptNode;
         if (hasAbc) {
             actionScriptNode = new ClassesListNode(classTreeModel);
         } else {
-            actionScriptNode = new StringNode(new StringItem(translate("node.scripts"), swf));
+            actionScriptNode = new StringNode(new StringItem(translate("node.scripts"), FOLDER_SCRIPTS, swf));
             actionScriptNode.subNodes.addAll(actionScript);
         }
         swfNode.scriptsNode = actionScriptNode;
@@ -278,7 +291,7 @@ public class TagTreeModel implements TreeModel {
         ret.addAll(frames);
 
         if (!others.isEmpty()) {
-            StringNode otherNode = new StringNode(new StringItem(translate("node.others"), swf));
+            StringNode otherNode = new StringNode(new StringItem(translate("node.others"), FOLDER_OTHERS, swf));
             otherNode.subNodes.addAll(others);
             ret.add(otherNode);
         }

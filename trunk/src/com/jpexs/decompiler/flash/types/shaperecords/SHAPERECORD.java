@@ -128,11 +128,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     public static SerializableImage shapeListToImage(SWF swf, List<SHAPE> shapes, int prevWidth, int prevHeight, Color color, ColorTransform colorTransform) {
         if (shapes.isEmpty()) {
             SerializableImage image = new SerializableImage(1, 1, BufferedImage.TYPE_INT_RGB);
-            //Make all pixels transparent
-            Graphics2D g = (Graphics2D) image.getGraphics();
-            g.setComposite(AlphaComposite.Src);
-            g.setColor(new Color(0, 0, 0, 0f));
-            g.fillRect(0, 0, image.getWidth(), image.getHeight());
+            image.fillTransparent();
             return image;
         }
         SerializableImage ret = new SerializableImage(prevWidth, prevHeight, SerializableImage.TYPE_INT_ARGB);

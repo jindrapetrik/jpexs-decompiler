@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.decompiler.flash.gui.timeline.TimelineFrame;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFBundleNode;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
+import com.jpexs.decompiler.flash.gui.treenodes.StringNode;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -82,6 +83,7 @@ import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
@@ -89,13 +91,16 @@ import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
+import com.jpexs.decompiler.flash.treeitems.StringItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.ContainerNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
@@ -214,6 +219,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private ImagePanel imagePanel;
     private BinaryPanel binaryPanel;
     private GenericTagPanel genericTagPanel;
+    private JPanel folderPreviewPanel;
     private final ImagePanel previewImagePanel;
     private final SWFPreviewPanel swfPreviewPanel;
     private boolean isWelcomeScreen = true;
@@ -223,6 +229,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String CARDIMAGEPANEL = "Image card";
     private static final String CARDBINARYPANEL = "Binary card";
     private static final String CARDGENEICTAGPANEL = "Generic tag card";
+    private static final String CARDFOLDERPREVIEWPANEL = "Folder preview card";
     private static final String CARDEMPTYPANEL = "Empty card";
     private static final String CARDACTIONSCRIPTPANEL = "ActionScript card";
     private static final String CARDACTIONSCRIPT3PANEL = "ActionScript3 card";
@@ -526,10 +533,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         genericButtonsPanel.add(genericEditButton);
         genericButtonsPanel.add(genericSaveButton);
         genericButtonsPanel.add(genericCancelButton);
-        // todo: honfika: temporary hide edit button
         genericTagCard.add(genericButtonsPanel, BorderLayout.SOUTH);
 
         return genericTagCard;
+    }
+
+    private JPanel createFolderPreviewCard() {
+        JPanel folderPreviewCard = new JPanel(new BorderLayout());
+        folderPreviewPanel = new JPanel();
+        folderPreviewCard.add(folderPreviewPanel, BorderLayout.CENTER);
+
+        return folderPreviewCard;
     }
 
     private void showHideImageReplaceButton(boolean show) {
@@ -774,6 +788,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         displayPanel.add(createImagesCard(), CARDIMAGEPANEL);
         displayPanel.add(createBinaryCard(), CARDBINARYPANEL);
         displayPanel.add(createGenericTagCard(), CARDGENEICTAGPANEL);
+        displayPanel.add(createFolderPreviewCard(), CARDFOLDERPREVIEWPANEL);
 
         JPanel shapesCard = new JPanel(new BorderLayout());
 
@@ -2398,7 +2413,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showDetail(DETAILCARDEMPTYPANEL);
         }
 
-        if (treeNode instanceof SWFNode) {
+        if (treeNode instanceof StringNode) {
+            StringNode stringNode = (StringNode) treeNode;
+            StringItem item = stringNode.getItem();
+            showCard(CARDFOLDERPREVIEWPANEL);
+            showFolderPreview(item.getSwf(), item.getName());
+        } else if (treeNode instanceof SWFNode) {
             SWFNode swfNode = (SWFNode) treeNode;
             SWF swf = swfNode.getItem();
             if (mainMenu.isInternalFlashViewerSelected()) {
@@ -2452,13 +2472,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showCard(CARDDRAWPREVIEWPANEL);
             previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), tag.getSwf().characters, 50/*FIXME*/);
         } else if ((tagObj instanceof FontTag) && (mainMenu.isInternalFlashViewerSelected())) {
-            Tag tag = (Tag) tagObj;
+            FontTag fontTag = (FontTag) tagObj;
             showCard(CARDFLASHPANEL);
-            showFontTag((FontTag) tagObj);
+            showFontTag(fontTag);
         } else if ((tagObj instanceof TextTag) && (mainMenu.isInternalFlashViewerSelected())) {
-            Tag tag = (Tag) tagObj;
+            TextTag textTag = (TextTag) tagObj;
             showCard(CARDFLASHPANEL);
-            showTextTag((TextTag) tagObj);
+            showTextTag(textTag);
         } else if (tagObj instanceof FrameNodeItem && ((FrameNodeItem) tagObj).isDisplayed() && (mainMenu.isInternalFlashViewerSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             FrameNodeItem fn = (FrameNodeItem) tagObj;
@@ -2908,6 +2928,96 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         textValue.setCaretPosition(0);
     }
 
+    private void showFolderPreview(SWF swf, String folderName) {
+        folderPreviewPanel.removeAll();
+        JPanel panel = folderPreviewPanel;
+        //folderPreviewPanel.add(new JScrollPane(panel), BorderLayout.CENTER);
+        switch (folderName) {
+            case TagTreeModel.FOLDER_SHAPES:
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof ShapeTag) {
+                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        if (c != null) {
+                            panel.add(c);
+                        }
+                    }
+                }
+                break;
+            case TagTreeModel.FOLDER_MORPHSHAPES:
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof MorphShapeTag) {
+                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        if (c != null) {
+                            panel.add(c);
+                        }
+                    }
+                }
+                break;
+            case TagTreeModel.FOLDER_SPRITES:
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof DefineSpriteTag) {
+                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        if (c != null) {
+                            panel.add(c);
+                        }
+                    }
+                }
+                break;
+            case TagTreeModel.FOLDER_BUTTONS:
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof ButtonTag) {
+                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        if (c != null) {
+                            panel.add(c);
+                        }
+                    }
+                }
+                break;
+            /*case TagTreeModel.FOLDER_FONTS:
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof FontTag) {
+                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        if (c != null) {
+                            panel.add(c);
+                        }
+                    }
+                }
+                break;*/
+            /*case TagTreeModel.FOLDER_FRAMES:
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof FrameTag) {
+                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        if (c != null) {
+                            panel.add(c);
+                        }
+                    }
+                }
+                break;*/
+            /*case TagTreeModel.FOLDER_IMAGES:
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof ImageTag) {
+                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        if (c != null) {
+                            panel.add(c);
+                        }
+                    }
+                }
+                break;*/
+            case TagTreeModel.FOLDER_TEXTS:
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof TextTag) {
+                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        if (c != null) {
+                            panel.add(c);
+                        }
+                    }
+                }
+                break;
+        }
+        panel.revalidate();
+        panel.repaint();
+    }
+    
     public void expandSwfNodes() {
         TreeModel model = tagTree.getModel();
         Object node = model.getRoot();
