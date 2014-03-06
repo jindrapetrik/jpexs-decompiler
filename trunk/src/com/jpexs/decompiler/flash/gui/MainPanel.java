@@ -2977,16 +2977,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
              }
              }
              break;*/
-            /*case TagTreeModel.FOLDER_IMAGES:
-             for (Tag tag : swf.tags) {
-             if (tag instanceof ImageTag) {
-             Component c = PreviewImage.createFolderPreviewImage(tag);
-             if (c != null) {
-             panel.add(c);
-             }
-             }
-             }
-             break;*/
+            case TagTreeModel.FOLDER_IMAGES:
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof ImageTag) {
+                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        if (c != null) {
+                            panel.add(c);
+                        }
+                    }
+                }
+                break;
             case TagTreeModel.FOLDER_TEXTS:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof TextTag) {

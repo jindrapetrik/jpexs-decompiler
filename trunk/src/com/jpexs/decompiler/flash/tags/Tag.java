@@ -69,6 +69,10 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     @Internal
     private boolean modified;
 
+    public String getTagName() {
+        return tagName;
+    }
+    
     public String getName() {
         return tagName;
     }
