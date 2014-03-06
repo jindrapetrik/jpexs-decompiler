@@ -540,8 +540,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private JPanel createFolderPreviewCard() {
         JPanel folderPreviewCard = new JPanel(new BorderLayout());
-        folderPreviewPanel = new JPanel();
-        folderPreviewCard.add(folderPreviewPanel, BorderLayout.CENTER);
+        folderPreviewPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
+        folderPreviewCard.add(new JScrollPane(folderPreviewPanel), BorderLayout.CENTER);
 
         return folderPreviewCard;
     }
