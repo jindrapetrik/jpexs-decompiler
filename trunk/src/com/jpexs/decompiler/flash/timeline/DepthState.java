@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class DepthState {
 
-    public int characterId;
+    public int characterId = -1;
     public MATRIX matrix = null;
     public String instanceName = null;
     public ColorTransform colorTransForm = null;
@@ -40,9 +40,9 @@ public class DepthState {
     public boolean isVisible = true;
     public RGBA backGroundColor = null;
     public CLIPACTIONS clipActions = null;
-    public int ratio;
+    public int ratio = -1;
     public boolean key = false;
-    public int clipDepth;
+    public int clipDepth = -1;
     public int time = 0;
 
     public DepthState() {
