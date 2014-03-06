@@ -796,18 +796,18 @@ public class Helper {
         Rectangle rectangle = new Rectangle();
         int y1, y2;
         for (int x = 0; x < image.getWidth(); x++) {
-            y1 = 99;
+            y1 = Integer.MAX_VALUE;
             y2 = -1;
             for (int y = 0; y < image.getHeight(); y++) {
                 int rgb = image.getRGB(x, y);
                 rgb = rgb >>> 24;
                 if (rgb > 0) {
-                    if (y1 == 99) {
+                    if (y1 == Integer.MAX_VALUE) {
                         y1 = y;
                         y2 = y;
                     }
                     if (y > (y2 + 1)) {
-                        rectangle.setBounds(x, y1, 1, y2 - y1);
+                        rectangle.setBounds(x, y1, 1, y2 - y1 + 1);
                         area.add(new Area(rectangle));
                         y1 = y;
                     }
@@ -815,7 +815,7 @@ public class Helper {
                 }
             }
             if ((y2 - y1) >= 0) {
-                rectangle.setBounds(x, y1, 1, y2 - y1);
+                rectangle.setBounds(x, y1, 1, y2 - y1 + 1);
                 area.add(new Area(rectangle));
             }
         }

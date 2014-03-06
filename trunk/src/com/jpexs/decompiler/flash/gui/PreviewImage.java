@@ -80,9 +80,17 @@ public class PreviewImage extends JPanel {
 
                     @Override
                     public void run() {
+                        // todo: 
+                        // call repaint on MainPanel.folderPreviewPanel
+                        // this is a hack, but otherwise the preview panel looks crazy sometimes
+                        // how to handle it in a better way?
+                        // normally repaint() on this panel should be enough
                         Component parent = getParent();
                         if (parent != null) {
-                            parent.repaint();
+                            parent = parent.getParent();
+                            if (parent != null) {
+                                parent.repaint();
+                            }
                         }
                     }
                 });
