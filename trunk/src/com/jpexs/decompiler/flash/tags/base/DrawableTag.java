@@ -18,12 +18,8 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.helpers.SerializableImage;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  *

@@ -22,7 +22,10 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.SerializableImage;
@@ -33,6 +36,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.util.Stack;
 import java.util.concurrent.Callable;
@@ -48,15 +53,22 @@ import javax.swing.JPanel;
  */
 public class PreviewImage extends JPanel {
 
-    private static ExecutorService executor = Executors.newFixedThreadPool(1);
+    private static final ExecutorService executor = Executors.newFixedThreadPool(1);
     private static final int PREVIEW_SIZE = 150;
     private static final int BORDER_SIZE = 5;
     private Image image;
     private boolean rendering;
-    private Tag tag;
+    private final MainPanel mainPanel;
+    private final TreeItem treeItem;
 
-    public PreviewImage(Tag tag) {
-        this.tag = tag;
+    /**
+     *
+     * @param mainPanel
+     * @param treeItem
+     */
+    public PreviewImage(final MainPanel mainPanel, final TreeItem treeItem) {
+        this.mainPanel = mainPanel;
+        this.treeItem = treeItem;
         Dimension dim = new Dimension(PREVIEW_SIZE + 2 * BORDER_SIZE, PREVIEW_SIZE + 2 * BORDER_SIZE);
         setMinimumSize(dim);
         setMaximumSize(dim);
@@ -64,9 +76,36 @@ public class PreviewImage extends JPanel {
         setSize(dim);
         setLayout(null);
         setBorder(BorderFactory.createLineBorder(Color.black));
+        this.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                if (e.getClickCount() >= 2) {
+                    mainPanel.setTreeItem(treeItem);
+
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
     }
 
-    private synchronized void renderImageTask(final Tag tag) {
+    private synchronized void renderImageTask(final TreeItem treeItem) {
         if (rendering) {
             return;
         }
@@ -75,23 +114,13 @@ public class PreviewImage extends JPanel {
 
             @Override
             public Void call() throws Exception {
-                image = renderImage(tag.getSwf(), tag);
+                image = renderImage(treeItem.getSwf(), treeItem);
                 View.execInEventDispatch(new Runnable() {
 
                     @Override
                     public void run() {
-                        // todo: 
-                        // call repaint on MainPanel.folderPreviewPanel
-                        // this is a hack, but otherwise the preview panel looks crazy sometimes
-                        // how to handle it in a better way?
-                        // normally repaint() on this panel should be enough
-                        Component parent = getParent();
-                        if (parent != null) {
-                            parent = parent.getParent();
-                            if (parent != null) {
-                                parent.repaint();
-                            }
-                        }
+                        revalidate();
+                        repaint();
                     }
                 });
                 return null;
@@ -101,19 +130,30 @@ public class PreviewImage extends JPanel {
 
     }
 
-    private Image renderImage(SWF swf, Tag tag) {
+    private Image renderImage(SWF swf, TreeItem treeItem) {
 
         double scale = 1;
         int width = 0;
         int height = 0;
         SerializableImage imgSrc = null;
         Matrix m = new Matrix();
-        if (tag instanceof ImageTag) {
-            imgSrc = ((ImageTag) tag).getImage();
+        if (treeItem instanceof FontTag) {
+            FontTag fontTag = (FontTag) treeItem;
+            imgSrc = fontTag.toImage(0, 0, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
             width = (imgSrc.getWidth());
             height = (imgSrc.getHeight());
-        } else if (tag instanceof BoundedTag) {
-            BoundedTag boundedTag = (BoundedTag) tag;
+        } else if (treeItem instanceof FrameNodeItem) {
+            FrameNodeItem fn = (FrameNodeItem) treeItem;
+            RECT rect = swf.displayRect;
+            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.getFrame() - 1, rect, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
+            width = (imgSrc.getWidth());
+            height = (imgSrc.getHeight());
+        } else if (treeItem instanceof ImageTag) {
+            imgSrc = ((ImageTag) treeItem).getImage();
+            width = (imgSrc.getWidth());
+            height = (imgSrc.getHeight());
+        } else if (treeItem instanceof BoundedTag) {
+            BoundedTag boundedTag = (BoundedTag) treeItem;
             RECT rect = boundedTag.getRect();
             width = (int) (rect.getWidth() / SWF.unitDivisor);
             height = (int) (rect.getHeight() / SWF.unitDivisor);
@@ -155,7 +195,7 @@ public class PreviewImage extends JPanel {
         SerializableImage image = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
         if (imgSrc == null) {
-            DrawableTag drawable = (DrawableTag) tag;
+            DrawableTag drawable = (DrawableTag) treeItem;
             drawable.toImage(0, 0, image, m, new ColorTransform());
         } else {
             Graphics2D g = (Graphics2D) image.getGraphics();
@@ -165,13 +205,18 @@ public class PreviewImage extends JPanel {
         return image.getBufferedImage();
     }
 
-    public static Component createFolderPreviewImage(Tag tag) {
+    public static Component createFolderPreviewImage(MainPanel mainPanel, TreeItem treeItem) {
         JPanel pan = new JPanel(new BorderLayout());
-        PreviewImage imagePanel = new PreviewImage(tag);
+        PreviewImage imagePanel = new PreviewImage(mainPanel, treeItem);
         pan.add(imagePanel, BorderLayout.CENTER);
-        String s = tag.getTagName();
-        if (tag instanceof CharacterTag) {
-            s = s + " (" + ((CharacterTag) tag).getCharacterId() + ")";
+        String s;
+        if (treeItem instanceof Tag) {
+            s = ((Tag) treeItem).getTagName();
+            if (treeItem instanceof CharacterTag) {
+                s = s + " (" + ((CharacterTag) treeItem).getCharacterId() + ")";
+            }
+        } else {
+            s = treeItem.toString();
         }
         JLabel lab = new JLabel(s);
         lab.setFont(lab.getFont().deriveFont(AffineTransform.getScaleInstance(0.8, 0.8)));
@@ -181,12 +226,13 @@ public class PreviewImage extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
         if (image != null) {
             int x = (getWidth() / 2) - (image.getWidth(this) / 2);
             int y = (getHeight() / 2) - (image.getHeight(this) / 2);
             g.drawImage(image, x, y, null);
         } else {
-            renderImageTask(tag);
+            renderImageTask(treeItem);
         }
     }
 }

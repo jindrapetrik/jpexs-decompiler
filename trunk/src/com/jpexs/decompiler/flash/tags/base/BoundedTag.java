@@ -17,8 +17,6 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.types.RECT;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  *

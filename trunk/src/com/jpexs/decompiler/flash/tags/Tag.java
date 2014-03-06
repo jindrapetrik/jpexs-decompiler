@@ -34,7 +34,6 @@ import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +71,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     public String getTagName() {
         return tagName;
     }
-    
+
     public String getName() {
         return tagName;
     }

@@ -103,6 +103,7 @@ import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
 import com.jpexs.decompiler.flash.treeitems.StringItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.ContainerNode;
+import com.jpexs.decompiler.flash.treenodes.FrameNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -1630,13 +1631,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     @Override
     public void updateSearchPos(TextTag item) {
-        TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
-        TreePath tp = ttm.getTagPath(item);
-        tagTree.setSelectionPath(tp);
-        tagTree.scrollPathToVisible(tp);
+        setTreeItem(item);
         textValue.setCaretPosition(0);
 
         textSearchPanel.showQuickFindDialog(textValue);
+    }
+
+    public void setTreeItem(TreeItem treeItem) {
+        TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
+        TreePath tp = ttm.getTagPath(treeItem);
+        tagTree.setSelectionPath(tp);
+        tagTree.scrollPathToVisible(tp);
     }
 
     public void autoDeobfuscateChanged() {
@@ -2177,9 +2182,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             case ACTION_SAVE_GENERIC_TAG: {
                 genericTagPanel.save();
                 refreshTree();
-                TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
-                TreePath tp = ttm.getTagPath(genericTagPanel.getTag());
-                tagTree.setSelectionPath(tp);
+                setTreeItem(genericTagPanel.getTag());
                 genericEditButton.setVisible(true);
                 genericSaveButton.setVisible(false);
                 genericCancelButton.setVisible(false);
@@ -2398,10 +2401,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         if (treeNode instanceof StringNode) {
-            StringNode stringNode = (StringNode) treeNode;
-            StringItem item = stringNode.getItem();
             showCard(CARDFOLDERPREVIEWPANEL);
-            showFolderPreview(item.getSwf(), item.getName());
+            showFolderPreview(treeNode);
         } else if (treeNode instanceof SWFNode) {
             SWFNode swfNode = (SWFNode) treeNode;
             SWF swf = swfNode.getItem();
@@ -2912,15 +2913,18 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         textValue.setCaretPosition(0);
     }
 
-    private void showFolderPreview(SWF swf, String folderName) {
+    private void showFolderPreview(TreeNode treeNode) {
         folderPreviewPanel.removeAll();
+        StringNode stringNode = (StringNode) treeNode;
+        StringItem item = stringNode.getItem();
+        String folderName = item.getName();
+        SWF swf = item.swf;
         JPanel panel = folderPreviewPanel;
-        //folderPreviewPanel.add(new JScrollPane(panel), BorderLayout.CENTER);
         switch (folderName) {
             case TagTreeModel.FOLDER_SHAPES:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof ShapeTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
                         if (c != null) {
                             panel.add(c);
                         }
@@ -2930,7 +2934,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             case TagTreeModel.FOLDER_MORPHSHAPES:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof MorphShapeTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
                         if (c != null) {
                             panel.add(c);
                         }
@@ -2940,7 +2944,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             case TagTreeModel.FOLDER_SPRITES:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof DefineSpriteTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
                         if (c != null) {
                             panel.add(c);
                         }
@@ -2950,37 +2954,37 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             case TagTreeModel.FOLDER_BUTTONS:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof ButtonTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
                         if (c != null) {
                             panel.add(c);
                         }
                     }
                 }
                 break;
-            /*case TagTreeModel.FOLDER_FONTS:
-             for (Tag tag : swf.tags) {
-             if (tag instanceof FontTag) {
-             Component c = PreviewImage.createFolderPreviewImage(tag);
-             if (c != null) {
-             panel.add(c);
-             }
-             }
-             }
-             break;*/
-            /*case TagTreeModel.FOLDER_FRAMES:
-             for (Tag tag : swf.tags) {
-             if (tag instanceof FrameTag) {
-             Component c = PreviewImage.createFolderPreviewImage(tag);
-             if (c != null) {
-             panel.add(c);
-             }
-             }
-             }
-             break;*/
+            case TagTreeModel.FOLDER_FONTS:
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof FontTag) {
+                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
+                        if (c != null) {
+                            panel.add(c);
+                        }
+                    }
+                }
+                break;
+            case TagTreeModel.FOLDER_FRAMES:
+                for (TreeNode subNode : treeNode.subNodes) {
+                    FrameNode frameNode = (FrameNode) subNode;
+                    FrameNodeItem fn = frameNode.getItem();
+                    Component c = PreviewImage.createFolderPreviewImage(this, fn);
+                    if (c != null) {
+                        panel.add(c);
+                    }
+                }
+                break;
             case TagTreeModel.FOLDER_IMAGES:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof ImageTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
                         if (c != null) {
                             panel.add(c);
                         }
@@ -2990,7 +2994,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             case TagTreeModel.FOLDER_TEXTS:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof TextTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(tag);
+                        Component c = PreviewImage.createFolderPreviewImage(this, tag);
                         if (c != null) {
                             panel.add(c);
                         }
