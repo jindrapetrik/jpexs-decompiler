@@ -226,13 +226,54 @@ public final class SWF implements TreeItem, Timelined {
     public String fileTitle;
     public boolean readOnly;
     public boolean isAS3;
-    public HashMap<Integer, CharacterTag> characters;
+    public Map<Integer, CharacterTag> characters = new HashMap<>();
     public List<ABCContainerTag> abcList;
     public JPEGTablesTag jtt;
     public Map<Integer, String> sourceFontsMap = new HashMap<>();
     public static final double unitDivisor = 20;
 
     private Timeline timeline;
+
+    private void parseCharacters(List<ContainerItem> list) {
+        for (ContainerItem t : list) {
+            if (t instanceof CharacterTag) {
+                characters.put(((CharacterTag) t).getCharacterId(), (CharacterTag) t);
+            }
+            if (t instanceof Container) {
+                parseCharacters(((Container) t).getSubItems());
+            }
+        }
+    }
+
+    /**
+     * Unresolve recursive sprites
+     */
+    private void checkInvalidSprites() {
+        for (int i = 0; i < tags.size(); i++) {
+            Tag t = tags.get(i);
+            if (t instanceof DefineSpriteTag) {
+                if (!isSpriteValid((DefineSpriteTag) t, new ArrayList<Integer>())) {
+                    tags.set(i, new Tag(this, t.getId(), "InvalidSprite", t.getData(), t.getPos()));
+                }
+            }
+        }
+    }
+
+    private boolean isSpriteValid(DefineSpriteTag sprite, List<Integer> path) {
+        if (path.contains(sprite.spriteId)) {
+            return false;
+        }
+        path.add(sprite.spriteId);
+        for (Tag t : sprite.subTags) {
+            if (t instanceof DefineSpriteTag) {
+                if (!isSpriteValid((DefineSpriteTag) t, path)) {
+                    return false;
+                }
+            }
+        }
+        path.remove((Integer) sprite.spriteId);
+        return true;
+    }
 
     @Override
     public Timeline getTimeline() {
@@ -509,6 +550,7 @@ public final class SWF implements TreeItem, Timelined {
                 tagMap.put(tag.getPos(), tag);
             }
 
+            checkInvalidSprites();
             for (Tag tag : tags) {
                 if (tag instanceof ShowFrameTag) {
                     ShowFrameTag showFrameTag = (ShowFrameTag) tag;
@@ -520,7 +562,7 @@ public final class SWF implements TreeItem, Timelined {
                     showFrameTag.innerTags = innerTags;
                 }
             }
-
+            parseCharacters(new ArrayList<ContainerItem>(tags));
             assignExportNamesToSymbols();
             assignClassesToSymbols();
             findFileAttributes();
@@ -2236,7 +2278,7 @@ public final class SWF implements TreeItem, Timelined {
         image.fillTransparent();
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
-        frameToImage(timeline, frame, displayRect, visited, image, m, colorTransform);
+        frameToImage(timeline, frame, image, m, colorTransform);
         putToCache(key, image);
         return image;
     }
@@ -2249,7 +2291,7 @@ public final class SWF implements TreeItem, Timelined {
             image.fillTransparent();
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
-            frameToImage(timeline, f, displayRect, visited, image, m, colorTransform);
+            frameToImage(timeline, f, image, m, colorTransform);
             ret.add(image);
         }
     }
@@ -2266,7 +2308,7 @@ public final class SWF implements TreeItem, Timelined {
 
     }
 
-    public static void frameToImage(Timeline timeline, int frame, RECT displayRect, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public static void frameToImage(Timeline timeline, int frame, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         float unzoom = (float) SWF.unitDivisor;
         Frame frameObj = timeline.frames.get(frame);
         Graphics2D g = (Graphics2D) image.getGraphics();
@@ -2315,7 +2357,7 @@ public final class SWF implements TreeItem, Timelined {
                 int dframe = 0 + layer.time % drawable.getNumFrames();
                 if (drawable instanceof BoundedTag) {
                     BoundedTag bounded = (BoundedTag) drawable;
-                    RECT boundRect = bounded.getRect(timeline.characters, new Stack<Integer>());
+                    RECT boundRect = bounded.getRect();
                     ExportRectangle rect = new ExportRectangle(boundRect);
                     rect = mat.transform(rect);
                     Matrix m = mat.clone();
@@ -2355,11 +2397,11 @@ public final class SWF implements TreeItem, Timelined {
                     m.translate(-rect.xMin, -rect.yMin);
                     drawMatrix.translate(rect.xMin, rect.yMin);
 
-                    drawable.toImage(dframe, layer.ratio, timeline.swf.tags, timeline.characters, visited, img, m, clrTrans);
+                    drawable.toImage(dframe, layer.ratio, img, m, clrTrans);
                 } else if (drawable instanceof FontTag) {
                     // only DefineFont tags
                     FontTag fontTag = (FontTag) drawable;
-                    img = fontTag.toImage(dframe, layer.ratio, timeline.swf.tags, timeline.characters, visited, transformation, clrTrans);
+                    img = fontTag.toImage(dframe, layer.ratio, transformation, clrTrans);
                 } else {
                     throw new Error("Unsupported drawable.");
                 }
@@ -2459,7 +2501,7 @@ public final class SWF implements TreeItem, Timelined {
                 BoundedTag b = (BoundedTag) character;
                 g.setPaint(new Color(255, 255, 255, 128));
                 g.setComposite(BlendComposite.Invert);
-                RECT r = b.getRect(timeline.characters, visited);
+                RECT r = b.getRect();
                 int div = (int) unzoom;
                 g.drawString(character.toString(), r.Xmin / div + 3, r.Ymin / div + 15);
                 g.draw(new Rectangle(r.Xmin / div, r.Ymin / div, r.getWidth() / div, r.getHeight() / div));

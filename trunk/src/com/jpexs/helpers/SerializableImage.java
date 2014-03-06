@@ -82,7 +82,7 @@ public class SerializableImage implements Serializable {
         g.setColor(new Color(0, 0, 0, 0f));
         g.fillRect(0, 0, getWidth(), getHeight());
     }
-    
+
     @Override
     protected Object clone() throws CloneNotSupportedException {
         SerializableImage retImage = new SerializableImage();

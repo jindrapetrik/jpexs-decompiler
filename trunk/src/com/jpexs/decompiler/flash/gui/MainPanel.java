@@ -949,11 +949,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
             }
 
-            List<ContainerItem> list2 = new ArrayList<>();
-            list2.addAll(swf.tags);
-            swf.characters = new HashMap<>();
-            parseCharacters(swf, list2);
-
             if (Configuration.autoRenameIdentifiers.get()) {
                 try {
                     swf.deobfuscateIdentifiers(RenameType.TYPENUMBER);
@@ -1143,17 +1138,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
             });
 
-        }
-    }
-
-    private void parseCharacters(SWF swf, List<ContainerItem> list) {
-        for (ContainerItem t : list) {
-            if (t instanceof CharacterTag) {
-                swf.characters.put(((CharacterTag) t).getCharacterId(), (CharacterTag) t);
-            }
-            if (t instanceof Container) {
-                parseCharacters(swf, ((Container) t).getSubItems());
-            }
         }
     }
 
@@ -2470,7 +2454,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (mainMenu.isInternalFlashViewerSelected())) {
             Tag tag = (Tag) tagObj;
             showCard(CARDDRAWPREVIEWPANEL);
-            previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), tag.getSwf().characters, 50/*FIXME*/);
+            previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), 50/*FIXME*/);
         } else if ((tagObj instanceof FontTag) && (mainMenu.isInternalFlashViewerSelected())) {
             FontTag fontTag = (FontTag) tagObj;
             showCard(CARDFLASHPANEL);
@@ -2491,7 +2475,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (fn.getParent() instanceof DefineSpriteTag) {
                 controlTags = ((DefineSpriteTag) fn.getParent()).subTags;
                 containerId = ((DefineSpriteTag) fn.getParent()).spriteId;
-                rect = ((DefineSpriteTag) fn.getParent()).getRect(swf.characters, new Stack<Integer>());
+                rect = ((DefineSpriteTag) fn.getParent()).getRect();
                 totalFrameCount = ((DefineSpriteTag) fn.getParent()).frameCount;
                 timeline = ((DefineSpriteTag) fn.getParent()).getTimeline();
             }
@@ -2613,7 +2597,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             break;
                         }
                         Tag t = (Tag) item;
-                        Set<Integer> needed = t.getDeepNeededCharacters(swf.characters, new ArrayList<Integer>());
+                        Set<Integer> needed = t.getDeepNeededCharacters(swf.characters);
                         for (int n : needed) {
                             if (!doneCharacters.contains(n)) {
                                 sos2.writeTag(classicTag(swf.characters.get(n)));
@@ -2639,7 +2623,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 }
                                 mat = Helper.deepCopy(mat);
                                 if (parent instanceof BoundedTag) {
-                                    RECT r = ((BoundedTag) parent).getRect(swf.characters, new Stack<Integer>());
+                                    RECT r = ((BoundedTag) parent).getRect();
                                     mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
                                     mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
                                 } else {
@@ -2661,7 +2645,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         }
                     } else if (tagObj instanceof AloneTag) {
                     } else {
-                        Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(swf.characters, new ArrayList<Integer>());
+                        Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(swf.characters);
                         for (int n : needed) {
                             sos2.writeTag(classicTag(swf.characters.get(n)));
                         }
@@ -2680,7 +2664,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     mat.translateX = 0;
                     mat.translateY = 0;
                     if (tagObj instanceof BoundedTag) {
-                        RECT r = ((BoundedTag) tagObj).getRect(swf.characters, new Stack<Integer>());
+                        RECT r = ((BoundedTag) tagObj).getRect();
                         mat.translateX = -r.Xmin;
                         mat.translateY = -r.Ymin;
                         mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
@@ -2900,7 +2884,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private void showFontTag(FontTag ft) {
         if (mainMenu.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
-            internelViewerPanel.setDrawable(ft, ft.getSwf(), ft.getSwf().characters, 1);
+            internelViewerPanel.setDrawable(ft, ft.getSwf(), 1);
         } else {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
         }
@@ -2914,7 +2898,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private void showTextTag(TextTag textTag) {
         if (mainMenu.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
-            internelViewerPanel.setDrawable(textTag, textTag.getSwf(), textTag.getSwf().characters, 1);
+            internelViewerPanel.setDrawable(textTag, textTag.getSwf(), 1);
         } else {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
         }
@@ -2974,35 +2958,35 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
                 break;
             /*case TagTreeModel.FOLDER_FONTS:
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof FontTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(tag);
-                        if (c != null) {
-                            panel.add(c);
-                        }
-                    }
-                }
-                break;*/
+             for (Tag tag : swf.tags) {
+             if (tag instanceof FontTag) {
+             Component c = PreviewImage.createFolderPreviewImage(tag);
+             if (c != null) {
+             panel.add(c);
+             }
+             }
+             }
+             break;*/
             /*case TagTreeModel.FOLDER_FRAMES:
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof FrameTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(tag);
-                        if (c != null) {
-                            panel.add(c);
-                        }
-                    }
-                }
-                break;*/
+             for (Tag tag : swf.tags) {
+             if (tag instanceof FrameTag) {
+             Component c = PreviewImage.createFolderPreviewImage(tag);
+             if (c != null) {
+             panel.add(c);
+             }
+             }
+             }
+             break;*/
             /*case TagTreeModel.FOLDER_IMAGES:
-                for (Tag tag : swf.tags) {
-                    if (tag instanceof ImageTag) {
-                        Component c = PreviewImage.createFolderPreviewImage(tag);
-                        if (c != null) {
-                            panel.add(c);
-                        }
-                    }
-                }
-                break;*/
+             for (Tag tag : swf.tags) {
+             if (tag instanceof ImageTag) {
+             Component c = PreviewImage.createFolderPreviewImage(tag);
+             if (c != null) {
+             panel.add(c);
+             }
+             }
+             }
+             break;*/
             case TagTreeModel.FOLDER_TEXTS:
                 for (Tag tag : swf.tags) {
                     if (tag instanceof TextTag) {
@@ -3017,7 +3001,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         panel.revalidate();
         panel.repaint();
     }
-    
+
     public void expandSwfNodes() {
         TreeModel model = tagTree.getModel();
         Object node = model.getRoot();

@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -322,20 +323,15 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         return new HashSet<>();
     }
 
-    public Set<Integer> getDeepNeededCharacters(HashMap<Integer, CharacterTag> characters, List<Integer> visited) {
+    public Set<Integer> getDeepNeededCharacters(Map<Integer, CharacterTag> characters) {
         Set<Integer> ret = new HashSet<>();
         Set<Integer> needed = getNeededCharacters();
         for (int ch : needed) {
             if (!characters.containsKey(ch)) { //TODO: use Import tag (?)
                 continue;
             }
-            if (visited.contains(ch)) {
-                continue;
-            } else {
-                visited.add(ch);
-            }
             ret.add(ch);
-            ret.addAll(characters.get(ch).getDeepNeededCharacters(characters, visited));
+            ret.addAll(characters.get(ch).getDeepNeededCharacters(characters));
         }
         return ret;
     }

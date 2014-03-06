@@ -46,7 +46,7 @@ public class DefineShape2Tag extends CharacterTag implements ShapeTag {
     public static final int ID = 22;
 
     @Override
-    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public Point getImagePos(int frame) {
         return new Point(shapeBounds.Xmin / SWF.unitDivisor, shapeBounds.Ymin / SWF.unitDivisor);
     }
 
@@ -73,7 +73,7 @@ public class DefineShape2Tag extends CharacterTag implements ShapeTag {
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter.exportTo(swf, getShapes(), null, image, transformation, colorTransform);
     }
 
@@ -83,7 +83,7 @@ public class DefineShape2Tag extends CharacterTag implements ShapeTag {
     }
 
     @Override
-    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect() {
         return shapeBounds;
     }
 

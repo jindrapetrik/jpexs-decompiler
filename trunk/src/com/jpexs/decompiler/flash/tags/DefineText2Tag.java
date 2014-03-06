@@ -412,7 +412,7 @@ public class DefineText2Tag extends TextTag {
     }
 
     @Override
-    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect() {
         return textBounds;
     }
 
@@ -490,12 +490,12 @@ public class DefineText2Tag extends TextTag {
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        staticTextToImage(swf, characters, textRecords, 2, image, getTextMatrix(), transformation, colorTransform);
+    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        staticTextToImage(swf, textRecords, 2, image, getTextMatrix(), transformation, colorTransform);
     }
 
     @Override
-    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public Point getImagePos(int frame) {
         return new Point(textBounds.Xmin / 20, textBounds.Ymin / 20);
     }
 

@@ -26,5 +26,5 @@ import java.util.Stack;
  */
 public interface BoundedTag {
 
-    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited);
+    public RECT getRect();
 }

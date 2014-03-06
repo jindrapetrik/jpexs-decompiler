@@ -228,22 +228,15 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     private static final Cache<RECT> rectCache = Cache.getInstance(true);
 
     @Override
-    public RECT getRect(Map<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {
+    public RECT getRect() {
         if (rectCache.contains(this)) {
             return (RECT) rectCache.get(this);
         }
-        if (visited.contains(buttonId)) {
-            return new RECT();
-        }
-        visited.push(buttonId);
         RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         for (BUTTONRECORD r : characters) {
-            CharacterTag ch = allCharacters.get(r.characterId);
+            CharacterTag ch = swf.characters.get(r.characterId);
             if (ch instanceof BoundedTag) {
-                if (visited.contains(ch.getCharacterId())) {
-                    continue;
-                }
-                RECT r2 = ((BoundedTag) ch).getRect(allCharacters, visited);
+                RECT r2 = ((BoundedTag) ch).getRect();
                 MATRIX mat = r.placeMatrix;
                 if (mat != null) {
                     r2 = mat.apply(r2);
@@ -254,7 +247,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
                 rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
             }
         }
-        visited.pop();
+
         rectCache.put(this, rect);
         return rect;
     }
@@ -276,22 +269,13 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        if (visited.contains(buttonId)) {
-            return;
-        }
-        visited.push(buttonId);
-
-        visited.pop();
-        RECT displayRect = getRect(characters, visited);
-        visited.push(buttonId);
-        SWF.frameToImage(getTimeline(), frame, displayRect, visited, image, transformation, colorTransform);
-        visited.pop();
+    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        SWF.frameToImage(getTimeline(), frame, image, transformation, colorTransform);
     }
 
     @Override
-    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
-        RECT r = getRect(characters, visited);
+    public Point getImagePos(int frame) {
+        RECT r = getRect();
         return new Point(r.Xmin / SWF.unitDivisor, r.Ymin / SWF.unitDivisor);
     }
 
@@ -325,7 +309,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         if (timeline != null) {
             return timeline;
         }
-        timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId);
+        timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId, getRect());
 
         ColorTransform clrTrans = null;
         for (Tag t : swf.tags) {

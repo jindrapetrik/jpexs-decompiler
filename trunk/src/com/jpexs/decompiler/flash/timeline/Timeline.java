@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -27,11 +28,14 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.helpers.SerializableImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  *
@@ -43,6 +47,7 @@ public class Timeline {
     public int id;
     public Map<Integer, CharacterTag> characters = new HashMap<>();
     public SWF swf;
+    public RECT displayRect;
 
     public Timeline() {
     }
@@ -64,12 +69,13 @@ public class Timeline {
     }
 
     public Timeline(SWF swf) {
-        this(swf, swf.tags, 0);
+        this(swf, swf.tags, 0, swf.displayRect);
     }
 
-    public Timeline(SWF swf, List<Tag> tags, int id) {
+    public Timeline(SWF swf, List<Tag> tags, int id, RECT displayRect) {
         this.id = id;
         this.swf = swf;
+        this.displayRect = displayRect;
         Frame frame = new Frame();
         for (Tag t : swf.tags) {
             if (t instanceof CharacterTag) {
@@ -155,5 +161,9 @@ public class Timeline {
                 frame = new Frame(frame);
             }
         }
+    }
+
+    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+
     }
 }

@@ -120,7 +120,7 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
     }
 
     @Override
-    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect() {
         return new RECT(0, (int) (SWF.unitDivisor * width), 0, (int) (SWF.unitDivisor * height));
     }
 }

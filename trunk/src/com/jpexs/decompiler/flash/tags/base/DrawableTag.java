@@ -31,9 +31,9 @@ import java.util.Stack;
  */
 public interface DrawableTag {
 
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform);
+    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform);
 
-    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited);
+    public Point getImagePos(int frame);
 
     public int getNumFrames();
 }

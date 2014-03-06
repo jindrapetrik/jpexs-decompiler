@@ -115,7 +115,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public SerializableImage toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
+    public SerializableImage toImage(int frame, int ratio, Matrix transformation, ColorTransform colorTransform) {
         List<SHAPE> shapes = new ArrayList<>();
         for (int i = 0; i < shapeCache.size(); i++) {
             shapes.add(SHAPERECORD.resizeSHAPE(shapeCache.get(i), SWF.unitDivisor));
@@ -130,7 +130,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public Point getImagePos(int frame) {
         return new Point(0, 0);
     }
 

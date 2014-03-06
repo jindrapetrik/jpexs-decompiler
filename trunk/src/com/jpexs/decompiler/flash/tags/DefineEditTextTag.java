@@ -306,9 +306,9 @@ public class DefineEditTextTag extends TextTag {
                         addCharacters(ret, txt, style);
                     }
                 };
-                str = "<!DOCTYPE html [\n" +
-                      "    <!ENTITY nbsp \"&#160;\"> \n" +
-                      "]><root>" + str + "</root>";
+                str = "<!DOCTYPE html [\n"
+                        + "    <!ENTITY nbsp \"&#160;\"> \n"
+                        + "]><root>" + str + "</root>";
                 saxParser.parse(new ByteArrayInputStream(str.getBytes(Utf8Helper.charset)), handler);
             } catch (ParserConfigurationException | SAXException | IOException ex) {
                 Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, null, ex);
@@ -622,7 +622,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public RECT getRect(Map<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {
+    public RECT getRect() {
         return bounds;
     }
 
@@ -760,12 +760,12 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         if (border) {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
             RGB fillColor = new RGBA(Color.white);
-            drawBorder(swf, image, borderColor, fillColor, getRect(characters, visited), getTextMatrix(), transformation, colorTransform);
+            drawBorder(swf, image, borderColor, fillColor, getRect(), getTextMatrix(), transformation, colorTransform);
         }
         if (hasText) {
             DynamicTextModel textModel = new DynamicTextModel();
@@ -794,11 +794,11 @@ public class DefineEditTextTag extends TextTag {
                     int advance;
                     FontTag font = lastStyle.font;
                     GLYPHENTRY ge = new GLYPHENTRY();
-                    ge.glyphIndex = font.charToGlyph(tags, c);
+                    ge.glyphIndex = font.charToGlyph(swf.tags, c);
                     if (font.hasLayout()) {
                         int kerningAdjustment = 0;
                         if (nextChar != null) {
-                            kerningAdjustment = font.getGlyphKerningAdjustment(tags, ge.glyphIndex, font.charToGlyph(tags, nextChar));
+                            kerningAdjustment = font.getGlyphKerningAdjustment(swf.tags, ge.glyphIndex, font.charToGlyph(swf.tags, nextChar));
                             kerningAdjustment /= font.getDivider();
                         }
                         advance = (int) Math.round(font.getDivider() * Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
@@ -933,7 +933,7 @@ public class DefineEditTextTag extends TextTag {
                 }
             }
 
-            staticTextToImage(swf, characters, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
+            staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
         }
     }
 
@@ -950,7 +950,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public Point getImagePos(int frame) {
         return new Point(bounds.Xmin / SWF.unitDivisor, bounds.Ymin / SWF.unitDivisor);
     }
 

@@ -78,7 +78,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     @Override
     public Timeline getTimeline() {
         if (timeline == null) {
-            timeline = new Timeline(swf, subTags, spriteId);
+            timeline = new Timeline(swf, subTags, spriteId, getRect());
         }
         return timeline;
     }
@@ -88,23 +88,14 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
         return spriteId;
     }
 
-    private RECT getCharacterBounds(Map<Integer, CharacterTag> allCharacters, Set<Integer> characters, Stack<Integer> visited) {
-        if (visited.contains(spriteId)) {
-            return new RECT();
-        }
-        visited.push(spriteId);
+    private RECT getCharacterBounds(Set<Integer> characters) {
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         boolean foundSomething = false;
         for (int c : characters) {
-            Tag t = allCharacters.get(c);
+            Tag t = swf.characters.get(c);
             RECT r = null;
             if (t instanceof BoundedTag) {
-                if (t instanceof CharacterTag) {
-                    if (visited.contains(((CharacterTag) t).getCharacterId())) {
-                        continue;
-                    }
-                }
-                r = ((BoundedTag) t).getRect(allCharacters, visited);
+                r = ((BoundedTag) t).getRect();
             }
             if (r != null) {
                 foundSomething = true;
@@ -114,7 +105,6 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
                 ret.Ymax = Math.max(r.Ymax, ret.Ymax);
             }
         }
-        visited.pop();
         if (!foundSomething) {
             return new RECT();
         }
@@ -123,14 +113,10 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     private static final Cache<RECT> rectCache = Cache.getInstance(true);
 
     @Override
-    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect() {
         if (rectCache.contains(this)) {
             return (RECT) rectCache.get(this);
         }
-        if (visited.contains(spriteId)) {
-            return new RECT();
-        }
-        visited.push(spriteId);
         RECT emptyRet = new RECT();
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         HashMap<Integer, Integer> depthMap = new HashMap<>();
@@ -157,14 +143,9 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
             if (characterId == -1) {
                 continue;
             }
-            HashSet<Integer> need = new HashSet<>();
-            if (visited.contains(characterId)) {
-                continue;
-            }
+            Set<Integer> need = new HashSet<>();
             need.add(characterId);
-            visited.pop();
-            RECT r = getCharacterBounds(characters, need, visited);
-            visited.push(spriteId);
+            RECT r = getCharacterBounds(need);
 
             if (m != null) {
                 AffineTransform trans = SWF.matrixToTransform(m);
@@ -190,8 +171,6 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
             ret.Ymax = Math.max(r.Ymax, ret.Ymax);
             foundSomething = true;
         }
-        visited.pop();
-
         if (!foundSomething) {
             ret = new RECT();
         }
@@ -289,18 +268,12 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        if (visited.contains(spriteId)) {
-            return;
-        }
-        RECT rect = getRect(characters, visited);
-        visited.push(spriteId);
-        SWF.frameToImage(getTimeline(), frame, rect, visited, image, transformation, colorTransform);
-        visited.pop();
+    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        SWF.frameToImage(getTimeline(), frame, image, transformation, colorTransform);
     }
 
     @Override
-    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public Point getImagePos(int frame) {
         return new Point(0, 0);
     }
 

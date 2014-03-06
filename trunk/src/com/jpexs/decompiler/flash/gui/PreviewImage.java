@@ -49,7 +49,7 @@ public class PreviewImage extends JPanel {
     private Tag tag;
 
     public PreviewImage(Tag tag) {
-        this.tag = tag; 
+        this.tag = tag;
         Dimension dim = new Dimension(PREVIEW_SIZE, PREVIEW_SIZE);
         setMinimumSize(dim);
         setMaximumSize(dim);
@@ -81,14 +81,14 @@ public class PreviewImage extends JPanel {
                 });
                 return null;
             }
-            
+
         });
 
     }
 
     private Image renderImage(SWF swf, Tag tag) {
         BoundedTag boundedTag = (BoundedTag) tag;
-        RECT rect = boundedTag.getRect(swf.characters, new Stack<Integer>());
+        RECT rect = boundedTag.getRect();
         Matrix m = new Matrix();
         double scale = 1;
         if (rect.getWidth() > PREVIEW_SIZE * SWF.unitDivisor) {
@@ -107,7 +107,7 @@ public class PreviewImage extends JPanel {
         SerializableImage image = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
         DrawableTag drawable = (DrawableTag) tag;
-        drawable.toImage(0, 0, swf.tags, swf.characters, new Stack<Integer>(), image, m, new ColorTransform());
+        drawable.toImage(0, 0, image, m, new ColorTransform());
         return image.getBufferedImage();
     }
 
@@ -119,7 +119,7 @@ public class PreviewImage extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         if (image != null) {
-            int x = (getWidth()- image.getWidth(this)) / 2;
+            int x = (getWidth() - image.getWidth(this)) / 2;
             int y = (getHeight() - image.getHeight(this)) / 2;
             g.drawImage(image, x, y, null);
         } else {

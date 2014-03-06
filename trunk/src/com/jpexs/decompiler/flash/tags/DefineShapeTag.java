@@ -34,10 +34,7 @@ import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 public class DefineShapeTag extends CharacterTag implements ShapeTag {
 
@@ -63,7 +60,7 @@ public class DefineShapeTag extends CharacterTag implements ShapeTag {
     }
 
     @Override
-    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect() {
         return shapeBounds;
     }
 
@@ -106,12 +103,12 @@ public class DefineShapeTag extends CharacterTag implements ShapeTag {
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter.exportTo(swf, getShapes(), null, image, transformation, colorTransform);
     }
 
     @Override
-    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public Point getImagePos(int frame) {
         return new Point(shapeBounds.Xmin / SWF.unitDivisor, shapeBounds.Ymin / SWF.unitDivisor);
     }
 

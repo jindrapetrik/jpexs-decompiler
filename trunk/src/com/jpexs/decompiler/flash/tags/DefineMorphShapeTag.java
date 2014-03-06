@@ -135,7 +135,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public RECT getRect(Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public RECT getRect() {
         RECT rect = new RECT();
         rect.Xmin = Math.min(startBounds.Xmin, endBounds.Xmin);
         rect.Ymin = Math.min(startBounds.Ymin, endBounds.Ymin);
@@ -299,7 +299,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         SHAPEWITHSTYLE shape = getShapeAtRatio(ratio);
         // shapeNum: 3
         // todo: Currently the generated image is not cached, because the cache 
@@ -309,7 +309,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public Point getImagePos(int frame, Map<Integer, CharacterTag> characters, Stack<Integer> visited) {
+    public Point getImagePos(int frame) {
         return new Point(
                 (startBounds.Xmin + (endBounds.Xmin - startBounds.Xmin) * frame / 65535) / SWF.unitDivisor,
                 (startBounds.Ymin + (endBounds.Ymin - startBounds.Ymin) * frame / 65535) / SWF.unitDivisor);
