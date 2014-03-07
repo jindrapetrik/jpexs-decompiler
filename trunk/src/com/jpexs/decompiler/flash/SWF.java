@@ -2311,6 +2311,9 @@ public final class SWF implements TreeItem, Timelined {
 
     public static void frameToImage(Timeline timeline, int frame,Point mousePos,int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         float unzoom = (float) SWF.unitDivisor;
+        if (timeline.frames.size() <= frame) {
+            return;
+        }
         Frame frameObj = timeline.frames.get(frame);
         Graphics2D g = (Graphics2D) image.getGraphics();
         g.setPaint(frameObj.backgroundColor.toColor());
