@@ -2490,7 +2490,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 totalFrameCount = ((DefineSpriteTag) fn.getParent()).frameCount;
                 timeline = ((DefineSpriteTag) fn.getParent()).getTimeline();
             }
-            previewImagePanel.setImage(SWF.frameToImageGet(timeline, fn.getFrame() - 1, rect, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform()));
+            previewImagePanel.setImage(SWF.frameToImageGet(timeline, fn.getFrame() - 1, null,0,rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform()));
         } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             createAndShowTempSwf(tagObj);

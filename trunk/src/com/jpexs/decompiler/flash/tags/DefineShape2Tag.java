@@ -70,7 +70,7 @@ public class DefineShape2Tag extends CharacterTag implements ShapeTag {
     }
 
     @Override
-    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int ratio, java.awt.Point mousePos, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter.exportTo(swf, getShapes(), null, image, transformation, colorTransform);
     }
 

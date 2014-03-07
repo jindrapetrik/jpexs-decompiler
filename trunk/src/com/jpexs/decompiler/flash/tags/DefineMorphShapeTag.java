@@ -297,7 +297,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int ratio, java.awt.Point mousePos, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         SHAPEWITHSTYLE shape = getShapeAtRatio(ratio);
         // shapeNum: 3
         // todo: Currently the generated image is not cached, because the cache 

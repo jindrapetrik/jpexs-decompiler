@@ -29,6 +29,8 @@ import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -266,8 +268,8 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     }
 
     @Override
-    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        SWF.frameToImage(getTimeline(), frame, image, transformation, colorTransform);
+    public void toImage(int frame, int ratio, java.awt.Point mousePos, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        SWF.frameToImage(getTimeline(), frame, mousePos, mouseButton, image, transformation, colorTransform);
     }
 
     @Override

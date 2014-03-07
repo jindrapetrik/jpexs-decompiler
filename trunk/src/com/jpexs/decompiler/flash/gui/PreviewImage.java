@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -36,6 +37,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -167,7 +169,7 @@ public class PreviewImage extends JPanel {
         } else if (treeItem instanceof FrameNodeItem) {
             FrameNodeItem fn = (FrameNodeItem) treeItem;
             RECT rect = swf.displayRect;
-            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.getFrame() - 1, rect, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
+            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.getFrame() - 1, null,0,rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
             width = (imgSrc.getWidth());
             height = (imgSrc.getHeight());
         } else if (treeItem instanceof ImageTag) {
@@ -218,7 +220,7 @@ public class PreviewImage extends JPanel {
         image.fillTransparent();
         if (imgSrc == null) {
             DrawableTag drawable = (DrawableTag) treeItem;
-            drawable.toImage(0, 0, image, m, new ColorTransform());
+            drawable.toImage(0, 0,null,0, image, m, new ColorTransform());
         } else {
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setTransform(m.toTransform());
@@ -248,7 +250,12 @@ public class PreviewImage extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        Graphics2D g2d=(Graphics2D)g;
+        g2d.setPaint(View.transparentPaint);
+        g2d.fill(new Rectangle(0,0,getWidth(),getHeight()));
+        g2d.setComposite(AlphaComposite.SrcOver);
+        g2d.setPaint(View.swfBackgroundColor);
+        g2d.fill(new Rectangle(0,0,getWidth(),getHeight()));
         if (image != null) {
             int x = (getWidth() / 2) - (image.getWidth(this) / 2);
             int y = (getHeight() / 2) - (image.getHeight(this) / 2);

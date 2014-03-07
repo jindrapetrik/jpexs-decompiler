@@ -27,7 +27,7 @@ import com.jpexs.helpers.SerializableImage;
  */
 public interface DrawableTag {
 
-    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform);
+    public void toImage(int frame, int ratio, java.awt.Point mousePos, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform);
 
     public Point getImagePos(int frame);
 

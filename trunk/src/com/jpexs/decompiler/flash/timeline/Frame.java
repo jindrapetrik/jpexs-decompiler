@@ -31,13 +31,15 @@ public class Frame {
     public Map<Integer, DepthState> layers = new HashMap<>();
     public DoActionTag action;
     public RGB backgroundColor = new RGBA(0, 0, 0, 0);
-
-    public Frame() {
-
+    public Timeline timeline;
+    
+    public Frame(Timeline timeline) {
+        this.timeline = timeline;
     }
 
     public Frame(Frame obj) {
         layers = new HashMap<>();
+        timeline = obj.timeline;
         for (int depth : obj.layers.keySet()) {
             layers.put(depth, new DepthState(obj.layers.get(depth)));
         }

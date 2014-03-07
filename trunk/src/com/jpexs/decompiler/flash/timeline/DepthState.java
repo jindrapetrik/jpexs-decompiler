@@ -16,11 +16,17 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.helpers.SerializableImage;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,12 +50,16 @@ public class DepthState {
     public boolean key = false;
     public int clipDepth = -1;
     public int time = 0;
-
-    public DepthState() {
-
+    private SWF swf;
+    private Frame frame;
+    public DepthState(SWF swf,Frame frame) {
+        this.swf = swf;
+        this.frame = frame;
     }
 
     public DepthState(DepthState obj) {
+        swf = obj.swf;
+        frame = obj.frame;
         characterId = obj.characterId;
         matrix = obj.matrix;
         instanceName = obj.instanceName;
@@ -63,5 +73,13 @@ public class DepthState {
         ratio = obj.ratio;
         clipDepth = obj.clipDepth;
         time = obj.time + 1;
+    }
+    
+    public void drawTo(SerializableImage img, Point mousePos, int mouseButton){
+        CharacterTag c=swf.characters.get(characterId);
+        if(c instanceof DrawableTag){
+            DrawableTag d = (DrawableTag)c;
+            d.toImage(time, ratio,mousePos, mouseButton,img, new Matrix(matrix), colorTransForm);
+        }
     }
 }

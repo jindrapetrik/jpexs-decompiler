@@ -20,14 +20,18 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.TexturePaint;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -76,6 +80,24 @@ public class View {
     public static final Color DEFAULT_BACKGROUND_COLOR = new Color(217, 231, 250);
     public static Color swfBackgroundColor = DEFAULT_BACKGROUND_COLOR;
 
+    
+    private static final BufferedImage transparentTexture;
+    public static final TexturePaint transparentPaint;
+    
+    private static final Color transparentColor1 = new Color(0x99,0x99,0x99);
+    private static final Color transparentColor2 = new Color(0x66,0x66,0x66);
+    
+    static{
+        transparentTexture = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        Graphics g=transparentTexture.getGraphics();
+        g.setColor(transparentColor1);
+        g.fillRect(0, 0, 16, 16);
+        g.setColor(transparentColor2);
+        g.fillRect(0, 0, 8, 8);
+        g.fillRect(8, 8, 8, 8);
+        transparentPaint = new TexturePaint(View.transparentTexture, new Rectangle(0,0,transparentTexture.getWidth(),transparentTexture.getHeight()));
+    }
+    
     /**
      * Sets windows Look and Feel
      */

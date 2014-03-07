@@ -126,6 +126,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -2261,7 +2262,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public static SerializableImage frameToImageGet(Timeline timeline, int frame, RECT displayRect, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame,Point mousePos,int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform) {
         String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode();
         SerializableImage image = getFromCache(key);
         if (image != null) {
@@ -2278,12 +2279,12 @@ public final class SWF implements TreeItem, Timelined {
         image.fillTransparent();
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
-        frameToImage(timeline, frame, image, m, colorTransform);
+        frameToImage(timeline, frame, mousePos,mouseButton,image, m, colorTransform);
         putToCache(key, image);
         return image;
     }
 
-    public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
+    public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, Point mousePos,int mouseButton,RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform) {
         RECT rect = displayRect;
         for (int f = 0; f < timeline.frames.size(); f++) {
             SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
@@ -2291,7 +2292,7 @@ public final class SWF implements TreeItem, Timelined {
             image.fillTransparent();
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
-            frameToImage(timeline, f, image, m, colorTransform);
+            frameToImage(timeline, f, mousePos,mouseButton,image, m, colorTransform);
             ret.add(image);
         }
     }
@@ -2308,7 +2309,7 @@ public final class SWF implements TreeItem, Timelined {
 
     }
 
-    public static void frameToImage(Timeline timeline, int frame, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public static void frameToImage(Timeline timeline, int frame,Point mousePos,int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         float unzoom = (float) SWF.unitDivisor;
         Frame frameObj = timeline.frames.get(frame);
         Graphics2D g = (Graphics2D) image.getGraphics();
@@ -2330,13 +2331,13 @@ public final class SWF implements TreeItem, Timelined {
                 continue;
             }
             DepthState layer = frameObj.layers.get(i);
-            if (!timeline.characters.containsKey(layer.characterId)) {
+            if (!timeline.swf.characters.containsKey(layer.characterId)) {
                 continue;
             }
             if (!layer.isVisible) {
                 continue;
             }
-            CharacterTag character = timeline.characters.get(layer.characterId);
+            CharacterTag character = timeline.swf.characters.get(layer.characterId);
             Matrix mat = new Matrix(layer.matrix);
             mat = mat.preConcatenate(transformation);
 
@@ -2397,7 +2398,7 @@ public final class SWF implements TreeItem, Timelined {
                     m.translate(-rect.xMin, -rect.yMin);
                     drawMatrix.translate(rect.xMin, rect.yMin);
 
-                    drawable.toImage(dframe, layer.ratio, img, m, clrTrans);
+                    drawable.toImage(dframe, layer.ratio,mousePos,mouseButton, img, m, clrTrans);
                 } else if (drawable instanceof FontTag) {
                     // only DefineFont tags
                     FontTag fontTag = (FontTag) drawable;

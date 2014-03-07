@@ -250,7 +250,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     @Override
-    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int ratio, java.awt.Point mousePos,int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         throw new Error("this overload of toImage call is not supported on FontTag");
     }
 

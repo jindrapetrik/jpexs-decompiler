@@ -245,9 +245,16 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     }
 
     @Override
-    public void toImage(int frame, int ratio, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        RECT displayRect = getRect();
-        SWF.frameToImage(getTimeline(), frame, image, transformation, colorTransform);
+    public void toImage(int frame, int ratio, java.awt.Point mousePos, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        Timeline tim = getTimeline();
+        //TODO: handle exact position
+        frame = 0;
+        if (mouseButton > 0 && tim.frames.size() > 1) {
+            frame = 1;
+        } else if (mousePos != null && tim.frames.size() > 2) {
+            frame = 2;
+        }
+        SWF.frameToImage(tim, frame, mousePos, mouseButton, image, transformation, colorTransform);
     }
 
     @Override
@@ -269,22 +276,50 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         timeline = new Timeline(swf, new ArrayList<Tag>(), buttonId, getRect());
 
         int maxDepth = 0;
-        Frame fr = new Frame();
+        Frame frameUp = null;
+        Frame frameDown = null;
+        Frame frameOver = null;
         for (BUTTONRECORD r : this.characters) {
+
+            Frame frame = new Frame(timeline);
             if (r.buttonStateUp) {
-                DepthState layer = new DepthState();
-                layer.colorTransForm = r.colorTransform;
-                layer.blendMode = r.blendMode;
-                layer.filters = r.filterList;
-                layer.matrix = r.placeMatrix;
-                layer.characterId = r.characterId;
-                if (r.placeDepth > maxDepth) {
-                    maxDepth = r.placeDepth;
+                if (frameUp == null) {
+                    frameUp = frame;
                 }
-                fr.layers.put(r.placeDepth, layer);
+                frame = frameUp;
+
+            } else if (r.buttonStateDown) {
+                if (frameDown == null) {
+                    frameDown = frame;
+                }
+                frame = frameDown;
+            } else if (r.buttonStateOver) {
+                if (frameOver == null) {
+                    frameOver = frame;
+                }
+                frame = frameOver;
             }
+            DepthState layer = new DepthState(swf,frame);
+            layer.colorTransForm = r.colorTransform;
+            layer.blendMode = r.blendMode;
+            layer.filters = r.filterList;
+            layer.matrix = r.placeMatrix;
+            layer.characterId = r.characterId;
+            if (r.placeDepth > maxDepth) {
+                maxDepth = r.placeDepth;
+            }
+            frame.layers.put(r.placeDepth, layer);
+
         }
-        timeline.frames.add(fr);
+        if (frameUp != null) {
+            timeline.frames.add(frameUp);
+        }
+        if (frameDown != null) {
+            timeline.frames.add(frameDown);
+        }
+        if (frameOver != null) {
+            timeline.frames.add(frameOver);
+        }
         return timeline;
     }
 }

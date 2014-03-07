@@ -20,18 +20,48 @@ import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Paint;
+import java.awt.PaintContext;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.TexturePaint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.ImageIcon;
@@ -55,6 +85,10 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
     private int frame = -1;
     private SWF swf;
     private boolean loaded;
+    private Point mousePos = null;
+    private int mouseButton;
+    
+    
 
     @Override
     public void setBackground(Color bg) {
@@ -64,13 +98,49 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         super.setBackground(bg);
     }
 
+    @Override
+    public synchronized void addMouseListener(MouseListener l) {
+        label.addMouseListener(l);
+    }
+
+    @Override
+    public synchronized void removeMouseListener(MouseListener l) {
+        label.removeMouseListener(l);
+    }
+
+    @Override
+    public synchronized void addMouseMotionListener(MouseMotionListener l) {
+        label.addMouseMotionListener(l);
+    }
+
+    @Override
+    public synchronized void removeMouseMotionListener(MouseMotionListener l) {
+        label.removeMouseMotionListener(l);
+    }
+
     public ImagePanel() {
         super(new BorderLayout());
         label.setHorizontalAlignment(JLabel.CENTER);
-        label.setOpaque(true);
         setOpaque(true);
         setBackground(View.DEFAULT_BACKGROUND_COLOR);
-        add(label, BorderLayout.CENTER);
+        
+        
+        
+        JPanel labelPan = new JPanel(new GridBagLayout()){
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d=(Graphics2D)g;
+                g2d.setPaint(View.transparentPaint);
+                g2d.fill(new Rectangle(0,0,getWidth(),getHeight()));
+                g2d.setComposite(AlphaComposite.SrcOver);
+                g2d.setPaint(View.swfBackgroundColor);
+                g2d.fill(new Rectangle(0,0,getWidth(),getHeight()));
+            }
+            
+        };        
+        labelPan.add(label,new GridBagConstraints());
+        add(labelPan,BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         JPanel buttonsPanel = new JPanel(new FlowLayout());
@@ -81,11 +151,47 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         buttonsPanel.add(selectColorButton);
         bottomPanel.add(buttonsPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
+        label.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                mousePos = e.getPoint();
+                drawFrame();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                mousePos = null;
+                drawFrame();
+            }
+
+            
+            
+            
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mouseButton = e.getButton();
+                drawFrame();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                mouseButton = 0;
+                drawFrame();
+            }
+            
+});
+        label.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                
+            }            
+});
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand() == ACTION_SELECT_BKCOLOR) {
+        if (e.getActionCommand().equals(ACTION_SELECT_BKCOLOR)) {
             View.execInEventDispatch(new Runnable() {
                 @Override
                 public void run() {
@@ -123,7 +229,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
             return;
         }
         frame = 0;
-        if (drawable.getNumFrames() == 1) {
+        /*if (drawable.getNumFrames() == 1) {
             Matrix mat = new Matrix();
             mat.translateX = swf.displayRect.Xmin;
             mat.translateY = swf.displayRect.Ymin;
@@ -145,7 +251,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     image.fillTransparent();
                     Matrix m = new Matrix();
                     m.translate(-rect.Xmin, -rect.Ymin);
-                    drawable.toImage(0, 0, image, m, new ColorTransform());
+                    drawable.toImage(0, 0, mousePos,mouseButton,image, m, new ColorTransform());
                     img = image;
                 } else if (drawable instanceof FontTag) {
                     // only DefineFont tags
@@ -158,7 +264,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                 setImage(img);
             }
             return;
-        }
+        }*/
         play();
     }
 
@@ -208,8 +314,8 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         }
     }
 
-    private static SerializableImage getFrame(SWF swf, int frame, DrawableTag drawable) {
-        String key = "drawable_" + frame + "_" + drawable.hashCode();
+    private static SerializableImage getFrame(SWF swf, int frame, DrawableTag drawable,Point mousePos, int mouseButton) {
+        String key = "drawable_" + frame + "_" + drawable.hashCode()+"_"+mouseButton+"_"+(mousePos==null?"out":"over");
         SerializableImage img = SWF.getFromCache(key);
         if (img == null) {
             if (drawable instanceof BoundedTag) {
@@ -231,7 +337,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                 Matrix m = new Matrix();
                 m.translate(-rect.Xmin, -rect.Ymin);
                 m.scale(scale);
-                drawable.toImage(frame, frame, image, m, new ColorTransform());
+                drawable.toImage(frame, frame,mousePos,mouseButton, image, m, new ColorTransform());
                 img = image;
             } else if (drawable instanceof FontTag) {
                 // only DefineFont tags
@@ -250,7 +356,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
-        ImageIcon icon = new ImageIcon(getFrame(swf, frame, drawable).getBufferedImage());
+        ImageIcon icon = new ImageIcon(getFrame(swf, frame, drawable,mousePos,mouseButton).getBufferedImage());
         label.setIcon(icon);
     }
 
@@ -265,7 +371,6 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
     public void play() {
         pause();
         if (drawable.getNumFrames() > 1) {
-
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -273,6 +378,8 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                     nextFrame();
                 }
             }, 0, 1000 / frameRate);
+        }else{
+            drawFrame();
         }
     }
 

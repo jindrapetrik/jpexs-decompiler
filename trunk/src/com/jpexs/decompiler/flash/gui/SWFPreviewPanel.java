@@ -24,6 +24,10 @@ import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -45,7 +49,7 @@ public class SWFPreviewPanel extends JPanel implements FlashDisplay {
     int frame = 1;
     List<SerializableImage> frameImages;
     JLabel buffering = new JLabel(AppStrings.translate("work.buffering") + "...");
-
+    
     public SWFPreviewPanel() {
         pan = new ImagePanel();
         pan.setBackground(View.swfBackgroundColor);
@@ -58,7 +62,7 @@ public class SWFPreviewPanel extends JPanel implements FlashDisplay {
         //prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         add(prevLabel, BorderLayout.NORTH);
         //add(buffering, BorderLayout.SOUTH);
-        add(new PlayerControls(this), BorderLayout.SOUTH);
+        add(new PlayerControls(this), BorderLayout.SOUTH);        
     }
     private SWF swf;
 
@@ -71,7 +75,8 @@ public class SWFPreviewPanel extends JPanel implements FlashDisplay {
             @Override
             public void run() {
                 buffering.setVisible(true);
-                SWF.framesToImage(swf.getTimeline(), frameImages, 0, swf.frameCount - 1, swf.displayRect, swf.frameCount, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
+                //TODO: handle mouse move and clicks
+                SWF.framesToImage(swf.getTimeline(), frameImages, 0, swf.frameCount - 1,null,0, swf.displayRect, swf.frameCount, new Stack<Integer>(), Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
                 buffering.setVisible(false);
             }
         }.start();

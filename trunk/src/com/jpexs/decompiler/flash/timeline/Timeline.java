@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
@@ -31,11 +30,12 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  *
@@ -45,12 +45,9 @@ public class Timeline {
 
     public List<Frame> frames = new ArrayList<>();
     public int id;
-    public Map<Integer, CharacterTag> characters = new HashMap<>();
     public SWF swf;
     public RECT displayRect;
 
-    public Timeline() {
-    }
 
     public int getMaxDepth() {
         int max_depth = 0;
@@ -76,13 +73,7 @@ public class Timeline {
         this.id = id;
         this.swf = swf;
         this.displayRect = displayRect;
-        Frame frame = new Frame();
-        for (Tag t : swf.tags) {
-            if (t instanceof CharacterTag) {
-                CharacterTag c = (CharacterTag) t;
-                characters.put(c.getCharacterId(), c);
-            }
-        }
+        Frame frame = new Frame(this);        
         for (Tag t : tags) {
             if (t instanceof SetBackgroundColorTag) {
                 frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
@@ -91,7 +82,7 @@ public class Timeline {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int depth = po.getDepth();
                 if (!frame.layers.containsKey(depth)) {
-                    frame.layers.put(depth, new DepthState());
+                    frame.layers.put(depth, new DepthState(swf,frame));
                 }
                 DepthState fl = frame.layers.get(depth);
                 int characterId = po.getCharacterId();
@@ -163,7 +154,7 @@ public class Timeline {
         }
     }
 
-    public void toImage(int frame, int ratio, List<Tag> tags, Map<Integer, CharacterTag> characters, Stack<Integer> visited, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-
+    public void toImage(int frame, int ratio, Point mousePos,int mouseButton,SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        SWF.frameToImage(this, frame, mousePos,mouseButton,image, transformation, colorTransform);
     }
 }
