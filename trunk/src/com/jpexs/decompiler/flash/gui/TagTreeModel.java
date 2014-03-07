@@ -317,8 +317,17 @@ public class TagTreeModel implements TreeModel {
             }
             if (n instanceof TreeNode) {
                 TreeNode nd = (TreeNode) n;
-                if (nd.getItem() == obj) {
-                    return newPath;
+                if (obj instanceof StringItem && nd.getItem() instanceof StringItem) {
+                    // StringItems are always recreated, so compare them by name
+                    StringItem nds = (StringItem) nd.getItem();
+                    StringItem objs = (StringItem) obj;
+                    if (objs.getName().equals(nds.getName())) {
+                        return newPath;
+                    }
+                } else {
+                    if (nd.getItem() == obj) {
+                        return newPath;
+                    }
                 }
             }
             ret = searchTag(obj, n, newPath);
@@ -337,6 +346,9 @@ public class TagTreeModel implements TreeModel {
         List<TreeNode> path = new ArrayList<>();
         path.add(getRoot());
         path = searchTag(obj, getRoot(), path);
+        if (path == null) {
+            return null;
+        }
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
         return tp;
     }

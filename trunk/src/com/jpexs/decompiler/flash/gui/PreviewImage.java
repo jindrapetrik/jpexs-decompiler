@@ -36,6 +36,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
@@ -43,9 +44,12 @@ import java.util.Stack;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 /**
  *
@@ -76,14 +80,32 @@ public class PreviewImage extends JPanel {
         setSize(dim);
         setLayout(null);
         setBorder(BorderFactory.createLineBorder(Color.black));
+        
+        if (treeItem instanceof Tag) {
+            JPopupMenu contextMenu = new JPopupMenu();
+            final JMenuItem removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove"));
+            removeMenuItem.addActionListener(new AbstractAction() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    TreeItem previewNode = mainPanel.oldTag;
+                    mainPanel.removeTag((Tag) treeItem);
+                    mainPanel.refreshTree();
+                    // refresh preview list
+                    mainPanel.setTreeItem(previewNode);
+                }
+            });
+            contextMenu.add(removeMenuItem);
+            this.setComponentPopupMenu(contextMenu);
+        }
+                
         this.addMouseListener(new MouseListener() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                if (e.getClickCount() >= 2) {
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
                     mainPanel.setTreeItem(treeItem);
-
                 }
             }
 

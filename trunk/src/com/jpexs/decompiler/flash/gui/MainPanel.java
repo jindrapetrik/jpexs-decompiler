@@ -1640,8 +1640,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public void setTreeItem(TreeItem treeItem) {
         TagTreeModel ttm = (TagTreeModel) tagTree.getModel();
         TreePath tp = ttm.getTagPath(treeItem);
-        tagTree.setSelectionPath(tp);
-        tagTree.scrollPathToVisible(tp);
+        if (tp != null) {
+            tagTree.setSelectionPath(tp);
+            tagTree.scrollPathToVisible(tp);
+        } else {
+            showCard(CARDEMPTYPANEL);
+        }
     }
 
     public void autoDeobfuscateChanged() {
@@ -2063,6 +2067,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         return false;
     }
+    
+    public void removeTag(Tag tag) {
+        tag.getSwf().removeTag(tag);
+        refreshTree();
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -2118,6 +2127,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                     swf.tags.set(swf.tags.indexOf(it), jpeg2Tag);
                                     showCard(CARDEMPTYPANEL);
                                     refreshTree();
+                                    setTreeItem(jpeg2Tag);
                                 } else {
                                     it.setImage(data);
                                 }

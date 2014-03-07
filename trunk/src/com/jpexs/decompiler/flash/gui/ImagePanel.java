@@ -133,8 +133,15 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                 if (drawable instanceof BoundedTag) {
                     BoundedTag bounded = (BoundedTag) drawable;
                     RECT rect = bounded.getRect();
-                    SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
-                            (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                    int width = (int) (rect.getWidth() / SWF.unitDivisor);
+                    int height = (int) (rect.getHeight() / SWF.unitDivisor);
+                    if (rect.getWidth() > width * SWF.unitDivisor) {
+                        width++;
+                    }
+                    if (rect.getHeight()> height * SWF.unitDivisor) {
+                        height++;
+                    }
+                    SerializableImage image = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
                     image.fillTransparent();
                     Matrix m = new Matrix();
                     m.translate(-rect.Xmin, -rect.Ymin);
