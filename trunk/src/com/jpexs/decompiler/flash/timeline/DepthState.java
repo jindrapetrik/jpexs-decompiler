@@ -50,8 +50,8 @@ public class DepthState {
     public boolean key = false;
     public int clipDepth = -1;
     public int time = 0;
-    private SWF swf;
-    private Frame frame;
+    private final SWF swf;
+    private final Frame frame;
     public DepthState(SWF swf,Frame frame) {
         this.swf = swf;
         this.frame = frame;

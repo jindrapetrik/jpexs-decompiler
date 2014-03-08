@@ -160,7 +160,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -284,6 +283,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String ACTION_CANCEL_TEXT = "CANCELTEXT";
     private static final String ACTION_SAVE_TEXT = "SAVETEXT";
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
+    private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
@@ -327,6 +327,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private void createContextMenu() {
         final JPopupMenu contextPopupMenu = new JPopupMenu();
+
+        final JMenuItem expandRecursiveMenuItem = new JMenuItem(translate("contextmenu.expandAll"));
+        expandRecursiveMenuItem.addActionListener(this);
+        expandRecursiveMenuItem.setActionCommand(ACTION_EXPAND_RECURSIVE);
+        contextPopupMenu.add(expandRecursiveMenuItem);
 
         final JMenuItem removeMenuItem = new JMenuItem(translate("contextmenu.remove"));
         removeMenuItem.addActionListener(this);
@@ -374,10 +379,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }
                     boolean allSelectedIsTag = true;
                     for (TreePath treePath : paths) {
-                        Object tagObj = treePath.getLastPathComponent();
+                        TreeNode treeNode = (TreeNode) treePath.getLastPathComponent();
 
-                        if (tagObj instanceof TreeNode) {
-                            TreeItem tag = ((TreeNode) tagObj).getItem();
+                        if (treeNode instanceof TreeNode) {
+                            TreeItem tag = treeNode.getItem();
                             if (!(tag instanceof Tag)) {
                                 allSelectedIsTag = false;
                                 break;
@@ -391,6 +396,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     replaceBinarySelectionMenuItem.setVisible(false);
                     closeSelectionMenuItem.setVisible(false);
                     moveTagMenu.setVisible(false);
+                    expandRecursiveMenuItem.setVisible(false);
 
                     if (paths.length == 1) {
                         TreeNode treeNode = (TreeNode) paths[0].getLastPathComponent();
@@ -431,6 +437,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             }
                             moveTagMenu.setVisible(true);
                         }
+                        
+                        TreeModel model = tagTree.getModel();
+                        expandRecursiveMenuItem.setVisible(model.getChildCount(treeNode) > 0);
                     }
 
                     removeMenuItem.setVisible(allSelectedIsTag);
@@ -1312,13 +1321,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         for (TreePath tp : tps) {
-            Object o = tp.getLastPathComponent();
-            ret.add((TreeNode) o);
+            TreeNode treeNode = (TreeNode) tp.getLastPathComponent();
+            ret.add(treeNode);
         }
         return ret;
     }
 
-    public List<TreeNode> getAllSubs(JTree tree, Object o) {
+    public List<TreeNode> getAllSubs(JTree tree, TreeNode o) {
         TagTreeModel tm = (TagTreeModel) tree.getModel();
         List<TreeNode> ret = new ArrayList<>();
         for (int i = 0; i < tm.getChildCount(o); i++) {
@@ -1338,9 +1347,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
 
         for (TreePath tp : tps) {
-            Object o = tp.getLastPathComponent();
-            ret.add((TreeNode) o);
-            ret.addAll(getAllSubs(tree, o));
+            TreeNode treeNode = (TreeNode) tp.getLastPathComponent();
+            ret.add(treeNode);
+            ret.addAll(getAllSubs(tree, treeNode));
         }
         return ret;
     }
@@ -2084,15 +2093,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
                 break;
             case ACTION_REPLACE_IMAGE: {
-                Object tagObj = tagTree.getLastSelectedPathComponent();
-                if (tagObj == null) {
+                TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
+                if (treeNode == null) {
                     return;
                 }
 
-                TreeItem item = null;
-                if (tagObj instanceof TreeNode) {
-                    item = ((TreeNode) tagObj).getItem();
-                }
+                TreeItem item = treeNode.getItem();
                 if (item instanceof ImageTag) {
                     ImageTag it = (ImageTag) item;
                     if (it.importSupported()) {
@@ -2143,15 +2149,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
             break;
             case ACTION_REPLACE_BINARY: {
-                Object tagObj = tagTree.getLastSelectedPathComponent();
-                if (tagObj == null) {
+                TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
+                if (treeNode == null) {
                     return;
                 }
 
-                TreeItem item = null;
-                if (tagObj instanceof TreeNode) {
-                    item = ((TreeNode) tagObj).getItem();
-                }
+                TreeItem item = treeNode.getItem();
                 if (item instanceof DefineBinaryDataTag) {
                     DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
                     JFileChooser fc = new JFileChooser();
@@ -2170,15 +2173,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
             break;
             case ACTION_EDIT_GENERIC_TAG: {
-                Object tagObj = tagTree.getLastSelectedPathComponent();
-                if (tagObj == null) {
+                TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
+                if (treeNode == null) {
                     return;
                 }
 
-                TreeItem item = null;
-                if (tagObj instanceof TreeNode) {
-                    item = ((TreeNode) tagObj).getItem();
-                }
+                TreeItem item = treeNode.getItem();
                 if (item instanceof Tag) {
                     genericEditButton.setVisible(false);
                     genericSaveButton.setVisible(true);
@@ -2205,6 +2205,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 genericCancelButton.setVisible(false);
                 genericTagPanel.setEditMode(false, null);
             }
+            break;
+            case ACTION_EXPAND_RECURSIVE: {
+                TreePath path = tagTree.getSelectionPath();
+                if (path == null) {
+                    return;
+                }
+                View.expandTreeNodesRecursive(tagTree, path, true);
+            }    
             break;
             case ACTION_REMOVE_ITEM:
                 List<TreeNode> sel = getSelected(tagTree);

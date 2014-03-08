@@ -448,4 +448,22 @@ public class View {
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
         tree.expandPath(tp);
     }
+    
+    public static void expandTreeNodesRecursive(JTree tree, TreePath parent, boolean expand) {
+        TreeModel model = tree.getModel();
+
+        Object node = parent.getLastPathComponent();
+        int childCount = model.getChildCount(node);
+        for (int j = 0; j < childCount; j++) {
+            Object child = model.getChild(node, j);
+            TreePath path = parent.pathByAddingChild(child);
+            expandTreeNodesRecursive(tree, path, expand);
+        }
+
+        if (expand) {
+            tree.expandPath(parent);
+        } else {
+            tree.collapsePath(parent);
+        }
+    }
 }
