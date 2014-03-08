@@ -29,7 +29,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -98,7 +97,10 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
 import com.jpexs.decompiler.flash.treeitems.StringItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -106,7 +108,6 @@ import com.jpexs.decompiler.flash.treenodes.ContainerNode;
 import com.jpexs.decompiler.flash.treenodes.FrameNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
-import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -221,7 +222,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private GenericTagPanel genericTagPanel;
     private JPanel folderPreviewPanel;
     private final ImagePanel previewImagePanel;
-    private final SWFPreviewPanel swfPreviewPanel;
+    private final ImagePanel swfPreviewPanel;
     private boolean isWelcomeScreen = true;
     private static final String CARDFLASHPANEL = "Flash card";
     private static final String CARDSWFPREVIEWPANEL = "SWF card";
@@ -284,6 +285,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String ACTION_SAVE_TEXT = "SAVETEXT";
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
+
+    // play morph shape in 2 second(s)
+    // this settings should be synchronized with frameCount and frameRate
+    // settings in Mainpanel.createAndShowTempSwf
+    static final int morphShapeAnimationLength = 2;
+
+    static final int morphShapeAnimationFrameRate = 30;
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
@@ -437,7 +445,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             }
                             moveTagMenu.setVisible(true);
                         }
-                        
+
                         TreeModel model = tagTree.getModel();
                         expandRecursiveMenuItem.setVisible(model.getChildCount(treeNode) > 0);
                     }
@@ -817,7 +825,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         shapesCard.add(previewPanel, BorderLayout.CENTER);
         displayPanel.add(shapesCard, CARDDRAWPREVIEWPANEL);
 
-        swfPreviewPanel = new SWFPreviewPanel();
+        swfPreviewPanel = new ImagePanel();
         displayPanel.add(swfPreviewPanel, CARDSWFPREVIEWPANEL);
 
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
@@ -2076,7 +2084,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         return false;
     }
-    
+
     public void removeTag(Tag tag) {
         tag.getSwf().removeTag(tag);
         refreshTree();
@@ -2212,7 +2220,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     return;
                 }
                 View.expandTreeNodesRecursive(tagTree, path, true);
-            }    
+            }
             break;
             case ACTION_REMOVE_ITEM:
                 List<TreeNode> sel = getSelected(tagTree);
@@ -2425,9 +2433,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             SWFNode swfNode = (SWFNode) treeNode;
             SWF swf = swfNode.getItem();
             if (mainMenu.isInternalFlashViewerSelected()) {
-                showCard(CARDSWFPREVIEWPANEL);
-                swfPreviewPanel.load(swf);
-                swfPreviewPanel.play();
+                showCard(CARDDRAWPREVIEWPANEL);
+
+                previewImagePanel.setTimelined(swf, swf, -1);
             } else {
                 showCard(CARDFLASHPANEL);
                 parametersPanel.setVisible(false);
@@ -2471,9 +2479,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showCard(CARDIMAGEPANEL);
             imagePanel.setImage(imageTag.getImage());
         } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (mainMenu.isInternalFlashViewerSelected())) {
-            Tag tag = (Tag) tagObj;
+            final Tag tag = (Tag) tagObj;
             showCard(CARDDRAWPREVIEWPANEL);
-            previewImagePanel.setDrawable((DrawableTag) tag, tag.getSwf(), 50/*FIXME*/);
+            DrawableTag d = (DrawableTag) tag;
+            Timelined timelined = null;
+            if (tagObj instanceof Timelined && !(tagObj instanceof ButtonTag)) {
+                timelined = (Timelined) tag;
+            } else {
+                timelined = makeTimelined(tag);
+            }
+
+            previewImagePanel.setTimelined(timelined, tag.getSwf(), -1);
         } else if ((tagObj instanceof FontTag) && (mainMenu.isInternalFlashViewerSelected())) {
             FontTag fontTag = (FontTag) tagObj;
             showCard(CARDFLASHPANEL);
@@ -2490,15 +2506,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             int containerId = 0;
             RECT rect = swf.displayRect;
             int totalFrameCount = swf.frameCount;
-            Timeline timeline = swf.getTimeline();
+            Timelined timelined = swf;
             if (fn.getParent() instanceof DefineSpriteTag) {
                 controlTags = ((DefineSpriteTag) fn.getParent()).subTags;
                 containerId = ((DefineSpriteTag) fn.getParent()).spriteId;
                 rect = ((DefineSpriteTag) fn.getParent()).getRect();
                 totalFrameCount = ((DefineSpriteTag) fn.getParent()).frameCount;
-                timeline = ((DefineSpriteTag) fn.getParent()).getTimeline();
+                timelined = ((DefineSpriteTag) fn.getParent());
             }
-            previewImagePanel.setImage(SWF.frameToImageGet(timeline, fn.getFrame() - 1, null,0,rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform()));
+            previewImagePanel.setTimelined(timelined, swf, fn.getFrame() - 1);
+            //previewImagePanel.setImage(SWF.frameToImageGet(timeline, fn.getFrame() - 1, null,0,rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform()));
         } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             createAndShowTempSwf(tagObj);
@@ -2903,7 +2920,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private void showFontTag(FontTag ft) {
         if (mainMenu.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
-            internelViewerPanel.setDrawable(ft, ft.getSwf(), 1);
+            internelViewerPanel.setTimelined(makeTimelined(ft), ft.getSwf(), 0);
         } else {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
         }
@@ -2917,7 +2934,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private void showTextTag(TextTag textTag) {
         if (mainMenu.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
-            internelViewerPanel.setDrawable(textTag, textTag.getSwf(), 1);
+            internelViewerPanel.setTimelined(makeTimelined(textTag), textTag.getSwf(), 0);
         } else {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
         }
@@ -3073,5 +3090,48 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             TimelineFrame tf = new TimelineFrame(swf);
             tf.setVisible(true);
         }
+    }
+
+    private static Timelined makeTimelined(final Tag tag) {
+
+        return new Timelined() {
+
+            private Timeline tim;
+
+            @Override
+            public Timeline getTimeline() {
+                if (tim != null) {
+                    return tim;
+                }
+                tim = new Timeline(tag.getSwf(), new ArrayList<Tag>(), ((CharacterTag) tag).getCharacterId(), getRect());
+                if (tag instanceof MorphShapeTag) {
+                    tim.frameRate = morphShapeAnimationFrameRate;
+                    int framesCnt = tim.frameRate * morphShapeAnimationLength;
+                    for (int i = 0; i < framesCnt; i++) {
+                        Frame f = new Frame(tim);
+                        DepthState ds = new DepthState(tag.getSwf(), f);
+                        ds.characterId = ((CharacterTag) tag).getCharacterId();
+                        ds.matrix = new MATRIX();
+                        ds.ratio = i * 65535 / framesCnt;
+                        f.layers.put(1, ds);
+                        tim.frames.add(f);
+                    }
+                } else {
+                    Frame f = new Frame(tim);
+                    DepthState ds = new DepthState(tag.getSwf(), f);
+                    ds.characterId = ((CharacterTag) tag).getCharacterId();
+                    ds.matrix = new MATRIX();
+                    f.layers.put(1, ds);
+                    tim.frames.add(f);
+                }
+                tim.displayRect = getRect();
+                return tim;
+            }
+
+            @Override
+            public RECT getRect() {
+                return ((BoundedTag) tag).getRect();
+            }
+        };
     }
 }

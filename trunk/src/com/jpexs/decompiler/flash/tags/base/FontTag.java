@@ -24,17 +24,24 @@ import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
+import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +51,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public abstract class FontTag extends CharacterTag implements AloneTag, DrawableTag {
+public abstract class FontTag extends CharacterTag implements AloneTag, BoundedTag, DrawableTag {
 
     public FontTag(SWF swf, int id, String name, byte[] data, long pos) {
         super(swf, id, name, data, pos);
@@ -250,8 +257,10 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     @Override
-    public void toImage(int frame, int ratio, java.awt.Point mousePos,int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        throw new Error("this overload of toImage call is not supported on FontTag");
+    public void toImage(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        Graphics2D g = (Graphics2D) image.getGraphics();
+        g.setComposite(AlphaComposite.SrcOver);
+        g.drawImage(toImage(0, 0, new Matrix(), colorTransform).getBufferedImage(), transformation.toTransform(), null);
     }
 
     @Override
@@ -263,4 +272,16 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     public int getNumFrames() {
         return 1;
     }
+
+    @Override
+    public Shape getOutline(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+        RECT r = getRect();
+        return new Area(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
+    }
+
+    @Override
+    public RECT getRect() {
+        return new RECT(0, (int) (500 * SWF.unitDivisor), 0, (int) (500 * SWF.unitDivisor));
+    }
+
 }

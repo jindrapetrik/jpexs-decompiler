@@ -16,17 +16,37 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.helpers.SerializableImage;
+import java.awt.Shape;
 
 /**
  *
  * @author JPEXS
  */
-public interface ShapeTag extends BoundedTag, DrawableTag {
+public abstract class ShapeTag extends CharacterTag implements BoundedTag, DrawableTag {
 
-    public SHAPEWITHSTYLE getShapes();
+    public ShapeTag(SWF swf, int id, String name, byte[] data, long pos) {
+        super(swf, id, name, data, pos);
+    }
 
-    public String toSVG();
+    public abstract SHAPEWITHSTYLE getShapes();
 
-    public int getShapeNum();
+    public abstract String toSVG();
+
+    public abstract int getShapeNum();
+
+    @Override
+    public Shape getOutline(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+        return transformation.toTransform().createTransformedShape(getShapes().getOutline());
+    }
+
+    public void toImage(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        BitmapExporter.exportTo(swf, getShapes(), null, image, transformation, colorTransform);
+    }
 }

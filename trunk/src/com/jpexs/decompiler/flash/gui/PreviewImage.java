@@ -81,7 +81,7 @@ public class PreviewImage extends JPanel {
         setSize(dim);
         setLayout(null);
         setBorder(BorderFactory.createLineBorder(Color.black));
-        
+
         if (treeItem instanceof Tag) {
             JPopupMenu contextMenu = new JPopupMenu();
             final JMenuItem removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove"));
@@ -99,7 +99,7 @@ public class PreviewImage extends JPanel {
             contextMenu.add(removeMenuItem);
             this.setComponentPopupMenu(contextMenu);
         }
-                
+
         this.addMouseListener(new MouseListener() {
 
             @Override
@@ -168,7 +168,7 @@ public class PreviewImage extends JPanel {
         } else if (treeItem instanceof FrameNodeItem) {
             FrameNodeItem fn = (FrameNodeItem) treeItem;
             RECT rect = swf.displayRect;
-            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.getFrame() - 1, null,0,rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
+            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.getFrame() - 1, null, 0, rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
             width = (imgSrc.getWidth());
             height = (imgSrc.getHeight());
         } else if (treeItem instanceof ImageTag) {
@@ -219,7 +219,7 @@ public class PreviewImage extends JPanel {
         image.fillTransparent();
         if (imgSrc == null) {
             DrawableTag drawable = (DrawableTag) treeItem;
-            drawable.toImage(0, 0,null,0, image, m, new ColorTransform());
+            drawable.toImage(0, 0, null, 0, image, m, new ColorTransform());
         } else {
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setTransform(m.toTransform());
@@ -249,12 +249,12 @@ public class PreviewImage extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        Graphics2D g2d=(Graphics2D)g;
+        Graphics2D g2d = (Graphics2D) g;
         g2d.setPaint(View.transparentPaint);
-        g2d.fill(new Rectangle(0,0,getWidth(),getHeight()));
+        g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
         g2d.setComposite(AlphaComposite.SrcOver);
         g2d.setPaint(View.swfBackgroundColor);
-        g2d.fill(new Rectangle(0,0,getWidth(),getHeight()));
+        g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
         if (image != null) {
             int x = (getWidth() / 2) - (image.getWidth(this) / 2);
             int y = (getHeight() / 2) - (image.getHeight(this) / 2);

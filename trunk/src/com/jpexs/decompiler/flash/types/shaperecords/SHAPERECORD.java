@@ -29,8 +29,10 @@ import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -410,5 +412,21 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         }
         ret.shapeRecords = recs;
         return ret;
+    }
+
+    public static Shape moveShapeToStart(Shape s) {
+        Rectangle bds = s.getBounds();
+        s = AffineTransform.getTranslateInstance(-bds.x, -bds.y).createTransformedShape(s);
+        return s;
+    }
+
+    public static Shape twipToPixelShape(Shape s) {
+        Rectangle bds = s.getBounds();
+        int dx = -bds.x - bds.width / 2;
+        int dy = -bds.y - bds.height / 2;
+        s = AffineTransform.getTranslateInstance(dx, dy).createTransformedShape(s);
+        s = AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor).createTransformedShape(s);
+        s = AffineTransform.getTranslateInstance(-dx / SWF.unitDivisor, -dy / SWF.unitDivisor).createTransformedShape(s);
+        return s;
     }
 }

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
+import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -42,6 +43,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.font.LineMetrics;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -296,5 +299,11 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 }
             }
         }
+    }
+
+    @Override
+    public Shape getOutline(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+        RECT r = getBounds();
+        return new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()); //TODO: match character shapes
     }
 }

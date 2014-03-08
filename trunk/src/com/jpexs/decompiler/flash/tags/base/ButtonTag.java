@@ -16,17 +16,43 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.helpers.SerializableImage;
+import java.awt.Shape;
 import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public interface ButtonTag extends DrawableTag, Timelined {
+public abstract class ButtonTag extends CharacterTag implements BoundedTag, DrawableTag, Timelined {
 
-    public List<BUTTONRECORD> getRecords();
+    public static int FRAME_UP = 0;
+    public static int FRAME_OVER = 1;
+    public static int FRAME_DOWN = 2;
+    public static int FRAME_HITTEST = 3;
 
-    public boolean trackAsMenu();
+    public ButtonTag(SWF swf, int id, String name, byte[] data, long pos) {
+        super(swf, id, name, data, pos);
+    }
+
+    public abstract List<BUTTONRECORD> getRecords();
+
+    public abstract boolean trackAsMenu();
+
+    @Override
+    public Shape getOutline(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+        return getTimeline().getOutline(frame, ratio, stateUnderCursor, mouseButton, transformation);
+    }
+
+    @Override
+    public void toImage(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        SWF.frameToImage(getTimeline(), frame, stateUnderCursor, mouseButton, image, transformation, colorTransform);
+    }
+
 }

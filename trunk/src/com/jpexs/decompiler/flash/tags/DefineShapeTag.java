@@ -19,24 +19,20 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.exporters.BitmapExporter;
-import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGShapeExporter;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Set;
 
-public class DefineShapeTag extends CharacterTag implements ShapeTag {
+public class DefineShapeTag extends ShapeTag {
 
     @SWFType(BasicType.UI16)
     public int shapeId;
@@ -102,11 +98,10 @@ public class DefineShapeTag extends CharacterTag implements ShapeTag {
         return exporter.getSVG();
     }
 
-    @Override
-    public void toImage(int frame, int ratio, java.awt.Point mousePos, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        BitmapExporter.exportTo(swf, getShapes(), null, image, transformation, colorTransform);
-    }
-
+    /*    @Override
+     public void toImage(int frame, int ratio, java.awt.Point mousePos, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+     BitmapExporter.exportTo(swf, getShapes(), null, image, transformation, colorTransform);
+     }*/
     @Override
     public Point getImagePos(int frame) {
         return new Point(shapeBounds.Xmin / SWF.unitDivisor, shapeBounds.Ymin / SWF.unitDivisor);

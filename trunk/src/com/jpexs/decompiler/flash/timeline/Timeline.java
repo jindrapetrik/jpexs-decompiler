@@ -22,6 +22,9 @@ import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
@@ -30,9 +33,12 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  *
@@ -44,7 +50,7 @@ public class Timeline {
     public int id;
     public SWF swf;
     public RECT displayRect;
-
+    public int frameRate;
 
     public int getMaxDepth() {
         int max_depth = 0;
@@ -70,7 +76,8 @@ public class Timeline {
         this.id = id;
         this.swf = swf;
         this.displayRect = displayRect;
-        Frame frame = new Frame(this);        
+        this.frameRate = swf.frameRate;
+        Frame frame = new Frame(this);
         for (Tag t : tags) {
             if (t instanceof SetBackgroundColorTag) {
                 frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
@@ -79,7 +86,7 @@ public class Timeline {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int depth = po.getDepth();
                 if (!frame.layers.containsKey(depth)) {
-                    frame.layers.put(depth, new DepthState(swf,frame));
+                    frame.layers.put(depth, new DepthState(swf, frame));
                 }
                 DepthState fl = frame.layers.get(depth);
                 int characterId = po.getCharacterId();
@@ -151,7 +158,72 @@ public class Timeline {
         }
     }
 
-    public void toImage(int frame, int ratio, Point mousePos,int mouseButton,SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        SWF.frameToImage(this, frame, mousePos,mouseButton,image, transformation, colorTransform);
+    public void toImage(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        SWF.frameToImage(this, frame, stateUnderCursor, mouseButton, image, transformation, colorTransform);
+    }
+
+    private class Clip {
+
+        public Shape shape;
+        public int depth;
+
+        public Clip(Shape shape, int depth) {
+            this.shape = shape;
+            this.depth = depth;
+        }
+
+    }
+
+    public Shape getOutline(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+        Frame fr = this.frames.get(frame);
+        Area area = new Area();
+        Stack<Clip> clips = new Stack<>();
+        for (int d = this.getMaxDepth(); d >= 0; d--) {
+            Clip currentClip = null;
+            for (int i = clips.size() - 1; i >= 0; i--) {
+                Clip cl = clips.get(i);
+                if (cl.depth <= d) {
+                    clips.remove(i);
+                }
+            }
+            if (!clips.isEmpty()) {
+                currentClip = clips.peek();
+            }
+            DepthState ds = fr.layers.get(d);
+            if (ds == null) {
+                continue;
+            }
+            if (!ds.isVisible) {
+                continue;
+            }
+            CharacterTag c = swf.characters.get(ds.characterId);
+            if ((c instanceof DrawableTag) && (c instanceof BoundedTag)) {
+                Matrix m = new Matrix(ds.matrix);
+                m = m.preConcatenate(transformation);
+
+                Matrix drawMatrix = new Matrix();
+                //drawMatrix.translate(rect.xMin, rect.yMin);
+                //System.out.println("m="+m);
+                //System.out.println("-------");
+                Shape cshape = ((DrawableTag) c).getOutline(ds.time, ds.ratio, stateUnderCursor, mouseButton, m);
+                //cshape = SHAPERECORD.twipToPixelShape(cshape);
+
+                //AffineTransform trans = drawMatrix.toTransform();
+                //cshape = trans.createTransformedShape(cshape);
+                Area addArea = new Area(cshape);
+                if (currentClip != null) {
+                    Area a = new Area(new Rectangle(displayRect.Xmin, displayRect.Ymin, displayRect.getWidth(), displayRect.getHeight()));
+                    a.subtract(new Area(currentClip.shape));
+                    addArea.subtract(a);
+                }
+                if (ds.clipDepth > -1) {
+                    Clip clip = new Clip(addArea, ds.clipDepth);
+                    clips.push(clip);
+                } else {
+                    area.add(addArea);
+                }
+            }
+        }
+        return area;
     }
 }

@@ -20,7 +20,11 @@ package com.jpexs.decompiler.flash.gui;
  *
  * @author JPEXS
  */
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 

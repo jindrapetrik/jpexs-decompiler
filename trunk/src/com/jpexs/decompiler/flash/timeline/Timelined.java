@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+
 /**
  *
  * @author JPEXS
  */
-public interface Timelined {
+public interface Timelined extends BoundedTag {
 
     public Timeline getTimeline();
 }

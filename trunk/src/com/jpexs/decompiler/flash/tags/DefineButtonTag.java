@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -45,7 +44,6 @@ import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
-import com.jpexs.helpers.SerializableImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -62,7 +60,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedTag, ButtonTag {
+public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     /**
      * ID for this character
@@ -267,19 +265,6 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     }
 
     @Override
-    public void toImage(int frame, int ratio, java.awt.Point mousePos, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        Timeline tim = getTimeline();
-        //TODO: handle exact position
-        frame = 0;
-        if (mouseButton > 0 && tim.frames.size() > 1) {
-            frame = 1;
-        } else if (mousePos != null && tim.frames.size() > 2) {
-            frame = 2;
-        }
-        SWF.frameToImage(tim, frame, mousePos,mouseButton, image, transformation, colorTransform);
-    }
-
-    @Override
     public Point getImagePos(int frame) {
         RECT r = getRect();
         return new Point(r.Xmin / SWF.unitDivisor, r.Ymin / SWF.unitDivisor);
@@ -325,32 +310,13 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             }
         }
         int maxDepth = 0;
-        Frame frameUp = null;
-        Frame frameDown = null;
-        Frame frameOver = null;
+        Frame frameUp = new Frame(timeline);
+        Frame frameDown = new Frame(timeline);
+        Frame frameOver = new Frame(timeline);
+        Frame frameHit = new Frame(timeline);
         for (BUTTONRECORD r : this.characters) {
-            
-             Frame frame = new Frame(timeline);
-             if (r.buttonStateUp) {
-                if(frameUp==null){
-                    frameUp = frame;
-                }
-                frame = frameUp;
-                
-            }else if (r.buttonStateDown) {
-                if(frameDown==null){
-                    frameDown = frame;
-                }      
-                frame = frameDown;
-            }else if (r.buttonStateOver) {
-                if(frameOver==null){
-                    frameOver = frame;
-                }      
-                frame = frameOver;
-            }
-            
-            
-            DepthState layer = new DepthState(swf,frame);
+
+            DepthState layer = new DepthState(swf, null);
             layer.colorTransForm = clrTrans;
             layer.blendMode = r.blendMode;
             layer.filters = r.filterList;
@@ -359,15 +325,35 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             if (r.placeDepth > maxDepth) {
                 maxDepth = r.placeDepth;
             }
-            
-            frame.layers.put(r.placeDepth, layer);
+
+            if (r.buttonStateUp) {
+                frameUp.layers.put(r.placeDepth, new DepthState(layer, frameUp, false));
+            }
+            if (r.buttonStateDown) {
+                frameDown.layers.put(r.placeDepth, new DepthState(layer, frameDown, false));
+            }
+            if (r.buttonStateOver) {
+                frameOver.layers.put(r.placeDepth, new DepthState(layer, frameOver, false));
+            }
+            if (r.buttonStateHitTest) {
+                frameHit.layers.put(r.placeDepth, new DepthState(layer, frameHit, false));
+            }
+
         }
-        if(frameUp!=null){
-            timeline.frames.add(frameUp);
+        timeline.frames.add(frameUp);
+        if (frameOver.layers.isEmpty()) {
+            frameOver = frameUp;
         }
-        if(frameDown!=null){
-            timeline.frames.add(frameDown);
+        timeline.frames.add(frameOver);
+        if (frameDown.layers.isEmpty()) {
+            frameDown = frameOver;
         }
+        timeline.frames.add(frameDown);
+        if (frameHit.layers.isEmpty()) {
+            frameHit = frameUp;
+        }
+        timeline.frames.add(frameHit);
+
         return timeline;
     }
 

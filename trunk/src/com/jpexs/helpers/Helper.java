@@ -658,12 +658,11 @@ public class Helper {
          result.append(";").append(line).append(nl);
          }
          }*/
-        
         int length = data.length;
         if (length > limit) {
             length = limit;
         }
-        
+
         int rowCount = length / bytesPerRow;
         if (length % bytesPerRow > 0) {
             rowCount++;
@@ -720,7 +719,7 @@ public class Helper {
         if (data.length > limit) {
             writer.appendNoHilight(AppStrings.translate("binaryData.truncateWarning").replace("%count%", Integer.toString(data.length - limit)));
         }
-        
+
         return writer;
     }
 

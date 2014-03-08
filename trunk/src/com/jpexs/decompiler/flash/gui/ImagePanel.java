@@ -21,21 +21,24 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
-import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,6 +47,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.ImageIcon;
@@ -55,22 +59,18 @@ import javax.swing.JPanel;
 public final class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
 
     static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
-    static final int frameRate = 25;
-    // play morph shape in 2 second(s)
-    // this settings should be synchronized with frameCount and frameRate
-    // settings in Mainpanel.createAndShowTempSwf
-    static final int morphShapeAnimationLength = 2;
 
-    public JLabel label = new JLabel();
-    public DrawableTag drawable;
+    private JLabel label = new JLabel();
+    private Timelined timelined;
+    private boolean stillFrame = false;
     private Timer timer;
     private int frame = -1;
     private SWF swf;
     private boolean loaded;
-    private Point mousePos = null;
     private int mouseButton;
-    
-    
+    private JLabel debugLabel = new JLabel("-");
+    private DepthState stateUnderCursor = null;
+    private MouseEvent lastMouseEvent = null;
 
     @Override
     public void setBackground(Color bg) {
@@ -100,29 +100,83 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         label.removeMouseMotionListener(l);
     }
 
+    private void updatePos(MouseEvent e) {
+        if (e == null) {
+            return;
+        }
+        lastMouseEvent = e;
+        boolean handCursor = false;
+        DepthState newStateUnderCursor = null;
+        if (timelined != null) {
+            Timeline tim = ((Timelined) timelined).getTimeline();
+            BoundedTag bounded = (BoundedTag) timelined;
+            RECT rect = bounded.getRect();
+            int width = rect.getWidth();
+            double scale = 1.0;
+            if (width > swf.displayRect.getWidth()) {
+                scale = (double) swf.displayRect.getWidth() / (double) width;
+            }
+            Matrix m = new Matrix();
+            m.translate(-rect.Xmin, -rect.Ymin);
+            m.scale(scale);
+            List<DepthState> objs = tim.frames.get(frame).getObjectsUnderCursor(e.getPoint(), mouseButton, m);
+            String ret = "";
+            ret += " [" + e.getX() + "," + e.getY() + "] : ";
+
+            boolean first = true;
+            for (DepthState ds : objs) {
+                if (!first) {
+                    ret += ", ";
+                }
+                first = false;
+                CharacterTag c = tim.swf.characters.get(ds.characterId);
+                if (c instanceof ButtonTag) {
+                    newStateUnderCursor = ds;
+                    handCursor = true;
+                }
+                ret += c.toString();
+                if (timelined instanceof ButtonTag) {
+                    handCursor = true;
+                }
+            }
+            if (objs.isEmpty()) {
+                ret += " - ";
+            }
+            debugLabel.setText(ret);
+
+            if (handCursor) {
+                label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            } else {
+                label.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+            if (newStateUnderCursor != stateUnderCursor) {
+                stateUnderCursor = newStateUnderCursor;
+                drawFrame();
+            }
+        }
+    }
+
     public ImagePanel() {
         super(new BorderLayout());
         label.setHorizontalAlignment(JLabel.CENTER);
         setOpaque(true);
         setBackground(View.DEFAULT_BACKGROUND_COLOR);
-        
-        
-        
-        JPanel labelPan = new JPanel(new GridBagLayout()){
+
+        JPanel labelPan = new JPanel(new GridBagLayout()) {
 
             @Override
             protected void paintComponent(Graphics g) {
-                Graphics2D g2d=(Graphics2D)g;
+                Graphics2D g2d = (Graphics2D) g;
                 g2d.setPaint(View.transparentPaint);
-                g2d.fill(new Rectangle(0,0,getWidth(),getHeight()));
+                g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
                 g2d.setComposite(AlphaComposite.SrcOver);
                 g2d.setPaint(View.swfBackgroundColor);
-                g2d.fill(new Rectangle(0,0,getWidth(),getHeight()));
+                g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
             }
-            
-        };        
-        labelPan.add(label,new GridBagConstraints());
-        add(labelPan,BorderLayout.CENTER);
+
+        };
+        labelPan.add(label, new GridBagConstraints());
+        add(labelPan, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         JPanel buttonsPanel = new JPanel(new FlowLayout());
@@ -133,42 +187,49 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         buttonsPanel.add(selectColorButton);
         bottomPanel.add(buttonsPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
+        add(debugLabel, BorderLayout.NORTH);
         label.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                mousePos = e.getPoint();
                 drawFrame();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                mousePos = null;
+                stateUnderCursor = null;
                 drawFrame();
+                debugLabel.setText(" - ");
             }
 
-            
-            
-            
             @Override
             public void mousePressed(MouseEvent e) {
                 mouseButton = e.getButton();
+                updatePos(e);
                 drawFrame();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 mouseButton = 0;
+                updatePos(e);
                 drawFrame();
             }
-            
-});
+
+        });
         label.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                
-            }            
-});
+
+                updatePos(e);
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                updatePos(e);
+            }
+
+        });
     }
 
     @Override
@@ -194,59 +255,33 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         if (timer != null) {
             timer.cancel();
         }
-        drawable = null;
+        timelined = null;
         loaded = true;
         ImageIcon icon = new ImageIcon(data);
         label.setIcon(icon);
     }
 
-    public void setDrawable(final DrawableTag drawable, final SWF swf, int frameRate) {
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame) {
         pause();
-        this.drawable = drawable;
+        if (drawable instanceof ButtonTag) {
+            frame = ButtonTag.FRAME_UP;
+        }
+        this.timelined = drawable;
         this.swf = swf;
+        if (frame > -1) {
+            this.frame = frame;
+            this.stillFrame = true;
+        } else {
+            this.frame = 0;
+            this.stillFrame = false;
+        }
         loaded = true;
 
-        if (drawable.getNumFrames() == 0) {
+        if (drawable.getTimeline().frames.isEmpty()) {
             label.setIcon(null);
             return;
         }
         frame = 0;
-        /*if (drawable.getNumFrames() == 1) {
-            Matrix mat = new Matrix();
-            mat.translateX = swf.displayRect.Xmin;
-            mat.translateY = swf.displayRect.Ymin;
-            String key = "drawable_0_" + drawable.hashCode();
-            SerializableImage img = SWF.getFromCache(key);
-            if (img == null) {
-                if (drawable instanceof BoundedTag) {
-                    BoundedTag bounded = (BoundedTag) drawable;
-                    RECT rect = bounded.getRect();
-                    int width = (int) (rect.getWidth() / SWF.unitDivisor);
-                    int height = (int) (rect.getHeight() / SWF.unitDivisor);
-                    if (rect.getWidth() > width * SWF.unitDivisor) {
-                        width++;
-                    }
-                    if (rect.getHeight()> height * SWF.unitDivisor) {
-                        height++;
-                    }
-                    SerializableImage image = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
-                    image.fillTransparent();
-                    Matrix m = new Matrix();
-                    m.translate(-rect.Xmin, -rect.Ymin);
-                    drawable.toImage(0, 0, mousePos,mouseButton,image, m, new ColorTransform());
-                    img = image;
-                } else if (drawable instanceof FontTag) {
-                    // only DefineFont tags
-                    FontTag fontTag = (FontTag) drawable;
-                    img = fontTag.toImage(0, 0, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
-                }
-                SWF.putToCache(key, img);
-            }
-            if (img != null) {
-                setImage(img);
-            }
-            return;
-        }*/
         play();
     }
 
@@ -255,8 +290,9 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
         if (timer != null) {
             timer.cancel();
         }
-        drawable = null;
+        timelined = null;
         loaded = true;
+        stillFrame = true;
         ImageIcon icon = new ImageIcon(image.getBufferedImage());
         label.setIcon(icon);
     }
@@ -268,10 +304,13 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
 
     @Override
     public int getTotalFrames() {
-        if (drawable == null) {
+        if (timelined == null) {
             return 0;
         }
-        return drawable.getNumFrames();
+        if (stillFrame) {
+            return 1;
+        }
+        return timelined.getTimeline().frames.size();
     }
 
     @Override
@@ -283,21 +322,16 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
     }
 
     private void nextFrame() {
-        int newframe = frame == drawable.getNumFrames() - 1 ? 0 : frame + 1;
-        if (drawable instanceof MorphShapeTag) {
-            newframe = frame + drawable.getNumFrames() / frameRate / morphShapeAnimationLength;
-            if (newframe > drawable.getNumFrames()) {
-                newframe = 0;
-            }
-        }
+        int newframe = frame == timelined.getTimeline().frames.size() - 1 ? 0 : frame + 1;
         if (newframe != frame) {
             frame = newframe;
+            updatePos(lastMouseEvent);
             drawFrame();
         }
     }
 
-    private static SerializableImage getFrame(SWF swf, int frame, DrawableTag drawable,Point mousePos, int mouseButton) {
-        String key = "drawable_" + frame + "_" + drawable.hashCode()+"_"+mouseButton+"_"+(mousePos==null?"out":"over");
+    private static SerializableImage getFrame(SWF swf, int frame, Timelined drawable, DepthState stateUnderCursor, int mouseButton) {
+        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode());
         SerializableImage img = SWF.getFromCache(key);
         if (img == null) {
             if (drawable instanceof BoundedTag) {
@@ -319,7 +353,7 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
                 Matrix m = new Matrix();
                 m.translate(-rect.Xmin, -rect.Ymin);
                 m.scale(scale);
-                drawable.toImage(frame, frame,mousePos,mouseButton, image, m, new ColorTransform());
+                drawable.getTimeline().toImage(frame, frame, stateUnderCursor, mouseButton, image, m, new ColorTransform());
                 img = image;
             } else if (drawable instanceof FontTag) {
                 // only DefineFont tags
@@ -332,13 +366,13 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
     }
 
     private void drawFrame() {
-        if (drawable == null) {
+        if (timelined == null) {
             return;
         }
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
-        ImageIcon icon = new ImageIcon(getFrame(swf, frame, drawable,mousePos,mouseButton).getBufferedImage());
+        ImageIcon icon = new ImageIcon(getFrame(swf, frame, timelined, stateUnderCursor, mouseButton).getBufferedImage());
         label.setIcon(icon);
     }
 
@@ -352,15 +386,15 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
     @Override
     public void play() {
         pause();
-        if (drawable.getNumFrames() > 1) {
+        if (!stillFrame && timelined.getTimeline().frames.size() > 1) {
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     nextFrame();
                 }
-            }, 0, 1000 / frameRate);
-        }else{
+            }, 0, 1000 / timelined.getTimeline().frameRate);
+        } else {
             drawFrame();
         }
     }
@@ -373,10 +407,13 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
 
     @Override
     public boolean isPlaying() {
-        if (drawable == null) {
+        if (timelined == null) {
             return false;
         }
-        return (drawable.getNumFrames() <= 1) || (timer != null);
+        if (stillFrame) {
+            return false;
+        }
+        return (timelined.getTimeline().frames.size() <= 1) || (timer != null);
     }
 
     @Override
@@ -387,13 +424,13 @@ public final class ImagePanel extends JPanel implements ActionListener, FlashDis
 
     @Override
     public int getFrameRate() {
-        if (drawable == null) {
+        if (timelined == null) {
             return 1;
         }
-        if (drawable instanceof MorphShapeTag) {
-            return drawable.getNumFrames() / morphShapeAnimationLength;
+        if (stillFrame) {
+            return 1;
         }
-        return frameRate;
+        return timelined.getTimeline().frameRate;
     }
 
     @Override

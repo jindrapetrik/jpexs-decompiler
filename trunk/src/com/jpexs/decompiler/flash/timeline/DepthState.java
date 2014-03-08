@@ -51,13 +51,15 @@ public class DepthState {
     public int clipDepth = -1;
     public int time = 0;
     private final SWF swf;
-    private final Frame frame;
-    public DepthState(SWF swf,Frame frame) {
+    public Frame frame;
+
+    public DepthState(SWF swf, Frame frame) {
         this.swf = swf;
         this.frame = frame;
     }
 
-    public DepthState(DepthState obj) {
+    public DepthState(DepthState obj, Frame frame, boolean addTime) {
+        this.frame = frame;
         swf = obj.swf;
         frame = obj.frame;
         characterId = obj.characterId;
@@ -72,14 +74,17 @@ public class DepthState {
         clipActions = obj.clipActions;
         ratio = obj.ratio;
         clipDepth = obj.clipDepth;
-        time = obj.time + 1;
+        time = obj.time;
+        if (addTime) {
+            time++;
+        }
     }
-    
-    public void drawTo(SerializableImage img, Point mousePos, int mouseButton){
-        CharacterTag c=swf.characters.get(characterId);
-        if(c instanceof DrawableTag){
-            DrawableTag d = (DrawableTag)c;
-            d.toImage(time, ratio,mousePos, mouseButton,img, new Matrix(matrix), colorTransForm);
+
+    public void drawTo(SerializableImage img, Point mousePos, int mouseButton) {
+        CharacterTag c = swf.characters.get(characterId);
+        if (c instanceof DrawableTag) {
+            DrawableTag d = (DrawableTag) c;
+            d.toImage(time, ratio, null, mouseButton, img, new Matrix(matrix), colorTransForm);
         }
     }
 }

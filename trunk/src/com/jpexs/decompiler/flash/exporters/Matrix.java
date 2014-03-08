@@ -204,4 +204,9 @@ public class Matrix {
                 translateX, translateY);
         return transform;
     }
+
+    @Override
+    public String toString() {
+        return "[Matrix scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";
+    }
 }
