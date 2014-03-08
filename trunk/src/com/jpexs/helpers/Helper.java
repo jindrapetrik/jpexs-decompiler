@@ -643,10 +643,10 @@ public class Helper {
 
     public static GraphTextWriter byteArrayToHexWithHeader(GraphTextWriter writer, byte[] data) {
         writer.appendNoHilight("#hexdata").newLine().newLine();
-        return byteArrayToHex(writer, data, 8, 8, false, false);
+        return byteArrayToHex(writer, data, 8, 8, -1, false, false);
     }
 
-    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize, boolean addChars, boolean showAddress) {
+    public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize, int limit, boolean addChars, boolean showAddress) {
 
         /* // hex data from decompiled actions
          Scanner scanner = new Scanner(srcWithHex);
@@ -658,8 +658,14 @@ public class Helper {
          result.append(";").append(line).append(nl);
          }
          }*/
-        int rowCount = data.length / bytesPerRow;
-        if (data.length % bytesPerRow > 0) {
+        
+        int length = data.length;
+        if (length > limit) {
+            length = limit;
+        }
+        
+        int rowCount = length / bytesPerRow;
+        if (length % bytesPerRow > 0) {
             rowCount++;
         }
 
@@ -675,7 +681,7 @@ public class Helper {
 
             for (int i = 0; i < bytesPerRow; i++) {
                 int idx = row * bytesPerRow + i;
-                if (data.length > idx) {
+                if (length > idx) {
                     if (i > 0 && i % groupSize == 0) {
                         writer.appendNoHilight(" ");
                     }
@@ -695,7 +701,7 @@ public class Helper {
                 writer.appendNoHilight("  ");
                 for (int i = 0; i < bytesPerRow; i++) {
                     int idx = row * bytesPerRow + i;
-                    if (data.length == idx) {
+                    if (length == idx) {
                         break;
                     }
                     if (i > 0 && i % groupSize == 0) {
@@ -711,12 +717,16 @@ public class Helper {
         }
 
         writer.newLine();
+        if (data.length > limit) {
+            writer.appendNoHilight(AppStrings.translate("binaryData.truncateWarning").replace("%count%", Integer.toString(data.length - limit)));
+        }
+        
         return writer;
     }
 
-    public static String byteArrayToHex(byte[] data, int bytesPerRow) {
+    public static String byteArrayToHex(byte[] data, int bytesPerRow, int limit) {
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-        byteArrayToHex(writer, data, bytesPerRow, 8, true, true);
+        byteArrayToHex(writer, data, bytesPerRow, 8, limit, true, true);
         return writer.toString();
     }
 

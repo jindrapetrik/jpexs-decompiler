@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -55,7 +56,8 @@ public final class BinaryPanel extends JPanel implements ComponentListener {
             int blockCount = widthInChars / 34;
             hexEditor.setFont(new Font("Monospaced", Font.PLAIN, hexEditor.getFont().getSize()));
             hexEditor.setContentType("text/plain");
-            hexEditor.setText(Helper.byteArrayToHex(data, blockCount * 8));
+            int limit = Configuration.binaryDataDisplayLimit.get();
+            hexEditor.setText(Helper.byteArrayToHex(data, blockCount * 8, limit));
             hexEditor.setCaretPosition(0);
         } else {
             hexEditor.setText("");
