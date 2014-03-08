@@ -2748,7 +2748,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         List<Action> actions;
                         DoActionTag doa;
 
-                        doa = new DoActionTag(null, new byte[]{}, 0);
+                        doa = new DoActionTag(swf, new byte[]{}, 0);
                         actions = ASMParser.parse(0, 0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
                                 + "Push \"_root\"\n"

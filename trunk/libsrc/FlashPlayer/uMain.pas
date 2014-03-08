@@ -316,12 +316,12 @@ begin
               val := (buffer[0] shl 8) + buffer[1];
               ReadPipe(pipe, buffer, val);
               SetString(vals, PChar(Addr(buffer)), val);
-              vals := '';
               try
                 vals := flaPreview.CallFunction(vals);
               except
                 on E: Exception do
                 begin
+                  vals := '';
                   freeSWF();
                 end;
               end;
@@ -338,12 +338,12 @@ begin
               val := (buffer[0] shl 8) + buffer[1];
               ReadPipe(pipe, buffer, val);
               SetString(vals, PChar(Addr(buffer)), val);
-              vals := '';
               try
                 vals := flaPreview.GetVariable(vals);
               except
                 on E: Exception do
                 begin
+                  vals := '';
                   freeSWF();
                 end;
               end;
