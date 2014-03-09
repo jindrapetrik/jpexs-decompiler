@@ -157,6 +157,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -281,6 +282,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public TreeItem oldTag;
     private File tempFile;
     private PlayerControls imagePlayControls;
+
+    private JPanel repPanel;
+    private JPanel repPanel2;
 
     private SoundThread soundThread = null;
 
@@ -422,6 +426,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
     private static final String ACTION_REPLACE_IMAGE = "REPLACEIMAGE";
     private static final String ACTION_REPLACE_BINARY = "REPLACEBINARY";
+    private static final String ACTION_REPLACE_OTHER = "REPLACEOTHER";
     private static final String ACTION_EDIT_GENERIC_TAG = "EDITGENERICTAG";
     private static final String ACTION_SAVE_GENERIC_TAG = "SAVEGENERICTAG";
     private static final String ACTION_CANCEL_GENERIC_TAG = "CANCELGENERICTAG";
@@ -507,6 +512,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         replaceBinarySelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(replaceBinarySelectionMenuItem);
 
+        final JMenuItem replaceSoundSelectionMenuItem = new JMenuItem(translate("button.replace"));
+        replaceSoundSelectionMenuItem.setActionCommand(ACTION_REPLACE_OTHER);
+        replaceSoundSelectionMenuItem.addActionListener(this);
+        contextPopupMenu.add(replaceSoundSelectionMenuItem);
+
         final JMenuItem closeSelectionMenuItem = new JMenuItem(translate("contextmenu.closeSwf"));
         closeSelectionMenuItem.setActionCommand(ACTION_CLOSE_SWF);
         closeSelectionMenuItem.addActionListener(this);
@@ -548,6 +558,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                     replaceImageSelectionMenuItem.setVisible(false);
                     replaceBinarySelectionMenuItem.setVisible(false);
+                    replaceSoundSelectionMenuItem.setVisible(false);
                     closeSelectionMenuItem.setVisible(false);
                     moveTagMenu.setVisible(false);
                     expandRecursiveMenuItem.setVisible(false);
@@ -562,6 +573,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         }
                         if (item instanceof DefineBinaryDataTag) {
                             replaceBinarySelectionMenuItem.setVisible(true);
+                        }
+
+                        if (item instanceof DefineSoundTag) {
+                            replaceSoundSelectionMenuItem.setVisible(true);
                         }
 
                         if (treeNode instanceof SWFNode) {
@@ -947,6 +962,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         }
         pan.add(leftComponent, BorderLayout.CENTER);
+
+        repPanel = new JPanel(new FlowLayout());
+        JButton repButton = new JButton(translate("button.replace"), View.getIcon("edit16"));
+        repButton.addActionListener(this);
+        repButton.setActionCommand(ACTION_REPLACE_OTHER);
+        repPanel.add(repButton);
+        pan.add(repPanel, BorderLayout.SOUTH);
         viewerCards.add(pan, FLASH_VIEWER_CARD);
         previewSplitPane.setLeftComponent(viewerCards);
 
@@ -976,8 +998,18 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         prevIntLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //prevIntLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         previewPanel.add(prevIntLabel, BorderLayout.NORTH);
+
+        repPanel2 = new JPanel(new FlowLayout());
+        JButton repButton2 = new JButton(translate("button.replace"), View.getIcon("edit16"));
+        repButton2.addActionListener(this);
+        repButton2.setActionCommand(ACTION_REPLACE_OTHER);
+        repPanel2.add(repButton2);
+        previewPanel.add(repPanel2, BorderLayout.SOUTH);
+
         shapesCard.add(previewPanel, BorderLayout.CENTER);
         displayPanel.add(shapesCard, CARDDRAWPREVIEWPANEL);
+
+        displayReplace(false);
 
         swfPreviewPanel = new ImagePanel();
         displayPanel.add(swfPreviewPanel, CARDSWFPREVIEWPANEL);
@@ -2251,13 +2283,79 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     reload(true);
                 }
                 break;
-            case ACTION_REPLACE_IMAGE: {
+            case ACTION_REPLACE_BINARY:
+            case ACTION_REPLACE_IMAGE:
+            case ACTION_REPLACE_OTHER: {
                 TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
                 if (treeNode == null) {
                     return;
                 }
 
                 TreeItem item = treeNode.getItem();
+                if (item instanceof DefineSoundTag) {
+                    JFileChooser fc = new JFileChooser();
+                    fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+                    fc.setFileFilter(new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            return (f.getName().toLowerCase().endsWith(".mp3"))
+                                    || (f.getName().toLowerCase().endsWith(".wav"))
+                                    || (f.isDirectory());
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return translate("filter.sounds");
+                        }
+                    });
+                    fc.addChoosableFileFilter(new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            return (f.getName().toLowerCase().endsWith(".mp3"))
+                                    || (f.isDirectory());
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return translate("filter.sounds.mp3");
+                        }
+                    });
+                    fc.addChoosableFileFilter(new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            return (f.getName().toLowerCase().endsWith(".wav"))
+                                    || (f.isDirectory());
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return translate("filter.sounds.wav");
+                        }
+                    });
+                    JFrame f = new JFrame();
+                    View.setWindowIcon(f);
+                    int returnVal = fc.showOpenDialog(f);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                        File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                        DefineSoundTag ds = (DefineSoundTag) item;
+                        int soundFormat = DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+                        if (selfile.getName().toLowerCase().endsWith(".mp3")) {
+                            soundFormat = DefineSoundTag.FORMAT_MP3;
+                        }
+                        boolean ok = false;
+                        try {
+                            ok = ds.setSound(new FileInputStream(selfile), soundFormat);
+                        } catch (IOException ex) {
+                            //ignore
+                        }
+                        if (!ok) {
+                            View.showMessageDialog(null, translate("error.sound.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            reload(true);
+                        }
+                    }
+                }
                 if (item instanceof ImageTag) {
                     ImageTag it = (ImageTag) item;
                     if (it.importSupported()) {
@@ -2290,12 +2388,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 if (it instanceof DefineBitsTag) {
                                     DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, it.getOriginalData(), it.getPos(), it.getCharacterId(), data);
                                     swf.tags.set(swf.tags.indexOf(it), jpeg2Tag);
+                                    swf.updateCharacters();
                                     refreshTree();
                                     setTreeItem(jpeg2Tag);
                                 } else {
                                     it.setImage(data);
                                 }
-                                swf.clearImageCache();
+                                SWF.clearImageCache();
                             } catch (IOException ex) {
                                 Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Invalid image", ex);
                                 View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2304,15 +2403,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         }
                     }
                 }
-            }
-            break;
-            case ACTION_REPLACE_BINARY: {
-                TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
-                if (treeNode == null) {
-                    return;
-                }
-
-                TreeItem item = treeNode.getItem();
                 if (item instanceof DefineBinaryDataTag) {
                     DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
                     JFileChooser fc = new JFileChooser();
@@ -2515,8 +2605,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (soundThread != null) {
             soundThread.pause();
         }
-        imagePlayControls.setMedia(imagePanel);
+        imagePlayControls.setMedia(previewImagePanel);
         stopFlashPlayer();
+        displayReplace(tagObj instanceof DefineSoundTag);
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
             final List<ABCContainerTag> abcList = scriptLeaf.abc.swf.abcList;
@@ -3319,5 +3410,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 return ((BoundedTag) tag).getRect();
             }
         };
+    }
+
+    public void displayReplace(boolean display) {
+
+        repPanel.setVisible(display);
+        repPanel2.setVisible(display);
+
     }
 }

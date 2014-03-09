@@ -46,6 +46,7 @@ public class MP3Player extends SoundPlayer {
     private int positionSamples = 0;
     private long sampleCount;
     private int frameRate;
+    private int positionFrames = 0;
 
     public MP3Player(InputStream stream, long sampleCount, int frameRate) throws JavaLayerException {
         this(stream, null);
@@ -118,6 +119,7 @@ public class MP3Player extends SoundPlayer {
                 }
                 SampleBuffer output = (SampleBuffer) decoder.decodeFrame(h, bitstream);
                 positionSamples += output.getBufferLength();
+                positionFrames++;
                 bitstream.closeFrame();
                 if (positionSamples >= endPosition) {
                     break;
@@ -163,6 +165,7 @@ public class MP3Player extends SoundPlayer {
 
             SampleBuffer output = (SampleBuffer) decoder.decodeFrame(h, bitstream);
             positionSamples += output.getBufferLength();
+            positionFrames++;
 
             synchronized (this) {
                 out = audio;

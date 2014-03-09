@@ -235,6 +235,10 @@ public final class SWF implements TreeItem, Timelined {
 
     private Timeline timeline;
 
+    public void updateCharacters() {
+        parseCharacters(new ArrayList<ContainerItem>(tags));
+    }
+
     private void parseCharacters(List<ContainerItem> list) {
         for (ContainerItem t : list) {
             if (t instanceof CharacterTag) {
@@ -563,7 +567,7 @@ public final class SWF implements TreeItem, Timelined {
                     showFrameTag.innerTags = innerTags;
                 }
             }
-            parseCharacters(new ArrayList<ContainerItem>(tags));
+            updateCharacters();
             assignExportNamesToSymbols();
             assignClassesToSymbols();
             findFileAttributes();

@@ -91,6 +91,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
+import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -1441,9 +1442,11 @@ public class XFLConverter {
                     format += 4; //quality best
                     SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), swf.version);
                     try {
-                        sis.readSI16();
-                        MP3FRAME frame = new MP3FRAME(sis);
-                        int bitRate = frame.getBitrate();
+                        MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
+                        //sis.readSI16();
+                        //MP3FRAME frame = new MP3FRAME(sis);
+                        MP3FRAME frame = s.frames.get(0);
+                        int bitRate = frame.getBitRate();
 
                         switch (bitRate) {
                             case 8:

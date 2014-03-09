@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import javazoom.jl.decoder.Bitstream;
+import javazoom.jl.decoder.Decoder;
 
 /**
  *
@@ -32,12 +34,25 @@ public class MP3SOUNDDATA {
     public int seekSamples;
     public List<MP3FRAME> frames;
 
-    public MP3SOUNDDATA(InputStream is) throws IOException {
+    public MP3SOUNDDATA(InputStream is, boolean raw) throws IOException {
         SWFInputStream sis = new SWFInputStream(is, SWF.DEFAULT_VERSION);
-        seekSamples = sis.readUI16();
-        frames = new ArrayList<>();
-        while (sis.available() > 0) {
-            frames.add(new MP3FRAME(sis));
+        if (!raw) {
+            seekSamples = sis.readSI16();
         }
+        frames = new ArrayList<>();
+        MP3FRAME f;
+        Decoder decoder = new Decoder();
+        Bitstream bitstream = new Bitstream(is);
+        while ((f = MP3FRAME.readFrame(bitstream, decoder)) != null) {
+            frames.add(f);
+        }
+    }
+
+    public int sampleCount() {
+        int r = 0;
+        for (MP3FRAME f : frames) {
+            r += f.getSamples().getBufferLength();
+        }
+        return r;
     }
 }

@@ -308,7 +308,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             return 0;
         }
         if (stillFrame) {
-            return 1;
+            return 0;
         }
         return timelined.getTimeline().frames.size();
     }
