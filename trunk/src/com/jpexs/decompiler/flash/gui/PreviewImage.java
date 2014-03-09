@@ -89,11 +89,8 @@ public class PreviewImage extends JPanel {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    TreeItem previewNode = mainPanel.oldTag;
                     mainPanel.removeTag((Tag) treeItem);
                     mainPanel.refreshTree();
-                    // refresh preview list
-                    mainPanel.setTreeItem(previewNode);
                 }
             });
             contextMenu.add(removeMenuItem);

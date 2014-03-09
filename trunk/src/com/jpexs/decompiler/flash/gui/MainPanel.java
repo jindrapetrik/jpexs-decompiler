@@ -1190,7 +1190,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             actionPanel.clearSource();
         }
         updateUi();
-        updateTagTree();
+        refreshTree();
     }
 
     public void close(SWFList swfList) {
@@ -1209,12 +1209,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         oldTag = null;
         genericTagPanel.clear();
         updateUi();
-        updateTagTree();
-    }
-
-    private void updateTagTree() {
-        tagTree.setModel(new TagTreeModel(mainFrame, swfs));
-        expandSwfNodes();
+        refreshTree();
     }
 
     public void enableDrop(boolean value) {
@@ -2193,13 +2188,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 swf.removeTag(tag);
             }
         }
-        showCard(CARDEMPTYPANEL);
         refreshTree();
     }
 
     public void refreshTree() {
+        swfPreviewPanel.stop();
+        imagePanel.stop();
+        showCard(CARDEMPTYPANEL);
         View.refreshTree(tagTree, new TagTreeModel(mainFrame, swfs));
-        expandSwfNodes();
+        setTreeItem(oldTag);
     }
 
     public void refreshDecompiled() {
@@ -2293,7 +2290,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 if (it instanceof DefineBitsTag) {
                                     DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, it.getOriginalData(), it.getPos(), it.getCharacterId(), data);
                                     swf.tags.set(swf.tags.indexOf(it), jpeg2Tag);
-                                    showCard(CARDEMPTYPANEL);
                                     refreshTree();
                                     setTreeItem(jpeg2Tag);
                                 } else {
@@ -2391,7 +2387,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     Tag tag = tagsToRemove.get(0);
                     if (View.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tag.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                         tag.getSwf().removeTag(tag);
-                        showCard(CARDEMPTYPANEL);
                         refreshTree();
                     }
                 } else if (tagsToRemove.size() > 1) {
@@ -2399,7 +2394,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         for (Tag tag : tagsToRemove) {
                             tag.getSwf().removeTag(tag);
                         }
-                        showCard(CARDEMPTYPANEL);
                         refreshTree();
                     }
                 }
