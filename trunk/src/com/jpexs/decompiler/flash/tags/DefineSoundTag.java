@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
@@ -32,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -42,7 +45,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  *
  * @author JPEXS
  */
-public class DefineSoundTag extends CharacterTag {
+public class DefineSoundTag extends CharacterTag implements SoundTag {
 
     @SWFType(BasicType.UI16)
     public int soundId;
@@ -119,6 +122,7 @@ public class DefineSoundTag extends CharacterTag {
         soundData = sis.readBytesEx(sis.available());
     }
 
+    @Override
     public String getExportFormat() {
         if (soundFormat == DefineSoundTag.FORMAT_MP3) {
             return "mp3";
@@ -182,7 +186,8 @@ public class DefineSoundTag extends CharacterTag {
         return (size + 10);
     }
 
-    public boolean setSound(InputStream is, int newSoundFormat) throws IOException {
+    @Override
+    public boolean setSound(InputStream is, int newSoundFormat) {
         int newSoundRate = -1;
         boolean newSoundSize = false;
         boolean newSoundType = false;
@@ -213,7 +218,7 @@ public class DefineSoundTag extends CharacterTag {
                         default:
                             return false;
                     }
-                } catch (UnsupportedAudioFileException ex) {
+                } catch (UnsupportedAudioFileException | IOException ex) {
                     return false;
                 }
                 break;
@@ -237,37 +242,41 @@ public class DefineSoundTag extends CharacterTag {
                         }
                     }
                 }
-                MP3SOUNDDATA snd = new MP3SOUNDDATA(new ByteArrayInputStream(mp3data), true);
-                if (!snd.frames.isEmpty()) {
-                    MP3FRAME fr = snd.frames.get(0);
-                    newSoundRate = fr.getSamplingRate();
-                    switch (newSoundRate) {
-                        case 11025:
-                            newSoundRate = 1;
-                            break;
-                        case 22050:
-                            newSoundRate = 2;
-                            break;
-                        case 44100:
-                            newSoundRate = 3;
-                            break;
-                        default:
-                            return false;
-                    }
-                    newSoundSize = true;
-                    newSoundType = fr.isStereo();
-                    int len = snd.sampleCount();
-                    if (fr.isStereo()) {
-                        len = len / 2;
-                    }
-                    newSoundSampleCount = len;
+                try {
+                    MP3SOUNDDATA snd = new MP3SOUNDDATA(new ByteArrayInputStream(mp3data), true);
+                    if (!snd.frames.isEmpty()) {
+                        MP3FRAME fr = snd.frames.get(0);
+                        newSoundRate = fr.getSamplingRate();
+                        switch (newSoundRate) {
+                            case 11025:
+                                newSoundRate = 1;
+                                break;
+                            case 22050:
+                                newSoundRate = 2;
+                                break;
+                            case 44100:
+                                newSoundRate = 3;
+                                break;
+                            default:
+                                return false;
+                        }
+                        newSoundSize = true;
+                        newSoundType = fr.isStereo();
+                        int len = snd.sampleCount();
+                        if (fr.isStereo()) {
+                            len = len / 2;
+                        }
+                        newSoundSampleCount = len;
 
-                }
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
-                sos.writeSI16(0); //Latency - how to calculate it?
-                sos.write(mp3data);
-                newSoundData = baos.toByteArray();
+                    }
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+                    sos.writeSI16(0); //Latency - how to calculate it?
+                    sos.write(mp3data);
+                    newSoundData = baos.toByteArray();
+                } catch (IOException ex) {
+                    return false;
+                }                
                 break;
             default:
                 return false;
@@ -282,5 +291,46 @@ public class DefineSoundTag extends CharacterTag {
             return true;
         }
         return false;
+
     }
+
+    @Override
+    public boolean importSupported() {
+        return true;
+    }
+
+    @Override
+    public int getSoundRate() {
+        return soundRate;
+    }
+
+    @Override
+    public boolean getSoundType() {
+        return soundType;
+    }
+
+    @Override
+    public byte[] getRawSoundData() {
+        if (soundFormat == FORMAT_MP3) {
+            return Arrays.copyOfRange(soundData, 2, soundData.length - 2);
+        }
+        return soundData;
+    }
+
+    @Override
+    public int getSoundFormat() {
+        return soundFormat;
+    }
+    
+    @Override
+    public long getTotalSoundSampleCount(){
+        return soundSampleCount;
+    }
+
+    @Override
+    public boolean getSoundSize() {
+        return soundSize;
+    }
+    
+    
 }

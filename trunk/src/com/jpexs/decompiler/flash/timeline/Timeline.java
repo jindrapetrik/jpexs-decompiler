@@ -21,8 +21,10 @@ import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -79,6 +81,9 @@ public class Timeline {
         this.frameRate = swf.frameRate;
         Frame frame = new Frame(this);
         for (Tag t : tags) {
+            if (t instanceof StartSoundTag) {
+                frame.sounds.add(((StartSoundTag) t).soundId);
+            }
             if (t instanceof SetBackgroundColorTag) {
                 frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
             }
@@ -172,6 +177,34 @@ public class Timeline {
             this.depth = depth;
         }
 
+    }
+
+    public List<Integer> getSounds(int frame, DepthState stateUnderCursor, int mouseButton) {
+        List<Integer> ret=new ArrayList<>();
+        Frame fr = this.frames.get(frame);
+        ret.addAll(fr.sounds);        
+        for (int d = this.getMaxDepth(); d >= 0; d--) {
+            DepthState ds = fr.layers.get(d);
+            if (ds != null) {
+                CharacterTag c = swf.characters.get(ds.characterId);
+                if (c instanceof Timelined) {
+                    int dframe = ds.time % ((Timelined)c).getTimeline().frames.size();
+                    if (c instanceof ButtonTag) {
+                        ButtonTag bt = (ButtonTag) c;
+                        dframe = ButtonTag.FRAME_UP;
+                        if (stateUnderCursor == ds) {
+                            if (mouseButton > 0) {
+                                dframe = ButtonTag.FRAME_DOWN;
+                            } else {
+                                dframe = ButtonTag.FRAME_OVER;
+                            }
+                        }                                  
+                    }
+                    ret.addAll(((Timelined)c).getTimeline().getSounds(dframe, stateUnderCursor, mouseButton));              
+                }
+            }
+        }
+        return ret;
     }
 
     public Shape getOutline(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {

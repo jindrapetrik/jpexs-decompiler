@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2014 JPEXS
+ * Copyright (C) 2014 JPEXS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,36 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.helpers.sound;
 
-import java.io.InputStream;
+package com.jpexs.decompiler.flash.gui;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class SoundPlayer {
-    
-    protected InputStream is;
-
-    protected SoundPlayer(InputStream is) {
-        this.is = is;
-    }
-
-    public abstract long samplesCount();
-
-    public abstract long getSamplePosition();
-
-    public abstract void play();
-
-    public abstract void stop();
-
-    public abstract void skip(long samples);
-
-    public abstract boolean isPlaying();
-
-    public abstract long getFrameRate();
-    
-   
-
+public interface PlayerListener {
+    public void playingFinished();
 }

@@ -31,9 +31,13 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -69,6 +73,12 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
             return "mp3";
         }
         if (streamSoundCompression == DefineSoundTag.FORMAT_ADPCM) {
+            return "wav";
+        }
+        if (streamSoundCompression == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN) {
+            return "wav";
+        }
+        if (streamSoundCompression == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) {
             return "wav";
         }
         return "flv";
@@ -190,5 +200,38 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
         populateSoundStreamBlocks(swf.tags, this, ret);
         return ret;
 
+    }
+
+    @Override
+    public boolean importSupported() {
+        return false;
+    }
+
+    @Override
+    public boolean setSound(InputStream is, int newSoundFormat) {
+        return false;
+    }
+
+    @Override
+    public byte[] getRawSoundData() {
+        List<SoundStreamBlockTag> blocks = getBlocks();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            for (SoundStreamBlockTag block : blocks) {
+                if (streamSoundCompression == DefineSoundTag.FORMAT_MP3) {
+                    baos.write(block.data, 4, block.data.length - 4);
+                } else {
+                    baos.write(block.data);
+                }
+            }
+        } catch (IOException ex) {
+            return null;
+        }
+        return baos.toByteArray();
+    }
+
+    @Override
+    public long getTotalSoundSampleCount() {
+        return getBlocks().size()*streamSoundSampleCount;
     }
 }

@@ -90,6 +90,7 @@ import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -1208,59 +1209,35 @@ public final class SWF implements TreeItem, Timelined {
         boolean mp3 = true;
         boolean wave = true;
         try (ByteArrayOutputStream fos = new ByteArrayOutputStream()) {
-
-            if (t instanceof DefineSoundTag) {
-                DefineSoundTag st = (DefineSoundTag) t;
-                if ((st.soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN || st.soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) && wave) {
+            if (t instanceof SoundTag) {
+                SoundTag st = (SoundTag) t;
+                if ((st.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN || st.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) && wave) {
                     //Does endiannes matter here?
-                    createWavFromPcmData(fos, st.soundRate, st.soundSize, st.soundType, st.soundData);
-                } else if ((st.soundFormat == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                    createWavFromAdpcm(fos, st.soundRate, st.soundSize, st.soundType, st.soundData);
-                } else if ((st.soundFormat == DefineSoundTag.FORMAT_MP3) && mp3) {
-                    fos.write(st.soundData, 2, st.soundData.length - 2);
-                } else {
+                    createWavFromPcmData(fos, st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData());
+                } else if ((st.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
+                    createWavFromAdpcm(fos, st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData());
+                } else if ((st.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
+                    fos.write(st.getRawSoundData());
+                } else if(st instanceof DefineSoundTag) {
                     FLVOutputStream flv = new FLVOutputStream(fos);
                     flv.writeHeader(true, false);
-                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
-                }
-            }
-            if (t instanceof SoundStreamHeadTypeTag) {
-                SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
-                List<SoundStreamBlockTag> blocks = shead.getBlocks();
-                if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    for (int b = 0; b < blocks.size(); b++) {
-                        byte[] data = blocks.get(b).getData();
-                        baos.write(data);
-                    }
-                    createWavFromAdpcm(fos, shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), baos.toByteArray());
-                }
-                if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN || shead.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) && wave) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    for (int b = 0; b < blocks.size(); b++) {
-                        byte[] data = blocks.get(b).getData();
-                        baos.write(data);
-                    }
-                    createWavFromPcmData(fos, shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), baos.toByteArray());
-                } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
-                    for (int b = 0; b < blocks.size(); b++) {
-                        byte[] data = blocks.get(b).getData();
-                        fos.write(data, 4, data.length - 4);
-                    }
-                } else {
+                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormat(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData())));
+                } else if (st instanceof SoundStreamHeadTypeTag) {
+                    SoundStreamHeadTypeTag sh=(SoundStreamHeadTypeTag)st;
                     FLVOutputStream flv = new FLVOutputStream(fos);
                     flv.writeHeader(true, false);
+                    List<SoundStreamBlockTag> blocks = sh.getBlocks();
 
                     int ms = (int) (1000.0f / ((float) frameRate));
                     for (int b = 0; b < blocks.size(); b++) {
                         byte[] data = blocks.get(b).getData();
-                        if (shead.getSoundFormat() == 2) { //MP3
+                        if (st.getSoundFormat() == 2) { //MP3
                             data = Arrays.copyOfRange(data, 4, data.length);
                         }
-                        flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(shead.getSoundFormat(), shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), data)));
+                        flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(st.getSoundFormat(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data)));
                     }
                 }
-            }
+            }            
             return fos.toByteArray();
         }
     }
@@ -1328,11 +1305,10 @@ public final class SWF implements TreeItem, Timelined {
             if (t instanceof DefineSoundTag) {
                 id = ((DefineSoundTag) t).soundId;
             }
-
-            if (t instanceof DefineSoundTag) {
-                final DefineSoundTag st = (DefineSoundTag) t;
-
-                if (st.soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN || st.soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) {
+            
+            if(t instanceof SoundTag){
+                final SoundTag st=(SoundTag)t;
+                if (st.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN || st.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) {
                     //Does endiannes matter here?
                     final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".wav");
                     newfile = file;
@@ -1340,33 +1316,33 @@ public final class SWF implements TreeItem, Timelined {
                         @Override
                         public void run() throws IOException {
                             try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                                createWavFromPcmData(os, st.soundRate, st.soundSize, st.soundType, st.soundData);
+                                createWavFromPcmData(os, st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData());
                             }
                         }
                     }, handler).run();
-                } else if ((st.soundFormat == DefineSoundTag.FORMAT_ADPCM) && wave) {
+                }else if ((st.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
                     final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".wav");
                     newfile = file;
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {
                             try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                                createWavFromAdpcm(os, st.soundRate, st.soundSize, st.soundType, st.soundData);
+                                createWavFromAdpcm(os, st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData());
                             }
                         }
                     }, handler).run();
-                } else if ((st.soundFormat == DefineSoundTag.FORMAT_MP3) && mp3) {
+                } else if ((st.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
                     final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".mp3");
                     newfile = file;
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {
-                            try (FileOutputStream fos = new FileOutputStream(file)) {
-                                fos.write(st.soundData, 2, st.soundData.length - 2);
+                            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+                                os.write(st.getRawSoundData());
                             }
                         }
                     }, handler).run();
-                } else {
+                } else if(st instanceof DefineSoundTag){
                     final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".flv");
                     newfile = file;
                     new RetryTask(new RunnableIOEx() {
@@ -1375,66 +1351,15 @@ public final class SWF implements TreeItem, Timelined {
                             FileOutputStream fos = new FileOutputStream(file);
                             try (FLVOutputStream flv = new FLVOutputStream(fos)) {
                                 flv.writeHeader(true, false);
-                                flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
+                                flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormat(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData())));
                             }
                         }
                     }, handler).run();
-                }
-            }
-            if (t instanceof SoundStreamHeadTypeTag) {
-                final SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
-                final List<SoundStreamBlockTag> blocks = ((SoundStreamHeadTypeTag) t).getBlocks();
-                List<ContainerItem> objs = new ArrayList<>();
-                objs.addAll(this.tags);
-                if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN || shead.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) && wave) {
-                    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    for (int b = 0; b < blocks.size(); b++) {
-                        byte[] data = blocks.get(b).getData();
-                        baos.write(data);
-                    }
-                    final File file = new File(outdir + File.separator + id + ".wav");
-                    newfile = file;
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                createWavFromPcmData(fos, shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), baos.toByteArray());
-                            }
-                        }
-                    }, handler).run();
-                } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    for (int b = 0; b < blocks.size(); b++) {
-                        byte data[] = blocks.get(b).getData();
-                        baos.write(data);
-                    }
-                    final File file = new File(outdir + File.separator + id + ".wav");
-                    newfile = file;
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                createWavFromAdpcm(fos, shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), baos.toByteArray());
-                            }
-                        }
-                    }, handler).run();
-                } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
-                    final File file = new File(outdir + File.separator + id + ".mp3");
-                    newfile = file;
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                                for (int b = 0; b < blocks.size(); b++) {
-                                    byte data[] = blocks.get(b).getData();
-                                    os.write(data, 2, data.length - 2);
-                                }
-                            }
-                        }
-                    }, handler).run();
-                } else {
+                } else if(st instanceof SoundStreamHeadTypeTag){
                     final File file = new File(outdir + File.separator + id + ".flv");
                     newfile = file;
+                    SoundStreamHeadTypeTag sh=(SoundStreamHeadTypeTag)st;
+                    final List<SoundStreamBlockTag> blocks=sh.getBlocks();
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {
@@ -1445,16 +1370,17 @@ public final class SWF implements TreeItem, Timelined {
                                 int ms = (int) (1000.0f / ((float) frameRate));
                                 for (int b = 0; b < blocks.size(); b++) {
                                     byte data[] = blocks.get(b).getData();
-                                    if (shead.getSoundFormat() == 2) { //MP3
+                                    if (st.getSoundFormat() == 2) { //MP3
                                         data = Arrays.copyOfRange(data, 4, data.length);
                                     }
-                                    flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(shead.getSoundFormat(), shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), data)));
+                                    flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(st.getSoundFormat(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data)));
                                 }
                             }
                         }
                     }, handler).run();
                 }
             }
+                       
             if (newfile != null) {
                 ret.add(newfile);
             }

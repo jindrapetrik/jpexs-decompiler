@@ -23,23 +23,15 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public interface SoundStreamHeadTypeTag {
-
-    public int getSoundFormat();
-
-    public int getSoundRate();
+public interface SoundStreamHeadTypeTag extends SoundTag {
 
     public boolean getSoundSize();
-
-    public boolean getSoundType();
 
     public long getSoundSampleCount();
 
     public void setVirtualCharacterId(int ch);
 
     public int getCharacterId();
-
-    public String getExportFormat();
 
     public List<SoundStreamBlockTag> getBlocks();
 }

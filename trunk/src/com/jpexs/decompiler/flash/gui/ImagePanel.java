@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -47,6 +48,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -71,6 +73,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private JLabel debugLabel = new JLabel("-");
     private DepthState stateUnderCursor = null;
     private MouseEvent lastMouseEvent = null;
+    private List<SoundTagPlayer> soundPlayers = new ArrayList<>();
 
     @Override
     public void setBackground(Color bg) {
@@ -319,11 +322,23 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             timer.cancel();
             timer = null;
         }
+        stopAllSounds();
+    }
+    
+    private void stopAllSounds(){
+        for (int i = soundPlayers.size() - 1; i >= 0; i--) {
+                    SoundTagPlayer pl = soundPlayers.get(i);
+                    pl.pause();
+                }
+                soundPlayers.clear();
     }
 
     private void nextFrame() {
         int newframe = frame == timelined.getTimeline().frames.size() - 1 ? 0 : frame + 1;
         if (newframe != frame) {
+            if (newframe == 0) {
+                stopAllSounds();
+            }
             frame = newframe;
             updatePos(lastMouseEvent);
             drawFrame();
@@ -373,6 +388,29 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
         ImageIcon icon = new ImageIcon(getFrame(swf, frame, timelined, stateUnderCursor, mouseButton).getBufferedImage());
+        List<Integer> sounds = timelined.getTimeline().getSounds(frame, stateUnderCursor, mouseButton);
+        for (int sndId : sounds) {
+            CharacterTag c = swf.characters.get(sndId);
+            if (c instanceof SoundTag) {
+                SoundTag st = (SoundTag) c;
+                if (SoundTagPlayer.tagSupported(st)) {
+                    final SoundTagPlayer sp = new SoundTagPlayer(st, 1);
+                    synchronized (ImagePanel.class) {
+                        soundPlayers.add(sp);
+                    }
+                    sp.addListener(new PlayerListener() {
+
+                        @Override
+                        public void playingFinished() {
+                            synchronized (ImagePanel.class) {
+                                soundPlayers.remove(sp);
+                            }
+                        }
+                    });
+                    sp.play();
+                }
+            }
+        }
         label.setIcon(icon);
     }
 

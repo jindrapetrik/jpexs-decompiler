@@ -95,6 +95,7 @@ import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
@@ -286,142 +287,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private JPanel repPanel;
     private JPanel repPanel2;
 
-    private SoundThread soundThread = null;
+    private SoundTagPlayer soundThread = null;
 
-    private class SoundThread implements MediaDisplay {
-
-        private SoundPlayer player;
-
-        private int mp3SampleCount;
-        private boolean mp3;
-        private Thread thr;
-        private int actualPos = 0;
-        private boolean playing = false;
-        private int mp3FrameRate;
-        private byte data[];
-
-        private static final int FRAME_DIVISOR = 1024;
-
-        public SoundThread(byte data[]) {
-            this(data, false, 0, 0);
-        }
-
-        public SoundThread(byte data[], boolean mp3, int mp3SampleCount, int mp3FrameRate) {
-            this.data = data;
-            this.mp3SampleCount = mp3SampleCount;
-            this.mp3 = mp3;
-            this.mp3FrameRate = mp3FrameRate;
-
-        }
-
-        @Override
-        public synchronized int getCurrentFrame() {
-            if (player == null) {
-                return 0;
-            }
-
-            if (!playing) {
-                return actualPos;
-            }
-
-            actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
-            return actualPos;
-        }
-
-        @Override
-        public synchronized int getTotalFrames() {
-            //System.out.println("getTotalFrames");
-            if (player == null) {
-                return 0;
-            }
-            int ret = (int) (player.samplesCount() / FRAME_DIVISOR);
-
-            //System.out.println("/getTotalFrames");
-            return ret;
-        }
-
-        @Override
-        public synchronized void pause() {
-            if (!playing) {
-                return;
-            }
-            playing = false;
-            actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
-            player.stop();
-
-        }
-
-        @Override
-        public synchronized void play() {
-            if (player != null) {
-                player.stop();
-            }
-
-            if (mp3) {
-                try {
-                    player = new MP3Player(new ByteArrayInputStream(data), mp3SampleCount, mp3FrameRate);
-                } catch (JavaLayerException ex) {
-                    Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else {
-                player = new WavPlayer(new ByteArrayInputStream(data));
-            }
-            final int startPos = actualPos * FRAME_DIVISOR;
-            thr = new Thread() {
-
-                @Override
-                public void run() {
-                    player.skip(startPos);
-                    player.play();
-                    if (playing) {
-                        gotoFrame(0);
-                        play();
-                    }
-                }
-
-            };
-            thr.start();
-            playing = true;
-        }
-
-        @Override
-        public void rewind() {
-            actualPos = 0;
-        }
-
-        @Override
-        public boolean isPlaying() {
-            return playing;
-        }
-
-        @Override
-        public synchronized void gotoFrame(int frame) {
-            if (playing) {
-                playing = false;
-                player.stop();
-            }
-            actualPos = frame;
-        }
-
-        @Override
-        public void setBackground(Color color) {
-
-        }
-
-        @Override
-        public int getFrameRate() {
-            if (player == null) {
-                return 1;
-            }
-            return (int) (player.getFrameRate() / FRAME_DIVISOR);
-        }
-
-        @Override
-        public boolean isLoaded() {
-            return true;
-        }
-
-    }
+    
 
     private static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
     private static final String ACTION_REPLACE_IMAGE = "REPLACEIMAGE";
@@ -2758,40 +2626,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 timelined = ((DefineSpriteTag) fn.getParent());
             }
             previewImagePanel.setTimelined(timelined, swf, fn.getFrame() - 1);
-        } else if (((tagObj instanceof DefineSoundTag) && mainMenu.isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((DefineSoundTag) tagObj).getExportFormat())))
-                || ((tagObj instanceof SoundStreamHeadTypeTag) && mainMenu.isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundStreamHeadTypeTag) tagObj).getExportFormat())))) {
+        } else if (((tagObj instanceof SoundTag) && mainMenu.isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             showCard(CARDDRAWPREVIEWPANEL);
             previewImagePanel.setImage(new SerializableImage(1, 1, BufferedImage.TYPE_INT_ARGB));
 
-            String exportFormat = "";
-            int soundRate = 0;
-            long sampleCount = 0;
-            boolean soundType = false;
-            if (tagObj instanceof DefineSoundTag) {
-                DefineSoundTag ds = (DefineSoundTag) tagObj;
-                exportFormat = ds.getExportFormat();
-                soundRate = ds.soundRate;
-                sampleCount = ds.soundSampleCount;
-                soundType = ds.soundType;
-            }
-            if (tagObj instanceof SoundStreamHeadTypeTag) {
-                SoundStreamHeadTypeTag sh = (SoundStreamHeadTypeTag) tagObj;
-                exportFormat = sh.getExportFormat();
-                soundRate = sh.getSoundRate();
-                sampleCount = sh.getSoundSampleCount() * sh.getBlocks().size();
-                soundType = sh.getSoundType();
-            }
-            try {
-                byte sounddata[] = tagObj.getSwf().exportSound((Tag) tagObj);
-                final int soundRates[] = new int[]{5512, 11025, 22050, 44100};
-                int frameRate = soundRates[soundRate];
-                soundThread = new SoundThread(sounddata, exportFormat.equals("mp3"), (int) (sampleCount * (soundType ? 2 : 1)), frameRate * (soundType ? 2 : 1));
-                imagePlayControls.setMedia(soundThread);
-                soundThread.play();
-
-            } catch (IOException ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Cannot export Sound for playback", ex);
-            }
+           
+                        
+           soundThread = new SoundTagPlayer((SoundTag)tagObj,Integer.MAX_VALUE);
+            imagePlayControls.setMedia(soundThread);
+            soundThread.play();
 
         } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag) || (tagObj instanceof SoundStreamHeadTypeTag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);

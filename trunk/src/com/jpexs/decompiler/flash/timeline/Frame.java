@@ -42,6 +42,7 @@ public class Frame {
     public DoActionTag action;
     public RGB backgroundColor = new RGBA(0, 0, 0, 0);
     public Timeline timeline;
+    public List<Integer> sounds = new ArrayList<>();
 
     public Frame(Timeline timeline) {
         this.timeline = timeline;
@@ -54,6 +55,7 @@ public class Frame {
         for (int depth : obj.layers.keySet()) {
             layers.put(depth, new DepthState(obj.layers.get(depth), this, true));
         }
+        //Do not copy sounds
     }
 
     private class Clip {
@@ -73,8 +75,7 @@ public class Frame {
         List<Integer> keys = new ArrayList<>(layers.keySet());
         DepthState maxds = null;
         Stack<Clip> clips = new Stack<>();
-        for (int d : keys) { //int i=keys.size()-1;i>=0;i--){
-            //int d = keys.get(i);
+        for (int d : keys) {
             DepthState ds = layers.get(d);
             Clip currentClip = null;
             for (int j = clips.size() - 1; j >= 0; j--) {
