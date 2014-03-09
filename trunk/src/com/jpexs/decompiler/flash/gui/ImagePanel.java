@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.Matrix;
-import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
+import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -56,7 +56,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public final class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
+public final class ImagePanel extends JPanel implements ActionListener, MediaDisplay {
 
     static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
 

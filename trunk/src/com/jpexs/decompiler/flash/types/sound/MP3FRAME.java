@@ -18,8 +18,12 @@ package com.jpexs.decompiler.flash.types.sound;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -40,6 +44,7 @@ public class MP3FRAME {
     public boolean copyright;
     public boolean original;
     public int emphasis;
+    public byte[] sampleData;
 
     public MP3FRAME(InputStream is) throws IOException {
         SWFInputStream sis = new SWFInputStream(is, SWF.DEFAULT_VERSION);
@@ -53,7 +58,36 @@ public class MP3FRAME {
         reserved = (int) sis.readUB(1);
         channelMode = (int) sis.readUB(2);
         modelExtension = (int) sis.readUB(2);
-        //TODO:read sample data
+
+        int size = getSampleDataSize();
+        int sizeBytes = (int) Math.ceil((double) size / 8.0);
+        sampleData = sis.readBytes(sizeBytes);
+    }
+
+    public byte[] getData() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+            sos.writeUB(11, syncWord);
+            sos.writeUB(1, mpegVersion);
+            sos.writeUB(2, layer);
+            sos.writeUB(1, protectionBit ? 1 : 0);
+            sos.writeUB(4, bitRate);
+            sos.writeUB(2, samplingRate);
+            sos.writeUB(1, paddingBit ? 1 : 0);
+            sos.writeUB(1, reserved);
+            sos.writeUB(2, channelMode);
+            sos.writeUB(2, modelExtension);
+            sos.write(sampleData);
+            return baos.toByteArray();
+        } catch (IOException ex) {
+            Logger.getLogger(MP3FRAME.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    private int getSampleDataSize() {
+        return (((isMPEG1() ? 144 : 72) * bitRate) / samplingRate) + (paddingBit ? 1 : 0) - 4;
     }
 
     public boolean isMPEG2() {

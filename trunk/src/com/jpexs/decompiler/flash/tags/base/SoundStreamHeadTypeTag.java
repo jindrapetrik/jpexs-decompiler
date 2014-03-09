@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import java.util.List;
+
 /**
  *
  * @author JPEXS
@@ -37,4 +40,6 @@ public interface SoundStreamHeadTypeTag {
     public int getCharacterId();
 
     public String getExportFormat();
+
+    public List<SoundStreamBlockTag> getBlocks();
 }

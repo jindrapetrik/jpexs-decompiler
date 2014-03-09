@@ -22,7 +22,7 @@ import java.awt.Color;
  *
  * @author JPEXS
  */
-public interface FlashDisplay {
+public interface MediaDisplay {
 
     public int getCurrentFrame();
 

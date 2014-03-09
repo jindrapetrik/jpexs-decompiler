@@ -46,7 +46,7 @@ public class PlayerControls extends JPanel implements ActionListener {
 
     private final JButton pauseButton;
     private boolean paused = false;
-    private final FlashDisplay display;
+    private MediaDisplay display;
     private JProgressBar progress;
     private final Timer timer;
     private final JLabel timeLabel;
@@ -54,7 +54,7 @@ public class PlayerControls extends JPanel implements ActionListener {
     private static final Icon pauseIcon = View.getIcon("pause16");
     private static final Icon playIcon = View.getIcon("play16");
 
-    public PlayerControls(final FlashDisplay display) {
+    public PlayerControls(MediaDisplay display) {
         this.display = display;
         JPanel controlPanel = new JPanel(new BorderLayout());
         timeLabel = new JLabel("00:00.00");
@@ -81,14 +81,15 @@ public class PlayerControls extends JPanel implements ActionListener {
         Dimension pref = progress.getPreferredSize();
         pref.height = 20;
         progress.setPreferredSize(pref);
+        final PlayerControls t = this;
         progress.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                int frame = (int) Math.floor(e.getX() * display.getTotalFrames() / (double) progress.getWidth());
+                int frame = (int) Math.floor(e.getX() * t.display.getTotalFrames() / (double) progress.getWidth());
                 boolean p = paused;
-                display.gotoFrame(frame);
+                t.display.gotoFrame(frame);
                 if (!p) {
-                    display.play();
+                    t.display.play();
                 }
             }
         });
@@ -119,6 +120,10 @@ public class PlayerControls extends JPanel implements ActionListener {
             ret = "0" + ret;
         }
         return ret;
+    }
+
+    public void setMedia(MediaDisplay media) {
+        this.display = media;
     }
 
     private void update() {

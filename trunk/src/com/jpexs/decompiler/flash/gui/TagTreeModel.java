@@ -164,8 +164,7 @@ public class TagTreeModel implements TreeModel {
 
         for (int i = 0; i < sounds.size(); i++) {
             if (sounds.get(i).getItem() instanceof SoundStreamHeadTypeTag) {
-                List<SoundStreamBlockTag> blocks = new ArrayList<>();
-                SWF.populateSoundStreamBlocks(list, (Tag) sounds.get(i).getItem(), blocks);
+                List<SoundStreamBlockTag> blocks = ((SoundStreamHeadTypeTag) sounds.get(i).getItem()).getBlocks();
                 if (blocks.isEmpty()) {
                     sounds.remove(i);
                     i--;

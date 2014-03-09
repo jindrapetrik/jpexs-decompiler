@@ -45,7 +45,7 @@ import java.util.concurrent.TimeoutException;
  *
  * @author JPEXS
  */
-public class FlashPlayerPanel extends Panel implements FlashDisplay {
+public class FlashPlayerPanel extends Panel implements MediaDisplay {
 
     private boolean executed = false;
     private String flash;

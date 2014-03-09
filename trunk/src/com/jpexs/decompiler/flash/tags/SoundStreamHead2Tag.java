@@ -30,6 +30,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -165,5 +167,13 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
     @Override
     public boolean getSoundType() {
         return streamSoundType;
+    }
+
+    @Override
+    public List<SoundStreamBlockTag> getBlocks() {
+        List<SoundStreamBlockTag> ret = new ArrayList<>();
+        SoundStreamHeadTag.populateSoundStreamBlocks(swf.tags, this, ret);
+        return ret;
+
     }
 }

@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -30,6 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -156,5 +160,35 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
     @Override
     public boolean getSoundType() {
         return streamSoundType;
+    }
+
+    public static void populateSoundStreamBlocks(List<? extends ContainerItem> tags, Tag head, List<SoundStreamBlockTag> output) {
+        boolean found = false;
+        for (ContainerItem t : tags) {
+            if (t == head) {
+                found = true;
+                continue;
+            }
+            if (!found) {
+                continue;
+            }
+            if (t instanceof SoundStreamBlockTag) {
+                output.add((SoundStreamBlockTag) t);
+            }
+            if (t instanceof SoundStreamHeadTypeTag) {
+                break;
+            }
+            if (t instanceof Container) {
+                populateSoundStreamBlocks(((Container) t).getSubItems(), head, output);
+            }
+        }
+    }
+
+    @Override
+    public List<SoundStreamBlockTag> getBlocks() {
+        List<SoundStreamBlockTag> ret = new ArrayList<>();
+        populateSoundStreamBlocks(swf.tags, this, ret);
+        return ret;
+
     }
 }

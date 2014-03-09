@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.treenodes.TreeElement;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
+import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.decompiler.flash.gui.timeline.TimelineFrame;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFBundleNode;
@@ -118,6 +119,10 @@ import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.SerializableImage;
+import com.jpexs.helpers.sound.MP3Player;
+import com.jpexs.helpers.sound.SoundPlayer;
+import com.jpexs.helpers.sound.WavPlayer;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -145,9 +150,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -196,6 +203,7 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import javazoom.jl.decoder.JavaLayerException;
 
 /**
  *
@@ -272,6 +280,144 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public TreeNode oldNode;
     public TreeItem oldTag;
     private File tempFile;
+    private PlayerControls imagePlayControls;
+
+    private SoundThread soundThread = null;
+
+    private class SoundThread implements MediaDisplay {
+
+        private SoundPlayer player;
+
+        private int mp3SampleCount;
+        private boolean mp3;
+        private Thread thr;
+        private int actualPos = 0;
+        private boolean playing = false;
+        private int mp3FrameRate;
+        private byte data[];
+
+        private static final int FRAME_DIVISOR = 1024;
+
+        public SoundThread(byte data[]) {
+            this(data, false, 0, 0);
+        }
+
+        public SoundThread(byte data[], boolean mp3, int mp3SampleCount, int mp3FrameRate) {
+            this.data = data;
+            this.mp3SampleCount = mp3SampleCount;
+            this.mp3 = mp3;
+            this.mp3FrameRate = mp3FrameRate;
+
+        }
+
+        @Override
+        public synchronized int getCurrentFrame() {
+            if (player == null) {
+                return 0;
+            }
+
+            if (!playing) {
+                return actualPos;
+            }
+
+            actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
+            return actualPos;
+        }
+
+        @Override
+        public synchronized int getTotalFrames() {
+            //System.out.println("getTotalFrames");
+            if (player == null) {
+                return 0;
+            }
+            int ret = (int) (player.samplesCount() / FRAME_DIVISOR);
+
+            //System.out.println("/getTotalFrames");
+            return ret;
+        }
+
+        @Override
+        public synchronized void pause() {
+            if (!playing) {
+                return;
+            }
+            playing = false;
+            actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
+            player.stop();
+
+        }
+
+        @Override
+        public synchronized void play() {
+            if (player != null) {
+                player.stop();
+            }
+
+            if (mp3) {
+                try {
+                    player = new MP3Player(new ByteArrayInputStream(data), mp3SampleCount, mp3FrameRate);
+                } catch (JavaLayerException ex) {
+                    Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                player = new WavPlayer(new ByteArrayInputStream(data));
+            }
+            final int startPos = actualPos * FRAME_DIVISOR;
+            thr = new Thread() {
+
+                @Override
+                public void run() {
+                    player.skip(startPos);
+                    player.play();
+                    if (playing) {
+                        gotoFrame(0);
+                        play();
+                    }
+                }
+
+            };
+            thr.start();
+            playing = true;
+        }
+
+        @Override
+        public void rewind() {
+            actualPos = 0;
+        }
+
+        @Override
+        public boolean isPlaying() {
+            return playing;
+        }
+
+        @Override
+        public synchronized void gotoFrame(int frame) {
+            if (playing) {
+                playing = false;
+                player.stop();
+            }
+            actualPos = frame;
+        }
+
+        @Override
+        public void setBackground(Color color) {
+
+        }
+
+        @Override
+        public int getFrameRate() {
+            if (player == null) {
+                return 1;
+            }
+            return (int) (player.getFrameRate() / FRAME_DIVISOR);
+        }
+
+        @Override
+        public boolean isLoaded() {
+            return true;
+        }
+
+    }
 
     private static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
     private static final String ACTION_REPLACE_IMAGE = "REPLACEIMAGE";
@@ -739,8 +885,24 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (flashPanel != null) {
             JPanel flashPlayPanel = new JPanel(new BorderLayout());
             flashPlayPanel.add(flashPanel, BorderLayout.CENTER);
-            flashPlayPanel.add(flashControls = new PlayerControls(flashPanel), BorderLayout.SOUTH);
-            leftComponent = flashPlayPanel;
+
+            JPanel bottomPanel = new JPanel(new BorderLayout());
+            JPanel buttonsPanel = new JPanel(new FlowLayout());
+            JButton selectColorButton = new JButton(View.getIcon("color16"));
+            selectColorButton.addActionListener(this);
+            selectColorButton.setActionCommand(ACTION_SELECT_BKCOLOR);
+            selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
+            buttonsPanel.add(selectColorButton);
+            bottomPanel.add(buttonsPanel, BorderLayout.EAST);
+
+            flashPlayPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+            JPanel flashPlayPanel2 = new JPanel(new BorderLayout());
+            flashPlayPanel2.add(flashPlayPanel, BorderLayout.CENTER);
+            flashPlayPanel2.add(flashControls = new PlayerControls(flashPanel), BorderLayout.SOUTH);
+
+            //pan.add(bottomPanel, BorderLayout.SOUTH);
+            leftComponent = flashPlayPanel2;
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
             swtPanel.add(new JLabel("<html><center>" + translate("notavailonthisplatform") + "</center></html>", JLabel.CENTER), BorderLayout.CENTER);
@@ -782,15 +944,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
 
         if (flashPanel != null) {
-            JPanel bottomPanel = new JPanel(new BorderLayout());
-            JPanel buttonsPanel = new JPanel(new FlowLayout());
-            JButton selectColorButton = new JButton(View.getIcon("color16"));
-            selectColorButton.addActionListener(this);
-            selectColorButton.setActionCommand(ACTION_SELECT_BKCOLOR);
-            selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
-            buttonsPanel.add(selectColorButton);
-            bottomPanel.add(buttonsPanel, BorderLayout.EAST);
-            pan.add(bottomPanel, BorderLayout.SOUTH);
+
         }
         pan.add(leftComponent, BorderLayout.CENTER);
         viewerCards.add(pan, FLASH_VIEWER_CARD);
@@ -816,7 +970,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         JPanel previewCnt = new JPanel(new BorderLayout());
         previewCnt.add(previewImagePanel, BorderLayout.CENTER);
-        previewCnt.add(new PlayerControls(previewImagePanel), BorderLayout.SOUTH);
+        previewCnt.add(imagePlayControls = new PlayerControls(previewImagePanel), BorderLayout.SOUTH);
         previewPanel.add(previewCnt, BorderLayout.CENTER);
         JLabel prevIntLabel = new HeaderLabel(translate("swfpreview.internal"));
         prevIntLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -2364,6 +2518,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         swfPreviewPanel.stop();
         imagePanel.stop();
+        if (soundThread != null) {
+            soundThread.pause();
+        }
+        imagePlayControls.setMedia(imagePanel);
         stopFlashPlayer();
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
@@ -2515,8 +2673,42 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 timelined = ((DefineSpriteTag) fn.getParent());
             }
             previewImagePanel.setTimelined(timelined, swf, fn.getFrame() - 1);
-            //previewImagePanel.setImage(SWF.frameToImageGet(timeline, fn.getFrame() - 1, null,0,rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform()));
-        } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
+        } else if (((tagObj instanceof DefineSoundTag) && mainMenu.isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((DefineSoundTag) tagObj).getExportFormat())))
+                || ((tagObj instanceof SoundStreamHeadTypeTag) && mainMenu.isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundStreamHeadTypeTag) tagObj).getExportFormat())))) {
+            showCard(CARDDRAWPREVIEWPANEL);
+            previewImagePanel.setImage(new SerializableImage(1, 1, BufferedImage.TYPE_INT_ARGB));
+
+            String exportFormat = "";
+            int soundRate = 0;
+            long sampleCount = 0;
+            boolean soundType = false;
+            if (tagObj instanceof DefineSoundTag) {
+                DefineSoundTag ds = (DefineSoundTag) tagObj;
+                exportFormat = ds.getExportFormat();
+                soundRate = ds.soundRate;
+                sampleCount = ds.soundSampleCount;
+                soundType = ds.soundType;
+            }
+            if (tagObj instanceof SoundStreamHeadTypeTag) {
+                SoundStreamHeadTypeTag sh = (SoundStreamHeadTypeTag) tagObj;
+                exportFormat = sh.getExportFormat();
+                soundRate = sh.getSoundRate();
+                sampleCount = sh.getSoundSampleCount() * sh.getBlocks().size();
+                soundType = sh.getSoundType();
+            }
+            try {
+                byte sounddata[] = tagObj.getSwf().exportSound((Tag) tagObj);
+                final int soundRates[] = new int[]{5512, 11025, 22050, 44100};
+                int frameRate = soundRates[soundRate];
+                soundThread = new SoundThread(sounddata, exportFormat.equals("mp3"), (int) (sampleCount * (soundType ? 2 : 1)), frameRate * (soundType ? 2 : 1));
+                imagePlayControls.setMedia(soundThread);
+                soundThread.play();
+
+            } catch (IOException ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Cannot export Sound for playback", ex);
+            }
+
+        } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag) || (tagObj instanceof SoundStreamHeadTypeTag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
             createAndShowTempSwf(tagObj);
 
@@ -2582,7 +2774,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
             List<SoundStreamBlockTag> soundFrames = new ArrayList<>();
             if (tagObj instanceof SoundStreamHeadTypeTag) {
-                SWF.populateSoundStreamBlocks(swf.tags, (Tag) tagObj, soundFrames);
+                soundFrames = ((SoundStreamHeadTypeTag) tagObj).getBlocks();
                 frameCount = soundFrames.size();
             }
 

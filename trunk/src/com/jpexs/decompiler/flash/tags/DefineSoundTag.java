@@ -115,6 +115,12 @@ public class DefineSoundTag extends CharacterTag {
         if (soundFormat == DefineSoundTag.FORMAT_ADPCM) {
             return "wav";
         }
+        if (soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN) {
+            return "wav";
+        }
+        if (soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) {
+            return "wav";
+        }
         return "flv";
     }
 }
