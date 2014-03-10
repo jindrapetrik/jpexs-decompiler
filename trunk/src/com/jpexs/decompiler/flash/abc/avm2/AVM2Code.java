@@ -213,9 +213,9 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -875,11 +875,11 @@ public class AVM2Code implements Serializable {
         return writer;
     }
 
-    public GraphTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ScriptExportMode exportMode, GraphTextWriter writer) {
         return toASMSource(constants, trait, info, body, new ArrayList<Integer>(), exportMode, writer);
     }
 
-    public GraphTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, ExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter toASMSource(ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
         invalidateCache();
         if (trait != null) {
             if (trait instanceof TraitFunction) {
@@ -1056,11 +1056,11 @@ public class AVM2Code implements Serializable {
         int largeLimit = 20000;
         boolean markOffsets = code.size() <= largeLimit;
 
-        if (exportMode == ExportMode.HEX) {
+        if (exportMode == ScriptExportMode.HEX) {
             Helper.byteArrayToHexWithHeader(writer, getBytes());
         } else {
             for (AVM2Instruction ins : code) {
-                if (exportMode == ExportMode.PCODEWITHHEX) {
+                if (exportMode == ScriptExportMode.PCODE_HEX) {
                     writer.appendNoHilight("; ");
                     writer.appendNoHilight(Helper.bytesToHexString(ins.getBytes()));
                     writer.newLine();
@@ -2248,7 +2248,7 @@ public class AVM2Code implements Serializable {
         try {
             List<Integer> outputMap = new ArrayList<>();
             HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-            toASMSource(constants, trait, info, body, outputMap, ExportMode.PCODE, writer);
+            toASMSource(constants, trait, info, body, outputMap, ScriptExportMode.PCODE, writer);
             String src = writer.toString();
 
             AVM2Code acode = ASM3Parser.parse(new StringReader(src), constants, null, body, info);
@@ -2290,7 +2290,7 @@ public class AVM2Code implements Serializable {
         try {
             List<Integer> outputMap = new ArrayList<>();
             HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-            toASMSource(constants, trait, info, body, outputMap, ExportMode.PCODE, writer);
+            toASMSource(constants, trait, info, body, outputMap, ScriptExportMode.PCODE, writer);
             String src = writer.toString();
             AVM2Code acode = ASM3Parser.parse(new StringReader(src), constants, trait, body, info);
             for (int i = 0; i < acode.code.size(); i++) {

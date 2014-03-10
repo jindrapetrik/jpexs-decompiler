@@ -91,7 +91,7 @@ public class WavPlayer extends SoundPlayer {
             }
         } catch (InterruptedException ex) {
             //Ignore
-        }        
+        }
     }
 
     @Override

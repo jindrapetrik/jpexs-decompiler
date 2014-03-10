@@ -58,12 +58,12 @@ import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -429,7 +429,7 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return HilightedTextWriter
      */
-    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, ExportMode exportMode, GraphTextWriter writer, long swfPos, String path) {
+    public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, ScriptExportMode exportMode, GraphTextWriter writer, long swfPos, String path) {
         return actionsToString(listeners, address, list, importantOffsets, new ArrayList<String>(), version, exportMode, writer, swfPos, path);
     }
 
@@ -447,7 +447,7 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return HilightedTextWriter
      */
-    private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, ExportMode exportMode, GraphTextWriter writer, long swfPos, String path) {
+    private static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer, long swfPos, String path) {
         long offset;
         if (importantOffsets == null) {
             //setActionsAddresses(list, 0, version);
@@ -471,7 +471,7 @@ public class Action implements GraphSourceItem {
                 a = (Action) s;
             }
             pos++;
-            if (exportMode == ExportMode.PCODEWITHHEX) {
+            if (exportMode == ScriptExportMode.PCODE_HEX) {
                 if (lastPush) {
                     writer.newLine();
                     lastPush = false;
@@ -636,7 +636,7 @@ public class Action implements GraphSourceItem {
      * @param exportMode PCode or hex?
      * @return String of P-code source
      */
-    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode) {
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode) {
         return toString();
     }
 
@@ -1239,7 +1239,7 @@ public class Action implements GraphSourceItem {
         String s = null;
         try {
             HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-            Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, ExportMode.PCODE, writer, swfPos, path);
+            Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, ScriptExportMode.PCODE, writer, swfPos, path);
             s = writer.toString();
             ret = ASMParser.parse(address, swfPos, true, s, SWF.DEFAULT_VERSION, false);
         } catch (IOException | ParseException ex) {
@@ -1268,7 +1268,7 @@ public class Action implements GraphSourceItem {
         }
     }
 
-    public GraphTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
         writer.appendNoHilight(getASMSource(container, knownAddreses, constantPool, version, exportMode));
         return writer;
     }

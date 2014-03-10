@@ -180,15 +180,15 @@ public class Timeline {
     }
 
     public List<Integer> getSounds(int frame, DepthState stateUnderCursor, int mouseButton) {
-        List<Integer> ret=new ArrayList<>();
+        List<Integer> ret = new ArrayList<>();
         Frame fr = this.frames.get(frame);
-        ret.addAll(fr.sounds);        
+        ret.addAll(fr.sounds);
         for (int d = this.getMaxDepth(); d >= 0; d--) {
             DepthState ds = fr.layers.get(d);
             if (ds != null) {
                 CharacterTag c = swf.characters.get(ds.characterId);
                 if (c instanceof Timelined) {
-                    int dframe = ds.time % ((Timelined)c).getTimeline().frames.size();
+                    int dframe = ds.time % ((Timelined) c).getTimeline().frames.size();
                     if (c instanceof ButtonTag) {
                         ButtonTag bt = (ButtonTag) c;
                         dframe = ButtonTag.FRAME_UP;
@@ -198,9 +198,9 @@ public class Timeline {
                             } else {
                                 dframe = ButtonTag.FRAME_OVER;
                             }
-                        }                                  
+                        }
                     }
-                    ret.addAll(((Timelined)c).getTimeline().getSounds(dframe, stateUnderCursor, mouseButton));              
+                    ret.addAll(((Timelined) c).getTimeline().getSounds(dframe, stateUnderCursor, mouseButton));
                 }
             }
         }

@@ -36,7 +36,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.graph.ExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
@@ -746,7 +746,7 @@ public class ActionListReader {
             }
 
             if (debugMode) {
-                String atos = a.getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, version, ExportMode.PCODE);
+                String atos = a.getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, version, ScriptExportMode.PCODE);
                 if (a instanceof GraphSourceItemContainer) {
                     atos = a.toString();
                 }

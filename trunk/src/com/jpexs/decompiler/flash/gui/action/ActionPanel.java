@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -41,7 +42,6 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
@@ -305,7 +305,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         });
     }
 
-    private HilightedText getHilightedText(ExportMode exportMode) {
+    private HilightedText getHilightedText(ScriptExportMode exportMode) {
         ASMSource asm = (ASMSource) src;
         DisassemblyListener listener = getDisassemblyListener();
         asm.addDisassemblyListener(listener);
@@ -319,9 +319,9 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         return new HilightedText(writer);
     }
 
-    public void setHex(ExportMode exportMode) {
-        if (exportMode != ExportMode.HEX) {
-            if (exportMode == ExportMode.PCODE) {
+    public void setHex(ScriptExportMode exportMode) {
+        if (exportMode != ScriptExportMode.HEX) {
+            if (exportMode == ScriptExportMode.PCODE) {
                 if (srcNoHex == null) {
                     srcNoHex = getHilightedText(exportMode);
                 }
@@ -762,9 +762,9 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         }
     }
 
-    private ExportMode getExportMode() {
-        ExportMode exportMode = hexOnlyButton.isSelected() ? ExportMode.HEX
-                : (hexButton.isSelected() ? ExportMode.PCODEWITHHEX : ExportMode.PCODE);
+    private ScriptExportMode getExportMode() {
+        ScriptExportMode exportMode = hexOnlyButton.isSelected() ? ScriptExportMode.HEX
+                : (hexButton.isSelected() ? ScriptExportMode.PCODE_HEX : ScriptExportMode.PCODE);
         return exportMode;
     }
 

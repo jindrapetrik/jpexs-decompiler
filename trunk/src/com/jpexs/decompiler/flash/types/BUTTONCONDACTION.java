@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
@@ -28,7 +29,6 @@ import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
@@ -165,7 +165,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
      * @throws java.lang.InterruptedException
      */
     @Override
-    public GraphTextWriter getASMSource(ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
+    public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
         if (actions == null) {
             actions = getActions();
         }

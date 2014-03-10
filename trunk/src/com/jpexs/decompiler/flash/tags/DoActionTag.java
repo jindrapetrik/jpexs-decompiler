@@ -21,10 +21,10 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.ByteArrayOutputStream;
@@ -78,7 +78,7 @@ public class DoActionTag extends Tag implements ASMSource {
      * @throws java.lang.InterruptedException
      */
     @Override
-    public GraphTextWriter getASMSource(ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
+    public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException {
         if (actions == null) {
             actions = getActions();
         }

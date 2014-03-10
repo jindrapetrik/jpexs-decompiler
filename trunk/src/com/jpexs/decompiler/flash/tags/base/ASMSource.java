@@ -18,9 +18,9 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.graph.ExportMode;
 import java.util.List;
 
 /**
@@ -39,7 +39,7 @@ public interface ASMSource extends TreeItem {
      * @return ASM source
      * @throws java.lang.InterruptedException
      */
-    public GraphTextWriter getASMSource(ExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException;
+    public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, List<Action> actions) throws InterruptedException;
 
     /**
      * Whether or not this object contains ASM source

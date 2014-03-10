@@ -20,8 +20,6 @@ import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,7 +28,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class AdpcmDecoder {
+public class AdpcmDecoder extends SoundDecoder {
 
     private static final int[] indexAdjustTable2bit = {
         -1, 2,
@@ -54,6 +52,10 @@ public class AdpcmDecoder {
         11487, 12635, 13899, 15289, 16818, 18500, 20350, 22385, 24623,
         27086, 29794, 32767
     };
+
+    public AdpcmDecoder(SoundFormat soundFormat) {
+        super(soundFormat);
+    }
 
     private static class AdpcmState {
 
@@ -200,13 +202,8 @@ public class AdpcmDecoder {
         return state.sample;
     }
 
-    public static byte[] decode(byte[] data, boolean isStereo) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        decode(new ByteArrayInputStream(data), baos, isStereo);
-        return baos.toByteArray();
-    }
-
-    public static void decode(InputStream is, OutputStream os, boolean is_stereo) throws IOException {
+    @Override
+    public void decode(InputStream is, OutputStream os) throws IOException {
         int adpcm_code_size;
         SWFInputStream sis = new SWFInputStream(is, SWF.DEFAULT_VERSION);
         SWFOutputStream sos = new SWFOutputStream(os, SWF.DEFAULT_VERSION);
@@ -214,7 +211,7 @@ public class AdpcmDecoder {
         int bits_per_code = adpcm_code_size + 2;
         try {
             do {
-                if (is_stereo) {
+                if (soundFormat.stereo) {
                     int initialSampleLeft = (int) sis.readSB(16);
                     int initialIndexLeft = (int) sis.readUB(6);
                     int initialSampleRight = (int) sis.readSB(16);

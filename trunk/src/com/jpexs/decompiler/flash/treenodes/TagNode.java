@@ -20,11 +20,11 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -76,7 +76,7 @@ public class TagNode extends ContainerNode {
         return count;
     }
 
-    public static List<File> exportNodeAS(final AbortRetryIgnoreHandler handler, final List<TreeNode> nodeList, final String outdir, final ExportMode exportMode, final EventListener ev) throws IOException {
+    public static List<File> exportNodeAS(final AbortRetryIgnoreHandler handler, final List<TreeNode> nodeList, final String outdir, final ScriptExportMode exportMode, final EventListener ev) throws IOException {
         try {
             List<File> result = CancellableWorker.call(new Callable<List<File>>() {
 
@@ -93,7 +93,7 @@ public class TagNode extends ContainerNode {
         return new ArrayList<>();
     }
 
-    private static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TreeNode> nodeList, String outdir, ExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
+    private static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TreeNode> nodeList, String outdir, ScriptExportMode exportMode, AtomicInteger index, int count, EventListener ev) throws IOException {
         File dir = new File(outdir);
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
@@ -138,11 +138,11 @@ public class TagNode extends ContainerNode {
                             File file = new File(f);
                             ASMSource asm = ((ASMSource) node.item);
                             try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(f))) {
-                                if (exportMode == ExportMode.HEX) {
+                                if (exportMode == ScriptExportMode.HEX) {
                                     asm.getActionSourcePrefix(writer);
                                     asm.getActionBytesAsHex(writer);
                                     asm.getActionSourceSuffix(writer);
-                                } else if (exportMode != ExportMode.SOURCE) {
+                                } else if (exportMode != ScriptExportMode.AS) {
                                     asm.getActionSourcePrefix(writer);
                                     asm.getASMSource(exportMode, writer, null);
                                     asm.getActionSourceSuffix(writer);

@@ -54,6 +54,13 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
@@ -110,10 +117,9 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
-import com.jpexs.decompiler.flash.types.sound.AdpcmDecoder;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
@@ -773,7 +779,7 @@ public final class SWF implements TreeItem, Timelined {
         return true;
     }
 
-    public boolean exportAS3Class(String className, String outdir, ExportMode exportMode, boolean parallel) throws Exception {
+    public boolean exportAS3Class(String className, String outdir, ScriptExportMode exportMode, boolean parallel) throws Exception {
         List<ABCContainerTag> abcTags = new ArrayList<>();
 
         for (Tag t : tags) {
@@ -840,7 +846,7 @@ public final class SWF implements TreeItem, Timelined {
         ScriptPack pack;
         String directory;
         List<ABCContainerTag> abcList;
-        ExportMode exportMode;
+        ScriptExportMode exportMode;
         ClassPath path;
         AtomicInteger index;
         int count;
@@ -849,7 +855,7 @@ public final class SWF implements TreeItem, Timelined {
         long startTime;
         long stopTime;
 
-        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, ExportMode exportMode, boolean parallel) {
+        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, ScriptExportMode exportMode, boolean parallel) {
             this.pack = pack;
             this.directory = directory;
             this.abcList = abcList;
@@ -885,7 +891,7 @@ public final class SWF implements TreeItem, Timelined {
         }
     }
 
-    public List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, ExportMode exportMode, boolean parallel, EventListener evl) throws IOException {
+    public List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, ScriptExportMode exportMode, boolean parallel, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         List<ContainerItem> list2 = new ArrayList<>();
         list2.addAll(tags);
@@ -900,7 +906,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public List<File> exportActionScript3(final AbortRetryIgnoreHandler handler, final String outdir, final ExportMode exportMode, final boolean parallel) {
+    public List<File> exportActionScript3(final AbortRetryIgnoreHandler handler, final String outdir, final ScriptExportMode exportMode, final boolean parallel) {
         final AtomicInteger cnt = new AtomicInteger(1);
         final List<ABCContainerTag> abcTags = new ArrayList<>();
         for (Tag t : tags) {
@@ -962,7 +968,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ExportMode exportMode, boolean parallel) throws Exception {
+    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportMode exportMode, boolean parallel) throws Exception {
         boolean asV3Found = false;
         List<File> ret = new ArrayList<>();
         final EventListener evl = new EventListener() {
@@ -1197,33 +1203,35 @@ public final class SWF implements TreeItem, Timelined {
         }
     }
 
-    public void exportMovies(AbortRetryIgnoreHandler handler, String outdir) throws IOException {
-        exportMovies(handler, outdir, tags);
+    public void exportMovies(AbortRetryIgnoreHandler handler, String outdir, MovieExportMode mode) throws IOException {
+        exportMovies(handler, outdir, tags, mode);
     }
 
-    public void exportSounds(AbortRetryIgnoreHandler handler, String outdir, boolean mp3, boolean wave) throws IOException {
-        exportSounds(handler, outdir, tags, mp3, wave);
+    public void exportSounds(AbortRetryIgnoreHandler handler, String outdir, SoundExportMode mode) throws IOException {
+        exportSounds(handler, outdir, tags, mode);
     }
 
-    public byte[] exportSound(Tag t) throws IOException {
-        boolean mp3 = true;
-        boolean wave = true;
-        try (ByteArrayOutputStream fos = new ByteArrayOutputStream()) {
-            if (t instanceof SoundTag) {
-                SoundTag st = (SoundTag) t;
-                if ((st.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN || st.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) && wave) {
-                    //Does endiannes matter here?
-                    createWavFromPcmData(fos, st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData());
-                } else if ((st.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                    createWavFromAdpcm(fos, st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData());
-                } else if ((st.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
-                    fos.write(st.getRawSoundData());
-                } else if(st instanceof DefineSoundTag) {
+    public byte[] exportSound(SoundTag t, SoundExportMode mode) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        exportSound(baos, t, mode);
+        return baos.toByteArray();
+    }
+
+    public void exportSound(OutputStream fos, SoundTag t, SoundExportMode mode) throws IOException {
+        if (t instanceof SoundTag) {
+            SoundTag st = (SoundTag) t;
+            SoundFormat fmt = st.getSoundFormat();
+            int nativeFormat = fmt.getNativeExportFormat();
+
+            if (nativeFormat == SoundFormat.EXPORT_MP3 && mode.hasMP3()) {
+                fos.write(st.getRawSoundData());
+            } else if ((nativeFormat == SoundFormat.EXPORT_FLV && mode.hasFlv()) || mode == SoundExportMode.FLV) {
+                if (st instanceof DefineSoundTag) {
                     FLVOutputStream flv = new FLVOutputStream(fos);
                     flv.writeHeader(true, false);
-                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormat(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData())));
+                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData())));
                 } else if (st instanceof SoundStreamHeadTypeTag) {
-                    SoundStreamHeadTypeTag sh=(SoundStreamHeadTypeTag)st;
+                    SoundStreamHeadTypeTag sh = (SoundStreamHeadTypeTag) st;
                     FLVOutputStream flv = new FLVOutputStream(fos);
                     flv.writeHeader(true, false);
                     List<SoundStreamBlockTag> blocks = sh.getBlocks();
@@ -1231,14 +1239,15 @@ public final class SWF implements TreeItem, Timelined {
                     int ms = (int) (1000.0f / ((float) frameRate));
                     for (int b = 0; b < blocks.size(); b++) {
                         byte[] data = blocks.get(b).getData();
-                        if (st.getSoundFormat() == 2) { //MP3
+                        if (st.getSoundFormatId() == 2) { //MP3
                             data = Arrays.copyOfRange(data, 4, data.length);
                         }
-                        flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(st.getSoundFormat(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data)));
+                        flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data)));
                     }
                 }
-            }            
-            return fos.toByteArray();
+            } else {
+                fmt.createWav(new ByteArrayInputStream(st.getRawSoundData()), fos);
+            }
         }
     }
 
@@ -1249,14 +1258,14 @@ public final class SWF implements TreeItem, Timelined {
         }
     }
 
-    private static void createWavFromPcmData(OutputStream fos, int soundRate, boolean soundSize, boolean soundType, byte[] data) throws IOException {
+    public static void createWavFromPcmData(OutputStream fos, int soundRateHz, boolean soundSize, boolean soundType, byte[] data) throws IOException {
         ByteArrayOutputStream subChunk1Data = new ByteArrayOutputStream();
         int audioFormat = 1; //PCM
         writeLE(subChunk1Data, audioFormat, 2);
         int numChannels = soundType ? 2 : 1;
         writeLE(subChunk1Data, numChannels, 2);
         int[] rateMap = {5512, 11025, 22050, 44100};
-        int sampleRate = rateMap[soundRate];
+        int sampleRate = soundRateHz;//rateMap[soundRate];
         writeLE(subChunk1Data, sampleRate, 4);
         int bitsPerSample = soundSize ? 16 : 8;
         int byteRate = sampleRate * numChannels * bitsPerSample / 8;
@@ -1282,11 +1291,14 @@ public final class SWF implements TreeItem, Timelined {
         fos.write(chunkBytes);
     }
 
-    private static void createWavFromAdpcm(OutputStream fos, int soundRate, boolean soundSize, boolean soundType, byte[] data) throws IOException {
-        createWavFromPcmData(fos, soundRate, soundSize, soundType, AdpcmDecoder.decode(data, soundType));
-    }
-
-    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, boolean mp3, boolean wave) throws IOException {
+    /*private static void createWavFromAdpcm(OutputStream fos, int soundRateHz, boolean soundSize, boolean soundType, byte[] data) throws IOException {
+     createWavFromPcmData(fos, soundRateHz, soundSize, soundType, AdpcmDecoder.decode(data, soundType));
+     }
+    
+     private static void createWavFromNelly(OutputStream fos, int soundRateHz,byte[] data) throws IOException {
+     createWavFromPcmData(fos, soundRateHz, true, false, NellyMoserDecoder.decode(data));
+     }*/
+    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final SoundExportMode mode) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1305,90 +1317,48 @@ public final class SWF implements TreeItem, Timelined {
             if (t instanceof DefineSoundTag) {
                 id = ((DefineSoundTag) t).soundId;
             }
-            
-            if(t instanceof SoundTag){
-                final SoundTag st=(SoundTag)t;
-                if (st.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN || st.getSoundFormat() == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) {
-                    //Does endiannes matter here?
-                    final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".wav");
-                    newfile = file;
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                                createWavFromPcmData(os, st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData());
-                            }
-                        }
-                    }, handler).run();
-                }else if ((st.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                    final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".wav");
-                    newfile = file;
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                                createWavFromAdpcm(os, st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData());
-                            }
-                        }
-                    }, handler).run();
-                } else if ((st.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
-                    final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".mp3");
-                    newfile = file;
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                                os.write(st.getRawSoundData());
-                            }
-                        }
-                    }, handler).run();
-                } else if(st instanceof DefineSoundTag){
-                    final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".flv");
-                    newfile = file;
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            FileOutputStream fos = new FileOutputStream(file);
-                            try (FLVOutputStream flv = new FLVOutputStream(fos)) {
-                                flv.writeHeader(true, false);
-                                flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormat(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData())));
-                            }
-                        }
-                    }, handler).run();
-                } else if(st instanceof SoundStreamHeadTypeTag){
-                    final File file = new File(outdir + File.separator + id + ".flv");
-                    newfile = file;
-                    SoundStreamHeadTypeTag sh=(SoundStreamHeadTypeTag)st;
-                    final List<SoundStreamBlockTag> blocks=sh.getBlocks();
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                                FLVOutputStream flv = new FLVOutputStream(os);
-                                flv.writeHeader(true, false);
 
-                                int ms = (int) (1000.0f / ((float) frameRate));
-                                for (int b = 0; b < blocks.size(); b++) {
-                                    byte data[] = blocks.get(b).getData();
-                                    if (st.getSoundFormat() == 2) { //MP3
-                                        data = Arrays.copyOfRange(data, 4, data.length);
-                                    }
-                                    flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(st.getSoundFormat(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data)));
-                                }
-                            }
+            if (t instanceof SoundTag) {
+                final SoundTag st = (SoundTag) t;
+
+                String ext = "wav";
+                SoundFormat fmt = st.getSoundFormat();
+                switch (fmt.getNativeExportFormat()) {
+                    case SoundFormat.EXPORT_MP3:
+                        if (mode.hasMP3()) {
+                            ext = "mp3";
                         }
-                    }, handler).run();
+                        break;
+                    case SoundFormat.EXPORT_FLV:
+                        if (mode.hasFlv()) {
+                            ext = "flv";
+                        }
+                        break;
                 }
-            }
-                       
-            if (newfile != null) {
+                if (mode == SoundExportMode.FLV) {
+                    ext = "flv";
+                }
+
+                final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + "." + ext);
+                newfile = file;
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+                            exportSound(os, st, mode);
+                        }
+                    }
+                }, handler).run();
+
                 ret.add(newfile);
+
             }
+
         }
         return ret;
     }
 
-    public byte[] exportMovie(DefineVideoStreamTag videoStream) throws IOException {
+    public byte[] exportMovie(DefineVideoStreamTag videoStream, MovieExportMode mode) throws IOException {
         HashMap<Integer, VideoFrameTag> frames = new HashMap<>();
         populateVideoFrames(videoStream.characterID, this.tags, frames);
         if (frames.isEmpty()) {
@@ -1479,7 +1449,7 @@ public final class SWF implements TreeItem, Timelined {
         return fos.toByteArray();
     }
 
-    public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags) throws IOException {
+    public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MovieExportMode mode) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1500,7 +1470,7 @@ public final class SWF implements TreeItem, Timelined {
                     @Override
                     public void run() throws IOException {
                         try (FileOutputStream fos = new FileOutputStream(file)) {
-                            fos.write(exportMovie(videoStream));
+                            fos.write(exportMovie(videoStream, mode));
                         }
                     }
                 }, handler).run();
@@ -1510,7 +1480,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final boolean formatted) throws IOException {
+    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final TextExportMode mode) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1530,7 +1500,7 @@ public final class SWF implements TreeItem, Timelined {
                     @Override
                     public void run() throws IOException {
                         try (FileOutputStream fos = new FileOutputStream(file)) {
-                            if (formatted) {
+                            if (mode == TextExportMode.FORMATTED) {
                                 fos.write(Utf8Helper.getBytes(((TextTag) t).getFormattedText()));
                             } else {
                                 fos.write(Utf8Helper.getBytes(((TextTag) t).getText()));
@@ -1544,11 +1514,11 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public void exportTexts(AbortRetryIgnoreHandler handler, String outdir, boolean formatted) throws IOException {
-        exportTexts(handler, outdir, tags, formatted);
+    public void exportTexts(AbortRetryIgnoreHandler handler, String outdir, TextExportMode mode) throws IOException {
+        exportTexts(handler, outdir, tags, mode);
     }
 
-    public static List<File> exportShapes(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags) throws IOException {
+    public static List<File> exportShapes(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, ShapeExportMode mode) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1583,7 +1553,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public static List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags) throws IOException {
+    public static List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, BinaryDataExportMode mode) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1615,7 +1585,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags) throws IOException {
+    public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final ImageExportMode mode) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1630,12 +1600,23 @@ public final class SWF implements TreeItem, Timelined {
         }
         for (final Tag t : tags) {
             if (t instanceof ImageTag) {
-                final File file = new File(outdir + File.separator + ((ImageTag) t).getCharacterId() + "." + ((ImageTag) t).getImageFormat());
+
+                String fileFormat = ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH);
+                if (mode == ImageExportMode.PNG) {
+                    fileFormat = "png";
+                }
+                if (mode == ImageExportMode.JPEG) {
+                    fileFormat = "jpg";
+                }
+
+                final File file = new File(outdir + File.separator + ((ImageTag) t).getCharacterId() + "." + fileFormat);
                 final List<Tag> ttags = this.tags;
+                final String ffileFormat = fileFormat;
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
-                        ImageIO.write(((ImageTag) t).getImage().getBufferedImage(), ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH), file);
+
+                        ImageIO.write(((ImageTag) t).getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
                     }
                 }, handler).run();
                 ret.add(file);
@@ -1644,16 +1625,16 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public void exportImages(AbortRetryIgnoreHandler handler, String outdir) throws IOException {
-        exportImages(handler, outdir, tags);
+    public void exportImages(AbortRetryIgnoreHandler handler, String outdir, ImageExportMode mode) throws IOException {
+        exportImages(handler, outdir, tags, mode);
     }
 
-    public void exportShapes(AbortRetryIgnoreHandler handler, String outdir) throws IOException {
-        exportShapes(handler, outdir, tags);
+    public void exportShapes(AbortRetryIgnoreHandler handler, String outdir, ShapeExportMode mode) throws IOException {
+        exportShapes(handler, outdir, tags, mode);
     }
 
-    public void exportBinaryData(AbortRetryIgnoreHandler handler, String outdir) throws IOException {
-        exportBinaryData(handler, outdir, tags);
+    public void exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, BinaryDataExportMode mode) throws IOException {
+        exportBinaryData(handler, outdir, tags, mode);
     }
     private final HashMap<String, String> deobfuscated = new HashMap<>();
     private List<MyEntry<DirectValueActionItem, ConstantPool>> allVariableNames = new ArrayList<>();
@@ -1671,7 +1652,7 @@ public final class SWF implements TreeItem, Timelined {
             GraphSourceItem ins = code.get(ip);
 
             if (debugMode) {
-                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), code.version, ExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
+                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), code.version, ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
             }
             if (ins.isExit()) {
                 break;

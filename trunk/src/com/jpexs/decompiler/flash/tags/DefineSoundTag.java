@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.Helper;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -33,8 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -52,14 +51,6 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
 
     @SWFType(value = BasicType.UB, count = 4)
     public int soundFormat;
-    public static final int FORMAT_UNCOMPRESSED_NATIVE_ENDIAN = 0;
-    public static final int FORMAT_ADPCM = 1;
-    public static final int FORMAT_MP3 = 2;
-    public static final int FORMAT_UNCOMPRESSED_LITTLE_ENDIAN = 3;
-    public static final int FORMAT_NELLYMOSER16KHZ = 4;
-    public static final int FORMAT_NELLYMOSER8KHZ = 5;
-    public static final int FORMAT_NELLYMOSER = 6;
-    public static final int FORMAT_SPEEX = 11;
 
     @SWFType(value = BasicType.UB, count = 2)
     public int soundRate;
@@ -124,16 +115,19 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
 
     @Override
     public String getExportFormat() {
-        if (soundFormat == DefineSoundTag.FORMAT_MP3) {
+        if (soundFormat == SoundFormat.FORMAT_MP3) {
             return "mp3";
         }
-        if (soundFormat == DefineSoundTag.FORMAT_ADPCM) {
+        if (soundFormat == SoundFormat.FORMAT_ADPCM) {
             return "wav";
         }
-        if (soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN) {
+        if (soundFormat == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN) {
             return "wav";
         }
-        if (soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) {
+        if (soundFormat == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) {
+            return "wav";
+        }
+        if (soundFormat == SoundFormat.FORMAT_NELLYMOSER || soundFormat == SoundFormat.FORMAT_NELLYMOSER16KHZ || soundFormat == SoundFormat.FORMAT_NELLYMOSER8KHZ) {
             return "wav";
         }
         return "flv";
@@ -194,7 +188,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
         long newSoundSampleCount = -1;
         byte newSoundData[];
         switch (newSoundFormat) {
-            case FORMAT_UNCOMPRESSED_LITTLE_ENDIAN:
+            case SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN:
                 try (AudioInputStream audioIs = AudioSystem.getAudioInputStream(new BufferedInputStream(is))) {
                     AudioFormat fmt = audioIs.getFormat();
                     newSoundType = fmt.getChannels() == 2;
@@ -222,7 +216,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
                     return false;
                 }
                 break;
-            case FORMAT_MP3:
+            case SoundFormat.FORMAT_MP3:
                 BufferedInputStream bis = new BufferedInputStream(is);
                 loadID3v2(bis);
                 byte mp3data[] = Helper.readStream(bis);
@@ -276,7 +270,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
                     newSoundData = baos.toByteArray();
                 } catch (IOException ex) {
                     return false;
-                }                
+                }
                 break;
             default:
                 return false;
@@ -311,19 +305,19 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
 
     @Override
     public byte[] getRawSoundData() {
-        if (soundFormat == FORMAT_MP3) {
+        if (soundFormat == SoundFormat.FORMAT_MP3) {
             return Arrays.copyOfRange(soundData, 2, soundData.length - 2);
         }
         return soundData;
     }
 
     @Override
-    public int getSoundFormat() {
+    public int getSoundFormatId() {
         return soundFormat;
     }
-    
+
     @Override
-    public long getTotalSoundSampleCount(){
+    public long getTotalSoundSampleCount() {
         return soundSampleCount;
     }
 
@@ -331,6 +325,11 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     public boolean getSoundSize() {
         return soundSize;
     }
-    
-    
+
+    @Override
+    public SoundFormat getSoundFormat() {
+        final int[] rateMap = {5512, 11025, 22050, 44100};
+        return new SoundFormat(getSoundFormatId(), rateMap[getSoundRate()], getSoundType());
+    }
+
 }

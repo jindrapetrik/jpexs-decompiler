@@ -247,6 +247,10 @@ public class Configuration {
     @ConfigurationName("check.updates.enabled")
     public static final ConfigurationItem<Boolean> checkForUpdatesAuto = null;
 
+    @ConfigurationDefaultString("")
+    @ConfigurationName("export.formats")
+    public static final ConfigurationItem<String> lastSelectedExportFormats = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

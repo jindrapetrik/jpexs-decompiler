@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.treeitems.TreeElementItem;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.File;
@@ -122,7 +122,7 @@ public class ScriptPack implements TreeElementItem {
         return Helper.joinStrings(pathParts, File.separator);
     }
 
-    public void convert(final NulWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ExportMode exportMode, final boolean parallel) throws InterruptedException {
+    public void convert(final NulWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
         for (int t : traitIndices) {
             Trait trait = traits[t];
             Multiname name = trait.getName(abc);
@@ -135,7 +135,7 @@ public class ScriptPack implements TreeElementItem {
         }
     }
 
-    public void appendTo(GraphTextWriter writer, List<ABCContainerTag> abcList, Trait[] traits, ExportMode exportMode, boolean parallel) throws InterruptedException {
+    public void appendTo(GraphTextWriter writer, List<ABCContainerTag> abcList, Trait[] traits, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
         for (int t : traitIndices) {
             Trait trait = traits[t];
             Multiname name = trait.getName(abc);
@@ -148,7 +148,7 @@ public class ScriptPack implements TreeElementItem {
         }
     }
 
-    public void toSource(GraphTextWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ExportMode exportMode, final boolean parallel) throws InterruptedException {
+    public void toSource(GraphTextWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
         writer.suspendMeasure();
         try {
             CancellableWorker.call(new Callable<Void>() {
@@ -174,7 +174,7 @@ public class ScriptPack implements TreeElementItem {
         appendTo(writer, abcList, traits, exportMode, parallel);
     }
 
-    public File export(String directory, List<ABCContainerTag> abcList, ExportMode exportMode, boolean parallel) throws IOException {
+    public File export(String directory, List<ABCContainerTag> abcList, ScriptExportMode exportMode, boolean parallel) throws IOException {
         String scriptName = getPathScriptName();
         String packageName = getPathPackage();
         File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));

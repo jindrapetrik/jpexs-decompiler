@@ -14,40 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.graph;
-
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
+package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
  *
  * @author JPEXS
  */
-public enum ExportMode {
+public enum ScriptExportMode {
 
-    // The order (or values) shoud be the same as in ExportDialog 
-    SOURCE(0), PCODE(1), PCODEWITHHEX(2), HEX(3);
-
-    private static final Map<Integer, ExportMode> lookup = new HashMap<>();
-
-    static {
-        for (ExportMode s : EnumSet.allOf(ExportMode.class)) {
-            lookup.put(s.getCode(), s);
-        }
-    }
-
-    private final int code;
-
-    private ExportMode(int code) {
-        this.code = code;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public static ExportMode get(int code) {
-        return lookup.get(code);
-    }
+    AS, PCODE, PCODE_HEX, HEX;
 }

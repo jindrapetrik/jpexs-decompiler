@@ -324,13 +324,13 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
         stopAllSounds();
     }
-    
-    private void stopAllSounds(){
+
+    private void stopAllSounds() {
         for (int i = soundPlayers.size() - 1; i >= 0; i--) {
-                    SoundTagPlayer pl = soundPlayers.get(i);
-                    pl.pause();
-                }
-                soundPlayers.clear();
+            SoundTagPlayer pl = soundPlayers.get(i);
+            pl.pause();
+        }
+        soundPlayers.clear();
     }
 
     private void nextFrame() {
@@ -393,22 +393,21 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             CharacterTag c = swf.characters.get(sndId);
             if (c instanceof SoundTag) {
                 SoundTag st = (SoundTag) c;
-                if (SoundTagPlayer.tagSupported(st)) {
-                    final SoundTagPlayer sp = new SoundTagPlayer(st, 1);
-                    synchronized (ImagePanel.class) {
-                        soundPlayers.add(sp);
-                    }
-                    sp.addListener(new PlayerListener() {
-
-                        @Override
-                        public void playingFinished() {
-                            synchronized (ImagePanel.class) {
-                                soundPlayers.remove(sp);
-                            }
-                        }
-                    });
-                    sp.play();
+                final SoundTagPlayer sp = new SoundTagPlayer(st, 1);
+                synchronized (ImagePanel.class) {
+                    soundPlayers.add(sp);
                 }
+                sp.addListener(new PlayerListener() {
+
+                    @Override
+                    public void playingFinished() {
+                        synchronized (ImagePanel.class) {
+                            soundPlayers.remove(sp);
+                        }
+                    }
+                });
+                sp.play();
+
             }
         }
         label.setIcon(icon);

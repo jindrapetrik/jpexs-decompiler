@@ -27,12 +27,12 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Cache;
 import java.util.ArrayList;
 import java.util.List;
@@ -447,7 +447,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (!cache.contains(scriptLeaf)) {
             boolean parallel = Configuration.parallelSpeedUp.get();
             HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
-            scriptLeaf.toSource(writer, abcList, script.traits.traits, ExportMode.SOURCE, parallel);
+            scriptLeaf.toSource(writer, abcList, script.traits.traits, ScriptExportMode.AS, parallel);
             hilightedCode = new HilightedText(writer);
             cache.put(scriptLeaf, new CachedDecompilation(hilightedCode));
         }

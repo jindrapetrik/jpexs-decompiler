@@ -29,6 +29,13 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -36,7 +43,6 @@ import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.treenodes.TreeElement;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
-import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.decompiler.flash.gui.timeline.TimelineFrame;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFBundleNode;
@@ -116,14 +122,11 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
-import com.jpexs.helpers.sound.MP3Player;
-import com.jpexs.helpers.sound.SoundPlayer;
-import com.jpexs.helpers.sound.WavPlayer;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -155,7 +158,6 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -205,7 +207,6 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import javazoom.jl.decoder.JavaLayerException;
 
 /**
  *
@@ -288,8 +289,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private JPanel repPanel2;
 
     private SoundTagPlayer soundThread = null;
-
-    
 
     private static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
     private static final String ACTION_REPLACE_IMAGE = "REPLACEIMAGE";
@@ -666,20 +665,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                     }
                                 }
                             }
-                            final ExportDialog export = new ExportDialog();
 
-                            try {
-                                File ftemp = new File(tempDir);
-                                files = exportSelection(errorHandler, tempDir, export);
-                                files.clear();
+                            File ftemp = new File(tempDir);
+                            ExportDialog exd = new ExportDialog(null);
+                            files = exportSelection(errorHandler, tempDir, exd);
+                            files.clear();
 
-                                File[] fs = ftemp.listFiles();
-                                files.addAll(Arrays.asList(fs));
+                            File[] fs = ftemp.listFiles();
+                            files.addAll(Arrays.asList(fs));
 
-                                Main.stopWork();
-                            } catch (IOException ex) {
-                                return null;
-                            }
+                            Main.stopWork();
+
                             for (File f : files) {
                                 f.deleteOnExit();
                             }
@@ -1466,24 +1462,64 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return false;
     }
 
+    private List<Object> getSelection(SWF swf) {
+        List<Object> ret = new ArrayList<>();
+        List<TreeNode> sel = getAllSelected(tagTree);
+        for (TreeNode d : sel) {
+            if (d.getItem().getSwf() != swf) {
+                continue;
+            }
+            if (d instanceof ContainerNode) {
+                ContainerNode n = (ContainerNode) d;
+                TreeNodeType nodeType = TagTree.getTreeNodeType(n.getItem());
+                if (nodeType == TreeNodeType.IMAGE) {
+                    ret.add((Tag) n.getItem());
+                }
+                if (nodeType == TreeNodeType.SHAPE) {
+                    ret.add((Tag) n.getItem());
+                }
+                if (nodeType == TreeNodeType.AS) {
+                    ret.add(n);
+                }
+                if (nodeType == TreeNodeType.MOVIE) {
+                    ret.add((Tag) n.getItem());
+                }
+                if (nodeType == TreeNodeType.SOUND) {
+                    ret.add((Tag) n.getItem());
+                }
+                if (nodeType == TreeNodeType.BINARY_DATA) {
+                    ret.add((Tag) n.getItem());
+                }
+                if (nodeType == TreeNodeType.TEXT) {
+                    ret.add((Tag) n.getItem());
+                }
+            }
+            if (d instanceof TreeElement) {
+                if (((TreeElement) d).isLeaf()) {
+                    TreeElement treeElement = (TreeElement) d;
+                    ret.add((ScriptPack) treeElement.getItem());
+                }
+            }
+        }
+        return ret;
+    }
+
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
-        final ExportMode exportMode = ExportMode.get(export.getOption(ExportDialog.OPTION_ACTIONSCRIPT));
-        final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
-        final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
 
         List<File> ret = new ArrayList<>();
         List<TreeNode> sel = getAllSelected(tagTree);
 
         for (SWFList swfList : swfs) {
             for (SWF swf : swfList) {
-                List<ScriptPack> tlsList = new ArrayList<>();
+                List<ScriptPack> as3scripts = new ArrayList<>();
                 List<Tag> images = new ArrayList<>();
                 List<Tag> shapes = new ArrayList<>();
                 List<Tag> movies = new ArrayList<>();
                 List<Tag> sounds = new ArrayList<>();
                 List<Tag> texts = new ArrayList<>();
-                List<TreeNode> actionNodes = new ArrayList<>();
+                List<TreeNode> as12scripts = new ArrayList<>();
                 List<Tag> binaryData = new ArrayList<>();
+
                 for (TreeNode d : sel) {
                     if (d.getItem().getSwf() != swf) {
                         continue;
@@ -1498,7 +1534,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             shapes.add((Tag) n.getItem());
                         }
                         if (nodeType == TreeNodeType.AS) {
-                            actionNodes.add(n);
+                            as12scripts.add(n);
                         }
                         if (nodeType == TreeNodeType.MOVIE) {
                             movies.add((Tag) n.getItem());
@@ -1516,31 +1552,54 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (d instanceof TreeElement) {
                         if (((TreeElement) d).isLeaf()) {
                             TreeElement treeElement = (TreeElement) d;
-                            tlsList.add((ScriptPack) treeElement.getItem());
+                            as3scripts.add((ScriptPack) treeElement.getItem());
                         }
                     }
                 }
-                ret.addAll(swf.exportImages(handler, selFile + File.separator + "images", images));
-                ret.addAll(SWF.exportShapes(handler, selFile + File.separator + "shapes", shapes));
-                ret.addAll(swf.exportTexts(handler, selFile + File.separator + "texts", texts, isFormatted));
-                ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies));
-                ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav));
-                ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData));
+
+                List<Object> allnodes = new ArrayList<>();
+                allnodes.addAll(as3scripts);
+                allnodes.addAll(as12scripts);
+                allnodes.addAll(images);
+                allnodes.addAll(shapes);
+                allnodes.addAll(movies);
+                allnodes.addAll(sounds);
+                allnodes.addAll(texts);
+                allnodes.addAll(binaryData);
+
+                if (selFile == null) {
+                    selFile = selectExportDir();
+                    if (selFile == null) {
+                        return new ArrayList<>();
+                    }
+                }
+
+                final ScriptExportMode scriptMode = export.getValue(ScriptExportMode.class);
+                ret.addAll(swf.exportImages(handler, selFile + File.separator + "images", images, export.getValue(ImageExportMode.class)));
+                ret.addAll(SWF.exportShapes(handler, selFile + File.separator + "shapes", shapes, export.getValue(ShapeExportMode.class)));
+                ret.addAll(swf.exportTexts(handler, selFile + File.separator + "texts", texts, export.getValue(TextExportMode.class)));
+                ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies, export.getValue(MovieExportMode.class)));
+                ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, export.getValue(SoundExportMode.class)));
+                ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData, export.getValue(BinaryDataExportMode.class)));
                 List<ABCContainerTag> abcList = swf.abcList;
                 if (abcPanel != null) {
-                    for (int i = 0; i < tlsList.size(); i++) {
-                        ScriptPack tls = tlsList.get(i);
-                        Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
-                        ret.add(tls.export(selFile, abcList, exportMode, Configuration.parallelSpeedUp.get()));
+                    for (int i = 0; i < as3scripts.size(); i++) {
+                        ScriptPack tls = as3scripts.get(i);
+                        Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
+                        ret.add(tls.export(selFile, abcList, scriptMode, Configuration.parallelSpeedUp.get()));
                     }
                 } else {
                     List<TreeNode> allNodes = new ArrayList<>();
-                    List<TreeNode> asNodes = getASTreeNodes(tagTree);
-                    for (TreeNode asn : asNodes) {
+                    List<TreeNode> allAs12Scripts = new ArrayList<>();
+
+                    if (abcPanel == null) {
+                        allAs12Scripts = getASTreeNodes(tagTree);
+                    }
+                    for (TreeNode asn : allAs12Scripts) {
                         allNodes.add(asn);
                         TagNode.setExport(allNodes, false);
-                        TagNode.setExport(actionNodes, true);
-                        ret.addAll(TagNode.exportNodeAS(handler, allNodes, selFile, exportMode, null));
+                        TagNode.setExport(as12scripts, true);
+                        ret.addAll(TagNode.exportNodeAS(handler, allNodes, selFile, scriptMode, null));
                     }
                 }
             }
@@ -1877,24 +1936,42 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
+    private String selectExportDir() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("export.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            final long timeBefore = System.currentTimeMillis();
+            Main.startWork(translate("work.exporting") + "...");
+            final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+            Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
+            return selFile;
+        }
+        return null;
+    }
+
     public void export(final boolean onlySel) {
-        final ExportDialog export = new ExportDialog();
+
+        final SWF swf = getCurrentSwf();
+        List<Object> sel = getSelection(swf);
+        if (!onlySel) {
+            sel = null;
+        } else {
+            if (sel.isEmpty()) {
+                return;
+            }
+        }
+        final ExportDialog export = new ExportDialog(sel);
         export.setVisible(true);
         if (!export.cancelled) {
-            JFileChooser chooser = new JFileChooser();
-            chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
-            chooser.setDialogTitle(translate("export.select.directory"));
-            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            chooser.setAcceptAllFileFilterUsed(false);
-            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            final String selFile = selectExportDir();
+            if (selFile != null) {
                 final long timeBefore = System.currentTimeMillis();
                 Main.startWork(translate("work.exporting") + "...");
-                final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
-                Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
-                final ExportMode exportMode = ExportMode.get(export.getOption(ExportDialog.OPTION_ACTIONSCRIPT));
-                final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
-                final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
-                final SWF swf = getCurrentSwf();
+                final ScriptExportMode exportMode = export.getValue(ScriptExportMode.class);
+
                 new CancellableWorker() {
                     @Override
                     public Void doInBackground() throws Exception {
@@ -1902,12 +1979,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             if (onlySel) {
                                 exportSelection(errorHandler, selFile, export);
                             } else {
-                                swf.exportImages(errorHandler, selFile + File.separator + "images");
-                                swf.exportShapes(errorHandler, selFile + File.separator + "shapes");
-                                swf.exportTexts(errorHandler, selFile + File.separator + "texts", isFormatted);
-                                swf.exportMovies(errorHandler, selFile + File.separator + "movies");
-                                swf.exportSounds(errorHandler, selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
-                                swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData");
+                                swf.exportImages(errorHandler, selFile + File.separator + "images", export.getValue(ImageExportMode.class));
+                                swf.exportShapes(errorHandler, selFile + File.separator + "shapes", export.getValue(ShapeExportMode.class));
+                                swf.exportTexts(errorHandler, selFile + File.separator + "texts", export.getValue(TextExportMode.class));
+                                swf.exportMovies(errorHandler, selFile + File.separator + "movies", export.getValue(MovieExportMode.class));
+                                swf.exportSounds(errorHandler, selFile + File.separator + "sounds", export.getValue(SoundExportMode.class));
+                                swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData", export.getValue(BinaryDataExportMode.class));
                                 swf.exportActionScript(errorHandler, selFile, exportMode, Configuration.parallelSpeedUp.get());
                             }
                         } catch (Exception ex) {
@@ -2207,9 +2284,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
                         File selfile = Helper.fixDialogFile(fc.getSelectedFile());
                         DefineSoundTag ds = (DefineSoundTag) item;
-                        int soundFormat = DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+                        int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
                         if (selfile.getName().toLowerCase().endsWith(".mp3")) {
-                            soundFormat = DefineSoundTag.FORMAT_MP3;
+                            soundFormat = SoundFormat.FORMAT_MP3;
                         }
                         boolean ok = false;
                         try {
@@ -2630,9 +2707,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showCard(CARDDRAWPREVIEWPANEL);
             previewImagePanel.setImage(new SerializableImage(1, 1, BufferedImage.TYPE_INT_ARGB));
 
-           
-                        
-           soundThread = new SoundTagPlayer((SoundTag)tagObj,Integer.MAX_VALUE);
+            soundThread = new SoundTagPlayer((SoundTag) tagObj, Integer.MAX_VALUE);
             imagePlayControls.setMedia(soundThread);
             soundThread.play();
 

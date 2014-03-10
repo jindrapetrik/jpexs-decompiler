@@ -21,9 +21,9 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.graph.ExportMode;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Insets;
@@ -155,18 +155,18 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         }
     }
 
-    private ExportMode getExportMode() {
-        ExportMode exportMode = hexOnlyButton.isSelected() ? ExportMode.HEX
-                : (hexButton.isSelected() ? ExportMode.PCODEWITHHEX : ExportMode.PCODE);
+    private ScriptExportMode getExportMode() {
+        ScriptExportMode exportMode = hexOnlyButton.isSelected() ? ScriptExportMode.HEX
+                : (hexButton.isSelected() ? ScriptExportMode.PCODE_HEX : ScriptExportMode.PCODE);
         return exportMode;
     }
 
     public void setEditMode(boolean val) {
-        ExportMode exportMode = getExportMode();
+        ScriptExportMode exportMode = getExportMode();
         if (val) {
-            sourceTextArea.setHex(exportMode == ExportMode.HEX ? ExportMode.HEX : ExportMode.PCODE, false);
+            sourceTextArea.setHex(exportMode == ScriptExportMode.HEX ? ScriptExportMode.HEX : ScriptExportMode.PCODE, false);
         } else {
-            if (exportMode != ExportMode.PCODE) {
+            if (exportMode != ScriptExportMode.PCODE) {
                 sourceTextArea.setHex(exportMode, false);
             }
         }

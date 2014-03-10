@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import java.io.InputStream;
 
 /**
@@ -24,14 +24,26 @@ import java.io.InputStream;
  * @author JPEXS
  */
 public interface SoundTag {
+
     public String getExportFormat();
+
     public boolean importSupported();
+
     public boolean setSound(InputStream is, int newSoundFormat);
+
     public int getSoundRate();
+
     public boolean getSoundType();
+
     public byte[] getRawSoundData();
-    public int getSoundFormat();
+
+    public int getSoundFormatId();
+
     public long getTotalSoundSampleCount();
+
     public boolean getSoundSize();
+
     public String getCharacterExportFileName();
+
+    public SoundFormat getSoundFormat();
 }

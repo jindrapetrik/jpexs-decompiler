@@ -23,6 +23,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -56,6 +59,7 @@ import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
@@ -92,7 +96,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
-import com.jpexs.decompiler.graph.ExportMode;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
@@ -1373,7 +1377,7 @@ public class XFLConverter {
                 String exportFormat = "flv";
                 if (symbol instanceof SoundStreamHeadTypeTag) {
                     SoundStreamHeadTypeTag sstream = (SoundStreamHeadTypeTag) symbol;
-                    soundFormat = sstream.getSoundFormat();
+                    soundFormat = sstream.getSoundFormatId();
                     soundRate = sstream.getSoundRate();
                     soundType = sstream.getSoundType();
                     soundSize = sstream.getSoundSize();
@@ -1400,9 +1404,10 @@ public class XFLConverter {
                 }
                 int format = 0;
                 int bits = 0;
-                if ((soundFormat == DefineSoundTag.FORMAT_ADPCM)
-                        || (soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN)
-                        || (soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN)) {
+                if ((soundFormat == SoundFormat.FORMAT_ADPCM)
+                        || (soundFormat == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN)
+                        || (soundFormat == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN)) {
+                    exportFormat = "wav";
                     if (soundType) { //stereo
                         format += 1;
                     }
@@ -1421,10 +1426,10 @@ public class XFLConverter {
                             break;
                     }
                 }
-                if (soundFormat == DefineSoundTag.FORMAT_SPEEX) {
+                if (soundFormat == SoundFormat.FORMAT_SPEEX) {
                     bits = 18;
                 }
-                if (soundFormat == DefineSoundTag.FORMAT_ADPCM) {
+                if (soundFormat == SoundFormat.FORMAT_ADPCM) {
                     SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), swf.version);
                     exportFormat = "wav";
                     try {
@@ -1434,7 +1439,7 @@ public class XFLConverter {
                         Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                if (soundFormat == DefineSoundTag.FORMAT_MP3) {
+                if (soundFormat == SoundFormat.FORMAT_MP3) {
                     exportFormat = "mp3";
                     if (!soundType) { //mono
                         format += 1;
@@ -1491,35 +1496,37 @@ public class XFLConverter {
                         Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+                SoundTag st = (SoundTag) symbol;
+                SoundFormat fmt = st.getSoundFormat();
                 byte[] data = new byte[0];
                 try {
-                    data = swf.exportSound(symbol);
+                    data = swf.exportSound(st, SoundExportMode.MP3_WAV);
                 } catch (IOException ex) {
                     Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                if (!exportFormat.equals("flv")) { //FLV import format unsupported
-                    String symbolFile = "sound" + symbol.getCharacterId() + "." + exportFormat;
-                    files.put(symbolFile, data);
-                    String mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
-                    mediaLinkStr += " href=\"" + symbolFile + "\"";
-                    mediaLinkStr += " format=\"";
-                    mediaLinkStr += rateMap[soundRate] + "kHz";
-                    mediaLinkStr += " " + (soundSize ? "16bit" : "8bit");
-                    mediaLinkStr += " " + (soundType ? "Stereo" : "Mono");
-                    mediaLinkStr += "\"";
-                    mediaLinkStr += " exportFormat=\"" + format + "\" exportBits=\"" + bits + "\" sampleCount=\"" + soundSampleCount + "\"";
 
-                    if (characterClasses.containsKey(symbol.getCharacterId())) {
-                        mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
-                    }
+                String symbolFile = "sound" + symbol.getCharacterId() + "." + exportFormat;
+                files.put(symbolFile, data);
+                String mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
+                mediaLinkStr += " href=\"" + symbolFile + "\"";
+                mediaLinkStr += " format=\"";
+                mediaLinkStr += rateMap[soundRate] + "kHz";
+                mediaLinkStr += " " + (soundSize ? "16bit" : "8bit");
+                mediaLinkStr += " " + (soundType ? "Stereo" : "Mono");
+                mediaLinkStr += "\"";
+                mediaLinkStr += " exportFormat=\"" + format + "\" exportBits=\"" + bits + "\" sampleCount=\"" + soundSampleCount + "\"";
 
-                    if (characterVariables.containsKey(symbol.getCharacterId())) {
-                        mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
-                    }
-
-                    mediaLinkStr += "/>\n";
-                    media.add(mediaLinkStr);
+                if (characterClasses.containsKey(symbol.getCharacterId())) {
+                    mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
                 }
+
+                if (characterVariables.containsKey(symbol.getCharacterId())) {
+                    mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
+                }
+
+                mediaLinkStr += "/>\n";
+                media.add(mediaLinkStr);
+
             } else if (symbol instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag video = (DefineVideoStreamTag) symbol;
                 String videoType = "no media";
@@ -1540,7 +1547,7 @@ public class XFLConverter {
 
                 byte[] data = new byte[0];
                 try {
-                    data = swf.exportMovie(video);
+                    data = swf.exportMovie(video, MovieExportMode.FLV);
                 } catch (IOException ex) {
                     Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -3015,7 +3022,7 @@ public class XFLConverter {
         }
         if (useAS3) {
             try {
-                swf.exportActionScript(handler, outDir.getAbsolutePath(), ExportMode.SOURCE, parallel);
+                swf.exportActionScript(handler, outDir.getAbsolutePath(), ScriptExportMode.AS, parallel);
             } catch (Exception ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }

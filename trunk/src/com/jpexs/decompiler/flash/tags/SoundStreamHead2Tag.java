@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -78,16 +79,19 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
 
     @Override
     public String getExportFormat() {
-        if (streamSoundCompression == DefineSoundTag.FORMAT_MP3) {
+        if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
             return "mp3";
         }
-        if (streamSoundCompression == DefineSoundTag.FORMAT_ADPCM) {
+        if (streamSoundCompression == SoundFormat.FORMAT_ADPCM) {
             return "wav";
         }
-        if (streamSoundCompression == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN) {
+        if (streamSoundCompression == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN) {
             return "wav";
         }
-        if (streamSoundCompression == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) {
+        if (streamSoundCompression == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) {
+            return "wav";
+        }
+        if (streamSoundCompression == SoundFormat.FORMAT_NELLYMOSER || streamSoundCompression == SoundFormat.FORMAT_NELLYMOSER16KHZ || streamSoundCompression == SoundFormat.FORMAT_NELLYMOSER8KHZ) {
             return "wav";
         }
         return "flv";
@@ -157,7 +161,7 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
     }
 
     @Override
-    public int getSoundFormat() {
+    public int getSoundFormatId() {
         return streamSoundCompression;
     }
 
@@ -200,7 +204,7 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             for (SoundStreamBlockTag block : blocks) {
-                if (streamSoundCompression == DefineSoundTag.FORMAT_MP3) {
+                if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
                     baos.write(block.data, 4, block.data.length - 4);
                 } else {
                     baos.write(block.data);
@@ -214,6 +218,12 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
 
     @Override
     public long getTotalSoundSampleCount() {
-        return getBlocks().size()*streamSoundSampleCount;
+        return getBlocks().size() * streamSoundSampleCount;
+    }
+
+    @Override
+    public SoundFormat getSoundFormat() {
+        final int[] rateMap = {5512, 11025, 22050, 44100};
+        return new SoundFormat(getSoundFormatId(), rateMap[getSoundRate()], getSoundType());
     }
 }

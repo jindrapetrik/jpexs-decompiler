@@ -26,9 +26,15 @@ import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -330,16 +336,16 @@ public class CommandLineArgumentParser {
         return bValue;
     }
 
-    private static ExportMode strToExportFormat(String exportFormatStr) {
+    private static ScriptExportMode strToExportFormat(String exportFormatStr) {
         switch (exportFormatStr) {
             case "pcode":
-                return ExportMode.PCODE;
+                return ScriptExportMode.PCODE;
             case "pcodehex":
-                return ExportMode.PCODEWITHHEX;
+                return ScriptExportMode.PCODE_HEX;
             case "hex":
-                return ExportMode.HEX;
+                return ScriptExportMode.HEX;
             default:
-                return ExportMode.SOURCE;
+                return ScriptExportMode.AS;
         }
     }
 
@@ -588,39 +594,39 @@ public class CommandLineArgumentParser {
                     case "all_pcode":
                     case "all_pcodehex":
                     case "all_hex":
-                        ExportMode allExportMode = ExportMode.SOURCE;
+                        ScriptExportMode allExportMode = ScriptExportMode.AS;
                         if (!exportFormat.equals("all")) {
                             allExportMode = strToExportFormat(exportFormat.substring("all_".length() - 1));
                         } else if (formats.containsKey("script")) {
                             allExportMode = strToExportFormat(formats.get("script"));
                         }
                         System.out.println("Exporting images...");
-                        exfile.exportImages(handler, outDir.getAbsolutePath() + File.separator + "images");
+                        exfile.exportImages(handler, outDir.getAbsolutePath() + File.separator + "images", ImageExportMode.PNG_JPEG);
                         System.out.println("Exporting shapes...");
-                        exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes");
+                        exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes", ShapeExportMode.SVG);
                         System.out.println("Exporting scripts...");
                         exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", allExportMode, Configuration.parallelSpeedUp.get());
                         System.out.println("Exporting movies...");
-                        exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies");
+                        exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies", MovieExportMode.FLV);
                         System.out.println("Exporting sounds...");
-                        exfile.exportSounds(handler, outDir.getAbsolutePath() + File.separator + "sounds", true, true);
+                        exfile.exportSounds(handler, outDir.getAbsolutePath() + File.separator + "sounds", SoundExportMode.MP3_WAV_FLV);
                         System.out.println("Exporting binaryData...");
-                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + File.separator + "binaryData");
+                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + File.separator + "binaryData", BinaryDataExportMode.RAW);
                         System.out.println("Exporting texts...");
 
                         String allTextFormat = formats.get("text");
                         if (allTextFormat == null) {
                             allTextFormat = "formatted";
                         }
-                        exfile.exportTexts(handler, outDir.getAbsolutePath() + File.separator + "texts", allTextFormat.equals("formatted"));
+                        exfile.exportTexts(handler, outDir.getAbsolutePath() + File.separator + "texts", allTextFormat.equals("formatted") ? TextExportMode.FORMATTED : TextExportMode.PLAIN);
                         break;
                     case "image":
                         System.out.println("Exporting images...");
-                        exfile.exportImages(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "images" : ""));
+                        exfile.exportImages(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "images" : ""), ImageExportMode.PNG_JPEG); //TODO: other modes
                         break;
                     case "shape":
                         System.out.println("Exporting shapes...");
-                        exfile.exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""));
+                        exfile.exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""), ShapeExportMode.SVG);
                         break;
                     case "script":
                     case "as":
@@ -628,7 +634,7 @@ public class CommandLineArgumentParser {
                     case "pcodehex":
                     case "hex":
                         System.out.println("Exporting scripts...");
-                        ExportMode exportMode = ExportMode.SOURCE;
+                        ScriptExportMode exportMode = ScriptExportMode.AS;
                         if (!exportFormat.equals("script")) {
                             exportMode = strToExportFormat(exportFormat);
                         } else if (formats.containsKey("script")) {
@@ -648,15 +654,15 @@ public class CommandLineArgumentParser {
                         break;
                     case "movie":
                         System.out.println("Exporting movies...");
-                        exfile.exportMovies(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "movies" : ""));
+                        exfile.exportMovies(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "movies" : ""), MovieExportMode.FLV);
                         break;
                     case "sound":
                         System.out.println("Exporting sounds...");
-                        exfile.exportSounds(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "sounds" : ""), true, true);
+                        exfile.exportSounds(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "sounds" : ""), SoundExportMode.MP3_WAV_FLV);
                         break;
                     case "binarydata":
                         System.out.println("Exporting binaryData...");
-                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "binaryData" : ""));
+                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "binaryData" : ""), BinaryDataExportMode.RAW);
                         break;
                     case "text":
                         System.out.println("Exporting texts...");
@@ -664,11 +670,11 @@ public class CommandLineArgumentParser {
                         if (textFormat == null) {
                             textFormat = "formatted";
                         }
-                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), textFormat.equals("formatted"));
+                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), textFormat.equals("formatted") ? TextExportMode.FORMATTED : TextExportMode.PLAIN);
                         break;
                     case "textplain":
                         System.out.println("Exporting texts...");
-                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), false);
+                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), TextExportMode.PLAIN);
                         break;
                     case "fla":
                         System.out.println("Exporting FLA...");

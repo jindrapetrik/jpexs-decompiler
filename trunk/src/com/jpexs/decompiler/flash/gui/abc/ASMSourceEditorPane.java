@@ -27,12 +27,12 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
@@ -59,32 +59,32 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     private HilightedText textWithHex;
     private HilightedText textNoHex;
     private HilightedText textHexOnly;
-    private ExportMode exportMode = ExportMode.PCODE;
+    private ScriptExportMode exportMode = ScriptExportMode.PCODE;
     private Trait trait;
 
-    public ExportMode getExportMode() {
+    public ScriptExportMode getExportMode() {
         return exportMode;
     }
 
-    private HilightedText getHilightedText(ExportMode exportMode) {
+    private HilightedText getHilightedText(ScriptExportMode exportMode) {
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
         abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], exportMode, writer);
         return new HilightedText(writer);
     }
 
-    public void setHex(ExportMode exportMode, boolean force) {
+    public void setHex(ScriptExportMode exportMode, boolean force) {
         if (this.exportMode == exportMode & !force) {
             return;
         }
         this.exportMode = exportMode;
         long oldOffset = getSelectedOffset();
-        if (exportMode == ExportMode.PCODE) {
+        if (exportMode == ScriptExportMode.PCODE) {
             setContentType("text/flasm");
             if (textNoHex == null) {
                 textNoHex = getHilightedText(exportMode);
             }
             setText(textNoHex);
-        } else if (exportMode == ExportMode.PCODEWITHHEX) {
+        } else if (exportMode == ScriptExportMode.PCODE_HEX) {
             setContentType("text/flasm");
             if (textWithHex == null) {
                 textWithHex = getHilightedText(exportMode);

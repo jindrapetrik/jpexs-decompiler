@@ -23,7 +23,7 @@ import java.io.InputStream;
  * @author JPEXS
  */
 public abstract class SoundPlayer {
-    
+
     protected InputStream is;
 
     protected SoundPlayer(InputStream is) {
@@ -43,7 +43,5 @@ public abstract class SoundPlayer {
     public abstract boolean isPlaying();
 
     public abstract long getFrameRate();
-    
-   
 
 }
