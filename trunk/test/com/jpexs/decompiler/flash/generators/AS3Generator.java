@@ -21,11 +21,11 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -64,7 +64,7 @@ public class AS3Generator {
                     s.append(name);
                     s.append("\", ");
                     HilightedTextWriter src = new HilightedTextWriter(new CodeFormatting(), false);
-                    abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", ExportMode.SOURCE, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, src, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
+                    abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, src, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
                     String[] srcs = src.toString().split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {
                         String ss = srcs[i];

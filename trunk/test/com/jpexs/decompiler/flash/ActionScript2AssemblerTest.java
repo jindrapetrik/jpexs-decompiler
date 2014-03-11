@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
-import com.jpexs.decompiler.graph.ExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class ActionScript2AssemblerTest extends ActionStript2TestBase {
             Action.actionsToSource(doa, doa.getActions(), "", writer);
             String actualResult = writer.toString();
             writer = new HilightedTextWriter(new CodeFormatting(), false);
-            doa.getASMSource(ExportMode.PCODE, writer, null);
+            doa.getASMSource(ScriptExportMode.PCODE, writer, null);
             String decompiled = writer.toString();
 
             assertEquals(actualResult.trim(), "ok = false;");

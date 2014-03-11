@@ -18,12 +18,12 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.graph.ExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -71,9 +71,9 @@ public class ActionScript3Test {
         assertTrue(bodyIndex > -1);
         HilightedTextWriter writer = null;
         try {
-            abc.bodies[bodyIndex].convert(methodName, ExportMode.SOURCE, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits, true);
+            abc.bodies[bodyIndex].convert(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits, true);
             writer = new HilightedTextWriter(new CodeFormatting(), false);
-            abc.bodies[bodyIndex].toString(methodName, ExportMode.SOURCE, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
+            abc.bodies[bodyIndex].toString(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
         } catch (InterruptedException ex) {
             fail();
         }
