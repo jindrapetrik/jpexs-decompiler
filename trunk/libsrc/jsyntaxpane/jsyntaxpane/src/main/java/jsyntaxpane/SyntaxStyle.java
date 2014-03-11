@@ -19,7 +19,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import javax.swing.text.Segment;
 import javax.swing.text.TabExpander;
-import javax.swing.text.Utilities;
 
 /**
  * This class represents the Style for a TokenType.  This class is responsible
@@ -110,14 +109,15 @@ public final class SyntaxStyle {
      * expanded as a space character.
      * @param startOffset - starting offset of the text in the document >= 0 
      * @return
-     */
-    public int drawText(Segment segment, int x, int y,
+     */   
+     public int drawText(Segment segment, int x, int y,
             Graphics graphics, TabExpander e, int startOffset) {
         graphics.setFont(graphics.getFont().deriveFont(getFontStyle()));
         FontMetrics fontMetrics = graphics.getFontMetrics();
         int a = fontMetrics.getAscent();
         int h = a + fontMetrics.getDescent();
-        int w = Utilities.getTabbedTextWidth(segment, fontMetrics, 0, e, startOffset);
+        //JPEXS: UniTools for multi fonts
+        int w = UniTools.getTabbedTextWidth(graphics,segment,0, e, startOffset);
         int rX = x - 1;
         int rY = y - a;
         int rW = w + 2;
@@ -127,7 +127,8 @@ public final class SyntaxStyle {
             graphics.fillRect(rX, rY, rW, rH);
         }
         graphics.setColor(getColor());
-        x = Utilities.drawTabbedText(segment, x, y, graphics, e, startOffset);
+        //JPEXS: UniTools for multi fonts
+        x = UniTools.drawTabbedText(segment, x, y, graphics, e, startOffset);
         if ((getFontStyle() & 0x8) != 0) {
             graphics.setColor(Color.RED);
             graphics.drawRect(rX, rY, rW, rH);

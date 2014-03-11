@@ -17,6 +17,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Toolkit;
@@ -25,8 +26,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.PlainView;
+import javax.swing.text.Position;
 import javax.swing.text.Segment;
 import javax.swing.text.ViewFactory;
 import jsyntaxpane.util.Configuration;
@@ -168,6 +171,100 @@ public class SyntaxView extends PlainView {
                     toolkit.getDesktopProperty("awt.font.desktophints");
             sysHints = new RenderingHints(map);
         } catch (Throwable t) {
+        }
+    }
+    
+    
+    
+    //JPEXS: PlainView adaptation for multi fonts (UniTools)
+    @Override
+    public Shape modelToView(int pos, Shape a, Position.Bias b) throws BadLocationException {
+        // line coordinates
+        Document doc = getDocument();
+        Element map = getElement();
+        int lineIndex = map.getElementIndex(pos);
+        if (lineIndex < 0) {
+            return lineToRect(a, 0);
+        }
+        Rectangle lineArea = lineToRect(a, lineIndex);
+
+        // determine span from the start of the line
+        int tabBase = lineArea.x;
+        Element line = map.getElement(lineIndex);
+        int p0 = line.getStartOffset();
+        Segment s = new Segment();
+        doc.getText(p0, pos - p0, s);
+        int xOffs = UniTools.getTabbedTextWidth(s, metrics, tabBase, this,p0);
+
+        // fill in the results and return
+        lineArea.x += xOffs;
+        lineArea.width = 1;
+        lineArea.height = metrics.getHeight();
+        return lineArea;
+    }
+
+    //JPEXS: PlainView adaptation for multi fonts (UniTools)
+    @Override
+    public int viewToModel(float fx, float fy, Shape a, Position.Bias[] bias) {
+        // PENDING(prinz) properly calculate bias
+        bias[0] = Position.Bias.Forward;
+
+        Rectangle alloc = a.getBounds();
+        Document doc = getDocument();
+        int x = (int) fx;
+        int y = (int) fy;
+        if (y < alloc.y) {
+            // above the area covered by this icon, so the the position
+            // is assumed to be the start of the coverage for this view.
+            return getStartOffset();
+        } else if (y > alloc.y + alloc.height) {
+            // below the area covered by this icon, so the the position
+            // is assumed to be the end of the coverage for this view.
+            return getEndOffset() - 1;
+        } else {
+            // positioned within the coverage of this view vertically,
+            // so we figure out which line the point corresponds to.
+            // if the line is greater than the number of lines contained, then
+            // simply use the last line as it represents the last possible place
+            // we can position to.
+          
+            Element map = doc.getDefaultRootElement();
+            int fontHeight = metrics.getHeight();
+            int lineIndex = (fontHeight > 0 ?
+                                Math.abs((y - alloc.y) / fontHeight) :
+                                map.getElementCount() - 1);
+            if (lineIndex >= map.getElementCount()) {
+                return getEndOffset() - 1;
+            }
+            Element line = map.getElement(lineIndex);
+            int dx = 0;
+            if (lineIndex == 0) {
+                //alloc.x += firstLineOffset;
+               // alloc.width -= firstLineOffset;
+            }
+            if (x < alloc.x) {
+                // point is to the left of the line
+                return line.getStartOffset();
+            } else if (x > alloc.x + alloc.width) {
+                // point is to the right of the line
+                return line.getEndOffset() - 1;
+            } else {
+                // Determine the offset into the text
+                try {
+                    int p0 = line.getStartOffset();
+                    int p1 = line.getEndOffset() - 1;
+                    Segment s = new Segment();
+                    doc.getText(p0, p1 - p0, s);
+                    int tabBase = alloc.x;
+                    int offs = p0 + UniTools.getTabbedTextOffset(s, metrics,
+                                                                  tabBase, x, this, p0);
+                    //SegmentCache.releaseSharedSegment(s);
+                    return offs;
+                } catch (BadLocationException e) {
+                    // should not happen
+                    return -1;
+                }
+            }
         }
     }
 }

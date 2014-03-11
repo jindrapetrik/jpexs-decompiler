@@ -32,6 +32,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import jsyntaxpane.SyntaxView;
+import jsyntaxpane.UniTools;
 import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.util.ReflectUtils;
 
@@ -76,7 +77,8 @@ abstract class MemberCell extends JPanel {
         g.setFont(list.getFont());
         x = drawString(getArguments(), x, y, g);
         String right = getReturnType();
-        int rw = fm.stringWidth(right);
+        //JPEXS: UniTools for multi fonts
+        int rw = UniTools.stringWidth(g, right);
         g.drawString(right, getWidth() - rw - 4, fm.getAscent());
     }
 
@@ -87,14 +89,16 @@ abstract class MemberCell extends JPanel {
         FontMetrics fm = g.getFontMetrics(font);
         // total text for this component:
         String total = getMemberName() + getArguments() + getReturnType() + "  ";
-        return new Dimension(fm.stringWidth(total) + 20, Math.max(fm.getHeight(), 16));
+        //JPEXS: UniTools for multi fonts
+        return new Dimension(UniTools.stringWidth(g,total) + 20, Math.max(fm.getHeight(), 16));
     }
 
     private int drawString(String string, int x, int y, Graphics g) {
         if(ActionUtils.isEmptyOrBlanks(string)) {
             return x;
         }
-        int w = g.getFontMetrics().stringWidth(string);
+        //JPEXS: UniTools for multi fonts
+        int w = UniTools.stringWidth(g, string);
         g.drawString(string, x, y);
         return x + w;
     }
