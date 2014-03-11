@@ -234,15 +234,23 @@ public class Timeline {
                 Matrix m = new Matrix(ds.matrix);
                 m = m.preConcatenate(transformation);
 
-                Matrix drawMatrix = new Matrix();
-                //drawMatrix.translate(rect.xMin, rect.yMin);
-                //System.out.println("m="+m);
-                //System.out.println("-------");
-                Shape cshape = ((DrawableTag) c).getOutline(ds.time, ds.ratio, stateUnderCursor, mouseButton, m);
-                //cshape = SHAPERECORD.twipToPixelShape(cshape);
-
-                //AffineTransform trans = drawMatrix.toTransform();
-                //cshape = trans.createTransformedShape(cshape);
+                int dframe = 0;
+                if(c instanceof Timelined){
+                    dframe = ds.time % ((Timelined) c).getTimeline().frames.size();                
+                    if (c instanceof ButtonTag) {
+                        ButtonTag bt = (ButtonTag) c;
+                        dframe = ButtonTag.FRAME_UP;
+                        if (stateUnderCursor == ds) {
+                            if (mouseButton > 0) {
+                                dframe = ButtonTag.FRAME_DOWN;
+                            } else {
+                                dframe = ButtonTag.FRAME_OVER;
+                            }
+                        }
+                    }
+                }
+                Shape cshape = ((DrawableTag) c).getOutline(dframe, ds.ratio, stateUnderCursor, mouseButton, m);
+                
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {
                     Area a = new Area(new Rectangle(displayRect.Xmin, displayRect.Ymin, displayRect.getWidth(), displayRect.getHeight()));
