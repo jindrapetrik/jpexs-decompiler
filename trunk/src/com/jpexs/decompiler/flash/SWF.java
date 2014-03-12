@@ -117,6 +117,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
@@ -132,7 +133,9 @@ import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -2347,6 +2350,14 @@ public final class SWF implements TreeItem, Timelined {
                     drawMatrix.translate(rect.xMin, rect.yMin);
 
                     drawable.toImage(dframe, layer.ratio, stateUnderCursor, mouseButton, img, m, clrTrans);
+                    //if(stateUnderCursor == layer){
+                   /* if(true){
+                        Graphics2D gg = (Graphics2D)img.getGraphics();
+                        gg.setStroke(new BasicStroke(3));
+                        gg.setPaint(Color.red);
+                        gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
+                        gg.draw(SHAPERECORD.twipToPixelShape(drawable.getOutline(frame, layer.ratio, stateUnderCursor, mouseButton, m)));
+                    }*/
                 } else if (drawable instanceof FontTag) {
                     // only DefineFont tags
                     FontTag fontTag = (FontTag) drawable;
@@ -2459,6 +2470,9 @@ public final class SWF implements TreeItem, Timelined {
                 g.setComposite(AlphaComposite.Dst);
             }
         }
+        
+        
+                
         g.setTransform(AffineTransform.getScaleInstance(1, 1));
     }
 

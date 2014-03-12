@@ -89,7 +89,7 @@ public class Frame {
             }
             CharacterTag c = timeline.swf.characters.get(ds.characterId);
             if (c instanceof DrawableTag) {
-                Matrix m = new Matrix(ds.matrix).concatenate(transformation);
+                Matrix m = new Matrix(ds.matrix).preConcatenate(transformation);
                 int frame = ds.time % ((DrawableTag) c).getNumFrames();
                 if (c instanceof ButtonTag) {
                     frame = ButtonTag.FRAME_HITTEST;

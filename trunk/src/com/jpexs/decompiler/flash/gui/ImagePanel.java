@@ -30,8 +30,10 @@ import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -48,6 +50,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -369,6 +372,13 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 m.translate(-rect.Xmin, -rect.Ymin);
                 m.scale(scale);
                 drawable.getTimeline().toImage(frame, frame, stateUnderCursor, mouseButton, image, m, new ColorTransform());
+                
+               /* Graphics2D gg = (Graphics2D)image.getGraphics();
+                        gg.setStroke(new BasicStroke(3));
+                        gg.setPaint(Color.green);
+                        gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
+                        gg.draw(SHAPERECORD.twipToPixelShape(drawable.getTimeline().getOutline(frame, frame, stateUnderCursor, mouseButton, m)));
+                */
                 img = image;
             } else if (drawable instanceof FontTag) {
                 // only DefineFont tags
