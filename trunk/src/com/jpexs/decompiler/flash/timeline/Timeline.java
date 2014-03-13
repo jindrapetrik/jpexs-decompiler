@@ -206,6 +206,69 @@ public class Timeline {
         }
         return ret;
     }
+    
+    public void getObjectsOutlines(int frame, int ratio,DepthState stateUnderCursor, int mouseButton, Matrix transformation,List<DepthState> objs,List<Shape> outlines){
+        Frame fr = this.frames.get(frame);
+        Stack<Clip> clips = new Stack<>();
+        for (int d = this.getMaxDepth(); d >= 0; d--) {
+            Clip currentClip = null;
+            for (int i = clips.size() - 1; i >= 0; i--) {
+                Clip cl = clips.get(i);
+                if (cl.depth <= d) {
+                    clips.remove(i);
+                }
+            }
+            if (!clips.isEmpty()) {
+                currentClip = clips.peek();
+            }
+            DepthState ds = fr.layers.get(d);
+            if (ds == null) {
+                continue;
+            }
+            if (!ds.isVisible) {
+                continue;
+            }
+            CharacterTag c = swf.characters.get(ds.characterId);
+            if ((c instanceof DrawableTag) && (c instanceof BoundedTag)) {
+                Matrix m = new Matrix(ds.matrix);
+                m = m.preConcatenate(transformation);
+
+                int dframe = 0;
+                if(c instanceof Timelined){
+                    dframe = ds.time % ((Timelined) c).getTimeline().frames.size();                
+                    if (c instanceof ButtonTag) {
+                        ButtonTag bt = (ButtonTag) c;
+                        dframe = ButtonTag.FRAME_UP;
+                        if (stateUnderCursor == ds) {
+                            if (mouseButton > 0) {
+                                dframe = ButtonTag.FRAME_DOWN;
+                            } else {
+                                dframe = ButtonTag.FRAME_OVER;
+                            }
+                        }
+                    }
+                }
+                Shape cshape = ((DrawableTag) c).getOutline(dframe, ds.ratio, stateUnderCursor, mouseButton, m);
+                
+                Area addArea = new Area(cshape);
+                if (currentClip != null) {
+                    Area a = new Area(new Rectangle(displayRect.Xmin, displayRect.Ymin, displayRect.getWidth(), displayRect.getHeight()));
+                    a.subtract(new Area(currentClip.shape));
+                    addArea.subtract(a);
+                }
+                if (ds.clipDepth > -1) {
+                    Clip clip = new Clip(addArea, ds.clipDepth);
+                    clips.push(clip);
+                } else {
+                    objs.add(ds);
+                    outlines.add(addArea);                    
+                }
+                if(c instanceof Timelined){
+                    ((Timelined)c).getTimeline().getObjectsOutlines(dframe, ds.ratio, stateUnderCursor, mouseButton, m, objs, outlines);
+                }
+            }
+        }
+    }
 
     public Shape getOutline(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
         Frame fr = this.frames.get(frame);

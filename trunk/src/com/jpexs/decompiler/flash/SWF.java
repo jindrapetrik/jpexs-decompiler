@@ -2351,7 +2351,7 @@ public final class SWF implements TreeItem, Timelined {
 
                     drawable.toImage(dframe, layer.ratio, stateUnderCursor, mouseButton, img, m, clrTrans);
                     //if(stateUnderCursor == layer){
-                   /* if(true){
+                  /* if(true){
                         Graphics2D gg = (Graphics2D)img.getGraphics();
                         gg.setStroke(new BasicStroke(3));
                         gg.setPaint(Color.red);
