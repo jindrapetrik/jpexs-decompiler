@@ -86,9 +86,9 @@ public class PlayerControls extends JPanel implements ActionListener {
             @Override
             public void mousePressed(MouseEvent e) {
                 int frame = (int) Math.floor(e.getX() * t.display.getTotalFrames() / (double) progress.getWidth());
-                boolean p = paused;
+                boolean p = t.display.isPlaying();
                 t.display.gotoFrame(frame);
-                if (!p) {
+                if (p) {
                     t.display.play();
                 }
             }

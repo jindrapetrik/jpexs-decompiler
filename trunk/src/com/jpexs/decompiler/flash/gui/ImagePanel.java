@@ -40,8 +40,6 @@ import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -63,8 +61,8 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
@@ -95,9 +93,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         private Rectangle rect = null;
         private List<DepthState> dss;
         private List<Shape> outlines;
-        
 
-        public void setImg(SerializableImage img,List<DepthState> dss, List<Shape> outlines) {
+        public void setImg(SerializableImage img, List<DepthState> dss, List<Shape> outlines) {
             this.img = img;
             this.dss = dss;
             this.outlines = outlines;
@@ -105,22 +102,22 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             repaint();
         }
 
-        public List<DepthState> getObjectsUnderPoint(Point p){
-            List<DepthState> ret=new ArrayList<>();
-            for(int i=0;i<outlines.size();i++){
-                if(outlines.get(i).contains(p)){
+        public List<DepthState> getObjectsUnderPoint(Point p) {
+            List<DepthState> ret = new ArrayList<>();
+            for (int i = 0; i < outlines.size(); i++) {
+                if (outlines.get(i).contains(p)) {
                     ret.add(dss.get(i));
                 }
             }
             return ret;
         }
-        
+
         public Rectangle getRect() {
             return rect;
         }
-        
-        public Point toImagePoint(Point p){
-            return new Point((p.x-rect.x)*img.getWidth()/rect.width,(p.y-rect.y)*img.getHeight()/rect.height);
+
+        public Point toImagePoint(Point p) {
+            return new Point((p.x - rect.x) * img.getWidth() / rect.width, (p.y - rect.y) * img.getHeight() / rect.height);
         }
 
         private void calcRect() {
@@ -162,7 +159,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             if (img != null) {
                 calcRect();
                 g2d.setComposite(AlphaComposite.SrcOver);
-                g2d.drawImage(img.getBufferedImage(), rect.x, rect.y, rect.x+rect.width, rect.y+rect.height, 0, 0, img.getWidth(), img.getHeight(), null);
+                g2d.drawImage(img.getBufferedImage(), rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, 0, 0, img.getWidth(), img.getHeight(), null);
             }
 
         }
@@ -210,24 +207,24 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             int width = rect.getWidth();
             double scale = 1.0;
             /*if (width > swf.displayRect.getWidth()) {
-                scale = (double) swf.displayRect.getWidth() / (double) width;
-            }*/
+             scale = (double) swf.displayRect.getWidth() / (double) width;
+             }*/
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
             m.scale(scale);
-            Point p=e.getPoint();
+            Point p = e.getPoint();
             p = iconPanel.toImagePoint(p);
-            int x = p.x;        
+            int x = p.x;
             int y = p.y;
             List<DepthState> objs = new ArrayList<>();
-            objs=iconPanel.getObjectsUnderPoint(p);
+            objs = iconPanel.getObjectsUnderPoint(p);
             String ret = "";
 
             ret += " [" + x + "," + y + "] : ";
 
             boolean first = true;
-            for (int i=0;i<objs.size();i++) {
-                DepthState ds=objs.get(i);
+            for (int i = 0; i < objs.size(); i++) {
+                DepthState ds = objs.get(i);
                 if (!first) {
                     ret += ", ";
                 }
@@ -349,7 +346,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         timelined = null;
         loaded = true;
         try {
-            iconPanel.setImg(new SerializableImage(ImageIO.read(new ByteArrayInputStream(data))),new ArrayList<DepthState>(),new ArrayList<Shape>());
+            iconPanel.setImg(new SerializableImage(ImageIO.read(new ByteArrayInputStream(data))), new ArrayList<DepthState>(), new ArrayList<Shape>());
         } catch (IOException ex) {
             Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -372,7 +369,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         loaded = true;
 
         if (drawable.getTimeline().frames.isEmpty()) {
-            iconPanel.setImg(null, new ArrayList<DepthState>(),new ArrayList<Shape>());
+            iconPanel.setImg(null, new ArrayList<DepthState>(), new ArrayList<Shape>());
             return;
         }
         frame = 0;
@@ -387,7 +384,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         timelined = null;
         loaded = true;
         stillFrame = true;
-        iconPanel.setImg(image,new ArrayList<DepthState>(),new ArrayList<Shape>());
+        iconPanel.setImg(image, new ArrayList<DepthState>(), new ArrayList<Shape>());
     }
 
     @Override
@@ -449,50 +446,50 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 int height = rect.getHeight();
                 double scale = 1.0;
                 /*if (width > swf.displayRect.getWidth() || height > swf.displayRect.getHeight()) {
-                    //scale = (double) swf.displayRect.getWidth() / (double) width;
-                     //width = swf.displayRect.getWidth();
+                 //scale = (double) swf.displayRect.getWidth() / (double) width;
+                 //width = swf.displayRect.getWidth();
 
-                    int w1 = width;
-                    int h1 = height;
-                    int w2 = swf.displayRect.getWidth();
-                    int h2 = swf.displayRect.getHeight();
+                 int w1 = width;
+                 int h1 = height;
+                 int w2 = swf.displayRect.getWidth();
+                 int h2 = swf.displayRect.getHeight();
 
-                    int w;
-                    int h = h1 * w2 / w1;
-                    if (h > h2) {
-                        w = w1 * h2 / h1;
-                        h = h2;
-                    } else {
-                        w = w2;
-                    }
-                    scale = (double) w / (double) width;
+                 int w;
+                 int h = h1 * w2 / w1;
+                 if (h > h2) {
+                 w = w1 * h2 / h1;
+                 h = h2;
+                 } else {
+                 w = w2;
+                 }
+                 scale = (double) w / (double) width;
 
-                    width = w;
-                    height = h;
-                }*/
+                 width = w;
+                 height = h;
+                 }*/
                 SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
                         (int) (height / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
                 image.fillTransparent();
                 Matrix m = new Matrix();
                 m.translate(-rect.Xmin, -rect.Ymin);
                 /*m.translate(-rect.getWidth(), -rect.getHeight());
-                m.scale(scale);
-                m.translate(rect.getWidth()*scale, rect.getHeight()*scale);*/
+                 m.scale(scale);
+                 m.translate(rect.getWidth()*scale, rect.getHeight()*scale);*/
                 drawable.getTimeline().toImage(frame, frame, stateUnderCursor, mouseButton, image, m, new ColorTransform());
 
-                 Graphics2D gg = (Graphics2D)image.getGraphics();
-                 gg.setStroke(new BasicStroke(3));
-                 gg.setPaint(Color.green);
-                 gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
-                 List<DepthState> dss=new ArrayList<>();
-                 List<Shape> os=new ArrayList<>();
-                 /*drawable.getTimeline().getObjectsOutlines(frame, frame, stateUnderCursor, mouseButton, m, dss, os);
+                Graphics2D gg = (Graphics2D) image.getGraphics();
+                gg.setStroke(new BasicStroke(3));
+                gg.setPaint(Color.green);
+                gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
+                List<DepthState> dss = new ArrayList<>();
+                List<Shape> os = new ArrayList<>();
+                /*drawable.getTimeline().getObjectsOutlines(frame, frame, stateUnderCursor, mouseButton, m, dss, os);
                  
                  //gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
                  for(Shape s:os){
-                   gg.draw(SHAPERECORD.twipToPixelShape(s));
+                 gg.draw(SHAPERECORD.twipToPixelShape(s));
                  }*/
-                 
+
                 img = image;
             } else if (drawable instanceof FontTag) {
                 // only DefineFont tags
@@ -517,34 +514,40 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             CharacterTag c = swf.characters.get(sndId);
             if (c instanceof SoundTag) {
                 SoundTag st = (SoundTag) c;
-                final SoundTagPlayer sp = new SoundTagPlayer(st, 1);
-                synchronized (ImagePanel.class) {
-                    soundPlayers.add(sp);
-                }
-                sp.addListener(new PlayerListener() {
+                final SoundTagPlayer sp;
+                try {
+                    sp = new SoundTagPlayer(st, 1);
 
-                    @Override
-                    public void playingFinished() {
-                        synchronized (ImagePanel.class) {
-                            soundPlayers.remove(sp);
-                        }
+                    synchronized (ImagePanel.class) {
+                        soundPlayers.add(sp);
                     }
-                });
-                sp.play();
+                    sp.addListener(new PlayerListener() {
+
+                        @Override
+                        public void playingFinished() {
+                            synchronized (ImagePanel.class) {
+                                soundPlayers.remove(sp);
+                            }
+                        }
+                    });
+                    sp.play();
+                } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
+                    Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, "Error during playing sound", ex);
+                }
 
             }
         }
         Matrix m = new Matrix();
-       RECT rect= timelined.getTimeline().displayRect;
-            m.translate(-rect.Xmin, -rect.Ymin);
-            m.scale(1);
-            List<DepthState> objs = new ArrayList<>();
-            List<Shape> outlines=new ArrayList<>();
-            timelined.getTimeline().getObjectsOutlines(frame, frame, stateUnderCursor, mouseButton, m, objs, outlines);
-            for(int i=0;i<outlines.size();i++){
-                outlines.set(i, SHAPERECORD.twipToPixelShape(outlines.get(i)));
-            }
-        iconPanel.setImg(new SerializableImage(img),objs,outlines);
+        RECT rect = timelined.getTimeline().displayRect;
+        m.translate(-rect.Xmin, -rect.Ymin);
+        m.scale(1);
+        List<DepthState> objs = new ArrayList<>();
+        List<Shape> outlines = new ArrayList<>();
+        timelined.getTimeline().getObjectsOutlines(frame, frame, stateUnderCursor, mouseButton, m, objs, outlines);
+        for (int i = 0; i < outlines.size(); i++) {
+            outlines.set(i, SHAPERECORD.twipToPixelShape(outlines.get(i)));
+        }
+        iconPanel.setImg(new SerializableImage(img), objs, outlines);
     }
 
     public void stop() {

@@ -16,20 +16,12 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
-import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
-import com.jpexs.decompiler.flash.tags.base.ButtonTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
-import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
-import java.awt.Point;
 import java.awt.Shape;
-import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 import java.util.TreeMap;
 
 /**

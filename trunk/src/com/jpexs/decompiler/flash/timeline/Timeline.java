@@ -206,8 +206,8 @@ public class Timeline {
         }
         return ret;
     }
-    
-    public void getObjectsOutlines(int frame, int ratio,DepthState stateUnderCursor, int mouseButton, Matrix transformation,List<DepthState> objs,List<Shape> outlines){
+
+    public void getObjectsOutlines(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation, List<DepthState> objs, List<Shape> outlines) {
         Frame fr = this.frames.get(frame);
         Stack<Clip> clips = new Stack<>();
         for (int d = this.getMaxDepth(); d >= 0; d--) {
@@ -234,8 +234,8 @@ public class Timeline {
                 m = m.preConcatenate(transformation);
 
                 int dframe = 0;
-                if(c instanceof Timelined){
-                    dframe = ds.time % ((Timelined) c).getTimeline().frames.size();                
+                if (c instanceof Timelined) {
+                    dframe = ds.time % ((Timelined) c).getTimeline().frames.size();
                     if (c instanceof ButtonTag) {
                         ButtonTag bt = (ButtonTag) c;
                         dframe = ButtonTag.FRAME_UP;
@@ -249,7 +249,7 @@ public class Timeline {
                     }
                 }
                 Shape cshape = ((DrawableTag) c).getOutline(dframe, ds.ratio, stateUnderCursor, mouseButton, m);
-                
+
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {
                     Area a = new Area(new Rectangle(displayRect.Xmin, displayRect.Ymin, displayRect.getWidth(), displayRect.getHeight()));
@@ -261,10 +261,10 @@ public class Timeline {
                     clips.push(clip);
                 } else {
                     objs.add(ds);
-                    outlines.add(addArea);                    
+                    outlines.add(addArea);
                 }
-                if(c instanceof Timelined){
-                    ((Timelined)c).getTimeline().getObjectsOutlines(dframe, ds.ratio, stateUnderCursor, mouseButton, m, objs, outlines);
+                if (c instanceof Timelined) {
+                    ((Timelined) c).getTimeline().getObjectsOutlines(dframe, ds.ratio, stateUnderCursor, mouseButton, m, objs, outlines);
                 }
             }
         }
@@ -298,8 +298,8 @@ public class Timeline {
                 m = m.preConcatenate(transformation);
 
                 int dframe = 0;
-                if(c instanceof Timelined){
-                    dframe = ds.time % ((Timelined) c).getTimeline().frames.size();                
+                if (c instanceof Timelined) {
+                    dframe = ds.time % ((Timelined) c).getTimeline().frames.size();
                     if (c instanceof ButtonTag) {
                         ButtonTag bt = (ButtonTag) c;
                         dframe = ButtonTag.FRAME_UP;
@@ -313,7 +313,7 @@ public class Timeline {
                     }
                 }
                 Shape cshape = ((DrawableTag) c).getOutline(dframe, ds.ratio, stateUnderCursor, mouseButton, m);
-                
+
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {
                     Area a = new Area(new Rectangle(displayRect.Xmin, displayRect.Ymin, displayRect.getWidth(), displayRect.getHeight()));

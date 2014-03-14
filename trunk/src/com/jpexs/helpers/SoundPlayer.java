@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.helpers.sound;
+package com.jpexs.helpers;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.Line;
@@ -33,51 +31,29 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  *
  * @author JPEXS
  */
-public class WavPlayer extends SoundPlayer {
+public class SoundPlayer {
 
     private Clip clip;
-    private boolean complete = false;
-    private long startPos = 0;
 
-    public WavPlayer(InputStream is) {
-        super(is);
-        try {
-            clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
-        } catch (LineUnavailableException ex) {
-            Logger.getLogger(WavPlayer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (clip == null) {
-            return;
-        }
-        try {
-            clip.open(AudioSystem.getAudioInputStream(new BufferedInputStream(is)));
-        } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
-            Logger.getLogger(WavPlayer.class.getName()).log(Level.SEVERE, "Error opening", ex);
-            clip = null;
-        }
+    public SoundPlayer(InputStream is) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+        clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
+        clip.open(AudioSystem.getAudioInputStream(new BufferedInputStream(is)));
     }
 
-    @Override
     public long samplesCount() {
         return clip.getMicrosecondLength();
     }
 
-    @Override
     public void play() {
-        if (clip == null) {
-            return;
-        }
-        clip.setMicrosecondPosition(startPos);//startPos);  
-        final WavPlayer t = this;
+
+        final SoundPlayer t = this;
         clip.addLineListener(new LineListener() {
 
             @Override
             public void update(LineEvent event) {
                 if (event.getType() == LineEvent.Type.STOP) {
-                    complete = true;
-                    startPos = 0;
-                    clip.close();
+                    //clip.close();
+
                     synchronized (t) {
                         t.notifyAll();
                     }
@@ -94,29 +70,31 @@ public class WavPlayer extends SoundPlayer {
         }
     }
 
-    @Override
     public long getSamplePosition() {
         return clip.getMicrosecondPosition();
     }
 
-    @Override
-    public void skip(long frames) {
-        startPos = getSamplePosition() + frames;
+    public void setPosition(long frames) {
+        clip.setMicrosecondPosition(frames);
     }
 
-    @Override
     public void stop() {
         clip.stop();
     }
 
-    @Override
     public boolean isPlaying() {
-        return !complete;
+        return clip.isActive();
+    }
+
+    public long getFrameRate() {
+        return 1000000L;
     }
 
     @Override
-    public long getFrameRate() {
-        return 1000000L;
+    protected void finalize() throws Throwable {
+        if (clip != null) {
+            clip.close();
+        }
     }
 
 }

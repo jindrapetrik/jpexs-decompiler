@@ -154,7 +154,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
@@ -176,6 +175,8 @@ import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -2705,11 +2706,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             previewImagePanel.setTimelined(timelined, swf, fn.getFrame() - 1);
         } else if (((tagObj instanceof SoundTag) && mainMenu.isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             showCard(CARDDRAWPREVIEWPANEL);
-            previewImagePanel.setImage(new SerializableImage(1, 1, BufferedImage.TYPE_INT_ARGB));
-
-            soundThread = new SoundTagPlayer((SoundTag) tagObj, Integer.MAX_VALUE);
-            imagePlayControls.setMedia(soundThread);
-            soundThread.play();
+            previewImagePanel.setImage(new SerializableImage(View.loadImage("sound32")));
+            try {
+                soundThread = new SoundTagPlayer((SoundTag) tagObj, Integer.MAX_VALUE);
+                imagePlayControls.setMedia(soundThread);
+                soundThread.play();
+            } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
         } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag) || (tagObj instanceof SoundStreamHeadTypeTag)) {
             ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);

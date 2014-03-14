@@ -18,13 +18,17 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
-import com.jpexs.helpers.sound.SoundPlayer;
-import com.jpexs.helpers.sound.WavPlayer;
+import com.jpexs.helpers.SoundPlayer;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  *
@@ -36,9 +40,7 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private Thread thr;
     private int actualPos = 0;
-    private boolean playing = false;
     private SoundTag tag;
-    private byte data[];
     private List<PlayerListener> listeners = new ArrayList<>();
 
     public void addListener(PlayerListener l) {
@@ -55,39 +57,39 @@ public class SoundTagPlayer implements MediaDisplay {
         }
     }
 
-    private static final int FRAME_DIVISOR = 1024;
+    private static final int FRAME_DIVISOR = 8000;
 
     private int loops;
+    private boolean paused = true;
+    private Object myLock = new Object();
+    private final Object playLock = new Object();
 
-    public SoundTagPlayer(SoundTag tag, int loops) {
+    public SoundTagPlayer(SoundTag tag, int loops) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
         this.tag = tag;
         this.loops = loops;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteArrayInputStream bais = new ByteArrayInputStream(tag.getRawSoundData());
         tag.getSoundFormat().createWav(bais, baos);
-        this.data = baos.toByteArray();
+        player = new SoundPlayer(new ByteArrayInputStream(baos.toByteArray()));
     }
 
     @Override
     public synchronized int getCurrentFrame() {
-        if (player == null) {
-            return 0;
-        }
 
-        if (!playing) {
+        if (!isPlaying()) {
             return actualPos;
         }
 
-        actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
+        synchronized (playLock) {
+            actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
+        }
         return actualPos;
     }
 
     @Override
     public synchronized int getTotalFrames() {
         //System.out.println("getTotalFrames");
-        if (player == null) {
-            return 0;
-        }
+
         int ret = (int) (player.samplesCount() / FRAME_DIVISOR);
 
         //System.out.println("/getTotalFrames");
@@ -96,39 +98,70 @@ public class SoundTagPlayer implements MediaDisplay {
 
     @Override
     public synchronized void pause() {
-        if (!playing) {
+        if (!isPlaying()) {
+            paused = true;
             return;
         }
-        playing = false;
-        actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
-        player.stop();
+
+        synchronized (playLock) {
+            actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
+            paused = true;
+            player.stop();
+            try {
+                playLock.wait();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
     }
 
     public void play(boolean async) {
-        if (player != null) {
-            player.stop();
-        }
 
-        player = new WavPlayer(new ByteArrayInputStream(data));
-        final int startPos = actualPos * FRAME_DIVISOR;
+        synchronized (playLock) {
+            if (!paused) {
+                paused = true;
+                player.stop();
+                try {
+                    playLock.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        ;
         Runnable r = new Runnable() {
 
             @Override
             public void run() {
-                player.skip(startPos);
-                player.play();
-                fireFinished();
-                if (loops > 0) {
-                    loops--;
+                int startPos = 0;
+                synchronized (playLock) {
+                    startPos = actualPos * FRAME_DIVISOR;
+                    paused = false;
                 }
-                if (playing && loops > 0) {
+                player.setPosition(startPos);
+                player.play();
+
+                boolean playAgain = false;
+                synchronized (playLock) {
+                    playAgain = !paused;
+                    paused = true;
+                    if (loops > 0) {
+                        loops--;
+                    }
+                }
+                if (playAgain && loops > 0) {
                     gotoFrame(0);
-                    play();
+                    run();
+                    return;
+                } else {
+                    fireFinished();
+                }
+                synchronized (playLock) {
+                    playLock.notifyAll();
                 }
             }
         };
-        playing = true;
         if (async) {
             thr = new Thread(r);
             thr.start();
@@ -145,21 +178,20 @@ public class SoundTagPlayer implements MediaDisplay {
 
     @Override
     public void rewind() {
-        actualPos = 0;
+        gotoFrame(0);
     }
 
     @Override
     public boolean isPlaying() {
-        return playing;
+        return player.isPlaying();
     }
 
     @Override
     public synchronized void gotoFrame(int frame) {
-        if (playing) {
-            playing = false;
-            player.stop();
+        pause();
+        synchronized (playLock) {
+            actualPos = frame;
         }
-        actualPos = frame;
     }
 
     @Override

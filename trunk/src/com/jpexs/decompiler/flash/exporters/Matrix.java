@@ -102,12 +102,11 @@ public class Matrix {
     public Point transform(Point point) {
         return transform(point.x, point.y);
     }
-    
+
     public java.awt.Point transform(java.awt.Point point) {
-        Point p= transform(point.x, point.y);
-        return new java.awt.Point((int)p.x,(int)p.y);
+        Point p = transform(point.x, point.y);
+        return new java.awt.Point((int) p.x, (int) p.y);
     }
-    
 
     public ExportRectangle transform(ExportRectangle rect) {
         double minX = Double.MAX_VALUE;

@@ -26,7 +26,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.TexturePaint;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -222,9 +221,13 @@ public class View {
      * @param name Name of the image
      * @return loaded Image
      */
-    public static Image loadImage(String name) {
+    public static BufferedImage loadImage(String name) {
         java.net.URL imageURL = View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + name + ".png");
-        return Toolkit.getDefaultToolkit().createImage(imageURL);
+        try {
+            return ImageIO.read(imageURL);
+        } catch (IOException ex) {
+            return null;
+        }
     }
 
     /**
