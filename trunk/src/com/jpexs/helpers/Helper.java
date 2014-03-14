@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -772,7 +773,7 @@ public class Helper {
     public static void appendTimeoutComment(GraphTextWriter writer, int timeout) {
         writer.appendNoHilight("/*").newLine();
         writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
-        writer.appendNoHilight(" * ").appendNoHilight(String.format(AppStrings.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(MessageFormat.format(AppStrings.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
         writer.appendNoHilight(" */").newLine();
         writer.appendNoHilight("throw new IllegalOperationError(\"").
                 appendNoHilight(AppStrings.translate("decompilationError.timeout.description")).
