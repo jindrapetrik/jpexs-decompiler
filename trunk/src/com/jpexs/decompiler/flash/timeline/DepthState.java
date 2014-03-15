@@ -17,16 +17,11 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.exporters.Matrix;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
-import com.jpexs.helpers.SerializableImage;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 

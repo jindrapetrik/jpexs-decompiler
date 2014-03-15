@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.treenodes.TreeNode;
 public class TagTreeRoot extends TreeNode {
 
     public static final String FOLDER_ROOT = "root";
-    
+
     public TagTreeRoot() {
         super(new StringItem("root", FOLDER_ROOT, null));
     }

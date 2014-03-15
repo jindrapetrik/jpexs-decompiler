@@ -36,12 +36,12 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public class SoundTagPlayer implements MediaDisplay {
 
-    private SoundPlayer player;
+    private final SoundPlayer player;
 
     private Thread thr;
     private int actualPos = 0;
-    private SoundTag tag;
-    private List<PlayerListener> listeners = new ArrayList<>();
+    private final SoundTag tag;
+    private final List<PlayerListener> listeners = new ArrayList<>();
 
     public void addListener(PlayerListener l) {
         listeners.add(l);
@@ -61,7 +61,7 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private int loops;
     private boolean paused = true;
-    private Object myLock = new Object();
+    private final Object myLock = new Object();
     private final Object playLock = new Object();
 
     public SoundTagPlayer(SoundTag tag, int loops) throws LineUnavailableException, IOException, UnsupportedAudioFileException {

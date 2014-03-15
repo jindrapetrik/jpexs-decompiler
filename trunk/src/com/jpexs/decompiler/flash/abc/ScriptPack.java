@@ -150,7 +150,7 @@ public class ScriptPack implements TreeElementItem {
 
     public void toSource(GraphTextWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
         writer.suspendMeasure();
-            int timeout = Configuration.decompilationTimeoutFile.get();
+        int timeout = Configuration.decompilationTimeoutFile.get();
         try {
             CancellableWorker.call(new Callable<Void>() {
                 @Override

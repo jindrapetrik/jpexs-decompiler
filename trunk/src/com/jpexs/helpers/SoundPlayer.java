@@ -33,7 +33,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public class SoundPlayer {
 
-    private Clip clip;
+    private final Clip clip;
 
     public SoundPlayer(InputStream is) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
         clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));

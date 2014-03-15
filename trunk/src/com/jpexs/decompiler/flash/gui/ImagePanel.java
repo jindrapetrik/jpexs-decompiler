@@ -83,8 +83,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     private JLabel debugLabel = new JLabel("-");
     private DepthState stateUnderCursor = null;
     private MouseEvent lastMouseEvent = null;
-    private List<SoundTagPlayer> soundPlayers = new ArrayList<>();
-    private IconPanel iconPanel;
+    private final List<SoundTagPlayer> soundPlayers = new ArrayList<>();
+    private final IconPanel iconPanel;
     private int time = 0;
 
     private class IconPanel extends JPanel {
@@ -424,7 +424,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     private void nextFrame() {
         int newframe = frame == timelined.getTimeline().frames.size() - 1 ? 0 : frame + 1;
-        if(stillFrame){
+        if (stillFrame) {
             newframe = frame;
         }
         if (newframe != frame) {
@@ -433,15 +433,15 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             }
             frame = newframe;
             updatePos(lastMouseEvent);
-            time = 0;            
-        }else{
+            time = 0;
+        } else {
             time++;
         }
         drawFrame();
     }
 
-    private static SerializableImage getFrame(SWF swf, int frame,int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton) {
-        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode())+"_"+time;
+    private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton) {
+        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode()) + "_" + time;
         SerializableImage img = SWF.getFromCache(key);
         if (img == null) {
             if (drawable instanceof BoundedTag) {
@@ -491,8 +491,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
-        BufferedImage img = getFrame(swf, frame,time, timelined, stateUnderCursor, mouseButton).getBufferedImage();
-        List<Integer> sounds = timelined.getTimeline().getSounds(frame,time, stateUnderCursor, mouseButton);
+        BufferedImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton).getBufferedImage();
+        List<Integer> sounds = timelined.getTimeline().getSounds(frame, time, stateUnderCursor, mouseButton);
         for (int sndId : sounds) {
             CharacterTag c = swf.characters.get(sndId);
             if (c instanceof SoundTag) {
@@ -543,7 +543,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     @Override
     public void play() {
         pause();
-        if (timelined!=null) {
+        if (timelined != null) {
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override

@@ -284,10 +284,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public TreeNode oldNode;
     public TreeItem oldTag;
     private File tempFile;
-    private PlayerControls imagePlayControls;
+    private final PlayerControls imagePlayControls;
 
-    private JPanel repPanel;
-    private JPanel repPanel2;
+    private final JPanel repPanel;
+    private final JPanel repPanel2;
 
     private SoundTagPlayer soundThread = null;
 
@@ -977,8 +977,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void load(SWFList newSwfs, boolean first) {
 
-        swfPreviewPanel.stop();
-        imagePanel.stop();
+        stopImagePanels();
 
         swfs.add(newSwfs);
 
@@ -1107,6 +1106,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         genericTagPanel.clear();
         updateUi();
         refreshTree();
+    }
+
+    private void stopImagePanels() {
+        imagePanel.stop();
+        previewImagePanel.stop();
+        swfPreviewPanel.stop();
     }
 
     public void enableDrop(boolean value) {
@@ -2170,8 +2175,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void refreshTree() {
-        swfPreviewPanel.stop();
-        imagePanel.stop();
+        stopImagePanels();
         showCard(CARDEMPTYPANEL);
         View.refreshTree(tagTree, new TagTreeModel(mainFrame, swfs));
         setTreeItem(oldTag);
@@ -2546,8 +2550,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (flashPanel != null) {
             flashPanel.specialPlayback = false;
         }
-        swfPreviewPanel.stop();
-        imagePanel.stop();
+        stopImagePanels();
         if (soundThread != null) {
             soundThread.pause();
         }
@@ -2697,11 +2700,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             int totalFrameCount = swf.frameCount;
             Timelined timelined = swf;
             if (fn.getParent() instanceof DefineSpriteTag) {
-                controlTags = ((DefineSpriteTag) fn.getParent()).subTags;
-                containerId = ((DefineSpriteTag) fn.getParent()).spriteId;
-                rect = ((DefineSpriteTag) fn.getParent()).getRect();
-                totalFrameCount = ((DefineSpriteTag) fn.getParent()).frameCount;
-                timelined = ((DefineSpriteTag) fn.getParent());
+                DefineSpriteTag parentSprite = (DefineSpriteTag) fn.getParent();
+                controlTags = parentSprite.subTags;
+                containerId = parentSprite.spriteId;
+                rect = parentSprite.getRect();
+                totalFrameCount = parentSprite.frameCount;
+                timelined = parentSprite;
             }
             previewImagePanel.setTimelined(timelined, swf, fn.getFrame() - 1);
         } else if (((tagObj instanceof SoundTag) && mainMenu.isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {

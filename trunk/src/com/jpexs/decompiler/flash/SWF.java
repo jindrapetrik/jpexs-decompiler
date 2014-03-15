@@ -2211,7 +2211,7 @@ public final class SWF implements TreeItem, Timelined {
         image.fillTransparent();
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
-        frameToImage(timeline, frame,time, stateUnderCursor, mouseButton, image, m, colorTransform);
+        frameToImage(timeline, frame, time, stateUnderCursor, mouseButton, image, m, colorTransform);
         putToCache(key, image);
         return image;
     }
@@ -2224,7 +2224,7 @@ public final class SWF implements TreeItem, Timelined {
             image.fillTransparent();
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
-            frameToImage(timeline, f,0, stateUnderCursor, mouseButton, image, m, colorTransform);
+            frameToImage(timeline, f, 0, stateUnderCursor, mouseButton, image, m, colorTransform);
             ret.add(image);
         }
     }
@@ -2290,7 +2290,7 @@ public final class SWF implements TreeItem, Timelined {
                 DrawableTag drawable = (DrawableTag) character;
                 SerializableImage img;
                 Matrix drawMatrix = new Matrix();
-                int dframe = 0 + (time+layer.time) % drawable.getNumFrames();
+                int dframe = 0 + (time + layer.time) % drawable.getNumFrames();
                 if (character instanceof ButtonTag) {
                     ButtonTag bt = (ButtonTag) character;
                     dframe = ButtonTag.FRAME_UP;

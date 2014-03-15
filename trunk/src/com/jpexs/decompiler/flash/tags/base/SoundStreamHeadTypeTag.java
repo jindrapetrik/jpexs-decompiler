@@ -25,6 +25,7 @@ import java.util.List;
  */
 public interface SoundStreamHeadTypeTag extends SoundTag {
 
+    @Override
     public boolean getSoundSize();
 
     public long getSoundSampleCount();

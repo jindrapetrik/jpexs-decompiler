@@ -179,7 +179,7 @@ public class Timeline {
 
     }
 
-    public List<Integer> getSounds(int frame,int time, DepthState stateUnderCursor, int mouseButton) {
+    public List<Integer> getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton) {
         List<Integer> ret = new ArrayList<>();
         Frame fr = this.frames.get(frame);
         ret.addAll(fr.sounds);
@@ -188,7 +188,7 @@ public class Timeline {
             if (ds != null) {
                 CharacterTag c = swf.characters.get(ds.characterId);
                 if (c instanceof Timelined) {
-                    int dframe = (time+ds.time) % ((Timelined) c).getTimeline().frames.size();
+                    int dframe = (time + ds.time) % ((Timelined) c).getTimeline().frames.size();
                     if (c instanceof ButtonTag) {
                         ButtonTag bt = (ButtonTag) c;
                         dframe = ButtonTag.FRAME_UP;
@@ -200,7 +200,7 @@ public class Timeline {
                             }
                         }
                     }
-                    ret.addAll(((Timelined) c).getTimeline().getSounds(dframe,time+ds.time, stateUnderCursor, mouseButton));
+                    ret.addAll(((Timelined) c).getTimeline().getSounds(dframe, time + ds.time, stateUnderCursor, mouseButton));
                 }
             }
         }
@@ -248,7 +248,7 @@ public class Timeline {
                         }
                     }
                 }
-                Shape cshape = ((DrawableTag) c).getOutline(dframe, ds.time+time, ds.ratio, stateUnderCursor, mouseButton, m);
+                Shape cshape = ((DrawableTag) c).getOutline(dframe, ds.time + time, ds.ratio, stateUnderCursor, mouseButton, m);
 
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {
@@ -264,7 +264,7 @@ public class Timeline {
                     outlines.add(addArea);
                 }
                 if (c instanceof Timelined) {
-                    ((Timelined) c).getTimeline().getObjectsOutlines(dframe,time+ds.time,ds.ratio, stateUnderCursor, mouseButton, m, objs, outlines);
+                    ((Timelined) c).getTimeline().getObjectsOutlines(dframe, time + ds.time, ds.ratio, stateUnderCursor, mouseButton, m, objs, outlines);
                 }
             }
         }
@@ -299,7 +299,7 @@ public class Timeline {
 
                 int dframe = 0;
                 if (c instanceof Timelined) {
-                    dframe = (time+ds.time) % ((Timelined) c).getTimeline().frames.size();
+                    dframe = (time + ds.time) % ((Timelined) c).getTimeline().frames.size();
                     if (c instanceof ButtonTag) {
                         ButtonTag bt = (ButtonTag) c;
                         dframe = ButtonTag.FRAME_UP;
@@ -312,7 +312,7 @@ public class Timeline {
                         }
                     }
                 }
-                Shape cshape = ((DrawableTag) c).getOutline(dframe, time+ds.time,ds.ratio, stateUnderCursor, mouseButton, m);
+                Shape cshape = ((DrawableTag) c).getOutline(dframe, time + ds.time, ds.ratio, stateUnderCursor, mouseButton, m);
 
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {

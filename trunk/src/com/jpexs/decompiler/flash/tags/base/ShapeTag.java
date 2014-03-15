@@ -46,6 +46,7 @@ public abstract class ShapeTag extends CharacterTag implements BoundedTag, Drawa
         return transformation.toTransform().createTransformedShape(getShapes().getOutline());
     }
 
+    @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter.exportTo(swf, getShapes(), null, image, transformation, colorTransform);
     }

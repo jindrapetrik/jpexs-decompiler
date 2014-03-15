@@ -269,7 +269,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
 
     @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        SWF.frameToImage(getTimeline(), frame,time, stateUnderCursor, mouseButton, image, transformation, colorTransform);
+        SWF.frameToImage(getTimeline(), frame, time, stateUnderCursor, mouseButton, image, transformation, colorTransform);
     }
 
     @Override
@@ -284,6 +284,6 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
-        return getTimeline().getOutline(frame,time, ratio, stateUnderCursor, mouseButton, transformation);
+        return getTimeline().getOutline(frame, time, ratio, stateUnderCursor, mouseButton, transformation);
     }
 }

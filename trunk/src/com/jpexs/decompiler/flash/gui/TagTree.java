@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
-import com.jpexs.decompiler.flash.gui.treenodes.StringNode;
 import com.jpexs.decompiler.flash.gui.treenodes.TagTreeRoot;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -99,18 +98,18 @@ public class TagTree extends JTree {
                 if (type == TreeNodeType.FOLDER && expanded) {
                     type = TreeNodeType.FOLDER_OPEN;
                 }
-                String itemName=type.toString();
-                if(type == TreeNodeType.FOLDER || type==TreeNodeType.FOLDER_OPEN){
-                    if(val instanceof StringItem){
-                        StringItem si=(StringItem)val;
-                        if(!TagTreeRoot.FOLDER_ROOT.equals(si.getName())){
-                            itemName="folder"+si.getName();
+                String itemName = type.toString();
+                if (type == TreeNodeType.FOLDER || type == TreeNodeType.FOLDER_OPEN) {
+                    if (val instanceof StringItem) {
+                        StringItem si = (StringItem) val;
+                        if (!TagTreeRoot.FOLDER_ROOT.equals(si.getName())) {
+                            itemName = "folder" + si.getName();
                         }
                     }
                 }
                 String tagTypeStr = itemName.toLowerCase().replace("_", "");
                 setIcon(View.getIcon(tagTypeStr + "16"));
-            } 
+            }
 
             Font font = getFont();
             boolean isModified = false;
@@ -245,42 +244,41 @@ public class TagTree extends JTree {
         if (t instanceof Tag) {
             return TreeNodeType.OTHER_TAG;
         }
-        
-        /*if(t instanceof StringNode){
-            StringNode sn=(StringNode)t;
-            String name = sn.getItem().getName();
-            if(name!=null){
-                switch(name){
-                    case TagTreeModel.FOLDER_BINARY_DATA:
-                        break;
-                    case TagTreeModel.FOLDER_BUTTONS:
-                        break;
-                    case TagTreeModel.FOLDER_FONTS:
-                        break;
-                    case TagTreeModel.FOLDER_FRAMES:
-                        break;
-                    case TagTreeModel.FOLDER_IMAGES:
-                        break;
-                    case TagTreeModel.FOLDER_MORPHSHAPES:
-                        break;
-                    case TagTreeModel.FOLDER_MOVIES:
-                        break;
-                    case TagTreeModel.FOLDER_OTHERS:
-                        break;
-                    case TagTreeModel.FOLDER_SCRIPTS:
-                        break;
-                    case TagTreeModel.FOLDER_SHAPES:
-                        break;
-                    case TagTreeModel.FOLDER_SOUNDS:
-                        break;
-                    case TagTreeModel.FOLDER_SPRITES:
-                        break;
-                    case TagTreeModel.FOLDER_TEXTS:
-                        break;
-                }
-            }
-        }*/
 
+        /*if(t instanceof StringNode){
+         StringNode sn=(StringNode)t;
+         String name = sn.getItem().getName();
+         if(name!=null){
+         switch(name){
+         case TagTreeModel.FOLDER_BINARY_DATA:
+         break;
+         case TagTreeModel.FOLDER_BUTTONS:
+         break;
+         case TagTreeModel.FOLDER_FONTS:
+         break;
+         case TagTreeModel.FOLDER_FRAMES:
+         break;
+         case TagTreeModel.FOLDER_IMAGES:
+         break;
+         case TagTreeModel.FOLDER_MORPHSHAPES:
+         break;
+         case TagTreeModel.FOLDER_MOVIES:
+         break;
+         case TagTreeModel.FOLDER_OTHERS:
+         break;
+         case TagTreeModel.FOLDER_SCRIPTS:
+         break;
+         case TagTreeModel.FOLDER_SHAPES:
+         break;
+         case TagTreeModel.FOLDER_SOUNDS:
+         break;
+         case TagTreeModel.FOLDER_SPRITES:
+         break;
+         case TagTreeModel.FOLDER_TEXTS:
+         break;
+         }
+         }
+         }*/
         return TreeNodeType.FOLDER;
     }
 
