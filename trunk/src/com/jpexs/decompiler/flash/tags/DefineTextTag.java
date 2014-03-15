@@ -504,7 +504,7 @@ public class DefineTextTag extends TextTag {
     }
 
     @Override
-    public void toImage(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         staticTextToImage(swf, textRecords, 1, image, getTextMatrix(), transformation, colorTransform);
     }
 

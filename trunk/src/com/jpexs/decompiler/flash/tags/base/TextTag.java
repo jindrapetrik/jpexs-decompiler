@@ -302,7 +302,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
     }
 
     @Override
-    public Shape getOutline(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+    public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
         RECT r = getBounds();
         return new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()); //TODO: match character shapes
     }

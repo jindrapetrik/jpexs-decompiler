@@ -257,7 +257,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, BoundedT
     }
 
     @Override
-    public void toImage(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         Graphics2D g = (Graphics2D) image.getGraphics();
         g.setComposite(AlphaComposite.SrcOver);
         g.drawImage(toImage(0, 0, new Matrix(), colorTransform).getBufferedImage(), transformation.toTransform(), null);
@@ -274,7 +274,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, BoundedT
     }
 
     @Override
-    public Shape getOutline(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+    public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
         RECT r = getRect();
         return new Area(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
     }

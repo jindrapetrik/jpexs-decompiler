@@ -46,13 +46,13 @@ public abstract class ButtonTag extends CharacterTag implements BoundedTag, Draw
     public abstract boolean trackAsMenu();
 
     @Override
-    public Shape getOutline(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
-        return getTimeline().getOutline(frame, ratio, stateUnderCursor, mouseButton, transformation);
+    public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
+        return getTimeline().getOutline(frame, time, ratio, stateUnderCursor, mouseButton, transformation);
     }
 
     @Override
-    public void toImage(int frame, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        SWF.frameToImage(getTimeline(), frame, stateUnderCursor, mouseButton, image, transformation, colorTransform);
+    public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        SWF.frameToImage(getTimeline(), frame, time, stateUnderCursor, mouseButton, image, transformation, colorTransform);
     }
 
 }

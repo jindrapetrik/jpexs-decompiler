@@ -165,7 +165,7 @@ public class PreviewImage extends JPanel {
         } else if (treeItem instanceof FrameNodeItem) {
             FrameNodeItem fn = (FrameNodeItem) treeItem;
             RECT rect = swf.displayRect;
-            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.getFrame() - 1, null, 0, rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
+            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.getFrame() - 1, 0, null, 0, rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
             width = (imgSrc.getWidth());
             height = (imgSrc.getHeight());
         } else if (treeItem instanceof ImageTag) {
@@ -199,12 +199,6 @@ public class PreviewImage extends JPanel {
             scale = 1;
         }
 
-        /*if (width > PREVIEW_SIZE * SWF.unitDivisor) {
-         scale = PREVIEW_SIZE * SWF.unitDivisor / width;
-         }
-         if (height > PREVIEW_SIZE * SWF.unitDivisor) {
-         scale = Math.min(scale, PREVIEW_SIZE * SWF.unitDivisor / height);
-         }*/
         m = m.preConcatenate(Matrix.getScaleInstance(scale));
         width = (int) (scale * width);
         height = (int) (scale * height);
@@ -216,7 +210,7 @@ public class PreviewImage extends JPanel {
         image.fillTransparent();
         if (imgSrc == null) {
             DrawableTag drawable = (DrawableTag) treeItem;
-            drawable.toImage(0, 0, null, 0, image, m, new ColorTransform());
+            drawable.toImage(0, 0, 0, null, 0, image, m, new ColorTransform());
         } else {
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setTransform(m.toTransform());

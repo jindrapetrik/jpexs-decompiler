@@ -80,11 +80,4 @@ public class DepthState {
         }
     }
 
-    public void drawTo(SerializableImage img, Point mousePos, int mouseButton) {
-        CharacterTag c = swf.characters.get(characterId);
-        if (c instanceof DrawableTag) {
-            DrawableTag d = (DrawableTag) c;
-            d.toImage(time, ratio, null, mouseButton, img, new Matrix(matrix), colorTransForm);
-        }
-    }
 }

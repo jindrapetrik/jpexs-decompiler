@@ -2194,7 +2194,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public static SerializableImage frameToImageGet(Timeline timeline, int frame, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform) {
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform) {
         String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode();
         SerializableImage image = getFromCache(key);
         if (image != null) {
@@ -2211,7 +2211,7 @@ public final class SWF implements TreeItem, Timelined {
         image.fillTransparent();
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
-        frameToImage(timeline, frame, stateUnderCursor, mouseButton, image, m, colorTransform);
+        frameToImage(timeline, frame,time, stateUnderCursor, mouseButton, image, m, colorTransform);
         putToCache(key, image);
         return image;
     }
@@ -2224,7 +2224,7 @@ public final class SWF implements TreeItem, Timelined {
             image.fillTransparent();
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
-            frameToImage(timeline, f, stateUnderCursor, mouseButton, image, m, colorTransform);
+            frameToImage(timeline, f,0, stateUnderCursor, mouseButton, image, m, colorTransform);
             ret.add(image);
         }
     }
@@ -2241,7 +2241,7 @@ public final class SWF implements TreeItem, Timelined {
 
     }
 
-    public static void frameToImage(Timeline timeline, int frame, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public static void frameToImage(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         float unzoom = (float) SWF.unitDivisor;
         if (timeline.frames.size() <= frame) {
             return;
@@ -2290,8 +2290,7 @@ public final class SWF implements TreeItem, Timelined {
                 DrawableTag drawable = (DrawableTag) character;
                 SerializableImage img;
                 Matrix drawMatrix = new Matrix();
-                int dframe = 0 + layer.time % drawable.getNumFrames();
-
+                int dframe = 0 + (time+layer.time) % drawable.getNumFrames();
                 if (character instanceof ButtonTag) {
                     ButtonTag bt = (ButtonTag) character;
                     dframe = ButtonTag.FRAME_UP;
@@ -2346,7 +2345,7 @@ public final class SWF implements TreeItem, Timelined {
                     m.translate(-rect.xMin, -rect.yMin);
                     drawMatrix.translate(rect.xMin, rect.yMin);
 
-                    drawable.toImage(dframe, layer.ratio, stateUnderCursor, mouseButton, img, m, clrTrans);
+                    drawable.toImage(dframe, layer.time + time, layer.ratio, stateUnderCursor, mouseButton, img, m, clrTrans);
                     //if(stateUnderCursor == layer){
                   /* if(true){
                      Graphics2D gg = (Graphics2D)img.getGraphics();
