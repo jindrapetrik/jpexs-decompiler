@@ -143,12 +143,14 @@ public class SerializableImage implements Serializable {
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        // out.writeObject(bounds);
-        ImageIO.write(image, "png", out);
+        try{
+            ImageIO.write(image, "png", out);
+        }catch(Exception ex){
+            //ignore
+        }
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        // bounds = (Rectangle2D) in.readObject();
         image = ImageIO.read(in);
     }
 }

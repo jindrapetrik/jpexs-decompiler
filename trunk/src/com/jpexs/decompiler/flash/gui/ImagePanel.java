@@ -95,15 +95,18 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         private List<DepthState> dss;
         private List<Shape> outlines;
 
-        public void setImg(SerializableImage img, List<DepthState> dss, List<Shape> outlines) {
-            this.img = img;
-            this.dss = dss;
+        public synchronized void setOutlines(List<DepthState> dss, List<Shape> outlines) {
             this.outlines = outlines;
+            this.dss = dss;
+        }
+
+        public void setImg(SerializableImage img) {
+            this.img = img;
             calcRect();
             repaint();
         }
 
-        public List<DepthState> getObjectsUnderPoint(Point p) {
+        public synchronized List<DepthState> getObjectsUnderPoint(Point p) {
             List<DepthState> ret = new ArrayList<>();
             for (int i = 0; i < outlines.size(); i++) {
                 if (outlines.get(i).contains(p)) {
@@ -194,65 +197,70 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         iconPanel.removeMouseMotionListener(l);
     }
 
-    private void updatePos(MouseEvent e) {
+    private void updatePos(MouseEvent e, boolean draw) {
         if (e == null) {
             return;
         }
-        lastMouseEvent = e;
-        boolean handCursor = false;
-        DepthState newStateUnderCursor = null;
-        if (timelined != null) {
-            Timeline tim = ((Timelined) timelined).getTimeline();
-            BoundedTag bounded = (BoundedTag) timelined;
-            RECT rect = bounded.getRect();
-            int width = rect.getWidth();
-            double scale = 1.0;
-            /*if (width > swf.displayRect.getWidth()) {
-             scale = (double) swf.displayRect.getWidth() / (double) width;
-             }*/
-            Matrix m = new Matrix();
-            m.translate(-rect.Xmin, -rect.Ymin);
-            m.scale(scale);
-            Point p = e.getPoint();
-            p = iconPanel.toImagePoint(p);
-            int x = p.x;
-            int y = p.y;
-            List<DepthState> objs = new ArrayList<>();
-            objs = iconPanel.getObjectsUnderPoint(p);
-            String ret = "";
+        synchronized (iconPanel) {
+            lastMouseEvent = e;
+            boolean handCursor = false;
+            DepthState newStateUnderCursor = null;
+            if (timelined != null) {
 
-            ret += " [" + x + "," + y + "] : ";
+                Timeline tim = ((Timelined) timelined).getTimeline();
+                BoundedTag bounded = (BoundedTag) timelined;
+                RECT rect = bounded.getRect();
+                int width = rect.getWidth();
+                double scale = 1.0;
+                /*if (width > swf.displayRect.getWidth()) {
+                 scale = (double) swf.displayRect.getWidth() / (double) width;
+                 }*/
+                Matrix m = new Matrix();
+                m.translate(-rect.Xmin, -rect.Ymin);
+                m.scale(scale);
+                Point p = e.getPoint();
+                p = iconPanel.toImagePoint(p);
+                int x = p.x;
+                int y = p.y;
+                List<DepthState> objs = new ArrayList<>();
+                objs = iconPanel.getObjectsUnderPoint(p);
+                String ret = "";
 
-            boolean first = true;
-            for (int i = 0; i < objs.size(); i++) {
-                DepthState ds = objs.get(i);
-                if (!first) {
-                    ret += ", ";
-                }
-                first = false;
-                CharacterTag c = tim.swf.characters.get(ds.characterId);
-                if (c instanceof ButtonTag) {
-                    newStateUnderCursor = ds;
-                    handCursor = true;
-                }
-                ret += c.toString();
-                if (timelined instanceof ButtonTag) {
-                    handCursor = true;
-                }
-            }
-            if (first) {
-                ret += " - ";
-            }
-            debugLabel.setText(ret);
+                ret += " [" + x + "," + y + "] : ";
 
-            if (handCursor) {
-                iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            } else {
-                iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            }
-            if (newStateUnderCursor != stateUnderCursor) {
-                stateUnderCursor = newStateUnderCursor;
-                drawFrame();
+                boolean first = true;
+                for (int i = 0; i < objs.size(); i++) {
+                    DepthState ds = objs.get(i);
+                    if (!first) {
+                        ret += ", ";
+                    }
+                    first = false;
+                    CharacterTag c = tim.swf.characters.get(ds.characterId);
+                    if (c instanceof ButtonTag) {
+                        newStateUnderCursor = ds;
+                        handCursor = true;
+                    }
+                    ret += c.toString();
+                    if (timelined instanceof ButtonTag) {
+                        handCursor = true;
+                    }
+                }
+                if (first) {
+                    ret += " - ";
+                }
+                debugLabel.setText(ret);
+
+                if (handCursor) {
+                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                }
+                if (newStateUnderCursor != stateUnderCursor) {
+                    stateUnderCursor = newStateUnderCursor;
+                    if (draw) {
+                        drawFrame();
+                    }
+                }
             }
         }
     }
@@ -294,14 +302,14 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             @Override
             public void mousePressed(MouseEvent e) {
                 mouseButton = e.getButton();
-                updatePos(e);
+                updatePos(e, true);
                 drawFrame();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 mouseButton = 0;
-                updatePos(e);
+                updatePos(e, true);
                 drawFrame();
             }
 
@@ -310,12 +318,12 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             @Override
             public void mouseMoved(MouseEvent e) {
 
-                updatePos(e);
+                updatePos(e, true);
             }
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                updatePos(e);
+                updatePos(e, true);
             }
 
         });
@@ -347,7 +355,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         timelined = null;
         loaded = true;
         try {
-            iconPanel.setImg(new SerializableImage(ImageIO.read(new ByteArrayInputStream(data))), new ArrayList<DepthState>(), new ArrayList<Shape>());
+            iconPanel.setImg(new SerializableImage(ImageIO.read(new ByteArrayInputStream(data))));
+            iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
         } catch (IOException ex) {
             Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -370,7 +379,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         loaded = true;
 
         if (drawable.getTimeline().frames.isEmpty()) {
-            iconPanel.setImg(null, new ArrayList<DepthState>(), new ArrayList<Shape>());
+            iconPanel.setImg(null);
+            iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
             return;
         }
         frame = 0;
@@ -386,7 +396,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         timelined = null;
         loaded = true;
         stillFrame = true;
-        iconPanel.setImg(image, new ArrayList<DepthState>(), new ArrayList<Shape>());
+        iconPanel.setImg(image);
+        iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
     }
 
     @Override
@@ -432,7 +443,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 stopAllSounds();
             }
             frame = newframe;
-            updatePos(lastMouseEvent);
             time = 0;
         } else {
             time++;
@@ -488,11 +498,24 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (timelined == null) {
             return;
         }
+
+        getOutlines();
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
+        updatePos(lastMouseEvent, false);
         BufferedImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton).getBufferedImage();
-        List<Integer> sounds = timelined.getTimeline().getSounds(frame, time, stateUnderCursor, mouseButton);
+        List<Integer> sounds = new ArrayList<>();
+        List<String> soundClasses = new ArrayList<>();
+        timelined.getTimeline().getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);
+        for (int cid : swf.characters.keySet()) {
+            CharacterTag c = swf.characters.get(cid);
+            for (String cls : soundClasses) {
+                if (cls.equals(c.getClassName())) {
+                    sounds.add(cid);
+                }
+            }
+        }
         for (int sndId : sounds) {
             CharacterTag c = swf.characters.get(sndId);
             if (c instanceof SoundTag) {
@@ -520,17 +543,23 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
             }
         }
+
+        iconPanel.setImg(new SerializableImage(img));
+    }
+
+    private void getOutlines() {
+        List<DepthState> objs = new ArrayList<>();
+        List<Shape> outlines = new ArrayList<>();
         Matrix m = new Matrix();
         RECT rect = timelined.getTimeline().displayRect;
         m.translate(-rect.Xmin, -rect.Ymin);
         m.scale(1);
-        List<DepthState> objs = new ArrayList<>();
-        List<Shape> outlines = new ArrayList<>();
+
         timelined.getTimeline().getObjectsOutlines(frame, time, frame, stateUnderCursor, mouseButton, m, objs, outlines);
         for (int i = 0; i < outlines.size(); i++) {
             outlines.set(i, SHAPERECORD.twipToPixelShape(outlines.get(i)));
         }
-        iconPanel.setImg(new SerializableImage(img), objs, outlines);
+        iconPanel.setOutlines(objs, outlines);
     }
 
     public void stop() {

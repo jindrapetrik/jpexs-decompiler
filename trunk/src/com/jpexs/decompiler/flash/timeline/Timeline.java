@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -83,6 +84,9 @@ public class Timeline {
         for (Tag t : tags) {
             if (t instanceof StartSoundTag) {
                 frame.sounds.add(((StartSoundTag) t).soundId);
+            }
+            if (t instanceof StartSound2Tag) {
+                frame.soundClasses.add(((StartSound2Tag) t).soundClassName);
             }
             if (t instanceof SetBackgroundColorTag) {
                 frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
@@ -179,10 +183,10 @@ public class Timeline {
 
     }
 
-    public List<Integer> getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton) {
-        List<Integer> ret = new ArrayList<>();
+    public void getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton, List<Integer> sounds, List<String> soundClasses) {
         Frame fr = this.frames.get(frame);
-        ret.addAll(fr.sounds);
+        sounds.addAll(fr.sounds);
+        soundClasses.addAll(fr.soundClasses);
         for (int d = this.getMaxDepth(); d >= 0; d--) {
             DepthState ds = fr.layers.get(d);
             if (ds != null) {
@@ -200,11 +204,10 @@ public class Timeline {
                             }
                         }
                     }
-                    ret.addAll(((Timelined) c).getTimeline().getSounds(dframe, time + ds.time, stateUnderCursor, mouseButton));
+                    ((Timelined) c).getTimeline().getSounds(dframe, time + ds.time, stateUnderCursor, mouseButton, sounds, soundClasses);
                 }
             }
         }
-        return ret;
     }
 
     public void getObjectsOutlines(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation, List<DepthState> objs, List<Shape> outlines) {
@@ -238,14 +241,15 @@ public class Timeline {
                     dframe = ds.time % ((Timelined) c).getTimeline().frames.size();
                     if (c instanceof ButtonTag) {
                         ButtonTag bt = (ButtonTag) c;
-                        dframe = ButtonTag.FRAME_UP;
-                        if (stateUnderCursor == ds) {
-                            if (mouseButton > 0) {
-                                dframe = ButtonTag.FRAME_DOWN;
-                            } else {
-                                dframe = ButtonTag.FRAME_OVER;
-                            }
-                        }
+                        dframe = ButtonTag.FRAME_HITTEST;
+                        /*dframe = ButtonTag.FRAME_UP;
+                         if (stateUnderCursor == ds) {
+                         if (mouseButton > 0) {
+                         dframe = ButtonTag.FRAME_DOWN;
+                         } else {
+                         dframe = ButtonTag.FRAME_OVER;
+                         }
+                         }*/
                     }
                 }
                 Shape cshape = ((DrawableTag) c).getOutline(dframe, ds.time + time, ds.ratio, stateUnderCursor, mouseButton, m);

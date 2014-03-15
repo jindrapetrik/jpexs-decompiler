@@ -35,6 +35,7 @@ public class Frame {
     public RGB backgroundColor = new RGBA(0, 0, 0, 0);
     public Timeline timeline;
     public List<Integer> sounds = new ArrayList<>();
+    public List<String> soundClasses = new ArrayList<>();
 
     public Frame(Timeline timeline) {
         this.timeline = timeline;
