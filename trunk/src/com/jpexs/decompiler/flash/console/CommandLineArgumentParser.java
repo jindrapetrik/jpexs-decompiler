@@ -118,6 +118,10 @@ public class CommandLineArgumentParser {
         System.out.println("         script:hex - ActionScript Hex only");
         System.out.println("         text:plain - Plain text format for Texts");
         System.out.println("         text:formatted - Formatted text format for Texts");
+        System.out.println("         sound:mp3_wav_flv - MP3/WAV/FLV format for Sounds");
+        System.out.println("         sound:mp3_wav - MP3/WAV format for Sounds");
+        System.out.println("         sound:wav - WAV format for Sounds");
+        System.out.println("         sound:flv - FLV format for Sounds");
         System.out.println("         fla:<flaversion> or xfl:<flaversion> - Specify FLA format version");
         System.out.println("            - values for <flaversion>: cs5,cs5.5,cs6,cc");
 
@@ -658,7 +662,24 @@ public class CommandLineArgumentParser {
                         break;
                     case "sound":
                         System.out.println("Exporting sounds...");
-                        exfile.exportSounds(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "sounds" : ""), SoundExportMode.MP3_WAV_FLV);
+                        String soundFormat = formats.get("sound");
+                        if (soundFormat == null) {
+                            soundFormat = "mp3_wav_flv";
+                        }
+                        SoundExportMode sem=SoundExportMode.MP3_WAV_FLV;
+                        switch(soundFormat){
+                            case "mp3_wav":
+                                sem = SoundExportMode.MP3_WAV;
+                                break;
+                             case "wav":
+                                sem = SoundExportMode.WAV;
+                                break;
+                             case "flv":
+                                 sem = SoundExportMode.FLV;
+                                 break;
+                                
+                        }
+                        exfile.exportSounds(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "sounds" : ""), sem);
                         break;
                     case "binarydata":
                         System.out.println("Exporting binaryData...");
