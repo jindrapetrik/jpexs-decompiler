@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
+import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -304,6 +305,13 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 mouseButton = e.getButton();
                 updatePos(e, true);
                 drawFrame();
+                if (stateUnderCursor != null) {
+                    ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
+                    DefineButtonSoundTag sounds = b.getSounds();
+                    if (sounds!=null && sounds.buttonSoundChar2 != 0) { //OverUpToOverDown
+                        playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar2));
+                    }
+                }
             }
 
             @Override
@@ -311,14 +319,41 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 mouseButton = 0;
                 updatePos(e, true);
                 drawFrame();
+                if (stateUnderCursor != null) {
+                    ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
+                    DefineButtonSoundTag sounds = b.getSounds();
+                    if (sounds!=null && sounds.buttonSoundChar3 != 0) { //OverDownToOverUp
+                        playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar3));
+                    }
+                }
             }
 
         });
         iconPanel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-
+                DepthState lastUnderCur = stateUnderCursor;
                 updatePos(e, true);
+                if (stateUnderCursor != null) {
+                    if (lastUnderCur == null || lastUnderCur.instanceId != stateUnderCursor.instanceId) {
+                        //New mouse entered
+                        ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
+                        DefineButtonSoundTag sounds = b.getSounds();
+                        if (sounds!=null && sounds.buttonSoundChar1 != 0) { //IddleToOverUp
+                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar1));
+                        }
+                    }
+                }
+                if (lastUnderCur != null) {
+                    if (stateUnderCursor == null || stateUnderCursor.instanceId != lastUnderCur.instanceId) {
+                        //Old mouse leave
+                        ButtonTag b = (ButtonTag) swf.characters.get(lastUnderCur.characterId);
+                        DefineButtonSoundTag sounds = b.getSounds();
+                        if (sounds!=null && sounds.buttonSoundChar0 != 0) { //OverUpToIddle
+                            playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar0));
+                        }
+                    }
+                }
             }
 
             @Override
@@ -520,31 +555,34 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             CharacterTag c = swf.characters.get(sndId);
             if (c instanceof SoundTag) {
                 SoundTag st = (SoundTag) c;
-                final SoundTagPlayer sp;
-                try {
-                    sp = new SoundTagPlayer(st, 1);
-
-                    synchronized (ImagePanel.class) {
-                        soundPlayers.add(sp);
-                    }
-                    sp.addListener(new PlayerListener() {
-
-                        @Override
-                        public void playingFinished() {
-                            synchronized (ImagePanel.class) {
-                                soundPlayers.remove(sp);
-                            }
-                        }
-                    });
-                    sp.play();
-                } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
-                    Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, "Error during playing sound", ex);
-                }
-
+                playSound(st);
             }
         }
 
         iconPanel.setImg(new SerializableImage(img));
+    }
+
+    private void playSound(SoundTag st) {
+        final SoundTagPlayer sp;
+        try {
+            sp = new SoundTagPlayer(st, 1);
+
+            synchronized (ImagePanel.class) {
+                soundPlayers.add(sp);
+            }
+            sp.addListener(new PlayerListener() {
+
+                @Override
+                public void playingFinished() {
+                    synchronized (ImagePanel.class) {
+                        soundPlayers.remove(sp);
+                    }
+                }
+            });
+            sp.play();
+        } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
+            Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, "Error during playing sound", ex);
+        }
     }
 
     private void getOutlines() {

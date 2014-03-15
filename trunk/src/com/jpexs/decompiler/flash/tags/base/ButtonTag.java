@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
@@ -53,6 +55,18 @@ public abstract class ButtonTag extends CharacterTag implements BoundedTag, Draw
     @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         SWF.frameToImage(getTimeline(), frame, time, stateUnderCursor, mouseButton, image, transformation, colorTransform);
+    }
+
+    public DefineButtonSoundTag getSounds() {
+        for (Tag t : swf.tags) {
+            if (t instanceof DefineButtonSoundTag) {
+                DefineButtonSoundTag st = (DefineButtonSoundTag) t;
+                if (st.buttonId == getCharacterId()) {
+                    return st;
+                }
+            }
+        }
+        return null;
     }
 
 }

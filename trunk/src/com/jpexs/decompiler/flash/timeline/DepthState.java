@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
@@ -47,13 +48,21 @@ public class DepthState {
     public int time = 0;
     private final SWF swf;
     public Frame frame;
+    public long instanceId;
+
+    private static AtomicLong lastInstanceId = new AtomicLong(0);
+
+    public static long getNewInstanceId() {
+        return lastInstanceId.addAndGet(1);
+    }
 
     public DepthState(SWF swf, Frame frame) {
         this.swf = swf;
         this.frame = frame;
+        this.instanceId = getNewInstanceId();
     }
 
-    public DepthState(DepthState obj, Frame frame, boolean addTime) {
+    public DepthState(DepthState obj, Frame frame, boolean sameInstance) {
         this.frame = frame;
         swf = obj.swf;
         frame = obj.frame;
@@ -70,8 +79,11 @@ public class DepthState {
         ratio = obj.ratio;
         clipDepth = obj.clipDepth;
         time = obj.time;
-        if (addTime) {
+        if (sameInstance) {
             time++;
+            instanceId = obj.instanceId;
+        } else {
+            instanceId = getNewInstanceId();
         }
     }
 
