@@ -116,6 +116,9 @@ public class CommandLineArgumentParser {
         System.out.println("         script:pcode - ActionScript P-code");
         System.out.println("         script:pcodehex - ActionScript P-code with hex");
         System.out.println("         script:hex - ActionScript Hex only");
+        System.out.println("         image:png_jpeg - PNG/JPEG format for Images");
+        System.out.println("         image:png - PNG format for Images");
+        System.out.println("         image:jpeg - JPEG format for Images");
         System.out.println("         text:plain - Plain text format for Texts");
         System.out.println("         text:formatted - Formatted text format for Texts");
         System.out.println("         sound:mp3_wav_flv - MP3/WAV/FLV format for Sounds");
@@ -626,7 +629,21 @@ public class CommandLineArgumentParser {
                         break;
                     case "image":
                         System.out.println("Exporting images...");
-                        exfile.exportImages(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "images" : ""), ImageExportMode.PNG_JPEG); //TODO: other modes
+                        String imageFormat = formats.get("image");
+                        if (imageFormat == null) {
+                            imageFormat = "png_jpeg";
+                        }
+                        ImageExportMode iem = ImageExportMode.PNG_JPEG;
+                        switch(imageFormat){
+                            case "png":
+                                iem = ImageExportMode.PNG;
+                                break;
+                            case "jpeg":
+                                iem = ImageExportMode.JPEG;
+                                break;
+                        }
+                        
+                        exfile.exportImages(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "images" : ""), iem);
                         break;
                     case "shape":
                         System.out.println("Exporting shapes...");
