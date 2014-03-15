@@ -150,6 +150,7 @@ public class ScriptPack implements TreeElementItem {
 
     public void toSource(GraphTextWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
         writer.suspendMeasure();
+            int timeout = Configuration.decompilationTimeoutFile.get();
         try {
             CancellableWorker.call(new Callable<Void>() {
                 @Override
@@ -157,11 +158,11 @@ public class ScriptPack implements TreeElementItem {
                     convert(new NulWriter(), abcList, traits, exportMode, parallel);
                     return null;
                 }
-            }, Configuration.decompilationTimeoutFile.get(), TimeUnit.SECONDS);
+            }, timeout, TimeUnit.SECONDS);
         } catch (TimeoutException ex) {
             writer.continueMeasure();
             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
-            Helper.appendTimeoutComment(writer, Configuration.decompilationTimeoutFile.get());
+            Helper.appendTimeoutComment(writer, timeout);
             return;
         } catch (ExecutionException ex) {
             writer.continueMeasure();

@@ -178,7 +178,7 @@ public class MethodBody implements Cloneable, Serializable {
                 writer.endMethod();
             } else if (convertException instanceof TimeoutException) {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
-                Helper.appendTimeoutComment(writer, Configuration.decompilationTimeoutFile.get());
+                Helper.appendTimeoutComment(writer, timeout);
             } else {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
                 Helper.appendErrorComment(writer, convertException);

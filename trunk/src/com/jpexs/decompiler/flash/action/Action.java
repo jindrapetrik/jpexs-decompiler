@@ -763,7 +763,7 @@ public class Action implements GraphSourceItem {
             Graph.graphToString(tree, writer, new LocalData());
         } else if (convertException instanceof TimeoutException) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
-            Helper.appendTimeoutComment(writer, Configuration.decompilationTimeoutFile.get());
+            Helper.appendTimeoutComment(writer, timeout);
         } else {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", convertException);
             Helper.appendErrorComment(writer, convertException);
