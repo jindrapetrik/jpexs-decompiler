@@ -87,6 +87,11 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     }
 
     @Override
+    public void resetTimeline() {
+        timeline = null;
+    }
+
+    @Override
     public int getCharacterId() {
         return spriteId;
     }
@@ -198,7 +203,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version, pos);
         spriteId = sis.readUI16();
         frameCount = sis.readUI16();
-        subTags = sis.readTagList(swf, level + 1, parallel, skipUnusualTags, true, swf.gfx);
+        subTags = sis.readTagList(swf, this, level + 1, parallel, skipUnusualTags, true, swf.gfx);
     }
     static int c = 0;
 

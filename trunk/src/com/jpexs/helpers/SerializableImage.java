@@ -47,7 +47,7 @@ public class SerializableImage implements Serializable {
     private BufferedImage image;
     private transient Graphics graphics;
 
-    public SerializableImage() {
+    private SerializableImage() {
     }
 
     public SerializableImage(BufferedImage image) {

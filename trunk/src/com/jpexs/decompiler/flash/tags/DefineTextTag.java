@@ -382,7 +382,7 @@ public class DefineTextTag extends TextTag {
                                 if (nextChar != null) {
                                     kerningAdjustment = font.getGlyphKerningAdjustment(tags, tr.glyphEntries[i].glyphIndex, font.charToGlyph(tags, nextChar));
                                 }
-                                advance = (int) Math.round(font.getDivider() * Math.round((double) textHeight * (font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
+                                advance = (int) Math.round(font.getDivider() * Math.round(((double) textHeight * font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
                             } else {
                                 advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor), c, nextChar));
                             }

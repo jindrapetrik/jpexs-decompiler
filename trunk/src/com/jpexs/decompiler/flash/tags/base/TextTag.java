@@ -42,10 +42,12 @@ import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.LineMetrics;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -112,7 +114,8 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         List<Integer> allLeftMargins = new ArrayList<>();
         List<Integer> allLetterSpacings = new ArrayList<>();
         FontMetrics fontMetrics;
-        SerializableImage bi = new SerializableImage(5, 5, SerializableImage.TYPE_INT_RGB);
+        BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = bi.getGraphics();
         Font aFont = null;
         int currentLeftMargin;
         for (int r = 0; r < list.size(); r++) {
@@ -132,8 +135,8 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 if (!font.hasLayout()) {
                     String fontName = FontTag.getFontNameWithFallback(font.getFontName());
                     aFont = new Font(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor));
-                    fontMetrics = bi.getGraphics().getFontMetrics(aFont);
-                    LineMetrics lm = fontMetrics.getLineMetrics("A", bi.getGraphics());
+                    fontMetrics = graphics.getFontMetrics(aFont);
+                    LineMetrics lm = fontMetrics.getLineMetrics("A", graphics);
                     ascent = lm.getAscent();
                     descent = lm.getDescent();
                     leading = lm.getLeading();

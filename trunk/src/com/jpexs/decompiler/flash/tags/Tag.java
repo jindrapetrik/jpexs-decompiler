@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -66,6 +67,8 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     @Internal
     protected transient SWF swf;
     @Internal
+    protected transient Timelined timelined;
+    @Internal
     private boolean modified;
 
     public String getTagName() {
@@ -99,6 +102,14 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         this.swf = swf;
     }
 
+    public Timelined getTimelined() {
+        return timelined;
+    }
+    
+    public void setTimelined(Timelined timelined) {
+        this.timelined = timelined;
+    }
+    
     /**
      * Constructor
      *

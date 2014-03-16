@@ -304,6 +304,12 @@ public final class SWF implements TreeItem, Timelined {
         return timeline;
     }
 
+    @Override
+    public void resetTimeline() {
+        timeline = null;
+    }
+    
+    
     /**
      * Gets all tags with specified id
      *
@@ -564,25 +570,10 @@ public final class SWF implements TreeItem, Timelined {
         sis.readUI8(); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, gfx);
+        tags = sis.readTagList(this, this, 0, parallelRead, true, !checkOnly, gfx);
         if (!checkOnly) {
-            Map<Long, Tag> tagMap = new HashMap<>();
-            for (Tag tag : tags) {
-                tagMap.put(tag.getPos(), tag);
-            }
-
             checkInvalidSprites();
-            for (Tag tag : tags) {
-                if (tag instanceof ShowFrameTag) {
-                    ShowFrameTag showFrameTag = (ShowFrameTag) tag;
-                    List<Long> tagPositions = sis.tagPositionsInFrames.get(tag.getPos());
-                    List<Tag> innerTags = new ArrayList<>();
-                    for (long tagPos : tagPositions) {
-                        innerTags.add(tagMap.get(tagPos));
-                    }
-                    showFrameTag.innerTags = innerTags;
-                }
-            }
+            updateInnerTagsForShowFrameTags();
             updateCharacters();
             assignExportNamesToSymbols();
             assignClassesToSymbols();
@@ -600,6 +591,49 @@ public final class SWF implements TreeItem, Timelined {
         }
     }
 
+    public void updateInnerTagsForShowFrameTags() {
+        Map<Long, Tag> tagMap = new HashMap<>();
+        Map<Long, List<Long>> tagPositionsInFrames = new HashMap<>();
+        createTagMap(tagMap, tagPositionsInFrames, tags);
+        addInnerTagsForShowFrameTags(tagPositionsInFrames, tagMap, tags);
+    }
+    
+    private void createTagMap(Map<Long, Tag> tagMap, Map<Long, List<Long>> tagPositionsInFrames, List<Tag> tags) {
+        List<Long> tagPositionsInFrame = new ArrayList<>();
+        for (Tag tag : tags) {
+            long pos = tag.getPos();
+            tagMap.put(pos, tag);
+            if (ShowFrameTag.isNestedTagType(tag.getId())) {
+                tagPositionsInFrame.add(pos);
+            } else if (tag.getId() == ShowFrameTag.ID) {
+                tagPositionsInFrames.put(pos, tagPositionsInFrame);
+                tagPositionsInFrame = new ArrayList<>();
+            }
+            
+            if (tag instanceof DefineSpriteTag) {
+                createTagMap(tagMap, tagPositionsInFrames, tag.getSubTags());
+            }
+        }
+    }
+    
+    private void addInnerTagsForShowFrameTags(Map<Long, List<Long>> tagPositionsInFrames, Map<Long, Tag> tagMap, List<Tag> tags) {
+        for (Tag tag : tags) {
+            if (tag instanceof ShowFrameTag) {
+                ShowFrameTag showFrameTag = (ShowFrameTag) tag;
+                List<Long> tagPositions = tagPositionsInFrames.get(tag.getPos());
+                if (tagPositions != null) {
+                    List<Tag> innerTags = new ArrayList<>();
+                    for (long tagPos : tagPositions) {
+                        innerTags.add(tagMap.get(tagPos));
+                    }
+                    showFrameTag.innerTags = innerTags;
+                }
+            } else if (tag instanceof DefineSpriteTag) {
+                addInnerTagsForShowFrameTags(tagPositionsInFrames, tagMap, tag.getSubTags());
+            }
+        }
+    }
+    
     @Override
     public SWF getSwf() {
         return this;
@@ -2688,6 +2722,19 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public void removeTag(Tag t) {
-        removeTagFromTimeline(t, tags);
+        if (ShowFrameTag.isNestedTagType(t.getId())) {
+            List<Tag> tags;
+            Timelined timelined = t.getTimelined();
+            if (timelined instanceof DefineSpriteTag) {
+                tags = ((DefineSpriteTag) timelined).getSubTags();
+            } else {
+                tags = this.tags;
+            }
+            tags.remove(t);
+            timelined.resetTimeline();
+        } else {
+            removeTagFromTimeline(t, tags);
+        }
+        clearImageCache();
     }
 }

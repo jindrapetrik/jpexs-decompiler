@@ -25,4 +25,6 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 public interface Timelined extends BoundedTag {
 
     public Timeline getTimeline();
+
+    public void resetTimeline();
 }

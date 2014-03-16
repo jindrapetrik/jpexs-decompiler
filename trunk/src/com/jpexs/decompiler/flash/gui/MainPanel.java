@@ -237,10 +237,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private GenericTagPanel genericTagPanel;
     private JPanel folderPreviewPanel;
     private final ImagePanel previewImagePanel;
-    private final ImagePanel swfPreviewPanel;
     private boolean isWelcomeScreen = true;
     private static final String CARDFLASHPANEL = "Flash card";
-    private static final String CARDSWFPREVIEWPANEL = "SWF card";
     private static final String CARDDRAWPREVIEWPANEL = "Draw card";
     private static final String CARDIMAGEPANEL = "Image card";
     private static final String CARDBINARYPANEL = "Binary card";
@@ -285,7 +283,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
     private CancellableWorker setSourceWorker;
     public TreeNode oldNode;
-    public TreeItem oldTag;
     private File tempFile;
     private final PlayerControls imagePlayControls;
 
@@ -879,9 +876,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         displayReplace(false);
 
-        swfPreviewPanel = new ImagePanel();
-        displayPanel.add(swfPreviewPanel, CARDSWFPREVIEWPANEL);
-
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
         CardLayout cl = (CardLayout) (displayPanel.getLayout());
         cl.show(displayPanel, CARDEMPTYPANEL);
@@ -1080,7 +1074,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public void closeAll() {
         swfs.clear();
         oldNode = null;
-        oldTag = null;
         genericTagPanel.clear();
         if (abcPanel != null) {
             abcPanel.clearSwf();
@@ -1105,7 +1098,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             actionPanel.clearSource();
         }
         oldNode = null;
-        oldTag = null;
         genericTagPanel.clear();
         updateUi();
         refreshTree();
@@ -1114,7 +1106,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private void stopImagePanels() {
         imagePanel.stop();
         previewImagePanel.stop();
-        swfPreviewPanel.stop();
     }
 
     public void enableDrop(boolean value) {
@@ -1636,7 +1627,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         return treeNode.getItem().getSwf();
     }
-
+    
     private void clearCache() {
         if (abcPanel != null) {
             abcPanel.decompiledTextArea.clearScriptCache();
@@ -2181,8 +2172,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public void refreshTree() {
         stopImagePanels();
         showCard(CARDEMPTYPANEL);
+        TreeItem treeItem = tagTree.getCurrentTreeItem();
+        for (SWFList sWFList : swfs) {
+            for (SWF swf : sWFList.swfs) {
+                swf.updateInnerTagsForShowFrameTags();
+            }
+        }
         View.refreshTree(tagTree, new TagTreeModel(mainFrame, swfs));
-        setTreeItem(oldTag);
+        if (treeItem != null) {
+            setTreeItem(treeItem);
+        }
     }
 
     public void refreshDecompiled() {
@@ -2240,12 +2239,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             case ACTION_REPLACE_BINARY:
             case ACTION_REPLACE_IMAGE:
             case ACTION_REPLACE_OTHER: {
-                TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
-                if (treeNode == null) {
+                TreeItem item = tagTree.getCurrentTreeItem();
+                if (item == null) {
                     return;
                 }
 
-                TreeItem item = treeNode.getItem();
                 if (item instanceof DefineSoundTag) {
                     JFileChooser fc = new JFileChooser();
                     fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
@@ -2375,12 +2373,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
             break;
             case ACTION_EDIT_GENERIC_TAG: {
-                TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
-                if (treeNode == null) {
+                TreeItem item = tagTree.getCurrentTreeItem();
+                if (item == null) {
                     return;
                 }
 
-                TreeItem item = treeNode.getItem();
                 if (item instanceof Tag) {
                     genericEditButton.setVisible(false);
                     genericSaveButton.setVisible(true);
@@ -2449,8 +2446,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 setEditText(false);
                 break;
             case ACTION_SAVE_TEXT:
-                if (oldTag instanceof TextTag) {
-                    TextTag textTag = (TextTag) oldTag;
+                TreeItem item = tagTree.getCurrentTreeItem();
+                if (item instanceof TextTag) {
+                    TextTag textTag = (TextTag) item;
                     if (saveText(textTag, textValue.getText())) {
                         setEditText(false);
                     }
@@ -2548,8 +2546,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         oldNode = treeNode;
 
         TreeItem tagObj = treeNode.getItem();
-
-        oldTag = tagObj;
 
         if (flashPanel != null) {
             flashPanel.specialPlayback = false;
@@ -3294,6 +3290,13 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public void timeline() {
         final SWF swf = getCurrentSwf();
         if (swf != null) {
+            TreeItem item = tagTree.getCurrentTreeItem();
+            if (item instanceof DefineSpriteTag) {
+                TimelineFrame tf = new TimelineFrame((DefineSpriteTag) item);
+                tf.setVisible(true);
+                return;
+            }
+            
             TimelineFrame tf = new TimelineFrame(swf);
             tf.setVisible(true);
         }
@@ -3336,6 +3339,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
 
             @Override
+            public void resetTimeline() {
+                tim = null;
+            }
+
+            @Override
             public RECT getRect() {
                 return ((BoundedTag) tag).getRect();
             }
@@ -3346,6 +3354,5 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         repPanel.setVisible(display);
         repPanel2.setVisible(display);
-
     }
 }

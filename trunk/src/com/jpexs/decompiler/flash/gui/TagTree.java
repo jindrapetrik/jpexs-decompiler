@@ -292,4 +292,12 @@ public class TagTree extends JTree {
         }
         return ret;
     }
+
+    public TreeItem getCurrentTreeItem() {
+        TreeNode treeNode = (TreeNode) getLastSelectedPathComponent();
+        if (treeNode == null) {
+            return null;
+        }
+        return treeNode.getItem();
+    }
 }

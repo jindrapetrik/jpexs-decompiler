@@ -19,11 +19,12 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.abc.treenodes.AS3PackageNode;
 import com.jpexs.decompiler.flash.gui.abc.treenodes.TreeElement;
+import com.jpexs.decompiler.flash.treeitems.AS3PackageNodeItem;
 import java.util.StringTokenizer;
 
 public class Tree {
 
-    private final TreeElement ROOT = new AS3PackageNode("", "", null, null);
+    private final TreeElement ROOT = new AS3PackageNode("", "", new AS3PackageNodeItem(null, null), null);
 
     public void add(String name, String path, ScriptPack item) {
         StringTokenizer st = new StringTokenizer(path, ".");

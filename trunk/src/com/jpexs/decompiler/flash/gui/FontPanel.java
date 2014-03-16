@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.Font;
 import java.util.Set;
 import java.util.TreeSet;
@@ -78,7 +79,7 @@ public class FontPanel extends javax.swing.JPanel {
     }
 
     private void fontAddChars(FontTag ft, Set<Integer> selChars, String selFont) {
-        FontTag f = (FontTag) mainPanel.oldTag;
+        FontTag f = (FontTag) mainPanel.tagTree.getCurrentTreeItem();
         SWF swf = ft.getSwf();
         String oldchars = f.getCharacters(swf.tags);
         for (int ic : selChars) {
@@ -571,26 +572,30 @@ public class FontPanel extends javax.swing.JPanel {
 
     private void fontAddCharsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontAddCharsButtonActionPerformed
         String newchars = fontAddCharactersField.getText();
-        if (mainPanel.oldTag instanceof FontTag) {
+
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item instanceof FontTag) {
             Set<Integer> selChars = new TreeSet<>();
             for (int c = 0; c < newchars.length(); c++) {
                 selChars.add(newchars.codePointAt(c));
             }
-            fontAddChars((FontTag) mainPanel.oldTag, selChars, fontSelection.getSelectedItem().toString());
+            fontAddChars((FontTag) item, selChars, fontSelection.getSelectedItem().toString());
             fontAddCharactersField.setText("");
             mainPanel.reload(true);
         }
     }//GEN-LAST:event_fontAddCharsButtonActionPerformed
 
     private void fontEmbedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontEmbedButtonActionPerformed
-        if (mainPanel.oldTag instanceof FontTag) {
-            FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), ((FontTag) mainPanel.oldTag).getFontStyle());
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item instanceof FontTag) {
+            FontTag fontTag = (FontTag) item;
+            FontEmbedDialog fed = new FontEmbedDialog(fontSelection.getSelectedItem().toString(), fontAddCharactersField.getText(), fontTag.getFontStyle());
             if (fed.display()) {
                 Set<Integer> selChars = fed.getSelectedChars();
                 if (!selChars.isEmpty()) {
                     String selFont = fed.getSelectedFont();
                     fontSelection.setSelectedItem(selFont);
-                    fontAddChars((FontTag) mainPanel.oldTag, selChars, selFont);
+                    fontAddChars(fontTag, selChars, selFont);
                     fontAddCharactersField.setText("");
                     mainPanel.reload(true);
                 }
@@ -599,8 +604,9 @@ public class FontPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_fontEmbedButtonActionPerformed
 
     private void fontSelectionItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_fontSelectionItemStateChanged
-        if (mainPanel.oldTag instanceof FontTag) {
-            FontTag f = (FontTag) mainPanel.oldTag;
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item instanceof FontTag) {
+            FontTag f = (FontTag) item;
             SWF swf = f.getSwf();
             String selectedSystemFont = (String) fontSelection.getSelectedItem();
             swf.sourceFontsMap.put(f.getFontId(), selectedSystemFont);

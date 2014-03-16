@@ -201,6 +201,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
 import com.jpexs.decompiler.flash.types.ARGB;
@@ -269,9 +270,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -296,8 +295,6 @@ public class SWFInputStream extends InputStream {
     private long percentMax;
     private final List<byte[]> buffered = new ArrayList<>();
     private ByteArrayOutputStream buffer;
-    private List<Long> tagPositionsInFrame = new ArrayList<>();
-    public Map<Long, List<Long>> tagPositionsInFrames = new HashMap<>();
 
     public int getVersion() {
         return version;
@@ -834,6 +831,7 @@ public class SWFInputStream extends InputStream {
      * of the stream. Optionally can skip AS1/2 tags when file is AS3
      *
      * @param swf
+     * @param timelined
      * @param level
      * @param parallel
      * @param skipUnusualTags
@@ -843,7 +841,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags, boolean gfx) throws IOException, InterruptedException {
+    public List<Tag> readTagList(SWF swf, Timelined timelined, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags, boolean gfx) throws IOException, InterruptedException {
         ExecutorService executor = null;
         List<Future<Tag>> futureResults = new ArrayList<>();
         if (parallel) {
@@ -864,6 +862,8 @@ public class SWFInputStream extends InputStream {
             if (tag == null) {
                 break;
             }
+            
+            tag.setTimelined(timelined);
             if (!parallel) {
                 tags.add(tag);
             }
@@ -872,13 +872,6 @@ public class SWFInputStream extends InputStream {
             }
             tag.previousTag = previousTag;
             previousTag = tag;
-
-            if (ShowFrameTag.isNestedTagType(tag.getId())) {
-                tagPositionsInFrame.add(pos);
-            } else if (tag.getId() == ShowFrameTag.ID) {
-                tagPositionsInFrames.put(pos, tagPositionsInFrame);
-                tagPositionsInFrame = new ArrayList<>();
-            }
 
             boolean doParse;
             if (!skipUnusualTags) {
@@ -1233,6 +1226,7 @@ public class SWFInputStream extends InputStream {
         }
         ret.previousTag = tag.previousTag;
         ret.forceWriteAsLong = tag.forceWriteAsLong;
+        ret.setTimelined(tag.getTimelined());
         return ret;
     }
 

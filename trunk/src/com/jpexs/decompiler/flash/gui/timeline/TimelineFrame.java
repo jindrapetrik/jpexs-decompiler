@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui.timeline;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Image;
@@ -32,14 +32,14 @@ public class TimelineFrame extends AppFrame {
 
     public TimelinePanel timeline;
 
-    public TimelineFrame(SWF swf) {
+    public TimelineFrame(Timelined timelined) {
         setSize(800, 600);
         View.setWindowIcon(this);
         View.centerScreen(this);
         setTitle(translate("dialog.title"));
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        cnt.add(timeline = new TimelinePanel(swf), BorderLayout.CENTER);
+        cnt.add(timeline = new TimelinePanel(timelined), BorderLayout.CENTER);
 
         java.util.List<Image> images = new ArrayList<>();
         images.add(View.loadImage("timeline16"));

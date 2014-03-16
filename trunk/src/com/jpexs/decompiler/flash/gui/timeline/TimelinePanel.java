@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.timeline;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -44,8 +44,8 @@ public class TimelinePanel extends JPanel {
     public static Color selectedBorderColor = new Color(0xcc, 0, 0);
     public static Color backgroundColor = new Color(0xee, 0xee, 0xee);
 
-    public TimelinePanel(SWF swf) {
-        timeline = new Timeline(swf);
+    public TimelinePanel(Timelined timelined) {
+        timeline = timelined.getTimeline();
         timelineBodyPanel = new TimelineBodyPanel(timeline);
         setLayout(new BorderLayout());
 

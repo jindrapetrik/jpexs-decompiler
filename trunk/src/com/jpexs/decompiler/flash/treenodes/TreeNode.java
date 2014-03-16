@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.treenodes;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -31,6 +33,9 @@ public abstract class TreeNode {
     public List<TreeNode> subNodes;
 
     public TreeNode(TreeItem item) {
+        if (item == null) {
+            throw new Error("TreeItem should not be null.");
+        }
         this.item = item;
         this.subNodes = new ArrayList<>();
     }
@@ -41,6 +46,10 @@ public abstract class TreeNode {
 
     @Override
     public String toString() {
+        if (item == null) {
+            Logger.getLogger(TreeNode.class.getName()).log(Level.FINE, "Tree item is null");
+            return null;
+        }
         return item.toString();
     }
 

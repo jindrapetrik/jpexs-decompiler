@@ -323,4 +323,9 @@ public class DefineButton2Tag extends ButtonTag implements Container {
         timeline.frames.add(frameHit);
         return timeline;
     }
+
+    @Override
+    public void resetTimeline() {
+        timeline = null;
+    }
 }
