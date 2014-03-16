@@ -35,8 +35,11 @@ public class GetSuperAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (!object.toString().equals("this")) {
+            int length = writer.getLength();
             object.toString(writer, localData);
-            writer.append(".");
+            if (writer.getLength() > length) {
+                writer.append(".");
+            }
         }
         writer.append("super.");
         return propertyName.toString(writer, localData);
