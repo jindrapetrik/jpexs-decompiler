@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -57,7 +58,7 @@ import javax.swing.JPopupMenu;
  */
 public class PreviewImage extends JPanel {
 
-    private static final ExecutorService executor = Executors.newFixedThreadPool(1);
+    private static final ExecutorService executor;
     private static final int PREVIEW_SIZE = 150;
     private static final int BORDER_SIZE = 5;
     private Image image;
@@ -65,6 +66,10 @@ public class PreviewImage extends JPanel {
     private final MainPanel mainPanel;
     private final TreeItem treeItem;
 
+    static {
+        executor = Executors.newFixedThreadPool(Configuration.parallelSpeedUp.get() ? Configuration.parallelThreadCount.get() : 1);
+    }
+    
     /**
      *
      * @param mainPanel

@@ -506,6 +506,10 @@ public class Configuration {
         } else {
             logLevel = Level.WARNING;
         }
+        int processorCount = Runtime.getRuntime().availableProcessors();
+        if (parallelThreadCount.get() > processorCount) {
+            parallelThreadCount.set(processorCount);
+        }
     }
 
     @SuppressWarnings("unchecked")
