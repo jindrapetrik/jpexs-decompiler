@@ -143,9 +143,9 @@ public class SerializableImage implements Serializable {
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        try{
+        try {
             ImageIO.write(image, "png", out);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             //ignore
         }
     }

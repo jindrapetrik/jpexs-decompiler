@@ -308,7 +308,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 if (stateUnderCursor != null) {
                     ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
                     DefineButtonSoundTag sounds = b.getSounds();
-                    if (sounds!=null && sounds.buttonSoundChar2 != 0) { //OverUpToOverDown
+                    if (sounds != null && sounds.buttonSoundChar2 != 0) { //OverUpToOverDown
                         playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar2));
                     }
                 }
@@ -322,7 +322,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 if (stateUnderCursor != null) {
                     ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
                     DefineButtonSoundTag sounds = b.getSounds();
-                    if (sounds!=null && sounds.buttonSoundChar3 != 0) { //OverDownToOverUp
+                    if (sounds != null && sounds.buttonSoundChar3 != 0) { //OverDownToOverUp
                         playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar3));
                     }
                 }
@@ -339,7 +339,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                         //New mouse entered
                         ButtonTag b = (ButtonTag) swf.characters.get(stateUnderCursor.characterId);
                         DefineButtonSoundTag sounds = b.getSounds();
-                        if (sounds!=null && sounds.buttonSoundChar1 != 0) { //IddleToOverUp
+                        if (sounds != null && sounds.buttonSoundChar1 != 0) { //IddleToOverUp
                             playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar1));
                         }
                     }
@@ -349,7 +349,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                         //Old mouse leave
                         ButtonTag b = (ButtonTag) swf.characters.get(lastUnderCur.characterId);
                         DefineButtonSoundTag sounds = b.getSounds();
-                        if (sounds!=null && sounds.buttonSoundChar0 != 0) { //OverUpToIddle
+                        if (sounds != null && sounds.buttonSoundChar0 != 0) { //OverUpToIddle
                             playSound((SoundTag) swf.characters.get(sounds.buttonSoundChar0));
                         }
                     }

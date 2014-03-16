@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -169,6 +170,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
@@ -1443,29 +1446,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private SearchDialog searchDialog;
 
     public boolean hasExportableNodes() {
-        List<TreeNode> sel = getAllSelected(tagTree);
-
-        for (TreeNode d : sel) {
-            if (d instanceof ContainerNode) {
-                ContainerNode n = (ContainerNode) d;
-                TreeNodeType nodeType = TagTree.getTreeNodeType(n.getItem());
-                if (nodeType == TreeNodeType.IMAGE
-                        || nodeType == TreeNodeType.SHAPE
-                        || nodeType == TreeNodeType.AS
-                        || nodeType == TreeNodeType.MOVIE
-                        || nodeType == TreeNodeType.SOUND
-                        || nodeType == TreeNodeType.BINARY_DATA
-                        || nodeType == TreeNodeType.TEXT) {
-                    return true;
-                }
-            }
-            if (d instanceof TreeElement) {
-                if (((TreeElement) d).isLeaf()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return !getSelection(getCurrentSwf()).isEmpty();
     }
 
     private List<Object> getSelection(SWF swf) {
@@ -1500,6 +1481,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     ret.add((Tag) n.getItem());
                 }
             }
+            if (d instanceof FrameNode) {
+                FrameNode fn = (FrameNode) d;
+                if (!fn.scriptsNode) {
+                    ret.add(d.getItem());
+                }
+            }
             if (d instanceof TreeElement) {
                 if (((TreeElement) d).isLeaf()) {
                     TreeElement treeElement = (TreeElement) d;
@@ -1525,6 +1512,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 List<Tag> texts = new ArrayList<>();
                 List<TreeNode> as12scripts = new ArrayList<>();
                 List<Tag> binaryData = new ArrayList<>();
+                Map<Integer, List<Integer>> frames = new HashMap<>();
 
                 for (TreeNode d : sel) {
                     if (d.getItem().getSwf() != swf) {
@@ -1555,6 +1543,23 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             texts.add((Tag) n.getItem());
                         }
                     }
+                    if (d instanceof FrameNode) {
+                        FrameNode fn = (FrameNode) d;
+                        if (!fn.scriptsNode) {
+
+                            FrameNodeItem fni = (FrameNodeItem) d.getItem();
+                            Tag par = fni.getParent();
+                            int frame = fni.getFrame();
+                            int parentId = 0;
+                            if (par != null) {
+                                parentId = ((CharacterTag) par).getCharacterId();
+                            }
+                            if (!frames.containsKey(parentId)) {
+                                frames.put(parentId, new ArrayList<Integer>());
+                            }
+                            frames.get(parentId).add(frame);
+                        }
+                    }
                     if (d instanceof TreeElement) {
                         if (((TreeElement) d).isLeaf()) {
                             TreeElement treeElement = (TreeElement) d;
@@ -1562,16 +1567,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         }
                     }
                 }
-
-                List<Object> allnodes = new ArrayList<>();
-                allnodes.addAll(as3scripts);
-                allnodes.addAll(as12scripts);
-                allnodes.addAll(images);
-                allnodes.addAll(shapes);
-                allnodes.addAll(movies);
-                allnodes.addAll(sounds);
-                allnodes.addAll(texts);
-                allnodes.addAll(binaryData);
 
                 if (selFile == null) {
                     selFile = selectExportDir();
@@ -1587,6 +1582,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies, export.getValue(MovieExportMode.class)));
                 ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, export.getValue(SoundExportMode.class)));
                 ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData, export.getValue(BinaryDataExportMode.class)));
+                for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
+                    ret.addAll(swf.exportFrames(handler, selFile + File.separator + "frames", entry.getKey(), entry.getValue(), export.getValue(FramesExportMode.class)));
+                }
                 List<ABCContainerTag> abcList = swf.abcList;
                 if (abcPanel != null) {
                     for (int i = 0; i < as3scripts.size(); i++) {
@@ -1991,6 +1989,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 swf.exportMovies(errorHandler, selFile + File.separator + "movies", export.getValue(MovieExportMode.class));
                                 swf.exportSounds(errorHandler, selFile + File.separator + "sounds", export.getValue(SoundExportMode.class));
                                 swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData", export.getValue(BinaryDataExportMode.class));
+                                swf.exportFrames(errorHandler, selFile + File.separator + "frames", 0, null, export.getValue(FramesExportMode.class));
+                                for (CharacterTag c : swf.characters.values()) {
+                                    if (c instanceof DefineSpriteTag) {
+                                        swf.exportFrames(errorHandler, selFile + File.separator + "frames", c.getCharacterId(), null, export.getValue(FramesExportMode.class));
+                                    }
+                                }
                                 swf.exportActionScript(errorHandler, selFile, exportMode, Configuration.parallelSpeedUp.get());
                             }
                         } catch (Exception ex) {

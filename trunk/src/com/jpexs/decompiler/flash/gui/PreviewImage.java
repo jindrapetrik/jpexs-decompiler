@@ -165,7 +165,7 @@ public class PreviewImage extends JPanel {
         } else if (treeItem instanceof FrameNodeItem) {
             FrameNodeItem fn = (FrameNodeItem) treeItem;
             RECT rect = swf.displayRect;
-            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.getFrame() - 1, 0, null, 0, rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
+            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.getFrame() - 1, 0, null, 0, rect, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform(), null);
             width = (imgSrc.getWidth());
             height = (imgSrc.getHeight());
         } else if (treeItem instanceof ImageTag) {

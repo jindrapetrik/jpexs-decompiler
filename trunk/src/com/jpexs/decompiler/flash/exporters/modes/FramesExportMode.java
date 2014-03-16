@@ -20,8 +20,9 @@ package com.jpexs.decompiler.flash.exporters.modes;
  *
  * @author JPEXS
  */
-public enum ShapeExportMode {
+public enum FramesExportMode {
 
-    SVG,
-    PNG
+    PNG,
+    GIF,
+    AVI
 }

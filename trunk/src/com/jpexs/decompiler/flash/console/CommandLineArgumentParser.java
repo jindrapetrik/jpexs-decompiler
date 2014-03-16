@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -97,6 +98,7 @@ public class CommandLineArgumentParser {
         System.out.println("        image - Images (Default format: PNG/JPEG)");
         System.out.println("        shape - Shapes (Default format: SVG)");
         System.out.println("        movie - Movies (Default format: FLV without sound)");
+        System.out.println("        frame - Frames (Default format: PNG)");
         System.out.println("        sound - Sounds (Default format: MP3/WAV/FLV only sound)");
         System.out.println("        binaryData - Binary data (Default format:  Raw data)");
         System.out.println("        text - Texts (Default format: Formatted text)");
@@ -116,6 +118,11 @@ public class CommandLineArgumentParser {
         System.out.println("         script:pcode - ActionScript P-code");
         System.out.println("         script:pcodehex - ActionScript P-code with hex");
         System.out.println("         script:hex - ActionScript Hex only");
+        System.out.println("         shape:svg - SVG format for Shapes");
+        System.out.println("         shape:png - PNG format for Shapes");
+        System.out.println("         frame:png - PNG format for Frames");
+        System.out.println("         frame:gif - GIF format for Frames");
+        System.out.println("         frame:avi - AVI format for Frames");
         System.out.println("         image:png_jpeg - PNG/JPEG format for Images");
         System.out.println("         image:png - PNG format for Images");
         System.out.println("         image:jpeg - JPEG format for Images");
@@ -532,6 +539,7 @@ public class CommandLineArgumentParser {
             "binarydata",
             "text",
             "all",
+            "frame",
             "fla",
             "xfl"
         };
@@ -629,25 +637,11 @@ public class CommandLineArgumentParser {
                         break;
                     case "image":
                         System.out.println("Exporting images...");
-                        String imageFormat = formats.get("image");
-                        if (imageFormat == null) {
-                            imageFormat = "png_jpeg";
-                        }
-                        ImageExportMode iem = ImageExportMode.PNG_JPEG;
-                        switch(imageFormat){
-                            case "png":
-                                iem = ImageExportMode.PNG;
-                                break;
-                            case "jpeg":
-                                iem = ImageExportMode.JPEG;
-                                break;
-                        }
-                        
-                        exfile.exportImages(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "images" : ""), iem);
+                        exfile.exportImages(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "images" : ""), enumFromStr(formats.get("image"), ImageExportMode.class));
                         break;
                     case "shape":
                         System.out.println("Exporting shapes...");
-                        exfile.exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""), ShapeExportMode.SVG);
+                        exfile.exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""), enumFromStr(formats.get("shape"), ShapeExportMode.class));
                         break;
                     case "script":
                     case "as":
@@ -655,60 +649,37 @@ public class CommandLineArgumentParser {
                     case "pcodehex":
                     case "hex":
                         System.out.println("Exporting scripts...");
-                        ScriptExportMode exportMode = ScriptExportMode.AS;
-                        if (!exportFormat.equals("script")) {
-                            exportMode = strToExportFormat(exportFormat);
-                        } else if (formats.containsKey("script")) {
-                            exportMode = strToExportFormat(formats.get("script"));
-                        }
                         boolean parallel = Configuration.parallelSpeedUp.get();
                         if (as3classes.isEmpty()) {
                             as3classes = parseSelectClasses(args);
                         }
                         if (!as3classes.isEmpty()) {
                             for (String as3class : as3classes) {
-                                exportOK = exportOK && exfile.exportAS3Class(as3class, outDir.getAbsolutePath(), exportMode, parallel);
+                                exportOK = exportOK && exfile.exportAS3Class(as3class, outDir.getAbsolutePath(), enumFromStr(formats.get("script"), ScriptExportMode.class), parallel);
                             }
                         } else {
-                            exportOK = exportOK && exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportMode, parallel) != null;
+                            exportOK = exportOK && exfile.exportActionScript(handler, outDir.getAbsolutePath(), enumFromStr(formats.get("script"), ScriptExportMode.class), parallel) != null;
                         }
                         break;
                     case "movie":
                         System.out.println("Exporting movies...");
-                        exfile.exportMovies(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "movies" : ""), MovieExportMode.FLV);
+                        exfile.exportMovies(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "movies" : ""), enumFromStr(formats.get("movie"), MovieExportMode.class));
+                        break;
+                    case "frame":
+                        System.out.println("Exporting frames...");
+                        exfile.exportFrames(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "frames" : ""), 0, null, enumFromStr(formats.get("frame"), FramesExportMode.class));
                         break;
                     case "sound":
                         System.out.println("Exporting sounds...");
-                        String soundFormat = formats.get("sound");
-                        if (soundFormat == null) {
-                            soundFormat = "mp3_wav_flv";
-                        }
-                        SoundExportMode sem=SoundExportMode.MP3_WAV_FLV;
-                        switch(soundFormat){
-                            case "mp3_wav":
-                                sem = SoundExportMode.MP3_WAV;
-                                break;
-                             case "wav":
-                                sem = SoundExportMode.WAV;
-                                break;
-                             case "flv":
-                                 sem = SoundExportMode.FLV;
-                                 break;
-                                
-                        }
-                        exfile.exportSounds(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "sounds" : ""), sem);
+                        exfile.exportSounds(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "sounds" : ""), enumFromStr(formats.get("sound"), SoundExportMode.class));
                         break;
                     case "binarydata":
                         System.out.println("Exporting binaryData...");
-                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "binaryData" : ""), BinaryDataExportMode.RAW);
+                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "binaryData" : ""), enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class));
                         break;
                     case "text":
                         System.out.println("Exporting texts...");
-                        String textFormat = formats.get("text");
-                        if (textFormat == null) {
-                            textFormat = "formatted";
-                        }
-                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), textFormat.equals("formatted") ? TextExportMode.FORMATTED : TextExportMode.PLAIN);
+                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), enumFromStr(formats.get("text"), TextExportMode.class));
                         break;
                     case "textplain":
                         System.out.println("Exporting texts...");
@@ -960,5 +931,15 @@ public class CommandLineArgumentParser {
             System.exit(1);
         }
         System.exit(0);
+    }
+
+    private static <E extends Enum> E enumFromStr(String str, Class<E> cls) {
+        E[] vals = cls.getEnumConstants();
+        for (E e : vals) {
+            if (e.toString().toLowerCase().equals(str.toLowerCase())) {
+                return e;
+            }
+        }
+        return vals[0];
     }
 }

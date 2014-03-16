@@ -156,7 +156,7 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar;lib/trident-6.2.jar;lib/substance-flamingo-6.2.jar;lib/flamingo-6.2.jar;lib/substance-6.2.jar;lib/jl1.0.1.jar;lib/nellymoser.jar</classpath>
+                <classpath mode="compile">lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar;lib/trident-6.2.jar;lib/substance-flamingo-6.2.jar;lib/flamingo-6.2.jar;lib/substance-6.2.jar;lib/jl1.0.1.jar;lib/nellymoser.jar;lib/gif.jar;lib/avi.jar</classpath>
                 <built-to>build</built-to>
                 <built-to>javadoc</built-to>
                 <built-to>reports</built-to>

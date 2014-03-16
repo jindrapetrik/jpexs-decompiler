@@ -55,7 +55,9 @@ import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.MorphshapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
@@ -78,6 +80,7 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
@@ -112,6 +115,7 @@ import com.jpexs.decompiler.flash.treenodes.ContainerNode;
 import com.jpexs.decompiler.flash.treenodes.FrameNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -171,6 +175,12 @@ import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
+import net.kroo.elliot.GifSequenceWriter;
+import org.monte.media.VideoFormatKeys;
+import org.monte.media.avi.AVIWriter;
 
 /**
  * Class representing SWF file
@@ -1006,7 +1016,7 @@ public final class SWF implements TreeItem, Timelined {
             TreeNode addNode = null;
             if (t instanceof ShowFrameTag) {
                 // do not add PlaceObjects (+etc) to script nodes
-                FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, false), null);
+                FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, false), null, true);
 
                 for (int r = ret.size() - 1; r >= 0; r--) {
                     if (!(ret.get(r).getItem() instanceof DefineSpriteTag)) {
@@ -1291,13 +1301,134 @@ public final class SWF implements TreeItem, Timelined {
         fos.write(chunkBytes);
     }
 
-    /*private static void createWavFromAdpcm(OutputStream fos, int soundRateHz, boolean soundSize, boolean soundType, byte[] data) throws IOException {
-     createWavFromPcmData(fos, soundRateHz, soundSize, soundType, AdpcmDecoder.decode(data, soundType));
-     }
-    
-     private static void createWavFromNelly(OutputStream fos, int soundRateHz,byte[] data) throws IOException {
-     createWavFromPcmData(fos, soundRateHz, true, false, NellyMoserDecoder.decode(data));
-     }*/
+    //TODO: implement morphshape export. How to handle 65536 frames?
+    public List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MorphshapeExportMode mode) throws IOException {
+        List<File> ret = new ArrayList<>();
+        if (tags.isEmpty()) {
+            return ret;
+        }
+        File foutdir = new File(outdir);
+        if (!foutdir.exists()) {
+            if (!foutdir.mkdirs()) {
+                if (!foutdir.exists()) {
+                    throw new IOException("Cannot create directory " + outdir);
+                }
+            }
+        }
+        throw new UnsupportedOperationException("Not implemented");
+        //return ret;
+    }
+
+    private static void makeAVI(List<BufferedImage> images, int frameRate, File file) throws IOException {
+        if (images.isEmpty()) {
+            return;
+        }
+        AVIWriter out = new AVIWriter(file);
+        out.addVideoTrack(VideoFormatKeys.ENCODING_AVI_PNG, 1, frameRate, images.get(0).getWidth(), images.get(0).getHeight(), 0, 0);
+        try {
+            for (BufferedImage img : images) {
+                out.write(0, img, 1);
+            }
+        } finally {
+            out.close();
+        }
+
+    }
+
+    private static void makeGIF(List<BufferedImage> images, int frameRate, File file) throws IOException {
+        if (images.isEmpty()) {
+            return;
+        }
+        try (ImageOutputStream output = new FileImageOutputStream(file)) {
+            GifSequenceWriter writer = new GifSequenceWriter(output, images.get(0).getType(), 1000 / frameRate, true);
+
+            for (BufferedImage img : images) {
+                writer.writeToSequence(img);
+            }
+
+            writer.close();
+        }
+    }
+
+    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, int containerId, List<Integer> frames, final FramesExportMode mode) throws IOException {
+        List<File> ret = new ArrayList<>();
+        if (tags.isEmpty()) {
+            return ret;
+        }
+        Timeline tim = null;
+        String path = "";
+        if (containerId == 0) {
+            tim = getTimeline();
+        } else {
+            tim = ((Timelined) characters.get(containerId)).getTimeline();
+            path = File.separator + characters.get(containerId).getExportFileName();
+        }
+        if (frames == null) {
+            int frameCnt = tim.frames.size();
+            frames = new ArrayList<>();
+            for (int i = 0; i < frameCnt; i++) {
+                frames.add(i);
+            }
+        }
+
+        final File foutdir = new File(outdir + path);
+        if (!foutdir.exists()) {
+            if (!foutdir.mkdirs()) {
+                if (!foutdir.exists()) {
+                    throw new IOException("Cannot create directory " + outdir);
+                }
+            }
+        }
+
+        final List<Integer> fframes = frames;
+
+        Color backgroundColor = null;
+        if (mode == FramesExportMode.AVI) {
+            for (Tag t : tags) {
+                if (t instanceof SetBackgroundColorTag) {
+                    SetBackgroundColorTag sb = (SetBackgroundColorTag) t;
+                    backgroundColor = sb.backgroundColor.toColor();
+                }
+            }
+        }
+
+        final List<BufferedImage> frameImages = new ArrayList<>();
+        for (int frame : frames) {
+            frameImages.add(frameToImageGet(tim, frame, 0, null, 0, tim.displayRect, new Matrix(), new ColorTransform(), backgroundColor).getBufferedImage());
+        }
+        switch (mode) {
+            case GIF:
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        makeGIF(frameImages, frameRate, new File(foutdir + File.separator + "frames.gif"));
+                    }
+                }, handler).run();
+                break;
+            case PNG:
+                for (int i = 0; i < frameImages.size(); i++) {
+                    final int fi = i;
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            ImageIO.write(frameImages.get(fi), "PNG", new File(foutdir + File.separator + fframes.get(fi) + ".png"));
+                        }
+                    }, handler).run();
+                }
+                break;
+            case AVI:
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        makeAVI(frameImages, frameRate, new File(foutdir + File.separator + "frames.avi"));
+                    }
+                }, handler).run();
+                break;
+        }
+
+        return ret;
+    }
+
     public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final SoundExportMode mode) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
@@ -1518,7 +1649,7 @@ public final class SWF implements TreeItem, Timelined {
         exportTexts(handler, outdir, tags, mode);
     }
 
-    public static List<File> exportShapes(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, ShapeExportMode mode) throws IOException {
+    public static List<File> exportShapes(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final ShapeExportMode mode) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1538,13 +1669,35 @@ public final class SWF implements TreeItem, Timelined {
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterId();
                 }
-                final File file = new File(outdir + File.separator + characterID + ".svg");
+                String ext = "svg";
+                if (mode == ShapeExportMode.PNG) {
+                    ext = "png";
+                }
+
+                final File file = new File(outdir + File.separator + characterID + "." + ext);
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
-                        try (FileOutputStream fos = new FileOutputStream(file)) {
-                            fos.write(Utf8Helper.getBytes(((ShapeTag) t).toSVG()));
+                        ShapeTag st = (ShapeTag) t;
+                        switch (mode) {
+                            case SVG:
+                                try (FileOutputStream fos = new FileOutputStream(file)) {
+                                    fos.write(Utf8Helper.getBytes(st.toSVG()));
+                                }
+                                break;
+                            case PNG:
+                                RECT rect = st.getRect();
+                                int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
+                                int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
+                                SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
+                                img.fillTransparent();
+                                Matrix m = new Matrix();
+                                m.translate(-rect.Xmin, -rect.Ymin);
+                                st.toImage(0, 0, 0, null, 0, img, m, new CXFORMWITHALPHA());
+                                ImageIO.write(img.getBufferedImage(), "PNG", new FileOutputStream(file));
+                                break;
                         }
+
                     }
                 }, handler).run();
                 ret.add(file);
@@ -2194,7 +2347,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform) {
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor) {
         String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode();
         SerializableImage image = getFromCache(key);
         if (image != null) {
@@ -2208,7 +2361,14 @@ public final class SWF implements TreeItem, Timelined {
         RECT rect = displayRect;
         image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
                 (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
-        image.fillTransparent();
+        if (backGroundColor == null) {
+            image.fillTransparent();
+        } else {
+            Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
+            g.setComposite(AlphaComposite.Src);
+            g.setColor(backGroundColor);
+            g.fill(new Rectangle(image.getWidth(), image.getHeight()));
+        }
         Matrix m = new Matrix();
         m.translate(-rect.Xmin, -rect.Ymin);
         frameToImage(timeline, frame, time, stateUnderCursor, mouseButton, image, m, colorTransform);

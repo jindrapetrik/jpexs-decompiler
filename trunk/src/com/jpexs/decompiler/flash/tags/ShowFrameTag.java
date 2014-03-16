@@ -42,8 +42,8 @@ public class ShowFrameTag extends Tag {
             add(StartSound2Tag.ID);
             add(VideoFrameTag.ID);
             add(SoundStreamBlockTag.ID);
-            add(SoundStreamHeadTag.ID);
-            add(SoundStreamHead2Tag.ID);
+            /*add(SoundStreamHeadTag.ID);
+             add(SoundStreamHead2Tag.ID);*/
         }
     };
     public List<Tag> innerTags;

@@ -26,8 +26,11 @@ import java.util.List;
  */
 public class FrameNode extends TreeNode {
 
-    public FrameNode(FrameNodeItem item, List<Tag> innerTags) {
+    public boolean scriptsNode = false;
+
+    public FrameNode(FrameNodeItem item, List<Tag> innerTags, boolean scriptsNode) {
         super(item);
+        this.scriptsNode = scriptsNode;
         if (innerTags != null) {
             for (Tag tag : innerTags) {
                 subNodes.add(new TagNode(tag));
