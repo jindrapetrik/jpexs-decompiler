@@ -79,7 +79,7 @@ public class InstanceInfo {
         if (isFinal()) {
             modifiers += "final ";
         }
-        if (isDynamic()) {
+        if (!isInterface() && isDynamic()) {
             modifiers += "dynamic ";
         }
         String objType = "class ";
