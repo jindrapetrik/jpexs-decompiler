@@ -1549,7 +1549,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                             FrameNodeItem fni = (FrameNodeItem) d.getItem();
                             Tag par = fni.getParent();
-                            int frame = fni.getFrame();
+                            int frame = fni.getFrame()-1; //Fix to zero based
                             int parentId = 0;
                             if (par != null) {
                                 parentId = ((CharacterTag) par).getCharacterId();
