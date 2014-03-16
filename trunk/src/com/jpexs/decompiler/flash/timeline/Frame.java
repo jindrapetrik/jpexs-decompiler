@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.timeline;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
-import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -49,17 +48,5 @@ public class Frame {
             layers.put(depth, new DepthState(obj.layers.get(depth), this, true));
         }
         //Do not copy sounds
-    }
-
-    private class Clip {
-
-        public Shape shape;
-        public int depth;
-
-        public Clip(Shape shape, int depth) {
-            this.shape = shape;
-            this.depth = depth;
-        }
-
     }
 }

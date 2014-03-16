@@ -27,13 +27,15 @@ import java.awt.Shape;
  *
  * @author JPEXS
  */
-public interface DrawableTag {
+public interface DrawableTag extends BoundedTag {
 
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform);
 
     public Point getImagePos(int frame);
 
     public int getNumFrames();
+
+    public boolean isSingleFrame();
 
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation);
 }

@@ -19,23 +19,26 @@ package com.jpexs.decompiler.flash.types.shaperecords;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,6 +53,7 @@ import javax.swing.JPanel;
 public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Serializable {
 
     public static final int MAX_CHARACTERS_IN_FONT_PREVIEW = 400;
+    private static final boolean DRAW_BOUNDING_BOX = false;
 
     public abstract void calculateBits();
 
@@ -125,34 +129,42 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return ret;
     }
 
-    public static SerializableImage shapeListToImage(SWF swf, List<SHAPE> shapes, int prevWidth, int prevHeight, Color color, ColorTransform colorTransform) {
+    public static void shapeListToImage(SWF swf, List<SHAPE> shapes, SerializableImage image, Color color, ColorTransform colorTransform) {
         if (shapes.isEmpty()) {
-            SerializableImage image = new SerializableImage(1, 1, BufferedImage.TYPE_INT_RGB);
-            image.fillTransparent();
-            return image;
+            return;
         }
-        SerializableImage ret = new SerializableImage(prevWidth, prevHeight, SerializableImage.TYPE_INT_ARGB);
-        Graphics g = ret.getGraphics();
+
+        int prevWidth = image.getWidth();
+        int prevHeight = image.getHeight();
 
         int maxw = 0;
         int maxh = 0;
+        int minXMin = 0;
+        int minYMin = 0;
         for (SHAPE s : shapes) {
             RECT r = SHAPERECORD.getBounds(s.shapeRecords);
+            if (r.Xmax < r.Xmin || r.Ymax < r.Ymin) {
+                continue;
+            }
             if (r.getWidth() > maxw) {
                 maxw = r.getWidth();
             }
             if (r.getHeight() > maxh) {
                 maxh = r.getHeight();
             }
+            if (r.Xmin < minXMin) {
+                minXMin = r.Xmin;
+            }
+            if (r.Ymin < minYMin) {
+                minYMin = r.Ymin;
+            }
         }
-        maxw /= SWF.unitDivisor;
-        maxh /= SWF.unitDivisor;
 
         int shapeCount = Math.min(MAX_CHARACTERS_IN_FONT_PREVIEW, shapes.size());
         int cols = (int) Math.ceil(Math.sqrt(shapeCount));
         int pos = 0;
-        int w2 = prevWidth / cols;
-        int h2 = prevHeight / cols;
+        int w2 = (int) (prevWidth * SWF.unitDivisor / cols);
+        int h2 = (int) (prevHeight * SWF.unitDivisor / cols);
 
         int mh = maxh * w2 / maxw;
         int mw;
@@ -173,21 +185,33 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 }
 
                 // shapeNum: 1
-                SerializableImage img = BitmapExporter.export(swf, shapes.get(pos), color, colorTransform);
+                SHAPE shape = shapes.get(pos);
+                List<SHAPERECORD> records = shape.shapeRecords;
+                RECT bounds = SHAPERECORD.getBounds(records);
 
-                int w1 = img.getWidth();
-                int h1 = img.getHeight();
+                int w1 = bounds.getWidth();
+                int h1 = bounds.getHeight();
 
-                int w = Math.round(ratio * w1);
-                int h = Math.round(ratio * h1);
-                int px = x * w2 + w2 / 2 - w / 2;
-                int py = y * h2 + w2 - h;
-                g.drawImage(img.getBufferedImage(), px, py, px + w, py + h, 0, 0, w1, h1, null);
+                double w = ratio * w1;
+                double h = ratio * h1;
+                double px = x * w2 + w2 / 2 - w / 2 - minXMin * ratio;
+                double py = y * h2 - minYMin * ratio;
+
+                Matrix transformation = new Matrix();
+                transformation.translate(px, py);
+                transformation = transformation.concatenate(Matrix.getScaleInstance(ratio));
+                BitmapExporter.export(swf, shape, color, image, transformation, colorTransform);
+
+                // draw bounding boxes
+                if (DRAW_BOUNDING_BOX) {
+                    RGB borderColor = new RGBA(Color.black);
+                    RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
+                    transformation = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(transformation);
+                    TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), transformation, colorTransform);
+                }
                 pos++;
             }
         }
-
-        return ret;
     }
 
     public abstract boolean isMove();

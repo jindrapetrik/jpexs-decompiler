@@ -957,4 +957,9 @@ public class DefineEditTextTag extends TextTag {
     public int getNumFrames() {
         return 1;
     }
+
+    @Override
+    public boolean isSingleFrame() {
+        return true;
+    }
 }

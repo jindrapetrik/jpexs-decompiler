@@ -54,7 +54,7 @@ import java.util.Set;
 /**
  * Defines a sprite character
  */
-public class DefineSpriteTag extends CharacterTag implements Container, BoundedTag, DrawableTag, Timelined {
+public class DefineSpriteTag extends CharacterTag implements Container, DrawableTag, Timelined {
 
     /**
      * Character ID of sprite
@@ -74,6 +74,9 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     public static final int ID = 39;
 
     private Timeline timeline;
+
+    private boolean isSingleFrameInitialized;
+    private boolean isSingleFrame;
 
     @Override
     public Timeline getTimeline() {
@@ -280,6 +283,26 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     @Override
     public int getNumFrames() {
         return frameCount;
+    }
+
+    @Override
+    public boolean isSingleFrame() {
+        if (!isSingleFrameInitialized) {
+            initialiteIsSingleFrame();
+        }
+        return isSingleFrame;
+    }
+
+    private synchronized void initialiteIsSingleFrame() {
+        if (!isSingleFrameInitialized) {
+            if (frameCount > 1) {
+                isSingleFrameInitialized = true;
+                return;
+            }
+
+            isSingleFrame = getTimeline().isSingleFrame();
+            isSingleFrameInitialized = true;
+        }
     }
 
     @Override

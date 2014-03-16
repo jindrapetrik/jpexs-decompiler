@@ -252,7 +252,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         shape.shapeRecords.add(bottom);
         shape.shapeRecords.add(left);
         shape.shapeRecords.add(new EndShapeRecord());
-        BitmapExporter.exportTo(swf, shape, null, image, mat, colorTransform);
+        BitmapExporter.export(swf, shape, null, image, mat, colorTransform);
     }
 
     public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
@@ -294,7 +294,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
-                    BitmapExporter.exportTo(swf, shape, textColor, image, mat, colorTransform);
+                    BitmapExporter.export(swf, shape, textColor, image, mat, colorTransform);
                     x += entry.glyphAdvance;
                 }
             }

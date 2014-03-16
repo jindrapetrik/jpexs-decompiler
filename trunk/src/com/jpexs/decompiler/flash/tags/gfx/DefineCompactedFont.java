@@ -19,13 +19,11 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -41,8 +39,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.SerializableImage;
-import java.awt.Color;
 import java.awt.Font;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -109,21 +105,6 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
 
     public void rebuildShapeCache() {
         shapeCache = fonts.get(0).getGlyphShapes();
-    }
-
-    @Override
-    public SerializableImage toImage(int frame, int ratio, Matrix transformation, ColorTransform colorTransform) {
-        List<SHAPE> shapes = new ArrayList<>();
-        for (int i = 0; i < shapeCache.size(); i++) {
-            shapes.add(SHAPERECORD.resizeSHAPE(shapeCache.get(i), SWF.unitDivisor));
-        }
-        int cols = (int) Math.ceil(Math.sqrt(shapes.size()));
-        int size = 500;
-        if (size / cols < 30) {
-            size = cols * 30;
-        }
-        SerializableImage ret = SHAPERECORD.shapeListToImage(swf, shapes, size, size, Color.black, colorTransform);
-        return ret;
     }
 
     @Override

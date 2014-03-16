@@ -23,13 +23,9 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
-import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
-import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
-import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
-import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -67,13 +63,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     private Stroke defaultStroke;
     private double unitDivisor;
 
-    public static SerializableImage export(SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
-        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, colorTransform);
-        exporter.export();
-        return exporter.getImage();
-    }
-
-    public static void exportTo(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public static void export(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, colorTransform);
         exporter.exportTo(image, transformation);
     }
@@ -82,34 +72,6 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
         super(shape, colorTransform);
         this.swf = swf;
         this.defaultColor = defaultColor;
-    }
-
-    @Override
-    public void export() {
-        List<SHAPERECORD> records = shape.shapeRecords;
-        RECT bounds = SHAPERECORD.getBounds(records);
-        int maxLineWidthTwips = 0;
-        if (shape instanceof SHAPEWITHSTYLE) {
-            SHAPEWITHSTYLE shapeWithStyle = (SHAPEWITHSTYLE) shape;
-            for (LINESTYLE lineStyle : shapeWithStyle.lineStyles.lineStyles) {
-                if (lineStyle.width > maxLineWidthTwips) {
-                    maxLineWidthTwips = lineStyle.width;
-                }
-            }
-        }
-        unitDivisor = SWF.unitDivisor;
-        double maxLineWidth = maxLineWidthTwips / unitDivisor / 2;
-        deltaX = bounds.Xmin / unitDivisor - maxLineWidth;
-        deltaY = bounds.Ymin / unitDivisor - maxLineWidth;
-        double width = bounds.getWidth() / unitDivisor + 2 * (maxLineWidth + 1);
-        double height = bounds.getHeight() / unitDivisor + 2 * (maxLineWidth + 1);
-        image = new SerializableImage((int) width, (int) height, SerializableImage.TYPE_INT_ARGB);
-        image.fillTransparent();
-
-        graphics = (Graphics2D) image.getGraphics();
-
-        defaultStroke = graphics.getStroke();
-        super.export();
     }
 
     private void exportTo(SerializableImage image, Matrix transformation) {

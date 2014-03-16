@@ -83,6 +83,9 @@ public class DefineButton2Tag extends ButtonTag implements Container {
 
     private Timeline timeline;
 
+    private boolean isSingleFrameInitialized;
+    private boolean isSingleFrame;
+
     @Override
     public int getCharacterId() {
         return buttonId;
@@ -250,6 +253,21 @@ public class DefineButton2Tag extends ButtonTag implements Container {
     @Override
     public int getNumFrames() {
         return 1;
+    }
+
+    @Override
+    public boolean isSingleFrame() {
+        if (!isSingleFrameInitialized) {
+            initialiteIsSingleFrame();
+        }
+        return isSingleFrame;
+    }
+
+    private synchronized void initialiteIsSingleFrame() {
+        if (!isSingleFrameInitialized) {
+            isSingleFrame = getTimeline().isSingleFrame();
+            isSingleFrameInitialized = true;
+        }
     }
 
     @Override

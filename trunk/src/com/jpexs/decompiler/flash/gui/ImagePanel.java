@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -52,7 +51,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -122,6 +120,9 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
 
         public Point toImagePoint(Point p) {
+            if (img == null) {
+                return null;
+            }
             return new Point((p.x - rect.x) * img.getWidth() / rect.width, (p.y - rect.y) * img.getHeight() / rect.height);
         }
 
@@ -150,6 +151,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 }
 
                 rect = new Rectangle(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2, w, h);
+            } else {
+                rect = null;
             }
         }
 
@@ -221,13 +224,15 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 m.scale(scale);
                 Point p = e.getPoint();
                 p = iconPanel.toImagePoint(p);
-                int x = p.x;
-                int y = p.y;
                 List<DepthState> objs = new ArrayList<>();
-                objs = iconPanel.getObjectsUnderPoint(p);
                 String ret = "";
+                if (p != null) {
+                    int x = p.x;
+                    int y = p.y;
+                    objs = iconPanel.getObjectsUnderPoint(p);
 
-                ret += " [" + x + "," + y + "] : ";
+                    ret += " [" + x + "," + y + "] : ";
+                }
 
                 boolean first = true;
                 for (int i = 0; i < objs.size(); i++) {
@@ -468,7 +473,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         soundPlayers.clear();
     }
 
-    private void nextFrame() {
+    private void nextFrame(boolean first) {
         int newframe = frame == timelined.getTimeline().frames.size() - 1 ? 0 : frame + 1;
         if (stillFrame) {
             newframe = frame;
@@ -480,13 +485,16 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             frame = newframe;
             time = 0;
         } else {
+            if (!first && timelined.getTimeline().isSingleFrame()) {
+                return;
+            }
             time++;
         }
         drawFrame();
     }
 
     private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton) {
-        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode()) + "_" + time;
+        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode());
         SerializableImage img = SWF.getFromCache(key);
         if (img == null) {
             if (drawable instanceof BoundedTag) {
@@ -497,7 +505,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                 }
                 int width = rect.getWidth();
                 int height = rect.getHeight();
-                double scale = 1.0;
                 SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
                         (int) (height / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
                 image.fillTransparent();
@@ -519,18 +526,16 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
                  }*/
 
                 img = image;
-            } else if (drawable instanceof FontTag) {
-                // only DefineFont tags
-                FontTag fontTag = (FontTag) drawable;
-                img = fontTag.toImage(frame, frame, Matrix.getScaleInstance(1 / SWF.unitDivisor), new ColorTransform());
             }
-            SWF.putToCache(key, img);
+            if (drawable.getTimeline().isSingleFrame()) {
+                SWF.putToCache(key, img);
+            }
         }
         return img;
     }
 
     private void drawFrame() {
-        if (timelined == null) {
+        if (timelined == null || timelined.getTimeline().getFrameCount() <= frame) {
             return;
         }
 
@@ -539,7 +544,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         mat.translateX = swf.displayRect.Xmin;
         mat.translateY = swf.displayRect.Ymin;
         updatePos(lastMouseEvent, false);
-        BufferedImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton).getBufferedImage();
+        SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton);
         List<Integer> sounds = new ArrayList<>();
         List<String> soundClasses = new ArrayList<>();
         timelined.getTimeline().getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);
@@ -559,7 +564,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             }
         }
 
-        iconPanel.setImg(new SerializableImage(img));
+        iconPanel.setImg(img);
     }
 
     private void playSound(SoundTag st) {
@@ -613,9 +618,12 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (timelined != null) {
             timer = new Timer();
             timer.schedule(new TimerTask() {
+                boolean first = true;
+
                 @Override
                 public void run() {
-                    nextFrame();
+                    nextFrame(first);
+                    first = false;
                 }
             }, 0, 1000 / timelined.getTimeline().frameRate);
         } else {

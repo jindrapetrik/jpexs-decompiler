@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public abstract class ButtonTag extends CharacterTag implements BoundedTag, DrawableTag, Timelined {
+public abstract class ButtonTag extends CharacterTag implements DrawableTag, Timelined {
 
     public static int FRAME_UP = 0;
     public static int FRAME_OVER = 1;

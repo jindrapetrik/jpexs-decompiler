@@ -87,6 +87,9 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     private Timeline timeline;
 
+    private boolean isSingleFrameInitialized;
+    private boolean isSingleFrame;
+
     @Override
     public List<BUTTONRECORD> getRecords() {
         return characters;
@@ -273,6 +276,21 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     @Override
     public int getNumFrames() {
         return 1;
+    }
+
+    @Override
+    public boolean isSingleFrame() {
+        if (!isSingleFrameInitialized) {
+            initialiteIsSingleFrame();
+        }
+        return isSingleFrame;
+    }
+
+    private synchronized void initialiteIsSingleFrame() {
+        if (!isSingleFrameInitialized) {
+            isSingleFrame = getTimeline().isSingleFrame();
+            isSingleFrameInitialized = true;
+        }
     }
 
     @Override

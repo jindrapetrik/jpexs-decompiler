@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -59,7 +58,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, MorphShapeTag, DrawableTag {
+public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag, DrawableTag {
 
     @SWFType(BasicType.UI16)
     public int characterId;
@@ -322,7 +321,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
         // todo: Currently the generated image is not cached, because the cache 
         // key contains the hashCode of the finalRecord object, and it is always 
         // recreated
-        BitmapExporter.exportTo(swf, shape, null, image, transformation, colorTransform);
+        BitmapExporter.export(swf, shape, null, image, transformation, colorTransform);
     }
 
     @Override
@@ -335,6 +334,12 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     @Override
     public int getNumFrames() {
         return 65536;
+    }
+
+    @Override
+    public boolean isSingleFrame() {
+        // Morpshape is a single frame specified with the ratio
+        return true;
     }
 
     @Override

@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
@@ -171,18 +170,6 @@ public class Timeline {
         SWF.frameToImage(this, frame, time, stateUnderCursor, mouseButton, image, transformation, colorTransform);
     }
 
-    private class Clip {
-
-        public Shape shape;
-        public int depth;
-
-        public Clip(Shape shape, int depth) {
-            this.shape = shape;
-            this.depth = depth;
-        }
-
-    }
-
     public void getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton, List<Integer> sounds, List<String> soundClasses) {
         Frame fr = this.frames.get(frame);
         sounds.addAll(fr.sounds);
@@ -232,7 +219,7 @@ public class Timeline {
                 continue;
             }
             CharacterTag c = swf.characters.get(ds.characterId);
-            if ((c instanceof DrawableTag) && (c instanceof BoundedTag)) {
+            if (c instanceof DrawableTag) {
                 Matrix m = new Matrix(ds.matrix);
                 m = m.preConcatenate(transformation);
 
@@ -297,7 +284,7 @@ public class Timeline {
                 continue;
             }
             CharacterTag c = swf.characters.get(ds.characterId);
-            if ((c instanceof DrawableTag) && (c instanceof BoundedTag)) {
+            if (c instanceof DrawableTag) {
                 Matrix m = new Matrix(ds.matrix);
                 m = m.preConcatenate(transformation);
 
@@ -333,5 +320,30 @@ public class Timeline {
             }
         }
         return area;
+    }
+
+    public boolean isSingleFrame() {
+        Frame frameObj = frames.get(0);
+        for (int i = 1; i <= getMaxDepth(); i++) {
+            if (!frameObj.layers.containsKey(i)) {
+                continue;
+            }
+            DepthState layer = frameObj.layers.get(i);
+            if (!swf.characters.containsKey(layer.characterId)) {
+                continue;
+            }
+            if (!layer.isVisible) {
+                continue;
+            }
+            CharacterTag character = swf.characters.get(layer.characterId);
+            if (character instanceof DrawableTag) {
+                DrawableTag drawable = (DrawableTag) character;
+                if (!drawable.isSingleFrame()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

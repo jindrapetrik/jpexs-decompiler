@@ -501,4 +501,9 @@ public class DefineText2Tag extends TextTag {
     public int getNumFrames() {
         return 1;
     }
+
+    @Override
+    public boolean isSingleFrame() {
+        return true;
+    }
 }

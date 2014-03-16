@@ -32,10 +32,8 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.FontRenderContext;
@@ -51,7 +49,9 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public abstract class FontTag extends CharacterTag implements AloneTag, BoundedTag, DrawableTag {
+public abstract class FontTag extends CharacterTag implements AloneTag, DrawableTag {
+
+    protected final int previewSize = 500;
 
     public FontTag(SWF swf, int id, String name, byte[] data, long pos) {
         super(swf, id, name, data, pos);
@@ -252,15 +252,9 @@ public abstract class FontTag extends CharacterTag implements AloneTag, BoundedT
         return defaultFontName;
     }
 
-    public SerializableImage toImage(int frame, int ratio, Matrix transformation, ColorTransform colorTransform) {
-        return SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), 500, 500, Color.black, colorTransform);
-    }
-
     @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        g.setComposite(AlphaComposite.SrcOver);
-        g.drawImage(toImage(0, 0, new Matrix(), colorTransform).getBufferedImage(), transformation.toTransform(), null);
+        SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), image, Color.black, colorTransform);
     }
 
     @Override
@@ -274,6 +268,11 @@ public abstract class FontTag extends CharacterTag implements AloneTag, BoundedT
     }
 
     @Override
+    public boolean isSingleFrame() {
+        return true;
+    }
+
+    @Override
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
         RECT r = getRect();
         return new Area(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
@@ -281,7 +280,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, BoundedT
 
     @Override
     public RECT getRect() {
-        return new RECT(0, (int) (500 * SWF.unitDivisor), 0, (int) (500 * SWF.unitDivisor));
+        return new RECT(0, (int) (previewSize * SWF.unitDivisor), 0, (int) (previewSize * SWF.unitDivisor));
     }
 
 }

@@ -87,4 +87,9 @@ public class DefineShape2Tag extends ShapeTag {
     public int getNumFrames() {
         return 1;
     }
+
+    @Override
+    public boolean isSingleFrame() {
+        return true;
+    }
 }

@@ -65,7 +65,6 @@ public class DepthState {
     public DepthState(DepthState obj, Frame frame, boolean sameInstance) {
         this.frame = frame;
         swf = obj.swf;
-        frame = obj.frame;
         characterId = obj.characterId;
         matrix = obj.matrix;
         instanceName = obj.instanceName;

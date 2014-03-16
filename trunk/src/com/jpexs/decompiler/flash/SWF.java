@@ -94,7 +94,6 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
-import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
@@ -102,6 +101,7 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.timeline.Clip;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -177,7 +177,6 @@ import java.util.zip.InflaterInputStream;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
 import net.kroo.elliot.GifSequenceWriter;
 import org.monte.media.VideoFormatKeys;
 import org.monte.media.avi.AVIWriter;
@@ -2389,18 +2388,6 @@ public final class SWF implements TreeItem, Timelined {
         }
     }
 
-    private static class Clip {
-
-        public Shape shape;
-        public int clipDepth;
-
-        public Clip(Shape clip, int clipDepth) {
-            this.shape = clip;
-            this.clipDepth = clipDepth;
-        }
-
-    }
-
     public static void frameToImage(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         float unzoom = (float) SWF.unitDivisor;
         if (timeline.frames.size() <= frame) {
@@ -2416,7 +2403,7 @@ public final class SWF implements TreeItem, Timelined {
 
         for (int i = 1; i <= timeline.getMaxDepth(); i++) {
             for (int c = 0; c < clips.size(); c++) {
-                if (clips.get(c).clipDepth == i) {
+                if (clips.get(c).depth == i) {
                     g.setClip(prevClips.get(c));
                     prevClips.remove(c);
                     clips.remove(c);
@@ -2450,7 +2437,7 @@ public final class SWF implements TreeItem, Timelined {
                 DrawableTag drawable = (DrawableTag) character;
                 SerializableImage img;
                 Matrix drawMatrix = new Matrix();
-                int dframe = 0 + (time + layer.time) % drawable.getNumFrames();
+                int dframe = (time + layer.time) % drawable.getNumFrames();
                 if (character instanceof ButtonTag) {
                     ButtonTag bt = (ButtonTag) character;
                     dframe = ButtonTag.FRAME_UP;
@@ -2463,64 +2450,56 @@ public final class SWF implements TreeItem, Timelined {
                     }
                 }
 
-                if (drawable instanceof BoundedTag) {
-                    BoundedTag bounded = (BoundedTag) drawable;
-                    RECT boundRect = bounded.getRect();
-                    ExportRectangle rect = new ExportRectangle(boundRect);
-                    rect = mat.transform(rect);
-                    Matrix m = mat.clone();
-                    if (layer.filters != null) {
-                        // calculate size after applying the filters
-                        double deltaXMax = 0;
-                        double deltaYMax = 0;
-                        for (FILTER filter : layer.filters) {
-                            double x = filter.getDeltaX();
-                            double y = filter.getDeltaY();
-                            deltaXMax = Math.max(x, deltaXMax);
-                            deltaYMax = Math.max(y, deltaYMax);
-                        }
-                        rect.xMin -= deltaXMax * SWF.unitDivisor;
-                        rect.xMax += deltaXMax * SWF.unitDivisor;
-                        rect.yMin -= deltaYMax * SWF.unitDivisor;
-                        rect.yMax += deltaYMax * SWF.unitDivisor;
+                RECT boundRect = drawable.getRect();
+                ExportRectangle rect = new ExportRectangle(boundRect);
+                rect = mat.transform(rect);
+                Matrix m = mat.clone();
+                if (layer.filters != null) {
+                    // calculate size after applying the filters
+                    double deltaXMax = 0;
+                    double deltaYMax = 0;
+                    for (FILTER filter : layer.filters) {
+                        double x = filter.getDeltaX();
+                        double y = filter.getDeltaY();
+                        deltaXMax = Math.max(x, deltaXMax);
+                        deltaYMax = Math.max(y, deltaYMax);
                     }
-
-                    rect.xMin = Math.max(0, rect.xMin);
-                    rect.yMin = Math.max(0, rect.yMin);
-
-                    int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
-                    int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
-                    int deltaX = (int) (rect.xMin / SWF.unitDivisor);
-                    int deltaY = (int) (rect.yMin / SWF.unitDivisor);
-                    newWidth = Math.min(image.getWidth() - deltaX, newWidth) + 1;
-                    newHeight = Math.min(image.getHeight() - deltaY, newHeight) + 1;
-
-                    if (newWidth <= 0 || newHeight <= 0) {
-                        continue;
-                    }
-
-                    img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
-                    img.fillTransparent();
-
-                    m.translate(-rect.xMin, -rect.yMin);
-                    drawMatrix.translate(rect.xMin, rect.yMin);
-
-                    drawable.toImage(dframe, layer.time + time, layer.ratio, stateUnderCursor, mouseButton, img, m, clrTrans);
-                    //if(stateUnderCursor == layer){
-                  /* if(true){
-                     Graphics2D gg = (Graphics2D)img.getGraphics();
-                     gg.setStroke(new BasicStroke(3));
-                     gg.setPaint(Color.red);
-                     gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
-                     gg.draw(SHAPERECORD.twipToPixelShape(drawable.getOutline(frame, layer.ratio, stateUnderCursor, mouseButton, m)));
-                     }*/
-                } else if (drawable instanceof FontTag) {
-                    // only DefineFont tags
-                    FontTag fontTag = (FontTag) drawable;
-                    img = fontTag.toImage(dframe, layer.ratio, transformation, clrTrans);
-                } else {
-                    throw new Error("Unsupported drawable.");
+                    rect.xMin -= deltaXMax * SWF.unitDivisor;
+                    rect.xMax += deltaXMax * SWF.unitDivisor;
+                    rect.yMin -= deltaYMax * SWF.unitDivisor;
+                    rect.yMax += deltaYMax * SWF.unitDivisor;
                 }
+
+                rect.xMin = Math.max(0, rect.xMin);
+                rect.yMin = Math.max(0, rect.yMin);
+
+                int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
+                int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
+                int deltaX = (int) (rect.xMin / SWF.unitDivisor);
+                int deltaY = (int) (rect.yMin / SWF.unitDivisor);
+                newWidth = Math.min(image.getWidth() - deltaX, newWidth) + 1;
+                newHeight = Math.min(image.getHeight() - deltaY, newHeight) + 1;
+
+                if (newWidth <= 0 || newHeight <= 0) {
+                    continue;
+                }
+
+                img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
+                img.fillTransparent();
+
+                m.translate(-rect.xMin, -rect.yMin);
+                drawMatrix.translate(rect.xMin, rect.yMin);
+
+                drawable.toImage(dframe, layer.time + time, layer.ratio, stateUnderCursor, mouseButton, img, m, clrTrans);
+                //if(stateUnderCursor == layer){
+              /* if(true){
+                 Graphics2D gg = (Graphics2D)img.getGraphics();
+                 gg.setStroke(new BasicStroke(3));
+                 gg.setPaint(Color.red);
+                 gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
+                 gg.draw(SHAPERECORD.twipToPixelShape(drawable.getOutline(frame, layer.ratio, stateUnderCursor, mouseButton, m)));
+                 }*/
+
                 if (layer.filters != null) {
                     for (FILTER filter : layer.filters) {
                         img = filter.apply(img);
