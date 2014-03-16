@@ -1049,7 +1049,7 @@ public final class SWF implements TreeItem, Timelined {
             TreeNode addNode = null;
             if (t instanceof ShowFrameTag) {
                 // do not add PlaceObjects (+etc) to script nodes
-                FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, false), null, true);
+                FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, (ShowFrameTag) t, false), null, true);
 
                 for (int r = ret.size() - 1; r >= 0; r--) {
                     if (!(ret.get(r).getItem() instanceof DefineSpriteTag)) {
@@ -2722,14 +2722,14 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public void removeTag(Tag t) {
-        if (ShowFrameTag.isNestedTagType(t.getId())) {
-            List<Tag> tags;
-            Timelined timelined = t.getTimelined();
-            if (timelined instanceof DefineSpriteTag) {
-                tags = ((DefineSpriteTag) timelined).getSubTags();
-            } else {
-                tags = this.tags;
-            }
+        List<Tag> tags;
+        Timelined timelined = t.getTimelined();
+        if (timelined instanceof DefineSpriteTag) {
+            tags = ((DefineSpriteTag) timelined).getSubTags();
+        } else {
+            tags = this.tags;
+        }
+        if (t instanceof ShowFrameTag || ShowFrameTag.isNestedTagType(t.getId())) {
             tags.remove(t);
             timelined.resetTimeline();
         } else {

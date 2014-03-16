@@ -409,18 +409,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (paths == null || paths.length == 0) {
                         return;
                     }
-                    boolean allSelectedIsTag = true;
+                    boolean allSelectedIsTagOrFrame = true;
                     for (TreePath treePath : paths) {
                         TreeNode treeNode = (TreeNode) treePath.getLastPathComponent();
 
-                        if (treeNode instanceof TreeNode) {
-                            TreeItem tag = treeNode.getItem();
-                            if (!(tag instanceof Tag)) {
-                                allSelectedIsTag = false;
-                                break;
-                            }
-                        } else {
-                            allSelectedIsTag = false;
+                        TreeItem tag = treeNode.getItem();
+                        if (!(tag instanceof Tag) && !(tag instanceof FrameNodeItem)) {
+                            allSelectedIsTagOrFrame = false;
+                            break;
                         }
                     }
 
@@ -479,7 +475,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         expandRecursiveMenuItem.setVisible(model.getChildCount(treeNode) > 0);
                     }
 
-                    removeMenuItem.setVisible(allSelectedIsTag);
+                    removeMenuItem.setVisible(allSelectedIsTagOrFrame);
                     exportSelectionMenuItem.setEnabled(hasExportableNodes());
                     contextPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
@@ -2421,6 +2417,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     TreeItem tag = o.getItem();
                     if (tag instanceof Tag) {
                         tagsToRemove.add((Tag) tag);
+                    } else if (tag instanceof FrameNodeItem) {
+                        FrameNodeItem frame = (FrameNodeItem) tag;
+                        tagsToRemove.add(frame.getShowFrameTag());
                     }
                 }
 

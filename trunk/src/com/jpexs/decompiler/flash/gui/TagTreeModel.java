@@ -122,7 +122,7 @@ public class TagTreeModel implements TreeModel {
             switch (ttype) {
                 case SHOW_FRAME:
                     ShowFrameTag showFrameTag = (ShowFrameTag) t;
-                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true), showFrameTag.innerTags, false));
+                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, showFrameTag, true), showFrameTag.innerTags, false));
                     break;
                 case SHAPE:
                     shapes.add(new TagNode(t));
@@ -277,7 +277,7 @@ public class TagTreeModel implements TreeModel {
             switch (ttype) {
                 case SHOW_FRAME:
                     ShowFrameTag showFrameTag = (ShowFrameTag) t;
-                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, true), showFrameTag.innerTags, false));
+                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, showFrameTag, true), showFrameTag.innerTags, false));
                     break;
                 default:
                     if (!actionScriptTags.contains(t) && !ShowFrameTag.isNestedTagType(t.getId())) {
