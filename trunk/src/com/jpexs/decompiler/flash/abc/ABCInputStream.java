@@ -111,9 +111,9 @@ public class ABCInputStream extends InputStream {
         return read();
     }
 
-    public int readU32() throws IOException {
+    public long readU32() throws IOException {
         int i;
-        int ret = 0;
+        long ret = 0;
         int bytePos = 0;
         int byteCount = 0;
         boolean nextByte;
@@ -121,7 +121,7 @@ public class ABCInputStream extends InputStream {
             i = read();
             nextByte = (i >> 7) == 1;
             i &= 0x7f;
-            ret += (i << bytePos);
+            ret += (((long) i) << bytePos);
             byteCount++;
             bytePos += 7;
         } while (nextByte);
@@ -129,7 +129,7 @@ public class ABCInputStream extends InputStream {
     }
 
     public int readU30() throws IOException {
-        return readU32();
+        return (int) readU32();
     }
 
     public int readS24() throws IOException {
