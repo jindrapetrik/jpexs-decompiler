@@ -1263,45 +1263,46 @@ public class SWFInputStream extends InputStream {
         byte[] data = readBytes((int) tagLength);
         Tag ret = new Tag(swf, tagID, "Unresolved", data, pos);
         ret.forceWriteAsLong = readLong;
-        byte[] dataNew = ret.getData();
 
-        int ignoreFirst = 0;
-        for (int i = 0; i < data.length; i++) {
-            if (i >= dataNew.length) {
-                break;
-            }
-            if (dataNew[i] != data[i]) {
-                if (ignoreFirst > 0) {
-                    ignoreFirst--;
-                    continue;
-                }
-                String e = "";
-                e = ("TAG " + ret.toString() + " WRONG, ");
-                for (int j = i - 10; j <= i + 5; j++) {
-                    while (j < 0) {
-                        j++;
-                    }
-                    if (j >= data.length) {
-                        break;
-                    }
-                    if (j >= dataNew.length) {
-                        break;
-                    }
-                    if (j >= i) {
-                        e += (Long.toHexString(data[j] & 0xff) + " ( is " + Long.toHexString(dataNew[j] & 0xff) + ") ");
-                    } else {
-                        e += (Long.toHexString(data[j] & 0xff) + " ");
-                    }
-                }
-                logger.fine(e);
-            }
-        }
         if (resolve) {
             try {
-                return resolveTag(swf, ret, level, parallel, skipUnusualTags, gfx);
+                ret = resolveTag(swf, ret, level, parallel, skipUnusualTags, gfx);
             } catch (EndOfStreamException ex) {
                 Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, null, ex);
-                return ret;
+            }
+            
+            if (Configuration.debugMode.get()) {
+                byte[] dataNew = ret.getData();
+                int ignoreFirst = 0;
+                for (int i = 0; i < data.length; i++) {
+                    if (i >= dataNew.length) {
+                        break;
+                    }
+                    if (dataNew[i] != data[i]) {
+                        if (ignoreFirst > 0) {
+                            ignoreFirst--;
+                            continue;
+                        }
+                        String e = "TAG " + ret.toString() + " WRONG, ";
+                        for (int j = i - 10; j <= i + 5; j++) {
+                            while (j < 0) {
+                                j++;
+                            }
+                            if (j >= data.length) {
+                                break;
+                            }
+                            if (j >= dataNew.length) {
+                                break;
+                            }
+                            if (j >= i) {
+                                e += (Long.toHexString(data[j] & 0xff) + " ( is " + Long.toHexString(dataNew[j] & 0xff) + ") ");
+                            } else {
+                                e += (Long.toHexString(data[j] & 0xff) + " ");
+                            }
+                        }
+                        logger.fine(e);
+                    }
+                }
             }
         }
         return ret;

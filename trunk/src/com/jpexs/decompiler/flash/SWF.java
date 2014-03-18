@@ -592,7 +592,7 @@ public final class SWF implements TreeItem, Timelined {
         } else {
             boolean hasNonUnknownTag = false;
             for (Tag tag : tags) {
-                if (tag.getData().length > 0 && Tag.getRequiredTags().contains(tag.getId())) {
+                if (tag.getOriginalData().length > 0 && Tag.getRequiredTags().contains(tag.getId())) {
                     hasNonUnknownTag = true;
                 }
             }

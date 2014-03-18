@@ -2753,7 +2753,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    private void createAndShowTempSwf(Object tagObj) {
+    private void createAndShowTempSwf(TreeItem tagObj) {
         SWF swf;
         try {
             if (tempFile != null) {
