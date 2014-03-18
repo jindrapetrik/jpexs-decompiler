@@ -78,7 +78,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
         SWFInputStream sis = new SWFInputStream(is, swf.version);
         flags = sis.readUI32();
         name = sis.readString();
-        abc = new ABC(is, swf);
+        abc = new ABC(is, swf, this);
     }
 
     /**

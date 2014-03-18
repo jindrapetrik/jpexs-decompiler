@@ -727,6 +727,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     } else {
                         src.setActions(ASMParser.parse(0, src.getPos(), true, text, src.getSwf().version, false));
                     }
+                    src.setModified();
                     setSource(this.src, false);
                     View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
                     saveButton.setVisible(false);
@@ -749,6 +750,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 try {
                     ActionScriptParser par = new ActionScriptParser();
                     src.setActions(par.actionsFromString(decompiledEditor.getText()));
+                    src.setModified();
                     setSource(src, false);
 
                     View.showMessageDialog(this, AppStrings.translate("message.action.saved"));

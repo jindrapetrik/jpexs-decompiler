@@ -103,6 +103,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         sos2.writeBytesZlib(bitmapDataOS.toByteArray());
         zlibBitmapData = zlibOS.toByteArray();
         decompressed = false;
+        setModified(true);
     }
 
     @Override

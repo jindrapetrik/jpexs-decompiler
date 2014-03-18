@@ -1675,8 +1675,8 @@ public class SWFInputStream extends InputStream {
      * @return CLIPACTIONRECORD value
      * @throws IOException
      */
-    public CLIPACTIONRECORD readCLIPACTIONRECORD(SWF swf) throws IOException {
-        CLIPACTIONRECORD ret = new CLIPACTIONRECORD(swf, this, getPos());
+    public CLIPACTIONRECORD readCLIPACTIONRECORD(SWF swf, Tag tag) throws IOException {
+        CLIPACTIONRECORD ret = new CLIPACTIONRECORD(swf, this, getPos(), tag);
         if (ret.eventFlags.isClear()) {
             return null;
         }
@@ -1691,13 +1691,13 @@ public class SWFInputStream extends InputStream {
      * @return CLIPACTIONS value
      * @throws IOException
      */
-    public CLIPACTIONS readCLIPACTIONS(SWF swf) throws IOException {
+    public CLIPACTIONS readCLIPACTIONS(SWF swf, Tag tag) throws IOException {
         CLIPACTIONS ret = new CLIPACTIONS();
         ret.reserved = readUI16();
         ret.allEventFlags = readCLIPEVENTFLAGS();
         CLIPACTIONRECORD cr;
         ret.clipActionRecords = new ArrayList<>();
-        while ((cr = readCLIPACTIONRECORD(swf)) != null) {
+        while ((cr = readCLIPACTIONRECORD(swf, tag)) != null) {
             ret.clipActionRecords.add(cr);
         }
         return ret;
@@ -2032,10 +2032,10 @@ public class SWFInputStream extends InputStream {
      * @return List of BUTTONCONDACTION values
      * @throws IOException
      */
-    public List<BUTTONCONDACTION> readBUTTONCONDACTIONList(SWF swf) throws IOException {
+    public List<BUTTONCONDACTION> readBUTTONCONDACTIONList(SWF swf, Tag tag) throws IOException {
         List<BUTTONCONDACTION> ret = new ArrayList<>();
         BUTTONCONDACTION bc;
-        while (!(bc = readBUTTONCONDACTION(swf)).isLast) {
+        while (!(bc = readBUTTONCONDACTION(swf, tag)).isLast) {
             ret.add(bc);
         }
         ret.add(bc);
@@ -2049,8 +2049,8 @@ public class SWFInputStream extends InputStream {
      * @return BUTTONCONDACTION value
      * @throws IOException
      */
-    public BUTTONCONDACTION readBUTTONCONDACTION(SWF swf) throws IOException {
-        BUTTONCONDACTION ret = new BUTTONCONDACTION(swf, this, getPos());
+    public BUTTONCONDACTION readBUTTONCONDACTION(SWF swf, Tag tag) throws IOException {
+        BUTTONCONDACTION ret = new BUTTONCONDACTION(swf, this, getPos(), tag);
         //ret.actions = readActionList();
         return ret;
     }

@@ -147,6 +147,11 @@ public class DoActionTag extends Tag implements ASMSource {
     }
 
     @Override
+    public void setModified() {
+        setModified(true);
+    }
+    
+    @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
         return Helper.byteArrayToHexWithHeader(writer, actionBytes);
     }

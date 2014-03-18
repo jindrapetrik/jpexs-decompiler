@@ -113,7 +113,7 @@ public class DefineButton2Tag extends ButtonTag implements Container {
         int actionOffset = sis.readUI16();
         characters = sis.readBUTTONRECORDList(true);
         if (actionOffset > 0) {
-            actions = sis.readBUTTONCONDACTIONList(swf);
+            actions = sis.readBUTTONCONDACTIONList(swf, this);
         }
     }
 

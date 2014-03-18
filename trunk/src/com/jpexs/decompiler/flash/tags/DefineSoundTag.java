@@ -282,6 +282,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
             this.soundData = newSoundData;
             this.soundType = newSoundType;
             this.soundFormat = newSoundFormat;
+            setModified(true);
             return true;
         }
         return false;

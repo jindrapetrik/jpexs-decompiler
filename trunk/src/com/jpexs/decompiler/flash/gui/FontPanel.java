@@ -137,6 +137,7 @@ public class FontPanel extends javax.swing.JPanel {
                 }
             }
         }
+        ft.setModified(true);
         SWF.clearImageCache();
     }
 

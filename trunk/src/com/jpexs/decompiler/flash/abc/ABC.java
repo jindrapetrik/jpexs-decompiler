@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -86,6 +87,7 @@ public class ABC {
     private static final Logger logger = Logger.getLogger(ABC.class.getName());
     private final AVM2Deobfuscation deobfuscation;
     public SWF swf;
+    public ABCContainerTag parentTag;
 
     public int addMethodBody(MethodBody body) {
         bodies = Arrays.copyOf(bodies, bodies.length + 1);
@@ -324,8 +326,9 @@ public class ABC {
         }
     }
 
-    public ABC(InputStream is, SWF swf) throws IOException {
+    public ABC(InputStream is, SWF swf, ABCContainerTag tag) throws IOException {
         this.swf = swf;
+        this.parentTag = tag;
         ABCInputStream ais = new ABCInputStream(is);
         minor_version = ais.readU16();
         major_version = ais.readU16();

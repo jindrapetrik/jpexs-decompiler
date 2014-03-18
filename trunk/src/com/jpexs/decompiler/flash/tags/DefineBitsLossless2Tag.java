@@ -104,6 +104,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         sos2.writeBytesZlib(bitmapDataOS.toByteArray());
         zlibBitmapData = zlibOS.toByteArray();
         decompressed = false;
+        setModified(true);
     }
 
     public DefineBitsLossless2Tag(SWF swf, byte[] data, long pos) throws IOException {

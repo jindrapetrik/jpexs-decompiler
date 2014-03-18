@@ -298,6 +298,13 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         return data;
     }
 
+    public byte[] getDataOrOriginalData() {
+        if (modified) {
+            return getData();
+        }
+        return data;
+    }
+
     /**
      * Returns string representation of the object
      *

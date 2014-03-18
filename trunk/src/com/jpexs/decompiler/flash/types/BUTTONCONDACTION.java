@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
@@ -47,6 +48,7 @@ import java.util.logging.Logger;
 public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, Serializable {
 
     private final SWF swf;
+    private final Tag tag;
     private final long pos;
 
     @Override
@@ -59,8 +61,9 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
         return pos;
     }
 
-    public BUTTONCONDACTION(SWF swf, InputStream is, long containerOffset) throws IOException {
+    public BUTTONCONDACTION(SWF swf, InputStream is, long containerOffset, Tag tag) throws IOException {
         this.swf = swf;
+        this.tag = tag;
         SWFInputStream sis = new SWFInputStream(is, swf.version);
         pos = containerOffset;
         int condActionSize = sis.readUI16();
@@ -217,6 +220,13 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
         this.actionBytes = actionBytes;
     }
 
+    @Override
+    public void setModified() {
+        if (tag != null) {
+            tag.setModified(true);
+        }
+    }
+    
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
         return Helper.byteArrayToHexWithHeader(writer, actionBytes);

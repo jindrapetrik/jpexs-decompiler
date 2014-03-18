@@ -2451,6 +2451,7 @@ public final class SWF implements TreeItem, Timelined {
         for (ASMSource src : actionsMap.keySet()) {
             actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, 0, ""/*FIXME path*/));
             src.setActions(actionsMap.get(src));
+            src.setModified();
         }
         deobfuscation.deobfuscateInstanceNames(deobfuscated, renameType, tags, selected);
         return ret;

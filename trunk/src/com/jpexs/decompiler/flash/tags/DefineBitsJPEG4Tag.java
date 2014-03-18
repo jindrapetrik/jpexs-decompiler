@@ -79,6 +79,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         } else {
             bitmapAlphaData = new byte[0];
         }
+        setModified(true);
     }
 
     @Override

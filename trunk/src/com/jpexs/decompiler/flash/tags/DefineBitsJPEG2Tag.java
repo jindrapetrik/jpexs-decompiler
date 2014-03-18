@@ -84,6 +84,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     @Override
     public void setImage(byte[] data) {
         imageData = data;
+        setModified(true);
     }
 
     @Override

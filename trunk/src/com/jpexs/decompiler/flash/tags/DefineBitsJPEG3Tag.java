@@ -62,6 +62,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             bitmapAlphaData = new byte[0];
         }
         imageData = data;
+        setModified(true);
     }
 
     @Override

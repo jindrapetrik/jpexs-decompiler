@@ -374,7 +374,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
         }
 
         if (placeFlagHasClipActions) {
-            clipActions = sis.readCLIPACTIONS(swf);
+            clipActions = sis.readCLIPACTIONS(swf, this);
         }
         amfData = sis.readBytesEx(sis.available());
     }

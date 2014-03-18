@@ -78,6 +78,7 @@ import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
@@ -2220,6 +2221,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                 }
             }, text)) {
+                textTag.setModified(true);
                 return true;
             }
         } catch (ParseException ex) {
@@ -2346,6 +2348,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 SWF swf = it.getSwf();
                                 if (it instanceof DefineBitsTag) {
                                     DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, it.getOriginalData(), it.getPos(), it.getCharacterId(), data);
+                                    jpeg2Tag.setModified(true);
                                     swf.tags.set(swf.tags.indexOf(it), jpeg2Tag);
                                     swf.updateCharacters();
                                     refreshTree();
@@ -2374,6 +2377,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         File selfile = Helper.fixDialogFile(fc.getSelectedFile());
                         byte[] data = Helper.readFile(selfile.getAbsolutePath());
                         bt.binaryData = data;
+                        bt.setModified(true);
                         reload(true);
                     }
                 }
@@ -2845,6 +2849,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         if (frameCnt > fn.getFrame()) {
                             break;
                         }
+                        
+                        if (item instanceof DoActionTag || item instanceof DoInitActionTag) {
+                            // todo: Maybe DoABC tags should be removed, too
+                            continue;
+                        }
+                        
                         Tag t = (Tag) item;
                         Set<Integer> needed = t.getDeepNeededCharacters(swf.characters);
                         for (int n : needed) {

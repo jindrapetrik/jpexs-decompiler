@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.HilightedText;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
@@ -221,6 +222,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                 acode.getBytes(abc.bodies[bodyIndex].codeBytes);
                 abc.bodies[bodyIndex].code = acode;
             }
+            ((Tag) abc.parentTag).setModified(true);
         } catch (IOException ex) {
         } catch (InterruptedException ex) {
         } catch (ParseException ex) {

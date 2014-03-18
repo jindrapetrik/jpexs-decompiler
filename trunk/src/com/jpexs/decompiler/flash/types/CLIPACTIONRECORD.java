@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
@@ -91,6 +92,8 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     @Internal
     private final SWF swf;
     @Internal
+    private final Tag tag;
+    @Internal
     private long pos;
     @Internal
     private long hdrPos;
@@ -98,13 +101,15 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     //Constructor for Generic tag editor. TODO:Handle this somehow better
     public CLIPACTIONRECORD() {
         swf = null;
+        tag = null;
         eventFlags = new CLIPEVENTFLAGS();
         actionBytes = new byte[0];
         hdrPos = 0;
     }
 
-    public CLIPACTIONRECORD(SWF swf, InputStream is, long pos) throws IOException {
+    public CLIPACTIONRECORD(SWF swf, InputStream is, long pos, Tag tag) throws IOException {
         this.swf = swf;
+        this.tag = tag;
         SWFInputStream sis = new SWFInputStream(is, swf.version);
         eventFlags = sis.readCLIPEVENTFLAGS();
         if (eventFlags.isClear()) {
@@ -224,6 +229,13 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
         this.actionBytes = actionBytes;
     }
 
+    @Override
+    public void setModified() {
+        if (tag != null) {
+            tag.setModified(true);
+        }
+    }
+    
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
         return Helper.byteArrayToHexWithHeader(writer, actionBytes);
