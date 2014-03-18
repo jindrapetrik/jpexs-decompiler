@@ -530,7 +530,10 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
 
     private void clearModified(SWF swf) {
         for (Tag tag : swf.tags) {
-            tag.setModified(false);
+            if (tag.isModified()) {
+                tag.setOriginalData(tag.getData());
+                tag.setModified(false);
+            }
         }
     }
 

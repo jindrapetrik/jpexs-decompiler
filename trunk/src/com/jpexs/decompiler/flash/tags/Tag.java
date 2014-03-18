@@ -298,6 +298,10 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         return data;
     }
 
+    public void setOriginalData(byte[] data) {
+        this.data = data;
+    }
+
     public byte[] getDataOrOriginalData() {
         if (modified) {
             return getData();
