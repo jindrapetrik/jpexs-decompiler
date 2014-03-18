@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
@@ -1467,6 +1468,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (nodeType == TreeNodeType.TEXT) {
                     ret.add((Tag) n.getItem());
                 }
+                if (nodeType == TreeNodeType.FONT) {
+                    ret.add((Tag) n.getItem());
+                }
             }
             if (d instanceof FrameNode) {
                 FrameNode fn = (FrameNode) d;
@@ -1500,6 +1504,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 List<TreeNode> as12scripts = new ArrayList<>();
                 List<Tag> binaryData = new ArrayList<>();
                 Map<Integer, List<Integer>> frames = new HashMap<>();
+                List<Tag> fonts = new ArrayList<>();
 
                 for (TreeNode d : sel) {
                     if (d.getItem().getSwf() != swf) {
@@ -1528,6 +1533,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         }
                         if (nodeType == TreeNodeType.TEXT) {
                             texts.add((Tag) n.getItem());
+                        }
+                        if (nodeType == TreeNodeType.FONT) {
+                            fonts.add((Tag) n.getItem());
                         }
                     }
                     if (d instanceof FrameNode) {
@@ -1569,6 +1577,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies, export.getValue(MovieExportMode.class)));
                 ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, export.getValue(SoundExportMode.class)));
                 ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData, export.getValue(BinaryDataExportMode.class)));
+                ret.addAll(swf.exportFonts(handler, selFile + File.separator + "fonts", fonts, export.getValue(FontExportMode.class)));
+                
                 for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
                     ret.addAll(swf.exportFrames(handler, selFile + File.separator + "frames", entry.getKey(), entry.getValue(), export.getValue(FramesExportMode.class)));
                 }
@@ -1976,6 +1986,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 swf.exportMovies(errorHandler, selFile + File.separator + "movies", export.getValue(MovieExportMode.class));
                                 swf.exportSounds(errorHandler, selFile + File.separator + "sounds", export.getValue(SoundExportMode.class));
                                 swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData", export.getValue(BinaryDataExportMode.class));
+                                swf.exportFonts(errorHandler, selFile + File.separator + "fonts", export.getValue(FontExportMode.class));
                                 swf.exportFrames(errorHandler, selFile + File.separator + "frames", 0, null, export.getValue(FramesExportMode.class));
                                 for (CharacterTag c : swf.characters.values()) {
                                     if (c instanceof DefineSpriteTag) {
@@ -2193,7 +2204,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         try {
             if (textTag.setFormattedText(new MissingCharacterHandler() {
                 @Override
-                public boolean handle(FontTag font, List<Tag> tags, char character) {
+                public boolean handle(FontTag font, char character) {
                     String fontName = font.getSwf().sourceFontsMap.get(font.getFontId());
                     if (fontName == null) {
                         fontName = font.getFontName();
@@ -2204,7 +2215,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
                         return false;
                     }
-                    font.addCharacter(tags, character, fontName);
+                    font.addCharacter(character, fontName);
                     return true;
 
                 }

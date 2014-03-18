@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+		datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+	<start>
+		<element name="glyphElement" 
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<ref name="head"/>
+			<ref name="body"/>
+		</element>
+	</start>
+	
+	<define name="head">
+		<element name="head"
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<element name="title"><text/></element>
+			<element name="unicode"><text/></element>
+			
+			<zeroOrMore>
+				<element name="unicodeRange"><text/></element>
+			</zeroOrMore>
+			
+			<zeroOrMore>
+				<element name="codePage"><text/></element>
+			</zeroOrMore>
+			
+			<optional>
+				<element name="ascender"><data type="double"/></element>
+			</optional>
+			<optional>
+				<element name="descender"><data type="double"/>
+				</element>
+			</optional>
+			<optional>
+				<element name="xHeight"><data type="double"/>
+				</element>
+			</optional>
+			
+			<optional>
+				<element name="advanceWidth"><data type="double"/>
+				</element>
+			</optional>
+			<optional>
+				<element name="advanceHeight"><data type="double"/>
+				</element>
+			</optional>
+			<optional>
+				<element name="leftSideBearing"><data type="double"/>
+				</element>
+			</optional>
+			<optional>
+				<element name="topSideBearing"><data type="double"/>
+				</element>
+			</optional>
+			<optional>
+				<element name="bottomSideBearing"><data type="double"/>
+				</element>
+			</optional>
+			
+			<optional>
+				<element name="lineGap"><data type="double"/></element>
+			</optional>
+			<element name="author"><text/></element>
+			<element name="copyright"><text/></element>
+			<optional>
+				<element name="version"><text/></element>
+			</optional>
+			
+			<element name="fontFamily"><text/></element>
+			<element name="fontSubFamily"><text/></element>
+			<element name="license"><text/></element>
+			
+			<element name="global"><ref name="paramList"/></element>
+			<element name="local"><ref name="paramList"/></element>
+		</element>
+	</define>
+	
+	<define name="body">
+		<element name="body"
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<interleave>
+				<zeroOrMore><ref name="glyphFile"/></zeroOrMore>
+				<zeroOrMore><ref name="contour"/></zeroOrMore>
+				<zeroOrMore><ref name="include"/></zeroOrMore>
+				<zeroOrMore><ref name="module"/></zeroOrMore>
+			</interleave>
+		</element>
+	</define>
+	
+	<define name="paramList">
+		<zeroOrMore>
+			<element name="param"
+					ns="http://doubletype.org/ns/glyph/0.0">
+				<attribute name="name"/>
+				<data type="double"/>
+			</element>
+		</zeroOrMore>
+	</define>
+	
+	<define name="contour">
+		<element name="contour"
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<optional>
+				<attribute name="type"/>
+			</optional>
+			<oneOrMore>
+				<ref name="contourPoint"/>
+			</oneOrMore>
+		</element>
+	</define>
+	
+	<define name="contourPoint">
+		<element name="contourPoint">
+			<attribute name="type">
+				<choice>
+					<value>on</value>
+					<value>off</value>
+				</choice>
+			</attribute>
+			<optional>
+				<attribute name="rounded">
+					<data type="boolean"/>
+				</attribute>
+			</optional>
+			<ref name="point2d"/>
+			<optional><ref name="controlPoint"/></optional>
+			<optional><ref name="controlPoint"/></optional>	
+			<zeroOrMore>
+				<ref name="hint"/>
+			</zeroOrMore>
+		</element>	
+	</define>
+	
+	<define name="controlPoint">
+		<element name="controlPoint"
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<attribute name="first">
+				<data type="boolean"/>
+			</attribute>
+			<attribute name="smooth">
+				<data type="boolean"/>
+			</attribute>
+			<ref name="contourPoint"/>
+		</element>
+	</define>
+	
+	<define name="point2d">
+		<element name="point2d"
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<attribute name="x">
+				<data type="double"/>
+			</attribute>
+			<attribute name="y">
+				<data type="double"/>
+			</attribute>
+		</element>
+	</define>
+	
+	<define name="hint">
+		<element name="hint"
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<attribute name="ppem">
+				<data type="long"/>
+			</attribute>
+			<ref name="point2d"/>
+		</element>
+	</define>
+	
+	<define name="glyphFile">
+		<element name="glyphFile"
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<attribute name="href"/>
+			<attribute name="unicode">
+				<data type="long"/>
+			</attribute>
+		</element>
+	</define>
+	
+	<define name="include">
+		<element name="include"
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<attribute name="href"/>
+			<ref name="invoke"/>
+		</element>
+	</define>
+	
+	<define name="module">
+		<element name="module"
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<attribute name="name"/>
+			<ref name="invoke"/>
+			<oneOrMore>
+				<ref name="contourPoint"/>
+			</oneOrMore>
+		</element>
+	</define>
+	
+	<define name="invoke">
+		<element name="invoke"
+					ns="http://doubletype.org/ns/glyph/0.0">
+			<element name="pos">
+				<ref name="point2d"/>
+			</element>
+			<zeroOrMore>
+				<element name="arg">
+					<attribute name="name"/>
+					<data type="double"/>
+				</element>
+			</zeroOrMore>
+			<zeroOrMore>
+				<element name="varg">
+					<attribute name="name"/>
+					<attribute name="src"/>
+				</element>
+			</zeroOrMore>
+		</element>
+	</define>
+</grammar>

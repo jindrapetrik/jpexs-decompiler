@@ -63,9 +63,9 @@ public class DefineFontTag extends FontTag {
         return glyphShapeTable.get(glyphIndex).getBounds().getWidth();
     }
 
-    private void ensureFontInfo(List<Tag> tags) {
+    private void ensureFontInfo() {
         if (fontInfoTag == null) {
-            for (Tag t : tags) {
+            for (Tag t : swf.tags) {
                 if (t instanceof DefineFontInfoTag) {
                     if (((DefineFontInfoTag) t).fontId == fontId) {
                         fontInfoTag = (DefineFontInfoTag) t;
@@ -83,8 +83,8 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public char glyphToChar(List<Tag> tags, int glyphIndex) {
-        ensureFontInfo(tags);
+    public char glyphToChar(int glyphIndex) {
+        ensureFontInfo();
         if (fontInfo2Tag != null) {
             return (char) (int) fontInfo2Tag.codeTable.get(glyphIndex);
         } else if (fontInfoTag != null) {
@@ -95,8 +95,8 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public int charToGlyph(List<Tag> tags, char c) {
-        ensureFontInfo(tags);
+    public int charToGlyph(char c) {
+        ensureFontInfo();
         if (fontInfo2Tag != null) {
             return fontInfo2Tag.codeTable.indexOf(c);
         } else if (fontInfoTag != null) {
@@ -175,7 +175,7 @@ public class DefineFontTag extends FontTag {
 
     @Override
     public String getFontName() {
-        ensureFontInfo(swf.tags);
+        ensureFontInfo();
         if (fontInfo2Tag != null) {
             return fontInfo2Tag.fontName;
         }
@@ -267,10 +267,10 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public void addCharacter(List<Tag> tags, char character, String fontName) {
+    public void addCharacter(char character, String fontName) {
         SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, getFontStyle(), getDivider() * 1024, character);
         List<Integer> codeTable = new ArrayList<>();
-        ensureFontInfo(tags);
+        ensureFontInfo();
         if (fontInfoTag != null) {
             codeTable = fontInfoTag.codeTable;
         }
@@ -293,7 +293,7 @@ public class DefineFontTag extends FontTag {
             pos = codeTable.size();
         }
         if (!exists) {
-            FontTag.shiftGlyphIndices(fontId, pos, tags);
+            shiftGlyphIndices(fontId, pos);
             glyphShapeTable.add(pos, shp);
             codeTable.add(pos, (int) character);
         } else {
@@ -305,7 +305,7 @@ public class DefineFontTag extends FontTag {
     @Override
     public String getCharacters(List<Tag> tags) {
         String ret = "";
-        ensureFontInfo(tags);
+        ensureFontInfo();
         if (fontInfoTag != null) {
             for (int i : fontInfoTag.codeTable) {
                 ret += (char) i;
@@ -320,7 +320,7 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public int getGlyphKerningAdjustment(List<Tag> tags, int glyphIndex, int nextGlyphIndex) {
+    public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         return 0;
     }
 }

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
@@ -541,7 +542,8 @@ public class CommandLineArgumentParser {
             "all",
             "frame",
             "fla",
-            "xfl"
+            "xfl",
+            "font"
         };
 
         String[] deprecatedExportFormats = new String[]{
@@ -664,6 +666,10 @@ public class CommandLineArgumentParser {
                     case "movie":
                         System.out.println("Exporting movies...");
                         exfile.exportMovies(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "movies" : ""), enumFromStr(formats.get("movie"), MovieExportMode.class));
+                        break;
+                    case "font":
+                        System.out.println("Exporting fonts...");
+                        exfile.exportFonts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "fonts" : ""), enumFromStr(formats.get("font"), FontExportMode.class));
                         break;
                     case "frame":
                         System.out.println("Exporting frames...");
@@ -935,6 +941,9 @@ public class CommandLineArgumentParser {
 
     private static <E extends Enum> E enumFromStr(String str, Class<E> cls) {
         E[] vals = cls.getEnumConstants();
+        if(str == null){
+            return vals[0];
+        }
         for (E e : vals) {
             if (e.toString().toLowerCase().equals(str.toLowerCase())) {
                 return e;

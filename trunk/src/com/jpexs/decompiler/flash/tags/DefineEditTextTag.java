@@ -793,11 +793,11 @@ public class DefineEditTextTag extends TextTag {
                     int advance;
                     FontTag font = lastStyle.font;
                     GLYPHENTRY ge = new GLYPHENTRY();
-                    ge.glyphIndex = font.charToGlyph(swf.tags, c);
+                    ge.glyphIndex = font.charToGlyph(c);
                     if (font.hasLayout()) {
                         int kerningAdjustment = 0;
                         if (nextChar != null) {
-                            kerningAdjustment = font.getGlyphKerningAdjustment(swf.tags, ge.glyphIndex, font.charToGlyph(swf.tags, nextChar));
+                            kerningAdjustment = font.getGlyphKerningAdjustment(ge.glyphIndex, font.charToGlyph(nextChar));
                             kerningAdjustment /= font.getDivider();
                         }
                         advance = (int) Math.round(font.getDivider() * Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));

@@ -41,7 +41,7 @@ public class PathExporter extends ShapeExporterBase {
         return exporter.paths;
     }
 
-    private PathExporter(SHAPE shape, ColorTransform colorTransform) {
+    protected PathExporter(SHAPE shape, ColorTransform colorTransform) {
         super(shape, colorTransform);
     }
 

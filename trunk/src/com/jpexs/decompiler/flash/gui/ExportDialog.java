@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
@@ -28,6 +29,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
@@ -65,7 +67,8 @@ public class ExportDialog extends AppDialog {
         "sounds",
         "scripts",
         "binaryData",
-        "frames"
+        "frames",
+        "fonts"
     //,"morphshapes"
     };
 
@@ -78,7 +81,8 @@ public class ExportDialog extends AppDialog {
         {SoundTag.class},
         {TreeNode.class, ScriptPack.class},
         {DefineBinaryDataTag.class},
-        {FrameNodeItem.class}
+        {FrameNodeItem.class},
+        {FontTag.class}
     //,{MorphShapeTag.class}
     };
 
@@ -91,7 +95,8 @@ public class ExportDialog extends AppDialog {
         SoundExportMode.class,
         ScriptExportMode.class,
         BinaryDataExportMode.class,
-        FramesExportMode.class
+        FramesExportMode.class,
+        FontExportMode.class
     //MorphshapeExportMode.class
     };
 

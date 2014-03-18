@@ -121,7 +121,7 @@ public class FontPanel extends javax.swing.JPanel {
                     continue;
                 }
             }
-            f.addCharacter(swf.tags, c, fontSelection.getSelectedItem().toString());
+            f.addCharacter(c, fontSelection.getSelectedItem().toString());
             oldchars += c;
         }
 

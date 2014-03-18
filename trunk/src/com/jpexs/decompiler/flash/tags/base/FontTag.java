@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
+import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -61,15 +62,15 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     public abstract List<SHAPE> getGlyphShapeTable();
 
-    public abstract void addCharacter(List<Tag> tags, char character, String fontName);
+    public abstract void addCharacter(char character, String fontName);
 
-    public abstract char glyphToChar(List<Tag> tags, int glyphIndex);
+    public abstract char glyphToChar(int glyphIndex);
 
-    public abstract int charToGlyph(List<Tag> tags, char c);
+    public abstract int charToGlyph(char c);
 
     public abstract double getGlyphAdvance(int glyphIndex);
 
-    public abstract int getGlyphKerningAdjustment(List<Tag> tags, int glyphIndex, int nextGlyphIndex);
+    public abstract int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex);
 
     public abstract int getGlyphWidth(int glyphIndex);
 
@@ -115,8 +116,8 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         return false;
     }
 
-    public boolean containsChar(List<Tag> tags, char character) {
-        return charToGlyph(tags, character) > -1;
+    public boolean containsChar(char character) {
+        return charToGlyph(character) > -1;
     }
 
     public int getFontStyle() {
@@ -161,9 +162,9 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         return defaultFontName;
     }
 
-    public static void shiftGlyphIndices(int fontId, int startIndex, List<Tag> tags) {
+    public void shiftGlyphIndices(int fontId, int startIndex) {
         List<TEXTRECORD> textRecords = new ArrayList<>();
-        for (Tag t : tags) {
+        for (Tag t : swf.tags) {
             if (t instanceof DefineTextTag) {
                 textRecords.addAll(((DefineTextTag) t).textRecords);
             }
@@ -283,4 +284,28 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         return new RECT(0, (int) (previewSize * SWF.unitDivisor), 0, (int) (previewSize * SWF.unitDivisor));
     }
 
+    @Override
+    public String getCharacterExportFileName() {
+        return super.getCharacterExportFileName()+"_"+getFontName();
+    }            
+    
+    public DefineFontNameTag getFontNameTag(){
+        for(Tag t:swf.tags){
+            if(t instanceof DefineFontNameTag){
+                DefineFontNameTag dfn=(DefineFontNameTag)t;
+                if(dfn.fontId==getFontId()){
+                    return dfn;
+                }
+            }
+        }
+        return null;
+    } 
+    
+    public String getCopyright(){
+        DefineFontNameTag dfn=getFontNameTag();
+        if(dfn==null){
+            return null;
+        }
+        return dfn.fontCopyright;
+    }
 }

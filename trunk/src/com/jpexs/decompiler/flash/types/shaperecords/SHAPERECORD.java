@@ -345,7 +345,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     }
 
     // Taken from org.apache.fop.afp.util
-    private static double[][] approximateCubic(double[] cubicControlPointCoords) {
+    public static double[][] approximateCubic(double[] cubicControlPointCoords) {
         if (cubicControlPointCoords.length < 8) {
             throw new IllegalArgumentException("Must have at least 8 coordinates");
         }

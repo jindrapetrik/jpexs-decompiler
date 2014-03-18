@@ -99,7 +99,7 @@ public class DefineText2Tag extends TextTag {
                     ret += "\r\n";
                 }
             }
-            ret += rec.getText(swf.tags, fnt);
+            ret += rec.getText(fnt);
         }
         return ret;
     }
@@ -160,7 +160,7 @@ public class DefineText2Tag extends TextTag {
             if (params.length() > 0) {
                 ret += "[" + params + "\r\n]";
             }
-            ret += Helper.escapeString(rec.getText(swf.tags, fnt)).replace("[", "\\[").replace("]", "\\]");
+            ret += Helper.escapeString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]");
         }
         return ret;
     }
@@ -349,7 +349,6 @@ public class DefineText2Tag extends TextTag {
                         }
                         String txt = (String) s.values[0];
                         tr.glyphEntries = new GLYPHENTRY[txt.length()];
-                        List<Tag> tags = swf.tags;
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);
                             Character nextChar = null;
@@ -357,24 +356,24 @@ public class DefineText2Tag extends TextTag {
                                 nextChar = txt.charAt(i + 1);
                             }
 
-                            if (!font.containsChar(tags, c)) {
-                                if (!missingCharHandler.handle(font, tags, c)) {
+                            if (!font.containsChar(c)) {
+                                if (!missingCharHandler.handle(font, c)) {
                                     return false;
                                 }
                             }
-                            if (nextChar != null && !font.containsChar(tags, nextChar)) {
-                                if (!missingCharHandler.handle(font, tags, nextChar)) {
+                            if (nextChar != null && !font.containsChar(nextChar)) {
+                                if (!missingCharHandler.handle(font, nextChar)) {
                                     return false;
                                 }
                             }
                             tr.glyphEntries[i] = new GLYPHENTRY();
-                            tr.glyphEntries[i].glyphIndex = font.charToGlyph(tags, c);
+                            tr.glyphEntries[i].glyphIndex = font.charToGlyph(c);
 
                             int advance;
                             if (font.hasLayout()) {
                                 int kerningAdjustment = 0;
                                 if (nextChar != null) {
-                                    kerningAdjustment = font.getGlyphKerningAdjustment(tags, tr.glyphEntries[i].glyphIndex, font.charToGlyph(tags, nextChar));
+                                    kerningAdjustment = font.getGlyphKerningAdjustment(tr.glyphEntries[i].glyphIndex, font.charToGlyph(nextChar));
                                 }
                                 advance = (int) Math.round(font.getDivider() * Math.round(((double) textHeight * font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
                             } else {

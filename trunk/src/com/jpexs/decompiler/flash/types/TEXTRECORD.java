@@ -62,10 +62,10 @@ public class TEXTRECORD implements Serializable {
     @SWFArray(countField = "glyphCount")
     public GLYPHENTRY[] glyphEntries;
 
-    public String getText(List<Tag> tags, FontTag font) {
+    public String getText(FontTag font) {
         String ret = "";
         for (GLYPHENTRY ge : glyphEntries) {
-            ret += font.glyphToChar(tags, ge.glyphIndex);
+            ret += font.glyphToChar(ge.glyphIndex);
         }
         return ret;
     }

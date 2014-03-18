@@ -54,7 +54,10 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.PathExporter;
+import com.jpexs.decompiler.flash.exporters.ShapeExporterBase;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MorphshapeExportMode;
@@ -94,6 +97,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
@@ -117,8 +121,11 @@ import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
@@ -135,6 +142,10 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import fontastic.FGlyph;
+import fontastic.FPoint;
+import fontastic.Fontastic;
+import fontastic.PVector;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -1258,6 +1269,137 @@ public final class SWF implements TreeItem, Timelined {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         exportSound(baos, t, mode);
         return baos.toByteArray();
+    }
+    
+    
+    public void exportFonts(AbortRetryIgnoreHandler handler, String outdir, FontExportMode mode) throws IOException {
+        exportFonts(handler, outdir, tags, mode);
+    }
+    
+    public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final FontExportMode mode) throws IOException {
+        List<File> ret = new ArrayList<>();
+        if (tags.isEmpty()) {
+            return ret;
+        }
+        File foutdir = new File(outdir);
+        if (!foutdir.exists()) {
+            if (!foutdir.mkdirs()) {
+                if (!foutdir.exists()) {
+                    throw new IOException("Cannot create directory " + outdir);
+                }
+            }
+        }
+        for (Tag t : tags) {
+            File newfile = null;
+            if (t instanceof FontTag) {                
+                final FontTag st = (FontTag) t;
+                final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".ttf");
+                newfile = file;
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        exportFont(st, mode, file);
+                    }
+                }, handler).run();
+
+                ret.add(newfile);
+
+            }
+
+        }
+        return ret;
+    }
+    
+    public void exportFont(final FontTag t, FontExportMode mode, File file) throws IOException {
+        List<SHAPE> shapes=t.getGlyphShapeTable();
+        Fontastic f = new Fontastic(t.getFontName(),file);
+        String cop=t.getCopyright();
+        
+        f.getEngine().setCopyrightYear(cop==null?"":cop);
+        f.setAuthor(ApplicationInfo.shortApplicationVerName);
+        f.setVersion("1.0");
+        f.setAscender(t.getAscent()/t.getDivider());
+        f.setDescender(t.getDescent()/t.getDivider());     
+        //f.set
+        
+        
+        for(int i=0;i<shapes.size();i++){            
+            SHAPE s=shapes.get(i);
+            final List<FPoint[]> contours=new ArrayList<>();
+            PathExporter seb=new PathExporter(s,new ColorTransform()){
+
+                private double transformX(double x){
+                    return Math.ceil((double)(x/t.getDivider()));
+                }
+                
+                private double transformY(double y){
+                    return -Math.ceil((double)(y/t.getDivider()));
+                }
+                
+                List<FPoint> path=new ArrayList<>();
+                private double lastX=0;
+                private double lastY=0;
+                
+                @Override
+                protected void finalizePath() {
+                    FPoint[] points=path.toArray(new FPoint[path.size()]);
+                    if(points.length>0){
+                        contours.add(points);
+                    }
+                    path.clear();
+                }
+
+                @Override
+                public void moveTo(double x, double y) {       
+                    finalizePath();
+                    lastX = x;
+                    lastY = y;
+                    path.add(new FPoint(new PVector(transformX(x),transformY(y))));
+                }                
+                
+                @Override
+                public void lineTo(double x, double y) {
+                    lastX = x;
+                    lastY = y;
+                    path.add(new FPoint(new PVector(transformX(x),transformY(y))));
+                }
+
+                @Override
+                public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
+                    lastX = anchorX;
+                    lastY = anchorY;      
+                    path.add(new FPoint(
+                            new PVector(transformX(anchorX),transformY(anchorY)),
+                            new PVector(transformX(controlX),transformY(controlY))
+                    ));
+                    
+                           
+                }                                                                                
+            };
+            seb.export();
+            char c=t.glyphToChar(i);
+            if(contours.isEmpty()){
+                continue;
+            }
+            if(c=='.'){
+                continue;
+            }
+            final FGlyph g=f.addGlyph(c);
+            double adv=t.getGlyphAdvance(i);
+            if(adv!=-1){
+                g.setAdvanceWidth((int)adv);
+            }else{
+                g.setAdvanceWidth(t.getGlyphWidth(i)/t.getDivider()+100);
+            }
+            for(FPoint[] cnt:contours){
+                if(cnt.length==0){
+                    continue;
+                }
+                g.addContour(cnt);
+            }
+        
+        }
+        f.buildFont();
     }
 
     public void exportSound(OutputStream fos, SoundTag t, SoundExportMode mode) throws IOException {

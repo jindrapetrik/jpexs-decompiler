@@ -187,11 +187,11 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 if (font.hasLayout()) {
                     int kerningAdjustment = 0;
                     if (nextEntry != null) {
-                        kerningAdjustment = font.getGlyphKerningAdjustment(tags, entry.glyphIndex, nextEntry.glyphIndex);
+                        kerningAdjustment = font.getGlyphKerningAdjustment(entry.glyphIndex, nextEntry.glyphIndex);
                     }
                     defaultAdvance = (int) Math.round(SWF.unitDivisor * textHeight * (font.getGlyphAdvance(entry.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0));
                 } else {
-                    defaultAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(tags, entry.glyphIndex), nextEntry == null ? null : font.glyphToChar(tags, nextEntry.glyphIndex)));
+                    defaultAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(entry.glyphIndex), nextEntry == null ? null : font.glyphToChar(nextEntry.glyphIndex)));
                 }
                 letterSpacing = adv - defaultAdvance;
                 x += adv;

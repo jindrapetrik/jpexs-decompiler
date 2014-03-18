@@ -54,6 +54,7 @@ is divided into following sections:
         <property file="nbproject/project.properties"/>
     </target>
     <target depends="-pre-init,-init-private,-init-user,-init-project,-init-macrodef-property" name="-do-init">
+        <property name="platform.java" value="${java.home}/bin/java"/>
         <available file="${manifest.file}" property="manifest.available"/>
         <condition property="splashscreen.available">
             <and>
@@ -71,10 +72,11 @@ is divided into following sections:
                 </not>
             </and>
         </condition>
-        <condition property="manifest.available+main.class">
+        <condition property="profile.available">
             <and>
-                <isset property="manifest.available"/>
-                <isset property="main.class.available"/>
+                <isset property="javac.profile"/>
+                <length length="0" string="${javac.profile}" when="greater"/>
+                <matches pattern="1\.[89](\..*)?" string="${javac.source}"/>
             </and>
         </condition>
         <condition property="do.archive">
@@ -89,12 +91,6 @@ is divided into following sections:
                 <not>
                     <istrue value="${mkdist.disabled}"/>
                 </not>
-            </and>
-        </condition>
-        <condition property="manifest.available+main.class+mkdist.available">
-            <and>
-                <istrue value="${manifest.available+main.class}"/>
-                <isset property="do.mkdist"/>
             </and>
         </condition>
         <condition property="do.archive+manifest.available">
@@ -115,23 +111,11 @@ is divided into following sections:
                 <istrue value="${do.archive}"/>
             </and>
         </condition>
-        <condition property="do.archive+manifest.available+main.class">
+        <condition property="do.archive+profile.available">
             <and>
-                <istrue value="${manifest.available+main.class}"/>
+                <isset property="profile.available"/>
                 <istrue value="${do.archive}"/>
             </and>
-        </condition>
-        <condition property="manifest.available-mkdist.available">
-            <or>
-                <istrue value="${manifest.available}"/>
-                <isset property="do.mkdist"/>
-            </or>
-        </condition>
-        <condition property="manifest.available+main.class-mkdist.available">
-            <or>
-                <istrue value="${manifest.available+main.class}"/>
-                <isset property="do.mkdist"/>
-            </or>
         </condition>
         <condition property="have.tests">
             <or>
@@ -186,7 +170,15 @@ is divided into following sections:
         </condition>
         <path id="endorsed.classpath.path" path="${endorsed.classpath}"/>
         <condition else="" property="endorsed.classpath.cmd.line.arg" value="-Xbootclasspath/p:'${toString:endorsed.classpath.path}'">
-            <length length="0" string="${endorsed.classpath}" when="greater"/>
+            <and>
+                <isset property="endorsed.classpath"/>
+                <not>
+                    <equals arg1="${endorsed.classpath}" arg2="" trim="true"/>
+                </not>
+            </and>
+        </condition>
+        <condition else="" property="javac.profile.cmd.line.arg" value="-profile ${javac.profile}">
+            <isset property="profile.available"/>
         </condition>
         <condition else="false" property="jdkBug6558476">
             <and>
@@ -275,6 +267,7 @@ is divided into following sections:
                         <path path="@{classpath}"/>
                     </classpath>
                     <compilerarg line="${endorsed.classpath.cmd.line.arg}"/>
+                    <compilerarg line="${javac.profile.cmd.line.arg}"/>
                     <compilerarg line="${javac.compilerargs}"/>
                     <compilerarg value="-processorpath"/>
                     <compilerarg path="@{processorpath}:${empty.dir}"/>
@@ -314,6 +307,7 @@ is divided into following sections:
                         <path path="@{classpath}"/>
                     </classpath>
                     <compilerarg line="${endorsed.classpath.cmd.line.arg}"/>
+                    <compilerarg line="${javac.profile.cmd.line.arg}"/>
                     <compilerarg line="${javac.compilerargs}"/>
                     <customize/>
                 </javac>
@@ -446,7 +440,7 @@ is divided into following sections:
                     </fileset>
                 </union>
                 <taskdef classname="org.testng.TestNGAntTask" classpath="${run.test.classpath}" name="testng"/>
-                <testng classfilesetref="test.set" failureProperty="tests.failed" methods="${testng.methods.arg}" mode="${testng.mode}" outputdir="${build.test.results.dir}" suitename="LZMA" testname="TestNG tests" workingDir="${work.dir}">
+                <testng classfilesetref="test.set" failureProperty="tests.failed" listeners="org.testng.reporters.VerboseReporter" methods="${testng.methods.arg}" mode="${testng.mode}" outputdir="${build.test.results.dir}" suitename="LZMA" testname="TestNG tests" workingDir="${work.dir}">
                     <xmlfileset dir="${build.test.classes.dir}" includes="@{testincludes}"/>
                     <propertyset>
                         <propertyref prefix="test-sys-prop."/>
@@ -837,8 +831,8 @@ is divided into following sections:
                     </chainedmapper>
                 </pathconvert>
                 <taskdef classname="org.netbeans.modules.java.j2seproject.copylibstask.CopyLibs" classpath="${libs.CopyLibs.classpath}" name="copylibs"/>
-                <copylibs compress="${jar.compress}" index="${jar.index}" indexMetaInf="${jar.index.metainf}" jarfile="${dist.jar}" manifest="@{manifest}" rebase="${copylibs.rebase}" runtimeclasspath="${run.classpath.without.build.classes.dir}">
-                    <fileset dir="${build.classes.dir}"/>
+                <copylibs compress="${jar.compress}" excludeFromCopy="${copylibs.excludes}" index="${jar.index}" indexMetaInf="${jar.index.metainf}" jarfile="${dist.jar}" manifest="@{manifest}" rebase="${copylibs.rebase}" runtimeclasspath="${run.classpath.without.build.classes.dir}">
+                    <fileset dir="${build.classes.dir}" excludes="${dist.archive.excludes}"/>
                     <manifest>
                         <attribute name="Class-Path" value="${jar.classpath}"/>
                         <customize/>
@@ -850,7 +844,7 @@ is divided into following sections:
     <target name="-init-presetdef-jar">
         <presetdef name="jar" uri="http://www.netbeans.org/ns/j2se-project/1">
             <jar compress="${jar.compress}" index="${jar.index}" jarfile="${dist.jar}">
-                <j2seproject1:fileset dir="${build.classes.dir}"/>
+                <j2seproject1:fileset dir="${build.classes.dir}" excludes="${dist.archive.excludes}"/>
             </jar>
         </presetdef>
     </target>
@@ -966,41 +960,25 @@ is divided into following sections:
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target depends="init,compile,-pre-pre-jar,-pre-jar" if="do.archive" name="-do-jar-without-manifest" unless="manifest.available-mkdist.available">
-        <j2seproject1:jar/>
-    </target>
-    <target depends="init,compile,-pre-pre-jar,-pre-jar" if="do.archive+manifest.available" name="-do-jar-with-manifest" unless="manifest.available+main.class-mkdist.available">
-        <j2seproject1:jar manifest="${manifest.file}"/>
-    </target>
-    <target depends="init,compile,-pre-pre-jar,-pre-jar" if="do.archive+manifest.available+main.class" name="-do-jar-with-mainclass" unless="manifest.available+main.class+mkdist.available">
-        <j2seproject1:jar manifest="${manifest.file}">
-            <j2seproject1:manifest>
-                <j2seproject1:attribute name="Main-Class" value="${main.class}"/>
-            </j2seproject1:manifest>
-        </j2seproject1:jar>
-        <echo level="info">To run this application from the command line without Ant, try:</echo>
-        <property location="${build.classes.dir}" name="build.classes.dir.resolved"/>
-        <property location="${dist.jar}" name="dist.jar.resolved"/>
-        <pathconvert property="run.classpath.with.dist.jar">
-            <path path="${run.classpath}"/>
-            <map from="${build.classes.dir.resolved}" to="${dist.jar.resolved}"/>
-        </pathconvert>
-        <echo level="info">java -cp "${run.classpath.with.dist.jar}" ${main.class}</echo>
-    </target>
-    <target depends="init" if="do.archive" name="-do-jar-with-libraries-create-manifest" unless="manifest.available">
+    <target depends="init" if="do.archive" name="-do-jar-create-manifest" unless="manifest.available">
         <tempfile deleteonexit="true" destdir="${build.dir}" property="tmp.manifest.file"/>
         <touch file="${tmp.manifest.file}" verbose="false"/>
     </target>
-    <target depends="init" if="do.archive+manifest.available" name="-do-jar-with-libraries-copy-manifest">
+    <target depends="init" if="do.archive+manifest.available" name="-do-jar-copy-manifest">
         <tempfile deleteonexit="true" destdir="${build.dir}" property="tmp.manifest.file"/>
         <copy file="${manifest.file}" tofile="${tmp.manifest.file}"/>
     </target>
-    <target depends="init,-do-jar-with-libraries-create-manifest,-do-jar-with-libraries-copy-manifest" if="do.archive+main.class.available" name="-do-jar-with-libraries-set-main">
+    <target depends="init,-do-jar-create-manifest,-do-jar-copy-manifest" if="do.archive+main.class.available" name="-do-jar-set-mainclass">
         <manifest file="${tmp.manifest.file}" mode="update">
             <attribute name="Main-Class" value="${main.class}"/>
         </manifest>
     </target>
-    <target depends="init,-do-jar-with-libraries-create-manifest,-do-jar-with-libraries-copy-manifest" if="do.archive+splashscreen.available" name="-do-jar-with-libraries-set-splashscreen">
+    <target depends="init,-do-jar-create-manifest,-do-jar-copy-manifest" if="do.archive+profile.available" name="-do-jar-set-profile">
+        <manifest file="${tmp.manifest.file}" mode="update">
+            <attribute name="Profile" value="${javac.profile}"/>
+        </manifest>
+    </target>
+    <target depends="init,-do-jar-create-manifest,-do-jar-copy-manifest" if="do.archive+splashscreen.available" name="-do-jar-set-splashscreen">
         <basename file="${application.splash}" property="splashscreen.basename"/>
         <mkdir dir="${build.classes.dir}/META-INF"/>
         <copy failonerror="false" file="${application.splash}" todir="${build.classes.dir}/META-INF"/>
@@ -1008,23 +986,41 @@ is divided into following sections:
             <attribute name="SplashScreen-Image" value="META-INF/${splashscreen.basename}"/>
         </manifest>
     </target>
-    <target depends="init,-init-macrodef-copylibs,compile,-pre-pre-jar,-pre-jar,-do-jar-with-libraries-create-manifest,-do-jar-with-libraries-copy-manifest,-do-jar-with-libraries-set-main,-do-jar-with-libraries-set-splashscreen" if="do.mkdist" name="-do-jar-with-libraries-pack">
+    <target depends="init,-init-macrodef-copylibs,compile,-pre-pre-jar,-pre-jar,-do-jar-create-manifest,-do-jar-copy-manifest,-do-jar-set-mainclass,-do-jar-set-profile,-do-jar-set-splashscreen" if="do.mkdist" name="-do-jar-copylibs">
         <j2seproject3:copylibs manifest="${tmp.manifest.file}"/>
         <echo level="info">To run this application from the command line without Ant, try:</echo>
         <property location="${dist.jar}" name="dist.jar.resolved"/>
         <echo level="info">java -jar "${dist.jar.resolved}"</echo>
     </target>
-    <target depends="-do-jar-with-libraries-pack" if="do.archive" name="-do-jar-with-libraries-delete-manifest">
+    <target depends="init,compile,-pre-pre-jar,-pre-jar,-do-jar-create-manifest,-do-jar-copy-manifest,-do-jar-set-mainclass,-do-jar-set-profile,-do-jar-set-splashscreen" if="do.archive" name="-do-jar-jar" unless="do.mkdist">
+        <j2seproject1:jar manifest="${tmp.manifest.file}"/>
+        <property location="${build.classes.dir}" name="build.classes.dir.resolved"/>
+        <property location="${dist.jar}" name="dist.jar.resolved"/>
+        <pathconvert property="run.classpath.with.dist.jar">
+            <path path="${run.classpath}"/>
+            <map from="${build.classes.dir.resolved}" to="${dist.jar.resolved}"/>
+        </pathconvert>
+        <condition else="" property="jar.usage.message" value="To run this application from the command line without Ant, try:${line.separator}${platform.java} -cp ${run.classpath.with.dist.jar} ${main.class}">
+            <isset property="main.class.available"/>
+        </condition>
+        <condition else="debug" property="jar.usage.level" value="info">
+            <isset property="main.class.available"/>
+        </condition>
+        <echo level="${jar.usage.level}" message="${jar.usage.message}"/>
+    </target>
+    <target depends="-do-jar-copylibs" if="do.archive" name="-do-jar-delete-manifest">
         <delete>
             <fileset file="${tmp.manifest.file}"/>
         </delete>
     </target>
-    <target depends="init,compile,-pre-pre-jar,-pre-jar,-do-jar-with-libraries-create-manifest,-do-jar-with-libraries-copy-manifest,-do-jar-with-libraries-set-main,-do-jar-with-libraries-set-splashscreen,-do-jar-with-libraries-pack,-do-jar-with-libraries-delete-manifest" name="-do-jar-with-libraries"/>
+    <target depends="init,compile,-pre-pre-jar,-pre-jar,-do-jar-create-manifest,-do-jar-copy-manifest,-do-jar-set-mainclass,-do-jar-set-profile,-do-jar-set-splashscreen,-do-jar-jar,-do-jar-delete-manifest" name="-do-jar-without-libraries"/>
+    <target depends="init,compile,-pre-pre-jar,-pre-jar,-do-jar-create-manifest,-do-jar-copy-manifest,-do-jar-set-mainclass,-do-jar-set-profile,-do-jar-set-splashscreen,-do-jar-copylibs,-do-jar-delete-manifest" name="-do-jar-with-libraries"/>
     <target name="-post-jar">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target depends="init,compile,-pre-jar,-do-jar-with-manifest,-do-jar-without-manifest,-do-jar-with-mainclass,-do-jar-with-libraries,-post-jar" description="Build JAR." name="jar"/>
+    <target depends="init,compile,-pre-jar,-do-jar-without-libraries,-do-jar-with-libraries,-post-jar" name="-do-jar"/>
+    <target depends="init,compile,-pre-jar,-do-jar,-post-jar" description="Build JAR." name="jar"/>
     <!--
                 =================
                 EXECUTION SECTION

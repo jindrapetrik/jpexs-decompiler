@@ -145,7 +145,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public void addCharacter(List<Tag> tags, char character, String fontName) {
+    public void addCharacter(char character, String fontName) {
         int fontStyle = getFontStyle();
         FontType font = fonts.get(0);
         SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, fontStyle, (int) (SWF.unitDivisor * font.nominalSize), character);
@@ -167,7 +167,7 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
         }
 
         if (!exists) {
-            FontTag.shiftGlyphIndices(fontId, pos, tags);
+            shiftGlyphIndices(fontId, pos);
         }
 
         Font fnt = new Font(fontName, fontStyle, font.nominalSize);
@@ -185,12 +185,12 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public char glyphToChar(List<Tag> tags, int glyphIndex) {
+    public char glyphToChar(int glyphIndex) {
         return (char) fonts.get(0).glyphInfo.get(glyphIndex).glyphCode;
     }
 
     @Override
-    public int charToGlyph(List<Tag> tags, char c) {
+    public int charToGlyph(char c) {
         FontType ft = fonts.get(0);
         for (int i = 0; i < ft.glyphInfo.size(); i++) {
             if (ft.glyphInfo.get(i).glyphCode == c) {
@@ -206,9 +206,9 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     }
 
     @Override
-    public int getGlyphKerningAdjustment(List<Tag> tags, int glyphIndex, int nextGlyphIndex) {
-        int char1 = glyphToChar(tags, glyphIndex);
-        int char2 = glyphToChar(tags, nextGlyphIndex);
+    public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
+        int char1 = glyphToChar(glyphIndex);
+        int char2 = glyphToChar(nextGlyphIndex);
         for (KerningPairType kp : fonts.get(0).kerning) {
             if (kp.char1 == char1 && kp.char2 == char2) {
                 return kp.advance;

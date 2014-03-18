@@ -2442,7 +2442,7 @@ public class XFLConverter {
                 firstRun = false;
                 if (font != null) {
                     ret += "<DOMTextRun>";
-                    ret += "<characters>" + xmlString((newline ? "\r" : "") + rec.getText(tags, font)) + "</characters>";
+                    ret += "<characters>" + xmlString((newline ? "\r" : "") + rec.getText(font)) + "</characters>";
                     ret += "<textAttrs>";
 
                     ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"" + textHeight + "\"";

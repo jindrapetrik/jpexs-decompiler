@@ -101,12 +101,12 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public char glyphToChar(List<Tag> tags, int glyphIndex) {
+    public char glyphToChar(int glyphIndex) {
         return (char) (int) codeTable.get(glyphIndex);
     }
 
     @Override
-    public int charToGlyph(List<Tag> tags, char c) {
+    public int charToGlyph(char c) {
         return codeTable.indexOf((Integer) (int) c);
     }
 
@@ -353,15 +353,15 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public void addCharacter(List<Tag> tags, char character, String fontName) {
+    public void addCharacter(char character, String fontName) {
 
         //Font Align Zones will be removed as adding new character zones is not supported:-(
-        for (int i = 0; i < tags.size(); i++) {
-            Tag t = tags.get(i);
+        for (int i = 0; i < swf.tags.size(); i++) {
+            Tag t = swf.tags.get(i);
             if (t instanceof DefineFontAlignZonesTag) {
                 DefineFontAlignZonesTag fa = (DefineFontAlignZonesTag) t;
                 if (fa.fontID == fontId) {
-                    tags.remove(i);
+                    swf.tags.remove(i);
                     i--;
                 }
             }
@@ -385,7 +385,7 @@ public class DefineFont3Tag extends FontTag {
         }
 
         if (!exists) {
-            FontTag.shiftGlyphIndices(fontId, pos, tags);
+            shiftGlyphIndices(fontId, pos);
             glyphShapeTable.add(pos, shp);
             codeTable.add(pos, (int) character);
         } else {
@@ -422,12 +422,12 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public int getGlyphKerningAdjustment(List<Tag> tags, int glyphIndex, int nextGlyphIndex) {
+    public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         if (glyphIndex == -1 || nextGlyphIndex == -1) {
             return 0;
         }
-        char c1 = glyphToChar(tags, glyphIndex);
-        char c2 = glyphToChar(tags, nextGlyphIndex);
+        char c1 = glyphToChar(glyphIndex);
+        char c2 = glyphToChar(nextGlyphIndex);
         int kerningAdjustment = 0;
         for (KERNINGRECORD ker : fontKerningTable) {
             if (ker.fontKerningCode1 == c1 && ker.fontKerningCode2 == c2) {
