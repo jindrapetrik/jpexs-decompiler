@@ -190,6 +190,23 @@ public class DefineFont3Tag extends FontTag {
             sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(data)), 10);
         }
         try {
+            List<Long> offsetTable = new ArrayList<>();
+            ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
+            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
+            for (int i = 0; i < numGlyphs; i++) {
+                offsetTable.add(sos3.getPos());
+                sos3.writeSHAPE(glyphShapeTable.get(i), 1);
+            }
+            byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
+
+            if (!fontFlagsWideOffsets && numGlyphs > 0) {
+                // Set wide offsets when necessary
+                long maxOffset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * 2 + baGlyphShapes.length;
+                if (maxOffset > 65535) {
+                    fontFlagsWideOffsets = true;
+                }
+            }
+            
             sos.writeUI16(fontId);
             sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
             sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
@@ -205,20 +222,12 @@ public class DefineFont3Tag extends FontTag {
             sos.write(fontNameBytes);
             sos.writeUI16(numGlyphs);
 
-            List<Long> offsetTable = new ArrayList<>();
-            ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
-
-            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
-            for (int i = 0; i < numGlyphs; i++) {
-                offsetTable.add((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
-                sos3.writeSHAPE(glyphShapeTable.get(i), 1);
-            }
-            byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
-            for (Long offset : offsetTable) {
+            for (long offset : offsetTable) {
+                long offset2 = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + offset;
                 if (fontFlagsWideOffsets) {
-                    sos.writeUI32(offset);
+                    sos.writeUI32(offset2);
                 } else {
-                    sos.writeUI16((int) (long) offset);
+                    sos.writeUI16((int) offset2);
                 }
             }
             if (numGlyphs > 0) {
