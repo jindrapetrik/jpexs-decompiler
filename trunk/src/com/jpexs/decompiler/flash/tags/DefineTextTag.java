@@ -421,7 +421,7 @@ public class DefineTextTag extends TextTag {
     }
 
     public DefineTextTag(SWF swf, int characterID, RECT textBounds, MATRIX textMatrix, List<TEXTRECORD> textRecords) {
-        super(swf, ID, "DefineText", new byte[0], 0);
+        super(swf, ID, "DefineText", null, 0);
         this.characterID = characterID;
         this.textBounds = textBounds;
         this.textMatrix = textMatrix;

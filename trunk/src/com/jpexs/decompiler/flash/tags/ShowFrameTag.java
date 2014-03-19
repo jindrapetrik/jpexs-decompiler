@@ -59,7 +59,7 @@ public class ShowFrameTag extends Tag {
     }
 
     public ShowFrameTag(SWF swf) {
-        super(swf, ID, "ShowFrame", new byte[0], 0);
+        super(swf, ID, "ShowFrame", null, 0);
     }
 
     public static boolean isNestedTagType(int tagTypeId) {

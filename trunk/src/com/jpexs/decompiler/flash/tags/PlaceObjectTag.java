@@ -118,7 +118,7 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
     }
 
     public PlaceObjectTag(SWF swf, int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
-        super(swf, ID, "PlaceObject", new byte[0], 0);
+        super(swf, ID, "PlaceObject", null, 0);
         this.characterId = characterId;
         this.depth = depth;
         this.matrix = matrix;

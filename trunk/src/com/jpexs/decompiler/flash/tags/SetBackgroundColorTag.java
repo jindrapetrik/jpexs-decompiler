@@ -36,7 +36,7 @@ public class SetBackgroundColorTag extends Tag {
     }
 
     public SetBackgroundColorTag(SWF swf, RGB backgroundColor) {
-        super(swf, ID, "SetBackgroundColor", new byte[0], 0);
+        super(swf, ID, "SetBackgroundColor", null, 0);
         this.backgroundColor = backgroundColor;
     }
 

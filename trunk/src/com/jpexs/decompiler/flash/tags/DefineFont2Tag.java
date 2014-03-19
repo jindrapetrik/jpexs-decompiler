@@ -186,7 +186,7 @@ public class DefineFont2Tag extends FontTag {
     }
 
     public DefineFont2Tag(SWF swf) throws IOException {
-        super(swf, ID, "DefineFont2", new byte[0], 0);
+        super(swf, ID, "DefineFont2", null, 0);
     }
 
     /**
