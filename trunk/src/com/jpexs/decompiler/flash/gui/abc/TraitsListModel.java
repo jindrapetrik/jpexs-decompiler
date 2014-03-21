@@ -48,11 +48,11 @@ public final class TraitsListModel implements ListModel<Object> {
 
     private void reset() {
         items = new ArrayList<>();
-        for (int t = 0; t < abc.class_info[classIndex].static_traits.traits.length; t++) {
-            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info[classIndex].static_traits.traits[t]), t, true, abcTags, abc, classIndex, scriptIndex));
+        for (int t = 0; t < abc.class_info.get(classIndex).static_traits.traits.length; t++) {
+            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info.get(classIndex).static_traits.traits[t]), t, true, abcTags, abc, classIndex, scriptIndex));
         }
-        for (int t = 0; t < abc.instance_info[classIndex].instance_traits.traits.length; t++) {
-            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info[classIndex].instance_traits.traits[t]), t, false, abcTags, abc, classIndex, scriptIndex));
+        for (int t = 0; t < abc.instance_info.get(classIndex).instance_traits.traits.length; t++) {
+            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info.get(classIndex).instance_traits.traits[t]), t, false, abcTags, abc, classIndex, scriptIndex));
         }
         items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abcTags, abc, classIndex, scriptIndex));
         items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abcTags, abc, classIndex, scriptIndex));

@@ -56,7 +56,7 @@ public class TraitMethodGetterSetter extends Trait {
         }
         MethodBody body = abc.findBody(method_info);
 
-        if (((classIndex == -1) || (!abc.instance_info[classIndex].isInterface())) && (body == null)) {
+        if (((classIndex == -1) || (!abc.instance_info.get(classIndex).isInterface())) && (body == null)) {
             modifier = "native " + modifier;
         }
 
@@ -64,9 +64,9 @@ public class TraitMethodGetterSetter extends Trait {
         writer.hilightSpecial("function " + addKind, "traittype");
         writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames), "traitname");
         writer.appendNoHilight("(");
-        abc.method_info[method_info].getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
+        abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");
-        abc.method_info[method_info].getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
+        abc.method_info.get(method_info).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
         return writer;
     }
 
@@ -75,9 +75,9 @@ public class TraitMethodGetterSetter extends Trait {
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames);
         convertHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
-        if (!(classIndex != -1 && abc.instance_info[classIndex].isInterface() || bodyIndex == -1)) {
+        if (!(classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1)) {
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null, true);
+                abc.bodies.get(bodyIndex).convert(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null, true);
             }
         }
     }
@@ -87,12 +87,12 @@ public class TraitMethodGetterSetter extends Trait {
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames);
         toStringHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
-        if (classIndex != -1 && abc.instance_info[classIndex].isInterface() || bodyIndex == -1) {
+        if (classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1) {
             writer.appendNoHilight(";");
         } else {
             writer.appendNoHilight(" {").newLine();
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].toString(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null);
+                abc.bodies.get(bodyIndex).toString(path, exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null);
             }
             writer.appendNoHilight("}");
         }
@@ -104,7 +104,7 @@ public class TraitMethodGetterSetter extends Trait {
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            return abc.bodies[bodyIndex].removeTraps(abc.constants, abc, this, scriptIndex, classIndex, isStatic, path);
+            return abc.bodies.get(bodyIndex).removeTraps(abc.constants, abc, this, scriptIndex, classIndex, isStatic, path);
         }
         return 0;
     }

@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, AssignmentAVM2Item {
 
     public GraphTargetItem object;
-    public FullMultinameAVM2Item propertyName;
+    public GraphTargetItem propertyName;
     public GraphTargetItem value;
 
     @Override
@@ -34,7 +34,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         return value.getFirstPart();
     }
 
-    public SetPropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem value) {
+    public SetPropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value) {
         super(instruction, PRECEDENCE_ASSIGMENT);
         this.object = object;
         this.propertyName = propertyName;

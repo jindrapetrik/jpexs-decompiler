@@ -56,9 +56,9 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         writer.hilightSpecial("function ", "traittype");
         writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames), "traitname");
         writer.appendNoHilight("(");
-        abc.method_info[method_info].getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
+        abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");
-        abc.method_info[method_info].getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
+        abc.method_info.get(method_info).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
         return writer;
     }
 
@@ -69,13 +69,13 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     @Override
     public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         toStringHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
-        if (abc.instance_info[classIndex].isInterface()) {
+        if (abc.instance_info.get(classIndex).isInterface()) {
             writer.appendNoHilight(";");
         } else {
             writer.appendNoHilight(" {").newLine();
             int bodyIndex = abc.findBodyIndex(method_info);
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null);
+                abc.bodies.get(bodyIndex).toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null);
             }
             writer.newLine();
             writer.appendNoHilight("}");
@@ -87,10 +87,10 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     @Override
     public void convert(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         convertHeader(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
-        if (!abc.instance_info[classIndex].isInterface()) {
+        if (!abc.instance_info.get(classIndex).isInterface()) {
             int bodyIndex = abc.findBodyIndex(method_info);
             if (bodyIndex != -1) {
-                abc.bodies[bodyIndex].convert(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null, true);
+                abc.bodies.get(bodyIndex).convert(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames), exportMode, isStatic, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, fullyQualifiedNames, null, true);
             }
         }
     }
@@ -99,7 +99,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            return abc.bodies[bodyIndex].removeTraps(abc.constants, abc, this, scriptIndex, classIndex, isStatic, path);
+            return abc.bodies.get(bodyIndex).removeTraps(abc.constants, abc, this, scriptIndex, classIndex, isStatic, path);
         }
         return 0;
     }

@@ -24,9 +24,9 @@ import com.jpexs.decompiler.graph.model.LocalData;
 public class GetPropertyAVM2Item extends AVM2Item {
 
     public GraphTargetItem object;
-    public FullMultinameAVM2Item propertyName;
+    public GraphTargetItem propertyName;
 
-    public GetPropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, FullMultinameAVM2Item propertyName) {
+    public GetPropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem propertyName) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.object = object;
         this.propertyName = propertyName;

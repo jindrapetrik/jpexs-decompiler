@@ -39,10 +39,10 @@ public class NewFunctionAVM2Item extends AVM2Item {
     public ABC abc;
     public List<String> fullyQualifiedNames;
     public ConstantPool constants;
-    public MethodInfo[] methodInfo;
+    public List<MethodInfo> methodInfo;
     public int methodIndex;
 
-    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<String> fullyQualifiedNames, ConstantPool constants, MethodInfo[] methodInfo, int methodIndex) {
+    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<String> fullyQualifiedNames, ConstantPool constants, List<MethodInfo> methodInfo, int methodIndex) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.functionName = functionName;
         this.path = path;
@@ -62,9 +62,9 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.append("function" + (!functionName.isEmpty() ? " " + functionName : ""));
         writer.startMethod(methodIndex);
         writer.appendNoHilight("(");
-        methodInfo[methodIndex].getParamStr(writer, constants, body, abc, fullyQualifiedNames);
+        methodInfo.get(methodIndex).getParamStr(writer, constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight("):");
-        methodInfo[methodIndex].getReturnTypeStr(writer, constants, fullyQualifiedNames);
+        methodInfo.get(methodIndex).getReturnTypeStr(writer, constants, fullyQualifiedNames);
         writer.endMethod();
         writer.newLine();
         writer.append("{").newLine();

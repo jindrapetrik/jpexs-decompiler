@@ -72,7 +72,7 @@ public class ScriptPack implements TreeElementItem {
     public String getPathPackage() {
         String packageName = "";
         for (int t : traitIndices) {
-            Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
+            Multiname name = abc.script_info.get(scriptIndex).traits.traits[t].getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 packageName = ns.getName(abc.constants);
@@ -84,7 +84,7 @@ public class ScriptPack implements TreeElementItem {
     public String getPathScriptName() {
         String scriptName = "";
         for (int t : traitIndices) {
-            Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
+            Multiname name = abc.script_info.get(scriptIndex).traits.traits[t].getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 scriptName = name.getName(abc.constants, new ArrayList<String>());
@@ -191,7 +191,7 @@ public class ScriptPack implements TreeElementItem {
         File file = new File(fileName);
         try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
             try {
-                toSource(writer, abcList, abc.script_info[scriptIndex].traits.traits, exportMode, parallel);
+                toSource(writer, abcList, abc.script_info.get(scriptIndex).traits.traits, exportMode, parallel);
             } catch (InterruptedException ex) {
                 Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, null, ex);
             }

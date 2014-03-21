@@ -26,15 +26,15 @@ import java.util.List;
 
 public class ConstantPool {
 
-    public List<Long> constant_int;
-    public List<Long> constant_uint;
-    public List<Double> constant_double;
+    public List<Long> constant_int = new ArrayList<>();
+    public List<Long> constant_uint = new ArrayList<>();
+    public List<Double> constant_double = new ArrayList<>();
     /* Only for some minor versions */
-    public List<Decimal> constant_decimal;
-    public List<String> constant_string;
-    public List<Namespace> constant_namespace;
-    public List<NamespaceSet> constant_namespace_set;
-    public List<Multiname> constant_multiname;
+    public List<Decimal> constant_decimal = new ArrayList<>();
+    public List<String> constant_string = new ArrayList<>();
+    public List<Namespace> constant_namespace = new ArrayList<>();
+    public List<NamespaceSet> constant_namespace_set = new ArrayList<>();
+    public List<Multiname> constant_multiname = new ArrayList<>();
 
     public synchronized int addInt(long value) {
         constant_int.add(value);

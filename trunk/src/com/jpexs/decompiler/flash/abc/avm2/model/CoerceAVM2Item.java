@@ -28,11 +28,18 @@ public class CoerceAVM2Item extends AVM2Item {
 
     //public GraphTargetItem value;
     public String type;
+    public GraphTargetItem typeObj;
 
     public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, String type) {
         super(instruction, NOPRECEDENCE);
         this.value = value;
         this.type = type;
+    }
+    
+    public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem typeObj) {
+        super(instruction, NOPRECEDENCE);
+        this.value = value;
+        this.typeObj = typeObj;
     }
 
     @Override

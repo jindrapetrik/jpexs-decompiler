@@ -26,9 +26,9 @@ import com.jpexs.decompiler.graph.model.LocalData;
 public class DeletePropertyAVM2Item extends AVM2Item {
 
     public GraphTargetItem object;
-    public FullMultinameAVM2Item propertyName;
+    public GraphTargetItem propertyName;
 
-    public DeletePropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, FullMultinameAVM2Item propertyName) {
+    public DeletePropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem propertyName) {
         super(instruction, PRECEDENCE_UNARY);
         this.object = object;
         this.propertyName = propertyName;

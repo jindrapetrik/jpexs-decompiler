@@ -71,43 +71,47 @@ import java.util.logging.Logger;
 
 public class ABC {
 
-    public int major_version = 0;
-    public int minor_version = 0;
-    public ConstantPool constants;
-    public MethodInfo[] method_info;
-    public MetadataInfo[] metadata_info;
-    public InstanceInfo[] instance_info;
-    public ClassInfo[] class_info;
-    public ScriptInfo[] script_info;
-    public MethodBody[] bodies;
-    private int[] bodyIdxFromMethodIdx;
+    public int major_version = 46;
+    public int minor_version = 16;
+    public ConstantPool constants=new ConstantPool();
+    public List<MethodInfo> method_info = new ArrayList<>();
+    public List<MetadataInfo> metadata_info = new ArrayList<>();
+    public List<InstanceInfo> instance_info=new ArrayList<>();
+    public List<ClassInfo> class_info = new ArrayList<>();
+    public List<ScriptInfo> script_info = new ArrayList<>();
+    public List<MethodBody> bodies = new ArrayList<>();
+    private List<Integer> bodyIdxFromMethodIdx = new ArrayList<>();
     public long[] stringOffsets;
     public static final int MINORwithDECIMAL = 17;
-    protected HashSet<EventListener> listeners = new HashSet<>();
+    protected Set<EventListener> listeners = new HashSet<>();
     private static final Logger logger = Logger.getLogger(ABC.class.getName());
     private final AVM2Deobfuscation deobfuscation;
     public SWF swf;
     public ABCContainerTag parentTag;
 
+    public ABC(SWF swf) {
+        this.deobfuscation = null;        
+        this.swf = swf;        
+    }
+
+    
+    
     public int addMethodBody(MethodBody body) {
-        bodies = Arrays.copyOf(bodies, bodies.length + 1);
-        bodies[bodies.length - 1] = body;
-        if (body.method_info >= bodyIdxFromMethodIdx.length) {
+        bodies.add(body);
+        if (body.method_info >= bodyIdxFromMethodIdx.size()) {
             int newlen = body.method_info + 1;
-            int oldlen = bodyIdxFromMethodIdx.length;
-            bodyIdxFromMethodIdx = Arrays.copyOf(bodyIdxFromMethodIdx, newlen);
+            int oldlen = bodyIdxFromMethodIdx.size();
             for (int i = oldlen; i < newlen; i++) {
-                bodyIdxFromMethodIdx[i] = -1;
+                bodyIdxFromMethodIdx.add(-1);
             }
-            bodyIdxFromMethodIdx[body.method_info] = bodies.length - 1;
+            bodyIdxFromMethodIdx.set(body.method_info,bodies.size() - 1);
         }
-        return bodies.length - 1;
+        return bodies.size() - 1;
     }
 
     public int addMethodInfo(MethodInfo mi) {
-        method_info = Arrays.copyOf(method_info, method_info.length + 1);
-        method_info[method_info.length - 1] = mi;
-        return method_info.length - 1;
+        method_info.add(mi);
+        return method_info.size() - 1;
     }
 
     public void addEventListener(EventListener listener) {
@@ -126,8 +130,8 @@ public class ABC {
 
     public int removeTraps() throws InterruptedException {
         int rem = 0;
-        for (int s = 0; s < script_info.length; s++) {
-            rem += script_info[s].removeTraps(s, this, "");
+        for (int s = 0; s < script_info.size(); s++) {
+            rem += script_info.get(s).removeTraps(s, this, "");
         }
         return rem;
     }
@@ -135,14 +139,14 @@ public class ABC {
     public int removeDeadCode() throws InterruptedException {
         int rem = 0;
         for (MethodBody body : bodies) {
-            rem += body.removeDeadCode(constants, null/*FIXME*/, method_info[body.method_info]);
+            rem += body.removeDeadCode(constants, null/*FIXME*/, method_info.get(body.method_info));
         }
         return rem;
     }
 
     public void restoreControlFlow() throws InterruptedException {
         for (MethodBody body : bodies) {
-            body.restoreControlFlow(constants, null/*FIXME*/, method_info[body.method_info]);
+            body.restoreControlFlow(constants, null/*FIXME*/, method_info.get(body.method_info));
         }
     }
 
@@ -186,14 +190,14 @@ public class ABC {
             String usageType = "";
             if (t instanceof TraitClass) {
                 TraitClass tc = (TraitClass) t;
-                getStringUsageTypes(ret, class_info[tc.class_info].static_traits, classesOnly);
-                getStringUsageTypes(ret, instance_info[tc.class_info].instance_traits, classesOnly);
+                getStringUsageTypes(ret, class_info.get(tc.class_info).static_traits, classesOnly);
+                getStringUsageTypes(ret, instance_info.get(tc.class_info).instance_traits, classesOnly);
 
-                if (instance_info[tc.class_info].name_index != 0) {
-                    setStringUsageType(ret, constants.getMultiname(instance_info[tc.class_info].name_index).name_index, "class");
+                if (instance_info.get(tc.class_info).name_index != 0) {
+                    setStringUsageType(ret, constants.getMultiname(instance_info.get(tc.class_info).name_index).name_index, "class");
                 }
-                if (instance_info[tc.class_info].super_index != 0) {
-                    setStringUsageType(ret, constants.getMultiname(instance_info[tc.class_info].super_index).name_index, "class");
+                if (instance_info.get(tc.class_info).super_index != 0) {
+                    setStringUsageType(ret, constants.getMultiname(instance_info.get(tc.class_info).super_index).name_index, "class");
                 }
 
                 usageType = "class";
@@ -256,17 +260,18 @@ public class ABC {
         Map<Integer, String> stringUsageTypes = new HashMap<>();
         informListeners("deobfuscate", "Getting usage types...");
         getStringUsageTypes(stringUsageTypes, classesOnly);
-        for (int i = 0; i < instance_info.length; i++) {
-            informListeners("deobfuscate", "class " + i + "/" + instance_info.length);
-            if (instance_info[i].name_index != 0) {
-                constants.getMultiname(instance_info[i].name_index).name_index = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(instance_info[i].name_index).name_index, true, renameType);
-                if (constants.getMultiname(instance_info[i].name_index).namespace_index != 0) {
-                    constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index
-                            = deobfuscation.deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(constants.getMultiname(instance_info[i].name_index).namespace_index).name_index, renameType);
+        for (int i = 0; i < instance_info.size(); i++) {
+            informListeners("deobfuscate", "class " + i + "/" + instance_info.size());
+            InstanceInfo insti=instance_info.get(i);
+            if (insti.name_index != 0) {
+                constants.getMultiname(insti.name_index).name_index = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(insti.name_index).name_index, true, renameType);
+                if (constants.getMultiname(insti.name_index).namespace_index != 0) {
+                    constants.getNamespace(constants.getMultiname(insti.name_index).namespace_index).name_index
+                            = deobfuscation.deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.getNamespace(constants.getMultiname(insti.name_index).namespace_index).name_index, renameType);
                 }
             }
-            if (instance_info[i].super_index != 0) {
-                constants.getMultiname(instance_info[i].super_index).name_index = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(instance_info[i].super_index).name_index, true, renameType);
+            if (insti.super_index != 0) {
+                constants.getMultiname(insti.super_index).name_index = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(insti.super_index).name_index, true, renameType);
             }
         }
         if (classesOnly) {
@@ -429,16 +434,16 @@ public class ABC {
 
         //method info
         int methods_count = ais.readU30();
-        method_info = new MethodInfo[methods_count];
-        bodyIdxFromMethodIdx = new int[methods_count];
+        method_info = new ArrayList<>();//MethodInfo[methods_count];
+        bodyIdxFromMethodIdx = new ArrayList<>(); //[methods_count];
         for (int i = 0; i < methods_count; i++) {
-            method_info[i] = ais.readMethodInfo();
-            bodyIdxFromMethodIdx[i] = -1;
+            method_info.add(ais.readMethodInfo());
+            bodyIdxFromMethodIdx.add(-1);
         }
 
         //metadata info
         int metadata_count = ais.readU30();
-        metadata_info = new MetadataInfo[metadata_count];
+        metadata_info = new ArrayList<>();
         for (int i = 0; i < metadata_count; i++) {
             int name_index = ais.readU30();
             int values_count = ais.readU30();
@@ -450,32 +455,32 @@ public class ABC {
             for (int v = 0; v < values_count; v++) {
                 values[v] = ais.readU30();
             }
-            metadata_info[i] = new MetadataInfo(name_index, keys, values);
+            metadata_info.add(new MetadataInfo(name_index, keys, values));
         }
 
         int class_count = ais.readU30();
-        instance_info = new InstanceInfo[class_count];
+        instance_info = new ArrayList<>(); //InstanceInfo[class_count];
         for (int i = 0; i < class_count; i++) {
-            instance_info[i] = ais.readInstanceInfo();
+            instance_info.add(ais.readInstanceInfo());
         }
-        class_info = new ClassInfo[class_count];
+        class_info = new ArrayList<>(); //ClassInfo[class_count];
         for (int i = 0; i < class_count; i++) {
             ClassInfo ci = new ClassInfo();
             ci.cinit_index = ais.readU30();
             ci.static_traits = ais.readTraits();
-            class_info[i] = ci;
+            class_info.add(ci);
         }
         int script_count = ais.readU30();
-        script_info = new ScriptInfo[script_count];
+        script_info = new ArrayList<>(); //ScriptInfo[script_count];
         for (int i = 0; i < script_count; i++) {
             ScriptInfo si = new ScriptInfo();
             si.init_index = ais.readU30();
             si.traits = ais.readTraits();
-            script_info[i] = si;
+            script_info.add(si);
         }
 
         int bodies_count = ais.readU30();
-        bodies = new MethodBody[bodies_count];
+        bodies = new ArrayList<>(); //MethodBody[bodies_count];
         for (int i = 0; i < bodies_count; i++) {
             MethodBody mb = new MethodBody();
             mb.method_info = ais.readU30();
@@ -504,9 +509,9 @@ public class ABC {
                 mb.exceptions[j] = abce;
             }
             mb.traits = ais.readTraits();
-            bodies[i] = mb;
-            method_info[mb.method_info].setBody(mb);
-            bodyIdxFromMethodIdx[mb.method_info] = i;
+            bodies.add(mb);
+            method_info.get(mb.method_info).setBody(mb);
+            bodyIdxFromMethodIdx.set(mb.method_info,i);
         }
         loadNamespaceMap();
     }
@@ -560,56 +565,56 @@ public class ABC {
             aos.writeMultiname(constants.getMultiname(i));
         }
 
-        aos.writeU30(method_info.length);
-        for (int i = 0; i < method_info.length; i++) {
-            aos.writeMethodInfo(method_info[i]);
+        aos.writeU30(method_info.size());
+        for (MethodInfo mi:method_info) {
+            aos.writeMethodInfo(mi);
         }
 
-        aos.writeU30(metadata_info.length);
-        for (int i = 0; i < metadata_info.length; i++) {
-            aos.writeU30(metadata_info[i].name_index);
-            aos.writeU30(metadata_info[i].values.length);
-            for (int j = 0; j < metadata_info[i].values.length; j++) {
-                aos.writeU30(metadata_info[i].keys[j]);
+        aos.writeU30(metadata_info.size());
+        for (MetadataInfo mi:metadata_info) {
+            aos.writeU30(mi.name_index);
+            aos.writeU30(mi.values.length);
+            for (int j = 0; j < mi.values.length; j++) {
+                aos.writeU30(mi.keys[j]);
             }
-            for (int j = 0; j < metadata_info[i].values.length; j++) {
-                aos.writeU30(metadata_info[i].values[j]);
+            for (int j = 0; j < mi.values.length; j++) {
+                aos.writeU30(mi.values[j]);
             }
         }
 
-        aos.writeU30(class_info.length);
-        for (int i = 0; i < instance_info.length; i++) {
-            aos.writeInstanceInfo(instance_info[i]);
+        aos.writeU30(class_info.size());
+        for (InstanceInfo ii:instance_info) {
+            aos.writeInstanceInfo(ii);
         }
-        for (int i = 0; i < class_info.length; i++) {
-            aos.writeU30(class_info[i].cinit_index);
-            aos.writeTraits(class_info[i].static_traits);
+        for (ClassInfo ci:class_info) {
+            aos.writeU30(ci.cinit_index);
+            aos.writeTraits(ci.static_traits);
         }
-        aos.writeU30(script_info.length);
-        for (int i = 0; i < script_info.length; i++) {
-            aos.writeU30(script_info[i].init_index);
-            aos.writeTraits(script_info[i].traits);
+        aos.writeU30(script_info.size());
+        for (ScriptInfo si:script_info) {
+            aos.writeU30(si.init_index);
+            aos.writeTraits(si.traits);
         }
 
-        aos.writeU30(bodies.length);
-        for (int i = 0; i < bodies.length; i++) {
-            aos.writeU30(bodies[i].method_info);
-            aos.writeU30(bodies[i].max_stack);
-            aos.writeU30(bodies[i].max_regs);
-            aos.writeU30(bodies[i].init_scope_depth);
-            aos.writeU30(bodies[i].max_scope_depth);
-            byte[] codeBytes = bodies[i].code.getBytes();
+        aos.writeU30(bodies.size());
+        for (MethodBody mb: bodies) {
+            aos.writeU30(mb.method_info);
+            aos.writeU30(mb.max_stack);
+            aos.writeU30(mb.max_regs);
+            aos.writeU30(mb.init_scope_depth);
+            aos.writeU30(mb.max_scope_depth);
+            byte[] codeBytes = mb.code.getBytes();
             aos.writeU30(codeBytes.length);
             aos.write(codeBytes);
-            aos.writeU30(bodies[i].exceptions.length);
-            for (int j = 0; j < bodies[i].exceptions.length; j++) {
-                aos.writeU30(bodies[i].exceptions[j].start);
-                aos.writeU30(bodies[i].exceptions[j].end);
-                aos.writeU30(bodies[i].exceptions[j].target);
-                aos.writeU30(bodies[i].exceptions[j].type_index);
-                aos.writeU30(bodies[i].exceptions[j].name_index);
+            aos.writeU30(mb.exceptions.length);
+            for (int j = 0; j < mb.exceptions.length; j++) {
+                aos.writeU30(mb.exceptions[j].start);
+                aos.writeU30(mb.exceptions[j].end);
+                aos.writeU30(mb.exceptions[j].target);
+                aos.writeU30(mb.exceptions[j].type_index);
+                aos.writeU30(mb.exceptions[j].name_index);
             }
-            aos.writeTraits(bodies[i].traits);
+            aos.writeTraits(mb.traits);
         }
     }
 
@@ -617,20 +622,20 @@ public class ABC {
         if (methodInfo < 0) {
             return null;
         }
-        return method_info[methodInfo].getBody();
+        return method_info.get(methodInfo).getBody();
     }
 
     public int findBodyIndex(int methodInfo) {
         if (methodInfo == -1) {
             return -1;
         }
-        return bodyIdxFromMethodIdx[methodInfo];
+        return bodyIdxFromMethodIdx.get(methodInfo);
     }
 
     public MethodBody findBodyByClassAndName(String className, String methodName) {
-        for (int i = 0; i < instance_info.length; i++) {
-            if (className.equals(constants.getMultiname(instance_info[i].name_index).getName(constants, new ArrayList<String>()))) {
-                for (Trait t : instance_info[i].instance_traits.traits) {
+        for (int i = 0; i < instance_info.size(); i++) {
+            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, new ArrayList<String>()))) {
+                for (Trait t : instance_info.get(i).instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
                         if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<String>()))) {
@@ -645,9 +650,9 @@ public class ABC {
                 //break;
             }
         }
-        for (int i = 0; i < class_info.length; i++) {
-            if (className.equals(constants.getMultiname(instance_info[i].name_index).getName(constants, new ArrayList<String>()))) {
-                for (Trait t : class_info[i].static_traits.traits) {
+        for (int i = 0; i < class_info.size(); i++) {
+            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, new ArrayList<String>()))) {
+                for (Trait t : class_info.get(i).static_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
                         if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<String>()))) {
@@ -667,9 +672,9 @@ public class ABC {
     }
 
     public boolean isStaticTraitId(int classIndex, int traitId) {
-        if (traitId < class_info[classIndex].static_traits.traits.length) {
+        if (traitId < class_info.get(classIndex).static_traits.traits.length) {
             return true;
-        } else if (traitId < class_info[classIndex].static_traits.traits.length + instance_info[classIndex].instance_traits.traits.length) {
+        } else if (traitId < class_info.get(classIndex).static_traits.traits.length + instance_info.get(classIndex).instance_traits.traits.length) {
             return false;
         } else {
             return true; //Can be class or instance initializer
@@ -680,11 +685,11 @@ public class ABC {
         if (classIndex == -1) {
             return null;
         }
-        if (traitId < class_info[classIndex].static_traits.traits.length) {
-            return class_info[classIndex].static_traits.traits[traitId];
-        } else if (traitId < class_info[classIndex].static_traits.traits.length + instance_info[classIndex].instance_traits.traits.length) {
-            traitId -= class_info[classIndex].static_traits.traits.length;
-            return instance_info[classIndex].instance_traits.traits[traitId];
+        if (traitId < class_info.get(classIndex).static_traits.traits.length) {
+            return class_info.get(classIndex).static_traits.traits[traitId];
+        } else if (traitId < class_info.get(classIndex).static_traits.traits.length + instance_info.get(classIndex).instance_traits.traits.length) {
+            traitId -= class_info.get(classIndex).static_traits.traits.length;
+            return instance_info.get(classIndex).instance_traits.traits[traitId];
         } else {
             return null; //Can be class or instance initializer
         }
@@ -694,25 +699,25 @@ public class ABC {
         if (classIndex == -1) {
             return -1;
         }
-        if (traitId < class_info[classIndex].static_traits.traits.length) {
-            if (class_info[classIndex].static_traits.traits[traitId] instanceof TraitMethodGetterSetter) {
-                return ((TraitMethodGetterSetter) class_info[classIndex].static_traits.traits[traitId]).method_info;
+        if (traitId < class_info.get(classIndex).static_traits.traits.length) {
+            if (class_info.get(classIndex).static_traits.traits[traitId] instanceof TraitMethodGetterSetter) {
+                return ((TraitMethodGetterSetter) class_info.get(classIndex).static_traits.traits[traitId]).method_info;
             } else {
                 return -1;
             }
-        } else if (traitId < class_info[classIndex].static_traits.traits.length + instance_info[classIndex].instance_traits.traits.length) {
-            traitId -= class_info[classIndex].static_traits.traits.length;
-            if (instance_info[classIndex].instance_traits.traits[traitId] instanceof TraitMethodGetterSetter) {
-                return ((TraitMethodGetterSetter) instance_info[classIndex].instance_traits.traits[traitId]).method_info;
+        } else if (traitId < class_info.get(classIndex).static_traits.traits.length + instance_info.get(classIndex).instance_traits.traits.length) {
+            traitId -= class_info.get(classIndex).static_traits.traits.length;
+            if (instance_info.get(classIndex).instance_traits.traits[traitId] instanceof TraitMethodGetterSetter) {
+                return ((TraitMethodGetterSetter) instance_info.get(classIndex).instance_traits.traits[traitId]).method_info;
             } else {
                 return -1;
             }
         } else {
-            traitId -= class_info[classIndex].static_traits.traits.length + instance_info[classIndex].instance_traits.traits.length;
+            traitId -= class_info.get(classIndex).static_traits.traits.length + instance_info.get(classIndex).instance_traits.traits.length;
             if (traitId == 0) {
-                return instance_info[classIndex].iinit_index;
+                return instance_info.get(classIndex).iinit_index;
             } else if (traitId == 1) {
-                return class_info[classIndex].cinit_index;
+                return class_info.get(classIndex).cinit_index;
             } else {
                 return -1;
             }
@@ -752,8 +757,8 @@ public class ABC {
 
     public List<MyEntry<ClassPath, ScriptPack>> getScriptPacks() {
         List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
-        for (int i = 0; i < script_info.length; i++) {
-            ret.addAll(script_info[i].getPacks(this, i));
+        for (int i = 0; i < script_info.size(); i++) {
+            ret.addAll(script_info.get(i).getPacks(this, i));
         }
         return ret;
     }
@@ -762,34 +767,34 @@ public class ABC {
         Utf8PrintWriter output;
         output = new Utf8PrintWriter(os);
         constants.dump(output);
-        for (int i = 0; i < method_info.length; i++) {
-            output.println("MethodInfo[" + i + "]:" + method_info[i].toString(constants, new ArrayList<String>()));
+        for (int i = 0; i < method_info.size(); i++) {
+            output.println("MethodInfo[" + i + "]:" + method_info.get(i).toString(constants, new ArrayList<String>()));
         }
-        for (int i = 0; i < metadata_info.length; i++) {
-            output.println("MetadataInfo[" + i + "]:" + metadata_info[i].toString(constants));
+        for (int i = 0; i < metadata_info.size(); i++) {
+            output.println("MetadataInfo[" + i + "]:" + metadata_info.get(i).toString(constants));
         }
-        for (int i = 0; i < instance_info.length; i++) {
-            output.println("InstanceInfo[" + i + "]:" + instance_info[i].toString(this, new ArrayList<String>()));
+        for (int i = 0; i < instance_info.size(); i++) {
+            output.println("InstanceInfo[" + i + "]:" + instance_info.get(i).toString(this, new ArrayList<String>()));
         }
-        for (int i = 0; i < class_info.length; i++) {
-            output.println("ClassInfo[" + i + "]:" + class_info[i].toString(this, new ArrayList<String>()));
+        for (int i = 0; i < class_info.size(); i++) {
+            output.println("ClassInfo[" + i + "]:" + class_info.get(i).toString(this, new ArrayList<String>()));
         }
-        for (int i = 0; i < script_info.length; i++) {
-            output.println("ScriptInfo[" + i + "]:" + script_info[i].toString(this, new ArrayList<String>()));
+        for (int i = 0; i < script_info.size(); i++) {
+            output.println("ScriptInfo[" + i + "]:" + script_info.get(i).toString(this, new ArrayList<String>()));
         }
-        for (int i = 0; i < bodies.length; i++) {
+        for (int i = 0; i < bodies.size(); i++) {
             output.println("MethodBody[" + i + "]:"); //+ bodies[i].toString(this, constants, method_info));
         }
     }
 
     private void checkMultinameUsedInMethod(int multinameIndex, int methodInfo, List<MultinameUsage> ret, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
-        for (int p = 0; p < method_info[methodInfo].param_types.length; p++) {
-            if (method_info[methodInfo].param_types[p] == multinameIndex) {
+        for (int p = 0; p < method_info.get(methodInfo).param_types.length; p++) {
+            if (method_info.get(methodInfo).param_types[p] == multinameIndex) {
                 ret.add(new MethodParamsMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex));
                 break;
             }
         }
-        if (method_info[methodInfo].ret_type == multinameIndex) {
+        if (method_info.get(methodInfo).ret_type == multinameIndex) {
             ret.add(new MethodReturnTypeMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex));
         }
         MethodBody body = findBody(methodInfo);
@@ -840,22 +845,22 @@ public class ABC {
         if (multinameIndex == 0) {
             return ret;
         }
-        for (int c = 0; c < instance_info.length; c++) {
-            if (instance_info[c].name_index == multinameIndex) {
+        for (int c = 0; c < instance_info.size(); c++) {
+            if (instance_info.get(c).name_index == multinameIndex) {
                 ret.add(new ClassNameMultinameUsage(multinameIndex, c));
             }
-            if (instance_info[c].super_index == multinameIndex) {
+            if (instance_info.get(c).super_index == multinameIndex) {
                 ret.add(new ExtendsMultinameUsage(multinameIndex, c));
             }
-            for (int i = 0; i < instance_info[c].interfaces.length; i++) {
-                if (instance_info[c].interfaces[i] == multinameIndex) {
+            for (int i = 0; i < instance_info.get(c).interfaces.length; i++) {
+                if (instance_info.get(c).interfaces[i] == multinameIndex) {
                     ret.add(new ImplementsMultinameUsage(multinameIndex, c));
                 }
             }
-            checkMultinameUsedInMethod(multinameIndex, instance_info[c].iinit_index, ret, c, 0, false, true, null, -1);
-            checkMultinameUsedInMethod(multinameIndex, class_info[c].cinit_index, ret, c, 0, true, true, null, -1);
-            findMultinameUsageInTraits(instance_info[c].instance_traits, multinameIndex, false, c, ret, -1);
-            findMultinameUsageInTraits(class_info[c].static_traits, multinameIndex, true, c, ret, -1);
+            checkMultinameUsedInMethod(multinameIndex, instance_info.get(c).iinit_index, ret, c, 0, false, true, null, -1);
+            checkMultinameUsedInMethod(multinameIndex, class_info.get(c).cinit_index, ret, c, 0, true, true, null, -1);
+            findMultinameUsageInTraits(instance_info.get(c).instance_traits, multinameIndex, false, c, ret, -1);
+            findMultinameUsageInTraits(class_info.get(c).static_traits, multinameIndex, true, c, ret, -1);
         }
         loopm:
         for (int m = 1; m < constants.getMultinameCount(); m++) {
@@ -876,14 +881,14 @@ public class ABC {
     }
 
     public void autoFillAllBodyParams() {
-        for (int i = 0; i < bodies.length; i++) {
-            bodies[i].autoFillStats(this);
+        for (int i = 0; i < bodies.size(); i++) {
+            bodies.get(i).autoFillStats(this);
         }
     }
 
     public int findMethodInfoByName(int classId, String methodName) {
         if (classId > -1) {
-            for (Trait t : instance_info[classId].instance_traits.traits) {
+            for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
                     if (t.getName(this).getName(constants, new ArrayList<String>()).equals(methodName)) {
                         return ((TraitMethodGetterSetter) t).method_info;
@@ -896,7 +901,7 @@ public class ABC {
 
     public int findMethodBodyByName(int classId, String methodName) {
         if (classId > -1) {
-            for (Trait t : instance_info[classId].instance_traits.traits) {
+            for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
                     if (t.getName(this).getName(constants, new ArrayList<String>()).equals(methodName)) {
                         return findBodyIndex(((TraitMethodGetterSetter) t).method_info);
@@ -913,8 +918,8 @@ public class ABC {
     }
 
     public int findClassByName(String name) {
-        for (int c = 0; c < instance_info.length; c++) {
-            String s = constants.getMultiname(instance_info[c].name_index).getNameWithNamespace(constants);
+        for (int c = 0; c < instance_info.size(); c++) {
+            String s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants);
             if (name.equals(s)) {
                 return c;
             }

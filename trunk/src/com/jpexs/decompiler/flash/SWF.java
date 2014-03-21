@@ -847,8 +847,8 @@ public final class SWF implements TreeItem, Timelined {
             ScriptPack scr = abc.findScriptPackByPath(className);
             if (scr != null) {
                 String cnt = "";
-                if (abc.script_info.length > 1) {
-                    cnt = "script " + (i + 1) + "/" + abc.script_info.length + " ";
+                if (abc.script_info.size() > 1) {
+                    cnt = "script " + (i + 1) + "/" + abc.script_info.size() + " ";
                 }
                 String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + scr.getPath() + " ...";
                 informListeners("exporting", exStr);

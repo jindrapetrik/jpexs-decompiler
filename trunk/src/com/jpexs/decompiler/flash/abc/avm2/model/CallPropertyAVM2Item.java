@@ -25,11 +25,11 @@ import java.util.List;
 public class CallPropertyAVM2Item extends AVM2Item {
 
     public GraphTargetItem receiver;
-    public FullMultinameAVM2Item propertyName;
+    public GraphTargetItem propertyName;
     public List<GraphTargetItem> arguments;
     public boolean isVoid;
 
-    public CallPropertyAVM2Item(AVM2Instruction instruction, boolean isVoid, GraphTargetItem receiver, FullMultinameAVM2Item propertyName, List<GraphTargetItem> arguments) {
+    public CallPropertyAVM2Item(AVM2Instruction instruction, boolean isVoid, GraphTargetItem receiver, GraphTargetItem propertyName, List<GraphTargetItem> arguments) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.receiver = receiver;
         this.propertyName = propertyName;

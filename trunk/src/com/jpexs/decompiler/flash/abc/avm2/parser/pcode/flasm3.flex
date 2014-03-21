@@ -1,6 +1,6 @@
 /* Flash assembler language lexer specification */
 
-package com.jpexs.decompiler.flash.abc.avm2.parser;
+package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 
 import java.util.Stack;
 %%

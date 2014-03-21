@@ -39,7 +39,7 @@ public class AVM2LocalData extends BaseLocalData {
     public HashMap<Integer, GraphTargetItem> localRegs;
     public Stack<GraphTargetItem> scopeStack;
     public ConstantPool constants;
-    public MethodInfo[] methodInfo;
+    public List<MethodInfo> methodInfo;
     public MethodBody methodBody;
     public ABC abc;
     public HashMap<Integer, String> localRegNames;

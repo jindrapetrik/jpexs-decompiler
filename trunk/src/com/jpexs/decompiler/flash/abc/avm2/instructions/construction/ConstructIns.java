@@ -75,7 +75,7 @@ public class ConstructIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
+    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
         int argCount = ins.operands[0];
         List<GraphTargetItem> args = new ArrayList<>();
         for (int a = 0; a < argCount; a++) {
@@ -89,7 +89,7 @@ public class ConstructIns extends InstructionDefinition {
             GetPropertyAVM2Item gpt = (GetPropertyAVM2Item) obj;
             if (gpt.object instanceof FindPropertyAVM2Item) {
                 FindPropertyAVM2Item fpt = (FindPropertyAVM2Item) gpt.object;
-                xmlMult = fpt.propertyName;
+                xmlMult = (FullMultinameAVM2Item)fpt.propertyName;
                 isXML = xmlMult.isXML(constants, localRegNames, fullyQualifiedNames) && xmlMult.isXML(constants, localRegNames, fullyQualifiedNames);
             }
         }

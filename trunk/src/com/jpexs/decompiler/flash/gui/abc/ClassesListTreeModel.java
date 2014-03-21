@@ -49,7 +49,7 @@ class ClassIndexVisitor implements TreeVisitor {
             return;
         }
         ScriptPack sc = (ScriptPack) o;
-        for (Trait t : sc.abc.script_info[sc.scriptIndex].traits.traits) {
+        for (Trait t : sc.abc.script_info.get(sc.scriptIndex).traits.traits) {
             if (t instanceof TraitClass) {
                 if (((TraitClass) t).class_info == classIndex) {
                     found = branch;
@@ -66,7 +66,7 @@ class ClassIndexVisitor implements TreeVisitor {
             return;
         }
         ScriptPack sc = (ScriptPack) o;
-        for (Trait t : sc.abc.script_info[sc.scriptIndex].traits.traits) {
+        for (Trait t : sc.abc.script_info.get(sc.scriptIndex).traits.traits) {
             if (t instanceof TraitClass) {
                 if (((TraitClass) t).class_info == classIndex) {
                     found = leaf;

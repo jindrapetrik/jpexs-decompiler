@@ -21,8 +21,8 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
-import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
-import com.jpexs.decompiler.flash.abc.avm2.parser.MissingSymbolHandler;
+import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -69,7 +69,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
     private HilightedText getHilightedText(ScriptExportMode exportMode) {
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
-        abc.bodies[bodyIndex].code.toASMSource(abc.constants, trait, abc.method_info[abc.bodies[bodyIndex].method_info], abc.bodies[bodyIndex], exportMode, writer);
+        abc.bodies.get(bodyIndex).code.toASMSource(abc.constants, trait, abc.method_info.get(abc.bodies.get(bodyIndex).method_info), abc.bodies.get(bodyIndex), exportMode, writer);
         return new HilightedText(writer);
     }
 
@@ -95,7 +95,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             setContentType("text/plain");
             if (textHexOnly == null) {
                 HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), true);
-                Helper.byteArrayToHexWithHeader(writer, abc.bodies[bodyIndex].code.getBytes());
+                Helper.byteArrayToHexWithHeader(writer, abc.bodies.get(bodyIndex).code.getBytes());
                 textHexOnly = new HilightedText(writer);
             }
             setText(textHexOnly);
@@ -167,7 +167,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
     public void graph() {
         try {
-            AVM2Graph gr = new AVM2Graph(abc.bodies[bodyIndex].code, abc, abc.bodies[bodyIndex], false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), abc.bodies[bodyIndex].code.visitCode(abc.bodies[bodyIndex]));
+            AVM2Graph gr = new AVM2Graph(abc.bodies.get(bodyIndex).code, abc, abc.bodies.get(bodyIndex), false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), abc.bodies.get(bodyIndex).code.visitCode(abc.bodies.get(bodyIndex)));
             (new GraphFrame(gr, name)).setVisible(true);
         } catch (InterruptedException ex) {
             Logger.getLogger(ASMSourceEditorPane.class.getName()).log(Level.SEVERE, null, ex);
@@ -178,7 +178,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         HashMap<Integer, Object> args = new HashMap<>();
         args.put(0, new Object()); //object "this"
         args.put(1, new Long(466561)); //param1
-        Object o = abc.bodies[bodyIndex].code.execute(args, abc.constants);
+        Object o = abc.bodies.get(bodyIndex).code.execute(args, abc.constants);
         View.showMessageDialog(this, "Returned object:" + o.toString());
     }
 
@@ -187,7 +187,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             String text = getText();
             if (text.trim().startsWith("#hexdata")) {
                 byte[] data = Helper.getBytesFromHexaText(text);
-                MethodBody mb = abc.bodies[bodyIndex];
+                MethodBody mb = abc.bodies.get(bodyIndex);
                 mb.codeBytes = data;
                 try {
                     mb.code = new AVM2Code(new ByteArrayInputStream(mb.codeBytes));
@@ -218,9 +218,9 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
                     public boolean missingDouble(double value) {
                         return true;
                     }
-                }, abc.bodies[bodyIndex], abc.method_info[abc.bodies[bodyIndex].method_info]);
-                acode.getBytes(abc.bodies[bodyIndex].codeBytes);
-                abc.bodies[bodyIndex].code = acode;
+                }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
+                acode.getBytes(abc.bodies.get(bodyIndex).codeBytes);
+                abc.bodies.get(bodyIndex).code = acode;
             }
             ((Tag) abc.parentTag).setModified(true);
         } catch (IOException ex) {

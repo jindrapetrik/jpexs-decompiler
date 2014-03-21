@@ -583,14 +583,14 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     if (mid == 0) {
                         break;
                     }
-                    for (Trait tr : abc.class_info[class_index].static_traits.traits) {
+                    for (Trait tr : abc.class_info.get(class_index).static_traits.traits) {
                         if (tr.name_index == mid) {
                             again = true;
                             break;
                         }
                     }
 
-                    for (Trait tr : abc.instance_info[class_index].instance_traits.traits) {
+                    for (Trait tr : abc.instance_info.get(class_index).instance_traits.traits) {
                         if (tr.name_index == mid) {
                             again = true;
                             break;
@@ -638,9 +638,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     t.name_index = abc.constants.getMultinameId(m, true);
                     int traitId;
                     if (isStatic) {
-                        traitId = abc.class_info[class_index].static_traits.addTrait(t);
+                        traitId = abc.class_info.get(class_index).static_traits.addTrait(t);
                     } else {
-                        traitId = abc.class_info[class_index].static_traits.traits.length + abc.instance_info[class_index].instance_traits.addTrait(t);
+                        traitId = abc.class_info.get(class_index).static_traits.traits.length + abc.instance_info.get(class_index).instance_traits.addTrait(t);
                     }
                     reload();
                     decompiledTextArea.gotoTrait(traitId);

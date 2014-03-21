@@ -209,7 +209,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         int pos = getCaretPosition();
         Highlighting h = Highlighting.search(highlights, pos);
         if (h != null) {
-            List<AVM2Instruction> list = abc.bodies[abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex()].code.code;
+            List<AVM2Instruction> list = abc.bodies.get(abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex()).code.code;
             AVM2Instruction lastIns = null;
             long inspos = 0;
             AVM2Instruction selIns = null;
@@ -256,12 +256,12 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     break;
                 case "returns":
                     if (currentMethod > -1) {
-                        return abc.method_info[currentMethod].ret_type;
+                        return abc.method_info.get(currentMethod).ret_type;
                     }
                     break;
                 case "param":
                     if (currentMethod > -1) {
-                        return abc.method_info[currentMethod].param_types[(int) (long) sh.getPropertyLong("index")];
+                        return abc.method_info.get(currentMethod).param_types[(int) (long) sh.getPropertyLong("index")];
                     }
                     break;
             }
@@ -302,7 +302,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 String name = "";
                 if (abc != null) {
                     if (classIndex > -1) {
-                        name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
+                        name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants);
                     }
                 }
                 currentTrait = null;
@@ -351,7 +351,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 String name = "";
                 currentTrait = null;
                 if (abc != null) {
-                    name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
+                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants);
                     currentTrait = abc.findTraitByTraitId(classIndex, lastTraitIndex);
                     isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                     if (currentTrait != null) {
@@ -442,7 +442,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         ScriptInfo script = null;
         ABC abc = scriptLeaf.abc;
         if (scriptIndex > -1) {
-            script = abc.script_info[scriptIndex];
+            script = abc.script_info.get(scriptIndex);
         }
         if (!cache.contains(scriptLeaf)) {
             boolean parallel = Configuration.parallelSpeedUp.get();
@@ -459,7 +459,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         ScriptInfo script = null;
         ABC abc = scriptLeaf.abc;
         if (scriptIndex > -1) {
-            script = abc.script_info[scriptIndex];
+            script = abc.script_info.get(scriptIndex);
         }
         if (script == null) {
             highlights = new ArrayList<>();

@@ -60,23 +60,23 @@ public class TraitsListItem {
     public int getGlobalTraitId() {
         if (type == Type.INITIALIZER) {
             if (!isStatic) {
-                return abc.class_info[classIndex].static_traits.traits.length + abc.instance_info[classIndex].instance_traits.traits.length;
+                return abc.class_info.get(classIndex).static_traits.traits.length + abc.instance_info.get(classIndex).instance_traits.traits.length;
             } else {
-                return abc.class_info[classIndex].static_traits.traits.length + abc.instance_info[classIndex].instance_traits.traits.length + 1;
+                return abc.class_info.get(classIndex).static_traits.traits.length + abc.instance_info.get(classIndex).instance_traits.traits.length + 1;
             }
         }
         if (isStatic) {
             return index;
         } else {
-            return abc.class_info[classIndex].static_traits.traits.length + index;
+            return abc.class_info.get(classIndex).static_traits.traits.length + index;
         }
     }
 
     public String toStringName() {
         if ((type != Type.INITIALIZER) && isStatic) {
-            return abc.class_info[classIndex].static_traits.traits[index].getName(abc).getName(abc.constants, new ArrayList<String>());
+            return abc.class_info.get(classIndex).static_traits.traits[index].getName(abc).getName(abc.constants, new ArrayList<String>());
         } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-            return abc.instance_info[classIndex].instance_traits.traits[index].getName(abc).getName(abc.constants, new ArrayList<String>());
+            return abc.instance_info.get(classIndex).instance_traits.traits[index].getName(abc).getName(abc.constants, new ArrayList<String>());
         } else if (!isStatic) {
             return "__" + STR_INSTANCE_INITIALIZER;
         } else {
@@ -89,14 +89,14 @@ public class TraitsListItem {
         String s = "";
         try {
             if ((type != Type.INITIALIZER) && isStatic) {
-                abc.class_info[classIndex].static_traits.traits[index].convertHeader(null, "", abcTags, abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
+                abc.class_info.get(classIndex).static_traits.traits[index].convertHeader(null, "", abcTags, abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
                 HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-                abc.class_info[classIndex].static_traits.traits[index].toStringHeader(null, "", abcTags, abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
+                abc.class_info.get(classIndex).static_traits.traits[index].toStringHeader(null, "", abcTags, abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
                 s = writer.toString();
             } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-                abc.instance_info[classIndex].instance_traits.traits[index].convertHeader(null, "", abcTags, abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
+                abc.instance_info.get(classIndex).instance_traits.traits[index].convertHeader(null, "", abcTags, abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<String>(), false);
                 HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-                abc.instance_info[classIndex].instance_traits.traits[index].toStringHeader(null, "", abcTags, abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
+                abc.instance_info.get(classIndex).instance_traits.traits[index].toStringHeader(null, "", abcTags, abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<String>(), false);
                 s = writer.toString();
             } else if (!isStatic) {
                 s = STR_INSTANCE_INITIALIZER;

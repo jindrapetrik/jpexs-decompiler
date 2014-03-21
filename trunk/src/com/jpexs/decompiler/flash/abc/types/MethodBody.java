@@ -85,24 +85,24 @@ public class MethodBody implements Cloneable, Serializable {
     }
 
     public int removeTraps(ConstantPool constants, ABC abc, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
-        return code.removeTraps(constants, trait, abc.method_info[method_info], this, abc, scriptIndex, classIndex, isStatic, path);
+        return code.removeTraps(constants, trait, abc.method_info.get(method_info), this, abc, scriptIndex, classIndex, isStatic, path);
     }
 
     public HashMap<Integer, String> getLocalRegNames(ABC abc) {
         HashMap<Integer, String> ret = new HashMap<>();
-        for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
+        for (int i = 1; i <= abc.method_info.get(this.method_info).param_types.length; i++) {
             String paramName = "param" + i;
-            if (abc.method_info[this.method_info].flagHas_paramnames() && Configuration.paramNamesEnable.get()) {
-                paramName = abc.constants.getString(abc.method_info[this.method_info].paramNames[i - 1]);
+            if (abc.method_info.get(this.method_info).flagHas_paramnames() && Configuration.paramNamesEnable.get()) {
+                paramName = abc.constants.getString(abc.method_info.get(this.method_info).paramNames[i - 1]);
             }
             ret.put(i, paramName);
         }
-        int pos = abc.method_info[this.method_info].param_types.length + 1;
-        if (abc.method_info[this.method_info].flagNeed_arguments()) {
+        int pos = abc.method_info.get(this.method_info).param_types.length + 1;
+        if (abc.method_info.get(this.method_info).flagNeed_arguments()) {
             ret.put(pos, "arguments");
             pos++;
         }
-        if (abc.method_info[this.method_info].flagNeed_rest()) {
+        if (abc.method_info.get(this.method_info).flagNeed_rest()) {
             ret.put(pos, "rest");
             pos++;
         }
@@ -114,12 +114,12 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
+    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final List<MethodInfo> method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
         if (exportMode != ScriptExportMode.AS) {
-            code.toASMSource(constants, trait, method_info[this.method_info], this, exportMode, writer);
+            code.toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
             if (!Configuration.decompile.get()) {
                 writer.appendNoHilight("//" + AppStrings.translate("decompilation.skipped")).newLine();
@@ -154,10 +154,10 @@ public class MethodBody implements Cloneable, Serializable {
         }
     }
 
-    public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final MethodInfo[] method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits) throws InterruptedException {
+    public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ConstantPool constants, final List<MethodInfo> method_info, final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits) throws InterruptedException {
         if (exportMode != ScriptExportMode.AS) {
             writer.indent();
-            code.toASMSource(constants, trait, method_info[this.method_info], this, exportMode, writer);
+            code.toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
             writer.unindent();
         } else {
             if (!Configuration.decompile.get()) {
@@ -188,13 +188,13 @@ public class MethodBody implements Cloneable, Serializable {
         return writer;
     }
 
-    public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, MethodInfo[] method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
+    public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ConstantPool constants, List<MethodInfo> method_info, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
         MethodBody b = Helper.deepCopy(this);
         AVM2Code deobfuscated = b.code;
         deobfuscated.markMappedOffsets();
         if (Configuration.autoDeobfuscate.get()) {
             try {
-                deobfuscated.removeTraps(constants, trait, method_info[this.method_info], b, abc, scriptIndex, classIndex, isStatic, path);
+                deobfuscated.removeTraps(constants, trait, method_info.get(this.method_info), b, abc, scriptIndex, classIndex, isStatic, path);
             } catch (StackOverflowError ex) {
                 Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps in " + path, ex);
             }
@@ -227,8 +227,8 @@ public class MethodBody implements Cloneable, Serializable {
         max_stack = stats.maxstack;
         max_scope_depth = init_scope_depth + stats.maxscope;
         max_regs = stats.maxlocal;
-        abc.method_info[method_info].setFlagSetsdxns(stats.has_set_dxns);
-        abc.method_info[method_info].setFlagNeed_activation(stats.has_activation);
+        abc.method_info.get(method_info).setFlagSetsdxns(stats.has_set_dxns);
+        abc.method_info.get(method_info).setFlagNeed_activation(stats.has_activation);
         return true;
     }
 }

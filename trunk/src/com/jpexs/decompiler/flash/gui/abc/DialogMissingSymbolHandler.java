@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.AppStrings;
-import com.jpexs.decompiler.flash.abc.avm2.parser.MissingSymbolHandler;
+import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.gui.View;
 import javax.swing.JOptionPane;
 

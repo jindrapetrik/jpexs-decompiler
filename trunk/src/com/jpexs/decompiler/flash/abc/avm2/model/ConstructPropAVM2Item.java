@@ -25,10 +25,10 @@ import java.util.List;
 public class ConstructPropAVM2Item extends AVM2Item {
 
     public GraphTargetItem object;
-    public FullMultinameAVM2Item propertyName;
+    public GraphTargetItem propertyName;
     public List<GraphTargetItem> args;
 
-    public ConstructPropAVM2Item(AVM2Instruction instruction, GraphTargetItem object, FullMultinameAVM2Item propertyName, List<GraphTargetItem> args) {
+    public ConstructPropAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem propertyName, List<GraphTargetItem> args) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.object = object;
         this.propertyName = propertyName;

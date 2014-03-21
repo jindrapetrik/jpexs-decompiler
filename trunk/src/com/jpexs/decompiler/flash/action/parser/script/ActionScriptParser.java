@@ -1242,6 +1242,9 @@ public class ActionScriptParser {
             case SHIFT_RIGHT:
                 ret = new RShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
                 break;
+            case USHIFT_RIGHT:
+                ret = new URShiftActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
+                break;
             case BITAND:
                 ret = new BitAndActionItem(null, expr, expression(registerVars, inFunction, inMethod, false, variables));
                 break;

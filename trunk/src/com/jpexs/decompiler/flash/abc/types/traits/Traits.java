@@ -127,7 +127,7 @@ public class Traits implements Serializable {
             int h = t;
             if (classIndex != -1) {
                 if (!isStatic) {
-                    h += abc.class_info[classIndex].static_traits.traits.length;
+                    h += abc.class_info.get(classIndex).static_traits.traits.length;
                 }
             }
             if (trait instanceof TraitClass) {

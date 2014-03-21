@@ -2037,7 +2037,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     } else {
                         int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
                         if (bi != -1) {
-                            abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants, abcPanel.decompiledTextArea.getCurrentTrait(), abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
+                            abcPanel.abc.bodies.get(bi).restoreControlFlow(abcPanel.abc.constants, abcPanel.decompiledTextArea.getCurrentTrait(), abcPanel.abc.method_info.get(abcPanel.abc.bodies.get(bi).method_info));
                         }
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, abcPanel.decompiledTextArea.getCurrentTrait());
                     }
@@ -2131,12 +2131,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             Trait t = abcPanel.decompiledTextArea.getCurrentTrait();
                             if (bi != -1) {
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
-                                    abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants, t, abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
+                                    abcPanel.abc.bodies.get(bi).removeDeadCode(abcPanel.abc.constants, t, abcPanel.abc.method_info.get(abcPanel.abc.bodies.get(bi).method_info));
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
+                                    abcPanel.abc.bodies.get(bi).removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
-                                    abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants, t, abcPanel.abc.method_info[abcPanel.abc.bodies[bi].method_info]);
+                                    abcPanel.abc.bodies.get(bi).removeTraps(abcPanel.abc.constants, abcPanel.abc, t, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic(), ""/*FIXME*/);
+                                    abcPanel.abc.bodies.get(bi).restoreControlFlow(abcPanel.abc.constants, t, abcPanel.abc.method_info.get(abcPanel.abc.bodies.get(bi).method_info));
                                 }
                             }
                             abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc, t);
@@ -2585,7 +2585,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     @Override
                     protected Void doInBackground() throws Exception {
                         int classIndex = -1;
-                        for (Trait t : scriptLeaf.abc.script_info[scriptLeaf.scriptIndex].traits.traits) {
+                        for (Trait t : scriptLeaf.abc.script_info.get(scriptLeaf.scriptIndex).traits.traits) {
                             if (t instanceof TraitClass) {
                                 classIndex = ((TraitClass) t).class_info;
                                 break;
