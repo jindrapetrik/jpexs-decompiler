@@ -97,7 +97,7 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> useRibbonInterface = null;
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> openFolderAfterFlaExport = null;
-    @ConfigurationDefaultBoolean(true)
+    @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> useDetailedLogging = null;
 
     @ConfigurationDefaultInt(65536)

@@ -641,11 +641,11 @@ public class SWFInputStream extends InputStream {
      * @return Array of read bytes
      * @throws IOException
      */
-    public byte[] readBytes(long count) throws IOException {
+    public byte[] readBytes(int count) throws IOException {
         if (count <= 0) {
             return new byte[0];
         }
-        byte[] ret = new byte[(int) count];
+        byte[] ret = new byte[count];
         try {
             for (int i = 0; i < count; i++) {
                 ret[i] = (byte) readEx();
