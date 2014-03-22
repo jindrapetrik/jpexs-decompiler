@@ -286,24 +286,24 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     @Override
     public String getCharacterExportFileName() {
-        return super.getCharacterExportFileName()+"_"+getFontName();
-    }            
-    
-    public DefineFontNameTag getFontNameTag(){
-        for(Tag t:swf.tags){
-            if(t instanceof DefineFontNameTag){
-                DefineFontNameTag dfn=(DefineFontNameTag)t;
-                if(dfn.fontId==getFontId()){
+        return super.getCharacterExportFileName() + "_" + getFontName();
+    }
+
+    public DefineFontNameTag getFontNameTag() {
+        for (Tag t : swf.tags) {
+            if (t instanceof DefineFontNameTag) {
+                DefineFontNameTag dfn = (DefineFontNameTag) t;
+                if (dfn.fontId == getFontId()) {
                     return dfn;
                 }
             }
         }
         return null;
-    } 
-    
-    public String getCopyright(){
-        DefineFontNameTag dfn=getFontNameTag();
-        if(dfn==null){
+    }
+
+    public String getCopyright() {
+        DefineFontNameTag dfn = getFontNameTag();
+        if (dfn == null) {
             return null;
         }
         return dfn.fontCopyright;

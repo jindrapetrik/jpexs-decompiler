@@ -47,10 +47,10 @@ public class GetGlobalSlotIns extends InstructionDefinition {
             slotname = constants.getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
         } else {
 
-            for (int t = 0; t < body.traits.traits.length; t++) {
-                if (body.traits.traits[t] instanceof TraitSlotConst) {
-                    if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
-                        slotname = body.traits.traits[t].getName(abc);
+            for (int t = 0; t < body.traits.traits.size(); t++) {
+                if (body.traits.traits.get(t) instanceof TraitSlotConst) {
+                    if (((TraitSlotConst) body.traits.traits.get(t)).slot_id == slotIndex) {
+                        slotname = body.traits.traits.get(t).getName(abc);
                     }
                 }
 

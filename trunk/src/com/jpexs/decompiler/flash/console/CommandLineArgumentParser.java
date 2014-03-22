@@ -941,7 +941,7 @@ public class CommandLineArgumentParser {
 
     private static <E extends Enum> E enumFromStr(String str, Class<E> cls) {
         E[] vals = cls.getEnumConstants();
-        if(str == null){
+        if (str == null) {
             return vals[0];
         }
         for (E e : vals) {

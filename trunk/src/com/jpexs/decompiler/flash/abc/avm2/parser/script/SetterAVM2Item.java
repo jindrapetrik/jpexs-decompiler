@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 petrik
+ * Copyright (C) 2014 JPEXS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -22,12 +21,12 @@ import java.util.List;
 
 /**
  *
- * @author petrik
+ * @author JPEXS
  */
-public class SetterAVM2Item extends MethodAVM2Item{
+public class SetterAVM2Item extends MethodAVM2Item {
 
-    public SetterAVM2Item(int namespaceKind, String methodName, List<String> paramNames, List<GraphTargetItem> body, List<VariableAVM2Item> subvariables) {
-        super(namespaceKind, methodName, paramNames, body, subvariables);
+    public SetterAVM2Item(boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<VariableAVM2Item> subvariables, GraphTargetItem retType) {
+        super(isStatic, namespaceKind, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }
-    
+
 }

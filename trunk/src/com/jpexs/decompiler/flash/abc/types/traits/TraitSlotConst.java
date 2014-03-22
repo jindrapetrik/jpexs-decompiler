@@ -90,8 +90,8 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (assignedValue != null) {
             if (parent instanceof TraitClass) {
                 TraitClass tc = (TraitClass) parent;
-                int traitInitId = abc.class_info.get(tc.class_info).static_traits.traits.length
-                        + abc.instance_info.get(tc.class_info).instance_traits.traits.length + 1;
+                int traitInitId = abc.class_info.get(tc.class_info).static_traits.traits.size()
+                        + abc.instance_info.get(tc.class_info).instance_traits.traits.size() + 1;
                 int initMethod = abc.class_info.get(tc.class_info).cinit_index;
                 writer.startTrait(traitInitId);
                 writer.startMethod(initMethod);

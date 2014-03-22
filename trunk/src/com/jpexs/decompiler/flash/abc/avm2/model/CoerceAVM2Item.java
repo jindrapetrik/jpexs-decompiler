@@ -35,7 +35,7 @@ public class CoerceAVM2Item extends AVM2Item {
         this.value = value;
         this.type = type;
     }
-    
+
     public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem typeObj) {
         super(instruction, NOPRECEDENCE);
         this.value = value;

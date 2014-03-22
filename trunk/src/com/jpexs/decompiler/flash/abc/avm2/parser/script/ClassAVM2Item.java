@@ -27,42 +27,30 @@ import java.util.List;
 
 public class ClassAVM2Item extends AVM2Item implements Block {
 
-    public List<GraphTargetItem> functions;
-    public List<GraphTargetItem> staticFunctions;
+    public List<GraphTargetItem> traits;
     public GraphTargetItem extendsOp;
     public List<GraphTargetItem> implementsOp;
-    public GraphTargetItem className;
+    public String className;
     public GraphTargetItem constructor;
-    public List<GraphTargetItem> vars;
-    public List<GraphTargetItem> staticVars;
+    public int namespaceKind;
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
-        if (functions != null) {
-            ret.add(functions);
-        }
-        if (staticFunctions != null) {
-            ret.add(staticFunctions);
+        if (traits != null) {
+            ret.add(traits);
         }
         return ret;
     }
 
-    public ClassAVM2Item(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> functions, List<GraphTargetItem> vars, List<GraphTargetItem> staticFunctions, List<GraphTargetItem> staticVars) {
+    public ClassAVM2Item(int namespaceKind, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.className = className;
-        this.functions = functions;
-        this.vars = vars;
+        this.traits = traits;
         this.extendsOp = extendsOp;
         this.implementsOp = implementsOp;
-        this.staticFunctions = staticFunctions;
-        this.staticVars = staticVars;
         this.constructor = constructor;
-
-        List<GraphTargetItem> allFunc = new ArrayList<>(functions);
-        if (constructor != null) {
-            allFunc.add(constructor);
-        }        
+        this.namespaceKind = namespaceKind;
     }
 
     @Override

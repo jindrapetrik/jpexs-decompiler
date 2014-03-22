@@ -62,7 +62,7 @@ public interface ASMSource extends TreeItem {
      * @param actions Action list
      */
     public void setActions(List<Action> actions);
-    
+
     public void setModified();
 
     public byte[] getActionBytes();

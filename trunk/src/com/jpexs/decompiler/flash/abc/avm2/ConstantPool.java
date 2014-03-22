@@ -285,6 +285,38 @@ public class ConstantPool {
         return id;
     }
 
+    public int getNamespaceSetId(NamespaceSet val) {
+        loopi:
+        for (int i = 0; i < constant_namespace_set.size(); i++) {
+            NamespaceSet ts = constant_namespace_set.get(i);
+            if (ts.namespaces.length != val.namespaces.length) {
+                continue;
+            }
+            for (int j = 0; j < val.namespaces.length; j++) {
+                boolean found = false;
+                for (int k = 0; k < val.namespaces.length; k++) {
+                    if (ts.namespaces[j] == val.namespaces[k]) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    continue loopi;
+                }
+            }
+            return i;
+        }
+        return 0;
+    }
+
+    public int getNamespaceSetId(NamespaceSet val, boolean add) {
+        int id = getNamespaceSetId(val);
+        if (add && id == 0) {
+            id = addNamespaceSet(val);
+        }
+        return id;
+    }
+
     public int getUIntId(long val, boolean add) {
         int id = getUIntId(val);
         if (add && id == 0) {

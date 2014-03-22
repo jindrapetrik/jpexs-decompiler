@@ -56,7 +56,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             GraphTargetItem inside = ((IncrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetPropertyAVM2Item) {
                 GetPropertyAVM2Item insideProp = ((GetPropertyAVM2Item) inside);
-                if (((FullMultinameAVM2Item)insideProp.propertyName).compareSame(multiname)) {
+                if (((FullMultinameAVM2Item) insideProp.propertyName).compareSame(multiname)) {
                     GraphTargetItem insideObj = obj.getThroughDuplicate();
                     if (insideObj instanceof LocalRegAVM2Item) {
                         if (((LocalRegAVM2Item) insideObj).computedValue != null) {
@@ -88,7 +88,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             GraphTargetItem inside = ((DecrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetPropertyAVM2Item) {
                 GetPropertyAVM2Item insideProp = ((GetPropertyAVM2Item) inside);
-                if (((FullMultinameAVM2Item)insideProp.propertyName).compareSame(multiname)) {
+                if (((FullMultinameAVM2Item) insideProp.propertyName).compareSame(multiname)) {
                     GraphTargetItem insideObj = obj.getThroughDuplicate();
                     if (insideObj instanceof LocalRegAVM2Item) {
                         if (((LocalRegAVM2Item) insideObj).computedValue != null) {

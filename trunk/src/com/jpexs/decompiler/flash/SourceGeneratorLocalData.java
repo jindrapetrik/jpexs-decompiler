@@ -16,8 +16,11 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.abc.types.ABCException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -29,6 +32,18 @@ public class SourceGeneratorLocalData implements Serializable {
     public Integer inFunction;
     public Boolean inMethod;
     public Integer forInLevel;
+    public List<String> openedNamespaces = new ArrayList<>();
+    public List<Integer> openedNamespacesKinds = new ArrayList<>();
+    public List<ABCException> exceptions = new ArrayList<>();
+
+    public void addNamespace(int kind, String ns) {
+        addNamespace(kind, ns, openedNamespaces.size() - 1);
+    }
+
+    public void addNamespace(int kind, String ns, int index) {
+        openedNamespaces.add(index, ns);
+        openedNamespacesKinds.add(index, kind);
+    }
 
     public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {
         this.registerVars = registerVars;

@@ -102,7 +102,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener {
         if (end_d - start_d + 1 < 0) {
             return;
         }
-        
+
         boolean keyfound[] = new boolean[end_d - start_d + 1];
 
         for (int f = start_f; f <= end_f; f++) {

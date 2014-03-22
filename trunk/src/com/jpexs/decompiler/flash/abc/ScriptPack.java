@@ -72,7 +72,7 @@ public class ScriptPack implements TreeElementItem {
     public String getPathPackage() {
         String packageName = "";
         for (int t : traitIndices) {
-            Multiname name = abc.script_info.get(scriptIndex).traits.traits[t].getName(abc);
+            Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 packageName = ns.getName(abc.constants);
@@ -84,7 +84,7 @@ public class ScriptPack implements TreeElementItem {
     public String getPathScriptName() {
         String scriptName = "";
         for (int t : traitIndices) {
-            Multiname name = abc.script_info.get(scriptIndex).traits.traits[t].getName(abc);
+            Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 scriptName = name.getName(abc.constants, new ArrayList<String>());
@@ -97,7 +97,7 @@ public class ScriptPack implements TreeElementItem {
      String packageName = "";
      String scriptName = "";
      for (int t : traitIndices) {
-     Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
+     Multiname name = abc.script_info[scriptIndex].traits.traits.get(t).getName(abc);
      Namespace ns = name.getNamespace(abc.constants);
      if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
      packageName = ns.getName(abc.constants);
@@ -122,9 +122,9 @@ public class ScriptPack implements TreeElementItem {
         return Helper.joinStrings(pathParts, File.separator);
     }
 
-    public void convert(final NulWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
+    public void convert(final NulWriter writer, final List<ABCContainerTag> abcList, final List<Trait> traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
         for (int t : traitIndices) {
-            Trait trait = traits[t];
+            Trait trait = traits.get(t);
             Multiname name = trait.getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
@@ -135,9 +135,9 @@ public class ScriptPack implements TreeElementItem {
         }
     }
 
-    public void appendTo(GraphTextWriter writer, List<ABCContainerTag> abcList, Trait[] traits, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
+    public void appendTo(GraphTextWriter writer, List<ABCContainerTag> abcList, List<Trait> traits, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
         for (int t : traitIndices) {
-            Trait trait = traits[t];
+            Trait trait = traits.get(t);
             Multiname name = trait.getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
@@ -148,7 +148,7 @@ public class ScriptPack implements TreeElementItem {
         }
     }
 
-    public void toSource(GraphTextWriter writer, final List<ABCContainerTag> abcList, final Trait[] traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
+    public void toSource(GraphTextWriter writer, final List<ABCContainerTag> abcList, final List<Trait> traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
         writer.suspendMeasure();
         int timeout = Configuration.decompilationTimeoutFile.get();
         try {

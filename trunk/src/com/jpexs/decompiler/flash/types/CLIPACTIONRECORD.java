@@ -235,7 +235,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
             tag.setModified(true);
         }
     }
-    
+
     @Override
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
         return Helper.byteArrayToHexWithHeader(writer, actionBytes);

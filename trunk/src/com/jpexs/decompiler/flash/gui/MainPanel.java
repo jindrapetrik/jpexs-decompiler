@@ -1545,7 +1545,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                             FrameNodeItem fni = (FrameNodeItem) d.getItem();
                             Tag par = fni.getParent();
-                            int frame = fni.getFrame()-1; //Fix to zero based
+                            int frame = fni.getFrame() - 1; //Fix to zero based
                             int parentId = 0;
                             if (par != null) {
                                 parentId = ((CharacterTag) par).getCharacterId();
@@ -1579,7 +1579,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, export.getValue(SoundExportMode.class)));
                 ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData, export.getValue(BinaryDataExportMode.class)));
                 ret.addAll(swf.exportFonts(handler, selFile + File.separator + "fonts", fonts, export.getValue(FontExportMode.class)));
-                
+
                 for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
                     ret.addAll(swf.exportFrames(handler, selFile + File.separator + "frames", entry.getKey(), entry.getValue(), export.getValue(FramesExportMode.class)));
                 }
@@ -1634,7 +1634,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         return treeNode.getItem().getSwf();
     }
-    
+
     private void clearCache() {
         if (abcPanel != null) {
             abcPanel.decompiledTextArea.clearScriptCache();
@@ -2849,12 +2849,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         if (frameCnt > fn.getFrame()) {
                             break;
                         }
-                        
+
                         if (item instanceof DoActionTag || item instanceof DoInitActionTag) {
                             // todo: Maybe DoABC tags should be removed, too
                             continue;
                         }
-                        
+
                         Tag t = (Tag) item;
                         Set<Integer> needed = t.getDeepNeededCharacters(swf.characters);
                         for (int n : needed) {
@@ -3316,7 +3316,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 tf.setVisible(true);
                 return;
             }
-            
+
             TimelineFrame tf = new TimelineFrame(swf);
             tf.setVisible(true);
         }

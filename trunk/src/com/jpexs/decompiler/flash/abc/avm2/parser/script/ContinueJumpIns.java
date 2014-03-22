@@ -16,17 +16,22 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import java.util.List;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 
 /**
  *
  * @author JPEXS
  */
-public class GetterAVM2Item extends MethodAVM2Item {
+public class ContinueJumpIns extends JumpIns {
 
-    public GetterAVM2Item(boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<VariableAVM2Item> subvariables, GraphTargetItem retType) {
-        super(isStatic, namespaceKind, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+    private long loopId;
+
+    public ContinueJumpIns(long loopId) {
+        this.loopId = loopId;
+    }
+
+    public long getLoopId() {
+        return loopId;
     }
 
 }

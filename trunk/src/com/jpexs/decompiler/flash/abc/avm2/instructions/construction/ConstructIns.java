@@ -89,7 +89,7 @@ public class ConstructIns extends InstructionDefinition {
             GetPropertyAVM2Item gpt = (GetPropertyAVM2Item) obj;
             if (gpt.object instanceof FindPropertyAVM2Item) {
                 FindPropertyAVM2Item fpt = (FindPropertyAVM2Item) gpt.object;
-                xmlMult = (FullMultinameAVM2Item)fpt.propertyName;
+                xmlMult = (FullMultinameAVM2Item) fpt.propertyName;
                 isXML = xmlMult.isXML(constants, localRegNames, fullyQualifiedNames) && xmlMult.isXML(constants, localRegNames, fullyQualifiedNames);
             }
         }

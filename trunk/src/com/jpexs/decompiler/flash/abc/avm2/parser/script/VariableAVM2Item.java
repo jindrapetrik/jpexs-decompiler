@@ -38,7 +38,7 @@ public class VariableAVM2Item extends AVM2Item {
     private GraphTargetItem storeValue;
     private boolean definition;
     private GraphTargetItem index;
-    private int nsKind=-1;
+    private int nsKind = -1;
 
     public void setDefinition(boolean definition) {
         this.definition = definition;
@@ -59,11 +59,6 @@ public class VariableAVM2Item extends AVM2Item {
     public int getNsKind() {
         return nsKind;
     }
-    
-    
-    
-    
-    
 
     public void setStoreValue(GraphTargetItem storeValue) {
         this.storeValue = storeValue;
@@ -137,6 +132,11 @@ public class VariableAVM2Item extends AVM2Item {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return variableName;
     }
 
 }

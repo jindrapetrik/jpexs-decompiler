@@ -102,12 +102,12 @@ public class UsageFrame extends AppFrame implements ActionListener, MouseListene
                         traitIndex = tmu.traitIndex;
                     }
                     if (!tmu.isStatic) {
-                        traitIndex += abc.class_info.get(tmu.classIndex).static_traits.traits.length;
+                        traitIndex += abc.class_info.get(tmu.classIndex).static_traits.traits.size();
                     }
                     if (tmu instanceof MethodMultinameUsage) {
                         MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
                         if (mmu.isInitializer == true) {
-                            traitIndex = abc.class_info.get(mmu.classIndex).static_traits.traits.length + abc.instance_info.get(mmu.classIndex).instance_traits.traits.length + (mmu.isStatic ? 1 : 0);
+                            traitIndex = abc.class_info.get(mmu.classIndex).static_traits.traits.size() + abc.instance_info.get(mmu.classIndex).instance_traits.traits.size() + (mmu.isStatic ? 1 : 0);
                         }
                     }
                     abcPanel.decompiledTextArea.gotoTrait(traitIndex);

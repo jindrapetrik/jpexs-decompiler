@@ -862,7 +862,7 @@ public class SWFInputStream extends InputStream {
             if (tag == null) {
                 break;
             }
-            
+
             tag.setTimelined(timelined);
             if (!parallel) {
                 tags.add(tag);
@@ -1270,7 +1270,7 @@ public class SWFInputStream extends InputStream {
             } catch (EndOfStreamException ex) {
                 Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
             if (Configuration.debugMode.get()) {
                 byte[] dataNew = ret.getData();
                 int ignoreFirst = 0;

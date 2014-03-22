@@ -254,9 +254,9 @@ public class ABCOutputStream extends OutputStream {
     }
 
     public void writeTraits(Traits t) throws IOException {
-        writeU30(t.traits.length);
-        for (int i = 0; i < t.traits.length; i++) {
-            writeTrait(t.traits[i]);
+        writeU30(t.traits.size());
+        for (int i = 0; i < t.traits.size(); i++) {
+            writeTrait(t.traits.get(i));
         }
     }
 

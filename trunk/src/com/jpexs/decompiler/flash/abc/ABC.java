@@ -60,7 +60,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -73,10 +72,10 @@ public class ABC {
 
     public int major_version = 46;
     public int minor_version = 16;
-    public ConstantPool constants=new ConstantPool();
+    public ConstantPool constants = new ConstantPool();
     public List<MethodInfo> method_info = new ArrayList<>();
     public List<MetadataInfo> metadata_info = new ArrayList<>();
-    public List<InstanceInfo> instance_info=new ArrayList<>();
+    public List<InstanceInfo> instance_info = new ArrayList<>();
     public List<ClassInfo> class_info = new ArrayList<>();
     public List<ScriptInfo> script_info = new ArrayList<>();
     public List<MethodBody> bodies = new ArrayList<>();
@@ -90,12 +89,10 @@ public class ABC {
     public ABCContainerTag parentTag;
 
     public ABC(SWF swf) {
-        this.deobfuscation = null;        
-        this.swf = swf;        
+        this.deobfuscation = null;
+        this.swf = swf;
     }
 
-    
-    
     public int addMethodBody(MethodBody body) {
         bodies.add(body);
         if (body.method_info >= bodyIdxFromMethodIdx.size()) {
@@ -104,7 +101,7 @@ public class ABC {
             for (int i = oldlen; i < newlen; i++) {
                 bodyIdxFromMethodIdx.add(-1);
             }
-            bodyIdxFromMethodIdx.set(body.method_info,bodies.size() - 1);
+            bodyIdxFromMethodIdx.set(body.method_info, bodies.size() - 1);
         }
         return bodies.size() - 1;
     }
@@ -262,7 +259,7 @@ public class ABC {
         getStringUsageTypes(stringUsageTypes, classesOnly);
         for (int i = 0; i < instance_info.size(); i++) {
             informListeners("deobfuscate", "class " + i + "/" + instance_info.size());
-            InstanceInfo insti=instance_info.get(i);
+            InstanceInfo insti = instance_info.get(i);
             if (insti.name_index != 0) {
                 constants.getMultiname(insti.name_index).name_index = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(insti.name_index).name_index, true, renameType);
                 if (constants.getMultiname(insti.name_index).namespace_index != 0) {
@@ -511,9 +508,20 @@ public class ABC {
             mb.traits = ais.readTraits();
             bodies.add(mb);
             method_info.get(mb.method_info).setBody(mb);
-            bodyIdxFromMethodIdx.set(mb.method_info,i);
+            bodyIdxFromMethodIdx.set(mb.method_info, i);
         }
         loadNamespaceMap();
+        /*for(int i=0;i<script_count;i++){
+         MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));                        
+         GraphTextWriter t=new HilightedTextWriter(Configuration.getCodeFormatting(),false);
+         try {
+         bod.toString("script", ScriptExportMode.PCODE, false,i, 0, this, null, constants, method_info, new Stack<GraphTargetItem>(), false, t ,new ArrayList<String>(), null);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         System.out.println(""+t.toString());
+         }
+         System.exit(0);*/
     }
 
     public void saveToStream(OutputStream os) throws IOException {
@@ -566,12 +574,12 @@ public class ABC {
         }
 
         aos.writeU30(method_info.size());
-        for (MethodInfo mi:method_info) {
+        for (MethodInfo mi : method_info) {
             aos.writeMethodInfo(mi);
         }
 
         aos.writeU30(metadata_info.size());
-        for (MetadataInfo mi:metadata_info) {
+        for (MetadataInfo mi : metadata_info) {
             aos.writeU30(mi.name_index);
             aos.writeU30(mi.values.length);
             for (int j = 0; j < mi.values.length; j++) {
@@ -583,21 +591,21 @@ public class ABC {
         }
 
         aos.writeU30(class_info.size());
-        for (InstanceInfo ii:instance_info) {
+        for (InstanceInfo ii : instance_info) {
             aos.writeInstanceInfo(ii);
         }
-        for (ClassInfo ci:class_info) {
+        for (ClassInfo ci : class_info) {
             aos.writeU30(ci.cinit_index);
             aos.writeTraits(ci.static_traits);
         }
         aos.writeU30(script_info.size());
-        for (ScriptInfo si:script_info) {
+        for (ScriptInfo si : script_info) {
             aos.writeU30(si.init_index);
             aos.writeTraits(si.traits);
         }
 
         aos.writeU30(bodies.size());
-        for (MethodBody mb: bodies) {
+        for (MethodBody mb : bodies) {
             aos.writeU30(mb.method_info);
             aos.writeU30(mb.max_stack);
             aos.writeU30(mb.max_regs);
@@ -672,9 +680,9 @@ public class ABC {
     }
 
     public boolean isStaticTraitId(int classIndex, int traitId) {
-        if (traitId < class_info.get(classIndex).static_traits.traits.length) {
+        if (traitId < class_info.get(classIndex).static_traits.traits.size()) {
             return true;
-        } else if (traitId < class_info.get(classIndex).static_traits.traits.length + instance_info.get(classIndex).instance_traits.traits.length) {
+        } else if (traitId < class_info.get(classIndex).static_traits.traits.size() + instance_info.get(classIndex).instance_traits.traits.size()) {
             return false;
         } else {
             return true; //Can be class or instance initializer
@@ -685,11 +693,11 @@ public class ABC {
         if (classIndex == -1) {
             return null;
         }
-        if (traitId < class_info.get(classIndex).static_traits.traits.length) {
-            return class_info.get(classIndex).static_traits.traits[traitId];
-        } else if (traitId < class_info.get(classIndex).static_traits.traits.length + instance_info.get(classIndex).instance_traits.traits.length) {
-            traitId -= class_info.get(classIndex).static_traits.traits.length;
-            return instance_info.get(classIndex).instance_traits.traits[traitId];
+        if (traitId < class_info.get(classIndex).static_traits.traits.size()) {
+            return class_info.get(classIndex).static_traits.traits.get(traitId);
+        } else if (traitId < class_info.get(classIndex).static_traits.traits.size() + instance_info.get(classIndex).instance_traits.traits.size()) {
+            traitId -= class_info.get(classIndex).static_traits.traits.size();
+            return instance_info.get(classIndex).instance_traits.traits.get(traitId);
         } else {
             return null; //Can be class or instance initializer
         }
@@ -699,21 +707,21 @@ public class ABC {
         if (classIndex == -1) {
             return -1;
         }
-        if (traitId < class_info.get(classIndex).static_traits.traits.length) {
-            if (class_info.get(classIndex).static_traits.traits[traitId] instanceof TraitMethodGetterSetter) {
-                return ((TraitMethodGetterSetter) class_info.get(classIndex).static_traits.traits[traitId]).method_info;
+        if (traitId < class_info.get(classIndex).static_traits.traits.size()) {
+            if (class_info.get(classIndex).static_traits.traits.get(traitId) instanceof TraitMethodGetterSetter) {
+                return ((TraitMethodGetterSetter) class_info.get(classIndex).static_traits.traits.get(traitId)).method_info;
             } else {
                 return -1;
             }
-        } else if (traitId < class_info.get(classIndex).static_traits.traits.length + instance_info.get(classIndex).instance_traits.traits.length) {
-            traitId -= class_info.get(classIndex).static_traits.traits.length;
-            if (instance_info.get(classIndex).instance_traits.traits[traitId] instanceof TraitMethodGetterSetter) {
-                return ((TraitMethodGetterSetter) instance_info.get(classIndex).instance_traits.traits[traitId]).method_info;
+        } else if (traitId < class_info.get(classIndex).static_traits.traits.size() + instance_info.get(classIndex).instance_traits.traits.size()) {
+            traitId -= class_info.get(classIndex).static_traits.traits.size();
+            if (instance_info.get(classIndex).instance_traits.traits.get(traitId) instanceof TraitMethodGetterSetter) {
+                return ((TraitMethodGetterSetter) instance_info.get(classIndex).instance_traits.traits.get(traitId)).method_info;
             } else {
                 return -1;
             }
         } else {
-            traitId -= class_info.get(classIndex).static_traits.traits.length + instance_info.get(classIndex).instance_traits.traits.length;
+            traitId -= class_info.get(classIndex).static_traits.traits.size() + instance_info.get(classIndex).instance_traits.traits.size();
             if (traitId == 0) {
                 return instance_info.get(classIndex).iinit_index;
             } else if (traitId == 1) {
@@ -820,9 +828,9 @@ public class ABC {
     }
 
     private void findMultinameUsageInTraits(Traits traits, int multinameIndex, boolean isStatic, int classIndex, List<MultinameUsage> ret, int parentTraitIndex) {
-        for (int t = 0; t < traits.traits.length; t++) {
-            if (traits.traits[t] instanceof TraitSlotConst) {
-                TraitSlotConst tsc = (TraitSlotConst) traits.traits[t];
+        for (int t = 0; t < traits.traits.size(); t++) {
+            if (traits.traits.get(t) instanceof TraitSlotConst) {
+                TraitSlotConst tsc = (TraitSlotConst) traits.traits.get(t);
                 if (tsc.name_index == multinameIndex) {
                     ret.add(new ConstVarNameMultinameUsage(multinameIndex, classIndex, t, isStatic, traits, parentTraitIndex));
                 }
@@ -830,8 +838,8 @@ public class ABC {
                     ret.add(new ConstVarTypeMultinameUsage(multinameIndex, classIndex, t, isStatic, traits, parentTraitIndex));
                 }
             }
-            if (traits.traits[t] instanceof TraitMethodGetterSetter) {
-                TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) traits.traits[t];
+            if (traits.traits.get(t) instanceof TraitMethodGetterSetter) {
+                TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) traits.traits.get(t);
                 if (tmgs.name_index == multinameIndex) {
                     ret.add(new MethodNameMultinameUsage(multinameIndex, classIndex, t, isStatic, false, traits, parentTraitIndex));
                 }

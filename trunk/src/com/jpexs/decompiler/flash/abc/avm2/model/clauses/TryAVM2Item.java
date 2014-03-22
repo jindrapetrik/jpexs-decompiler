@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ExceptionSAVM2item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.Block;
@@ -30,6 +31,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
     public List<GraphTargetItem> tryCommands;
     public List<ABCException> catchExceptions;
+    public List<ExceptionSAVM2item> catchExceptions2;
     public List<List<GraphTargetItem>> catchCommands;
     public List<GraphTargetItem> finallyCommands;
 

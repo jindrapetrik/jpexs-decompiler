@@ -28,14 +28,14 @@ import java.util.List;
 public class ScriptInfo {
 
     public int init_index; //MethodInfo
-    public Traits traits;
+    public Traits traits = new Traits();
 
     public List<MyEntry<ClassPath, ScriptPack>> getPacks(ABC abc, int scriptIndex) {
         List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
 
         List<Integer> otherTraits = new ArrayList<>();
-        for (int j = 0; j < traits.traits.length; j++) {
-            Trait t = traits.traits[j];
+        for (int j = 0; j < traits.traits.size(); j++) {
+            Trait t = traits.traits.get(j);
             Multiname name = t.getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if (!((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
@@ -43,8 +43,8 @@ public class ScriptInfo {
                 otherTraits.add(j);
             }
         }
-        for (int j = 0; j < traits.traits.length; j++) {
-            Trait t = traits.traits[j];
+        for (int j = 0; j < traits.traits.size(); j++) {
+            Trait t = traits.traits.get(j);
             Multiname name = t.getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)

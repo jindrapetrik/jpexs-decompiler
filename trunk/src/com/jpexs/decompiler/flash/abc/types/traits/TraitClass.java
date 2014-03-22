@@ -436,7 +436,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (bodyIndex != -1) {
             if (!classInitializerIsEmpty) {
                 writer.newLine();
-                writer.startTrait(abc.class_info.get(class_info).static_traits.traits.length + abc.instance_info.get(class_info).instance_traits.traits.length + 1);
+                writer.startTrait(abc.class_info.get(class_info).static_traits.traits.size() + abc.instance_info.get(class_info).instance_traits.traits.size() + 1);
                 writer.appendNoHilight("{").newLine();
                 abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + abc.instance_info.get(class_info).getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, writer, fullyQualifiedNames, abc.class_info.get(class_info).static_traits);
                 writer.appendNoHilight("}").newLine();
@@ -464,7 +464,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
 
             writer.newLine();
-            writer.startTrait(abc.class_info.get(class_info).static_traits.traits.length + abc.instance_info.get(class_info).instance_traits.traits.length);
+            writer.startTrait(abc.class_info.get(class_info).static_traits.traits.size() + abc.instance_info.get(class_info).instance_traits.traits.size());
             writer.appendNoHilight(modifier);
             writer.appendNoHilight("function ");
             writer.appendNoHilight(abc.constants.getMultiname(abc.instance_info.get(class_info).name_index).getName(abc.constants, new ArrayList<String>()/*do not want full names here*/));

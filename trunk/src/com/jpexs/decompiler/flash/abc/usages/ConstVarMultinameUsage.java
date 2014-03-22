@@ -43,23 +43,23 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         NulWriter nulWriter = new NulWriter();
         if (parentTraitIndex > -1) {
             if (isStatic) {
-                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
+                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
             } else {
-                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits[parentTraitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
+                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
             }
         }
-        ((TraitSlotConst) traits.traits[traitIndex]).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
+        ((TraitSlotConst) traits.traits.get(traitIndex)).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
 
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
         writer.appendNoHilight(super.toString(abcTags, abc) + " ");
         if (parentTraitIndex > -1) {
             if (isStatic) {
-                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits[parentTraitIndex]).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
             } else {
-                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits[parentTraitIndex]).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
             }
         }
-        ((TraitSlotConst) traits.traits[traitIndex]).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+        ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
         return writer.toString();
     }
 

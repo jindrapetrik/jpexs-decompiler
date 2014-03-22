@@ -16,17 +16,26 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import java.util.List;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 
 /**
  *
  * @author JPEXS
  */
-public class GetterAVM2Item extends MethodAVM2Item {
+public class ExceptionMarkAVM2Instruction extends AVM2Instruction {
 
-    public GetterAVM2Item(boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<VariableAVM2Item> subvariables, GraphTargetItem retType) {
-        super(isStatic, namespaceKind, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+    public int markType;
+    public int exceptionId;
+
+    public ExceptionMarkAVM2Instruction(int exceptionId, int markType) {
+        super(0, null, new int[0], new byte[0]);
+        this.markType = markType;
+        this.exceptionId = exceptionId;
+    }
+
+    @Override
+    public byte[] getBytes() {
+        return new byte[0];
     }
 
 }

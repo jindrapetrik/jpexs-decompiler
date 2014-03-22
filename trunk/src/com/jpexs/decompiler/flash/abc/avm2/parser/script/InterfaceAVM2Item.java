@@ -16,33 +16,29 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
-import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.model.ActionItem;
-import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class InterfaceAVM2Item extends ActionItem {
+public class InterfaceAVM2Item extends AVM2Item {
 
-    public GraphTargetItem name;
+    public String name;
     public List<GraphTargetItem> superInterfaces;
     public List<GraphTargetItem> methods;
+    public int namespaceKind;
 
-    public InterfaceAVM2Item(GraphTargetItem name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> methods) {
+    public InterfaceAVM2Item(int namespaceKind, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.name = name;
         this.superInterfaces = superInterfaces;
-        this.methods = methods;
+        this.methods = traits;
+        this.namespaceKind = namespaceKind;
     }
 
     @Override
@@ -53,14 +49,6 @@ public class InterfaceAVM2Item extends ActionItem {
     @Override
     public boolean needsSemicolon() {
         return false;
-    }
-
-    @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        List<GraphSourceItem> ret = new ArrayList<>();
-        ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        ret.addAll(asGenerator.generateTraits(localData, true, name, null, superInterfaces, null, null, null, null, null));
-        return ret;
     }
 
     @Override

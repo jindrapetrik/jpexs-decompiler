@@ -56,8 +56,8 @@ public class GetSlotIns extends InstructionDefinition {
         } else if (obj instanceof ThisAVM2Item) {
             slotname = ((ThisAVM2Item) obj).className;
         } else if (obj instanceof ScriptAVM2Item) {
-            for (int t = 0; t < abc.script_info.get(((ScriptAVM2Item) obj).scriptIndex).traits.traits.length; t++) {
-                Trait tr = abc.script_info.get(((ScriptAVM2Item) obj).scriptIndex).traits.traits[t];
+            for (int t = 0; t < abc.script_info.get(((ScriptAVM2Item) obj).scriptIndex).traits.traits.size(); t++) {
+                Trait tr = abc.script_info.get(((ScriptAVM2Item) obj).scriptIndex).traits.traits.get(t);
                 if (tr instanceof TraitWithSlot) {
                     if (((TraitWithSlot) tr).getSlotIndex() == slotIndex) {
                         slotname = tr.getName(abc);
@@ -66,10 +66,10 @@ public class GetSlotIns extends InstructionDefinition {
             }
         } else if (obj instanceof NewActivationAVM2Item) {
 
-            for (int t = 0; t < body.traits.traits.length; t++) {
-                if (body.traits.traits[t] instanceof TraitWithSlot) {
-                    if (((TraitWithSlot) body.traits.traits[t]).getSlotIndex() == slotIndex) {
-                        slotname = body.traits.traits[t].getName(abc);
+            for (int t = 0; t < body.traits.traits.size(); t++) {
+                if (body.traits.traits.get(t) instanceof TraitWithSlot) {
+                    if (((TraitWithSlot) body.traits.traits.get(t)).getSlotIndex() == slotIndex) {
+                        slotname = body.traits.traits.get(t).getName(abc);
                     }
                 }
 

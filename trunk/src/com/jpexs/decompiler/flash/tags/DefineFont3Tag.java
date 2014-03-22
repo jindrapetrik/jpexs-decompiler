@@ -206,7 +206,7 @@ public class DefineFont3Tag extends FontTag {
                     fontFlagsWideOffsets = true;
                 }
             }
-            
+
             sos.writeUI16(fontId);
             sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
             sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);

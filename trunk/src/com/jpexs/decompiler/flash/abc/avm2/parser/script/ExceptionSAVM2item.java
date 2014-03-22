@@ -16,17 +16,29 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
+import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import java.util.List;
+import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
  *
  * @author JPEXS
  */
-public class GetterAVM2Item extends MethodAVM2Item {
+public class ExceptionSAVM2item extends AVM2Item {
 
-    public GetterAVM2Item(boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<VariableAVM2Item> subvariables, GraphTargetItem retType) {
-        super(isStatic, namespaceKind, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+    public GraphTargetItem type;
+    public GraphTargetItem name;
+
+    public ExceptionSAVM2item(GraphTargetItem type, GraphTargetItem name) {
+        super(null, NOPRECEDENCE);
+        this.type = type;
+        this.name = name;
+    }
+
+    @Override
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return writer;
     }
 
 }

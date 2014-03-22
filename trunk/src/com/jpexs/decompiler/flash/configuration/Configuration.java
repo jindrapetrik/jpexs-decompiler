@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -39,6 +40,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -591,5 +593,34 @@ public class Configuration {
         ret.indentString = indentString;
         ret.beginBlockOnNewLine = beginBlockOnNewLine.get();
         return ret;
+    }
+
+    public static File getPlayerSWC() {
+        try {
+            String home = getFFDecHome();
+            File libsdir = new File(home + "flashlib");
+            if (libsdir.exists()) {
+                File libs[] = libsdir.listFiles(new FilenameFilter() {
+
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        return name.toLowerCase().startsWith("playerglobal");
+                    }
+                });
+                List<String> libnames = new ArrayList<>();
+                for (File f : libs) {
+                    libnames.add(f.getName());
+                }
+                Collections.sort(libnames);
+                if (!libnames.isEmpty()) {
+                    return new File(libsdir.getAbsolutePath() + File.separator + libnames.get(libnames.size() - 1));
+                } else {
+                    return null;
+                }
+            }
+        } catch (IOException ex) {
+
+        }
+        return null;
     }
 }

@@ -105,11 +105,11 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     public Timelined getTimelined() {
         return timelined;
     }
-    
+
     public void setTimelined(Timelined timelined) {
         this.timelined = timelined;
     }
-    
+
     /**
      * Constructor
      *
@@ -125,7 +125,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         this.data = data;
         this.pos = pos;
         this.swf = swf;
-        if(data == null){//it is tag build by constructor        
+        if (data == null) {//it is tag build by constructor        
             this.data = new byte[0];
             modified = true;
         }

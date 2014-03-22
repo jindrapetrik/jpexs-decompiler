@@ -69,7 +69,7 @@ public class PreviewImage extends JPanel {
     static {
         executor = Executors.newFixedThreadPool(Configuration.parallelSpeedUp.get() ? Configuration.parallelThreadCount.get() : 1);
     }
-    
+
     /**
      *
      * @param mainPanel

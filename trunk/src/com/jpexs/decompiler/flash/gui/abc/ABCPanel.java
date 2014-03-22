@@ -618,7 +618,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                         code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[0], new byte[0]));
                         body.code = code;
                         Traits traits = new Traits();
-                        traits.traits = new Trait[0];
+                        traits.traits = new ArrayList<>();
                         body.traits = traits;
                         abc.addMethodBody(body);
                         mi.setBody(body);
@@ -640,7 +640,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     if (isStatic) {
                         traitId = abc.class_info.get(class_index).static_traits.addTrait(t);
                     } else {
-                        traitId = abc.class_info.get(class_index).static_traits.traits.length + abc.instance_info.get(class_index).instance_traits.addTrait(t);
+                        traitId = abc.class_info.get(class_index).static_traits.traits.size() + abc.instance_info.get(class_index).instance_traits.addTrait(t);
                     }
                     reload();
                     decompiledTextArea.gotoTrait(traitId);

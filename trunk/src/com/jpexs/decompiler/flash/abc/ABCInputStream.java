@@ -337,9 +337,9 @@ public class ABCInputStream extends InputStream {
     public Traits readTraits() throws IOException {
         int count = readU30();
         Traits traits = new Traits();
-        traits.traits = new Trait[count];
+        traits.traits = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            traits.traits[i] = readTrait();
+            traits.traits.add(readTrait());
         }
         return traits;
     }
