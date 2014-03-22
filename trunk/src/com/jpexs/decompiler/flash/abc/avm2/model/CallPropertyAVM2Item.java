@@ -16,9 +16,15 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
@@ -48,5 +54,13 @@ public class CallPropertyAVM2Item extends AVM2Item {
             arguments.get(a).toString(writer, localData);
         }
         return writer.append(")");
+    }
+    
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, receiver, arguments,                
+                new AVM2Instruction(0, new CallPropertyIns(), new int[]{((AVM2SourceGenerator)generator).propertyName(propertyName),arguments.size()}, new byte[0])                
+        );
     }
 }

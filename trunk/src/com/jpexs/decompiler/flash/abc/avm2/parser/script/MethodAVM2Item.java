@@ -30,7 +30,7 @@ public class MethodAVM2Item extends FunctionAVM2Item {
     public int namespaceKind;
     private boolean isStatic;
 
-    public MethodAVM2Item(boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<VariableAVM2Item> subvariables, GraphTargetItem retType) {
+    public MethodAVM2Item(boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
         super(methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
         this.namespaceKind = namespaceKind;
         this.isStatic = isStatic;

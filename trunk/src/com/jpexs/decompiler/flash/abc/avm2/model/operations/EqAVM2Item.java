@@ -16,11 +16,18 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.EqualsIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
+import java.util.List;
 
 public class EqAVM2Item extends BinaryOpItem implements LogicalOpItem {
 
@@ -36,5 +43,12 @@ public class EqAVM2Item extends BinaryOpItem implements LogicalOpItem {
     @Override
     public GraphTargetItem invert() {
         return new NeqAVM2Item(src, leftSide, rightSide);
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, leftSide, rightSide, 
+                new AVM2Instruction(0, new EqualsIns(), new int[]{}, new byte[0])
+        );
     }
 }

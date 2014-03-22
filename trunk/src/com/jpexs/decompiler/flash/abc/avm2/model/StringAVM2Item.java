@@ -16,11 +16,18 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNanIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
+import java.util.List;
 import java.util.Set;
 
 public class StringAVM2Item extends AVM2Item {
@@ -46,4 +53,11 @@ public class StringAVM2Item extends AVM2Item {
     public Object getResult() {
         return value;
     }
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator,  
+                new AVM2Instruction(0, new PushStringIns(), new int[]{((AVM2SourceGenerator)generator).str(value)}, new byte[0])
+        );
+    }
+    
 }

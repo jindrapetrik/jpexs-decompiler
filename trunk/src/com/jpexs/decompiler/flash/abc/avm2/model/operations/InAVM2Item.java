@@ -16,13 +16,26 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.InIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.InstanceOfIns;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import java.util.List;
 
 public class InAVM2Item extends BinaryOpItem {
 
     public InAVM2Item(AVM2Instruction instruction, GraphTargetItem name, GraphTargetItem object) {
         super(instruction, PRECEDENCE_RELATIONAL, name, object, "in");
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, leftSide, rightSide, 
+                new AVM2Instruction(0, new InIns(), new int[]{}, new byte[0])
+        );
     }
 }

@@ -16,10 +16,14 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
+import java.util.List;
 
 public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2Item {
 
@@ -31,4 +35,10 @@ public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2I
     public boolean hasSideEffect() {
         return true;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return super.toSource(localData, generator); //TODO
+    }
+    
 }

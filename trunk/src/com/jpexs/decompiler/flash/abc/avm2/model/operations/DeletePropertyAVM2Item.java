@@ -16,11 +16,18 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.DeletePropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.TypeOfIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 
 public class DeletePropertyAVM2Item extends AVM2Item {
 
@@ -40,5 +47,12 @@ public class DeletePropertyAVM2Item extends AVM2Item {
         writer.append("[");
         propertyName.toString(writer, localData);
         return writer.append("]");
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, object, 
+                new AVM2Instruction(0, new DeletePropertyIns(), new int[]{((AVM2SourceGenerator)generator).propertyName(propertyName)}, new byte[0])
+        );
     }
 }

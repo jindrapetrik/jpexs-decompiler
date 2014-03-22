@@ -16,12 +16,26 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal1Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal2Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal3Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal0Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 import java.util.Set;
 
 public class LocalRegAVM2Item extends AVM2Item {
@@ -75,5 +89,28 @@ public class LocalRegAVM2Item extends AVM2Item {
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return isCT;
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        AVM2Instruction ins;
+        switch(regIndex){
+            case 0: 
+                ins = new AVM2Instruction(0, new GetLocal0Ins(), new int[]{},new byte[0]);
+                break;
+            case 1: 
+                ins = new AVM2Instruction(0, new GetLocal1Ins(), new int[]{},new byte[0]);
+                break;
+            case 2: 
+                ins = new AVM2Instruction(0, new GetLocal2Ins(), new int[]{},new byte[0]);
+                break;
+            case 3: 
+                ins = new AVM2Instruction(0, new GetLocal3Ins(), new int[]{},new byte[0]);
+                break;
+            default:
+                ins = new AVM2Instruction(0, new GetLocalIns(), new int[]{regIndex},new byte[0]);
+                break;
+        }
+        return toSourceMerge(localData, generator, ins);
     }
 }

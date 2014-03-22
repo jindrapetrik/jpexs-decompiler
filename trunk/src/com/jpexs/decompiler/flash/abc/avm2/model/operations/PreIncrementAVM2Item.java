@@ -16,9 +16,13 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
+import java.util.List;
 
 public class PreIncrementAVM2Item extends UnaryOpItem {
 
@@ -29,5 +33,10 @@ public class PreIncrementAVM2Item extends UnaryOpItem {
     @Override
     public boolean hasSideEffect() {
         return true;
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return super.toSource(localData, generator); //TODO
     }
 }

@@ -16,12 +16,18 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.ModuloIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 
 public class ModuloAVM2Item extends BinaryOpItem {
 
@@ -57,5 +63,12 @@ public class ModuloAVM2Item extends BinaryOpItem {
         } else {
             return super.appendTo(writer, localData);
         }
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, leftSide, rightSide, 
+                new AVM2Instruction(0, new ModuloIns(), new int[]{}, new byte[0])
+        );
     }
 }

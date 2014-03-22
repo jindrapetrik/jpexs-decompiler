@@ -16,10 +16,17 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushFalseIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushTrueIns;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 import java.util.Set;
 
 public class BooleanAVM2Item extends AVM2Item {
@@ -44,5 +51,12 @@ public class BooleanAVM2Item extends AVM2Item {
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return true;
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator,  
+                new AVM2Instruction(0, value?new PushTrueIns():new PushFalseIns(), new int[]{}, new byte[0])
+        );
     }
 }

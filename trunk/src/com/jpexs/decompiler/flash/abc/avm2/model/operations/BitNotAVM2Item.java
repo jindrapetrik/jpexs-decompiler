@@ -16,10 +16,15 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitNotIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
+import java.util.List;
 
 public class BitNotAVM2Item extends UnaryOpItem {
 
@@ -30,5 +35,12 @@ public class BitNotAVM2Item extends UnaryOpItem {
     @Override
     public Object getResult() {
         return ~((long) (double) EcmaScript.toNumber(value.getResult()));
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, value, 
+                new AVM2Instruction(0, new BitNotIns(), new int[]{}, new byte[0])
+        );
     }
 }

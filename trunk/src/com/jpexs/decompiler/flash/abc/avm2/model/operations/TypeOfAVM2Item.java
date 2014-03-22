@@ -16,11 +16,16 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.TypeOfIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.EcmaType;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
+import java.util.List;
 import java.util.Set;
 
 public class TypeOfAVM2Item extends UnaryOpItem {
@@ -59,5 +64,12 @@ public class TypeOfAVM2Item extends UnaryOpItem {
         }
         //TODO: function,xml
         return "object";
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, value, 
+                new AVM2Instruction(0, new TypeOfIns(), new int[]{}, new byte[0])
+        );
     }
 }

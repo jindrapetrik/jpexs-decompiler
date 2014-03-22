@@ -16,11 +16,18 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.ModuloIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
+import java.util.List;
 
 public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem {
 
@@ -39,5 +46,13 @@ public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem {
         Object y = rightSide.getResult();
         return EcmaScript.type(x) != EcmaScript.type(y)
                 || (!EcmaScript.equals(x, y));
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, leftSide, rightSide, 
+                new AVM2Instruction(0, new StrictEqualsIns(), new int[]{}, new byte[0]),
+                new AVM2Instruction(0, new NotIns(), new int[]{}, new byte[0])
+        );
     }
 }

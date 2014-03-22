@@ -25,11 +25,11 @@ import java.util.List;
 public class CallSuperAVM2Item extends AVM2Item {
 
     public GraphTargetItem receiver;
-    public FullMultinameAVM2Item multiname;
+    public GraphTargetItem multiname;
     public List<GraphTargetItem> arguments;
     public boolean isVoid;
 
-    public CallSuperAVM2Item(AVM2Instruction instruction, boolean isVoid, GraphTargetItem receiver, FullMultinameAVM2Item multiname, List<GraphTargetItem> arguments) {
+    public CallSuperAVM2Item(AVM2Instruction instruction, boolean isVoid, GraphTargetItem receiver, GraphTargetItem multiname, List<GraphTargetItem> arguments) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.receiver = receiver;
         this.multiname = multiname;

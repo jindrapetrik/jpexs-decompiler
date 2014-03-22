@@ -16,10 +16,16 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.TypeOfIns;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 
 public class ReturnVoidAVM2Item extends AVM2Item implements ExitItem {
 
@@ -30,5 +36,11 @@ public class ReturnVoidAVM2Item extends AVM2Item implements ExitItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("return");
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new AVM2Instruction(0, new ReturnVoidIns(), new int[]{}, new byte[0])
+        );
     }
 }

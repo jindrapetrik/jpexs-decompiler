@@ -14,11 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
@@ -26,31 +30,25 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class FunctionAVM2Item extends AVM2Item {
+public class CallAVM2Item extends AVM2Item {
 
-    public String calculatedFunctionName;
-    public String functionName;
-    public List<String> paramNames;
-    public List<GraphTargetItem> body;
-    public List<NameAVM2Item> subvariables;
-    public List<GraphTargetItem> paramTypes;
-    public List<GraphTargetItem> paramValues;
-    public GraphTargetItem retType;
-
-    public FunctionAVM2Item(String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
-        super(null, NOPRECEDENCE);
-        this.paramNames = paramNames;
-        this.body = body;
-        this.functionName = functionName;
-        this.subvariables = subvariables;
-        this.paramTypes = paramTypes;
-        this.paramValues = paramValues;
-        this.retType = retType;
+    public GraphTargetItem name;
+    public List<GraphTargetItem> arguments;
+    
+    public CallAVM2Item(GraphTargetItem name,List<GraphTargetItem> arguments) {
+        super(null,NOPRECEDENCE);
+        this.name = name;
+        this.arguments = arguments;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return writer; //todo?
+        return writer;
     }
 
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return super.toSource(localData, generator); //To change body of generated methods, choose Tools | Templates.
+    }
+        
 }

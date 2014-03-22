@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class GetterAVM2Item extends MethodAVM2Item {
 
-    public GetterAVM2Item(boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<VariableAVM2Item> subvariables, GraphTargetItem retType) {
+    public GetterAVM2Item(boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
         super(isStatic, namespaceKind, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }
 

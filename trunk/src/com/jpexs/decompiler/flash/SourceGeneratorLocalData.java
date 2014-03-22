@@ -32,10 +32,10 @@ public class SourceGeneratorLocalData implements Serializable {
     public Integer inFunction;
     public Boolean inMethod;
     public Integer forInLevel;
-    public List<String> openedNamespaces = new ArrayList<>();
-    public List<Integer> openedNamespacesKinds = new ArrayList<>();
+    //public List<String> openedNamespaces = new ArrayList<>();
+    //public List<Integer> openedNamespacesKinds = new ArrayList<>();
     public List<ABCException> exceptions = new ArrayList<>();
-
+/*
     public void addNamespace(int kind, String ns) {
         addNamespace(kind, ns, openedNamespaces.size() - 1);
     }
@@ -43,7 +43,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public void addNamespace(int kind, String ns, int index) {
         openedNamespaces.add(index, ns);
         openedNamespacesKinds.add(index, kind);
-    }
+    }*/
 
     public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {
         this.registerVars = registerVars;
