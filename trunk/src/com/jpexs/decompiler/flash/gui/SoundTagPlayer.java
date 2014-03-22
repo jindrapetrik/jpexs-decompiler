@@ -61,7 +61,6 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private int loops;
     private boolean paused = true;
-    private final Object myLock = new Object();
     private final Object playLock = new Object();
 
     public SoundTagPlayer(SoundTag tag, int loops) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
@@ -76,23 +75,18 @@ public class SoundTagPlayer implements MediaDisplay {
     @Override
     public synchronized int getCurrentFrame() {
 
-        if (!isPlaying()) {
+        synchronized (playLock) {
+            if (isPlaying()) {
+                actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
+            }
             return actualPos;
         }
-
-        synchronized (playLock) {
-            actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
-        }
-        return actualPos;
     }
 
     @Override
     public synchronized int getTotalFrames() {
-        //System.out.println("getTotalFrames");
 
         int ret = (int) (player.samplesCount() / FRAME_DIVISOR);
-
-        //System.out.println("/getTotalFrames");
         return ret;
     }
 
@@ -105,19 +99,12 @@ public class SoundTagPlayer implements MediaDisplay {
 
         synchronized (playLock) {
             actualPos = (int) (player.getSamplePosition() / FRAME_DIVISOR);
-            paused = true;
-            player.stop();
-            try {
-                playLock.wait();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
 
+        waitStop();
     }
 
-    public void play(boolean async) {
-
+    private void waitStop() {
         synchronized (playLock) {
             if (!paused) {
                 paused = true;
@@ -129,39 +116,48 @@ public class SoundTagPlayer implements MediaDisplay {
                 }
             }
         }
-        ;
+    }
+    
+    public void play(boolean async) {
+
+        waitStop();
         Runnable r = new Runnable() {
 
             @Override
             public void run() {
-                int startPos = 0;
-                synchronized (playLock) {
-                    startPos = actualPos * FRAME_DIVISOR;
-                    paused = false;
-                }
-                player.setPosition(startPos);
-                player.play();
+                boolean playAgain = true;
+                while (playAgain) {
+                    int startPos = 0;
+                    synchronized (playLock) {
+                        startPos = actualPos * FRAME_DIVISOR;
+                    }
+                    player.setPosition(startPos);
+                    player.play();
 
-                boolean playAgain = false;
-                synchronized (playLock) {
-                    playAgain = !paused;
-                    paused = true;
-                    if (loops > 0) {
-                        loops--;
+                    synchronized (playLock) {
+                        playAgain = !paused && loops > 0;
+                        if (!paused) {
+                            if (loops == 0) {
+                                paused = true;
+                            } else if (loops != Integer.MAX_VALUE) {
+                                loops--;
+                            }
+                        }
+                        if (playAgain) {
+                            actualPos = 0;
+                        }
                     }
                 }
-                if (playAgain && loops > 0) {
-                    gotoFrame(0);
-                    run();
-                    return;
-                } else {
-                    fireFinished();
-                }
+
+                fireFinished();
                 synchronized (playLock) {
                     playLock.notifyAll();
                 }
             }
         };
+        synchronized (playLock) {
+            paused = false;
+        }
         if (async) {
             thr = new Thread(r);
             thr.start();
