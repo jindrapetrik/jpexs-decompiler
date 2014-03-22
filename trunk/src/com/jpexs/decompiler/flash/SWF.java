@@ -535,7 +535,8 @@ public final class SWF implements TreeItem, Timelined {
             gfx = true;
         }
         if (hdr[0] == 'C') {
-            sis = new SWFInputStream(new InflaterInputStream(is), version, 8);
+            byte[] uncompressedData = Helper.readStream(new InflaterInputStream(is));
+            sis = new SWFInputStream(new ByteArrayInputStream(uncompressedData), version, 8);
             compressed = true;
         }
 

@@ -5,13 +5,13 @@
 	import classes.myInternal;
 	import flash.errors.EOFError;
 	import flash.events.Event;
-
 	public class Test
 	{
 		private var testPriv:int=5;
 		protected var testProt:int=9;
 		public var t3:TestClass3;
 		public static const p:int=8;
+		private namespace n="nazdar";
 
 		public function testHello()
 		{
@@ -614,7 +614,7 @@
 
 		function getNamespace():Namespace
 		{
-			return null; //myInternal;
+			return myInternal;
 		}
 
 		function getName():String
@@ -626,9 +626,10 @@
 		{
 			var ns=getNamespace();
 			var name=getName();
-			//var a=ns::unnamespacedFunc();
-			//var b=ns::[name];
-			//trace(b.c);
+			var a=ns::unnamespacedFunc();
+			var b=ns::[name];
+			trace(b.c);
+			var c=myInternal::neco;
 		}
 
 		function testComplexExpressions()
