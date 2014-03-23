@@ -93,4 +93,9 @@ public class PreIncrementActionItem extends UnaryOpItem {
         }
         return ret;
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return value.returnType();
+    }
 }

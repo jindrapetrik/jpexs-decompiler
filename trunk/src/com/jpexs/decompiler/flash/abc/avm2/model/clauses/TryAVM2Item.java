@@ -17,11 +17,12 @@
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.ExceptionSAVM2item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.NameAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
     public List<GraphTargetItem> tryCommands;
     public List<ABCException> catchExceptions;
-    public List<ExceptionSAVM2item> catchExceptions2;
+    public List<NameAVM2Item> catchExceptions2;
     public List<List<GraphTargetItem>> catchCommands;
     public List<GraphTargetItem> finallyCommands;
 
@@ -137,4 +138,9 @@ public class TryAVM2Item extends AVM2Item implements Block {
     public boolean needsSemicolon() {
         return false;
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
+    } 
 }

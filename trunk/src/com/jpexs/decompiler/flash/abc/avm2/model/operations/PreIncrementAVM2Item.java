@@ -39,4 +39,9 @@ public class PreIncrementAVM2Item extends UnaryOpItem {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return super.toSource(localData, generator); //TODO
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return value.returnType();
+    }
 }

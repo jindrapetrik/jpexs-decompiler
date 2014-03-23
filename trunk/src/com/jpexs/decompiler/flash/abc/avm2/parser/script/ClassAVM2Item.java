@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,4 +74,11 @@ public class ClassAVM2Item extends AVM2Item implements Block {
     public boolean hasReturnValue() {
         return false;
     }
+
+    @Override
+    public GraphTargetItem returnType() {
+        return new UnboundedTypeItem(); //FIXME
+    }
+    
+    
 }

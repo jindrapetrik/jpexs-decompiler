@@ -225,6 +225,9 @@ public abstract class GraphTargetItem implements Serializable {
     protected List<GraphSourceItem> toSourceMerge(SourceGeneratorLocalData localData, SourceGenerator gen, Object... tar) {
         List<GraphSourceItem> ret = new ArrayList<>();
         for (Object o : tar) {
+            if(o == null){
+                continue;
+            }
             if (o instanceof GraphTargetItem) {
                 ret.addAll(((GraphTargetItem) o).toSource(localData, gen));
             }
@@ -252,4 +255,6 @@ public abstract class GraphTargetItem implements Serializable {
         }
         return ret;
     }
+    
+    public abstract GraphTargetItem returnType();
 }

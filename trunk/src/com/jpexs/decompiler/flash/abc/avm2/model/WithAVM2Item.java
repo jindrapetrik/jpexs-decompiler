@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,4 +59,9 @@ public class WithAVM2Item extends AVM2Item {
     public boolean needsSemicolon() {
         return false;
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
+    } 
 }

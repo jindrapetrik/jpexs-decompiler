@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class TemporaryRegister extends GraphTargetItem {
+public class TemporaryRegister extends ActionItem {
 
     private final int regId;
 

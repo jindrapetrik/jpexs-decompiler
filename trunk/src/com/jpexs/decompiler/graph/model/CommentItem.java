@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 
 /**
  *
@@ -67,4 +68,9 @@ public class CommentItem extends GraphTargetItem {
     public boolean hasReturnValue() {
         return false;
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
+    } 
 }

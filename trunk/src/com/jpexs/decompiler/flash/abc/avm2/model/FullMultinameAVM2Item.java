@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
@@ -153,4 +154,9 @@ public class FullMultinameAVM2Item extends AVM2Item {
         }
         return true;
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
+    } 
 }

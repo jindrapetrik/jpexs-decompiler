@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionStringEquals;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 import java.util.Set;
@@ -39,5 +40,10 @@ public class StringEqActionItem extends BinaryOpItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return toSourceMerge(localData, generator, leftSide, rightSide, new ActionStringEquals());
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.BOOLEAN;
     }
 }

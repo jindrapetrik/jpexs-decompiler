@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Set;
 
@@ -79,5 +80,10 @@ public class CoerceAVM2Item extends AVM2Item {
         }
         return ret;
 
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return new TypeItem(type);
     }
 }

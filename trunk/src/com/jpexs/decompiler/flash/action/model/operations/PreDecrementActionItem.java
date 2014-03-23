@@ -93,4 +93,10 @@ public class PreDecrementActionItem extends UnaryOpItem {
         }
         return ret;
     }
+    
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return value.returnType();
+    }
 }

@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.MultiplyIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.MultiplyIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -28,6 +26,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
 public class MultiplyAVM2Item extends BinaryOpItem {
@@ -68,5 +67,10 @@ public class MultiplyAVM2Item extends BinaryOpItem {
         return toSourceMerge(localData, generator, leftSide, rightSide, 
                 new AVM2Instruction(0, new MultiplyIns(), new int[]{}, new byte[0])
         );
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return new UnboundedTypeItem();
     }
 }

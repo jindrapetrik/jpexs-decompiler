@@ -18,13 +18,13 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.LShiftIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
 public class LShiftAVM2Item extends BinaryOpItem {
@@ -44,4 +44,10 @@ public class LShiftAVM2Item extends BinaryOpItem {
                 new AVM2Instruction(0, new LShiftIns(), new int[]{}, new byte[0])
         );
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return new UnboundedTypeItem();
+    }
+    
 }

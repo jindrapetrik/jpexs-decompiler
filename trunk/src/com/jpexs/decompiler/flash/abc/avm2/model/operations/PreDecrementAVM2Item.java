@@ -41,4 +41,9 @@ public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2I
         return super.toSource(localData, generator); //TODO
     }
     
+    @Override
+    public GraphTargetItem returnType() {
+        return value.returnType();
+    }
+    
 }

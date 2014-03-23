@@ -21,6 +21,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 
 public class OrItem extends BinaryOpItem {
@@ -48,4 +49,9 @@ public class OrItem extends BinaryOpItem {
     public boolean hasReturnValue() {
         return true;
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.BOOLEAN;
+    } 
 }

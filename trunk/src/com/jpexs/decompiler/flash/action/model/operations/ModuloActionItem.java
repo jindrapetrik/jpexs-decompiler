@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 
@@ -42,5 +43,10 @@ public class ModuloActionItem extends BinaryOpItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return toSourceMerge(localData, generator, leftSide, rightSide, new ActionModulo());
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
     }
 }

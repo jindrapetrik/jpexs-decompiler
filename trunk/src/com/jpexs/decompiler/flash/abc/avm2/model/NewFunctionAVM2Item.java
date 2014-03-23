@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Stack;
@@ -77,5 +78,10 @@ public class NewFunctionAVM2Item extends AVM2Item {
         }
         writer.append("}");
         return writer;
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return new TypeItem("Function");
     }
 }

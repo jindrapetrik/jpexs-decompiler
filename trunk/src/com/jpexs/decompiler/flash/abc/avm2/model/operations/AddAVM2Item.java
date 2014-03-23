@@ -27,6 +27,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
 public class AddAVM2Item extends BinaryOpItem {
@@ -70,6 +71,11 @@ public class AddAVM2Item extends BinaryOpItem {
         return toSourceMerge(localData, generator, leftSide, rightSide, 
                 new AVM2Instruction(0, new AddIns(), new int[]{}, new byte[0])
         );
+    }
+
+    @Override
+    public GraphTargetItem returnType() {
+        return new UnboundedTypeItem();
     }
     
     

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model.operations;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.Set;
 
@@ -31,5 +32,10 @@ public class InActionItem extends BinaryOpItem {
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return false;
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.BOOLEAN;
     }
 }

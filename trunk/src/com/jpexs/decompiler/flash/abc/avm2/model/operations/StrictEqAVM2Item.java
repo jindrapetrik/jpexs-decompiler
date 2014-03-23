@@ -18,12 +18,12 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.ModuloIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
@@ -52,5 +52,10 @@ public class StrictEqAVM2Item extends BinaryOpItem implements LogicalOpItem {
         return toSourceMerge(localData, generator, leftSide, rightSide, 
                 new AVM2Instruction(0, new StrictEqualsIns(), new int[]{}, new byte[0])
         );
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return new TypeItem("Boolean");
     }
 }

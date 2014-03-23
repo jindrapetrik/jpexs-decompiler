@@ -18,12 +18,17 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeFunctionItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,7 +53,27 @@ public class CallAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return super.toSource(localData, generator); //To change body of generated methods, choose Tools | Templates.
+        if(name instanceof PropertyAVM2Item){
+            PropertyAVM2Item prop=(PropertyAVM2Item)name;
+            return toSourceMerge(localData, generator, prop.object,prop.index,arguments,
+                    new AVM2Instruction(0, new CallPropertyIns(), new int[]{prop.resolveProperty(),arguments.size()}, new byte[0])
+                    );
+        }
+        if(name instanceof NameAVM2Item){
+            //TODO
+        }
+        return new ArrayList<>();
     }
+
+    @Override
+    public GraphTargetItem returnType() {
+        GraphTargetItem ti = name.returnType();
+        if(ti instanceof TypeFunctionItem){
+            TypeFunctionItem tfi=(TypeFunctionItem)ti;
+            return new TypeItem(tfi.fullTypeName);
+        }
+        return ti;
+    }
+           
         
 }

@@ -50,4 +50,9 @@ public class ParenthesisItem extends GraphTargetItem {
     public boolean hasReturnValue() {
         return value.hasReturnValue();
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return value.returnType();
+    } 
 }

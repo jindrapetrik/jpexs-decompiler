@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -142,4 +143,9 @@ public class IfItem extends GraphTargetItem implements Block {
     public boolean hasReturnValue() {
         return false;
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
+    } 
 }

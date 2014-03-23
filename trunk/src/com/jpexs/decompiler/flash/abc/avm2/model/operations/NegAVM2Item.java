@@ -19,12 +19,12 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NegateIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.TypeOfIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
+import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
 public class NegAVM2Item extends UnaryOpItem {
@@ -43,5 +43,10 @@ public class NegAVM2Item extends UnaryOpItem {
         return toSourceMerge(localData, generator, value, 
                 new AVM2Instruction(0, new NegateIns(), new int[]{}, new byte[0])
         );
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return new UnboundedTypeItem();
     }
 }

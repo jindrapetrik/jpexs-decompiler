@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 public class IncLocalAVM2Item extends AVM2Item {
@@ -34,4 +36,9 @@ public class IncLocalAVM2Item extends AVM2Item {
         writer.append(localRegName(localData.localRegNames, regIndex));
         return writer.append("++");
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
+    } 
 }

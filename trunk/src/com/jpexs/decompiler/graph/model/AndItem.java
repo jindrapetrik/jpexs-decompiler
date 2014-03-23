@@ -21,6 +21,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 
 public class AndItem extends BinaryOpItem {
@@ -48,4 +49,9 @@ public class AndItem extends BinaryOpItem {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return generator.generate(localData, this);
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.BOOLEAN;
+    } 
 }

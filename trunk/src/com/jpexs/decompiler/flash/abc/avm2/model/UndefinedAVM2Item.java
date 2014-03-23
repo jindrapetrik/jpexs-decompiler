@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Set;
 
@@ -43,4 +44,9 @@ public class UndefinedAVM2Item extends AVM2Item {
     public Object getResult() {
         return new Undefined();
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return new TypeItem("Undefined");
+    } 
 }

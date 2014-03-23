@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
@@ -71,4 +72,9 @@ public class DeclarationAVM2Item extends AVM2Item {
         writer.append("var ");
         return assignment.toString(writer, localData);
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return new TypeItem(type);
+    } 
 }

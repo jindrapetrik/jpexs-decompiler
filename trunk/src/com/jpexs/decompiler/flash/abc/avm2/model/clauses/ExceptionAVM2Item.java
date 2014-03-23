@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 public class ExceptionAVM2Item extends AVM2Item {
@@ -34,4 +36,9 @@ public class ExceptionAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append(exception.getVarName(localData.constantsAvm2, localData.fullyQualifiedNames));
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
+    } 
 }

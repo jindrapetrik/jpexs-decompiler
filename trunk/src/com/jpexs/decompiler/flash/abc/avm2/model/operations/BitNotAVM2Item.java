@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
+import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
 public class BitNotAVM2Item extends UnaryOpItem {
@@ -42,5 +43,9 @@ public class BitNotAVM2Item extends UnaryOpItem {
         return toSourceMerge(localData, generator, value, 
                 new AVM2Instruction(0, new BitNotIns(), new int[]{}, new byte[0])
         );
+    }
+    @Override
+    public GraphTargetItem returnType() {
+        return new UnboundedTypeItem();
     }
 }

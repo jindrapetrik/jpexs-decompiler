@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 
 /**
@@ -58,4 +59,9 @@ public class CommaExpressionItem extends GraphTargetItem {
     public boolean hasReturnValue() {
         return false;
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return commands.isEmpty()?TypeItem.UNBOUNDED:commands.get(commands.size()-1).returnType();
+    } 
 }

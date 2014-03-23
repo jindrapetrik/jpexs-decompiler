@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
@@ -41,5 +42,10 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
         writer.append("op_" + name + "(");
         ofs.toString(writer, localData);
         return writer.append(") /*Alchemy*/");
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
     }
 }

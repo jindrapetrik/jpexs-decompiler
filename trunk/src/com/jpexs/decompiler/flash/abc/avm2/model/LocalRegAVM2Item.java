@@ -23,17 +23,13 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal1Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal3Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Set;
@@ -113,4 +109,9 @@ public class LocalRegAVM2Item extends AVM2Item {
         }
         return toSourceMerge(localData, generator, ins);
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
+    } 
 }

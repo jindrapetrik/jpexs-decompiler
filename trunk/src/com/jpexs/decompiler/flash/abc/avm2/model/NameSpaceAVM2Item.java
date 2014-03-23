@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 public class NameSpaceAVM2Item extends AVM2Item {
@@ -34,8 +36,13 @@ public class NameSpaceAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         if (namespaceIndex == 0) {
             return writer.append("*");
-        }
+        }        
         ConstantPool constants = localData.constantsAvm2;
         return writer.append(constants.getNamespace(namespaceIndex).toString(constants));
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.UNBOUNDED;
+    } 
 }

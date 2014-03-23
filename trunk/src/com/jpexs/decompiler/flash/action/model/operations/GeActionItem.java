@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
@@ -62,5 +63,10 @@ public class GeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return toSourceMerge(localData, generator, leftSide, rightSide, new ActionLess2(), new ActionNot());
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.BOOLEAN;
     }
 }

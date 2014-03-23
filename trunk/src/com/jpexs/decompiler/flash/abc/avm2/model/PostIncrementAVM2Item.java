@@ -41,4 +41,9 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     public boolean hasSideEffect() {
         return true;
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return object.returnType();
+    }
 }

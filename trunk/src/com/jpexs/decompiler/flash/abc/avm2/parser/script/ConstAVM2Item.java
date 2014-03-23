@@ -54,4 +54,11 @@ public class ConstAVM2Item extends AVM2Item {
         return writer; //TODO
     }
 
+    @Override
+    public GraphTargetItem returnType() {
+        return type;
+    }
+    
+    
+
 }

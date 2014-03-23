@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
 /**
@@ -40,6 +41,11 @@ public class PackageAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return writer;
+    }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return new UnboundedTypeItem(); //FIXME
     }
 
 }

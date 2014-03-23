@@ -55,4 +55,9 @@ public class TernarOpItem extends GraphTargetItem {
     public boolean hasReturnValue() {
         return true;
     }
+    
+    @Override
+    public GraphTargetItem returnType() {
+        return onTrue.returnType();
+    } 
 }

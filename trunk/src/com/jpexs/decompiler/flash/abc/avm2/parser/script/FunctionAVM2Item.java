@@ -53,4 +53,11 @@ public class FunctionAVM2Item extends AVM2Item {
         return writer; //todo?
     }
 
+    @Override
+    public GraphTargetItem returnType() {
+        return retType;
+    }
+    
+    
+
 }
