@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -84,11 +85,43 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
                 ins = new AVM2Instruction(0, new SetLocalIns(), new int[]{regIndex},new byte[0]);
                 break;
         }
+        return toSourceMerge(localData, generator, value, 
+                new AVM2Instruction(0, new DupIns(), new int[]{},new byte[0])
+                ,ins);
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        AVM2Instruction ins;
+        switch(regIndex){
+            case 0: 
+                ins = new AVM2Instruction(0, new SetLocal0Ins(), new int[]{},new byte[0]);
+                break;
+            case 1: 
+                ins = new AVM2Instruction(0, new SetLocal1Ins(), new int[]{},new byte[0]);
+                break;
+            case 2: 
+                ins = new AVM2Instruction(0, new SetLocal2Ins(), new int[]{},new byte[0]);
+                break;
+            case 3: 
+                ins = new AVM2Instruction(0, new SetLocal3Ins(), new int[]{},new byte[0]);
+                break;
+            default:
+                ins = new AVM2Instruction(0, new SetLocalIns(), new int[]{regIndex},new byte[0]);
+                break;
+        }
         return toSourceMerge(localData, generator, value, ins);
     }
+    
+    
     
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     } 
+    
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

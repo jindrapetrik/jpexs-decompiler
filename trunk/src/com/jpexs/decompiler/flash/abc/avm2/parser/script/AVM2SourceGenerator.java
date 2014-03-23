@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.InitPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
@@ -65,6 +66,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
@@ -73,6 +75,7 @@ import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
@@ -556,21 +559,24 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return abc;
     }
 
-    public void generateClass(ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, GraphTargetItem name, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems) {
+    public void generateClass(PackageAVM2Item pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems) {
         List<GraphSourceItem> ret = new ArrayList<>();
 
         ParsedSymbol s = null;
 
+        instanceInfo.name_index = abc.constants.addMultiname(new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true),
+                abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(pkg.packageName, true)), 0, true), 0, 0, new ArrayList<Integer>()));
+
         if (constructor == null) {
-            instanceInfo.iinit_index = method(localData, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), new ArrayList<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), name/*?? FIXME*/);
+            instanceInfo.iinit_index = method(localData, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), new ArrayList<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), TypeItem.UNBOUNDED/*?? FIXME*/);
         } else {
             MethodAVM2Item m = (MethodAVM2Item) constructor;
-            calcRegisters(m);
-            instanceInfo.iinit_index = method(localData, m.paramTypes, m.paramNames, m.paramValues, m.body, name/*?? FIXME*/);
+            calcRegisters(localData, m);
+            instanceInfo.iinit_index = method(localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
         }
 
-        generateTraits(false, localData, traitItems, instanceInfo.instance_traits);
-        generateTraits(true, localData, traitItems, classInfo.static_traits);
+        generateTraits(pkg, false, localData, traitItems, instanceInfo.instance_traits);
+        generateTraits(pkg, true, localData, traitItems, classInfo.static_traits);
 
         if (extendsVal != null) {
             instanceInfo.super_index = typeName(localData, extendsVal);
@@ -582,6 +588,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         MethodInfo mi = new MethodInfo(new int[0], 0, str(""), 0, new ValueKind[0], new int[0]);
         MethodBody mb = new MethodBody();
         mb.method_info = abc.addMethodInfo(mi);
+        mb.code = new AVM2Code();
+        mb.code.code = new ArrayList<>();
         mb.code.code.add(ins(new GetLocal0Ins()));
         mb.code.code.add(ins(new PushScopeIns()));
         for (GraphTargetItem ti : traitItems) {
@@ -596,6 +604,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         mb.code.code.add(ins(new ReturnVoidIns()));
         mb.autoFillStats(abc);
+
+        abc.addMethodBody(mb);
 
         classInfo.cinit_index = mb.method_info;
 
@@ -621,8 +631,26 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
-    public int generateClass(AVM2Item cls) {
-        return -1; //TODO
+    public int generateClass(PackageAVM2Item pkg, SourceGeneratorLocalData localData, AVM2Item cls) {
+        ClassInfo ci = new ClassInfo();
+        InstanceInfo ii = new InstanceInfo();
+        abc.class_info.add(ci);
+        abc.instance_info.add(ii);
+
+        if (cls instanceof ClassAVM2Item) {
+            ClassAVM2Item cai = (ClassAVM2Item) cls;
+            generateClass(pkg, ci, ii, localData, false, cai.className, cai.extendsOp, cai.implementsOp, cai.constructor, cai.traits);
+            if(!cai.isDynamic){
+                ii.flags |= InstanceInfo.CLASS_SEALED;
+            }            
+        }
+        if (cls instanceof InterfaceAVM2Item) {
+            InterfaceAVM2Item iai = (InterfaceAVM2Item) cls;
+            generateClass(pkg, ci, ii, localData, true, iai.name, null, iai.superInterfaces, null, iai.methods);
+            ii.flags |= InstanceInfo.CLASS_INTERFACE;
+        }
+
+        return abc.instance_info.size() - 1;
     }
 
     public int traitName(int nsKind, String var) {
@@ -636,46 +664,45 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         String pkg = "";
         String name = type.toString();
-        NameAVM2Item nameItem = (NameAVM2Item) type;
+        TypeItem nameItem = (TypeItem) type;
         if (name.contains(".")) {
             pkg = name.substring(0, name.lastIndexOf("."));
             name = name.substring(name.lastIndexOf(".") + 1);
         }
 
-        int nsKind = Namespace.KIND_PACKAGE;
-        if (pkg.equals("")) {
-            for (int i = 0; i < nameItem.openedNamespaces.size(); i++) {
-                String ns = nameItem.openedNamespaces.get(i);
-                String nspkg = ns;
-                String nsclass = null;
-                if (nspkg.contains(":")) {
-                    nsclass = nspkg.substring(nspkg.indexOf(":") + 1);
-                    nspkg = nspkg.substring(0, nspkg.indexOf(":"));
-                }
-                if (nsclass == null) {
-                    List<ABC> abcs = new ArrayList<>();
-                    abcs.add(abc);
-                    abcs.addAll(allABCs);
-                    loopabc:
-                    for (ABC a : abcs) {
-                        for (InstanceInfo ii : a.instance_info) {
-                            Multiname n = a.constants.constant_multiname.get(ii.name_index);
-                            if (n.getNamespace(a.constants).getName(a.constants).equals(nspkg) && n.getName(a.constants, new ArrayList<String>()).equals(name)) {
-                                pkg = nspkg;
-                                nsKind = n.getNamespace(a.constants).kind;
-                                break loopabc;
-                            }
-                        }
-                    }
-                } else if (name.equals(nsclass)) {
-                    pkg = nspkg;
-                    nsKind = nameItem.openedNamespacesKind.get(i);
-                    break;
-                }
-            }
-        }
-
-        return abc.constants.getMultinameId(new Multiname(Multiname.QNAME, str(name), namespace(nsKind, pkg), 0, 0, new ArrayList<Integer>()), true);
+        /*int nsKind = Namespace.KIND_PACKAGE;
+         if (pkg.equals("")) {
+         for (int i = 0; i < nameItem.openedNamespaces.size(); i++) {
+         String ns = nameItem.openedNamespaces.get(i);
+         String nspkg = ns;
+         String nsclass = null;
+         if (nspkg.contains(":")) {
+         nsclass = nspkg.substring(nspkg.indexOf(":") + 1);
+         nspkg = nspkg.substring(0, nspkg.indexOf(":"));
+         }
+         if (nsclass == null) {
+         List<ABC> abcs = new ArrayList<>();
+         abcs.add(abc);
+         abcs.addAll(allABCs);
+         loopabc:
+         for (ABC a : abcs) {
+         for (InstanceInfo ii : a.instance_info) {
+         Multiname n = a.constants.constant_multiname.get(ii.name_index);
+         if (n.getNamespace(a.constants).getName(a.constants).equals(nspkg) && n.getName(a.constants, new ArrayList<String>()).equals(name)) {
+         pkg = nspkg;
+         nsKind = n.getNamespace(a.constants).kind;
+         break loopabc;
+         }
+         }
+         }
+         } else if (name.equals(nsclass)) {
+         pkg = nspkg;
+         nsKind = nameItem.openedNamespacesKind.get(i);
+         break;
+         }
+         }
+         }*/
+        return abc.constants.getMultinameId(new Multiname(Multiname.QNAME, str(name), namespace(Namespace.KIND_PACKAGE/*?*/, pkg), 0, 0, new ArrayList<Integer>()), true);
     }
 
     public int ident(GraphTargetItem name) {
@@ -701,6 +728,30 @@ public class AVM2SourceGenerator implements SourceGenerator {
         throw new RuntimeException("no prop"); //FIXME
     }
 
+    public int getFreeRegister(SourceGeneratorLocalData localData) {
+        for (int i = 0;; i++) {
+            if (!localData.registerVars.containsValue(i)) {
+                localData.registerVars.put("__TEMP__" + i, i);
+                return i;
+            }
+        }
+    }
+
+    public boolean killRegister(SourceGeneratorLocalData localData, int i) {
+        String key = null;
+        for (String k : localData.registerVars.keySet()) {
+            if (localData.registerVars.get(k) == i) {
+                key = k;
+                break;
+            }
+        }
+        if (key != null) {
+            localData.registerVars.remove(key);
+            return true;
+        }
+        return false;
+    }
+
     public int method(SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) {
         int param_types[] = new int[paramTypes.size()];
         ValueKind optional[] = new ValueKind[paramValues.size()];
@@ -720,7 +771,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         List<GraphSourceItem> src = generate(localData, body);
         mbody.code = new AVM2Code();
         mbody.code.code = toInsList(src);
+        mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}, new byte[0]));
+        mbody.code.code.add(1, new AVM2Instruction(0, new PushScopeIns(), new int[]{}, new byte[0]));
         mbody.autoFillStats(abc);
+
         abc.addMethodBody(mbody);
         //TODO: Exceptions
         return mbody.method_info;
@@ -766,24 +820,28 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return null;
     }
 
-    public void generateTraits(boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts) {
+    public void generateTraits(PackageAVM2Item pkg, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts) {
         Trait[] traits = new Trait[items.size()];
+        int slot_id = 1;
         for (int k = 0; k < items.size(); k++) {
             GraphTargetItem item = items.get(k);
             if (item instanceof InterfaceAVM2Item) {
                 TraitClass tc = new TraitClass();
-                //tc.class_info = generateClass((InterfaceAVM2Item) item);
+                tc.kindType = Trait.TRAIT_CLASS;
                 tc.name_index = traitName(((InterfaceAVM2Item) item).namespaceKind, ((InterfaceAVM2Item) item).name);
+                tc.slot_id = slot_id++;
                 ts.traits.add(tc);
                 traits[k] = tc;
             }
 
             if (item instanceof ClassAVM2Item) {
                 TraitClass tc = new TraitClass();
-                //tc.class_info = generateClass((ClassAVM2Item) item);
+                tc.kindType = Trait.TRAIT_CLASS;
                 tc.name_index = traitName(((ClassAVM2Item) item).namespaceKind, ((ClassAVM2Item) item).className);
+                tc.slot_id = slot_id++;
                 ts.traits.add(tc);
                 traits[k] = tc;
+                
             }
             if ((item instanceof SlotAVM2Item) || (item instanceof ConstAVM2Item)) {
                 TraitSlotConst tsc = new TraitSlotConst();
@@ -822,6 +880,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     tsc.value_kind = vk.value_kind;
                     tsc.value_index = vk.value_index;
                 }
+                tsc.slot_id = slot_id++;
                 ts.traits.add(tsc);
                 traits[k] = tsc;
             }
@@ -833,14 +892,20 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 TraitMethodGetterSetter tmgs = new TraitMethodGetterSetter();
                 tmgs.kindType = (item instanceof MethodAVM2Item) ? Trait.TRAIT_METHOD : ((item instanceof GetterAVM2Item) ? Trait.TRAIT_GETTER : Trait.TRAIT_SETTER);
                 tmgs.name_index = traitName(((MethodAVM2Item) item).namespaceKind, ((MethodAVM2Item) item).functionName);
-
-                //tmgs.method_info = method(localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
+                tmgs.disp_id = 0; //0 = disable override optimization;  TODO: handle this
+                if(mai.isFinal()){
+                    tmgs.kindFlags |= Trait.ATTR_Final;
+                }
+                if(mai.isOverride()){
+                    tmgs.kindFlags |= Trait.ATTR_Override;
+                }
                 ts.traits.add(tmgs);
+                
                 traits[k] = tmgs;
             } else if (item instanceof FunctionAVM2Item) {
                 TraitFunction tf = new TraitFunction();
-                FunctionAVM2Item fai = (FunctionAVM2Item) item;
-                //tf.method_info = method(localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
+                tf.slot_id = slot_id++;
+                tf.kindType = Trait.TRAIT_FUNCTION;
                 tf.name_index = traitName(Namespace.KIND_PACKAGE, ((FunctionAVM2Item) item).functionName);
                 ts.traits.add(tf);
                 traits[k] = tf;
@@ -854,32 +919,32 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 continue;
             }
             if (item instanceof InterfaceAVM2Item) {
-                ((TraitClass) traits[k]).class_info = generateClass((InterfaceAVM2Item) item);
+                ((TraitClass) traits[k]).class_info = generateClass(pkg, localData, (InterfaceAVM2Item) item);
             }
 
             if (item instanceof ClassAVM2Item) {
-                ((TraitClass) traits[k]).class_info = generateClass((ClassAVM2Item) item);
+                ((TraitClass) traits[k]).class_info = generateClass(pkg, localData, (ClassAVM2Item) item);
             }
             if ((item instanceof MethodAVM2Item) || (item instanceof GetterAVM2Item) || (item instanceof SetterAVM2Item)) {
                 MethodAVM2Item mai = (MethodAVM2Item) item;
                 if (mai.isStatic() != generateStatic) {
                     continue;
                 }
-                calcRegisters(mai);
+                calcRegisters(localData, mai);
                 ((TraitMethodGetterSetter) traits[k]).method_info = method(localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
             } else if (item instanceof FunctionAVM2Item) {
                 FunctionAVM2Item fai = (FunctionAVM2Item) item;
-                calcRegisters(fai);
+                calcRegisters(localData, fai);
                 ((TraitFunction) traits[k]).method_info = method(localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
             }
         }
     }
 
-    public ScriptInfo generateScriptInfo(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) {
+    public ScriptInfo generateScriptInfo(PackageAVM2Item pkg, SourceGeneratorLocalData localData, List<GraphTargetItem> commands) {
         ScriptInfo si = new ScriptInfo();
-        generateTraits(false, localData, commands, si.traits);
+        generateTraits(pkg, false, localData, commands, si.traits);
 
-        MethodInfo mi = new MethodInfo(new int[0], 0, str(""), 0, new ValueKind[0], new int[0]);
+        MethodInfo mi = new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]);
         MethodBody mb = new MethodBody();
         mb.method_info = abc.addMethodInfo(mi);
         mb.code = new AVM2Code();
@@ -889,36 +954,103 @@ public class AVM2SourceGenerator implements SourceGenerator {
         for (Trait t : si.traits.traits) {
             if (t instanceof TraitClass) {
                 TraitClass tc = (TraitClass) t;
-                List<Integer> parents = parentNames(abc.instance_info.get(tc.class_info).name_index);
+                List<Integer> parents = new ArrayList<>();
+                parentNamesAddNames(abc, allABCs, abc.instance_info.get(tc.class_info).name_index, parents, new ArrayList<String>(), new ArrayList<String>());
                 NamespaceSet nsset = new NamespaceSet(new int[]{abc.constants.constant_multiname.get(tc.name_index).namespace_index});
                 mb.code.code.add(ins(new FindPropertyStrictIns(), abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, abc.constants.constant_multiname.get(tc.name_index).name_index, 0, abc.constants.getNamespaceSetId(nsset, true), 0, new ArrayList<Integer>()), true)));
                 for (int i = parents.size() - 1; i >= 1; i--) {
-                    mb.code.code.add(ins(new FindPropertyStrictIns(), parents.get(i)));
-                    mb.code.code.add(ins(new GetPropertyIns(), parents.get(i)));
+                    mb.code.code.add(ins(new GetLexIns(), parents.get(i)));
                     mb.code.code.add(ins(new PushScopeIns()));
                 }
-                mb.code.code.add(ins(new FindPropertyStrictIns(), parents.get(1)));
-                mb.code.code.add(ins(new GetPropertyIns(), parents.get(1)));
+                mb.code.code.add(ins(new GetLexIns(), parents.get(1)));
                 mb.code.code.add(ins(new NewClassIns(), tc.class_info));
                 for (int i = parents.size() - 1; i >= 1; i--) {
                     mb.code.code.add(ins(new PopScopeIns()));
                 }
-                mb.code.code.add(ins(new InitPropertyIns(), tc.name_index));
+                mb.code.code.add(ins(new InitPropertyIns(), tc.name_index));                
             }
         }
 
         mb.code.code.add(ins(new ReturnVoidIns()));
-        abc.addMethodBody(mb);
-
+        mb.autoFillStats(abc);
+        abc.addMethodBody(mb);        
         si.init_index = mb.method_info;
         return si;
     }
 
-    public List<Integer> parentNames(int name_index) {
-        List<Integer> ret = new ArrayList<>();
-        ret.add(name_index);
+    public static void parentNamesAddNames(ABC abc, List<ABC> allABCs, int name_index, List<Integer> indices, List<String> names, List<String> namespaces) {
+        List<Integer> cindices = new ArrayList<>();
 
+        List<ABC> outABCs = new ArrayList<>();
+        parentNames(abc, allABCs, name_index, cindices, names, namespaces, outABCs);
+        for (int i = 0; i < cindices.size(); i++) {
+            ABC a = outABCs.get(i);
+            int m = cindices.get(i);
+            if (a == abc) {
+                indices.add(m);
+                continue;
+            }
+            Multiname superName = a.constants.constant_multiname.get(m);
+            indices.add(
+                    abc.constants.getMultinameId(
+                    new Multiname(Multiname.QNAME,
+                            abc.constants.getStringId(superName.getName(a.constants, new ArrayList<String>()), true),
+                            abc.constants.getNamespaceId(new Namespace(superName.getNamespace(a.constants).kind, abc.constants.getStringId(superName.getNamespace(a.constants).getName(a.constants), true)), 0, true), 0, 0, new ArrayList<Integer>()), true)
+            );
+        }
+    }
+
+    public static boolean searchProperty(List<ABC> abcs, String pkg, String obj, String propertyName, Reference<String> outName, Reference<String> outNs, Reference<String> outPropNs, Reference<Integer> outPropNsKind) {
+        for (ABC abc : abcs) {
+            for (ScriptInfo ii : abc.script_info) {
+                for (Trait t : ii.traits.traits) {
+                    if (pkg.equals(t.getName(abc).getNamespace(abc.constants).getName(abc.constants))) {
+                        if (propertyName.equals(t.getName(abc).getName(abc.constants, new ArrayList<String>()))) {
+                            outName.setVal(obj);
+                            outNs.setVal(pkg);
+                            outPropNs.setVal(t.getName(abc).getNamespace(abc.constants).getName(abc.constants));
+                            outPropNsKind.setVal(t.getName(abc).getNamespace(abc.constants).kind);
+                            return true;
+                        }
+                    }
+                }
+            }
+            for (InstanceInfo ii : abc.instance_info) {
+                Multiname clsName = ii.getName(abc.constants);
+                if (obj.equals(clsName.getName(abc.constants, new ArrayList<String>()))) {
+                    if (pkg.equals(clsName.getNamespace(abc.constants).getName(abc.constants))) {
+                        //class found
+
+                        for (Trait t : ii.instance_traits.traits) {
+                            if (propertyName.equals(t.getName(abc).getName(abc.constants, new ArrayList<String>()))) {
+                                outName.setVal(obj);
+                                outNs.setVal(pkg);
+                                outPropNs.setVal(t.getName(abc).getNamespace(abc.constants).getName(abc.constants));
+                                outPropNsKind.setVal(t.getName(abc).getNamespace(abc.constants).kind);
+                                return true;
+                            }
+                        }
+
+                        Multiname superName = abc.constants.constant_multiname.get(ii.super_index);
+                        if (superName != null) {
+                            return searchProperty(abcs, superName.getNamespace(abc.constants).getName(abc.constants), superName.getName(abc.constants, new ArrayList<String>()), propertyName, outName, outNs, outPropNs, outPropNsKind);
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void parentNames(ABC abc, List<ABC> allABCs, int name_index, List<Integer> indices, List<String> names, List<String> namespaces, List<ABC> outABCs) {
+        indices.add(name_index);
+        names.add(abc.constants.constant_multiname.get(name_index).getName(abc.constants, new ArrayList<String>()));
+        namespaces.add(abc.constants.constant_multiname.get(name_index).getNamespace(abc.constants).getName(abc.constants));
         Multiname mname = abc.constants.constant_multiname.get(name_index);
+
+        outABCs.add(abc);
 
         List<ABC> abcs = new ArrayList<>();
         abcs.add(abc);
@@ -929,20 +1061,27 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 Multiname m = a.constants.constant_multiname.get(a.instance_info.get(i).name_index);
                 if (m.getName(a.constants, new ArrayList<String>()).equals(mname.getName(abc.constants, new ArrayList<String>()))) {
                     if (m.getNamespace(a.constants).getName(a.constants).equals(mname.getNamespace(abc.constants).getName(abc.constants))) {
-                        Multiname superName = a.constants.constant_multiname.get(a.instance_info.get(i).super_index);
-                        ret.addAll(parentNames(abc.constants.getMultinameId(new Multiname(superName.kind, str(superName.getName(a.constants, new ArrayList<String>())), namespace(superName.getNamespace(a.constants).kind, superName.getNamespace(a.constants).getName(a.constants)), 0, 0, new ArrayList<Integer>()), true)));
-                        return ret;
+                        //Multiname superName = a.constants.constant_multiname.get(a.instance_info.get(i).super_index);
+                        abcs.remove(a);
+                        if (a.instance_info.get(i).super_index != 0) {
+                            parentNames(a, abcs, a.instance_info.get(i).super_index, indices, names, namespaces, outABCs);
+                        }
+                        /*parentNames(abc,allABCs,abc.constants.getMultinameId(
+                         new Multiname(superName.kind, 
+                         abc.constants.getStringId(superName.getName(a.constants, new ArrayList<String>()),true), 
+                         abc.constants.getNamespaceId(new Namespace(superName.getNamespace(a.constants).kind, abc.constants.getStringId(superName.getNamespace(a.constants).getName(a.constants),true)),0,true), 0, 0, new ArrayList<Integer>()), true),indices,names,namespaces,outABCs);*/
+                        return;
                     }
                 }
             }
         }
-        return ret;
     }
 
-    public void calcRegisters(FunctionAVM2Item fun) {
+    public void calcRegisters(SourceGeneratorLocalData localData, FunctionAVM2Item fun) {
         List<String> registerNames = new ArrayList<>();
         registerNames.add("this");
         registerNames.addAll(fun.paramNames);
+        localData.registerVars.clear();
         for (NameAVM2Item n : fun.subvariables) {
             if (n.getVariableName().equals("arguments")) {
                 registerNames.add("arguments");
@@ -957,5 +1096,27 @@ public class AVM2SourceGenerator implements SourceGenerator {
         for (NameAVM2Item n : fun.subvariables) {
             n.setRegNumber(registerNames.indexOf(n.getVariableName()));
         }
+        for (int i = 0; i < registerNames.size(); i++) {
+            localData.registerVars.put(registerNames.get(i), i);
+        }
+    }
+
+    public int resolveType(String objType) {
+        if (objType.equals("*")) {
+            return 0;
+        }
+        List<ABC> abcs = new ArrayList<>();
+        abcs.add(abc);
+        abcs.addAll(allABCs);
+        for (ABC a : abcs) {
+            int ci = a.findClassByName(objType);
+            if (ci != -1) {
+                Multiname tname = a.instance_info.get(ci).getName(a.constants);
+                return abc.constants.getMultinameId(new Multiname(tname.kind,
+                        abc.constants.getStringId(tname.getName(a.constants, new ArrayList<String>()), true),
+                        abc.constants.getNamespaceId(new Namespace(tname.getNamespace(a.constants).kind, abc.constants.getStringId(tname.getNamespace(a.constants).getName(a.constants), true)), 0, true), 0, 0, new ArrayList<Integer>()), true);
+            }
+        }
+        return 0;
     }
 }

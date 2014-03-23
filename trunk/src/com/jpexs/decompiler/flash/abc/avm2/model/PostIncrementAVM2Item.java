@@ -46,4 +46,9 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     public GraphTargetItem returnType() {
         return object.returnType();
     }
+    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

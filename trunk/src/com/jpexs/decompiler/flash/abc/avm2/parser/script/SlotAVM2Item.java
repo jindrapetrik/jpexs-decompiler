@@ -58,5 +58,10 @@ public class SlotAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         return type;
     }
+    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 
 }

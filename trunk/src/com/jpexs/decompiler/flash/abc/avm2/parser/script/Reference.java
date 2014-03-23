@@ -14,42 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.graph.model;
 
-import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
-import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 /**
  *
  * @author JPEXS
  */
-public class UnboundedTypeItem extends AVM2Item {
+public class Reference <T>  {
 
-    public UnboundedTypeItem() {
-        super(null, NOPRECEDENCE);
+    private T val;
+    
+    public Reference(T val) {
+        this.val = val;
     }
 
-    @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("*");
-        return writer;
+    public T getVal() {
+        return val;
     }
 
-    @Override
-    public GraphTargetItem returnType() {
-        return this;
+    public void setVal(T val) {
+        this.val = val;
     }
 
     @Override
     public String toString() {
-        return "*";
+        return val.toString();
     }
     
     
-
-    @Override
-    public boolean hasReturnValue() {
-        return true;
-    }
 }

@@ -19,16 +19,13 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
-import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
-import com.jpexs.decompiler.graph.TypeFunctionItem;
 import com.jpexs.decompiler.graph.TypeItem;
-import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,52 +33,35 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class CallAVM2Item extends AVM2Item {
+public class ConstructSomethingAVM2Item extends CallAVM2Item{
 
-    public GraphTargetItem name;
-    public List<GraphTargetItem> arguments;
+    public ConstructSomethingAVM2Item(GraphTargetItem name, List<GraphTargetItem> arguments) {
+        super(name, arguments);
+    }
+
+    @Override
+    public GraphTargetItem returnType() {
+        return name.returnType();
+    }
+
     
-    public CallAVM2Item(GraphTargetItem name,List<GraphTargetItem> arguments) {
-        super(null,NOPRECEDENCE);
-        this.name = name;
-        this.arguments = arguments;
-    }
-
-    @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return writer;
-    }
-
-    @Override
+    
+   @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        if(name instanceof PropertyAVM2Item){
-            PropertyAVM2Item prop=(PropertyAVM2Item)name;
-            Object obj = prop.object;
-            if(obj == null){
-                obj =  new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty()}, new byte[0]);
-            }
-            return toSourceMerge(localData, generator, obj,prop.index,arguments,
-                    new AVM2Instruction(0, new CallPropertyIns(), new int[]{prop.resolveProperty(),arguments.size()}, new byte[0])
+  
+        if(name instanceof TypeItem){
+            TypeItem prop=(TypeItem)name;
+            int type_index = ((AVM2SourceGenerator)generator).resolveType(name.toString());
+            return toSourceMerge(localData, generator, 
+                    new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index,arguments.size()}, new byte[0])
+                    ,arguments,
+                    new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index,arguments.size()}, new byte[0])
                     );
         }
         if(name instanceof NameAVM2Item){
             //TODO
         }
         return new ArrayList<>();
-    }
-
-    @Override
-    public GraphTargetItem returnType() {
-        GraphTargetItem ti = name.returnType();
-        if(ti instanceof TypeFunctionItem){
-            TypeFunctionItem tfi=(TypeFunctionItem)ti;
-            return new TypeItem(tfi.fullTypeName);
-        }
-        return ti;
-    }
-           
-    @Override
-    public boolean hasReturnValue() {
-        return true;
-    }    
+    } 
+    
 }

@@ -48,4 +48,8 @@ public class PackageAVM2Item extends AVM2Item {
         return new UnboundedTypeItem(); //FIXME
     }
 
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

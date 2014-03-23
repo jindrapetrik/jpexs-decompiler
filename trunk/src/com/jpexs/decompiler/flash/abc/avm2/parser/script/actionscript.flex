@@ -188,6 +188,7 @@ SingleCharacter = [^\r\n\'\\]
   "undefined"                    { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.UNDEFINED,yytext()); }
   "Infinity"                     { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.INFINITY,yytext()); }
   "NaN"                          { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.NAN,yytext()); }
+  "final"                        { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FINAL,yytext()); }
   
 
   /* operators */

@@ -891,7 +891,7 @@ public class AVM2Code implements Serializable {
                 writer.hilightSpecial("function ", "traittype");
                 writer.hilightSpecial(constants.multinameToString(tf.name_index), "traitname");
                 writer.appendNoHilight(" slotid ");
-                writer.hilightSpecial("" + tf.slot_index, "slotid");
+                writer.hilightSpecial("" + tf.slot_id, "slotid");
                 writer.newLine();
             }
             if (trait instanceof TraitMethodGetterSetter) {

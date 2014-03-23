@@ -55,4 +55,9 @@ public class IncrementAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     } 
+    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

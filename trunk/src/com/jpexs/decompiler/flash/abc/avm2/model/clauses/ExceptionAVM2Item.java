@@ -40,5 +40,11 @@ public class ExceptionAVM2Item extends AVM2Item {
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
+    }
+    
+    
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

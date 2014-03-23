@@ -73,4 +73,9 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item {
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     } 
+    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

@@ -17,9 +17,15 @@
 
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -86,6 +92,32 @@ public class TypeItem extends GraphTargetItem{
     @Override
     public String toString() {
         return fullTypeName;
+    }
+    
+    public int resolveClass(ABC abc){
+        String name = fullTypeName;
+        String pkg = "";
+        if(name.contains(".")){
+            pkg = name.substring(0,name.lastIndexOf("."));
+            name = name.substring(name.lastIndexOf(".")+1);
+        }
+        for(InstanceInfo ii:abc.instance_info){
+            Multiname mname=abc.constants.constant_multiname.get(ii.name_index);
+            if(mname.getName(abc.constants, new ArrayList<String>()).equals(name)){
+                if(mname.getNamespace(abc.constants).getName(abc.constants).equals(pkg)){
+                    return ii.name_index;
+                }
+            }
+        }
+        for(int i=1;i<abc.constants.constant_multiname.size();i++){
+            Multiname mname=abc.constants.constant_multiname.get(i);
+            if(name.equals(mname.getName(abc.constants, new ArrayList<String>()))){
+                if(pkg.equals(mname.getNamespace(abc.constants).getName(abc.constants))){
+                    return i;
+                }
+            }
+        }
+        return abc.constants.getMultinameId(new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(pkg, true)), 0,true), 0,0, new ArrayList<Integer>()), true);
     }
     
     

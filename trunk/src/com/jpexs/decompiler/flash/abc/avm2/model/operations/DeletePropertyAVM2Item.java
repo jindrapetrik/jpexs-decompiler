@@ -61,4 +61,9 @@ public class DeletePropertyAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         return new TypeItem("Boolean");
     }
+    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

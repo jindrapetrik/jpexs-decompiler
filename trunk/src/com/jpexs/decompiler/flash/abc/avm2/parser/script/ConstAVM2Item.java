@@ -59,6 +59,9 @@ public class ConstAVM2Item extends AVM2Item {
         return type;
     }
     
-    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 
 }

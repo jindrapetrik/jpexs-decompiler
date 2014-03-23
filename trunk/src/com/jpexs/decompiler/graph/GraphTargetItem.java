@@ -240,6 +240,9 @@ public abstract class GraphTargetItem implements Serializable {
                     if (o2 instanceof GraphSourceItem) {
                         ret.add((GraphSourceItem) o2);
                     }
+                    if(o2 instanceof GraphTargetItem){
+                        ret.addAll(((GraphTargetItem) o2).toSource(localData, gen));
+                    }
                 }
             }
         }

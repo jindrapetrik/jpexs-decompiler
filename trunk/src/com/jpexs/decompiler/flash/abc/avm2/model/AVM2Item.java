@@ -16,13 +16,17 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class AVM2Item extends GraphTargetItem {
 
@@ -91,8 +95,20 @@ public abstract class AVM2Item extends GraphTargetItem {
         }
     }
 
-    @Override
+    /*@Override
     public boolean hasReturnValue() {
-        throw new UnsupportedOperationException(); //Not supported in AVM2 yet
+        return false;
+    }*/
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        if(!hasReturnValue()){
+            return toSource(localData, generator);
+        }
+        List<GraphSourceItem> ret=toSource(localData, generator);
+        ret.add(new AVM2Instruction(0, new PopIns(), new int[]{}, new byte[0]));
+        return ret;
     }
+    
+    
 }

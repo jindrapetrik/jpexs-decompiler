@@ -16,11 +16,16 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewObjectIns;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
 import java.util.List;
 
 public class NewObjectAVM2Item extends AVM2Item {
@@ -65,4 +70,23 @@ public class NewObjectAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         return new TypeItem("Object");
     }
+    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        List<GraphTargetItem> args=new ArrayList<>();
+        for(NameValuePair p:pairs){
+            args.add(p.name);
+            args.add(p.value);
+        }
+        return toSourceMerge(localData, generator, args,
+                new AVM2Instruction(0, new NewObjectIns(), new int[]{pairs.size()}, new byte[0])
+                );
+    }
+    
+    
 }

@@ -883,11 +883,11 @@ public class Main {
      * @param args the command line arguments
      * @throws IOException
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {                
         startFreeMemThread();
         initLogging(Configuration.debugMode.get());
         initLang();
-
+               
         if (Configuration.cacheOnDisk.get()) {
             Cache.setStorageType(Cache.STORAGE_FILES);
         } else {

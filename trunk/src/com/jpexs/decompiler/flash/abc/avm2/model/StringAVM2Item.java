@@ -65,4 +65,8 @@ public class StringAVM2Item extends AVM2Item {
         return TypeItem.STRING;
     } 
     
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

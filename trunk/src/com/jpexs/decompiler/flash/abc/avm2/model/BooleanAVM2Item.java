@@ -64,4 +64,9 @@ public class BooleanAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         return TypeItem.BOOLEAN;
     }
+    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

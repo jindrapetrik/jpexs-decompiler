@@ -29,17 +29,17 @@ import java.util.Stack;
 
 public class TraitFunction extends Trait implements TraitWithSlot {
 
-    public int slot_index;
+    public int slot_id;
     public int method_info;
 
     @Override
     public int getSlotIndex() {
-        return slot_index;
+        return slot_id;
     }
 
     @Override
     public String toString(ABC abc, List<String> fullyQualifiedNames) {
-        return "Function " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_index + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
+        return "Function " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
     @Override

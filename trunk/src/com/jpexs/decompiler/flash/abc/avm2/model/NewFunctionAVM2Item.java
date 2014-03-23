@@ -84,4 +84,9 @@ public class NewFunctionAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         return new TypeItem("Function");
     }
+    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

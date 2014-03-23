@@ -57,4 +57,9 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     } 
+    
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

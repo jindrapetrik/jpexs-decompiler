@@ -31,7 +31,7 @@ public class InstanceInfo {
     public int protectedNS; //if flags & 8
     public int[] interfaces;
     public int iinit_index; // MethodInfo - constructor
-    public Traits instance_traits;
+    public Traits instance_traits = new Traits();
     public static final int CLASS_SEALED = 1; //not dynamic
     public static final int CLASS_FINAL = 2;
     public static final int CLASS_INTERFACE = 4;

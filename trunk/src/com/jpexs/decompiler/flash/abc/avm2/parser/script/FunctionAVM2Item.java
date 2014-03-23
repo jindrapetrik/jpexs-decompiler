@@ -58,6 +58,9 @@ public class FunctionAVM2Item extends AVM2Item {
         return retType;
     }
     
-    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 
 }

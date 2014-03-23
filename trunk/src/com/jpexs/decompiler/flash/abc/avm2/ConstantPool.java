@@ -287,7 +287,7 @@ public class ConstantPool {
 
     public int getNamespaceSetId(NamespaceSet val) {
         loopi:
-        for (int i = 0; i < constant_namespace_set.size(); i++) {
+        for (int i = 1; i < constant_namespace_set.size(); i++) {
             NamespaceSet ts = constant_namespace_set.get(i);
             if (ts.namespaces.length != val.namespaces.length) {
                 continue;

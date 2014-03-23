@@ -33,13 +33,15 @@ public class InterfaceAVM2Item extends AVM2Item {
     public List<GraphTargetItem> superInterfaces;
     public List<GraphTargetItem> methods;
     public int namespaceKind;
+    public boolean isFinal;
 
-    public InterfaceAVM2Item(int namespaceKind, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
+    public InterfaceAVM2Item(boolean isFinal,int namespaceKind, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.name = name;
         this.superInterfaces = superInterfaces;
         this.methods = traits;
         this.namespaceKind = namespaceKind;
+        this.isFinal = isFinal;
     }
 
     @Override

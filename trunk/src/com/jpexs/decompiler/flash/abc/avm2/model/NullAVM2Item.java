@@ -61,4 +61,9 @@ public class NullAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         return new TypeItem("null");
     }
+    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

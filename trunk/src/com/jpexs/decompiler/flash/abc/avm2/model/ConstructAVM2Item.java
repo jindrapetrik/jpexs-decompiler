@@ -55,4 +55,9 @@ public class ConstructAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         return object.returnType();
     }
+    
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

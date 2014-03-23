@@ -242,7 +242,7 @@ public class ABCOutputStream extends OutputStream {
         }
         if (t instanceof TraitFunction) {
             TraitFunction t4 = (TraitFunction) t;
-            writeU30(t4.slot_index);
+            writeU30(t4.slot_id);
             writeU30(t4.method_info);
         }
         if ((t.kindFlags & 4) == 4) {

@@ -312,7 +312,7 @@ public class ABCInputStream extends InputStream {
                 break;
             case 5: //function
                 TraitFunction t4 = new TraitFunction();
-                t4.slot_index = readU30();
+                t4.slot_id = readU30();
                 t4.method_info = readU30();
                 trait = t4;
                 break;

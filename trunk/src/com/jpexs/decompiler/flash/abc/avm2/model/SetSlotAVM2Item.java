@@ -87,4 +87,9 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     } 
+    
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

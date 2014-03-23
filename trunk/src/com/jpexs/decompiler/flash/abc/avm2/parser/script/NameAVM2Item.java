@@ -28,7 +28,12 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -44,7 +49,6 @@ import java.util.List;
  */
 public class NameAVM2Item extends AVM2Item {
 
-
     private String variableName;
     private GraphTargetItem storeValue;
     private boolean definition;
@@ -55,7 +59,7 @@ public class NameAVM2Item extends AVM2Item {
     public int line;
     public GraphTargetItem type;
     private String ns = "";
-    private int regNumber=-1;
+    private int regNumber = -1;
 
     public void setNs(String ns) {
         this.ns = ns;
@@ -64,13 +68,11 @@ public class NameAVM2Item extends AVM2Item {
     public void setRegNumber(int regNumber) {
         this.regNumber = regNumber;
     }
-    
-    
 
     public String getNs() {
         return ns;
-    }            
-    
+    }
+
     public void appendName(String name) {
         this.variableName += "." + name;
     }
@@ -103,7 +105,7 @@ public class NameAVM2Item extends AVM2Item {
         return variableName;
     }
 
-    public NameAVM2Item(GraphTargetItem type, int line,String variableName, GraphTargetItem storeValue, boolean definition, List<String> openedNamespaces, List<Integer> openedNamespacesKind) {
+    public NameAVM2Item(GraphTargetItem type, int line, String variableName, GraphTargetItem storeValue, boolean definition, List<String> openedNamespaces, List<Integer> openedNamespacesKind) {
         super(null, PRECEDENCE_PRIMARY);
         this.variableName = variableName;
         this.storeValue = storeValue;
@@ -127,55 +129,35 @@ public class NameAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        if(regNumber==-1){
-            throw new RuntimeException("No register set");
+        if (regNumber == -1) {
+            throw new RuntimeException("No register set for " + variableName);
         }
-        if(definition && storeValue==null){
+        if (definition && storeValue == null) {
             return new ArrayList<>();
         }
-        AVM2Instruction ins;
-        if(storeValue!=null){
-            switch(regNumber){
-                case 0:
-                    ins = new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}, new byte[0]);
-                    break;
-                case 1:
-                    ins = new AVM2Instruction(0, new GetLocal1Ins(), new int[]{}, new byte[0]);
-                    break;
-                case 2:
-                    ins = new AVM2Instruction(0, new GetLocal2Ins(), new int[]{}, new byte[0]);
-                    break;
-                case 3:
-                    ins = new AVM2Instruction(0, new GetLocal3Ins(), new int[]{}, new byte[0]);
-                    break;
-                default:
-                    ins = new AVM2Instruction(0, new GetLocalIns(), new int[]{regNumber}, new byte[0]);
-                    break;
-            }
-            return toSourceMerge(localData, generator, ins);
-        }else{
-             switch(regNumber){
-                case 0:
-                    ins = new AVM2Instruction(0, new SetLocal0Ins(), new int[]{}, new byte[0]);
-                    break;
-                case 1:
-                    ins = new AVM2Instruction(0, new SetLocal1Ins(), new int[]{}, new byte[0]);
-                    break;
-                case 2:
-                    ins = new AVM2Instruction(0, new SetLocal2Ins(), new int[]{}, new byte[0]);
-                    break;
-                case 3:
-                    ins = new AVM2Instruction(0, new SetLocal3Ins(), new int[]{}, new byte[0]);
-                    break;
-                default:
-                    ins = new AVM2Instruction(0, new SetLocalIns(), new int[]{regNumber}, new byte[0]);
-                    break;
-            }
-            return toSourceMerge(localData, generator,storeValue, ins);
+        if (storeValue == null) {
+            return toSourceMerge(localData, generator, new LocalRegAVM2Item(null, regNumber, null));
+        } else {
+            return toSourceMerge(localData, generator, new SetLocalAVM2Item(null, regNumber, new CoerceAVM2Item(null, storeValue, type.toString())));
         }
-        
+
     }
 
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        if (regNumber == -1) {
+            throw new RuntimeException("No register set for " + variableName);
+        }
+        if (definition && storeValue == null) {
+            return new ArrayList<>();
+        }
+        if (storeValue == null) {
+            return toSourceMerge(localData, generator, new LocalRegAVM2Item(null, regNumber, null),
+                    new AVM2Instruction(0, new PopIns(), new int[]{}, new byte[0]));
+        } else {
+            return toSourceMerge(localData, generator, new SetLocalAVM2Item(null, regNumber, new CoerceAVM2Item(null, storeValue, type.toString())).toSourceIgnoreReturnValue(localData, generator));
+        }
+    }
 
     @Override
     public boolean hasReturnValue() {
@@ -197,13 +179,13 @@ public class NameAVM2Item extends AVM2Item {
     public String toString() {
         return variableName;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
-        if(index!=null){
+        if (index != null) {
             return TypeItem.UNBOUNDED;
         }
         return type;
     }
-        
+
 }
