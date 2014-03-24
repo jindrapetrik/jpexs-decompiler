@@ -30,25 +30,34 @@ public class MethodInfo {
     public int ret_type;
     public int name_index; //0=no name
     // 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional 16=ignore_rest, 32=explicit, 64=setsdxns, 128=has_paramnames
+    public static int FLAG_NEED_ARGUMENTS = 1;
+    public static int FLAG_NEED_ACTIVATION = 2; 
+    public static int FLAG_NEED_REST = 4;
+    public static int FLAG_HAS_OPTIONAL = 8;
+    public static int FLAG_IGNORE_REST = 16;
+    public static int FLAG_EXPLICIT = 32;
+    public static int FLAG_SETSDXNS = 64;
+    public static int FLAG_HAS_PARAMNAMES = 128;
+    
     public int flags;
     public ValueKind[] optional;
     public int[] paramNames;
     private MethodBody body;
 
     public void setFlagIgnore_Rest() {
-        flags |= 16;
+        flags |= FLAG_IGNORE_REST;
     }
 
     public void setFlagExplicit() {
-        flags |= 32;
+        flags |= FLAG_EXPLICIT;
     }
 
     public void setFlagNeed_Arguments() {
-        flags |= 1;
+        flags |= FLAG_NEED_ARGUMENTS;
     }
 
     public void setFlagSetsdxns() {
-        flags |= 64;
+        flags |= FLAG_SETSDXNS;
     }
 
     public void setFlagSetsdxns(boolean val) {
@@ -61,12 +70,12 @@ public class MethodInfo {
 
     public void unsetFlagSetsdxns() {
         if (flagSetsdxns()) {
-            flags -= 64;
+            flags -= FLAG_SETSDXNS;
         }
     }
 
     public void setFlagNeed_activation() {
-        flags |= 2;
+        flags |= FLAG_NEED_ACTIVATION;
     }
 
     public void setFlagNeed_activation(boolean val) {
@@ -79,17 +88,17 @@ public class MethodInfo {
 
     public void unsetFlagNeed_activation() {
         if (flagNeed_activation()) {
-            flags -= 2;
+            flags -= FLAG_NEED_ACTIVATION;
         }
     }
 
     public void setFlagNeed_rest() {
-        flags |= 4;
+        flags |= FLAG_NEED_REST;
     }
 
     public void unsetFlagNeed_rest() {
         if (flagNeed_rest()) {
-            flags -= 4;
+            flags -= FLAG_NEED_REST;
         }
     }
 
@@ -102,12 +111,12 @@ public class MethodInfo {
     }
 
     public void setFlagHas_optional() {
-        flags |= 8;
+        flags |= FLAG_HAS_OPTIONAL;
     }
 
     public void unsetFlagHas_optional() {
         if (flagHas_optional()) {
-            flags -= 8;
+            flags -= FLAG_HAS_OPTIONAL;
         }
     }
 
@@ -120,12 +129,12 @@ public class MethodInfo {
     }
 
     public void setFlagHas_paramnames() {
-        flags |= 128;
+        flags |= FLAG_HAS_PARAMNAMES;
     }
 
     public void unsetFlagHas_paramnames() {
         if (flagHas_paramnames()) {
-            flags -= 128;
+            flags -= FLAG_HAS_PARAMNAMES;
         }
     }
 
@@ -138,35 +147,35 @@ public class MethodInfo {
     }
 
     public boolean flagNeed_arguments() {
-        return (flags & 1) == 1;
+        return (flags & FLAG_NEED_ARGUMENTS) == FLAG_NEED_ARGUMENTS;
     }
 
     public boolean flagNeed_activation() {
-        return (flags & 2) == 2;
+        return (flags & FLAG_NEED_ACTIVATION) == FLAG_NEED_ACTIVATION;
     }
 
     public boolean flagNeed_rest() {
-        return (flags & 4) == 4;
+        return (flags & FLAG_NEED_REST) == FLAG_NEED_REST;
     }
 
     public boolean flagHas_optional() {
-        return (flags & 8) == 8;
+        return (flags & FLAG_HAS_OPTIONAL) == FLAG_HAS_OPTIONAL;
     }
 
     public boolean flagIgnore_rest() {
-        return (flags & 16) == 16;
+        return (flags & FLAG_IGNORE_REST) == FLAG_IGNORE_REST;
     }
 
     public boolean flagExplicit() {
-        return (flags & 32) == 32;
+        return (flags & FLAG_EXPLICIT) == FLAG_EXPLICIT;
     }
 
     public boolean flagSetsdxns() {
-        return (flags & 64) == 64;
+        return (flags & FLAG_SETSDXNS) == FLAG_SETSDXNS;
     }
 
     public boolean flagHas_paramnames() {
-        return (flags & 128) == 128;
+        return (flags & FLAG_HAS_PARAMNAMES) == FLAG_HAS_PARAMNAMES;
     }
 
     public MethodInfo(int[] param_types, int ret_type, int name_index, int flags, ValueKind[] optional, int[] paramNames) {
