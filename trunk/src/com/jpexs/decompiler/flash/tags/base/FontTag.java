@@ -255,7 +255,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), image, Color.black, colorTransform);
+        SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), image, frame, Color.black, colorTransform);
     }
 
     @Override
@@ -265,7 +265,11 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     @Override
     public int getNumFrames() {
-        return 1;
+        int frameCount = (getGlyphShapeTable().size() - 1) / SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW + 1;
+        if (frameCount < 1) {
+            frameCount = 1;
+        }
+        return frameCount;
     }
 
     @Override

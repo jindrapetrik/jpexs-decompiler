@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.util.Timer;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
@@ -44,7 +45,7 @@ public class LoadingPanel extends JPanel {
         this.iconHeight = iconHeight;
         ImageIcon icon = View.getIcon("loading");
         animationImage = icon.getImage();
-        java.util.Timer timer = new java.util.Timer();
+        Timer timer = new Timer();
         timer.schedule(new java.util.TimerTask() {
             @Override
             public void run() {

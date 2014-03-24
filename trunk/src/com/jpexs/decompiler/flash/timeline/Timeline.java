@@ -323,7 +323,16 @@ public class Timeline {
     }
 
     public boolean isSingleFrame() {
-        Frame frameObj = frames.get(0);
+        for (int i = 0; i < frames.size(); i++) {
+            if (!isSingleFrame(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    private boolean isSingleFrame(int frame) {
+        Frame frameObj = frames.get(frame);
         for (int i = 1; i <= getMaxDepth(); i++) {
             if (!frameObj.layers.containsKey(i)) {
                 continue;

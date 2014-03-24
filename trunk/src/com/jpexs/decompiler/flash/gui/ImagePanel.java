@@ -423,7 +423,6 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
             return;
         }
-        frame = 0;
         time = 0;
         play();
     }
@@ -473,7 +472,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         soundPlayers.clear();
     }
 
-    private void nextFrame(boolean first) {
+    private void nextFrame() {
+        drawFrame();
         int newframe = frame == timelined.getTimeline().frames.size() - 1 ? 0 : frame + 1;
         if (stillFrame) {
             newframe = frame;
@@ -485,12 +485,8 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             frame = newframe;
             time = 0;
         } else {
-            if (!first && timelined.getTimeline().isSingleFrame()) {
-                return;
-            }
             time++;
         }
-        drawFrame();
     }
 
     private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton) {
@@ -535,10 +531,14 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
     }
 
     private void drawFrame() {
-        if (timelined == null || timelined.getTimeline().getFrameCount() <= frame) {
+        if (timelined == null) {
             return;
         }
-
+        Timeline timeline = timelined.getTimeline();
+        if (timeline.getFrameCount() <= frame) {
+            return;
+        }
+        
         getOutlines();
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;
@@ -547,7 +547,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         SerializableImage img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton);
         List<Integer> sounds = new ArrayList<>();
         List<String> soundClasses = new ArrayList<>();
-        timelined.getTimeline().getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);
+        timeline.getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);
         for (int cid : swf.characters.keySet()) {
             CharacterTag c = swf.characters.get(cid);
             for (String cls : soundClasses) {
@@ -622,8 +622,15 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
                 @Override
                 public void run() {
-                    nextFrame(first);
-                    first = false;
+                    Timeline timeline = timelined.getTimeline();
+                    if (timeline.frames.size() <= 1 && timeline.isSingleFrame()) {
+                        if (first) {
+                            drawFrame();
+                            first = false;
+                        }
+                    } else {
+                        nextFrame();
+                    }
                 }
             }, 0, 1000 / timelined.getTimeline().frameRate);
         } else {

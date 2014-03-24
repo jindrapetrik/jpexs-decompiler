@@ -50,6 +50,14 @@ public class FontPanel extends javax.swing.JPanel {
         initComponents();
     }
 
+    public FontTag getFontTag() {
+        return fontTag;
+    }
+    
+    public void clear() {
+        fontTag = null;
+    }
+
     private ComboBoxModel<String> getModel() {
         return new DefaultComboBoxModel<>(FontTag.fontNamesArray);
     }

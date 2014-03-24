@@ -129,7 +129,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return ret;
     }
 
-    public static void shapeListToImage(SWF swf, List<SHAPE> shapes, SerializableImage image, Color color, ColorTransform colorTransform) {
+    public static void shapeListToImage(SWF swf, List<SHAPE> shapes, SerializableImage image, int frame, Color color, ColorTransform colorTransform) {
         if (shapes.isEmpty()) {
             return;
         }
@@ -161,8 +161,15 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         }
 
         int shapeCount = Math.min(MAX_CHARACTERS_IN_FONT_PREVIEW, shapes.size());
+        int frameCount = (shapes.size() - 1) / MAX_CHARACTERS_IN_FONT_PREVIEW + 1;
+        if (frameCount < 1) {
+            frameCount = 1;
+        }
+        if (frame >= frameCount) {
+            frame = frameCount - 1;
+        }
         int cols = (int) Math.ceil(Math.sqrt(shapeCount));
-        int pos = 0;
+        int pos = frame * MAX_CHARACTERS_IN_FONT_PREVIEW;
         int w2 = (int) (prevWidth * SWF.unitDivisor / cols);
         int h2 = (int) (prevHeight * SWF.unitDivisor / cols);
 

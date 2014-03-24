@@ -41,11 +41,9 @@ import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
-import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.treenodes.TreeElement;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
-import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.decompiler.flash.gui.timeline.TimelineFrame;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFBundleNode;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
@@ -137,7 +135,6 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Insets;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -185,7 +182,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -227,83 +223,39 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private final JPanel welcomePanel;
     private final MainFrameStatusPanel statusPanel;
     private final MainFrameMenu mainMenu;
-    private final FontPanel fontPanel;
     private final JProgressBar progressBar = new JProgressBar(0, 100);
     private DeobfuscationDialog deobfuscationDialog;
     public TagTree tagTree;
     private final FlashPlayerPanel flashPanel;
     private final JPanel contentPanel;
     private final JPanel displayPanel;
-    private ImagePanel imagePanel;
-    private BinaryPanel binaryPanel;
-    private GenericTagPanel genericTagPanel;
     private JPanel folderPreviewPanel;
-    private final ImagePanel previewImagePanel;
     private boolean isWelcomeScreen = true;
-    private static final String CARDFLASHPANEL = "Flash card";
-    private static final String CARDDRAWPREVIEWPANEL = "Draw card";
-    private static final String CARDIMAGEPANEL = "Image card";
-    private static final String CARDBINARYPANEL = "Binary card";
-    private static final String CARDGENEICTAGPANEL = "Generic tag card";
+    private static final String CARDPREVIEWPANEL = "Preview card";
     private static final String CARDFOLDERPREVIEWPANEL = "Folder preview card";
     private static final String CARDEMPTYPANEL = "Empty card";
     private static final String CARDACTIONSCRIPTPANEL = "ActionScript card";
     private static final String CARDACTIONSCRIPT3PANEL = "ActionScript3 card";
     private static final String DETAILCARDAS3NAVIGATOR = "Traits list";
     private static final String DETAILCARDEMPTYPANEL = "Empty card";
-    private static final String CARDTEXTPANEL = "Text card";
-    private static final String CARDFONTPANEL = "Font card";
-    private static final String FLASH_VIEWER_CARD = "FLASHVIEWER";
-    private static final String INTERNAL_VIEWER_CARD = "INTERNALVIEWER";
     private static final String SPLIT_PANE1 = "SPLITPANE1";
     private static final String WELCOME_PANEL = "WELCOMEPANEL";
-    private final SearchPanel<TextTag> textSearchPanel;
-    private final LineMarkedEditorPane textValue;
     private final JSplitPane splitPane1;
     private final JSplitPane splitPane2;
     private boolean splitsInited = false;
     private JPanel detailPanel;
     private JTextField filterField = new MyTextField("");
     private JPanel searchPanel;
-    private final JPanel displayWithPreview;
-    private final JButton textSaveButton;
-    private final JButton textEditButton;
-    private final JButton textCancelButton;
-    private final JPanel parametersPanel;
-    private JSplitPane previewSplitPane;
-    private JButton imageReplaceButton;
-    private JPanel imageButtonsPanel;
-    private JButton binaryReplaceButton;
-    private JPanel binaryButtonsPanel;
-    private JButton genericEditButton;
-    private JButton genericSaveButton;
-    private JButton genericCancelButton;
-    private JPanel genericButtonsPanel;
-    private PlayerControls flashControls;
-    private final ImagePanel internelViewerPanel;
-    private final JPanel viewerCards;
+    private PreviewPanel previewPanel;
     private AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
     private CancellableWorker setSourceWorker;
     public TreeNode oldNode;
-    private File tempFile;
-    private final PlayerControls imagePlayControls;
-
-    private final JPanel repPanel;
-    private final JPanel repPanel2;
 
     private SoundTagPlayer soundThread = null;
 
-    private static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
-    private static final String ACTION_REPLACE_IMAGE = "REPLACEIMAGE";
-    private static final String ACTION_REPLACE_BINARY = "REPLACEBINARY";
-    private static final String ACTION_REPLACE_OTHER = "REPLACEOTHER";
-    private static final String ACTION_EDIT_GENERIC_TAG = "EDITGENERICTAG";
-    private static final String ACTION_SAVE_GENERIC_TAG = "SAVEGENERICTAG";
-    private static final String ACTION_CANCEL_GENERIC_TAG = "CANCELGENERICTAG";
+    public static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
+    public static final String ACTION_REPLACE = "REPLACE";
     private static final String ACTION_REMOVE_ITEM = "REMOVEITEM";
-    private static final String ACTION_EDIT_TEXT = "EDITTEXT";
-    private static final String ACTION_CANCEL_TEXT = "CANCELTEXT";
-    private static final String ACTION_SAVE_TEXT = "SAVETEXT";
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
 
@@ -350,6 +302,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         statusPanel.setStatus(s);
     }
 
+    
     public void setWorkStatus(String s, CancellableWorker worker) {
         statusPanel.setWorkStatus(s, worker);
     }
@@ -372,20 +325,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         exportSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(exportSelectionMenuItem);
 
-        final JMenuItem replaceImageSelectionMenuItem = new JMenuItem(translate("button.replace"));
-        replaceImageSelectionMenuItem.setActionCommand(ACTION_REPLACE_IMAGE);
-        replaceImageSelectionMenuItem.addActionListener(this);
-        contextPopupMenu.add(replaceImageSelectionMenuItem);
-
-        final JMenuItem replaceBinarySelectionMenuItem = new JMenuItem(translate("button.replace"));
-        replaceBinarySelectionMenuItem.setActionCommand(ACTION_REPLACE_BINARY);
-        replaceBinarySelectionMenuItem.addActionListener(this);
-        contextPopupMenu.add(replaceBinarySelectionMenuItem);
-
-        final JMenuItem replaceSoundSelectionMenuItem = new JMenuItem(translate("button.replace"));
-        replaceSoundSelectionMenuItem.setActionCommand(ACTION_REPLACE_OTHER);
-        replaceSoundSelectionMenuItem.addActionListener(this);
-        contextPopupMenu.add(replaceSoundSelectionMenuItem);
+        final JMenuItem replaceSelectionMenuItem = new JMenuItem(translate("button.replace"));
+        replaceSelectionMenuItem.setActionCommand(ACTION_REPLACE);
+        replaceSelectionMenuItem.addActionListener(this);
+        contextPopupMenu.add(replaceSelectionMenuItem);
 
         final JMenuItem closeSelectionMenuItem = new JMenuItem(translate("contextmenu.closeSwf"));
         closeSelectionMenuItem.setActionCommand(ACTION_CLOSE_SWF);
@@ -422,9 +365,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         }
                     }
 
-                    replaceImageSelectionMenuItem.setVisible(false);
-                    replaceBinarySelectionMenuItem.setVisible(false);
-                    replaceSoundSelectionMenuItem.setVisible(false);
+                    replaceSelectionMenuItem.setVisible(false);
                     closeSelectionMenuItem.setVisible(false);
                     moveTagMenu.setVisible(false);
                     expandRecursiveMenuItem.setVisible(false);
@@ -435,14 +376,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         TreeItem item = ((TreeNode) treeNode).getItem();
 
                         if (item instanceof ImageTag && ((ImageTag) item).importSupported()) {
-                            replaceImageSelectionMenuItem.setVisible(true);
+                            replaceSelectionMenuItem.setVisible(true);
                         }
+                        
                         if (item instanceof DefineBinaryDataTag) {
-                            replaceBinarySelectionMenuItem.setVisible(true);
+                            replaceSelectionMenuItem.setVisible(true);
                         }
 
                         if (item instanceof DefineSoundTag) {
-                            replaceSoundSelectionMenuItem.setVisible(true);
+                            replaceSelectionMenuItem.setVisible(true);
                         }
 
                         if (treeNode instanceof SWFNode) {
@@ -523,84 +465,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return welcomePanel;
     }
 
-    private JPanel createImagesCard() {
-        JPanel imagesCard = new JPanel(new BorderLayout());
-        imagePanel = new ImagePanel();
-        imagesCard.add(imagePanel, BorderLayout.CENTER);
-
-        imageReplaceButton = new JButton(translate("button.replace"), View.getIcon("edit16"));
-        imageReplaceButton.setMargin(new Insets(3, 3, 3, 10));
-        imageReplaceButton.setActionCommand(ACTION_REPLACE_IMAGE);
-        imageReplaceButton.addActionListener(this);
-        imageButtonsPanel = new JPanel(new FlowLayout());
-        imageButtonsPanel.add(imageReplaceButton);
-
-        imagesCard.add(imageButtonsPanel, BorderLayout.SOUTH);
-        return imagesCard;
-    }
-
-    private JPanel createBinaryCard() {
-        JPanel binaryCard = new JPanel(new BorderLayout());
-        binaryPanel = new BinaryPanel();
-        binaryCard.add(binaryPanel, BorderLayout.CENTER);
-
-        binaryReplaceButton = new JButton(translate("button.replace"), View.getIcon("edit16"));
-        binaryReplaceButton.setMargin(new Insets(3, 3, 3, 10));
-        binaryReplaceButton.setActionCommand(ACTION_REPLACE_BINARY);
-        binaryReplaceButton.addActionListener(this);
-        binaryButtonsPanel = new JPanel(new FlowLayout());
-        binaryButtonsPanel.add(binaryReplaceButton);
-
-        binaryCard.add(binaryButtonsPanel, BorderLayout.SOUTH);
-        return binaryCard;
-    }
-
-    private JPanel createGenericTagCard() {
-        JPanel genericTagCard = new JPanel(new BorderLayout());
-        genericTagPanel = new GenericTagTreePanel();
-        genericTagCard.add(genericTagPanel, BorderLayout.CENTER);
-
-        genericEditButton = new JButton(translate("button.edit"), View.getIcon("edit16"));
-        genericEditButton.setMargin(new Insets(3, 3, 3, 10));
-        genericEditButton.setActionCommand(ACTION_EDIT_GENERIC_TAG);
-        genericEditButton.addActionListener(this);
-        genericSaveButton = new JButton(translate("button.save"), View.getIcon("save16"));
-        genericSaveButton.setMargin(new Insets(3, 3, 3, 10));
-        genericSaveButton.setActionCommand(ACTION_SAVE_GENERIC_TAG);
-        genericSaveButton.addActionListener(this);
-        genericSaveButton.setVisible(false);
-        genericCancelButton = new JButton(translate("button.cancel"), View.getIcon("cancel16"));
-        genericCancelButton.setMargin(new Insets(3, 3, 3, 10));
-        genericCancelButton.setActionCommand(ACTION_CANCEL_GENERIC_TAG);
-        genericCancelButton.addActionListener(this);
-        genericCancelButton.setVisible(false);
-        genericButtonsPanel = new JPanel(new FlowLayout());
-        genericButtonsPanel.add(genericEditButton);
-        genericButtonsPanel.add(genericSaveButton);
-        genericButtonsPanel.add(genericCancelButton);
-        genericTagCard.add(genericButtonsPanel, BorderLayout.SOUTH);
-
-        return genericTagCard;
-    }
-
     private JPanel createFolderPreviewCard() {
         JPanel folderPreviewCard = new JPanel(new BorderLayout());
         folderPreviewPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
         folderPreviewCard.add(new JScrollPane(folderPreviewPanel), BorderLayout.CENTER);
 
         return folderPreviewCard;
-    }
-
-    private void showHideImageReplaceButton(boolean show) {
-        imageReplaceButton.setVisible(show);
-        setImageButtonPanelVisibility();
-    }
-
-    private void setImageButtonPanelVisibility() {
-        // hide button panel when no button is visible
-        // now there is only one button, later add here the other buttons
-        boolean visible = imageReplaceButton.isVisible();
-        imageButtonsPanel.setVisible(visible);
     }
 
     public String translate(String key) {
@@ -715,168 +585,15 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         statusPanel = new MainFrameStatusPanel(this);
         add(statusPanel, BorderLayout.SOUTH);
 
-        JPanel textTopPanel = new JPanel(new BorderLayout());
-        textSearchPanel = new SearchPanel<>(new FlowLayout(), this);
-        textTopPanel.add(textSearchPanel, BorderLayout.NORTH);
-        textValue = new LineMarkedEditorPane();
-        textTopPanel.add(new JScrollPane(textValue), BorderLayout.CENTER);
-        textValue.setEditable(false);
-
-        JPanel textButtonsPanel = new JPanel();
-        textButtonsPanel.setLayout(new FlowLayout());
-
-        textSaveButton = new JButton(translate("button.save"), View.getIcon("save16"));
-        textSaveButton.setMargin(new Insets(3, 3, 3, 10));
-        textSaveButton.setActionCommand(ACTION_SAVE_TEXT);
-        textSaveButton.addActionListener(this);
-
-        textEditButton = new JButton(translate("button.edit"), View.getIcon("edit16"));
-        textEditButton.setMargin(new Insets(3, 3, 3, 10));
-        textEditButton.setActionCommand(ACTION_EDIT_TEXT);
-        textEditButton.addActionListener(this);
-
-        textCancelButton = new JButton(translate("button.cancel"), View.getIcon("cancel16"));
-        textCancelButton.setMargin(new Insets(3, 3, 3, 10));
-        textCancelButton.setActionCommand(ACTION_CANCEL_TEXT);
-        textCancelButton.addActionListener(this);
-
-        textButtonsPanel.add(textEditButton);
-        textButtonsPanel.add(textSaveButton);
-        textButtonsPanel.add(textCancelButton);
-
-        textSaveButton.setVisible(false);
-        textCancelButton.setVisible(false);
-
-        textTopPanel.add(textButtonsPanel, BorderLayout.SOUTH);
-
-        displayWithPreview = new JPanel(new CardLayout());
-
-        displayWithPreview.add(textTopPanel, CARDTEXTPANEL);
-
-        fontPanel = new FontPanel(this);
-        displayWithPreview.add(fontPanel, CARDFONTPANEL);
-
-        Component leftComponent;
-
         displayPanel = new JPanel(new CardLayout());
 
-        if (flashPanel != null) {
-            JPanel flashPlayPanel = new JPanel(new BorderLayout());
-            flashPlayPanel.add(flashPanel, BorderLayout.CENTER);
 
-            JPanel bottomPanel = new JPanel(new BorderLayout());
-            JPanel buttonsPanel = new JPanel(new FlowLayout());
-            JButton selectColorButton = new JButton(View.getIcon("color16"));
-            selectColorButton.addActionListener(this);
-            selectColorButton.setActionCommand(ACTION_SELECT_BKCOLOR);
-            selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
-            buttonsPanel.add(selectColorButton);
-            bottomPanel.add(buttonsPanel, BorderLayout.EAST);
-
-            flashPlayPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-            JPanel flashPlayPanel2 = new JPanel(new BorderLayout());
-            flashPlayPanel2.add(flashPlayPanel, BorderLayout.CENTER);
-            flashPlayPanel2.add(flashControls = new PlayerControls(flashPanel), BorderLayout.SOUTH);
-
-            //pan.add(bottomPanel, BorderLayout.SOUTH);
-            leftComponent = flashPlayPanel2;
-        } else {
-            JPanel swtPanel = new JPanel(new BorderLayout());
-            swtPanel.add(new JLabel("<html><center>" + translate("notavailonthisplatform") + "</center></html>", JLabel.CENTER), BorderLayout.CENTER);
-            swtPanel.setBackground(View.DEFAULT_BACKGROUND_COLOR);
-            leftComponent = swtPanel;
-        }
-
-        previewSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-
-        previewSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent pce) {
-                if (splitsInited && previewSplitPane.getRightComponent().isVisible()) {
-                    Configuration.guiPreviewSplitPaneDividerLocation.set((int) pce.getNewValue());
-                }
-            }
-        });
-
-        JPanel pan = new JPanel(new BorderLayout());
-        JLabel prevLabel = new HeaderLabel(translate("swfpreview"));
-        prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        //prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-
-        JLabel paramsLabel = new HeaderLabel(translate("parameters"));
-        paramsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        //paramsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        pan.add(prevLabel, BorderLayout.NORTH);
-
-        viewerCards = new JPanel();
-        viewerCards.setLayout(new CardLayout());
-        //viewerCards.add(leftComponent,FLASH_VIEWER_CARD);
-
-        internelViewerPanel = new ImagePanel();
-        JPanel ivPanel = new JPanel(new BorderLayout());
-        ivPanel.add(new HeaderLabel(translate("swfpreview.internal")), BorderLayout.NORTH);
-        ivPanel.add(internelViewerPanel, BorderLayout.CENTER);
-        viewerCards.add(ivPanel, INTERNAL_VIEWER_CARD);
-
-        ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
-
-        if (flashPanel != null) {
-
-        }
-        pan.add(leftComponent, BorderLayout.CENTER);
-
-        repPanel = new JPanel(new FlowLayout());
-        JButton repButton = new JButton(translate("button.replace"), View.getIcon("edit16"));
-        repButton.addActionListener(this);
-        repButton.setActionCommand(ACTION_REPLACE_OTHER);
-        repPanel.add(repButton);
-        pan.add(repPanel, BorderLayout.SOUTH);
-        viewerCards.add(pan, FLASH_VIEWER_CARD);
-        previewSplitPane.setLeftComponent(viewerCards);
-
-        parametersPanel = new JPanel(new BorderLayout());
-        parametersPanel.add(paramsLabel, BorderLayout.NORTH);
-        parametersPanel.add(displayWithPreview, BorderLayout.CENTER);
-        previewSplitPane.setRightComponent(parametersPanel);
-        parametersPanel.setVisible(false);
-        displayPanel.add(previewSplitPane, CARDFLASHPANEL);
-
-        displayPanel.add(createImagesCard(), CARDIMAGEPANEL);
-        displayPanel.add(createBinaryCard(), CARDBINARYPANEL);
-        displayPanel.add(createGenericTagCard(), CARDGENEICTAGPANEL);
+        previewPanel = new PreviewPanel(this, flashPanel);
+        displayPanel.add(previewPanel, CARDPREVIEWPANEL);
         displayPanel.add(createFolderPreviewCard(), CARDFOLDERPREVIEWPANEL);
 
-        JPanel shapesCard = new JPanel(new BorderLayout());
-
-        JPanel previewPanel = new JPanel(new BorderLayout());
-
-        previewImagePanel = new ImagePanel();
-
-        JPanel previewCnt = new JPanel(new BorderLayout());
-        previewCnt.add(previewImagePanel, BorderLayout.CENTER);
-        previewCnt.add(imagePlayControls = new PlayerControls(previewImagePanel), BorderLayout.SOUTH);
-        previewPanel.add(previewCnt, BorderLayout.CENTER);
-        JLabel prevIntLabel = new HeaderLabel(translate("swfpreview.internal"));
-        prevIntLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        //prevIntLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        previewPanel.add(prevIntLabel, BorderLayout.NORTH);
-
-        repPanel2 = new JPanel(new FlowLayout());
-        JButton repButton2 = new JButton(translate("button.replace"), View.getIcon("edit16"));
-        repButton2.addActionListener(this);
-        repButton2.setActionCommand(ACTION_REPLACE_OTHER);
-        repPanel2.add(repButton2);
-        previewPanel.add(repPanel2, BorderLayout.SOUTH);
-
-        shapesCard.add(previewPanel, BorderLayout.CENTER);
-        displayPanel.add(shapesCard, CARDDRAWPREVIEWPANEL);
-
-        displayReplace(false);
-
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
-        CardLayout cl = (CardLayout) (displayPanel.getLayout());
-        cl.show(displayPanel, CARDEMPTYPANEL);
+        showCard(CARDEMPTYPANEL);
 
         searchPanel = new JPanel();
         searchPanel.setLayout(new BorderLayout());
@@ -972,7 +689,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void load(SWFList newSwfs, boolean first) {
 
-        stopImagePanels();
+        previewPanel.clear();
 
         swfs.add(newSwfs);
 
@@ -1072,7 +789,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public void closeAll() {
         swfs.clear();
         oldNode = null;
-        genericTagPanel.clear();
+        previewPanel.clear();
         if (abcPanel != null) {
             abcPanel.clearSwf();
         }
@@ -1096,14 +813,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             actionPanel.clearSource();
         }
         oldNode = null;
-        genericTagPanel.clear();
+        previewPanel.clear();
         updateUi();
         refreshTree();
-    }
-
-    private void stopImagePanels() {
-        imagePanel.stop();
-        previewImagePanel.stop();
     }
 
     public void enableDrop(boolean value) {
@@ -1192,10 +904,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         confDivLoc = splitPane2.getHeight() * 3 / 5;
                     }
                     splitPane2.setDividerLocation(confDivLoc);
-                    previewSplitPane.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewSplitPane.getWidth() / 2));
+                    previewPanel.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewPanel.getWidth() / 2));
 
                     splitPos = splitPane2.getDividerLocation();
                     splitsInited = true;
+                    previewPanel.setSplitsInited();
                 }
             });
 
@@ -1734,6 +1447,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     private boolean searchText(String txt, boolean ignoreCase, boolean regexp, SWF swf) {
         if ((txt != null) && (!txt.isEmpty())) {
+            SearchPanel<TextTag> textSearchPanel = previewPanel.getTextPanel().getSearchPanel();
             textSearchPanel.setOptions(ignoreCase, regexp);
             List<TextTag> found = new ArrayList<>();
             Pattern pat = null;
@@ -1759,9 +1473,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     @Override
     public void updateSearchPos(TextTag item) {
         setTreeItem(item);
-        textValue.setCaretPosition(0);
-
-        textSearchPanel.showQuickFindDialog(textValue);
+        previewPanel.getTextPanel().updateSearchPos();
     }
 
     public void setTreeItem(TreeItem treeItem) {
@@ -2178,7 +1890,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     public void refreshTree() {
-        stopImagePanels();
+        previewPanel.clear();
         showCard(CARDEMPTYPANEL);
         TreeItem treeItem = tagTree.getCurrentTreeItem();
         for (SWFList sWFList : swfs) {
@@ -2245,9 +1957,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     reload(true);
                 }
                 break;
-            case ACTION_REPLACE_BINARY:
-            case ACTION_REPLACE_IMAGE:
-            case ACTION_REPLACE_OTHER: {
+            case ACTION_REPLACE: {
                 TreeItem item = tagTree.getCurrentTreeItem();
                 if (item == null) {
                     return;
@@ -2383,39 +2093,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
             }
             break;
-            case ACTION_EDIT_GENERIC_TAG: {
-                TreeItem item = tagTree.getCurrentTreeItem();
-                if (item == null) {
-                    return;
-                }
-
-                if (item instanceof Tag) {
-                    genericEditButton.setVisible(false);
-                    genericSaveButton.setVisible(true);
-                    genericCancelButton.setVisible(true);
-                    //genericTagPanel.generateEditControls((Tag) item, false);
-                    genericTagPanel.setEditMode(true, (Tag) item);
-
-                }
-            }
-            break;
-            case ACTION_SAVE_GENERIC_TAG: {
-                genericTagPanel.save();
-                refreshTree();
-                setTreeItem(genericTagPanel.getTag());
-                genericEditButton.setVisible(true);
-                genericSaveButton.setVisible(false);
-                genericCancelButton.setVisible(false);
-                genericTagPanel.setEditMode(false, null);
-            }
-            break;
-            case ACTION_CANCEL_GENERIC_TAG: {
-                genericEditButton.setVisible(true);
-                genericSaveButton.setVisible(false);
-                genericCancelButton.setVisible(false);
-                genericTagPanel.setEditMode(false, null);
-            }
-            break;
             case ACTION_EXPAND_RECURSIVE: {
                 TreePath path = tagTree.getSelectionPath();
                 if (path == null) {
@@ -2453,22 +2130,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }
                 }
                 break;
-            case ACTION_EDIT_TEXT:
-                setEditText(true);
-                break;
-            case ACTION_CANCEL_TEXT:
-                setEditText(false);
-                break;
-            case ACTION_SAVE_TEXT:
-                TreeItem item = tagTree.getCurrentTreeItem();
-                if (item instanceof TextTag) {
-                    TextTag textTag = (TextTag) item;
-                    if (saveText(textTag, textValue.getText())) {
-                        setEditText(false);
-                    }
-                    SWF.clearImageCache();
-                }
-                break;
             case ACTION_CLOSE_SWF: {
                 Main.closeFile(getCurrentSwfList());
             }
@@ -2486,11 +2147,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     }
 
     private int splitPos = 0;
-
-    public void showDetailWithPreview(String card) {
-        CardLayout cl = (CardLayout) (displayWithPreview.getLayout());
-        cl.show(displayWithPreview, card);
-    }
 
     public void showDetail(String card) {
         CardLayout cl = (CardLayout) (detailPanel.getLayout());
@@ -2528,7 +2184,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         } else {
             updateUi();
         }
-        setEditText(false, false);
+        previewPanel.setEditText(false);
         reload(false);
     }
 
@@ -2540,13 +2196,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    private static Tag classicTag(Tag t) {
-        if (t instanceof DefineCompactedFont) {
-            return ((DefineCompactedFont) t).toClassicFont();
-        }
-        return t;
+    public boolean isInternalFlashViewerSelected() {
+        return mainMenu.isInternalFlashViewerSelected();
     }
-
+    
     public void reload(boolean forceReload) {
         TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
         if (treeNode == null) {
@@ -2564,13 +2217,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (flashPanel != null) {
             flashPanel.specialPlayback = false;
         }
-        stopImagePanels();
+        previewPanel.clear();
         if (soundThread != null) {
             soundThread.pause();
         }
-        imagePlayControls.setMedia(previewImagePanel);
         stopFlashPlayer();
-        displayReplace(tagObj instanceof DefineSoundTag);
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
             final List<ABCContainerTag> abcList = scriptLeaf.abc.swf.abcList;
@@ -2632,61 +2283,39 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             showDetail(DETAILCARDEMPTYPANEL);
         }
 
+        previewPanel.setImageReplaceButtonVisible(false);
+
         if (treeNode instanceof StringNode) {
             showCard(CARDFOLDERPREVIEWPANEL);
             showFolderPreview(treeNode);
         } else if (treeNode instanceof SWFNode) {
             SWFNode swfNode = (SWFNode) treeNode;
             SWF swf = swfNode.getItem();
-            if (mainMenu.isInternalFlashViewerSelected()) {
-                showCard(CARDDRAWPREVIEWPANEL);
-
-                previewImagePanel.setTimelined(swf, swf, -1);
+            showCard(CARDPREVIEWPANEL);
+            if (isInternalFlashViewerSelected()) {
+                previewPanel.showImagePanel(swf, swf, -1);
             } else {
-                showCard(CARDFLASHPANEL);
-                parametersPanel.setVisible(false);
+                previewPanel.setParametersPanelVisible(false);
                 if (flashPanel != null) {
-                    Color backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
-                    for (Tag t : swf.tags) {
-                        if (t instanceof SetBackgroundColorTag) {
-                            backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
-                            break;
-                        }
-                    }
-                    ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
-                    if (tempFile != null) {
-                        tempFile.delete();
-                    }
-                    try {
-                        tempFile = File.createTempFile("temp", ".swf");
-                        tempFile.deleteOnExit();
-                        swf.saveTo(new BufferedOutputStream(new FileOutputStream(tempFile)));
-                        flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
-                    } catch (IOException iex) {
-                        Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);
-                    }
+                    previewPanel.showFlashViewerPanel();
+                    previewPanel.showSwf(swf);
                 }
             }
-
-        } /*else if (tagObj instanceof DefineVideoStreamTag) {
-         showCard(CARDEMPTYPANEL);
-         } else if ((tagObj instanceof DefineSoundTag) || (tagObj instanceof SoundStreamHeadTag) || (tagObj instanceof SoundStreamHead2Tag)) {
-         showCard(CARDEMPTYPANEL);
-         } */ else if (tagObj instanceof DefineBinaryDataTag) {
+        } else if (tagObj instanceof DefineBinaryDataTag) {
             DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) tagObj;
-            showCard(CARDBINARYPANEL);
-            binaryPanel.setBinaryData(binaryTag.binaryData);
+            showCard(CARDPREVIEWPANEL);
+            previewPanel.showBinaryPanel(binaryTag.binaryData);
         } else if (tagObj instanceof ASMSource) {
             showCard(CARDACTIONSCRIPTPANEL);
             actionPanel.setSource((ASMSource) tagObj, !forceReload);
         } else if (tagObj instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) tagObj;
-            showHideImageReplaceButton(imageTag.importSupported());
-            showCard(CARDIMAGEPANEL);
-            imagePanel.setImage(imageTag.getImage());
-        } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (mainMenu.isInternalFlashViewerSelected())) {
+            previewPanel.setImageReplaceButtonVisible(imageTag.importSupported());
+            showCard(CARDPREVIEWPANEL);
+            previewPanel.showImagePanel(imageTag.getImage());
+        } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (!(tagObj instanceof FontTag)) && (isInternalFlashViewerSelected())) {
             final Tag tag = (Tag) tagObj;
-            showCard(CARDDRAWPREVIEWPANEL);
+            showCard(CARDPREVIEWPANEL);
             DrawableTag d = (DrawableTag) tag;
             Timelined timelined = null;
             if (tagObj instanceof Timelined && !(tagObj instanceof ButtonTag)) {
@@ -2695,17 +2324,18 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 timelined = makeTimelined(tag);
             }
 
-            previewImagePanel.setTimelined(timelined, tag.getSwf(), -1);
-        } else if ((tagObj instanceof FontTag) && (mainMenu.isInternalFlashViewerSelected())) {
+            previewPanel.setParametersPanelVisible(false);
+            previewPanel.showImagePanel(timelined, tag.getSwf(), -1);
+        } else if ((tagObj instanceof FontTag) && (isInternalFlashViewerSelected())) {
             FontTag fontTag = (FontTag) tagObj;
-            showCard(CARDFLASHPANEL);
+            showCard(CARDPREVIEWPANEL);
             showFontTag(fontTag);
-        } else if ((tagObj instanceof TextTag) && (mainMenu.isInternalFlashViewerSelected())) {
+        } else if ((tagObj instanceof TextTag) && (isInternalFlashViewerSelected())) {
             TextTag textTag = (TextTag) tagObj;
-            showCard(CARDFLASHPANEL);
+            showCard(CARDPREVIEWPANEL);
             showTextTag(textTag);
-        } else if (tagObj instanceof FrameNodeItem && ((FrameNodeItem) tagObj).isDisplayed() && (mainMenu.isInternalFlashViewerSelected())) {
-            showCard(CARDDRAWPREVIEWPANEL);
+        } else if (tagObj instanceof FrameNodeItem && ((FrameNodeItem) tagObj).isDisplayed() && (isInternalFlashViewerSelected())) {
+            showCard(CARDPREVIEWPANEL);
             FrameNodeItem fn = (FrameNodeItem) tagObj;
             SWF swf = fn.getSwf();
             List<Tag> controlTags = swf.tags;
@@ -2721,454 +2351,45 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 totalFrameCount = parentSprite.frameCount;
                 timelined = parentSprite;
             }
-            previewImagePanel.setTimelined(timelined, swf, fn.getFrame() - 1);
-        } else if (((tagObj instanceof SoundTag) && mainMenu.isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
-            showCard(CARDDRAWPREVIEWPANEL);
-            previewImagePanel.setImage(new SerializableImage(View.loadImage("sound32")));
+            previewPanel.showImagePanel(timelined, swf, fn.getFrame() - 1);
+        } else if (((tagObj instanceof SoundTag) && isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
+            showCard(CARDPREVIEWPANEL);
+            previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
+            previewPanel.setImageReplaceButtonVisible(tagObj instanceof DefineSoundTag);
             try {
                 soundThread = new SoundTagPlayer((SoundTag) tagObj, Integer.MAX_VALUE);
-                imagePlayControls.setMedia(soundThread);
+                previewPanel.setMedia(soundThread);
                 soundThread.play();
             } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
                 Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         } else if (((tagObj instanceof FrameNodeItem) && ((FrameNodeItem) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag) || (tagObj instanceof SoundStreamHeadTypeTag)) {
-            ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
-            createAndShowTempSwf(tagObj);
+            showCard(CARDPREVIEWPANEL);
+            previewPanel.createAndShowTempSwf(tagObj);
 
             if (tagObj instanceof TextTag) {
                 showTextTag((TextTag) tagObj);
             } else if (tagObj instanceof FontTag) {
                 showFontTag((FontTag) tagObj);
             } else {
-                parametersPanel.setVisible(false);
+                previewPanel.setParametersPanelVisible(false);
             }
-
         } else if (tagObj instanceof Tag) {
-            showCard(CARDGENEICTAGPANEL);
-            //genericTagPanel.setTagText((Tag) tagObj);
-            genericEditButton.setVisible(true);
-            genericSaveButton.setVisible(false);
-            genericCancelButton.setVisible(false);
-            genericTagPanel.setEditMode(false, (Tag) tagObj);
+            showCard(CARDPREVIEWPANEL);
+            previewPanel.showGenericTagPanel((Tag) tagObj);
         } else {
             showCard(CARDEMPTYPANEL);
         }
     }
 
-    private void createAndShowTempSwf(TreeItem tagObj) {
-        SWF swf;
-        try {
-            if (tempFile != null) {
-                tempFile.delete();
-            }
-            tempFile = File.createTempFile("temp", ".swf");
-            tempFile.deleteOnExit();
-
-            Color backgroundColor = View.swfBackgroundColor;
-
-            if (tagObj instanceof FontTag) { //Fonts are always black on white
-                backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
-            }
-
-            if (tagObj instanceof FrameNodeItem) {
-                FrameNodeItem fn = (FrameNodeItem) tagObj;
-                swf = fn.getSwf();
-                if (fn.getParent() == null) {
-                    for (Tag t : swf.tags) {
-                        if (t instanceof SetBackgroundColorTag) {
-                            backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
-                            break;
-                        }
-                    }
-                }
-            } else {
-                Tag tag = (Tag) tagObj;
-                swf = tag.getSwf();
-            }
-
-            int frameCount = 1;
-            int frameRate = swf.frameRate;
-            HashMap<Integer, VideoFrameTag> videoFrames = new HashMap<>();
-            if (tagObj instanceof DefineVideoStreamTag) {
-                DefineVideoStreamTag vs = (DefineVideoStreamTag) tagObj;
-                swf.populateVideoFrames(vs.getCharacterId(), swf.tags, videoFrames);
-                frameCount = videoFrames.size();
-            }
-
-            List<SoundStreamBlockTag> soundFrames = new ArrayList<>();
-            if (tagObj instanceof SoundStreamHeadTypeTag) {
-                soundFrames = ((SoundStreamHeadTypeTag) tagObj).getBlocks();
-                frameCount = soundFrames.size();
-            }
-
-            if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
-                // this setting should be synchronized with ImagePanel.morphShapeAnimationLength
-                frameCount = 100;
-                frameRate = 50;
-            }
-
-            if (tagObj instanceof DefineSoundTag) {
-                frameCount = 1;
-            }
-
-            byte[] data;
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                SWFOutputStream sos2 = new SWFOutputStream(baos, 10);
-                int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
-                int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
-                sos2.writeRECT(swf.displayRect);
-                sos2.writeUI8(0);
-                sos2.writeUI8(frameRate);
-                sos2.writeUI16(frameCount); //framecnt
-
-                /*FileAttributesTag fa = new FileAttributesTag();
-                 sos2.writeTag(fa);
-                 */
-                sos2.writeTag(new SetBackgroundColorTag(null, new RGB(backgroundColor)));
-
-                if (tagObj instanceof FrameNodeItem) {
-                    FrameNodeItem fn = (FrameNodeItem) tagObj;
-                    Tag parent = fn.getParent();
-                    List<ContainerItem> subs = new ArrayList<>();
-                    if (parent == null) {
-                        subs.addAll(swf.tags);
-                    } else {
-                        if (parent instanceof Container) {
-                            subs = ((Container) parent).getSubItems();
-                        }
-                    }
-                    List<Integer> doneCharacters = new ArrayList<>();
-                    int frameCnt = 1;
-                    for (ContainerItem item : subs) {
-                        if (item instanceof ShowFrameTag) {
-                            frameCnt++;
-                            continue;
-                        }
-                        if (frameCnt > fn.getFrame()) {
-                            break;
-                        }
-
-                        if (item instanceof DoActionTag || item instanceof DoInitActionTag) {
-                            // todo: Maybe DoABC tags should be removed, too
-                            continue;
-                        }
-
-                        Tag t = (Tag) item;
-                        Set<Integer> needed = t.getDeepNeededCharacters(swf.characters);
-                        for (int n : needed) {
-                            if (!doneCharacters.contains(n)) {
-                                sos2.writeTag(classicTag(swf.characters.get(n)));
-                                doneCharacters.add(n);
-                            }
-                        }
-                        if (t instanceof CharacterTag) {
-                            int characterId = ((CharacterTag) t).getCharacterId();
-                            if (!doneCharacters.contains(characterId)) {
-                                doneCharacters.add(((CharacterTag) t).getCharacterId());
-                            }
-                        }
-                        sos2.writeTag(classicTag(t));
-
-                        if (parent != null) {
-                            if (t instanceof PlaceObjectTypeTag) {
-                                PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
-                                int chid = pot.getCharacterId();
-                                int depth = pot.getDepth();
-                                MATRIX mat = pot.getMatrix();
-                                if (mat == null) {
-                                    mat = new MATRIX();
-                                }
-                                mat = Helper.deepCopy(mat);
-                                if (parent instanceof BoundedTag) {
-                                    RECT r = ((BoundedTag) parent).getRect();
-                                    mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
-                                    mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
-                                } else {
-                                    mat.translateX += width / 2;
-                                    mat.translateY += height / 2;
-                                }
-                                sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
-
-                            }
-                        }
-                    }
-                    sos2.writeTag(new ShowFrameTag(null));
-                } else {
-
-                    if (tagObj instanceof DefineBitsTag) {
-                        JPEGTablesTag jtt = swf.jtt;
-                        if (jtt != null) {
-                            sos2.writeTag(jtt);
-                        }
-                    } else if (tagObj instanceof AloneTag) {
-                    } else {
-                        Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(swf.characters);
-                        for (int n : needed) {
-                            sos2.writeTag(classicTag(swf.characters.get(n)));
-                        }
-                    }
-
-                    sos2.writeTag(classicTag((Tag) tagObj));
-
-                    int chtId = 0;
-                    if (tagObj instanceof CharacterTag) {
-                        chtId = ((CharacterTag) tagObj).getCharacterId();
-                    }
-
-                    MATRIX mat = new MATRIX();
-                    mat.hasRotate = false;
-                    mat.hasScale = false;
-                    mat.translateX = 0;
-                    mat.translateY = 0;
-                    if (tagObj instanceof BoundedTag) {
-                        RECT r = ((BoundedTag) tagObj).getRect();
-                        mat.translateX = -r.Xmin;
-                        mat.translateY = -r.Ymin;
-                        mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
-                        mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
-                    } else {
-                        mat.translateX = width / 4;
-                        mat.translateY = height / 4;
-                    }
-                    if (tagObj instanceof FontTag) {
-
-                        int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().size();
-                        countGlyphs = Math.min(SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW, countGlyphs);
-                        int fontId = ((FontTag) tagObj).getFontId();
-                        int cols = (int) Math.ceil(Math.sqrt(countGlyphs));
-                        int rows = (int) Math.ceil(((float) countGlyphs) / ((float) cols));
-                        int x = 0;
-                        int y = 1;
-                        for (int f = 0; f < countGlyphs; f++) {
-                            if (x >= cols) {
-                                x = 0;
-                                y++;
-                            }
-                            List<TEXTRECORD> rec = new ArrayList<>();
-                            TEXTRECORD tr = new TEXTRECORD();
-                            int textHeight = height / rows;
-                            tr.fontId = fontId;
-                            tr.styleFlagsHasFont = true;
-                            tr.textHeight = textHeight;
-                            tr.glyphEntries = new GLYPHENTRY[1];
-                            tr.styleFlagsHasColor = true;
-                            tr.textColor = new RGB(0, 0, 0);
-                            tr.glyphEntries[0] = new GLYPHENTRY();
-                            tr.glyphEntries[0].glyphAdvance = 0;
-                            tr.glyphEntries[0].glyphIndex = f;
-                            rec.add(tr);
-                            mat.translateX = x * width / cols;
-                            mat.translateY = y * height / rows;
-                            sos2.writeTag(new DefineTextTag(null, 999 + f, new RECT(0, width, 0, height), new MATRIX(), rec));
-                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
-                            x++;
-                        }
-                        sos2.writeTag(new ShowFrameTag(null));
-                    } else if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
-                        sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                        sos2.writeTag(new ShowFrameTag(null));
-                        int numFrames = 100;
-                        for (int ratio = 0; ratio < 65536; ratio += 65536 / numFrames) {
-                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null));
-                            sos2.writeTag(new ShowFrameTag(null));
-                        }
-                    } else if (tagObj instanceof SoundStreamHeadTypeTag) {
-                        for (SoundStreamBlockTag blk : soundFrames) {
-                            sos2.writeTag(blk);
-                            sos2.writeTag(new ShowFrameTag(null));
-                        }
-                    } else if (tagObj instanceof DefineSoundTag) {
-                        ExportAssetsTag ea = new ExportAssetsTag();
-                        DefineSoundTag ds = (DefineSoundTag) tagObj;
-                        ea.tags.add(ds.soundId);
-                        ea.names.add("my_define_sound");
-                        sos2.writeTag(ea);
-                        List<Action> actions;
-                        DoActionTag doa;
-
-                        doa = new DoActionTag(swf, new byte[]{}, 0);
-                        actions = ASMParser.parse(0, 0, false,
-                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
-                                + "Push \"_root\"\n"
-                                + "GetVariable\n"
-                                + "Push \"my_sound\" 0.0 \"Sound\"\n"
-                                + "NewObject\n"
-                                + "SetMember\n"
-                                + "Push \"my_define_sound\" 1 \"_root\"\n"
-                                + "GetVariable\n"
-                                + "Push \"my_sound\"\n"
-                                + "GetMember\n"
-                                + "Push \"attachSound\"\n"
-                                + "CallMethod\n"
-                                + "Pop\n"
-                                + "Stop", swf.version, false);
-                        doa.setActions(actions);
-                        sos2.writeTag(doa);
-                        sos2.writeTag(new ShowFrameTag(null));
-
-                        actions = ASMParser.parse(0, 0, false,
-                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
-                                + "StopSounds\n"
-                                + "Push \"_root\"\n"
-                                + "GetVariable\n"
-                                + "Push \"my_sound\" 0.0 \"Sound\"\n"
-                                + "NewObject\n"
-                                + "SetMember\n"
-                                + "Push \"my_define_sound\" 1 \"_root\"\n"
-                                + "GetVariable\n"
-                                + "Push \"my_sound\"\n"
-                                + "GetMember\n"
-                                + "Push \"attachSound\"\n"
-                                + "CallMethod\n"
-                                + "Pop\n"
-                                + "Push 9999 0.0 2 \"_root\"\n"
-                                + "GetVariable\n"
-                                + "Push \"my_sound\"\n"
-                                + "GetMember\n"
-                                + "Push \"start\"\n"
-                                + "CallMethod\n"
-                                + "Pop\n"
-                                + "Stop", swf.version, false);
-                        doa.setActions(actions);
-                        sos2.writeTag(doa);
-                        sos2.writeTag(new ShowFrameTag(null));
-
-                        actions = ASMParser.parse(0, 0, false,
-                                "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
-                                + "StopSounds\n"
-                                + "Push \"_root\"\n"
-                                + "GetVariable\n"
-                                + "Push \"my_sound\" 0.0 \"Sound\"\n"
-                                + "NewObject\n"
-                                + "SetMember\n"
-                                + "Push \"my_define_sound\" 1 \"_root\"\n"
-                                + "GetVariable\n"
-                                + "Push \"my_sound\"\n"
-                                + "GetMember\n"
-                                + "Push \"attachSound\"\n"
-                                + "CallMethod\n"
-                                + "Pop\n"
-                                + "Push \"_root\"\n"
-                                + "GetVariable\n"
-                                + "Push \"my_sound\"\n"
-                                + "GetMember\n"
-                                + "Push \"onSoundComplete\"\n"
-                                + "DefineFunction2 \"\" 0 2 false true true false true false true false false  {\n"
-                                + "Push 0.0 register1 \"my_sound\"\n"
-                                + "GetMember\n"
-                                + "Push \"start\"\n"
-                                + "CallMethod\n"
-                                + "Pop\n"
-                                + "}\n"
-                                + "SetMember\n"
-                                + "Push \"_root\"\n"
-                                + "GetVariable\n"
-                                + "Push \"execParam\"\n"
-                                + "GetMember\n"
-                                + "Push 1 \"_root\"\n"
-                                + "GetVariable\n"
-                                + "Push \"my_sound\"\n"
-                                + "GetMember\n"
-                                + "Push \"start\"\n"
-                                + "CallMethod\n"
-                                + "Pop\n"
-                                + "Stop", swf.version, false);
-                        doa.setActions(actions);
-                        sos2.writeTag(doa);
-                        sos2.writeTag(new ShowFrameTag(null));
-
-                        actions = ASMParser.parse(0, 0, false,
-                                "StopSounds\n"
-                                + "Stop", swf.version, false);
-                        doa.setActions(actions);
-                        sos2.writeTag(doa);
-                        sos2.writeTag(new ShowFrameTag(null));
-
-                        sos2.writeTag(new ShowFrameTag(null));
-                        if (flashPanel != null) {
-                            flashPanel.specialPlayback = true;
-                        }
-                    } else if (tagObj instanceof DefineVideoStreamTag) {
-
-                        sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                        List<VideoFrameTag> frs = new ArrayList<>(videoFrames.values());
-                        Collections.sort(frs, new Comparator<VideoFrameTag>() {
-                            @Override
-                            public int compare(VideoFrameTag o1, VideoFrameTag o2) {
-                                return o1.frameNum - o2.frameNum;
-                            }
-                        });
-                        boolean first = true;
-                        int ratio = 0;
-                        for (VideoFrameTag f : frs) {
-                            if (!first) {
-                                ratio++;
-                                sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, false, false, true, 1, 0, null, null, ratio, null, 0, null));
-                            }
-                            sos2.writeTag(f);
-                            sos2.writeTag(new ShowFrameTag(null));
-                            first = false;
-                        }
-                    } else {
-                        sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                        sos2.writeTag(new ShowFrameTag(null));
-                    }
-
-                }//not showframe
-
-                sos2.writeTag(new EndTag(null));
-                data = baos.toByteArray();
-            }
-
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                SWFOutputStream sos = new SWFOutputStream(fos, Math.max(10, swf.version));
-                sos.write("FWS".getBytes());
-                sos.write(swf.version);
-                sos.writeUI32(sos.getPos() + data.length + 4);
-                sos.write(data);
-                fos.flush();
-            }
-
-            showCard(CARDFLASHPANEL);
-            if (flashPanel != null) {
-                flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, frameRate);
-            }
-        } catch (IOException | com.jpexs.decompiler.flash.action.parser.ParseException ex) {
-            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     private void showFontTag(FontTag ft) {
-        if (mainMenu.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
-            internelViewerPanel.setTimelined(makeTimelined(ft), ft.getSwf(), 0);
-        } else {
-            ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
-        }
 
-        parametersPanel.setVisible(true);
-        previewSplitPane.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewSplitPane.getWidth() / 2));
-        fontPanel.showFontTag(ft);
-        showDetailWithPreview(CARDFONTPANEL);
+        previewPanel.showFontPanel(ft);
     }
 
     private void showTextTag(TextTag textTag) {
-        if (mainMenu.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            ((CardLayout) viewerCards.getLayout()).show(viewerCards, INTERNAL_VIEWER_CARD);
-            internelViewerPanel.setTimelined(makeTimelined(textTag), textTag.getSwf(), 0);
-        } else {
-            ((CardLayout) viewerCards.getLayout()).show(viewerCards, FLASH_VIEWER_CARD);
-        }
 
-        parametersPanel.setVisible(true);
-        previewSplitPane.setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(previewSplitPane.getWidth() / 2));
-        showDetailWithPreview(CARDTEXTPANEL);
-        textValue.setContentType("text/swf_text");
-        //textValue.setFont(new Font("Monospaced", Font.PLAIN, 13));
-        textValue.setText(textTag.getFormattedText());
-        textValue.setCaretPosition(0);
+        previewPanel.showTextPanel(textTag);
     }
 
     private void showFolderPreview(TreeNode treeNode) {
@@ -3274,20 +2495,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    public void setEditText(boolean edit) {
-        setEditText(edit, true);
-    }
-
-    public void setEditText(boolean edit, boolean reload) {
-        textValue.setEditable(edit);
-        textSaveButton.setVisible(edit);
-        textEditButton.setVisible(!edit);
-        textCancelButton.setVisible(edit);
-        if (!edit && reload) {
-            reload(true);
-        }
-    }
-
     private boolean isFreeing;
 
     @Override
@@ -3322,7 +2529,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    private static Timelined makeTimelined(final Tag tag) {
+    public static Timelined makeTimelined(final Tag tag) {
 
         return new Timelined() {
 
@@ -3343,6 +2550,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         ds.characterId = ((CharacterTag) tag).getCharacterId();
                         ds.matrix = new MATRIX();
                         ds.ratio = i * 65535 / framesCnt;
+                        f.layers.put(1, ds);
+                        tim.frames.add(f);
+                    }
+                } else if (tag instanceof FontTag) {
+                    int pageCount = PreviewPanel.getFontPageCount((FontTag) tag);
+                    for (int i = 0; i < pageCount; i++) {
+                        Frame f = new Frame(tim);
+                        DepthState ds = new DepthState(tag.getSwf(), f);
+                        ds.characterId = ((CharacterTag) tag).getCharacterId();
+                        ds.matrix = new MATRIX();
+                        ds.time = i;
                         f.layers.put(1, ds);
                         tim.frames.add(f);
                     }
@@ -3368,11 +2586,5 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 return ((BoundedTag) tag).getRect();
             }
         };
-    }
-
-    public void displayReplace(boolean display) {
-
-        repPanel.setVisible(display);
-        repPanel2.setVisible(display);
     }
 }
