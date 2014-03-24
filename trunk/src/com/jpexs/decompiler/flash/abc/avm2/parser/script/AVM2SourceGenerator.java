@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewClassIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfTrueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
@@ -48,6 +49,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.TryAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -561,25 +563,26 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return abc;
     }
 
-    public void generateClass(PackageAVM2Item pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems) {
+    public void generateClass(PackageAVM2Item pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems) throws ParseException {
         List<GraphSourceItem> ret = new ArrayList<>();
-
+        if (extendsVal == null && !isInterface) {
+            extendsVal = new TypeItem("Object");
+        }
         ParsedSymbol s = null;
 
         instanceInfo.name_index = abc.constants.addMultiname(new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true),
                 abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(pkg.packageName, true)), 0, true), 0, 0, new ArrayList<Integer>()));
-        
-        generateTraits(pkg, name, false, localData, traitItems, instanceInfo.instance_traits);
-        generateTraits(pkg, name, true, localData, traitItems, classInfo.static_traits);
-        
+
+        generateTraits(pkg, name, superName, false, localData, traitItems, instanceInfo.instance_traits);
+        generateTraits(pkg, name, superName, true, localData, traitItems, classInfo.static_traits);        
         if (constructor == null) {
-            instanceInfo.iinit_index = method(true,localData, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), new ArrayList<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), TypeItem.UNBOUNDED/*?? FIXME*/);
+            instanceInfo.iinit_index = method(false,false,0,name, extendsVal != null ? extendsVal.toString() : null, true, localData, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), new ArrayList<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), TypeItem.UNBOUNDED/*?? FIXME*/);
         } else {
             MethodAVM2Item m = (MethodAVM2Item) constructor;
-            calcRegisters(localData, m);
-            instanceInfo.iinit_index = method(true,localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
+            Reference<Boolean> hasArgs=new Reference<>(Boolean.FALSE);
+            calcRegisters(localData, m,hasArgs);            
+            instanceInfo.iinit_index = method(m.hasRest,hasArgs.getVal(),m.line,name, extendsVal != null ? extendsVal.toString() : null, true, localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
         }
-
 
         if (extendsVal != null) {
             instanceInfo.super_index = typeName(localData, extendsVal);
@@ -636,7 +639,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
-    public int generateClass(PackageAVM2Item pkg, SourceGeneratorLocalData localData, AVM2Item cls) {
+    public int generateClass(PackageAVM2Item pkg, SourceGeneratorLocalData localData, AVM2Item cls) throws ParseException {
         ClassInfo ci = new ClassInfo();
         InstanceInfo ii = new InstanceInfo();
         abc.class_info.add(ci);
@@ -644,14 +647,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         if (cls instanceof ClassAVM2Item) {
             ClassAVM2Item cai = (ClassAVM2Item) cls;
-            generateClass(pkg, ci, ii, localData, false, cai.className, cai.extendsOp, cai.implementsOp, cai.constructor, cai.traits);
+            generateClass(pkg, ci, ii, localData, false, cai.className, cai.extendsOp.toString(), cai.extendsOp, cai.implementsOp, cai.constructor, cai.traits);
             if (!cai.isDynamic) {
                 ii.flags |= InstanceInfo.CLASS_SEALED;
             }
         }
         if (cls instanceof InterfaceAVM2Item) {
             InterfaceAVM2Item iai = (InterfaceAVM2Item) cls;
-            generateClass(pkg, ci, ii, localData, true, iai.name, null, iai.superInterfaces, null, iai.methods);
+            generateClass(pkg, ci, ii, localData, true, iai.name, null, null, iai.superInterfaces, null, iai.methods);
             ii.flags |= InstanceInfo.CLASS_INTERFACE;
         }
 
@@ -757,7 +760,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return false;
     }
 
-    public int method(boolean constructor,SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) {
+    public int method(boolean hasRest,boolean hasArguments,int line, String className, String superType, boolean constructor, SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) throws ParseException {
         int param_types[] = new int[paramTypes.size()];
         ValueKind optional[] = new ValueKind[paramValues.size()];
         int param_names[] = new int[paramNames.size()];
@@ -770,19 +773,69 @@ public class AVM2SourceGenerator implements SourceGenerator {
             optional[i] = getValueKind(paramTypes.get(paramTypes.size() - paramValues.size() + i), paramTypes.get(i));
         }
 
-        MethodInfo mi = new MethodInfo(param_types, constructor?0:typeName(localData, retType), 0/*name_index*/, 0/*TODO*/, optional, param_names);
+        
+        
+        MethodInfo mi = new MethodInfo(param_types, constructor ? 0 : typeName(localData, retType), 0/*name_index*/, 0, optional, param_names);
+        if(hasArguments){
+            mi.setFlagNeed_Arguments();
+        }
+        mi.setFlagHas_paramnames();
+        if(!paramValues.isEmpty()){
+            mi.setFlagHas_optional();
+        }        
+        if(hasRest){
+            mi.setFlagNeed_rest();
+        }            
+        
         MethodBody mbody = new MethodBody();
         mbody.method_info = abc.addMethodInfo(mi);
         List<GraphSourceItem> src = generate(localData, body);
         mbody.code = new AVM2Code();
         mbody.code.code = toInsList(src);
+
+        if (constructor) {
+            List<ABC> abcs = new ArrayList<>();
+            abcs.add(abc);
+            abcs.addAll(allABCs);
+
+            int parentConsAC = 0;
+
+            for (ABC a : abcs) {
+                int ci = a.findClassByName(superType);
+                if (ci > -1) {
+                    MethodInfo pmi = a.method_info.get(a.instance_info.get(ci).iinit_index);
+                    parentConsAC = pmi.param_types.length;
+
+                }
+            }
+            int ac = -1;
+            for (AVM2Instruction ins : mbody.code.code) {
+                if (ins.definition instanceof ConstructSuperIns) {
+                    ac = ins.operands[0];
+                    if (parentConsAC != ac) {
+                        throw new ParseException("Parent constructor call requires different number of arguments", line);
+                    }
+
+                }
+            }
+            if (ac == -1) {
+                if (parentConsAC == 0) {
+                    mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}, new byte[0]));
+                    mbody.code.code.add(1, new AVM2Instruction(0, new ConstructSuperIns(), new int[]{0}, new byte[0]));
+
+                } else {
+                    throw new ParseException("Parent constructor must be called", line);
+                }
+            }
+        }
         mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}, new byte[0]));
         mbody.code.code.add(1, new AVM2Instruction(0, new PushScopeIns(), new int[]{}, new byte[0]));
-        InstructionDefinition lastDef = mbody.code.code.get(mbody.code.code.size()-1).definition;
-        if(!(lastDef instanceof ReturnVoidIns)||(lastDef instanceof ReturnValueIns)){
-            if(retType.equals("void") || constructor){
+
+        InstructionDefinition lastDef = mbody.code.code.get(mbody.code.code.size() - 1).definition;
+        if (!(lastDef instanceof ReturnVoidIns) || (lastDef instanceof ReturnValueIns)) {
+            if (retType.equals("void") || constructor) {
                 mbody.code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[]{}, new byte[0]));
-            }else{
+            } else {
                 mbody.code.code.add(new AVM2Instruction(0, new PushUndefinedIns(), new int[]{}, new byte[0]));
                 mbody.code.code.add(new AVM2Instruction(0, new ReturnValueIns(), new int[]{}, new byte[0]));
             }
@@ -834,7 +887,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return null;
     }
 
-    public void generateTraits(PackageAVM2Item pkg, String className, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts) {
+    public void generateTraits(PackageAVM2Item pkg, String className, String superName, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts) throws ParseException {
         Trait[] traits = new Trait[items.size()];
         int slot_id = 1;
         for (int k = 0; k < items.size(); k++) {
@@ -944,19 +997,22 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 if (mai.isStatic() != generateStatic) {
                     continue;
                 }
-                calcRegisters(localData, mai);
-                ((TraitMethodGetterSetter) traits[k]).method_info = method(false,localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
+                Reference<Boolean> hasArgs=new Reference<>(Boolean.FALSE);
+                
+                calcRegisters(localData, mai, hasArgs);
+                ((TraitMethodGetterSetter) traits[k]).method_info = method(mai.hasRest,hasArgs.getVal(),mai.line,className, superName, false, localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
             } else if (item instanceof FunctionAVM2Item) {
                 FunctionAVM2Item fai = (FunctionAVM2Item) item;
-                calcRegisters(localData, fai);
-                ((TraitFunction) traits[k]).method_info = method(false,localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
+                Reference<Boolean> hasArgs=new Reference<>(Boolean.FALSE);
+                calcRegisters(localData, fai, hasArgs);
+                ((TraitFunction) traits[k]).method_info = method(fai.hasRest,hasArgs.getVal(),fai.line,className, superName, false, localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
             }
         }
     }
 
-    public ScriptInfo generateScriptInfo(PackageAVM2Item pkg, SourceGeneratorLocalData localData, List<GraphTargetItem> commands) {
+    public ScriptInfo generateScriptInfo(PackageAVM2Item pkg, SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws ParseException {
         ScriptInfo si = new ScriptInfo();
-        generateTraits(pkg, null, false, localData, commands, si.traits);
+        generateTraits(pkg, null, null, false, localData, commands, si.traits);
 
         MethodInfo mi = new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]);
         MethodBody mb = new MethodBody();
@@ -1091,14 +1147,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
     }
 
-    public void calcRegisters(SourceGeneratorLocalData localData, FunctionAVM2Item fun) {
+    public void calcRegisters(SourceGeneratorLocalData localData, FunctionAVM2Item fun, Reference<Boolean> hasArguments) {
         List<String> registerNames = new ArrayList<>();
         registerNames.add("this");
         registerNames.addAll(fun.paramNames);
         localData.registerVars.clear();
         for (NameAVM2Item n : fun.subvariables) {
-            if (n.getVariableName().equals("arguments")) {
+            if (n.getVariableName().equals("arguments")&!n.isDefinition()) {
                 registerNames.add("arguments");
+                hasArguments.setVal(Boolean.TRUE);
                 break;
             }
         }

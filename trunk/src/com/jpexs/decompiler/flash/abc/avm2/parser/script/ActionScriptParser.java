@@ -343,8 +343,8 @@ public class ActionScriptParser {
             }
         }
 
-        if (k == -1) {
-            throw new ParseException("Cannot find variable or type:" + String.join(".", parts), lexer.yyline());
+        if (k == -1) {            
+            throw new ParseException("Cannot find variable or type:" + Helper.joinStrings(parts,"."), lexer.yyline());
         }
         GraphTargetItem ret = new TypeItem("".equals(pkg) ? name : pkg + "." + name);
         for (int i = 1; i < parts.size(); i++) {
@@ -408,41 +408,53 @@ public class ActionScriptParser {
 
     private MethodAVM2Item method(boolean override, boolean isFinal, GraphTargetItem thisType, List<String> openedNamespaces, List<Integer> openedNamespacesKinds, boolean isStatic, int namespaceKind, boolean withBody, String functionName, boolean isMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
         FunctionAVM2Item f = function(thisType, openedNamespaces, openedNamespacesKinds, withBody, functionName, isMethod, variables);
-        return new MethodAVM2Item(override, isFinal, isStatic, namespaceKind, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
+        return new MethodAVM2Item(f.hasRest,f.line,override, isFinal, isStatic, namespaceKind, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
     }
 
     private FunctionAVM2Item function(GraphTargetItem thisType, List<String> openedNamespaces, List<Integer> openedNamespacesKinds, boolean withBody, String functionName, boolean isMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
+        int line=lexer.yyline();
         ParsedSymbol s;
         expectedType(SymbolType.PARENT_OPEN);
         s = lex();
         List<String> paramNames = new ArrayList<>();
         List<GraphTargetItem> paramTypes = new ArrayList<>();
         List<GraphTargetItem> paramValues = new ArrayList<>();
-
+        boolean hasRest = false;        
         while (s.type != SymbolType.PARENT_CLOSE) {
             if (s.type != SymbolType.COMMA) {
                 lexer.pushback(s);
+            }            
+            s = lex();            
+            if(s.type == SymbolType.REST){
+                hasRest = true;
+                s = lex();
             }
-            s = lex();
             expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+            
             paramNames.add(s.value.toString());
             s = lex();
-            if (s.type == SymbolType.COLON) {
-                paramTypes.add(type(openedNamespaces, openedNamespacesKinds, variables));
-                s = lex();
-            } else {
-                paramTypes.add(new UnboundedTypeItem());
-            }
-            if (s.type == SymbolType.ASSIGN) {
-                paramValues.add(expression(openedNamespaces, openedNamespacesKinds, null, isMethod, isMethod, isMethod, variables));
-            } else {
-                if (!paramValues.isEmpty()) {
-                    throw new ParseException("Some of parameters do not have default values", lexer.yyline());
+            if(!hasRest){
+                if (s.type == SymbolType.COLON) {
+                    paramTypes.add(type(openedNamespaces, openedNamespacesKinds, variables));
+                    s = lex();
+                } else {
+                    paramTypes.add(new UnboundedTypeItem());
+                }
+                if (s.type == SymbolType.ASSIGN) {
+                    paramValues.add(expression(openedNamespaces, openedNamespacesKinds, null, isMethod, isMethod, isMethod, variables));
+                } else {
+                    if (!paramValues.isEmpty()) {
+                        throw new ParseException("Some of parameters do not have default values", lexer.yyline());
+                    }
                 }
             }
+            
 
             if (!s.isType(SymbolType.COMMA, SymbolType.PARENT_CLOSE)) {
                 expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
+            }
+            if(hasRest){
+                expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE);
             }
         }
         s = lex();
@@ -459,6 +471,7 @@ public class ActionScriptParser {
         for (int i = 0; i < paramNames.size(); i++) {
             subvariables.add(new NameAVM2Item(paramTypes.get(i), lexer.yyline(), paramNames.get(i), null, true, openedNamespaces, openedNamespacesKinds));
         }
+        subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), "arguments", null, true, openedNamespaces, openedNamespacesKinds));
         int parCnt = subvariables.size();
         if (withBody) {
             expectedType(SymbolType.CURLY_OPEN);
@@ -470,8 +483,7 @@ public class ActionScriptParser {
         for (int i = 0; i < parCnt; i++) {
             subvariables.remove(0);
         }
-        //return new FunctionAVM2Item(null, functionName, paramNames, body, constantPool, -1, subvariables);
-        return new FunctionAVM2Item(functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+        return new FunctionAVM2Item(hasRest,line,functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }
 
     private GraphTargetItem traits(List<String> openedNamespaces, List<Integer> openedNamespacesKinds, String packageName, String classNameStr, boolean isInterface, List<GraphTargetItem> traits) throws ParseException, IOException {
@@ -659,13 +671,13 @@ public class ActionScriptParser {
                                 if(!ft.paramTypes.isEmpty()){
                                     throw new ParseException("Getter can't have any parameters", lexer.yyline());
                                 }
-                                GetterAVM2Item g = new GetterAVM2Item(ft.isOverride(), ft.isFinal(), isStatic, ft.namespaceKind, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                GetterAVM2Item g = new GetterAVM2Item(ft.hasRest,ft.line,ft.isOverride(), ft.isFinal(), isStatic, ft.namespaceKind, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = g;
                             } else if (isSetter) {
                                 if(ft.paramTypes.size()!=1){
                                     throw new ParseException("Getter must have exactly one parameter", lexer.yyline());
                                 }
-                                SetterAVM2Item st = new SetterAVM2Item(ft.isOverride(), ft.isFinal(), isStatic, ft.namespaceKind, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                SetterAVM2Item st = new SetterAVM2Item(ft.hasRest, ft.line,ft.isOverride(), ft.isFinal(), isStatic, ft.namespaceKind, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = st;
                             } else {
                                 t = ft;
@@ -1759,7 +1771,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    public void addScriptFromTree(PackageAVM2Item pkg) {
+    public void addScriptFromTree(PackageAVM2Item pkg) throws ParseException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abc, otherABCs);
         List<AVM2Instruction> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
