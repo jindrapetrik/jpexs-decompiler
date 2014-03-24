@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
@@ -69,6 +70,26 @@ public class CallAVM2Item extends AVM2Item {
         }
         return new ArrayList<>();
     }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        if(name instanceof PropertyAVM2Item){
+            PropertyAVM2Item prop=(PropertyAVM2Item)name;
+            Object obj = prop.object;
+            if(obj == null){
+                obj =  new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty()}, new byte[0]);
+            }
+            return toSourceMerge(localData, generator, obj,prop.index,arguments,
+                    new AVM2Instruction(0, new CallPropVoidIns(), new int[]{prop.resolveProperty(),arguments.size()}, new byte[0])
+                    );
+        }
+        if(name instanceof NameAVM2Item){
+            //TODO
+        }
+        return new ArrayList<>();
+    }
+    
+    
 
     @Override
     public GraphTargetItem returnType() {

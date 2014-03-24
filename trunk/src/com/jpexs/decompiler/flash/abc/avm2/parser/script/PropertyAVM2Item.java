@@ -270,7 +270,13 @@ public class PropertyAVM2Item extends AVM2Item {
         }
         if (storeValue != null) {
             int temp_reg = g.getFreeRegister(localData);
-            List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, index, new CoerceAVM2Item(null, storeValue, resolvePropertyType().toString()),
+            String targetType = resolvePropertyType().toString();
+            String srcType = storeValue.returnType().toString();
+            GraphTargetItem st=storeValue;
+            if(!targetType.equals(srcType)){
+                st = new CoerceAVM2Item(null, storeValue, targetType);
+            }
+            List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, index,st ,
                     new AVM2Instruction(0, new DupIns(), new int[]{}, new byte[0]),
                     new AVM2Instruction(0, new SetLocalIns(), new int[]{temp_reg}, new byte[0]),
                     new AVM2Instruction(0, new SetPropertyIns(), new int[]{propertyId}, new byte[0]),
@@ -296,7 +302,13 @@ public class PropertyAVM2Item extends AVM2Item {
             obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propertyId}, new byte[0]);
         }
         if (storeValue != null) {
-            return toSourceMerge(localData, generator, obj, index, new CoerceAVM2Item(null, storeValue, resolvePropertyType().toString()),
+            String targetType = resolvePropertyType().toString();
+            String srcType = storeValue.returnType().toString();
+            GraphTargetItem st=storeValue;
+            if(!targetType.equals(srcType)){
+                st = new CoerceAVM2Item(null, storeValue, targetType);
+            }
+            return toSourceMerge(localData, generator, obj, index, st,
                     new AVM2Instruction(0, new SetPropertyIns(), new int[]{propertyId}, new byte[0])
             );
         } else {

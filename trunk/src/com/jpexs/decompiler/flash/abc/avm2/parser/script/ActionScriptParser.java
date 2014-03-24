@@ -1725,6 +1725,7 @@ public class ActionScriptParser {
                 s = lex();
                 if (s.type == SymbolType.MULTIPLY) {
                     impName = null;
+                    s = lex();
                     break;
                 }
                 expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
