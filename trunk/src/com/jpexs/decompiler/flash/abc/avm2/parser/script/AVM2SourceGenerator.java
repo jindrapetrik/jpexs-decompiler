@@ -33,11 +33,13 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrict
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.InitPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
@@ -571,11 +573,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
         generateTraits(pkg, name, true, localData, traitItems, classInfo.static_traits);
         
         if (constructor == null) {
-            instanceInfo.iinit_index = method(localData, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), new ArrayList<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), TypeItem.UNBOUNDED/*?? FIXME*/);
+            instanceInfo.iinit_index = method(true,localData, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), new ArrayList<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), TypeItem.UNBOUNDED/*?? FIXME*/);
         } else {
             MethodAVM2Item m = (MethodAVM2Item) constructor;
             calcRegisters(localData, m);
-            instanceInfo.iinit_index = method(localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
+            instanceInfo.iinit_index = method(true,localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
         }
 
 
@@ -755,7 +757,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return false;
     }
 
-    public int method(SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) {
+    public int method(boolean constructor,SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) {
         int param_types[] = new int[paramTypes.size()];
         ValueKind optional[] = new ValueKind[paramValues.size()];
         int param_names[] = new int[paramNames.size()];
@@ -768,7 +770,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             optional[i] = getValueKind(paramTypes.get(paramTypes.size() - paramValues.size() + i), paramTypes.get(i));
         }
 
-        MethodInfo mi = new MethodInfo(param_types, typeName(localData, retType), 0/*name_index*/, 0/*TODO*/, optional, param_names);
+        MethodInfo mi = new MethodInfo(param_types, constructor?0:typeName(localData, retType), 0/*name_index*/, 0/*TODO*/, optional, param_names);
         MethodBody mbody = new MethodBody();
         mbody.method_info = abc.addMethodInfo(mi);
         List<GraphSourceItem> src = generate(localData, body);
@@ -776,6 +778,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
         mbody.code.code = toInsList(src);
         mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}, new byte[0]));
         mbody.code.code.add(1, new AVM2Instruction(0, new PushScopeIns(), new int[]{}, new byte[0]));
+        InstructionDefinition lastDef = mbody.code.code.get(mbody.code.code.size()-1).definition;
+        if(!(lastDef instanceof ReturnVoidIns)||(lastDef instanceof ReturnValueIns)){
+            if(retType.equals("void") || constructor){
+                mbody.code.code.add(new AVM2Instruction(0, new ReturnVoidIns(), new int[]{}, new byte[0]));
+            }else{
+                mbody.code.code.add(new AVM2Instruction(0, new PushUndefinedIns(), new int[]{}, new byte[0]));
+                mbody.code.code.add(new AVM2Instruction(0, new ReturnValueIns(), new int[]{}, new byte[0]));
+            }
+        }
         mbody.autoFillStats(abc);
 
         abc.addMethodBody(mbody);
@@ -934,11 +945,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     continue;
                 }
                 calcRegisters(localData, mai);
-                ((TraitMethodGetterSetter) traits[k]).method_info = method(localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
+                ((TraitMethodGetterSetter) traits[k]).method_info = method(false,localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
             } else if (item instanceof FunctionAVM2Item) {
                 FunctionAVM2Item fai = (FunctionAVM2Item) item;
                 calcRegisters(localData, fai);
-                ((TraitFunction) traits[k]).method_info = method(localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
+                ((TraitFunction) traits[k]).method_info = method(false,localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
             }
         }
     }

@@ -103,9 +103,9 @@ public class CoerceAVM2Item extends AVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
 
-        if (value.returnType().toString().equals(type)) {
+        /*if (value.returnType().toString().equals(type)) {
             return toSourceMerge(localData, generator, value);
-        }
+        }*/
 
         AVM2Instruction ins;
         switch (type) {
