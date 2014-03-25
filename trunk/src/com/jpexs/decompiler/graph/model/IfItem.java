@@ -91,18 +91,26 @@ public class IfItem extends GraphTargetItem implements Block {
         }
         writer.endBlock();
         if (elseBranch.size() > 0) {
+            boolean elseIf = elseBranch.size() == 1 && (elseBranch.get(0) instanceof IfItem);
             if (writer.getFormatting().beginBlockOnNewLine) {
                 writer.newLine();
             } else {
                 writer.append(" ");
             }
-            writer.append("else").startBlock();
+            writer.append("else");
+            if (!elseIf) {
+                writer.startBlock();
+            } else {
+                writer.append(" ");
+            }
             for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
                     ti.toStringSemicoloned(writer, localData).newLine();
                 }
             }
-            writer.endBlock();
+            if (!elseIf) {
+                writer.endBlock();
+            }
         }
         return writer;
     }
