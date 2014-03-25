@@ -16,11 +16,27 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.NameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Item {
 
@@ -41,14 +57,65 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     public boolean hasSideEffect() {
         return true;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return object.returnType();
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        int objectTempReg = g.getFreeRegister(localData);
+        if (object instanceof PropertyAVM2Item) {
+            PropertyAVM2Item p = (PropertyAVM2Item) object;
+            int propertyId = p.resolveProperty();
+            Object obj = p.object;
+            GraphTargetItem index = p.index;
+            if (obj == null) {
+                obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propertyId}, new byte[0]);
+            }
+
+            List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj,
+                    new AVM2Instruction(0, new DupIns(), new int[]{}, new byte[0]),
+                    new AVM2Instruction(0, new SetLocalIns(), new int[]{objectTempReg}, new byte[0])
+            );
+            int indexTempReg = 0;
+            if (index != null) {
+                indexTempReg = g.getFreeRegister(localData);
+                ret.addAll(toSourceMerge(localData, generator, index,
+                        new AVM2Instruction(0, new DupIns(), new int[]{}, new byte[0]),
+                        new AVM2Instruction(0, new SetLocalIns(), new int[]{indexTempReg}, new byte[0])
+                ));
+            }
+
+            ret.addAll(toSourceMerge(localData, generator,
+                    new AVM2Instruction(0, new GetPropertyIns(), new int[]{}, new byte[0]),
+                    new AVM2Instruction(0, new DupIns(), new int[]{}, new byte[0]),
+                    new AVM2Instruction(0, new IncrementIns(), new int[]{}, new byte[0]),
+                    new AVM2Instruction(0, new GetLocalIns(), new int[]{objectTempReg}, new byte[0])
+            ));
+
+            if (index != null) {
+                ret.add(new AVM2Instruction(0, new GetLocalIns(), new int[]{indexTempReg}, new byte[0]));
+            }
+            ret.add(new AVM2Instruction(0, new SetPropertyIns(), new int[]{propertyId}, new byte[0]));
+            ret.add(new AVM2Instruction(0, new KillIns(), new int[]{objectTempReg}, new byte[0]));
+            if (index != null) {
+                ret.add(new AVM2Instruction(0, new KillIns(), new int[]{indexTempReg}, new byte[0]));
+            }
+            return ret;
+        }
+        if(object instanceof NameAVM2Item){
+            //TODO
+                      
+        }
+        return toSourceMerge(localData, generator, object);
+    }
+
 }
