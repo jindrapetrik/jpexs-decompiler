@@ -18,17 +18,6 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
@@ -69,6 +58,12 @@ public class NameAVM2Item extends AVM2Item {
         this.regNumber = regNumber;
     }
 
+    public int getRegNumber() {
+        return regNumber;
+    }
+
+    
+    
     public String getNs() {
         return ns;
     }
@@ -142,7 +137,7 @@ public class NameAVM2Item extends AVM2Item {
         }
 
     }
-
+      
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
         if (regNumber == -1) {

@@ -75,6 +75,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -1799,6 +1800,7 @@ public class ActionScriptParser {
         if(args.length<2){
             return;
         }
+        Main.initLogging(false);
         try {
             String src = args[0];
             String dst = args[1];
