@@ -70,7 +70,11 @@ public class SwitchItem extends LoopItem implements Block {
         if (labelUsed) {
             writer.append("loopswitch" + loop.id + ":").newLine();
         }
-        writer.append("switch(");
+        writer.append("switch");
+        if (writer.getFormatting().spaceBeforeParenthesesSwitchParentheses) {
+            writer.append(" ");
+        }
+        writer.append("(");
         switchedObject.toString(writer, localData);
         writer.append(")").startBlock();
         for (int i = 0; i < caseCommands.size(); i++) {

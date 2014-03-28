@@ -25,4 +25,29 @@ public class CodeFormatting {
     public String newLineChars = "\r\n";
     public String indentString = "   ";
     public boolean beginBlockOnNewLine = true;
+    
+    // spaces
+    // before parentheses
+    public boolean spaceBeforeParenthesesMethodCallParentheses = false;
+    public boolean spaceBeforeParenthesesMethodCallEmptyParentheses = false;
+    public boolean spaceBeforeArrayAccessBrackets = false;
+    public boolean spaceBeforeParenthesesMethodDeclarationParentheses = false;
+    public boolean spaceBeforeParenthesesMethodDeclarationEmptyParentheses = false;
+    public boolean spaceBeforeParenthesesIfParentheses = false;
+    public boolean spaceBeforeParenthesesWithParentheses = false;
+    public boolean spaceBeforeParenthesesWhileParentheses = false;
+    public boolean spaceBeforeParenthesesCatchParentheses = false;
+    public boolean spaceBeforeParenthesesSwitchParentheses = false;
+    public boolean spaceBeforeParenthesesForParentheses = false;
+    public boolean spaceBeforeParenthesesForEachParentheses = false;
+
+    // around operators
+    public boolean spaceAroundOperatorsAssignmentOperators = false; // =, +=,...
+    public boolean spaceAroundOperatorsLogicalOperators = false; // &&, ||
+    public boolean spaceAroundOperatorsEqualityOperators = false; // ==, !=
+    public boolean spaceAroundOperatorsRelationalOperator = false; // <, >, <=, >=
+    public boolean spaceAroundOperatorsBitwiseOperator = false; // &, |, ^
+    public boolean spaceAroundOperatorsAdditiveOperator = false; // +, -
+    public boolean spaceAroundOperatorsMultiplicativeOperator = false; // *, /, %
+    public boolean spaceAroundOperatorsShiftOperator = false; // <<, >>
 }

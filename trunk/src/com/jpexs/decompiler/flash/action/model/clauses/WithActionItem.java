@@ -48,7 +48,11 @@ public class WithActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("with(");
+        writer.append("with");
+        if (writer.getFormatting().spaceBeforeParenthesesWithParentheses) {
+            writer.append(" ");
+        }
+        writer.append("(");
         scope.toString(writer, localData);
         writer.append(")").newLine();
         writer.append("{").newLine();

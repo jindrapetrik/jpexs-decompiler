@@ -68,7 +68,11 @@ public class ForItem extends LoopItem implements Block {
         if (labelUsed) {
             writer.append("loop" + loop.id + ":").newLine();
         }
-        writer.append("for(");
+        writer.append("for");
+        if (writer.getFormatting().spaceBeforeParenthesesForParentheses) {
+            writer.append(" ");
+        }
+        writer.append("(");
         int p = 0;
         for (int i = 0; i < firstCommands.size(); i++) {
             if (firstCommands.get(i).isEmpty()) {

@@ -81,7 +81,11 @@ public class IfItem extends GraphTargetItem implements Block {
                 elseBranch = onTrue;
             }
         }
-        writer.append("if(");
+        writer.append("if");
+        if (writer.getFormatting().spaceBeforeParenthesesIfParentheses) {
+            writer.append(" ");
+        }
+        writer.append("(");
         expr.toString(writer, localData);
         writer.append(")").startBlock();
         for (GraphTargetItem ti : ifBranch) {

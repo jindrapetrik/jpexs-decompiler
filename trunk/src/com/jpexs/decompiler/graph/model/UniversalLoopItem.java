@@ -53,7 +53,11 @@ public class UniversalLoopItem extends LoopItem implements Block {
         if (labelUsed) {
             writer.append("loop" + loop.id + ":").newLine();
         }
-        writer.append("while(true)").startBlock();
+        writer.append("while").startBlock();
+        if (writer.getFormatting().spaceBeforeParenthesesWhileParentheses) {
+            writer.append(" ");
+        }
+        writer.append("(true)").startBlock();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();

@@ -58,7 +58,11 @@ public class WhileItem extends LoopItem implements Block {
         if (labelUsed) {
             writer.append("loop" + loop.id + ":").newLine();
         }
-        writer.append("while(");
+        writer.append("while");
+        if (writer.getFormatting().spaceBeforeParenthesesWhileParentheses) {
+            writer.append(" ");
+        }
+        writer.append("(");
         for (int i = 0; i < expression.size(); i++) {
             if (expression.get(i).isEmpty()) {
                 continue;
