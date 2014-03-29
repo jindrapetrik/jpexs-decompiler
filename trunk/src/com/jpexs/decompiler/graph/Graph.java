@@ -1364,7 +1364,7 @@ public class Graph {
         /**
          * AND / OR detection
          */
-        if (part.nextParts.size() == 2) {
+        if (parseNext && part.nextParts.size() == 2) {
             if ((stack.size() >= 2) && (stack.get(stack.size() - 1) instanceof NotItem) && (((NotItem) (stack.get(stack.size() - 1))).getOriginal().getNotCoerced() == stack.get(stack.size() - 2).getNotCoerced())) {
                 GraphPart sp0 = getNextNoJump(part.nextParts.get(0), localData);
                 GraphPart sp1 = getNextNoJump(part.nextParts.get(1), localData);
