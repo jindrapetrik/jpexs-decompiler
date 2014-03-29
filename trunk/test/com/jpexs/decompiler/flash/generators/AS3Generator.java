@@ -18,12 +18,14 @@ package com.jpexs.decompiler.flash.generators;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -54,7 +56,7 @@ public class AS3Generator {
         ABC abc = tag.getABC();
         int classId = abc.findClassByName("classes.Test");
         StringBuilder s = new StringBuilder();
-        for (Trait t : abc.instance_info[classId].instance_traits.traits) {
+        for (Trait t : abc.instance_info.get(classId).instance_traits.traits) {
             if (t instanceof TraitMethodGetterSetter) {
                 String name = t.getName(abc).getName(abc.constants, new ArrayList<String>());
                 if (name.startsWith("test")) {
@@ -64,7 +66,9 @@ public class AS3Generator {
                     s.append(name);
                     s.append("\", ");
                     HilightedTextWriter src = new HilightedTextWriter(new CodeFormatting(), false);
-                    abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, src, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
+                    MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
+                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info.get(classId).instance_traits, true);            
+                    b.toString("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, src, new ArrayList<String>(), abc.instance_info.get(classId).instance_traits);
                     String[] srcs = src.toString().split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {
                         String ss = srcs[i];

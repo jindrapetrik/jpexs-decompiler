@@ -71,9 +71,9 @@ public class ActionScript3Test {
         assertTrue(bodyIndex > -1);
         HilightedTextWriter writer = null;
         try {
-            abc.bodies[bodyIndex].convert(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits, true);
+            abc.bodies.get(bodyIndex).convert(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info.get(clsIndex).instance_traits, true);
             writer = new HilightedTextWriter(new CodeFormatting(), false);
-            abc.bodies[bodyIndex].toString(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
+            abc.bodies.get(bodyIndex).toString(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, writer, new ArrayList<String>(), abc.instance_info.get(clsIndex).instance_traits);
         } catch (InterruptedException ex) {
             fail();
         }
@@ -132,8 +132,8 @@ public class ActionScript3Test {
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
                 + "a++;\r\n"
-                + "}\r\n"
-                + "while(a < 20);\r\n", false);
+                + "}while(a < 20);\r\n"
+                + "\r\n", false);
     }
 
     @Test
@@ -663,7 +663,11 @@ public class ActionScript3Test {
     @Test
     public void testNames() {
         decompileMethod("testNames", "var ns:* = this.getNamespace();\r\n"
-                + "var name:* = this.getName();\r\n", false);
+                + "var name:* = this.getName();\r\n"
+                + "var a:* = ns::unnamespacedFunc();\r\n"
+                + "var b:* = ns::[name];\r\n"
+                + "trace(b.c);\r\n"
+                + "var c:* = myInternal::neco;\r\n", false);
     }
 
     @Test
@@ -775,8 +779,8 @@ public class ActionScript3Test {
                 + "k = 5 - k;\r\n"
                 + "}\r\n"
                 + "k--;\r\n"
-                + "}\r\n"
-                + "while(k < 9);\r\n"
+                + "}while(k < 9);\r\n"
+                + "\r\n"
                 + "return 2;\r\n", false);
     }
 
@@ -886,18 +890,18 @@ public class ActionScript3Test {
                 + "return 4;\r\n", false);
     }
 
-    @Test
-    public void testOptionalParameters() {
+        @Test
+        public void testOptionalParameters() {
         String methodName = "testOptionalParameters";
-        int methodInfo = abc.findMethodInfoByName(clsIndex, methodName);
-        int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
-        assertTrue(methodInfo > -1);
-        assertTrue(bodyIndex > -1);
-        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
-        abc.method_info[methodInfo].getParamStr(writer, abc.constants, abc.bodies[bodyIndex], abc, new ArrayList<String>());
-        String actualResult = writer.toString().replaceAll("[ \r\n]", "");
-        String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";
-        expectedResult = expectedResult.replaceAll("[ \r\n]", "");
-        assertEquals(actualResult, expectedResult);
+            int methodInfo = abc.findMethodInfoByName(clsIndex, methodName);
+            int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
+            assertTrue(methodInfo > -1);
+            assertTrue(bodyIndex > -1);
+            HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+            abc.method_info.get(methodInfo).getParamStr(writer, abc.constants, abc.bodies.get(bodyIndex), abc, new ArrayList<String>());
+            String actualResult = writer.toString().replaceAll("[ \r\n]", "");
+            String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";
+            expectedResult = expectedResult.replaceAll("[ \r\n]", "");
+            assertEquals(actualResult, expectedResult);
+        }
     }
-}
