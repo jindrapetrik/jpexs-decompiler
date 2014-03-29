@@ -237,10 +237,6 @@ public class ActionScriptParser {
                 }
             }
         }
-
-        if (parts.get(0).equals("addChild")) {
-            //System.out.println("ss");
-        }
         //search for variable in openedNamespaces
         if (!typeOnly) {
             for (int i = 0; i < openedNamespaces.size(); i++) {
@@ -293,7 +289,6 @@ public class ActionScriptParser {
         //variable not found, gonna search types
         String pkg = "";
         String name = null;
-        String type = null;
         int foundNsKind = Namespace.KIND_PACKAGE;
         int k;
         loopk:
@@ -330,7 +325,7 @@ public class ActionScriptParser {
                                 Multiname n = a.constants.constant_multiname.get(ii.name_index);
                                 if (n.getNamespace(a.constants).kind == nsKind && n.getNamespace(a.constants).getName(a.constants).equals(nspkg) && n.getName(a.constants, new ArrayList<String>()).equals(name)) {
                                     foundNsKind = n.getNamespace(a.constants).kind;
-                                    type = n.getNameWithNamespace(a.constants);
+                                    pkg = nspkg;
                                     break loopk;
                                 }
                             }
