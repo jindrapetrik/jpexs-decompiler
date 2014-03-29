@@ -132,7 +132,8 @@ public class ActionScript3Test {
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
                 + "a++;\r\n"
-                + "}while(a < 20);\r\n"
+                + "}\r\n"
+                + "while(a < 20);\r\n"
                 + "\r\n", false);
     }
 
@@ -450,9 +451,7 @@ public class ActionScript3Test {
                 + "trace(\"b!=6\");\r\n"
                 + "}\r\n"
                 + "}\r\n"
-                + "else\r\n"
-                + "{\r\n"
-                + "if(b == 7)\r\n"
+                + "else if(b == 7)\r\n"
                 + "{\r\n"
                 + "trace(\"b==7\");\r\n"
                 + "}\r\n"
@@ -460,7 +459,7 @@ public class ActionScript3Test {
                 + "{\r\n"
                 + "trace(\"b!=7\");\r\n"
                 + "}\r\n"
-                + "}\r\n"
+                + "\r\n"
                 + "trace(\"end\");\r\n", false);
     }
 
@@ -502,7 +501,7 @@ public class ActionScript3Test {
                 + "list[0] = \"first\";\r\n"
                 + "list[1] = \"second\";\r\n"
                 + "list[2] = \"third\";\r\n"
-                + "for each (item in list)\r\n"
+                + "for each(item in list)\r\n"
                 + "{\r\n"
                 + "trace(\"item #\" + item);\r\n"
                 + "}\r\n", false);
@@ -518,7 +517,7 @@ public class ActionScript3Test {
                 + "list[2] = \"third\";\r\n"
                 + "test = new Array();\r\n"
                 + "test[0] = 0;\r\n"
-                + "for each (test[0] in list)\r\n"
+                + "for each(test[0] in list)\r\n"
                 + "{\r\n"
                 + "trace(\"item #\" + test[0]);\r\n"
                 + "}\r\n", false);
@@ -531,7 +530,7 @@ public class ActionScript3Test {
                 + "list[0] = \"first\";\r\n"
                 + "list[1] = \"second\";\r\n"
                 + "list[2] = \"third\";\r\n"
-                + "for each (this.testPriv in list)\r\n"
+                + "for each(this.testPriv in list)\r\n"
                 + "{\r\n"
                 + "trace(\"item #\" + this.testPriv);\r\n"
                 + "}\r\n", false);
@@ -650,11 +649,11 @@ public class ActionScript3Test {
     public void testForIn() {
         decompileMethod("testForIn", "var dic:Dictionary = null;\r\n"
                 + "var item:Object = null;\r\n"
-                + "for (item in dic)\r\n"
+                + "for(item in dic)\r\n"
                 + "{\r\n"
                 + "trace(item);\r\n"
                 + "}\r\n"
-                + "for each (item in dic)\r\n"
+                + "for each(item in dic)\r\n"
                 + "{\r\n"
                 + "trace(item);\r\n"
                 + "}\r\n", false);
@@ -686,9 +685,7 @@ public class ActionScript3Test {
                 + "{\r\n"
                 + "arguments.concat(i);\r\n"
                 + "}\r\n"
-                + "else\r\n"
-                + "{\r\n"
-                + "if(i == 0)\r\n"
+                + "else if(i == 0)\r\n"
                 + "{\r\n"
                 + "i = j++;\r\n"
                 + "}\r\n"
@@ -696,7 +693,7 @@ public class ActionScript3Test {
                 + "{\r\n"
                 + "arr[0]();\r\n"
                 + "}\r\n"
-                + "}\r\n"
+                + "\r\n"
                 + "return i == 0;\r\n", false);
     }
 
@@ -779,7 +776,8 @@ public class ActionScript3Test {
                 + "k = 5 - k;\r\n"
                 + "}\r\n"
                 + "k--;\r\n"
-                + "}while(k < 9);\r\n"
+                + "}\r\n"
+                + "while(k < 9);\r\n"
                 + "\r\n"
                 + "return 2;\r\n", false);
     }
@@ -890,18 +888,18 @@ public class ActionScript3Test {
                 + "return 4;\r\n", false);
     }
 
-        @Test
-        public void testOptionalParameters() {
+    @Test
+    public void testOptionalParameters() {
         String methodName = "testOptionalParameters";
-            int methodInfo = abc.findMethodInfoByName(clsIndex, methodName);
-            int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
-            assertTrue(methodInfo > -1);
-            assertTrue(bodyIndex > -1);
-            HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
-            abc.method_info.get(methodInfo).getParamStr(writer, abc.constants, abc.bodies.get(bodyIndex), abc, new ArrayList<String>());
-            String actualResult = writer.toString().replaceAll("[ \r\n]", "");
-            String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";
-            expectedResult = expectedResult.replaceAll("[ \r\n]", "");
-            assertEquals(actualResult, expectedResult);
-        }
+        int methodInfo = abc.findMethodInfoByName(clsIndex, methodName);
+        int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
+        assertTrue(methodInfo > -1);
+        assertTrue(bodyIndex > -1);
+        HilightedTextWriter writer = new HilightedTextWriter(new CodeFormatting(), false);
+        abc.method_info.get(methodInfo).getParamStr(writer, abc.constants, abc.bodies.get(bodyIndex), abc, new ArrayList<String>());
+        String actualResult = writer.toString().replaceAll("[ \r\n]", "");
+        String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";
+        expectedResult = expectedResult.replaceAll("[ \r\n]", "");
+        assertEquals(actualResult, expectedResult);
     }
+}

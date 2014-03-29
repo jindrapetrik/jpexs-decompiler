@@ -53,7 +53,7 @@ public class UniversalLoopItem extends LoopItem implements Block {
         if (labelUsed) {
             writer.append("loop" + loop.id + ":").newLine();
         }
-        writer.append("while").startBlock();
+        writer.append("while");
         if (writer.getFormatting().spaceBeforeParenthesesWhileParentheses) {
             writer.append(" ");
         }
