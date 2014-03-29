@@ -159,7 +159,8 @@ public class Traits implements Serializable {
 
             futureResults = new ArrayList<>();
             for (int t = 0; t < traits.size(); t++) {
-                TraitConvertTask task = new TraitConvertTask(traits.get(t), parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, t, parallel);
+                // each convert task needs a separate NulWriter, because they are executed parallel
+                TraitConvertTask task = new TraitConvertTask(traits.get(t), parent, makePackages, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, new NulWriter(), fullyQualifiedNames, t, parallel);
                 Future<Void> future = executor.submit(task);
                 futureResults.add(future);
             }

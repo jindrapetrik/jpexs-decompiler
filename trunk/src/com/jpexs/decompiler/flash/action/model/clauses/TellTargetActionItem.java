@@ -42,7 +42,9 @@ public class TellTargetActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("tellTarget(");
+        writer.append("tellTarget");
+        writer.spaceBeforeCallParenthesies(1);
+        writer.append("(");
         target.toString(writer, localData);
         writer.append(")").newLine();
         writer.append("{").newLine();

@@ -53,7 +53,9 @@ public class PrintAsBitmapNumActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("printAsBitmapNum(");
+        writer.append("printAsBitmapNum");
+        writer.spaceBeforeCallParenthesies(2);
+        writer.append("(");
         num.toString(writer, localData);
         writer.append(",");
         boundingBox.toString(writer, localData);

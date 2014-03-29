@@ -65,14 +65,17 @@ public class DoWhileItem extends LoopItem implements Block {
         }
         writer.append("do");
         writer.startBlock();
-        writer.indent();
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ti.toStringSemicoloned(writer, localData).newLine();
             }
         }
-        writer.endBlock();
-        writer.append("while(");
+        writer.endBlock().newLine();
+        writer.append("while");
+        if (writer.getFormatting().spaceBeforeParenthesesWhileParentheses) {
+            writer.append(" ");
+        }
+        writer.append("(");
 
         for (int i = 0; i < expression.size(); i++) {
             if (expression.get(i).isEmpty()) {

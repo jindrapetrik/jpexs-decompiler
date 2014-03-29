@@ -68,7 +68,11 @@ public class ForItem extends LoopItem implements Block {
         if (labelUsed) {
             writer.append("loop" + loop.id + ":").newLine();
         }
-        writer.append("for(");
+        writer.append("for");
+        if (writer.getFormatting().spaceBeforeParenthesesForParentheses) {
+            writer.append(" ");
+        }
+        writer.append("(");
         int p = 0;
         for (int i = 0; i < firstCommands.size(); i++) {
             if (firstCommands.get(i).isEmpty()) {
@@ -79,7 +83,6 @@ public class ForItem extends LoopItem implements Block {
                 writer.append(",");
             }
             firstCommands.get(i).toString(writer, localData);
-            writer.stripSemicolon();
             p++;
         }
         writer.append(";");
@@ -94,7 +97,6 @@ public class ForItem extends LoopItem implements Block {
                 writer.append(",");
             }
             finalCommands.get(i).toString(writer, localData);
-            writer.stripSemicolon();
             p++;
         }
         writer.append(")").startBlock();

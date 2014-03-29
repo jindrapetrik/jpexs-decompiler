@@ -488,10 +488,21 @@ public class GenericTagTreePanel extends GenericTagPanel {
         private final Object mtroot;
         private final List<TreeModelListener> listeners = new ArrayList<>();
         private final Map<String, Object> nodeCache = new HashMap<>();
+        // it is much faster to store the reverse mappings, too
+        private final Map<Object, String> nodeCacheReverse = new HashMap<>();
 
         private Object getNodeByPath(String path) {
+
             if (nodeCache.containsKey(path)) {
                 return nodeCache.get(path);
+            }
+            return null;
+        }
+
+        public String getNodePathName(Object find) {
+
+            if (nodeCacheReverse.containsKey(find)) {
+                return nodeCacheReverse.get(find);
             }
             return null;
         }
@@ -522,20 +533,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     }
                 }
             }
-            for (int i = 0; i < getChildCount(node); i++) {
+            int count = getChildCount(node);
+            for (int i = 0; i < count; i++) {
                 FieldNode f = (FieldNode) getChild(node, i);
                 getDependentFields(dependence, currentPath + "." + f.getName(), f, ret);
             }
-        }
-
-        public String getNodePathName(Object find) {
-
-            for (Map.Entry<String, Object> en : nodeCache.entrySet()) {
-                if (en.getValue().equals(find)) {
-                    return en.getKey();
-                }
-            }
-            return null;
         }
 
         public MyTreeModel(Tag root) {
@@ -555,7 +557,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 parentPath += obj.getClass().getSimpleName();
             }
             nodeCache.put(parentPath, obj);
-            for (int i = 0; i < getChildCount(obj, false); i++) {
+            nodeCacheReverse.put(obj, parentPath);
+            int count = getChildCount(obj, false);
+            for (int i = 0; i < count; i++) {
                 buildCache(getChild(obj, i, false), parentPath);
             }
         }
@@ -597,7 +601,16 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 return 0;
             }
             Field field = fnode.field;
-            if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays ot Lists
+            if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays or Lists
+                try {
+                    if (field.get(fnode.obj) == null) {
+                        // todo: instanciate the (Array)List or Array to allow adding items to it
+                        return 0;
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    return 0;
+                }
+
                 return ReflectionTools.getFieldSubSize(fnode.obj, field);
             }
             parent = fnode.getValue();

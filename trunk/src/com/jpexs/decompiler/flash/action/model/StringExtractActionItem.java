@@ -42,7 +42,9 @@ public class StringExtractActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         value.toString(writer, localData);
-        writer.append(".substr(");
+        writer.append(".substr");
+        writer.spaceBeforeCallParenthesies(2);
+        writer.append("(");
         index.toString(writer, localData);
         writer.append(",");
         count.toString(writer, localData);

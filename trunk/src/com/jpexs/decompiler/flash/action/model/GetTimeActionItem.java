@@ -35,7 +35,9 @@ public class GetTimeActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("getTimer()");
+        writer.append("getTimer");
+        writer.spaceBeforeCallParenthesies(0);
+        return writer.append("()");
     }
 
     @Override

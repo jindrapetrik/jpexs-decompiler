@@ -56,7 +56,9 @@ public class StartDragActionItem extends ActionItem {
                 hasConstrains = false;
             }
         }
-        writer.append("startDrag(");
+        writer.append("startDrag");
+        writer.spaceBeforeCallParenthesies(2);
+        writer.append("(");
         target.toString(writer, localData);
         writer.append(",");
         lockCenter.toString(writer, localData);

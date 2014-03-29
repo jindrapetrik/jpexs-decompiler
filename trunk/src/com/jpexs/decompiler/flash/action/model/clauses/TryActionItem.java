@@ -76,7 +76,11 @@ public class TryActionItem extends ActionItem implements Block {
         writer.append("}");
         for (int e = 0; e < catchExceptions.size(); e++) {
             writer.newLine();
-            writer.append("catch(");
+            writer.append("catch");
+            if (writer.getFormatting().spaceBeforeParenthesesCatchParentheses) {
+                writer.append(" ");
+            }
+            writer.append("(");
             catchExceptions.get(e).toStringNoQuotes(writer, localData);
             writer.append(")").newLine();
             writer.append("{").newLine();

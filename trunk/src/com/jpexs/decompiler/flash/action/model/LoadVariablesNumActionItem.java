@@ -62,7 +62,9 @@ public class LoadVariablesNumActionItem extends ActionItem {
         if (method == 2) {
             methodStr = ",\"POST\"";
         }
-        writer.append("loadVariablesNum(");
+        writer.append("loadVariablesNum");
+        writer.spaceBeforeCallParenthesies(2);
+        writer.append("(");
         urlString.toString(writer, localData);
         writer.append(",");
         num.toString(writer, localData);

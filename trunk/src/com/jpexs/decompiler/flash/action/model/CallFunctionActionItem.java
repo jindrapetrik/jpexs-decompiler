@@ -48,6 +48,7 @@ public class CallFunctionActionItem extends ActionItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         String paramStr = "";
         stripQuotes(functionName, localData, writer);
+        writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {

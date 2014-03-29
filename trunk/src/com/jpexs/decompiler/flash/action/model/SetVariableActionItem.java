@@ -77,7 +77,9 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
             writer.append(" = ");
             return value.toString(writer, localData);
         } else {
-            writer.append("set(");
+            writer.append("set");
+            writer.spaceBeforeCallParenthesies(2);
+            writer.append("(");
             name.toString(writer, localData);
             writer.append(",");
             value.toString(writer, localData);

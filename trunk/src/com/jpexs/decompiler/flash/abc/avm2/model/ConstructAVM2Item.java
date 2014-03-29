@@ -41,6 +41,7 @@ public class ConstructAVM2Item extends AVM2Item {
         }
         writer.append("new ");
         object.toString(writer, localData);
+        writer.spaceBeforeCallParenthesies(args.size());
         writer.append("(");
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {

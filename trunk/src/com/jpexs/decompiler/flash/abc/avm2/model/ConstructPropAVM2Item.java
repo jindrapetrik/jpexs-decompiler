@@ -45,6 +45,7 @@ public class ConstructPropAVM2Item extends AVM2Item {
             writer.append(".");
         }
         propertyName.toString(writer, localData);
+        writer.spaceBeforeCallParenthesies(args.size());
         writer.append("(");
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {

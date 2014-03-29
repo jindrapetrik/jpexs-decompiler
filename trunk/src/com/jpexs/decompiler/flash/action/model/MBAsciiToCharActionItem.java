@@ -35,7 +35,9 @@ public class MBAsciiToCharActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("mbchr(");
+        writer.append("mbchr");
+        writer.spaceBeforeCallParenthesies(1);
+        writer.append("(");
         value.toString(writer, localData);
         return writer.append(")");
     }

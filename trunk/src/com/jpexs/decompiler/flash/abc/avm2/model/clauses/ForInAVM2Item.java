@@ -82,7 +82,11 @@ public class ForInAVM2Item extends LoopItem implements Block {
         if (labelUsed) {
             writer.append("loop" + loop.id + ":").newLine();
         }
-        writer.append("for (");
+        writer.append("for");
+        if (writer.getFormatting().spaceBeforeParenthesesForParentheses) {
+            writer.append(" ");
+        }
+        writer.append("(");
         expression.toString(writer, localData);
         writer.append(")").newLine();
         writer.append("{").newLine();

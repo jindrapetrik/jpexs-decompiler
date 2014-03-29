@@ -28,7 +28,9 @@ public class ToggleHighQualityActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("toggleHighQuality()");
+        writer.append("toggleHighQuality");
+        writer.spaceBeforeCallParenthesies(0);
+        return writer.append("()");
     }
 
     public ToggleHighQualityActionItem(GraphSourceItem instruction) {

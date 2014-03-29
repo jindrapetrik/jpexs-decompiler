@@ -62,7 +62,9 @@ public class LoadMovieNumActionItem extends ActionItem {
         if (method == 2) {
             methodStr = ",\"POST\"";
         }
-        writer.append("loadMovieNum(");
+        writer.append("loadMovieNum");
+        writer.spaceBeforeCallParenthesies(2);
+        writer.append("(");
         urlString.toString(writer, localData);
         writer.append(",");
         num.toString(writer, localData);

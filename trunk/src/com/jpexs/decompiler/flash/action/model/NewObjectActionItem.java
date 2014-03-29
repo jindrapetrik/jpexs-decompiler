@@ -50,6 +50,7 @@ public class NewObjectActionItem extends ActionItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("new ");
         stripQuotes(objectName, localData, writer);
+        writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {

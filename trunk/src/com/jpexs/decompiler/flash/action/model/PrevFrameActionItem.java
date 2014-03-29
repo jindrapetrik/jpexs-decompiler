@@ -28,7 +28,9 @@ public class PrevFrameActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("prevFrame()");
+        writer.append("prevFrame");
+        writer.spaceBeforeCallParenthesies(0);
+        return writer.append("()");
     }
 
     public PrevFrameActionItem(GraphSourceItem instruction) {

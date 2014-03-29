@@ -55,7 +55,9 @@ public class GotoFrame2ActionItem extends ActionItem {
         if (playFlag) {
             prefix = "gotoAndPlay";
         }
-        writer.append(prefix + "(");
+        writer.append(prefix);
+        writer.spaceBeforeCallParenthesies(1);
+        writer.append("(");
         frame.toString(writer, localData);
         writer.append((sceneBiasFlag ? "," + sceneBias : ""));
         return writer.append(")");

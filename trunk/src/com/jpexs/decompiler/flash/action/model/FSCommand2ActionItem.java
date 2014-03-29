@@ -50,7 +50,9 @@ public class FSCommand2ActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("FSCommand2(");
+        writer.append("FSCommand2");
+        writer.spaceBeforeCallParenthesies(arguments.size());
+        writer.append("(");
         command.toString(writer, localData);
         for (int t = 0; t < arguments.size(); t++) {
             writer.append(",");

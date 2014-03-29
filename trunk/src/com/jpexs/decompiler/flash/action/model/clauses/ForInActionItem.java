@@ -81,7 +81,11 @@ public class ForInActionItem extends LoopActionItem implements Block {
         if (labelUsed) {
             writer.append("loop" + loop.id + ":").newLine();
         }
-        writer.append("for(");
+        writer.append("for");
+        if (writer.getFormatting().spaceBeforeParenthesesForParentheses) {
+            writer.append(" ");
+        }
+        writer.append("(");
         if ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber)) {
             writer.append("var ");
         }

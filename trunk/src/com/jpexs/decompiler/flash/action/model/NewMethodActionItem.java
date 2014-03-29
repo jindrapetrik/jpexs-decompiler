@@ -78,6 +78,7 @@ public class NewMethodActionItem extends ActionItem {
                 methodName.toString(writer, localData);
             }
         }
+        writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
