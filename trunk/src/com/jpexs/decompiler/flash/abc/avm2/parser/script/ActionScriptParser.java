@@ -1767,7 +1767,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    public void addScriptFromTree(PackageAVM2Item pkg) throws ParseException {
+    public void addScriptFromTree(PackageAVM2Item pkg, boolean documentClass) throws ParseException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abc, otherABCs);
         List<AVM2Instruction> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
@@ -1778,12 +1778,12 @@ public class ActionScriptParser {
                 className = ((ClassAVM2Item) it).className;
             }
         }
-        abc.script_info.add(gen.generateScriptInfo(pkg, localData, pkg.items));
+        abc.script_info.add(gen.generateScriptInfo(pkg, localData, pkg.items, documentClass));
     }
 
-    public void addScript(String s) throws ParseException, IOException {
+    public void addScript(String s, boolean documentClass) throws ParseException, IOException {
         PackageAVM2Item pkg = packageFromString(s);
-        addScriptFromTree(pkg);
+        addScriptFromTree(pkg, documentClass);
     }
 
     public ActionScriptParser(ABC abc, List<ABC> otherABCs) {
@@ -1809,7 +1809,7 @@ public class ActionScriptParser {
             }
             ABC abc = new ABC(swf);
             ActionScriptParser parser = new ActionScriptParser(abc, playerABCs);
-            parser.addScript(new String(Helper.readFile(src), "UTF-8"));
+            parser.addScript(new String(Helper.readFile(src), "UTF-8"),true);
             abc.saveToStream(new FileOutputStream(new File(dst)));
         } catch (Exception ex) {
             Logger.getLogger(ActionScriptParser.class.getName()).log(Level.SEVERE, null, ex);

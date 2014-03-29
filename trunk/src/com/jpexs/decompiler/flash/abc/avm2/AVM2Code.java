@@ -1856,8 +1856,11 @@ public class AVM2Code implements Serializable {
             stats.instructionStats[pos].stackpos = stack;
             stats.instructionStats[pos].scopepos = scope;
             AVM2Instruction ins = code.get(pos);
-            stack += ins.definition.getStackDelta(ins, abc);
-            scope += ins.definition.getScopeStackDelta(ins, abc);
+            int stackDelta = ins.definition.getStackDelta(ins, abc);
+            stack += stackDelta;
+            int scopeDelta = ins.definition.getScopeStackDelta(ins, abc);            
+            //System.out.println(""+ins+" stack:"+(stackDelta>0?"+"+stackDelta:stackDelta)+" scope:"+(scopeDelta>0?"+"+scopeDelta:scopeDelta));
+            scope += scopeDelta;
             if (stack > stats.maxstack) {
                 stats.maxstack = stack;
             }
@@ -1872,13 +1875,15 @@ public class AVM2Code implements Serializable {
             }
             if (ins.definition instanceof SetLocalTypeIns) {
                 handleRegister(stats, ((SetLocalTypeIns) ins.definition).getRegisterId(ins));
+            } else if (ins.definition instanceof GetLocalTypeIns) {
+                handleRegister(stats, ((GetLocalTypeIns) ins.definition).getRegisterId(ins));
             } else {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
                     if (ins.definition.operands[i] == DAT_REGISTER_INDEX) {
                         handleRegister(stats, ins.operands[i]);
                     }
                 }
-            }
+            }            
             if (ins.definition instanceof ReturnValueIns) {
                 //check stack=1
                 return true;
@@ -1919,9 +1924,9 @@ public class AVM2Code implements Serializable {
         return true;
     }
 
-    public CodeStats getStats(ABC abc, MethodBody body) {
-        CodeStats stats = new CodeStats(this);
-        if (!walkCode(stats, 0, 0, 0, abc)) {
+    public CodeStats getStats(ABC abc, MethodBody body, int initScope) {
+        CodeStats stats = new CodeStats(this);        
+        if (!walkCode(stats, 0, 0, initScope, abc)) {
             return null;
         }
         for (ABCException ex : body.exceptions) {

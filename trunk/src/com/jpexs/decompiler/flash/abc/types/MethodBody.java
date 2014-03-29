@@ -219,14 +219,15 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public boolean autoFillStats(ABC abc) {
-        CodeStats stats = code.getStats(abc, this);
+    public boolean autoFillStats(ABC abc, int initScope) {
+        CodeStats stats = code.getStats(abc, this, initScope);
         if (stats == null) {
             return false;
         }
         max_stack = stats.maxstack;
         max_scope_depth = init_scope_depth + stats.maxscope;
         max_regs = stats.maxlocal;
+        init_scope_depth = initScope;
         abc.method_info.get(method_info).setFlagSetsdxns(stats.has_set_dxns);
         abc.method_info.get(method_info).setFlagNeed_activation(stats.has_activation);
         return true;

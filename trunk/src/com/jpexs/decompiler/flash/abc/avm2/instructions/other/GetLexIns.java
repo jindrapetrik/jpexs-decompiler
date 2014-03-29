@@ -44,7 +44,9 @@ public class GetLexIns extends InstructionDefinition {
     }
 
     @Override
-    public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-        return 1; //multiname may not be runtime
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return 1;
     }
+ 
+    
 }

@@ -895,11 +895,6 @@ public class ABC {
         return ret;
     }
 
-    public void autoFillAllBodyParams() {
-        for (int i = 0; i < bodies.size(); i++) {
-            bodies.get(i).autoFillStats(this);
-        }
-    }
 
     public int findMethodInfoByName(int classId, String methodName) {
         if (classId > -1) {
