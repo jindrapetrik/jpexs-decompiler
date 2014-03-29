@@ -35,7 +35,9 @@ public class TraceActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("trace(");
+        writer.append("trace");
+        writer.spaceBeforeCallParenthesies(1);
+        writer.append("(");
         value.toString(writer, localData);
         return writer.append(")");
     }

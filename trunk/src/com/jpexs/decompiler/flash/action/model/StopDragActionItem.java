@@ -28,7 +28,9 @@ public class StopDragActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("stopDrag()");
+        writer.append("stopDrag");
+        writer.spaceBeforeCallParenthesies(0);
+        return writer.append("()");
     }
 
     public StopDragActionItem(GraphSourceItem instruction) {

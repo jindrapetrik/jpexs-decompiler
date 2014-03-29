@@ -51,7 +51,9 @@ public class UnLoadMovieNumActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("unloadMovieNum(");
+        writer.append("unloadMovieNum");
+        writer.spaceBeforeCallParenthesies(1);
+        writer.append("(");
         num.toString(writer, localData);
         return writer.append(")");
     }

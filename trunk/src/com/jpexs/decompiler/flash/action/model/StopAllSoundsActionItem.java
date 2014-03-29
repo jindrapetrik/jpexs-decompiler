@@ -28,7 +28,9 @@ public class StopAllSoundsActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("stopAllSounds()");
+        writer.append("stopAllSounds");
+        writer.spaceBeforeCallParenthesies(0);
+        return writer.append("()");
     }
 
     public StopAllSoundsActionItem(GraphSourceItem instruction) {

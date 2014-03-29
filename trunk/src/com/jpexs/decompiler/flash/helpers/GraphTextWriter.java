@@ -23,7 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
  *
  * @author JPEXS
  */
-public class GraphTextWriter {
+public abstract class GraphTextWriter {
 
     protected long startTime;
     protected long suspendTime;
@@ -111,21 +111,13 @@ public class GraphTextWriter {
         return "";
     }
 
-    public GraphTextWriter append(String str) {
-        return this;
-    }
+    public abstract GraphTextWriter append(String str);
 
-    public GraphTextWriter append(String str, long offset) {
-        return this;
-    }
+    public abstract GraphTextWriter append(String str, long offset);
 
-    public GraphTextWriter appendNoHilight(int i) {
-        return this;
-    }
+    public abstract GraphTextWriter appendNoHilight(int i);
 
-    public GraphTextWriter appendNoHilight(String str) {
-        return this;
-    }
+    public abstract GraphTextWriter appendNoHilight(String str);
 
     public GraphTextWriter indent() {
         return this;
@@ -136,10 +128,6 @@ public class GraphTextWriter {
     }
 
     public GraphTextWriter newLine() {
-        return this;
-    }
-
-    public GraphTextWriter stripSemicolon() {
         return this;
     }
 
@@ -184,5 +172,22 @@ public class GraphTextWriter {
 
     public GraphTextWriter endBlock() {
         return endBlock("}");
+    }
+    
+    public GraphTextWriter space() {
+        return append(" ");
+    }
+    
+    public GraphTextWriter spaceBeforeCallParenthesies(int argCount) {
+        if (argCount > 0) {
+            if (formatting.spaceBeforeParenthesesMethodCallParentheses) {
+                space();
+            }
+        } else {
+            if (formatting.spaceBeforeParenthesesMethodCallEmptyParentheses) {
+                space();
+            }
+        }
+        return this;
     }
 }

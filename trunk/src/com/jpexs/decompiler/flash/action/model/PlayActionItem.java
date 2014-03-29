@@ -28,7 +28,9 @@ public class PlayActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("play()");
+        writer.append("play");
+        writer.spaceBeforeCallParenthesies(0);
+        return writer.append("()");
     }
 
     public PlayActionItem(GraphSourceItem instruction) {

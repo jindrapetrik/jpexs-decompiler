@@ -51,7 +51,9 @@ public class GetURL2ActionItem extends ActionItem {
             methodStr = ",\"POST\"";
         }
 
-        writer.append("getURL(");
+        writer.append("getURL");
+        writer.spaceBeforeCallParenthesies(2);
+        writer.append("(");
         urlString.toString(writer, localData);
         writer.append(",");
         targetString.toString(writer, localData);

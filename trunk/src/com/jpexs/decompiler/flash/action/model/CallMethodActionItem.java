@@ -75,6 +75,7 @@ public class CallMethodActionItem extends ActionItem {
         } else {
             scriptObject.toString(writer, localData);
         }
+        writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
 
         for (int t = 0; t < arguments.size(); t++) {

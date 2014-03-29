@@ -51,7 +51,9 @@ public class MBStringExtractActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("mbsubstring(");
+        writer.append("mbsubstring");
+        writer.spaceBeforeCallParenthesies(3);
+        writer.append("(");
         value.toString(writer, localData);
         writer.append(",");
         index.toString(writer, localData);

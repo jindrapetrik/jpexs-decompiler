@@ -53,7 +53,9 @@ public class PrintActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("print(");
+        writer.append("print");
+        writer.spaceBeforeCallParenthesies(2);
+        writer.append("(");
         target.toString(writer, localData);
         writer.append(",");
         boundingBox.toString(writer, localData);

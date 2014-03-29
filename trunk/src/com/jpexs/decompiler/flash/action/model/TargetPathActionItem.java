@@ -35,7 +35,9 @@ public class TargetPathActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("targetPath(");
+        writer.append("targetPath");
+        writer.spaceBeforeCallParenthesies(1);
+        writer.append("(");
         value.toString(writer, localData);
         return writer.append(")");
     }

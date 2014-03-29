@@ -83,7 +83,6 @@ public class ForItem extends LoopItem implements Block {
                 writer.append(",");
             }
             firstCommands.get(i).toString(writer, localData);
-            writer.stripSemicolon();
             p++;
         }
         writer.append(";");
@@ -98,7 +97,6 @@ public class ForItem extends LoopItem implements Block {
                 writer.append(",");
             }
             finalCommands.get(i).toString(writer, localData);
-            writer.stripSemicolon();
             p++;
         }
         writer.append(")").startBlock();

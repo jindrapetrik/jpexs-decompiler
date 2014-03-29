@@ -223,17 +223,6 @@ public class HilightedTextWriter extends GraphTextWriter {
     }
 
     @Override
-    public HilightedTextWriter stripSemicolon() {
-        // hack
-        if (sb.charAt(sb.length() - 1) == ';') {
-            // todo: remove later
-            // probably this code branch is not executed anymore
-            sb.append("TODO_REMOVE_SEMICOLON");
-        }
-        return this;
-    }
-
-    @Override
     public int getLength() {
         return sb.length();
     }

@@ -37,7 +37,9 @@ public class GetVersionActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("getVersion()");
+        writer.append("getVersion");
+        writer.spaceBeforeCallParenthesies(0);
+        return writer.append("()");
     }
 
     @Override

@@ -85,6 +85,7 @@ public class FunctionActionItem extends ActionItem {
             writer.append(" ");
             writer.append(functionName);
         }
+        writer.spaceBeforeCallParenthesies(paramNames.size());
         writer.append("(");
 
         for (int p = 0; p < paramNames.size(); p++) {

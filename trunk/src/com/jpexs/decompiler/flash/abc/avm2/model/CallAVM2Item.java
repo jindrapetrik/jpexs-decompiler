@@ -52,6 +52,7 @@ public class CallAVM2Item extends AVM2Item {
         } else {
             function.toString(writer, localData);
         }
+        writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
