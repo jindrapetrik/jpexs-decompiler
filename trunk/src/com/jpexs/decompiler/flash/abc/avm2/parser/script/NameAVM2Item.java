@@ -36,10 +36,10 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class NameAVM2Item extends AVM2Item {
+public class NameAVM2Item extends AssignableAVM2Item {
 
     private String variableName;
-    private GraphTargetItem storeValue;
+    
     private boolean definition;
     private GraphTargetItem index;
     private int nsKind = -1;
@@ -92,8 +92,8 @@ public class NameAVM2Item extends AVM2Item {
         return nsKind;
     }
 
-    public void setStoreValue(GraphTargetItem storeValue) {
-        this.storeValue = storeValue;
+    public void setAssignedValue(GraphTargetItem storeValue) {
+        this.assignedValue = storeValue;
     }
 
     public String getVariableName() {
@@ -101,9 +101,9 @@ public class NameAVM2Item extends AVM2Item {
     }
 
     public NameAVM2Item(GraphTargetItem type, int line, String variableName, GraphTargetItem storeValue, boolean definition, List<String> openedNamespaces, List<Integer> openedNamespacesKind) {
-        super(null, PRECEDENCE_PRIMARY);
+        super(storeValue);
         this.variableName = variableName;
-        this.storeValue = storeValue;
+        this.assignedValue = storeValue;
         this.definition = definition;
         this.line = line;
         this.type = type;
@@ -114,7 +114,7 @@ public class NameAVM2Item extends AVM2Item {
     }
 
     public GraphTargetItem getStoreValue() {
-        return storeValue;
+        return assignedValue;
     }
 
     @Override
@@ -127,13 +127,19 @@ public class NameAVM2Item extends AVM2Item {
         if (regNumber == -1) {
             throw new RuntimeException("No register set for " + variableName);
         }
-        if (definition && storeValue == null) {
+        if (definition && assignedValue == null) {
             return new ArrayList<>();
         }
-        if (storeValue == null) {
+        AVM2SourceGenerator g=(AVM2SourceGenerator)generator;
+        
+        if(index!=null){
+            //g.abc.constants.getmu
+        }
+        
+        if (assignedValue == null) {
             return toSourceMerge(localData, generator, new LocalRegAVM2Item(null, regNumber, null));
         } else {
-            return toSourceMerge(localData, generator, new SetLocalAVM2Item(null, regNumber, new CoerceAVM2Item(null, storeValue, type.toString())));
+            return toSourceMerge(localData, generator, new SetLocalAVM2Item(null, regNumber, new CoerceAVM2Item(null, assignedValue, type.toString())));
         }
 
     }
@@ -143,14 +149,14 @@ public class NameAVM2Item extends AVM2Item {
         if (regNumber == -1) {
             throw new RuntimeException("No register set for " + variableName);
         }
-        if (definition && storeValue == null) {
+        if (definition && assignedValue == null) {
             return new ArrayList<>();
         }
-        if (storeValue == null) {
+        if (assignedValue == null) {
             return toSourceMerge(localData, generator, new LocalRegAVM2Item(null, regNumber, null),
                     new AVM2Instruction(0, new PopIns(), new int[]{}, new byte[0]));
         } else {
-            return toSourceMerge(localData, generator, new SetLocalAVM2Item(null, regNumber, new CoerceAVM2Item(null, storeValue, type.toString())).toSourceIgnoreReturnValue(localData, generator));
+            return toSourceMerge(localData, generator, new SetLocalAVM2Item(null, regNumber, new CoerceAVM2Item(null, assignedValue, type.toString())).toSourceIgnoreReturnValue(localData, generator));
         }
     }
 
@@ -181,6 +187,16 @@ public class NameAVM2Item extends AVM2Item {
             return TypeItem.UNBOUNDED;
         }
         return type;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourcePreChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> change) {
+        return null;//TODO
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourcePostChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> change) {
+        return null;//TODO
     }
 
 }

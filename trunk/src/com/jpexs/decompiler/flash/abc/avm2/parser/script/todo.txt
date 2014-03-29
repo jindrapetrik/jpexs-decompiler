@@ -11,3 +11,4 @@ TODO List for AS3 parser/compiler:
 - with
 - delete property
 - default xml namespace
+- method body correct code stats

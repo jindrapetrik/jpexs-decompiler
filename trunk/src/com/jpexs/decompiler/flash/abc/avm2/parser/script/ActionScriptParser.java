@@ -344,8 +344,8 @@ public class ActionScriptParser {
             }
         }
 
-        if (k == -1) {            
-            throw new ParseException("Cannot find variable or type:" + Helper.joinStrings(parts,"."), lexer.yyline());
+        if (k == -1) {
+            throw new ParseException("Cannot find variable or type:" + Helper.joinStrings(parts, "."), lexer.yyline());
         }
         GraphTargetItem ret = new TypeItem("".equals(pkg) ? name : pkg + "." + name);
         for (int i = 1; i < parts.size(); i++) {
@@ -409,32 +409,32 @@ public class ActionScriptParser {
 
     private MethodAVM2Item method(boolean override, boolean isFinal, GraphTargetItem thisType, List<String> openedNamespaces, List<Integer> openedNamespacesKinds, boolean isStatic, int namespaceKind, boolean withBody, String functionName, boolean isMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
         FunctionAVM2Item f = function(thisType, openedNamespaces, openedNamespacesKinds, withBody, functionName, isMethod, variables);
-        return new MethodAVM2Item(f.hasRest,f.line,override, isFinal, isStatic, namespaceKind, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
+        return new MethodAVM2Item(f.hasRest, f.line, override, isFinal, isStatic, namespaceKind, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
     }
 
     private FunctionAVM2Item function(GraphTargetItem thisType, List<String> openedNamespaces, List<Integer> openedNamespacesKinds, boolean withBody, String functionName, boolean isMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
-        int line=lexer.yyline();
+        int line = lexer.yyline();
         ParsedSymbol s;
         expectedType(SymbolType.PARENT_OPEN);
         s = lex();
         List<String> paramNames = new ArrayList<>();
         List<GraphTargetItem> paramTypes = new ArrayList<>();
         List<GraphTargetItem> paramValues = new ArrayList<>();
-        boolean hasRest = false;        
+        boolean hasRest = false;
         while (s.type != SymbolType.PARENT_CLOSE) {
             if (s.type != SymbolType.COMMA) {
                 lexer.pushback(s);
-            }            
-            s = lex();            
-            if(s.type == SymbolType.REST){
+            }
+            s = lex();
+            if (s.type == SymbolType.REST) {
                 hasRest = true;
                 s = lex();
             }
             expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
-            
+
             paramNames.add(s.value.toString());
             s = lex();
-            if(!hasRest){
+            if (!hasRest) {
                 if (s.type == SymbolType.COLON) {
                     paramTypes.add(type(openedNamespaces, openedNamespacesKinds, variables));
                     s = lex();
@@ -449,12 +449,11 @@ public class ActionScriptParser {
                     }
                 }
             }
-            
 
             if (!s.isType(SymbolType.COMMA, SymbolType.PARENT_CLOSE)) {
                 expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
             }
-            if(hasRest){
+            if (hasRest) {
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE);
             }
         }
@@ -484,7 +483,7 @@ public class ActionScriptParser {
         for (int i = 0; i < parCnt; i++) {
             subvariables.remove(0);
         }
-        return new FunctionAVM2Item(hasRest,line,functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+        return new FunctionAVM2Item(hasRest, line, functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }
 
     private GraphTargetItem traits(List<String> openedNamespaces, List<Integer> openedNamespacesKinds, String packageName, String classNameStr, boolean isInterface, List<GraphTargetItem> traits) throws ParseException, IOException {
@@ -511,7 +510,7 @@ public class ActionScriptParser {
                     }
                     isFinal = true;
                 }
-                if(s.type == SymbolType.DYNAMIC){
+                if (s.type == SymbolType.DYNAMIC) {
                     if (isDynamic) {
                         throw new ParseException("Only one dynamic keyword allowed", lexer.yyline());
                     }
@@ -586,7 +585,7 @@ public class ActionScriptParser {
                         } while (s.type == SymbolType.COMMA);
                     }
                     expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
-                    traits.add((classTraits(isDynamic,isFinal,openedNamespaces, openedNamespacesKinds, packageName, nsKind, false, classTypeStr, extendsTypeStr, implementsTypeStrs, variables)));
+                    traits.add((classTraits(isDynamic, isFinal, openedNamespaces, openedNamespacesKinds, packageName, nsKind, false, classTypeStr, extendsTypeStr, implementsTypeStrs, variables)));
                     expectedType(SymbolType.CURLY_CLOSE);
                     break;
                 case INTERFACE:
@@ -599,7 +598,7 @@ public class ActionScriptParser {
                     if (isFinal) {
                         throw new ParseException("Final flag not allowed for interfaces", lexer.yyline());
                     }
-                    if(isDynamic){
+                    if (isDynamic) {
                         throw new ParseException("Dynamic flag not allowed for interfaces", lexer.yyline());
                     }
                     //GraphTargetItem interfaceTypeStr = type(openedNamespaces, openedNamespacesKinds, variables);
@@ -617,20 +616,20 @@ public class ActionScriptParser {
                         } while (s.type == SymbolType.COMMA);
                     }
                     expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
-                    traits.add((classTraits(false,isFinal,openedNamespaces, openedNamespacesKinds, packageName, nsKind, true, intTypeStr, null, intExtendsTypeStrs, variables)));
+                    traits.add((classTraits(false, isFinal, openedNamespaces, openedNamespacesKinds, packageName, nsKind, true, intTypeStr, null, intExtendsTypeStrs, variables)));
                     expectedType(SymbolType.CURLY_CLOSE);
                     break;
 
                 case FUNCTION:
-                    
-                    if(isDynamic){
+
+                    if (isDynamic) {
                         throw new ParseException("Dynamic flag not allowed for methods", lexer.yyline());
                     }
                     s = lex();
                     if (s.type == SymbolType.GET) {
                         if (classNameStr == null) {
                             throw new ParseException("No get keyword allowed here", lexer.yyline());
-                        }                        
+                        }
                         isGetter = true;
                         s = lex();
                     } else if (s.type == SymbolType.SET) {
@@ -669,16 +668,16 @@ public class ActionScriptParser {
                             MethodAVM2Item ft = method(isOverride, isFinal, thisType, openedNamespaces, openedNamespacesKinds, isStatic, nsKind, !isInterface, fname, true, variables);
                             GraphTargetItem t;
                             if (isGetter) {
-                                if(!ft.paramTypes.isEmpty()){
+                                if (!ft.paramTypes.isEmpty()) {
                                     throw new ParseException("Getter can't have any parameters", lexer.yyline());
                                 }
-                                GetterAVM2Item g = new GetterAVM2Item(ft.hasRest,ft.line,ft.isOverride(), ft.isFinal(), isStatic, ft.namespaceKind, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                GetterAVM2Item g = new GetterAVM2Item(ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespaceKind, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = g;
                             } else if (isSetter) {
-                                if(ft.paramTypes.size()!=1){
+                                if (ft.paramTypes.size() != 1) {
                                     throw new ParseException("Getter must have exactly one parameter", lexer.yyline());
                                 }
-                                SetterAVM2Item st = new SetterAVM2Item(ft.hasRest, ft.line,ft.isOverride(), ft.isFinal(), isStatic, ft.namespaceKind, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                SetterAVM2Item st = new SetterAVM2Item(ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespaceKind, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = st;
                             } else {
                                 t = ft;
@@ -699,8 +698,8 @@ public class ActionScriptParser {
                     if (isFinal) {
                         throw new ParseException("Final flag not allowed for " + (isConst ? "consts" : "vars"), lexer.yyline());
                     }
-                    if(isDynamic){
-                        throw new ParseException("Dynamic flag not allowed for "+(isConst ? "consts":"vars"), lexer.yyline());
+                    if (isDynamic) {
+                        throw new ParseException("Dynamic flag not allowed for " + (isConst ? "consts" : "vars"), lexer.yyline());
                     }
 
                     s = lex();
@@ -735,7 +734,7 @@ public class ActionScriptParser {
         return constr;
     }
 
-    private GraphTargetItem classTraits(boolean isDynamic,boolean isFinal,List<String> openedNamespaces, List<Integer> openedNamespacesKinds, String packageName, int namespaceKind, boolean isInterface, String nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private GraphTargetItem classTraits(boolean isDynamic, boolean isFinal, List<String> openedNamespaces, List<Integer> openedNamespacesKinds, String packageName, int namespaceKind, boolean isInterface, String nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<NameAVM2Item> variables) throws IOException, ParseException {
 
         GraphTargetItem ret = null;
 
@@ -781,9 +780,9 @@ public class ActionScriptParser {
         GraphTargetItem constr = traits(openedNamespaces, openedNamespacesKinds, packageName, classNameStr, isInterface, traits);
 
         if (isInterface) {
-            return new InterfaceAVM2Item(isFinal,namespaceKind, classNameStr, implementsStr, traits);
+            return new InterfaceAVM2Item(isFinal, namespaceKind, classNameStr, implementsStr, traits);
         } else {
-            return new ClassAVM2Item(isDynamic,isFinal,namespaceKind, classNameStr, extendsStr, implementsStr, constr, traits);
+            return new ClassAVM2Item(isDynamic, isFinal, namespaceKind, classNameStr, extendsStr, implementsStr, constr, traits);
         }
     }
 
@@ -1407,15 +1406,16 @@ public class ActionScriptParser {
                         assigned = new BitXorAVM2Item(null, expr, assigned);
                         break;
                 }
-                if (expr instanceof NameAVM2Item) {
-                    ((NameAVM2Item) expr).setStoreValue(assigned);
-                    ((NameAVM2Item) expr).setDefinition(false);
-                    ret = expr;
-                } else if (expr instanceof PropertyAVM2Item) {
-                    ((PropertyAVM2Item) expr).setStoreValue(assigned);
-                } else {
+
+                if (!(expr instanceof AssignableAVM2Item)) {
                     throw new ParseException("Invalid assignment", lexer.yyline());
                 }
+                ((AssignableAVM2Item) expr).setAssignedValue(assigned);
+                if (expr instanceof NameAVM2Item) {
+                    ((NameAVM2Item) expr).setDefinition(false);
+                    ret = expr;
+                }
+                ret = expr;
                 break;
             case INCREMENT: //postincrement
                 if (!(expr instanceof NameAVM2Item) && !(expr instanceof GetPropertyAVM2Item)) {
@@ -1797,7 +1797,7 @@ public class ActionScriptParser {
     }
 
     public static void main(String[] args) {
-        if(args.length<2){
+        if (args.length < 2) {
             return;
         }
         Main.initLogging(false);

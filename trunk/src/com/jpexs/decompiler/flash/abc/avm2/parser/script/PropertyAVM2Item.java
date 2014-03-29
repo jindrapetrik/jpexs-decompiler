@@ -52,29 +52,23 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class PropertyAVM2Item extends AVM2Item {
+public class PropertyAVM2Item extends AssignableAVM2Item {
 
     public String propertyName;
     public GraphTargetItem object;
     public List<ABC> abcs;
     public GraphTargetItem index;
-    private GraphTargetItem storeValue;
     private List<String> openedNamespaces;
     private List<Integer> openedNamespacesKind;
 
-    public PropertyAVM2Item(GraphTargetItem object, String propertyName, GraphTargetItem index, List<ABC> abcs, List<String> openedNamespaces, List<Integer> openedNamespacesKind) {
-        super(null, PRECEDENCE_PRIMARY);
+    public PropertyAVM2Item(GraphTargetItem object, String propertyName, GraphTargetItem index, List<ABC> abcs, List<String> openedNamespaces, List<Integer> openedNamespacesKind) {        
         this.propertyName = propertyName;
         this.object = object;
         this.abcs = abcs;
         this.index = index;
         this.openedNamespaces = openedNamespaces;
         this.openedNamespacesKind = openedNamespacesKind;
-    }
-
-    public void setStoreValue(GraphTargetItem storeValue) {
-        this.storeValue = storeValue;
-    }
+    }    
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
@@ -268,13 +262,13 @@ public class PropertyAVM2Item extends AVM2Item {
         if (obj == null) {
             obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propertyId}, new byte[0]);
         }
-        if (storeValue != null) {
+        if (assignedValue != null) {
             int temp_reg = g.getFreeRegister(localData);
             String targetType = resolvePropertyType().toString();
-            String srcType = storeValue.returnType().toString();
-            GraphTargetItem st=storeValue;
+            String srcType = assignedValue.returnType().toString();
+            GraphTargetItem st=assignedValue;
             if(!targetType.equals(srcType)){
-                st = new CoerceAVM2Item(null, storeValue, targetType);
+                st = new CoerceAVM2Item(null, assignedValue, targetType);
             }
             List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, index,st ,
                     new AVM2Instruction(0, new DupIns(), new int[]{}, new byte[0]),
@@ -301,12 +295,12 @@ public class PropertyAVM2Item extends AVM2Item {
         if (obj == null) {
             obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propertyId}, new byte[0]);
         }
-        if (storeValue != null) {
+        if (assignedValue != null) {
             String targetType = resolvePropertyType().toString();
-            String srcType = storeValue.returnType().toString();
-            GraphTargetItem st=storeValue;
+            String srcType = assignedValue.returnType().toString();
+            GraphTargetItem st=assignedValue;
             if(!targetType.equals(srcType)){
-                st = new CoerceAVM2Item(null, storeValue, targetType);
+                st = new CoerceAVM2Item(null, assignedValue, targetType);
             }
             return toSourceMerge(localData, generator, obj, index, st,
                     new AVM2Instruction(0, new SetPropertyIns(), new int[]{propertyId}, new byte[0])
@@ -322,6 +316,16 @@ public class PropertyAVM2Item extends AVM2Item {
     @Override
     public boolean hasReturnValue() {
         return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourcePreChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> change) {
+        return null; //TODO
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourcePostChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> change) {
+        return null; //TODO
     }
 
 }
