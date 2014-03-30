@@ -46,7 +46,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         return ret;
     }
 
-    public ClassAVM2Item(boolean isDynamic,boolean isFinal, int namespaceKind, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> traits) {
+    public ClassAVM2Item(boolean isDynamic, boolean isFinal, int namespaceKind, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.className = className;
         this.traits = traits;
@@ -83,6 +83,5 @@ public class ClassAVM2Item extends AVM2Item implements Block {
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem(); //FIXME
     }
-    
-    
+
 }

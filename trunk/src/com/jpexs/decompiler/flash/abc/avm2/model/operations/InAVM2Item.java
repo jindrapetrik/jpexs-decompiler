@@ -31,14 +31,14 @@ public class InAVM2Item extends BinaryOpItem {
     public InAVM2Item(AVM2Instruction instruction, GraphTargetItem name, GraphTargetItem object) {
         super(instruction, PRECEDENCE_RELATIONAL, name, object, "in");
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, leftSide, rightSide, 
+        return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new InIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("Boolean");

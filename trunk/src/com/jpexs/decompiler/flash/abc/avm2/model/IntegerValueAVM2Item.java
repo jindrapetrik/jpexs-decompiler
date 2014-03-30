@@ -63,17 +63,17 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item {
         } else if (value >= 0 && value <= 65535) {
             ins = new AVM2Instruction(0, new PushShortIns(), new int[]{(int) (long) value}, new byte[0]);
         } else {
-            ins = new AVM2Instruction(0, new PushIntIns(), new int[]{((AVM2SourceGenerator)generator).abc.constants.getIntId(value, true)}, new byte[0]);
+            ins = new AVM2Instruction(0, new PushIntIns(), new int[]{((AVM2SourceGenerator) generator).abc.constants.getIntId(value, true)}, new byte[0]);
         }
 
         return toSourceMerge(localData, generator, ins);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

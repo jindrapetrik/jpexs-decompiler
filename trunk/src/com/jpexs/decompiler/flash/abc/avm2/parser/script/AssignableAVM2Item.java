@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -29,25 +28,25 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public abstract class AssignableAVM2Item extends AVM2Item{
+public abstract class AssignableAVM2Item extends AVM2Item {
 
     protected GraphTargetItem assignedValue;
-    
+
     public AssignableAVM2Item() {
         this(null);
     }
-    
+
     public AssignableAVM2Item(GraphTargetItem storeValue) {
         super(null, PRECEDENCE_PRIMARY);
         this.assignedValue = storeValue;
     }
-    public abstract List<GraphSourceItem> toSourcePreChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> change);
-    public abstract List<GraphSourceItem> toSourcePostChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> change);
 
-    public GraphTargetItem getAssignedValue(){
+    public abstract List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> pre, List<GraphSourceItem> post, boolean needsReturn);
+
+    public GraphTargetItem getAssignedValue() {
         return assignedValue;
     }
-    
+
     public void setAssignedValue(GraphTargetItem storeValue) {
         this.assignedValue = storeValue;
     }

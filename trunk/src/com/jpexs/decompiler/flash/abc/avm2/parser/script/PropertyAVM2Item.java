@@ -61,14 +61,14 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     private List<String> openedNamespaces;
     private List<Integer> openedNamespacesKind;
 
-    public PropertyAVM2Item(GraphTargetItem object, String propertyName, GraphTargetItem index, List<ABC> abcs, List<String> openedNamespaces, List<Integer> openedNamespacesKind) {        
+    public PropertyAVM2Item(GraphTargetItem object, String propertyName, GraphTargetItem index, List<ABC> abcs, List<String> openedNamespaces, List<Integer> openedNamespacesKind) {
         this.propertyName = propertyName;
         this.object = object;
         this.abcs = abcs;
         this.index = index;
         this.openedNamespaces = openedNamespaces;
         this.openedNamespacesKind = openedNamespacesKind;
-    }    
+    }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
@@ -167,7 +167,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                     abcs.get(0).constants.getStringId(propertyName, true), 0,
                     allNsSet(), 0, new ArrayList<Integer>()), true);
         }
-        
+
         String objType = resolveObjectType();
         for (ABC a : abcs) {
             int ci = a.findClassByName(objType);
@@ -193,12 +193,12 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 break;
             }
         }
-        
+
         for (ABC a : abcs) {
-            for(ScriptInfo si:a.script_info){
+            for (ScriptInfo si : a.script_info) {
                 for (Trait t : si.traits.traits) {
                     Multiname tname = t.getName(a);
-                    String tnames = t.getName(a).getName(a.constants, new ArrayList<String>());                    
+                    String tnames = t.getName(a).getName(a.constants, new ArrayList<String>());
                     if (tnames.equals(propertyName)) {
                         return abcs.get(0).constants.getMultinameId(new Multiname(tname.kind,
                                 abcs.get(0).constants.getStringId(tnames, true),
@@ -207,7 +207,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 }
             }
         }
-        
+
         return abcs.get(0).constants.getMultinameId(new Multiname(Multiname.MULTINAME,
                 abcs.get(0).constants.getStringId(propertyName, true), 0,
                 allNsSet(), 0, new ArrayList<Integer>()), true);
@@ -253,64 +253,67 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return TypeItem.UNBOUNDED;
     }
 
-    @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) {
 
         int propertyId = resolveProperty();
         Object obj = object;
         if (obj == null) {
-            obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propertyId}, new byte[0]);
+
+            String cname;
+            String pkgName = "";
+            cname = localData.currentClass;
+            if (cname.contains(".")) {
+                pkgName = cname.substring(0, cname.lastIndexOf("."));
+                cname = cname.substring(cname.lastIndexOf(".") + 1);
+            }
+            Reference<String> outName = new Reference<>("");
+            Reference<String> outNs = new Reference<>("");
+            Reference<String> outPropNs = new Reference<>("");
+            Reference<Integer> outPropNsKind = new Reference<>(1);
+            if (AVM2SourceGenerator.searchProperty(abcs, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind)) {
+                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0/*?*/, "this", null, false, openedNamespaces, openedNamespacesKind);
+                nobj.setRegNumber(0);
+                obj = nobj;
+            } else {
+                obj = ins(new FindPropertyStrictIns(), propertyId);
+            }
         }
         if (assignedValue != null) {
-            int temp_reg = g.getFreeRegister(localData);
+            int temp_reg = getFreeRegister(localData, generator);
             String targetType = resolvePropertyType().toString();
             String srcType = assignedValue.returnType().toString();
-            GraphTargetItem st=assignedValue;
-            if(!targetType.equals(srcType)){
+            GraphTargetItem st = assignedValue;
+            if (!targetType.equals(srcType)) {
                 st = new CoerceAVM2Item(null, assignedValue, targetType);
             }
-            List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, index,st ,
-                    new AVM2Instruction(0, new DupIns(), new int[]{}, new byte[0]),
-                    new AVM2Instruction(0, new SetLocalIns(), new int[]{temp_reg}, new byte[0]),
-                    new AVM2Instruction(0, new SetPropertyIns(), new int[]{propertyId}, new byte[0]),
-                    new AVM2Instruction(0, new GetLocalIns(), new int[]{temp_reg}, new byte[0]),
-                    new AVM2Instruction(0, new KillIns(), new int[]{temp_reg}, new byte[0])
-            );
-            g.killRegister(localData, temp_reg);
+            List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, index, st);
+            if (needsReturn) {
+                ret.add(ins(new DupIns()));
+                ret.add(ins(new SetLocalIns(), temp_reg));
+            }
+            ret.add(ins(new SetPropertyIns(), propertyId));
+            if (needsReturn) {
+                ret.add(ins(new GetLocalIns(), temp_reg));
+                ret.add(ins(new KillIns(), temp_reg));
+                killRegister(localData, generator, temp_reg);
+            }
             return ret;
         } else {
             return toSourceMerge(localData, generator, obj, index,
-                    new AVM2Instruction(0, new GetPropertyIns(), new int[]{propertyId}, new byte[0])
+                    ins(new GetPropertyIns(), propertyId),
+                    needsReturn ? null : ins(new PopIns())
             );
         }
     }
 
     @Override
-    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSource(localData, generator, true);
+    }
 
-        int propertyId = resolveProperty();
-        Object obj = object;
-        if (obj == null) {
-            obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propertyId}, new byte[0]);
-        }
-        if (assignedValue != null) {
-            String targetType = resolvePropertyType().toString();
-            String srcType = assignedValue.returnType().toString();
-            GraphTargetItem st=assignedValue;
-            if(!targetType.equals(srcType)){
-                st = new CoerceAVM2Item(null, assignedValue, targetType);
-            }
-            return toSourceMerge(localData, generator, obj, index, st,
-                    new AVM2Instruction(0, new SetPropertyIns(), new int[]{propertyId}, new byte[0])
-            );
-        } else {
-            return toSourceMerge(localData, generator, obj, index,
-                    new AVM2Instruction(0, new GetPropertyIns(), new int[]{propertyId}, new byte[0]),
-                    new AVM2Instruction(0, new PopIns(), new int[]{}, new byte[0])
-            );
-        }
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return toSource(localData, generator, false);
     }
 
     @Override
@@ -319,13 +322,36 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     }
 
     @Override
-    public List<GraphSourceItem> toSourcePreChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> change) {
-        return null; //TODO
-    }
+    public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> pre, List<GraphSourceItem> post, boolean needsReturn) {
+        int propertyId = resolveProperty();
+        Object obj = object;
+        if (obj == null) {
+            obj = ins(new FindPropertyStrictIns(), propertyId);
+        }
 
-    @Override
-    public List<GraphSourceItem> toSourcePostChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> change) {
-        return null; //TODO
+        int temp_reg = getFreeRegister(localData, generator);
+
+        List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, index,
+                //Start get original
+                obj,
+                index,
+                ins(new GetPropertyIns(), propertyId),
+                //End get original
+                pre
+        );
+        if (needsReturn) {
+            ret.add(ins(new DupIns()));
+            ret.add(ins(new SetLocalIns(), temp_reg));
+        }
+        ret.addAll(post);
+        ret.add(ins(new SetPropertyIns(), propertyId));
+        if (needsReturn) {
+            ret.add(ins(new GetLocalIns(), temp_reg));
+            ret.add(ins(new KillIns(), temp_reg));
+            killRegister(localData, generator, temp_reg);
+        }
+        return ret;
+
     }
 
 }

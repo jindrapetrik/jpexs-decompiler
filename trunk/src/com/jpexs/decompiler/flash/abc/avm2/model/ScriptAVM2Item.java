@@ -38,12 +38,12 @@ public class ScriptAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("script" + scriptIndex);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return false;

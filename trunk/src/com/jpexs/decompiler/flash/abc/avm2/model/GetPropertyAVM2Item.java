@@ -43,19 +43,19 @@ public class GetPropertyAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return formatProperty(writer, object, propertyName, localData);
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, object,  
-                new AVM2Instruction(0, new GetPropertyIns(), new int[]{((AVM2SourceGenerator)generator).propertyName(propertyName)}, new byte[0])
+        return toSourceMerge(localData, generator, object,
+                new AVM2Instruction(0, new GetPropertyIns(), new int[]{((AVM2SourceGenerator) generator).propertyName(propertyName)}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

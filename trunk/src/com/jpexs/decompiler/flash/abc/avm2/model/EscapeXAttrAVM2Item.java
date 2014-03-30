@@ -39,12 +39,12 @@ public class EscapeXAttrAVM2Item extends AVM2Item {
         value.toString(writer, localData);
         return writer.append("}");
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

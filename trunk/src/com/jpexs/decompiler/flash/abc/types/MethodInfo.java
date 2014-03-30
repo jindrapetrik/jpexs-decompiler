@@ -31,14 +31,14 @@ public class MethodInfo {
     public int name_index; //0=no name
     // 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional 16=ignore_rest, 32=explicit, 64=setsdxns, 128=has_paramnames
     public static int FLAG_NEED_ARGUMENTS = 1;
-    public static int FLAG_NEED_ACTIVATION = 2; 
+    public static int FLAG_NEED_ACTIVATION = 2;
     public static int FLAG_NEED_REST = 4;
     public static int FLAG_HAS_OPTIONAL = 8;
     public static int FLAG_IGNORE_REST = 16;
     public static int FLAG_EXPLICIT = 32;
     public static int FLAG_SETSDXNS = 64;
     public static int FLAG_HAS_PARAMNAMES = 128;
-    
+
     public int flags;
     public ValueKind[] optional;
     public int[] paramNames;

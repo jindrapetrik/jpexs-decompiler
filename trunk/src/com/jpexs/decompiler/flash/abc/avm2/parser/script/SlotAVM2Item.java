@@ -53,12 +53,12 @@ public class SlotAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return writer; //TODO
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return type;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

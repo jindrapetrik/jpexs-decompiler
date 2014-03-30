@@ -46,14 +46,14 @@ public class StrictEqAVM2Item extends BinaryOpItem implements LogicalOpItem {
     public GraphTargetItem invert() {
         return new StrictNeqAVM2Item(src, leftSide, rightSide);
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, leftSide, rightSide, 
+        return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new StrictEqualsIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("Boolean");

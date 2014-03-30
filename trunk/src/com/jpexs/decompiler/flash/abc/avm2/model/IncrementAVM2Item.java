@@ -50,12 +50,12 @@ public class IncrementAVM2Item extends AVM2Item {
     public Object getResult() {
         return EcmaScript.toNumber(value.getResult()) + 1;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

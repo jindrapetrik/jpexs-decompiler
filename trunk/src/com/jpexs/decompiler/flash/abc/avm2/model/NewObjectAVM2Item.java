@@ -65,12 +65,12 @@ public class NewObjectAVM2Item extends AVM2Item {
         }
         return writer;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("Object");
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;
@@ -78,15 +78,14 @@ public class NewObjectAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        List<GraphTargetItem> args=new ArrayList<>();
-        for(NameValuePair p:pairs){
+        List<GraphTargetItem> args = new ArrayList<>();
+        for (NameValuePair p : pairs) {
             args.add(p.name);
             args.add(p.value);
         }
         return toSourceMerge(localData, generator, args,
                 new AVM2Instruction(0, new NewObjectIns(), new int[]{pairs.size()}, new byte[0])
-                );
+        );
     }
-    
-    
+
 }

@@ -47,12 +47,12 @@ public class XMLAVM2Item extends AVM2Item {
         }
         return writer;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("XML");
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

@@ -43,12 +43,12 @@ public class HasNextAVM2Item extends AVM2Item {
         writer.append(" hasNext ");
         return object.toString(writer, localData);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

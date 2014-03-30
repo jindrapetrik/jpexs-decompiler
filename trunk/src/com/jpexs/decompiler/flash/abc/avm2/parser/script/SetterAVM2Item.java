@@ -25,8 +25,8 @@ import java.util.List;
  */
 public class SetterAVM2Item extends MethodAVM2Item {
 
-    public SetterAVM2Item(boolean hasRest,int line, boolean override, boolean isFinal, boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
-        super(hasRest,line, override, isFinal, isStatic, namespaceKind, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+    public SetterAVM2Item(boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
+        super(hasRest, line, override, isFinal, isStatic, namespaceKind, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }
 
 }

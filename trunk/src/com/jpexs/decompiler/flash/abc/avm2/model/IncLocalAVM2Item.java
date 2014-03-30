@@ -36,12 +36,12 @@ public class IncLocalAVM2Item extends AVM2Item {
         writer.append(localRegName(localData.localRegNames, regIndex));
         return writer.append("++");
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return false;

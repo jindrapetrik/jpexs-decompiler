@@ -79,12 +79,12 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.append("}");
         return writer;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("Function");
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

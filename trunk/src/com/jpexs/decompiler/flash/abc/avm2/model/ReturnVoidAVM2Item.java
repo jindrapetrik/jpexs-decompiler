@@ -38,18 +38,18 @@ public class ReturnVoidAVM2Item extends AVM2Item implements ExitItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append("return");
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return toSourceMerge(localData, generator, new AVM2Instruction(0, new ReturnVoidIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return false;

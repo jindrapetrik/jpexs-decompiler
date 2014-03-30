@@ -69,18 +69,19 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     public boolean hasSideEffect() {
         return true;
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, object, value,  
-                new AVM2Instruction(0, new SetPropertyIns(), new int[]{((AVM2SourceGenerator)generator).propertyName(propertyName)}, new byte[0])
+        return toSourceMerge(localData, generator, object, value,
+                new AVM2Instruction(0, new SetPropertyIns(), new int[]{((AVM2SourceGenerator) generator).propertyName(propertyName)}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
+    }
+
     @Override
     public boolean hasReturnValue() {
         return false;

@@ -35,12 +35,12 @@ public class ThrowAVM2Item extends AVM2Item {
         writer.append("throw ");
         return value.toString(writer, localData);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return false;

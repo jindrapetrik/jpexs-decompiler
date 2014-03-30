@@ -48,20 +48,19 @@ public class DeletePropertyAVM2Item extends AVM2Item {
         propertyName.toString(writer, localData);
         return writer.append("]");
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, object, 
-                new AVM2Instruction(0, new DeletePropertyIns(), new int[]{((AVM2SourceGenerator)generator).propertyName(propertyName)}, new byte[0])
+        return toSourceMerge(localData, generator, object,
+                new AVM2Instruction(0, new DeletePropertyIns(), new int[]{((AVM2SourceGenerator) generator).propertyName(propertyName)}, new byte[0])
         );
     }
-    
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("Boolean");
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

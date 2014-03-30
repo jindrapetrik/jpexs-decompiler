@@ -37,14 +37,14 @@ public class RShiftAVM2Item extends BinaryOpItem {
     public Object getResult() {
         return ((long) (double) EcmaScript.toNumber(leftSide.getResult())) >> ((long) (double) EcmaScript.toNumber(rightSide.getResult()));
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, leftSide, rightSide, 
+        return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new RShiftIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem();

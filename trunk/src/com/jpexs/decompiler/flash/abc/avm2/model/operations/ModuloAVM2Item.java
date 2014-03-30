@@ -64,14 +64,14 @@ public class ModuloAVM2Item extends BinaryOpItem {
             return super.appendTo(writer, localData);
         }
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, leftSide, rightSide, 
+        return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new ModuloIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem();

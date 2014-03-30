@@ -35,12 +35,12 @@ public class ClassAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         return writer.append(className.getName(localData.constantsAvm2, localData.fullyQualifiedNames));
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return false;

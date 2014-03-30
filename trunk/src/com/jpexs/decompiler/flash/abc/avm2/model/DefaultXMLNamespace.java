@@ -40,12 +40,12 @@ public class DefaultXMLNamespace extends AVM2Item {
         writer.append("default xml namespace = ");
         return ns.toString(writer, localData);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return false;

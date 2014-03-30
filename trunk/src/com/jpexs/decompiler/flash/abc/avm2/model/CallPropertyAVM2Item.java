@@ -56,20 +56,19 @@ public class CallPropertyAVM2Item extends AVM2Item {
         }
         return writer.append(")");
     }
-    
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, receiver, arguments,                
-                new AVM2Instruction(0, new CallPropertyIns(), new int[]{((AVM2SourceGenerator)generator).propertyName(propertyName),arguments.size()}, new byte[0])                
+        return toSourceMerge(localData, generator, receiver, arguments,
+                new AVM2Instruction(0, new CallPropertyIns(), new int[]{((AVM2SourceGenerator) generator).propertyName(propertyName), arguments.size()}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

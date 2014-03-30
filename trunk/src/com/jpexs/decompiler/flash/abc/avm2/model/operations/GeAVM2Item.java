@@ -50,14 +50,14 @@ public class GeAVM2Item extends BinaryOpItem implements LogicalOpItem {
         }
         return ret;//undefined
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, leftSide, rightSide, 
+        return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new GreaterEqualsIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("Boolean");

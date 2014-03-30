@@ -45,12 +45,12 @@ public class GetSuperAVM2Item extends AVM2Item {
         writer.append("super.");
         return propertyName.toString(writer, localData);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

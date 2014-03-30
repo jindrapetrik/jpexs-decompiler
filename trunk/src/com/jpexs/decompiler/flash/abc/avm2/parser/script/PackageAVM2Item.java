@@ -42,7 +42,7 @@ public class PackageAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return writer;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem(); //FIXME

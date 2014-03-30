@@ -41,19 +41,19 @@ public class ReturnValueAVM2Item extends AVM2Item implements ExitItem {
         writer.append("return ");
         return value.toString(writer, localData);
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, value, 
+        return toSourceMerge(localData, generator, value,
                 new AVM2Instruction(0, new ReturnValueIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return false;

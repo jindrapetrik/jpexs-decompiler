@@ -55,12 +55,12 @@ public class ConstructPropAVM2Item extends AVM2Item {
         }
         return writer.append(")");
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

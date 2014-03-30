@@ -18,7 +18,9 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -96,19 +98,31 @@ public abstract class AVM2Item extends GraphTargetItem {
     }
 
     /*@Override
-    public boolean hasReturnValue() {
-        return false;
-    }*/
-
+     public boolean hasReturnValue() {
+     return false;
+     }*/
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        if(!hasReturnValue()){
+        if (!hasReturnValue()) {
             return toSource(localData, generator);
         }
-        List<GraphSourceItem> ret=toSource(localData, generator);
+        List<GraphSourceItem> ret = toSource(localData, generator);
         ret.add(new AVM2Instruction(0, new PopIns(), new int[]{}, new byte[0]));
         return ret;
     }
-    
-    
+
+    protected AVM2Instruction ins(InstructionDefinition def, int... operands) {
+        return new AVM2Instruction(0, def, operands, new byte[0]);
+    }
+
+    protected int getFreeRegister(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        return g.getFreeRegister(localData);
+    }
+
+    protected void killRegister(SourceGeneratorLocalData localData, SourceGenerator generator, int regNumber) {
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        g.killRegister(localData, regNumber);
+    }
+
 }

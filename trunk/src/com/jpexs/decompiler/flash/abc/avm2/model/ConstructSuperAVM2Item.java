@@ -54,12 +54,12 @@ public class ConstructSuperAVM2Item extends AVM2Item {
         }
         return writer.append(")");
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return false;
@@ -71,6 +71,5 @@ public class ConstructSuperAVM2Item extends AVM2Item {
                 new AVM2Instruction(0, new ConstructSuperIns(), new int[]{args.size()}, new byte[0])
         );
     }
-    
-    
+
 }

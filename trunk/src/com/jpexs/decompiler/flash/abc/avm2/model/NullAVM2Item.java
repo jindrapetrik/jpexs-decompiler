@@ -49,19 +49,19 @@ public class NullAVM2Item extends AVM2Item {
     public Object getResult() {
         return new Null();
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator,  
+        return toSourceMerge(localData, generator,
                 new AVM2Instruction(0, new PushNullIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("null");
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

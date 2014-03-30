@@ -18,10 +18,13 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PreIncrementAVM2Item extends UnaryOpItem {
@@ -34,12 +37,27 @@ public class PreIncrementAVM2Item extends UnaryOpItem {
     public boolean hasSideEffect() {
         return true;
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return super.toSource(localData, generator); //TODO
+        if (value instanceof AssignableAVM2Item) {
+            return ((AssignableAVM2Item) value).toSourceChange(localData, generator, toSourceMerge(localData, generator,
+                    new AVM2Instruction(0, new IncrementIns(), new int[]{}, new byte[0])
+            ), null, true);
+        }
+        return new ArrayList<>(); //?
     }
-    
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        if (value instanceof AssignableAVM2Item) {
+            return ((AssignableAVM2Item) value).toSourceChange(localData, generator, toSourceMerge(localData, generator,
+                    new AVM2Instruction(0, new IncrementIns(), new int[]{}, new byte[0])
+            ), null, false);
+        }
+        return new ArrayList<>(); //?
+    }
+
     @Override
     public GraphTargetItem returnType() {
         return value.returnType();

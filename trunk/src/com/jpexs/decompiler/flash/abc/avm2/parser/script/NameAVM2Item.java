@@ -17,12 +17,34 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal1Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal2Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal3Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal0Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertSIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -39,7 +61,7 @@ import java.util.List;
 public class NameAVM2Item extends AssignableAVM2Item {
 
     private String variableName;
-    
+
     private boolean definition;
     private GraphTargetItem index;
     private int nsKind = -1;
@@ -47,10 +69,13 @@ public class NameAVM2Item extends AssignableAVM2Item {
     public List<Integer> openedNamespacesKind;
     public int line;
     public GraphTargetItem type;
-    private String ns = "";
+    private GraphTargetItem ns = null;
     private int regNumber = -1;
+    public boolean unresolved = false;
 
-    public void setNs(String ns) {
+    public GraphTargetItem redirect;
+
+    public void setNs(GraphTargetItem ns) {
         this.ns = ns;
     }
 
@@ -62,9 +87,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return regNumber;
     }
 
-    
-    
-    public String getNs() {
+    public GraphTargetItem getNs() {
         return ns;
     }
 
@@ -92,6 +115,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return nsKind;
     }
 
+    @Override
     public void setAssignedValue(GraphTargetItem storeValue) {
         this.assignedValue = storeValue;
     }
@@ -107,6 +131,8 @@ public class NameAVM2Item extends AssignableAVM2Item {
         this.definition = definition;
         this.line = line;
         this.type = type;
+        this.openedNamespaces = openedNamespaces;
+        this.openedNamespacesKind = openedNamespacesKind;
     }
 
     public boolean isDefinition() {
@@ -122,42 +148,178 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return writer;
     }
 
-    @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        if (regNumber == -1) {
+    private int allNsSet(ABC abc) {
+        int nssa[] = new int[openedNamespaces.size()];
+        for (int i = 0; i < openedNamespaces.size(); i++) {
+            nssa[i] = (abc.constants.getNamespaceId(new Namespace(openedNamespacesKind.get(i), abc.constants.getStringId(openedNamespaces.get(i), true)), 0, true));
+        }
+        return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
+    }
+
+    private AVM2Instruction generateSetLoc(int regNumber) {
+        switch (regNumber) {
+            case 0:
+                return ins(new SetLocal0Ins());
+            case 1:
+                return ins(new SetLocal1Ins());
+            case 2:
+                return ins(new SetLocal2Ins());
+            case 3:
+                return ins(new SetLocal3Ins());
+            default:
+                return ins(new SetLocalIns(), regNumber);
+        }
+    }
+
+    private AVM2Instruction generateGetLoc(int regNumber) {
+        switch (regNumber) {
+            case 0:
+                return ins(new GetLocal0Ins());
+            case 1:
+                return ins(new GetLocal1Ins());
+            case 2:
+                return ins(new GetLocal2Ins());
+            case 3:
+                return ins(new GetLocal3Ins());
+            default:
+                return ins(new GetLocalIns(), regNumber);
+        }
+    }
+
+    private AVM2Instruction generateCoerce(SourceGenerator generator, String type) {
+        AVM2Instruction ins;
+        switch (type) {
+            case "*":
+                ins = ins(new CoerceAIns());
+                break;
+            case "String":
+                ins = ins(new CoerceSIns());
+                break;
+            default:
+                int type_index = new TypeItem(type).resolveClass(((AVM2SourceGenerator) generator).abc);
+                ins = ins(new CoerceIns(), type_index);
+                break;
+        }
+        return ins;
+    }
+
+    private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) {
+        if (variableName != null && regNumber == -1 && ns == null) {
             throw new RuntimeException("No register set for " + variableName);
         }
         if (definition && assignedValue == null) {
             return new ArrayList<>();
         }
-        AVM2SourceGenerator g=(AVM2SourceGenerator)generator;
-        
-        if(index!=null){
-            //g.abc.constants.getmu
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+
+        if (variableName == null && ns != null && index != null) {
+            if (assignedValue != null) {
+                List<GraphSourceItem> ret = toSourceMerge(localData, generator,
+                        ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                        ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), assignedValue);
+                int tempReg = -1;
+                if (needsReturn) {
+                    tempReg = getFreeRegister(localData, generator);
+                    ret.add(ins(new DupIns()));
+                    ret.add(generateSetLoc(tempReg));
+                }
+                ret.addAll(toSourceMerge(localData, generator,
+                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true))
+                ));
+                if (needsReturn) {
+                    ret.add(generateGetLoc(tempReg));
+                    ret.add(ins(new KillIns(), tempReg));
+                    killRegister(localData, generator, tempReg);
+                }
+                return ret;
+            } else {
+                return toSourceMerge(localData, generator,
+                        ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                        ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                        needsReturn ? null : ins(new PopIns())
+                );
+            }
         }
-        
-        if (assignedValue == null) {
-            return toSourceMerge(localData, generator, new LocalRegAVM2Item(null, regNumber, null));
-        } else {
-            return toSourceMerge(localData, generator, new SetLocalAVM2Item(null, regNumber, new CoerceAVM2Item(null, assignedValue, type.toString())));
+        if (variableName != null && ns != null && index == null) {
+            if (assignedValue != null) {
+                List<GraphSourceItem> ret = toSourceMerge(localData, generator,
+                        ns, generateCoerce(generator, "Namespace"), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                        ns, generateCoerce(generator, "Namespace"), assignedValue);
+                int tempReg = -1;
+                if (needsReturn) {
+                    tempReg = getFreeRegister(localData, generator);
+                    ret.add(ins(new DupIns()));
+                    ret.add(generateSetLoc(tempReg));
+                }
+                ret.addAll(toSourceMerge(localData, generator,
+                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true))
+                ));
+                if (needsReturn) {
+                    ret.add(generateGetLoc(tempReg));
+                    ret.add(ins(new KillIns(), tempReg));
+                    killRegister(localData, generator, tempReg);
+                }
+                return ret;
+            } else {
+                return toSourceMerge(localData, generator,
+                        ns, generateCoerce(generator, "Namespace"), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                        ns, generateCoerce(generator, "Namespace"), ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                        needsReturn ? null : ins(new PopIns())
+                );
+            }
         }
 
+        if (index != null) {
+            if (assignedValue != null) {
+                List<GraphSourceItem> ret = toSourceMerge(localData, generator,
+                        generateGetLoc(regNumber), index, assignedValue);
+                int tempReg = -1;
+                if (needsReturn) {
+                    tempReg = getFreeRegister(localData, generator);
+                    ret.add(ins(new DupIns()));
+                    ret.add(generateSetLoc(tempReg));
+                }
+                ret.addAll(toSourceMerge(localData, generator, ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true))
+                ));
+                if (needsReturn) {
+                    ret.add(generateGetLoc(tempReg));
+                    ret.add(ins(new KillIns(), tempReg));
+                    killRegister(localData, generator, tempReg);
+                }
+                return ret;
+            } else {
+                return toSourceMerge(localData, generator,
+                        generateGetLoc(regNumber), index,
+                        ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                        needsReturn ? null : ins(new PopIns())
+                );
+            }
+        }
+
+        if (assignedValue != null) {
+            return toSourceMerge(localData, generator, assignedValue, generateCoerce(generator, type.toString()), needsReturn
+                    ? ins(new DupIns()) : null, generateSetLoc(regNumber));
+        } else {
+            return toSourceMerge(localData, generator, generateGetLoc(regNumber),
+                    needsReturn ? null : ins(new PopIns()));
+        }
     }
-      
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        if (redirect != null) {
+            return redirect.toSource(localData, generator);
+        }
+        return toSource(localData, generator, true);
+
+    }
+
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        if (regNumber == -1) {
-            throw new RuntimeException("No register set for " + variableName);
+        if (redirect != null) {
+            return redirect.toSourceIgnoreReturnValue(localData, generator);
         }
-        if (definition && assignedValue == null) {
-            return new ArrayList<>();
-        }
-        if (assignedValue == null) {
-            return toSourceMerge(localData, generator, new LocalRegAVM2Item(null, regNumber, null),
-                    new AVM2Instruction(0, new PopIns(), new int[]{}, new byte[0]));
-        } else {
-            return toSourceMerge(localData, generator, new SetLocalAVM2Item(null, regNumber, new CoerceAVM2Item(null, assignedValue, type.toString())).toSourceIgnoreReturnValue(localData, generator));
-        }
+        return toSource(localData, generator, false);
     }
 
     @Override
@@ -190,13 +352,97 @@ public class NameAVM2Item extends AssignableAVM2Item {
     }
 
     @Override
-    public List<GraphSourceItem> toSourcePreChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> change) {
-        return null;//TODO
-    }
+    public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> pre, List<GraphSourceItem> post, boolean needsReturn) {
+        if (redirect != null) {
+            return ((AssignableAVM2Item) redirect).toSourceChange(localData, generator, pre, post, needsReturn);
+        }
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
 
-    @Override
-    public List<GraphSourceItem> toSourcePostChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> change) {
-        return null;//TODO
+        if (variableName == null && ns != null && index != null) {
+            List<GraphSourceItem> ret = toSourceMerge(localData, generator,
+                    ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                    ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()),
+                    //Start get original
+                    ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                    ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                    //End get original
+                    pre);
+            int tempReg = -1;
+            if (needsReturn) {
+                tempReg = getFreeRegister(localData, generator);
+                ret.add(ins(new DupIns()));
+                ret.add(generateSetLoc(tempReg));
+            }
+            ret.addAll(toSourceMerge(localData, generator,
+                    post,
+                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true))
+            ));
+            if (needsReturn) {
+                ret.add(generateGetLoc(tempReg));
+                ret.add(ins(new KillIns(), tempReg));
+                killRegister(localData, generator, tempReg);
+            }
+            return ret;
+        }
+        if (variableName != null && ns != null && index == null) {
+            List<GraphSourceItem> ret = toSourceMerge(localData, generator,
+                    ns, generateCoerce(generator, "Namespace"), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                    ns, generateCoerce(generator, "Namespace"),
+                    //Start get original
+                    ns, generateCoerce(generator, "Namespace"), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                    ns, generateCoerce(generator, "Namespace"), ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                    //End get original
+                    pre);
+            int tempReg = -1;
+            if (needsReturn) {
+                tempReg = getFreeRegister(localData, generator);
+                ret.add(ins(new DupIns()));
+                ret.add(generateSetLoc(tempReg));
+            }
+            ret.addAll(toSourceMerge(localData, generator,
+                    post,
+                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true))
+            ));
+            if (needsReturn) {
+                ret.add(generateGetLoc(tempReg));
+                ret.add(ins(new KillIns(), tempReg));
+                killRegister(localData, generator, tempReg);
+            }
+            return ret;
+        }
+
+        if (index != null) {
+            List<GraphSourceItem> ret = toSourceMerge(localData, generator,
+                    generateGetLoc(regNumber), index,
+                    //Start get original
+                    generateGetLoc(regNumber), index,
+                    ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                    //End get original
+                    pre);
+            int tempReg = -1;
+            if (needsReturn) {
+                tempReg = getFreeRegister(localData, generator);
+                ret.add(ins(new DupIns()));
+                ret.add(generateSetLoc(tempReg));
+            }
+            ret.addAll(toSourceMerge(localData, generator,
+                    post,
+                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true))
+            ));
+            if (needsReturn) {
+                ret.add(generateGetLoc(tempReg));
+                ret.add(ins(new KillIns(), tempReg));
+                killRegister(localData, generator, tempReg);
+            }
+            return ret;
+        }
+
+        return toSourceMerge(localData, generator,
+                //Start get original
+                generateGetLoc(regNumber),
+                //End get original
+                pre, generateCoerce(generator, type.toString()), needsReturn
+                ? ins(new DupIns()) : null, post, generateSetLoc(regNumber));
     }
 
 }

@@ -118,7 +118,7 @@ import java.util.logging.Logger;
 public class ActionScriptParser {
 
     private long uniqLast = 0;
-    private final boolean debugMode = false;
+    private final boolean debugMode = true;
     private static final String AS3_NAMESPACE = "http://adobe.com/AS3/2006/builtin";
 
     private ABC abc;
@@ -148,6 +148,8 @@ public class ActionScriptParser {
         ParsedSymbol s = lex();
         if (s.type == SymbolType.MULTIPLY) {
             return new UnboundedTypeItem();
+        } else if (s.type == SymbolType.VOID) {
+            return new TypeItem("void");
         } else {
             lexer.pushback(s);
         }
@@ -200,7 +202,6 @@ public class ActionScriptParser {
     private GraphTargetItem name(boolean typeOnly, List<String> openedNamespaces, List<Integer> openedNamespacesKinds, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
         ParsedSymbol s = lex();
         expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
-        //NameAVM2Item ret = new NameAVM2Item(lexer.yyline(),s.value.toString(), null, false, openedNamespaces, openedNamespacesKinds);
         List<String> parts = new ArrayList<>();
         parts.add(s.value.toString());
         s = lex();
@@ -263,23 +264,6 @@ public class ActionScriptParser {
                             if (AVM2SourceGenerator.searchProperty(allAbcs, nspkg, n.getName(a.constants, new ArrayList<String>()), parts.get(0), outName, outNs, outPropNs, outPropNsKind)) {
                                 return new PropertyAVM2Item(null, parts.get(0), index, allAbcs, openedNamespaces, openedNamespacesKinds);
                             }
-
-                            /*for (int g = 0; g < a.instance_info.size(); g++) {
-                             InstanceInfo iii = a.instance_info.get(g);
-                             System.out.println("check " + iii.getName(a.constants).getNameWithNamespace(a.constants) + " - search " + parts.get(0));
-                             for (Trait t : iii.instance_traits.traits) {
-                             n = t.getName(a);
-                             if (n.getNamespace(a.constants).kind == nsKind && n.getName(a.constants, new ArrayList<String>()).equals(parts.get(0))) {
-                             return new PropertyAVM2Item(null, parts.get(0), index, allAbcs, openedNamespaces, openedNamespacesKinds);
-                             }
-                             }
-                             for (Trait t : a.class_info.get(g).static_traits.traits) {
-                             n = t.getName(a);
-                             if (n.getNamespace(a.constants).kind == nsKind && n.getName(a.constants, new ArrayList<String>()).equals(parts.get(0))) {
-                             return new PropertyAVM2Item(null, parts.get(0), index, allAbcs, openedNamespaces, openedNamespacesKinds);
-                             }
-                             }
-                             }*/
                         }
                     }
                 }
@@ -340,7 +324,12 @@ public class ActionScriptParser {
         }
 
         if (k == -1) {
-            throw new ParseException("Cannot find variable or type:" + Helper.joinStrings(parts, "."), lexer.yyline());
+            NameAVM2Item ret = new NameAVM2Item(null, lexer.yyline(), Helper.joinStrings(parts, "."), null, false, openedNamespaces, openedNamespacesKinds);
+            ret.unresolved = true;
+            ret.setIndex(index);
+            variables.add(ret);
+            return ret;
+            //throw new ParseException("Cannot find variable or type:" + Helper.joinStrings(parts, "."), lexer.yyline());
         }
         GraphTargetItem ret = new TypeItem("".equals(pkg) ? name : pkg + "." + name);
         for (int i = 1; i < parts.size(); i++) {
@@ -683,10 +672,31 @@ public class ActionScriptParser {
                     }
                     //}
                     break;
+                case NAMESPACE:
+                    s = lex();
+                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    String nname = s.value.toString();
+                    String nval = "";
+                    s = lex();
+
+                    if (s.type == SymbolType.ASSIGN) {
+                        s = lex();
+                        expected(s, lexer.yyline(), SymbolType.STRING);
+                        nval = s.value.toString();
+                        s = lex();
+                    } else {
+                        nval = (packageName.equals("") ? classNameStr : packageName + ":" + classNameStr) + "/" + nname;
+                    }
+                    if (s.type != SymbolType.SEMICOLON) {
+                        lexer.pushback(s);
+                    }
+
+                    ConstAVM2Item ns = new ConstAVM2Item(true, nsKind, nname, new TypeItem("Namespace"), new StringAVM2Item(null, nval));
+                    traits.add(ns);
+                    break;
                 case CONST:
                 case VAR:
                     boolean isConst = s.type == SymbolType.CONST;
-
                     if (isOverride) {
                         throw new ParseException("Override flag not allowed for " + (isConst ? "consts" : "vars"), lexer.yyline());
                     }
@@ -706,16 +716,20 @@ public class ActionScriptParser {
                         type = type(openedNamespaces, openedNamespacesKinds, variables);
                         s = lex();
                     }
+
+                    GraphTargetItem value = null;
+
                     if (s.type == SymbolType.ASSIGN) {
-                        GraphTargetItem tar;
-                        if (isConst) {
-                            tar = new ConstAVM2Item(isStatic, nsKind, vcname, type, expression(openedNamespaces, openedNamespacesKinds, new HashMap<String, Integer>(), false, false, true, variables));
-                        } else {
-                            tar = new SlotAVM2Item(isStatic, nsKind, vcname, type, expression(openedNamespaces, openedNamespacesKinds, new HashMap<String, Integer>(), false, false, true, variables));
-                        }
-                        traits.add(tar);
+                        value = expression(openedNamespaces, openedNamespacesKinds, new HashMap<String, Integer>(), false, false, true, variables);
                         s = lex();
                     }
+                    GraphTargetItem tar;
+                    if (isConst) {
+                        tar = new ConstAVM2Item(isStatic, nsKind, vcname, type, value);
+                    } else {
+                        tar = new SlotAVM2Item(isStatic, nsKind, vcname, type, value);
+                    }
+                    traits.add(tar);
                     if (s.type != SymbolType.SEMICOLON) {
                         lexer.pushback(s);
                     }
@@ -742,7 +756,7 @@ public class ActionScriptParser {
         openedNamespacesKinds = new ArrayList<>(openedNamespacesKinds);
 
         openedNamespacesKinds.add(Namespace.KIND_PRIVATE);
-        openedNamespaces.add("".equals(packageName) ? classNameStr : packageName + ":" + classNameStr);
+        openedNamespaces.add(packageName + ":" + classNameStr);
         openedNamespacesKinds.add(Namespace.KIND_PACKAGE);
         openedNamespaces.add("");
         openedNamespacesKinds.add(Namespace.KIND_PRIVATE);
@@ -756,9 +770,9 @@ public class ActionScriptParser {
         openedNamespacesKinds.add(Namespace.KIND_NAMESPACE);
         openedNamespaces.add(AS3_NAMESPACE);
         openedNamespacesKinds.add(Namespace.KIND_PROTECTED);
-        openedNamespaces.add("".equals(packageName) ? classNameStr : packageName + ":" + classNameStr);
+        openedNamespaces.add(packageName + ":" + classNameStr);
         openedNamespacesKinds.add(Namespace.KIND_STATIC_PROTECTED);
-        openedNamespaces.add("".equals(packageName) ? classNameStr : packageName + ":" + classNameStr);
+        openedNamespaces.add(packageName + ":" + classNameStr);
         List<Integer> indices = new ArrayList<>();
         List<String> names = new ArrayList<>();
         List<String> namespaces = new ArrayList<>();
@@ -848,25 +862,31 @@ public class ActionScriptParser {
         switch (s.type) {
             case WITH:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem wvar = (name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables));
+                GraphTargetItem wvar = expression(openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, true, variables);//(name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables));
+                if (!isNameOrProp(wvar)) {
+                    throw new ParseException("Not a property or name", lexer.yyline());
+                }
                 expectedType(SymbolType.PARENT_CLOSE);
                 expectedType(SymbolType.CURLY_OPEN);
                 List<GraphTargetItem> wcmd = commands(openedNamespaces, openedNamespacesKinds, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, variables);
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = new WithAVM2Item(null, wvar, wcmd);
                 break;
-            case DELETE:
-                GraphTargetItem varDel = name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables);
-                if (varDel instanceof GetPropertyAVM2Item) {
-                    GetPropertyAVM2Item gm = (GetPropertyAVM2Item) varDel;
-                    ret = new DeletePropertyAVM2Item(null, gm.object, gm.propertyName);
-                } else if (varDel instanceof NameAVM2Item) {
-                    variables.remove(varDel);
-                    ret = new DeletePropertyAVM2Item(null, null, (NameAVM2Item) varDel);
-                } else {
-                    throw new ParseException("Not a property", lexer.yyline());
-                }
-                break;
+            /*case DELETE:
+             GraphTargetItem varDel = expression(openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables);
+             if(!isNameOrProp(varDel)){
+             throw new ParseException("Not a property or name", lexer.yyline());
+             }
+             if (varDel instanceof GetPropertyAVM2Item) {
+             GetPropertyAVM2Item gm = (GetPropertyAVM2Item) varDel;
+             ret = new DeletePropertyAVM2Item(null, gm.object, gm.propertyName);
+             } else if (varDel instanceof NameAVM2Item) {
+             variables.remove(varDel);
+             ret = new DeletePropertyAVM2Item(null, null, (NameAVM2Item) varDel);
+             } else {
+             throw new ParseException("Not a property", lexer.yyline());
+             }
+             break;*/
             case FUNCTION:
                 s = lexer.lex();
                 expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
@@ -899,15 +919,18 @@ public class ActionScriptParser {
                 ret = new BlockItem(null, commands(openedNamespaces, openedNamespacesKinds, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, variables));
                 expectedType(SymbolType.CURLY_CLOSE);
                 break;
-            case INCREMENT: //preincrement
-            case DECREMENT: //predecrement
-                GraphTargetItem varincdec = name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables);
-                if (s.type == SymbolType.INCREMENT) {
-                    ret = new PreIncrementAVM2Item(null, varincdec);
-                } else if (s.type == SymbolType.DECREMENT) {
-                    ret = new PreDecrementAVM2Item(null, varincdec);
-                }
-                break;
+            /*case INCREMENT: //preincrement
+             case DECREMENT: //predecrement
+             GraphTargetItem varincdec = expression(openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables);
+             if(!isNameOrProp(varincdec)){
+             throw new ParseException("Not a property or name", lexer.yyline());
+             }
+             if (s.type == SymbolType.INCREMENT) {
+             ret = new PreIncrementAVM2Item(null, varincdec);
+             } else if (s.type == SymbolType.DECREMENT) {
+             ret = new PreDecrementAVM2Item(null, varincdec);
+             }
+             break;*/
             case SUPER: //constructor call
                 ParsedSymbol ss2 = lex();
                 if (ss2.type == SymbolType.PARENT_OPEN) {
@@ -1271,6 +1294,27 @@ public class ActionScriptParser {
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
         switch (s.type) {
+            case NAMESPACE_OP:
+                s = lex();
+                if (s.type == SymbolType.BRACKET_OPEN) {
+                    GraphTargetItem index = expression(openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, true, variables);
+                    NameAVM2Item name = new NameAVM2Item(new UnboundedTypeItem(), lexer.yyline(), null, null, false, openedNamespaces, openedNamespacesKinds);
+                    name.setIndex(index);
+                    name.setNs(expr);
+                    ret = name;
+                    expectedType(SymbolType.BRACKET_CLOSE);
+                } else {
+                    lexer.pushback(s);
+                    GraphTargetItem name = name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables);
+                    if (name instanceof NameAVM2Item) {
+                        ((NameAVM2Item) name).setNs(expr);
+                        ((NameAVM2Item) name).unresolved = false;
+                    } else {
+                        throw new ParseException("Not a property name", lexer.yyline());
+                    }
+                    ret = name;
+                }
+                break;
             case TERNAR:
                 GraphTargetItem terOnTrue = expression(openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, true, variables);
                 expectedType(SymbolType.COLON);
@@ -1413,13 +1457,13 @@ public class ActionScriptParser {
                 ret = expr;
                 break;
             case INCREMENT: //postincrement
-                if (!(expr instanceof NameAVM2Item) && !(expr instanceof GetPropertyAVM2Item)) {
+                if (!(expr instanceof AssignableAVM2Item)) {
                     throw new ParseException("Invalid assignment", lexer.yyline());
                 }
                 ret = new PostIncrementAVM2Item(null, expr);
                 break;
             case DECREMENT: //postdecrement
-                if (!(expr instanceof NameAVM2Item) && !(expr instanceof GetPropertyAVM2Item)) {
+                if (!(expr instanceof AssignableAVM2Item)) {
                     throw new ParseException("Invalid assignment", lexer.yyline());
                 }
                 ret = new PostDecrementAVM2Item(null, expr);
@@ -1445,6 +1489,16 @@ public class ActionScriptParser {
         }
         ret = fixPrecedence(ret);
         return ret;
+    }
+
+    private boolean isNameOrProp(GraphTargetItem item) {
+        if (item instanceof NameAVM2Item) {
+            return true;
+        }
+        if (item instanceof PropertyAVM2Item) {
+            return true;
+        }
+        return false;
     }
 
     private boolean isType(GraphTargetItem item) {
@@ -1626,7 +1680,10 @@ public class ActionScriptParser {
                 existsRemainder = true;
                 break;
             case DELETE:
-                GraphTargetItem varDel = name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables);
+                GraphTargetItem varDel = expression(openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables);
+                if (!isNameOrProp(varDel)) {
+                    throw new ParseException("Not a property or name", lexer.yyline());
+                }
                 if (varDel instanceof GetPropertyAVM2Item) {
                     GetPropertyAVM2Item gm = (GetPropertyAVM2Item) varDel;
                     ret = new DeletePropertyAVM2Item(null, gm.object, gm.propertyName);
@@ -1636,12 +1693,15 @@ public class ActionScriptParser {
                 break;
             case INCREMENT:
             case DECREMENT: //preincrement
-                GraphTargetItem prevar = name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables);
+                GraphTargetItem varincdec = expression(openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables);
+                if (!isNameOrProp(varincdec)) {
+                    throw new ParseException("Not a property or name", lexer.yyline());
+                }
                 if (s.type == SymbolType.INCREMENT) {
-                    ret = new PreIncrementAVM2Item(null, prevar);
+                    ret = new PreIncrementAVM2Item(null, varincdec);
                 }
                 if (s.type == SymbolType.DECREMENT) {
-                    ret = new PreDecrementAVM2Item(null, prevar);
+                    ret = new PreDecrementAVM2Item(null, varincdec);
                 }
                 existsRemainder = true;
                 break;
@@ -1809,7 +1869,7 @@ public class ActionScriptParser {
             }
             ABC abc = new ABC(swf);
             ActionScriptParser parser = new ActionScriptParser(abc, playerABCs);
-            parser.addScript(new String(Helper.readFile(src), "UTF-8"),true);
+            parser.addScript(new String(Helper.readFile(src), "UTF-8"), true);
             abc.saveToStream(new FileOutputStream(new File(dst)));
         } catch (Exception ex) {
             Logger.getLogger(ActionScriptParser.class.getName()).log(Level.SEVERE, null, ex);

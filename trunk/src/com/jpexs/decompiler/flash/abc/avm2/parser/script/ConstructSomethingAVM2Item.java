@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -33,7 +32,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ConstructSomethingAVM2Item extends CallAVM2Item{
+public class ConstructSomethingAVM2Item extends CallAVM2Item {
 
     public ConstructSomethingAVM2Item(GraphTargetItem name, List<GraphTargetItem> arguments) {
         super(name, arguments);
@@ -44,24 +43,21 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item{
         return name.returnType();
     }
 
-    
-    
-   @Override
+    @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-  
-        if(name instanceof TypeItem){
-            TypeItem prop=(TypeItem)name;
-            int type_index = ((AVM2SourceGenerator)generator).resolveType(name.toString());
-            return toSourceMerge(localData, generator, 
-                    new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index,arguments.size()}, new byte[0])
-                    ,arguments,
-                    new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index,arguments.size()}, new byte[0])
-                    );
+
+        if (name instanceof TypeItem) {
+            TypeItem prop = (TypeItem) name;
+            int type_index = ((AVM2SourceGenerator) generator).resolveType(name.toString());
+            return toSourceMerge(localData, generator,
+                    new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index, arguments.size()}, new byte[0]), arguments,
+                    new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index, arguments.size()}, new byte[0])
+            );
         }
-        if(name instanceof NameAVM2Item){
+        if (name instanceof NameAVM2Item) {
             //TODO
         }
         return new ArrayList<>();
-    } 
-    
+    }
+
 }

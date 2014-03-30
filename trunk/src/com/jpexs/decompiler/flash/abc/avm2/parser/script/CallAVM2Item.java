@@ -14,15 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -30,6 +33,7 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeFunctionItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +45,9 @@ public class CallAVM2Item extends AVM2Item {
 
     public GraphTargetItem name;
     public List<GraphTargetItem> arguments;
-    
-    public CallAVM2Item(GraphTargetItem name,List<GraphTargetItem> arguments) {
-        super(null,NOPRECEDENCE);
+
+    public CallAVM2Item(GraphTargetItem name, List<GraphTargetItem> arguments) {
+        super(null, NOPRECEDENCE);
         this.name = name;
         this.arguments = arguments;
     }
@@ -55,54 +59,92 @@ public class CallAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        if(name instanceof PropertyAVM2Item){
-            PropertyAVM2Item prop=(PropertyAVM2Item)name;
-            Object obj = prop.object;
-            if(obj == null){
-                obj =  new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty()}, new byte[0]);
+
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+
+        GraphTargetItem callable = name;
+        if (callable instanceof NameAVM2Item) {
+            NameAVM2Item n = (NameAVM2Item) callable;
+            List<ABC> allAbcs = new ArrayList<>();
+            allAbcs.add(g.abc);
+            allAbcs.addAll(g.allABCs);
+            String cname;
+            String pkgName = "";
+            cname = localData.currentClass;
+            if (cname.contains(".")) {
+                pkgName = cname.substring(0, cname.lastIndexOf("."));
+                cname = cname.substring(cname.lastIndexOf(".") + 1);
             }
-            return toSourceMerge(localData, generator, obj,prop.index,arguments,
-                    new AVM2Instruction(0, new CallPropertyIns(), new int[]{prop.resolveProperty(),arguments.size()}, new byte[0])
-                    );
+            GraphTargetItem obj = null;
+            Reference<String> outName = new Reference<>("");
+            Reference<String> outNs = new Reference<>("");
+            Reference<String> outPropNs = new Reference<>("");
+            Reference<Integer> outPropNsKind = new Reference<>(1);
+            if (AVM2SourceGenerator.searchProperty(allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind)) {
+                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), n.line, "this", null, false, n.openedNamespaces, n.openedNamespacesKind);
+                nobj.setRegNumber(0);
+                obj = nobj;
+            }
+            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), n.getIndex(), allAbcs, n.openedNamespaces, n.openedNamespacesKind);
+            p.setAssignedValue(n.getAssignedValue());
+            callable = p;
         }
-        if(name instanceof NameAVM2Item){
-            //TODO
+
+        if (callable instanceof PropertyAVM2Item) {
+            PropertyAVM2Item prop = (PropertyAVM2Item) callable;
+            Object obj = prop.object;
+            if (obj == null) {
+                obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty()}, new byte[0]);
+            }
+            return toSourceMerge(localData, generator, obj, prop.index, arguments,
+                    new AVM2Instruction(0, new CallPropertyIns(), new int[]{prop.resolveProperty(), arguments.size()}, new byte[0])
+            );
         }
         return new ArrayList<>();
     }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        if(name instanceof PropertyAVM2Item){
-            PropertyAVM2Item prop=(PropertyAVM2Item)name;
+
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+
+        GraphTargetItem callable = name;
+        if (callable instanceof NameAVM2Item) {
+            NameAVM2Item n = (NameAVM2Item) callable;
+            List<ABC> allAbcs = new ArrayList<>();
+            allAbcs.add(g.abc);
+            allAbcs.addAll(g.allABCs);
+            PropertyAVM2Item p = new PropertyAVM2Item(null, n.getVariableName(), n.getIndex(), allAbcs, n.openedNamespaces, n.openedNamespacesKind);
+            p.setAssignedValue(n.getAssignedValue());
+            callable = p;
+        }
+
+        if (callable instanceof PropertyAVM2Item) {
+            PropertyAVM2Item prop = (PropertyAVM2Item) callable;
             Object obj = prop.object;
-            if(obj == null){
-                obj =  new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty()}, new byte[0]);
+            if (obj == null) {
+                obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty()}, new byte[0]);
             }
-            return toSourceMerge(localData, generator, obj,prop.index,arguments,
-                    new AVM2Instruction(0, new CallPropVoidIns(), new int[]{prop.resolveProperty(),arguments.size()}, new byte[0])
-                    );
+            return toSourceMerge(localData, generator, obj, prop.index, arguments,
+                    new AVM2Instruction(0, new CallPropVoidIns(), new int[]{prop.resolveProperty(), arguments.size()}, new byte[0])
+            );
         }
-        if(name instanceof NameAVM2Item){
-            //TODO
-        }
+
         return new ArrayList<>();
     }
-    
-    
 
     @Override
     public GraphTargetItem returnType() {
         GraphTargetItem ti = name.returnType();
-        if(ti instanceof TypeFunctionItem){
-            TypeFunctionItem tfi=(TypeFunctionItem)ti;
+        if (ti instanceof TypeFunctionItem) {
+            TypeFunctionItem tfi = (TypeFunctionItem) ti;
             return new TypeItem(tfi.fullTypeName);
         }
         return ti;
     }
-           
+
     @Override
     public boolean hasReturnValue() {
         return true;
-    }    
+    }
 }

@@ -50,20 +50,20 @@ public class UndefinedAVM2Item extends AVM2Item {
     public Object getResult() {
         return new Undefined();
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("Undefined");
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;
     }
-    
-     @Override
+
+    @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator,  
+        return toSourceMerge(localData, generator,
                 new AVM2Instruction(0, new PushUndefinedIns(), new int[]{}, new byte[0])
         );
     }

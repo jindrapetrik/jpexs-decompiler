@@ -47,12 +47,12 @@ public class NewArrayAVM2Item extends AVM2Item {
         }
         return writer.append("]");
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.ARRAY;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;
@@ -62,8 +62,7 @@ public class NewArrayAVM2Item extends AVM2Item {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         return toSourceMerge(localData, generator, values,
                 new AVM2Instruction(0, new NewArrayIns(), new int[]{values.size()}, new byte[0])
-                );
+        );
     }
-    
-    
+
 }

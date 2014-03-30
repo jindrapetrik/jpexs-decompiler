@@ -35,7 +35,7 @@ public class InterfaceAVM2Item extends AVM2Item {
     public int namespaceKind;
     public boolean isFinal;
 
-    public InterfaceAVM2Item(boolean isFinal,int namespaceKind, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
+    public InterfaceAVM2Item(boolean isFinal, int namespaceKind, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.name = name;
         this.superInterfaces = superInterfaces;
@@ -58,7 +58,7 @@ public class InterfaceAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return false;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem(); //FIXME

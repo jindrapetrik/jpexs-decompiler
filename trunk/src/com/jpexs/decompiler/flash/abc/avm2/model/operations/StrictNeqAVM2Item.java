@@ -47,15 +47,15 @@ public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem {
         return EcmaScript.type(x) != EcmaScript.type(y)
                 || (!EcmaScript.equals(x, y));
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, leftSide, rightSide, 
+        return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new StrictEqualsIns(), new int[]{}, new byte[0]),
                 new AVM2Instruction(0, new NotIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("Boolean");

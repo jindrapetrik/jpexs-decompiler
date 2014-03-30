@@ -53,18 +53,19 @@ public class StringAVM2Item extends AVM2Item {
     public Object getResult() {
         return value;
     }
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator,  
-                new AVM2Instruction(0, new PushStringIns(), new int[]{((AVM2SourceGenerator)generator).str(value)}, new byte[0])
+        return toSourceMerge(localData, generator,
+                new AVM2Instruction(0, new PushStringIns(), new int[]{((AVM2SourceGenerator) generator).str(value)}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.STRING;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

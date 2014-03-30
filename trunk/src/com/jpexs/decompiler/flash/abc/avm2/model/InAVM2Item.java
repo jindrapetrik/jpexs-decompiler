@@ -39,12 +39,12 @@ public class InAVM2Item extends AVM2Item {
         writer.append(" in ");
         return collection.toString(writer, localData);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.BOOLEAN;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

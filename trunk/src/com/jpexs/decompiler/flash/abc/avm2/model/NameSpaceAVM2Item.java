@@ -36,16 +36,16 @@ public class NameSpaceAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         if (namespaceIndex == 0) {
             return writer.append("*");
-        }        
+        }
         ConstantPool constants = localData.constantsAvm2;
         return writer.append(constants.getNamespace(namespaceIndex).toString(constants));
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

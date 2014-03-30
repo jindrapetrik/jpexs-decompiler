@@ -37,14 +37,14 @@ public class NegAVM2Item extends UnaryOpItem {
     public Object getResult() {
         return -EcmaScript.toNumber(value.getResult());
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, value, 
+        return toSourceMerge(localData, generator, value,
                 new AVM2Instruction(0, new NegateIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem();

@@ -73,12 +73,12 @@ public class ConvertAVM2Item extends AVM2Item {
         dependencies.add(value);
         return value.isCompileTime(dependencies);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem(type);
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

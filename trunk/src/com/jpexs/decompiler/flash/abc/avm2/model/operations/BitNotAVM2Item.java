@@ -37,13 +37,14 @@ public class BitNotAVM2Item extends UnaryOpItem {
     public Object getResult() {
         return ~((long) (double) EcmaScript.toNumber(value.getResult()));
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, value, 
+        return toSourceMerge(localData, generator, value,
                 new AVM2Instruction(0, new BitNotIns(), new int[]{}, new byte[0])
         );
     }
+
     @Override
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem();

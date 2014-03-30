@@ -43,14 +43,14 @@ public class GtAVM2Item extends BinaryOpItem implements LogicalOpItem {
     public Object getResult() {
         return EcmaScript.compare(rightSide.getResult(), leftSide.getResult());
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, leftSide, rightSide, 
+        return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new GreaterThanIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem("Boolean");

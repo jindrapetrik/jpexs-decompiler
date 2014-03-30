@@ -39,7 +39,7 @@ public class FunctionAVM2Item extends AVM2Item {
     public int line;
     public boolean hasRest;
 
-    public FunctionAVM2Item(boolean hasRest,int line,String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
+    public FunctionAVM2Item(boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
         super(null, NOPRECEDENCE);
         this.paramNames = paramNames;
         this.body = body;
@@ -61,7 +61,7 @@ public class FunctionAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         return retType;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

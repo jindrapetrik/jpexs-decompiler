@@ -52,19 +52,19 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return true;
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator,  
-                new AVM2Instruction(0, new PushDoubleIns(), new int[]{((AVM2SourceGenerator)generator).abc.constants.getDoubleId(value, true)}, new byte[0])
+        return toSourceMerge(localData, generator,
+                new AVM2Instruction(0, new PushDoubleIns(), new int[]{((AVM2SourceGenerator) generator).abc.constants.getDoubleId(value, true)}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

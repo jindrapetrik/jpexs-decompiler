@@ -39,12 +39,12 @@ public class GetDescendantsAVM2Item extends AVM2Item {
         writer.append("..");
         return multiname.toString(writer, localData);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

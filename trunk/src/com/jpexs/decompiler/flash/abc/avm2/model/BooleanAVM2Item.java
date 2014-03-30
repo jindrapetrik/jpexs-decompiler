@@ -52,19 +52,19 @@ public class BooleanAVM2Item extends AVM2Item {
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return true;
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator,  
-                new AVM2Instruction(0, value?new PushTrueIns():new PushFalseIns(), new int[]{}, new byte[0])
+        return toSourceMerge(localData, generator,
+                new AVM2Instruction(0, value ? new PushTrueIns() : new PushFalseIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.BOOLEAN;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

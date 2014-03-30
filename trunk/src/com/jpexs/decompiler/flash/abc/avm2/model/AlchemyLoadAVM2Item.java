@@ -43,12 +43,12 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
         ofs.toString(writer, localData);
         return writer.append(") /*Alchemy*/");
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;

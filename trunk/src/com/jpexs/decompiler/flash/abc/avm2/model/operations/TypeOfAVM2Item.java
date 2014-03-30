@@ -66,14 +66,14 @@ public class TypeOfAVM2Item extends UnaryOpItem {
         //TODO: function,xml
         return "object";
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, value, 
+        return toSourceMerge(localData, generator, value,
                 new AVM2Instruction(0, new TypeOfIns(), new int[]{}, new byte[0])
         );
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem();

@@ -14,17 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 /**
  *
  * @author JPEXS
  */
-public class Reference <T>  {
+public class Reference<T> {
 
     private T val;
-    
+
     public Reference(T val) {
         this.val = val;
     }
@@ -41,6 +40,5 @@ public class Reference <T>  {
     public String toString() {
         return val.toString();
     }
-    
-    
+
 }

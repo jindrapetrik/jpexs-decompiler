@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2014 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,6 +45,26 @@ public class ValueKind {
     public ValueKind(int value_index, int value_kind) {
         this.value_index = value_index;
         this.value_kind = value_kind;
+    }
+
+    public static int nsKindToValueKind(int nsKind) {
+        switch (nsKind) {
+            case Namespace.KIND_EXPLICIT:
+                return CONSTANT_ExplicitNamespace;
+            case Namespace.KIND_NAMESPACE:
+                return CONSTANT_Namespace;
+            case Namespace.KIND_PACKAGE:
+                return CONSTANT_PackageNamespace;
+            case Namespace.KIND_PACKAGE_INTERNAL:
+                return CONSTANT_PackageInternalNs;
+            case Namespace.KIND_PRIVATE:
+                return CONSTANT_PrivateNs;
+            case Namespace.KIND_PROTECTED:
+                return CONSTANT_ProtectedNamespace;
+            case Namespace.KIND_STATIC_PROTECTED:
+                return CONSTANT_StaticProtectedNs;
+        }
+        return 0;
     }
 
     @Override

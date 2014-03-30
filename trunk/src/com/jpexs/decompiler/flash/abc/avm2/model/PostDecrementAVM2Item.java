@@ -16,11 +16,19 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostDecrementAVM2Item extends AVM2Item implements AssignmentAVM2Item {
 
@@ -41,14 +49,34 @@ public class PostDecrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     public boolean hasSideEffect() {
         return true;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return object.returnType();
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        if (object instanceof AssignableAVM2Item) {
+            return ((AssignableAVM2Item) object).toSourceChange(localData, generator, null, toSourceMerge(localData, generator,
+                    new AVM2Instruction(0, new DecrementIns(), new int[]{}, new byte[0])
+            ), true);
+        }
+        return new ArrayList<>(); //?
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        if (object instanceof AssignableAVM2Item) {
+            return ((AssignableAVM2Item) object).toSourceChange(localData, generator, null, toSourceMerge(localData, generator,
+                    new AVM2Instruction(0, new DecrementIns(), new int[]{}, new byte[0])
+            ), false);
+        }
+        return new ArrayList<>(); //?
     }
 }

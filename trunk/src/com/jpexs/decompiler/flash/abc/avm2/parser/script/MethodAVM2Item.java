@@ -32,8 +32,8 @@ public class MethodAVM2Item extends FunctionAVM2Item {
     private boolean isFinal;
     private boolean override;
 
-    public MethodAVM2Item(boolean hasRest,int line, boolean override,boolean isFinal,boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
-        super(hasRest,line,methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+    public MethodAVM2Item(boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
+        super(hasRest, line, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
         this.namespaceKind = namespaceKind;
         this.isStatic = isStatic;
         this.override = override;
@@ -44,12 +44,10 @@ public class MethodAVM2Item extends FunctionAVM2Item {
         return override;
     }
 
-    
-    
     public boolean isStatic() {
         return isStatic;
     }
-    
+
     public boolean isFinal() {
         return isFinal;
     }

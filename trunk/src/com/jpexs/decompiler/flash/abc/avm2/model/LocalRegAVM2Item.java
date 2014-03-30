@@ -86,35 +86,35 @@ public class LocalRegAVM2Item extends AVM2Item {
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return isCT;
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         AVM2Instruction ins;
-        switch(regIndex){
-            case 0: 
-                ins = new AVM2Instruction(0, new GetLocal0Ins(), new int[]{},new byte[0]);
+        switch (regIndex) {
+            case 0:
+                ins = new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}, new byte[0]);
                 break;
-            case 1: 
-                ins = new AVM2Instruction(0, new GetLocal1Ins(), new int[]{},new byte[0]);
+            case 1:
+                ins = new AVM2Instruction(0, new GetLocal1Ins(), new int[]{}, new byte[0]);
                 break;
-            case 2: 
-                ins = new AVM2Instruction(0, new GetLocal2Ins(), new int[]{},new byte[0]);
+            case 2:
+                ins = new AVM2Instruction(0, new GetLocal2Ins(), new int[]{}, new byte[0]);
                 break;
-            case 3: 
-                ins = new AVM2Instruction(0, new GetLocal3Ins(), new int[]{},new byte[0]);
+            case 3:
+                ins = new AVM2Instruction(0, new GetLocal3Ins(), new int[]{}, new byte[0]);
                 break;
             default:
-                ins = new AVM2Instruction(0, new GetLocalIns(), new int[]{regIndex},new byte[0]);
+                ins = new AVM2Instruction(0, new GetLocalIns(), new int[]{regIndex}, new byte[0]);
                 break;
         }
         return toSourceMerge(localData, generator, ins);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return true;

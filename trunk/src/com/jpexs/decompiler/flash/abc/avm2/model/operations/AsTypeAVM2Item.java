@@ -30,10 +30,10 @@ public class AsTypeAVM2Item extends BinaryOpItem {
     public AsTypeAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, PRECEDENCE_RELATIONAL, value, type, "as");
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, leftSide, rightSide, 
+        return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new AsTypeIns(), new int[]{}, new byte[0])
         );
     }
@@ -42,6 +42,5 @@ public class AsTypeAVM2Item extends BinaryOpItem {
     public GraphTargetItem returnType() {
         return rightSide;
     }
-    
-    
+
 }

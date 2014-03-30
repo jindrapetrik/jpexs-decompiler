@@ -68,7 +68,7 @@ public class AddAVM2Item extends BinaryOpItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, leftSide, rightSide, 
+        return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new AddIns(), new int[]{}, new byte[0])
         );
     }
@@ -77,6 +77,5 @@ public class AddAVM2Item extends BinaryOpItem {
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem();
     }
-    
-    
+
 }

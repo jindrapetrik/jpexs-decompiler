@@ -23,7 +23,9 @@ import java.util.List;
 public class ClassInfo {
 
     public int cinit_index; //MethodInfo - static initializer
-    public Traits static_traits = new Traits();;
+    public Traits static_traits = new Traits();
+
+    ;
 
     @Override
     public String toString() {
