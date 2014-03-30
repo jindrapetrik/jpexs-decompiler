@@ -19,17 +19,10 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
@@ -38,10 +31,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertSIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
@@ -52,6 +43,7 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -156,36 +148,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
     }
 
-    private AVM2Instruction generateSetLoc(int regNumber) {
-        switch (regNumber) {
-            case 0:
-                return ins(new SetLocal0Ins());
-            case 1:
-                return ins(new SetLocal1Ins());
-            case 2:
-                return ins(new SetLocal2Ins());
-            case 3:
-                return ins(new SetLocal3Ins());
-            default:
-                return ins(new SetLocalIns(), regNumber);
-        }
-    }
-
-    private AVM2Instruction generateGetLoc(int regNumber) {
-        switch (regNumber) {
-            case 0:
-                return ins(new GetLocal0Ins());
-            case 1:
-                return ins(new GetLocal1Ins());
-            case 2:
-                return ins(new GetLocal2Ins());
-            case 3:
-                return ins(new GetLocal3Ins());
-            default:
-                return ins(new GetLocalIns(), regNumber);
-        }
-    }
-
     private AVM2Instruction generateCoerce(SourceGenerator generator, String type) {
         AVM2Instruction ins;
         switch (type) {
@@ -211,82 +173,58 @@ public class NameAVM2Item extends AssignableAVM2Item {
             return new ArrayList<>();
         }
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        Reference<Integer> ns_temp = new Reference<>(-1);
+        Reference<Integer> index_temp = new Reference<>(-1);
+        Reference<Integer> ret_temp = new Reference<>(-1);
 
         if (variableName == null && ns != null && index != null) {
             if (assignedValue != null) {
-                List<GraphSourceItem> ret = toSourceMerge(localData, generator,
+                return toSourceMerge(localData, generator,
                         ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
-                        ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), assignedValue);
-                int tempReg = -1;
-                if (needsReturn) {
-                    tempReg = getFreeRegister(localData, generator);
-                    ret.add(ins(new DupIns()));
-                    ret.add(generateSetLoc(tempReg));
-                }
-                ret.addAll(toSourceMerge(localData, generator,
-                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true))
-                ));
-                if (needsReturn) {
-                    ret.add(generateGetLoc(tempReg));
-                    ret.add(ins(new KillIns(), tempReg));
-                    killRegister(localData, generator, tempReg);
-                }
-                return ret;
+                        ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), assignedValue,
+                        needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
+                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                        needsReturn ? getTemp(localData, generator, ret_temp) : null,
+                        killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
+                );
             } else {
                 return toSourceMerge(localData, generator,
                         ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
                         ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
-                        needsReturn ? null : ins(new PopIns())
+                        needsReturn ? null : ins(new PopIns()),
+                        killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
                 );
             }
         }
         if (variableName != null && ns != null && index == null) {
             if (assignedValue != null) {
-                List<GraphSourceItem> ret = toSourceMerge(localData, generator,
+                return toSourceMerge(localData, generator,
                         ns, generateCoerce(generator, "Namespace"), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
-                        ns, generateCoerce(generator, "Namespace"), assignedValue);
-                int tempReg = -1;
-                if (needsReturn) {
-                    tempReg = getFreeRegister(localData, generator);
-                    ret.add(ins(new DupIns()));
-                    ret.add(generateSetLoc(tempReg));
-                }
-                ret.addAll(toSourceMerge(localData, generator,
-                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true))
-                ));
-                if (needsReturn) {
-                    ret.add(generateGetLoc(tempReg));
-                    ret.add(ins(new KillIns(), tempReg));
-                    killRegister(localData, generator, tempReg);
-                }
-                return ret;
+                        ns, generateCoerce(generator, "Namespace"), assignedValue,
+                        needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
+                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                        needsReturn ? getTemp(localData, generator, ret_temp) : null,
+                        killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
+                );
             } else {
                 return toSourceMerge(localData, generator,
                         ns, generateCoerce(generator, "Namespace"), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
                         ns, generateCoerce(generator, "Namespace"), ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
-                        needsReturn ? null : ins(new PopIns())
+                        needsReturn ? null : ins(new PopIns()),
+                        killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
                 );
             }
         }
 
         if (index != null) {
             if (assignedValue != null) {
-                List<GraphSourceItem> ret = toSourceMerge(localData, generator,
-                        generateGetLoc(regNumber), index, assignedValue);
-                int tempReg = -1;
-                if (needsReturn) {
-                    tempReg = getFreeRegister(localData, generator);
-                    ret.add(ins(new DupIns()));
-                    ret.add(generateSetLoc(tempReg));
-                }
-                ret.addAll(toSourceMerge(localData, generator, ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true))
-                ));
-                if (needsReturn) {
-                    ret.add(generateGetLoc(tempReg));
-                    ret.add(ins(new KillIns(), tempReg));
-                    killRegister(localData, generator, tempReg);
-                }
-                return ret;
+                return toSourceMerge(localData, generator,
+                        generateGetLoc(regNumber), index, assignedValue,
+                        needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
+                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                        needsReturn ? getTemp(localData, generator, ret_temp) : null,
+                        killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
+                );
             } else {
                 return toSourceMerge(localData, generator,
                         generateGetLoc(regNumber), index,
@@ -297,7 +235,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
 
         if (assignedValue != null) {
-            return toSourceMerge(localData, generator, assignedValue, generateCoerce(generator, type.toString()), needsReturn
+            return toSourceMerge(localData, generator, assignedValue, (!(assignedValue.returnType().toString().equals("int")&&type.toString().equals("int")))?generateCoerce(generator, type.toString()):null, needsReturn
                     ? ins(new DupIns()) : null, generateSetLoc(regNumber));
         } else {
             return toSourceMerge(localData, generator, generateGetLoc(regNumber),
@@ -348,101 +286,107 @@ public class NameAVM2Item extends AssignableAVM2Item {
         if (index != null) {
             return TypeItem.UNBOUNDED;
         }
+        if(type == null){
+            return TypeItem.UNBOUNDED;
+        }
         return type;
     }
 
     @Override
-    public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> pre, List<GraphSourceItem> post, boolean needsReturn) {
+    public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, boolean post, boolean decrement, boolean needsReturn) {
         if (redirect != null) {
-            return ((AssignableAVM2Item) redirect).toSourceChange(localData, generator, pre, post, needsReturn);
+            return ((AssignableAVM2Item) redirect).toSourceChange(localData, generator, post, decrement, needsReturn);
         }
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        Reference<Integer> ns_temp = new Reference<>(-1);
+        Reference<Integer> name_temp = new Reference<>(-1);
+        Reference<Integer> index_temp = new Reference<>(-1);
+        Reference<Integer> ret_temp = new Reference<>(-1);
+        boolean isInteger = returnType().toString().equals("int");
+        /*
+        
+                
+         */
 
         if (variableName == null && ns != null && index != null) {
-            List<GraphSourceItem> ret = toSourceMerge(localData, generator,
-                    ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+            return toSourceMerge(localData, generator,
                     ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()),
+                    ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                    dupSetTemp(localData, generator, name_temp),
+                    ns, generateCoerce(generator, "Namespace"),
+                    dupSetTemp(localData, generator, ns_temp),
+                    //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"), getTemp(localData, generator, index_temp), ins(new ConvertSIns()),
                     //Start get original
-                    ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
-                    ns, generateCoerce(generator, "Namespace"), index, ins(new ConvertSIns()), ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                    //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"), getTemp(localData, generator, index_temp), ins(new ConvertSIns()), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                    //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"), getTemp(localData, generator, index_temp), ins(new ConvertSIns()),
+                    ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                    !isInteger ? ins(new ConvertDIns()) : null,
                     //End get original
-                    pre);
-            int tempReg = -1;
-            if (needsReturn) {
-                tempReg = getFreeRegister(localData, generator);
-                ret.add(ins(new DupIns()));
-                ret.add(generateSetLoc(tempReg));
-            }
-            ret.addAll(toSourceMerge(localData, generator,
-                    post,
-                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true))
-            ));
-            if (needsReturn) {
-                ret.add(generateGetLoc(tempReg));
-                ret.add(ins(new KillIns(), tempReg));
-                killRegister(localData, generator, tempReg);
-            }
-            return ret;
+                    (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                    needsReturn ? ins(new DupIns()) : null,
+                    (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                    setTemp(localData, generator, ret_temp),
+                    getTemp(localData, generator, name_temp),
+                    getTemp(localData, generator, ns_temp),
+                    getTemp(localData, generator, ret_temp),
+                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                    killTemp(localData, generator, Arrays.asList(ret_temp, name_temp, ns_temp)));
         }
         if (variableName != null && ns != null && index == null) {
-            List<GraphSourceItem> ret = toSourceMerge(localData, generator,
-                    ns, generateCoerce(generator, "Namespace"), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+            return toSourceMerge(localData, generator,
                     ns, generateCoerce(generator, "Namespace"),
+                    ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                    dupSetTemp(localData, generator, name_temp),
+                    ns, generateCoerce(generator, "Namespace"),
+                    dupSetTemp(localData, generator, ns_temp),
                     //Start get original
-                    ns, generateCoerce(generator, "Namespace"), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
-                    ns, generateCoerce(generator, "Namespace"), ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                    //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                    //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"),
+                    ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                    !isInteger ? ins(new ConvertDIns()) : null,
                     //End get original
-                    pre);
-            int tempReg = -1;
-            if (needsReturn) {
-                tempReg = getFreeRegister(localData, generator);
-                ret.add(ins(new DupIns()));
-                ret.add(generateSetLoc(tempReg));
-            }
-            ret.addAll(toSourceMerge(localData, generator,
-                    post,
-                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true))
-            ));
-            if (needsReturn) {
-                ret.add(generateGetLoc(tempReg));
-                ret.add(ins(new KillIns(), tempReg));
-                killRegister(localData, generator, tempReg);
-            }
-            return ret;
+                    (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                    needsReturn ? ins(new DupIns()) : null,
+                    (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                    setTemp(localData, generator, ret_temp),
+                    getTemp(localData, generator, name_temp),
+                    getTemp(localData, generator, ns_temp),
+                    getTemp(localData, generator, ret_temp),
+                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                    killTemp(localData, generator, Arrays.asList(ret_temp, name_temp, ns_temp))
+            );
         }
 
         if (index != null) {
-            List<GraphSourceItem> ret = toSourceMerge(localData, generator,
-                    generateGetLoc(regNumber), index,
+            return toSourceMerge(localData, generator,
+                    generateGetLoc(regNumber), dupSetTemp(localData, generator, name_temp), index, dupSetTemp(localData, generator, index_temp),
                     //Start get original
-                    generateGetLoc(regNumber), index,
+                    //generateGetLoc(regNumber), getTemp(localData, generator, index_temp),
                     ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                    !isInteger ? ins(new ConvertDIns()) : null,
                     //End get original
-                    pre);
-            int tempReg = -1;
-            if (needsReturn) {
-                tempReg = getFreeRegister(localData, generator);
-                ret.add(ins(new DupIns()));
-                ret.add(generateSetLoc(tempReg));
-            }
-            ret.addAll(toSourceMerge(localData, generator,
-                    post,
-                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true))
-            ));
-            if (needsReturn) {
-                ret.add(generateGetLoc(tempReg));
-                ret.add(ins(new KillIns(), tempReg));
-                killRegister(localData, generator, tempReg);
-            }
-            return ret;
+                    (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                    needsReturn ? ins(new DupIns()) : null,
+                    (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                    setTemp(localData, generator, ret_temp),
+                    getTemp(localData, generator, name_temp),
+                    getTemp(localData, generator, index_temp),
+                    getTemp(localData, generator, ret_temp),
+                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                    killTemp(localData, generator, Arrays.asList(ret_temp, name_temp, index_temp))
+            );
         }
 
         return toSourceMerge(localData, generator,
                 //Start get original
                 generateGetLoc(regNumber),
                 //End get original
-                pre, generateCoerce(generator, type.toString()), needsReturn
-                ? ins(new DupIns()) : null, post, generateSetLoc(regNumber));
+                !isInteger ? ins(new ConvertDIns()) : null,
+                //End get original
+                (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                needsReturn ? ins(new DupIns()) : null,
+                (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                generateSetLoc(regNumber));
     }
 
 }

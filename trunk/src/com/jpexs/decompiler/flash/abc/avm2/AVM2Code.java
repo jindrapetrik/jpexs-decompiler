@@ -1859,14 +1859,16 @@ public class AVM2Code implements Serializable {
             int stackDelta = ins.definition.getStackDelta(ins, abc);
             stack += stackDelta;
             int scopeDelta = ins.definition.getScopeStackDelta(ins, abc);            
-            //System.out.println(""+ins+" stack:"+(stackDelta>0?"+"+stackDelta:stackDelta)+" scope:"+(scopeDelta>0?"+"+scopeDelta:scopeDelta));
             scope += scopeDelta;
+            
             if (stack > stats.maxstack) {
                 stats.maxstack = stack;
             }
             if (scope > stats.maxscope) {
                 stats.maxscope = scope;
             }
+            //System.out.println(""+ins+" deltaStack:"+(stackDelta>0?"+"+stackDelta:stackDelta)+" deltaScope:"+(scopeDelta>0?"+"+scopeDelta:scopeDelta)+" stack:"+stack+" scope:"+scope);
+            
             if ((ins.definition instanceof DXNSIns) || (ins.definition instanceof DXNSLateIns)) {
                 stats.has_set_dxns = true;
             }

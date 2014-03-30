@@ -19,14 +19,20 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -46,6 +52,7 @@ import com.jpexs.decompiler.graph.TypeFunctionItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -256,48 +263,20 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) {
 
         int propertyId = resolveProperty();
-        Object obj = object;
-        if (obj == null) {
-
-            String cname;
-            String pkgName = "";
-            cname = localData.currentClass;
-            if (cname.contains(".")) {
-                pkgName = cname.substring(0, cname.lastIndexOf("."));
-                cname = cname.substring(cname.lastIndexOf(".") + 1);
-            }
-            Reference<String> outName = new Reference<>("");
-            Reference<String> outNs = new Reference<>("");
-            Reference<String> outPropNs = new Reference<>("");
-            Reference<Integer> outPropNsKind = new Reference<>(1);
-            if (AVM2SourceGenerator.searchProperty(abcs, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind)) {
-                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0/*?*/, "this", null, false, openedNamespaces, openedNamespacesKind);
-                nobj.setRegNumber(0);
-                obj = nobj;
-            } else {
-                obj = ins(new FindPropertyStrictIns(), propertyId);
-            }
-        }
+        Object obj = resolveObject(localData, generator);
+        Reference<Integer> ret_temp=new Reference<>(0);
         if (assignedValue != null) {
-            int temp_reg = getFreeRegister(localData, generator);
             String targetType = resolvePropertyType().toString();
             String srcType = assignedValue.returnType().toString();
             GraphTargetItem st = assignedValue;
             if (!targetType.equals(srcType)) {
                 st = new CoerceAVM2Item(null, assignedValue, targetType);
             }
-            List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, index, st);
-            if (needsReturn) {
-                ret.add(ins(new DupIns()));
-                ret.add(ins(new SetLocalIns(), temp_reg));
-            }
-            ret.add(ins(new SetPropertyIns(), propertyId));
-            if (needsReturn) {
-                ret.add(ins(new GetLocalIns(), temp_reg));
-                ret.add(ins(new KillIns(), temp_reg));
-                killRegister(localData, generator, temp_reg);
-            }
-            return ret;
+            return toSourceMerge(localData, generator, obj, index, st,
+                    needsReturn?dupSetTemp(localData, generator, ret_temp):null,
+                    ins(new SetPropertyIns(), propertyId),
+                    needsReturn?getTemp(localData, generator, ret_temp):null,
+                killTemp(localData, generator, Arrays.asList(ret_temp)));
         } else {
             return toSourceMerge(localData, generator, obj, index,
                     ins(new GetPropertyIns(), propertyId),
@@ -321,37 +300,63 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return true;
     }
 
-    @Override
-    public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> pre, List<GraphSourceItem> post, boolean needsReturn) {
-        int propertyId = resolveProperty();
+
+    private Object resolveObject(SourceGeneratorLocalData localData, SourceGenerator generator){
         Object obj = object;
-        if (obj == null) {
-            obj = ins(new FindPropertyStrictIns(), propertyId);
+        int propertyId = resolveProperty();
+        if(obj==null){
+        String cname;
+            String pkgName = "";
+            cname = localData.currentClass;
+            if (cname.contains(".")) {
+                pkgName = cname.substring(0, cname.lastIndexOf("."));
+                cname = cname.substring(cname.lastIndexOf(".") + 1);
+            }
+            Reference<String> outName = new Reference<>("");
+            Reference<String> outNs = new Reference<>("");
+            Reference<String> outPropNs = new Reference<>("");
+            Reference<Integer> outPropNsKind = new Reference<>(1);
+            if (AVM2SourceGenerator.searchProperty(abcs, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind)) {
+                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0/*?*/, "this", null, false, openedNamespaces, openedNamespacesKind);
+                nobj.setRegNumber(0);
+                obj = nobj;
+            } else {
+                obj = ins(new FindPropertyStrictIns(), propertyId);
+            }
         }
+        return obj;
+    }
+    
+    @Override
+    public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, boolean post,boolean decrement, boolean needsReturn) {
+        int propertyId = resolveProperty();
+        Object obj = resolveObject(localData, generator);
 
-        int temp_reg = getFreeRegister(localData, generator);
-
-        List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, index,
+        Reference<Integer> ret_temp = new Reference<>(-1);
+        Reference<Integer> obj_temp = new Reference<>(-1);
+        Reference<Integer> index_temp = new Reference<>(-1);
+        
+        boolean isInteger = resolvePropertyType().toString().equals("int");
+        
+        
+        List<GraphSourceItem> ret= toSourceMerge(localData, generator, obj, dupSetTemp(localData, generator, obj_temp), index,index!=null?dupSetTemp(localData, generator, index_temp):null,
                 //Start get original
-                obj,
-                index,
+                //getTemp(localData, generator, obj_temp),
+                //index!=null?getTemp(localData, generator, index_temp):null,
                 ins(new GetPropertyIns(), propertyId),
+                !isInteger?ins(new ConvertDIns()):null,
                 //End get original
-                pre
-        );
-        if (needsReturn) {
-            ret.add(ins(new DupIns()));
-            ret.add(ins(new SetLocalIns(), temp_reg));
-        }
-        ret.addAll(post);
-        ret.add(ins(new SetPropertyIns(), propertyId));
-        if (needsReturn) {
-            ret.add(ins(new GetLocalIns(), temp_reg));
-            ret.add(ins(new KillIns(), temp_reg));
-            killRegister(localData, generator, temp_reg);
-        }
+                (!post)?(decrement?ins(isInteger?new DecrementIIns():new DecrementIns()):ins(isInteger?new IncrementIIns():new IncrementIns())):null,
+                needsReturn?ins(new DupIns()):null,
+                (post)?(decrement?ins(isInteger?new DecrementIIns():new DecrementIns()):ins(isInteger?new IncrementIIns():new IncrementIns())):null,
+                setTemp(localData, generator, ret_temp),
+                getTemp(localData, generator, obj_temp),
+                index!=null?getTemp(localData, generator, index_temp):null,
+                getTemp(localData, generator, ret_temp),
+                ins(new SetPropertyIns(), propertyId),
+                //needsReturn?getTemp(localData, generator, ret_temp):null,
+                killTemp(localData, generator, Arrays.asList(ret_temp,obj_temp,index_temp)));
         return ret;
-
     }
 
 }

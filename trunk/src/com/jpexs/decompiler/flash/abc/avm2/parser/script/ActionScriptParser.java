@@ -118,7 +118,7 @@ import java.util.logging.Logger;
 public class ActionScriptParser {
 
     private long uniqLast = 0;
-    private final boolean debugMode = true;
+    private final boolean debugMode = false;
     private static final String AS3_NAMESPACE = "http://adobe.com/AS3/2006/builtin";
 
     private ABC abc;

@@ -17,6 +17,19 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal1Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal2Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal3Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal0Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -41,7 +54,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
         this.assignedValue = storeValue;
     }
 
-    public abstract List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, List<GraphSourceItem> pre, List<GraphSourceItem> post, boolean needsReturn);
+    public abstract List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, boolean post,boolean decrement, boolean needsReturn);
 
     public GraphTargetItem getAssignedValue() {
         return assignedValue;
@@ -49,6 +62,82 @@ public abstract class AssignableAVM2Item extends AVM2Item {
 
     public void setAssignedValue(GraphTargetItem storeValue) {
         this.assignedValue = storeValue;
+    }
+
+    protected List<GraphSourceItem> dupSetTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
+        register.setVal(getFreeRegister(localData, generator));
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(ins(new DupIns()));
+        ret.add(generateSetLoc(register.getVal()));
+        return ret;
+    }
+    
+    protected List<GraphSourceItem> setTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
+        register.setVal(getFreeRegister(localData, generator));
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(generateSetLoc(register.getVal()));
+        return ret;
+    }
+
+    protected List<GraphSourceItem> getTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
+        if (register.getVal() < 0) {
+            return new ArrayList<>();
+        }
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(generateGetLoc(register.getVal()));
+        return ret;
+    }
+
+    /*protected List<GraphSourceItem> getAndKillTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
+        killRegister(localData, generator, register.getVal());
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(generateGetLoc(register.getVal()));
+        ret.add(ins(new KillIns(), register.getVal()));
+        return ret;
+    }*/
+
+    @SuppressWarnings("unchecked")
+    protected List<GraphSourceItem> killTemp(SourceGeneratorLocalData localData, SourceGenerator generator, List<Reference<Integer>> registers) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        for (Reference<Integer> register : registers) {
+            if (register.getVal() < 0) {
+                continue;
+            }
+            killRegister(localData, generator, register.getVal());
+
+            ret.add(ins(new KillIns(), register.getVal()));
+        }
+        return ret;
+    }
+
+    protected AVM2Instruction generateSetLoc(int regNumber) {
+        switch (regNumber) {
+            case 0:
+                return ins(new SetLocal0Ins());
+            case 1:
+                return ins(new SetLocal1Ins());
+            case 2:
+                return ins(new SetLocal2Ins());
+            case 3:
+                return ins(new SetLocal3Ins());
+            default:
+                return ins(new SetLocalIns(), regNumber);
+        }
+    }
+
+    protected AVM2Instruction generateGetLoc(int regNumber) {
+        switch (regNumber) {
+            case 0:
+                return ins(new GetLocal0Ins());
+            case 1:
+                return ins(new GetLocal1Ins());
+            case 2:
+                return ins(new GetLocal2Ins());
+            case 3:
+                return ins(new GetLocal3Ins());
+            default:
+                return ins(new GetLocalIns(), regNumber);
+        }
     }
 
 }

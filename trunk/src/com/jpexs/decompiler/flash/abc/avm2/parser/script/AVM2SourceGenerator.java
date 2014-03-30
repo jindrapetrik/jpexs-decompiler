@@ -1081,9 +1081,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         mb.code.code.add(ins(new ReturnVoidIns()));
-        System.out.println("---------------script---------------");
         mb.autoFillStats(abc, documentClass ? 1 : 0);
-        System.out.println("/--------------script---------------");
         abc.addMethodBody(mb);
         si.init_index = mb.method_info;
         generateTraitsPhase2(traitScope, pkg, null, null, false, localData, commands, si.traits, traitArr);

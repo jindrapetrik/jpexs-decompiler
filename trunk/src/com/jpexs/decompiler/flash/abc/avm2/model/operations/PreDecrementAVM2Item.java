@@ -43,9 +43,7 @@ public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2I
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         if (value instanceof AssignableAVM2Item) {
-            return ((AssignableAVM2Item) value).toSourceChange(localData, generator, toSourceMerge(localData, generator,
-                    new AVM2Instruction(0, new DecrementIns(), new int[]{}, new byte[0])
-            ), null, true);
+            return ((AssignableAVM2Item) value).toSourceChange(localData, generator, false, true, true);
         }
         return new ArrayList<>(); //?
     }
@@ -53,13 +51,11 @@ public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2I
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
         if (value instanceof AssignableAVM2Item) {
-            return ((AssignableAVM2Item) value).toSourceChange(localData, generator, toSourceMerge(localData, generator,
-                    new AVM2Instruction(0, new DecrementIns(), new int[]{}, new byte[0])
-            ), null, false);
+            return ((AssignableAVM2Item) value).toSourceChange(localData, generator, false, true, false);
         }
         return new ArrayList<>(); //?
     }
-
+    
     @Override
     public GraphTargetItem returnType() {
         return value.returnType();

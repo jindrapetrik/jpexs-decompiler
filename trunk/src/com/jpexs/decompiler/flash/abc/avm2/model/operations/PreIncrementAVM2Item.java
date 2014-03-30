@@ -41,9 +41,7 @@ public class PreIncrementAVM2Item extends UnaryOpItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         if (value instanceof AssignableAVM2Item) {
-            return ((AssignableAVM2Item) value).toSourceChange(localData, generator, toSourceMerge(localData, generator,
-                    new AVM2Instruction(0, new IncrementIns(), new int[]{}, new byte[0])
-            ), null, true);
+            return ((AssignableAVM2Item) value).toSourceChange(localData, generator, false, false, true);
         }
         return new ArrayList<>(); //?
     }
@@ -51,9 +49,7 @@ public class PreIncrementAVM2Item extends UnaryOpItem {
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
         if (value instanceof AssignableAVM2Item) {
-            return ((AssignableAVM2Item) value).toSourceChange(localData, generator, toSourceMerge(localData, generator,
-                    new AVM2Instruction(0, new IncrementIns(), new int[]{}, new byte[0])
-            ), null, false);
+            return ((AssignableAVM2Item) value).toSourceChange(localData, generator, false, false, false);
         }
         return new ArrayList<>(); //?
     }

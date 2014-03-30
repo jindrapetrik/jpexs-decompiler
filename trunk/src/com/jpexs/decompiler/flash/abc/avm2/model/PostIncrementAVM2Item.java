@@ -69,12 +69,10 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
         return true;
     }
 
-    @Override
+   @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
         if (object instanceof AssignableAVM2Item) {
-            return ((AssignableAVM2Item) object).toSourceChange(localData, generator, null, toSourceMerge(localData, generator,
-                    new AVM2Instruction(0, new IncrementIns(), new int[]{}, new byte[0])
-            ), true);
+            return ((AssignableAVM2Item) object).toSourceChange(localData, generator, true, false, true);
         }
         return new ArrayList<>(); //?
     }
@@ -82,9 +80,7 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
         if (object instanceof AssignableAVM2Item) {
-            return ((AssignableAVM2Item) object).toSourceChange(localData, generator, null, toSourceMerge(localData, generator,
-                    new AVM2Instruction(0, new IncrementIns(), new int[]{}, new byte[0])
-            ), false);
+            return ((AssignableAVM2Item) object).toSourceChange(localData, generator, true, false, false);
         }
         return new ArrayList<>(); //?
     }
