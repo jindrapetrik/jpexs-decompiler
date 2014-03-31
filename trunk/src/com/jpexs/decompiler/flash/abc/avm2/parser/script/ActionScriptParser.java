@@ -860,6 +860,12 @@ public class ActionScriptParser {
         }
 
         switch (s.type) {
+            case USE:
+                expectedType(SymbolType.NAMESPACE);
+                GraphTargetItem ns=type(openedNamespaces, openedNamespacesKinds, variables);
+                openedNamespaces.add(ns.toString());
+                openedNamespacesKinds.add(Namespace.KIND_NAMESPACE);
+                break;
             case WITH:
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem wvar = expression(openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, true, variables);//(name(false, openedNamespaces, openedNamespacesKinds, registerVars, inFunction, inMethod, variables));
