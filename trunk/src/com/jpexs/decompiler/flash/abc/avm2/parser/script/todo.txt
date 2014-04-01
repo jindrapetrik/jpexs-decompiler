@@ -9,4 +9,4 @@ TODO List for AS3 parser/compiler:
 - with
 - delete property
 - default xml namespace
-- better private namespaces handling
+- custom namespace modifiers

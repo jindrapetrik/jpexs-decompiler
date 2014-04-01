@@ -27,14 +27,12 @@ import java.util.List;
  */
 public class MethodAVM2Item extends FunctionAVM2Item {
 
-    public int namespaceKind;
     private boolean isStatic;
     private boolean isFinal;
     private boolean override;
 
-    public MethodAVM2Item(boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespaceKind, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
-        super(hasRest, line, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
-        this.namespaceKind = namespaceKind;
+    public MethodAVM2Item(boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespace, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
+        super(namespace, hasRest, line, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
         this.isStatic = isStatic;
         this.override = override;
         this.isFinal = isFinal;

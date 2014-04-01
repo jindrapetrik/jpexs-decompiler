@@ -54,7 +54,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
         this.assignedValue = storeValue;
     }
 
-    public abstract List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, boolean post,boolean decrement, boolean needsReturn);
+    public abstract List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, boolean post, boolean decrement, boolean needsReturn);
 
     public GraphTargetItem getAssignedValue() {
         return assignedValue;
@@ -71,7 +71,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
         ret.add(generateSetLoc(register.getVal()));
         return ret;
     }
-    
+
     protected List<GraphSourceItem> setTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
         register.setVal(getFreeRegister(localData, generator));
         List<GraphSourceItem> ret = new ArrayList<>();
@@ -89,13 +89,12 @@ public abstract class AssignableAVM2Item extends AVM2Item {
     }
 
     /*protected List<GraphSourceItem> getAndKillTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
-        killRegister(localData, generator, register.getVal());
-        List<GraphSourceItem> ret = new ArrayList<>();
-        ret.add(generateGetLoc(register.getVal()));
-        ret.add(ins(new KillIns(), register.getVal()));
-        return ret;
-    }*/
-
+     killRegister(localData, generator, register.getVal());
+     List<GraphSourceItem> ret = new ArrayList<>();
+     ret.add(generateGetLoc(register.getVal()));
+     ret.add(ins(new KillIns(), register.getVal()));
+     return ret;
+     }*/
     @SuppressWarnings("unchecked")
     protected List<GraphSourceItem> killTemp(SourceGeneratorLocalData localData, SourceGenerator generator, List<Reference<Integer>> registers) {
         List<GraphSourceItem> ret = new ArrayList<>();

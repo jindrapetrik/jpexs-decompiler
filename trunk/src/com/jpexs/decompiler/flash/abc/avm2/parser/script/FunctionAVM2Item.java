@@ -30,6 +30,7 @@ public class FunctionAVM2Item extends AVM2Item {
 
     public String calculatedFunctionName;
     public String functionName;
+    public int namespace;
     public List<String> paramNames;
     public List<GraphTargetItem> body;
     public List<NameAVM2Item> subvariables;
@@ -39,8 +40,9 @@ public class FunctionAVM2Item extends AVM2Item {
     public int line;
     public boolean hasRest;
 
-    public FunctionAVM2Item(boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
+    public FunctionAVM2Item(int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
         super(null, NOPRECEDENCE);
+        this.namespace = namespace;
         this.paramNames = paramNames;
         this.body = body;
         this.functionName = functionName;

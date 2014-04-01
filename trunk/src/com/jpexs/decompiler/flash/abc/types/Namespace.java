@@ -97,7 +97,7 @@ public class Namespace {
 
     public String getName(ConstantPool constants) {
         if (name_index == 0) {
-            return "-";
+            return null;
         }
         return constants.getString(name_index);
     }

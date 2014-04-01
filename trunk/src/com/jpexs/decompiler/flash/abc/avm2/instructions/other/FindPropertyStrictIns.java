@@ -55,14 +55,13 @@ public class FindPropertyStrictIns extends InstructionDefinition {
     @Override
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         int ret = 1;
-        //FLEX does not calculate following:
-        /*int multinameIndex = ins.operands[0];
+        int multinameIndex = ins.operands[0];
         if (abc.constants.getMultiname(multinameIndex).needsName()) {
             ret--;
         }
         if (abc.constants.getMultiname(multinameIndex).needsNs()) {
             ret--;
-        }*/
+        }
         return ret;
     }
 }

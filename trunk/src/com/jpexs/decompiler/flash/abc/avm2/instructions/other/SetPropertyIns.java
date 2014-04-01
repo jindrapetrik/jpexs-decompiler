@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -133,6 +134,10 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         int ret = -2;
         int multinameIndex = ins.operands[0];
+        int multinameKind = abc.constants.getMultiname(multinameIndex).kind;
+        if(multinameKind == Multiname.MULTINAMEL || multinameKind == Multiname.MULTINAMELA){
+            return 0;
+        }
         if (abc.constants.getMultiname(multinameIndex).needsName()) {
             ret--;
         }

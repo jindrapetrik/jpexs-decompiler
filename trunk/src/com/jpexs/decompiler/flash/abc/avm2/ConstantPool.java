@@ -221,6 +221,9 @@ public class ConstantPool {
     }
 
     public int getStringId(String val) {
+        if (val == null) {
+            return 0;
+        }
         for (int i = 1; i < constant_string.size(); i++) {
             if (constant_string.get(i).equals(val)) {
                 return i;
@@ -262,6 +265,9 @@ public class ConstantPool {
     }
 
     public int getStringId(String val, boolean add) {
+        if (val == null) {
+            return 0;
+        }
         int id = getStringId(val);
         if (add && id == 0) {
             id = addString(val);

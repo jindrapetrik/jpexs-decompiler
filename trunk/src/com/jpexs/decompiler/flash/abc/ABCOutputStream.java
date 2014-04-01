@@ -161,11 +161,16 @@ public class ABCOutputStream extends OutputStream {
 
     public void writeNamespace(Namespace ns) throws IOException {
         write(ns.kind);
+        boolean found = false;
         for (int k = 0; k < Namespace.nameSpaceKinds.length; k++) {
             if (Namespace.nameSpaceKinds[k] == ns.kind) {
                 writeU30(ns.name_index);
+                found = true;
                 break;
             }
+        }
+        if (!found) {
+            throw new RuntimeException("Invalid ns kind:" + ns.kind);
         }
     }
 

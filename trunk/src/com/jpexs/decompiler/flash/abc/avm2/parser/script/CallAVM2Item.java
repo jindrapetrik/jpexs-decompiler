@@ -23,9 +23,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -33,7 +30,6 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeFunctionItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,12 +76,13 @@ public class CallAVM2Item extends AVM2Item {
             Reference<String> outNs = new Reference<>("");
             Reference<String> outPropNs = new Reference<>("");
             Reference<Integer> outPropNsKind = new Reference<>(1);
-            if (AVM2SourceGenerator.searchProperty(allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind)) {
-                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), n.line, "this", null, false, n.openedNamespaces, n.openedNamespacesKind);
+            Reference<String> outPropType = new Reference<>("");
+            if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropType)) {
+                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), n.line, "this", null, false, n.openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;
             }
-            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), n.getIndex(), allAbcs, n.openedNamespaces, n.openedNamespacesKind);
+            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), n.getIndex(), g.abc, g.allABCs, n.openedNamespaces);
             p.setAssignedValue(n.getAssignedValue());
             callable = p;
         }
@@ -111,10 +108,7 @@ public class CallAVM2Item extends AVM2Item {
         GraphTargetItem callable = name;
         if (callable instanceof NameAVM2Item) {
             NameAVM2Item n = (NameAVM2Item) callable;
-            List<ABC> allAbcs = new ArrayList<>();
-            allAbcs.add(g.abc);
-            allAbcs.addAll(g.allABCs);
-            PropertyAVM2Item p = new PropertyAVM2Item(null, n.getVariableName(), n.getIndex(), allAbcs, n.openedNamespaces, n.openedNamespacesKind);
+            PropertyAVM2Item p = new PropertyAVM2Item(null, n.getVariableName(), n.getIndex(), g.abc, g.allABCs, n.openedNamespaces);
             p.setAssignedValue(n.getAssignedValue());
             callable = p;
         }

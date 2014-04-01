@@ -94,10 +94,10 @@ public class ABC {
         constants.constant_double.add(null);
         constants.constant_int.add(null);
         constants.constant_uint.add(null);
-        constants.constant_string.add("");       
+        constants.constant_string.add("");
         constants.constant_multiname.add(null);
         constants.constant_namespace.add(null);
-        constants.constant_namespace_set.add(null);     
+        constants.constant_namespace_set.add(null);
     }
 
     public int addMethodBody(MethodBody body) {
@@ -894,7 +894,6 @@ public class ABC {
         }
         return ret;
     }
-
 
     public int findMethodInfoByName(int classId, String methodName) {
         if (classId > -1) {

@@ -42,6 +42,16 @@ public class Multiname {
     public int qname_index = -1; //for TypeName
     public List<Integer> params; //for TypeName
 
+    public boolean validType() {
+        boolean cnt = false;
+        for (int i = 0; i < multinameKinds.length; i++) {
+            if (multinameKinds[i] == kind) {
+                cnt = true;
+            }
+        }
+        return cnt;
+    }
+
     public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index, int qname_index, List<Integer> params) {
         this.kind = kind;
         this.name_index = name_index;
@@ -49,6 +59,9 @@ public class Multiname {
         this.namespace_set_index = namespace_set_index;
         this.qname_index = qname_index;
         this.params = params;
+        if (!validType()) {
+            throw new RuntimeException("Invalid multiname kind:" + kind);
+        }
     }
 
     public boolean isAttribute() {

@@ -27,22 +27,22 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class ConstAVM2Item extends AVM2Item {
 
-    private final int nsKind;
+    private final int namespace;
     private boolean isStatic;
     public String var;
     public GraphTargetItem type;
 
-    public int getNsKind() {
-        return nsKind;
+    public int getNamespace() {
+        return namespace;
     }
 
     public boolean isStatic() {
         return isStatic;
     }
 
-    public ConstAVM2Item(boolean isStatic, int nsKind, String var, GraphTargetItem type, GraphTargetItem value) {
+    public ConstAVM2Item(boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value) {
         super(null, NOPRECEDENCE);
-        this.nsKind = nsKind;
+        this.namespace = namespace;
         this.value = value;
         this.isStatic = isStatic;
         this.var = var;

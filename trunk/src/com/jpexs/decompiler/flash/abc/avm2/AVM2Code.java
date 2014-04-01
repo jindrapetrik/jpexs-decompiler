@@ -1857,18 +1857,21 @@ public class AVM2Code implements Serializable {
             stats.instructionStats[pos].scopepos = scope;
             AVM2Instruction ins = code.get(pos);
             int stackDelta = ins.definition.getStackDelta(ins, abc);
+            int scopeDelta = ins.definition.getScopeStackDelta(ins, abc);
+            int oldStack = stack;
+
+            //+" deltaScope:"+(scopeDelta>0?"+"+scopeDelta:scopeDelta)+" stack:"+stack+" scope:"+scope);
             stack += stackDelta;
-            int scopeDelta = ins.definition.getScopeStackDelta(ins, abc);            
             scope += scopeDelta;
-            
+
             if (stack > stats.maxstack) {
                 stats.maxstack = stack;
             }
             if (scope > stats.maxscope) {
                 stats.maxscope = scope;
             }
-            //System.out.println(""+ins+" deltaStack:"+(stackDelta>0?"+"+stackDelta:stackDelta)+" deltaScope:"+(scopeDelta>0?"+"+scopeDelta:scopeDelta)+" stack:"+stack+" scope:"+scope);
-            
+
+            //System.out.println("stack "+oldStack+(stackDelta>=0?"+"+stackDelta:stackDelta)+" max:"+stats.maxstack+" "+ins);
             if ((ins.definition instanceof DXNSIns) || (ins.definition instanceof DXNSLateIns)) {
                 stats.has_set_dxns = true;
             }
@@ -1885,7 +1888,7 @@ public class AVM2Code implements Serializable {
                         handleRegister(stats, ins.operands[i]);
                     }
                 }
-            }            
+            }
             if (ins.definition instanceof ReturnValueIns) {
                 //check stack=1
                 return true;
@@ -1927,7 +1930,7 @@ public class AVM2Code implements Serializable {
     }
 
     public CodeStats getStats(ABC abc, MethodBody body, int initScope) {
-        CodeStats stats = new CodeStats(this);        
+        CodeStats stats = new CodeStats(this);
         if (!walkCode(stats, 0, 0, initScope, abc)) {
             return null;
         }

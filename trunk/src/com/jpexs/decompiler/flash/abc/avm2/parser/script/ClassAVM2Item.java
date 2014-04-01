@@ -33,7 +33,8 @@ public class ClassAVM2Item extends AVM2Item implements Block {
     public List<GraphTargetItem> implementsOp;
     public String className;
     public GraphTargetItem constructor;
-    public int namespaceKind;
+    public int namespace;
+    public int protectedNs;
     public boolean isDynamic;
     public boolean isFinal;
 
@@ -46,14 +47,15 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         return ret;
     }
 
-    public ClassAVM2Item(boolean isDynamic, boolean isFinal, int namespaceKind, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> traits) {
+    public ClassAVM2Item(int protectedNs, boolean isDynamic, boolean isFinal, int namespace, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
+        this.protectedNs = protectedNs;
         this.className = className;
         this.traits = traits;
         this.extendsOp = extendsOp;
         this.implementsOp = implementsOp;
         this.constructor = constructor;
-        this.namespaceKind = namespaceKind;
+        this.namespace = namespace;
         this.isDynamic = isDynamic;
         this.isFinal = isFinal;
     }

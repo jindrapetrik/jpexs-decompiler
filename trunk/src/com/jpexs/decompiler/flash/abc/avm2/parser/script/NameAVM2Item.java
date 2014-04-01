@@ -34,7 +34,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertSIns;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
-import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -57,8 +56,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
     private boolean definition;
     private GraphTargetItem index;
     private int nsKind = -1;
-    public List<String> openedNamespaces;
-    public List<Integer> openedNamespacesKind;
+    public List<Integer> openedNamespaces;
     public int line;
     public GraphTargetItem type;
     private GraphTargetItem ns = null;
@@ -116,7 +114,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return variableName;
     }
 
-    public NameAVM2Item(GraphTargetItem type, int line, String variableName, GraphTargetItem storeValue, boolean definition, List<String> openedNamespaces, List<Integer> openedNamespacesKind) {
+    public NameAVM2Item(GraphTargetItem type, int line, String variableName, GraphTargetItem storeValue, boolean definition, List<Integer> openedNamespaces) {
         super(storeValue);
         this.variableName = variableName;
         this.assignedValue = storeValue;
@@ -124,7 +122,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
         this.line = line;
         this.type = type;
         this.openedNamespaces = openedNamespaces;
-        this.openedNamespacesKind = openedNamespacesKind;
     }
 
     public boolean isDefinition() {
@@ -143,7 +140,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
     private int allNsSet(ABC abc) {
         int nssa[] = new int[openedNamespaces.size()];
         for (int i = 0; i < openedNamespaces.size(); i++) {
-            nssa[i] = (abc.constants.getNamespaceId(new Namespace(openedNamespacesKind.get(i), abc.constants.getStringId(openedNamespaces.get(i), true)), 0, true));
+            nssa[i] = openedNamespaces.get(i);
         }
         return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
     }
@@ -235,7 +232,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
 
         if (assignedValue != null) {
-            return toSourceMerge(localData, generator, assignedValue, (!(assignedValue.returnType().toString().equals("int")&&type.toString().equals("int")))?generateCoerce(generator, type.toString()):null, needsReturn
+            return toSourceMerge(localData, generator, assignedValue, (!("int".equals("" + assignedValue.returnType()) && "int".equals("" + type))) ? generateCoerce(generator, "" + type) : null, needsReturn
                     ? ins(new DupIns()) : null, generateSetLoc(regNumber));
         } else {
             return toSourceMerge(localData, generator, generateGetLoc(regNumber),
@@ -286,7 +283,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         if (index != null) {
             return TypeItem.UNBOUNDED;
         }
-        if(type == null){
+        if (type == null) {
             return TypeItem.UNBOUNDED;
         }
         return type;
