@@ -307,7 +307,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     }
 
     public byte[] getDataOrOriginalData() {
-        if (modified) {
+        if (isModified()) {
             return getData();
         }
         return data;

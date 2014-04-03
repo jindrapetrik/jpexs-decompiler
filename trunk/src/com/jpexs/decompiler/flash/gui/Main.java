@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
@@ -61,6 +62,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.Socket;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1050,7 +1052,7 @@ public class Main {
             Socket sock = new Socket("www.free-decompiler.com", 80);
             OutputStream os = sock.getOutputStream();
             String currentLoc = Configuration.locale.get("en");
-            os.write(("GET /flash/update.html?action=check&currentVersion=" + ApplicationInfo.version + "&currentBuild=" + ApplicationInfo.build + "&currentNightly=" + ApplicationInfo.nightly + " HTTP/1.1\r\n"
+            os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(ApplicationInfo.version,"UTF-8") + "&currentBuild=" + URLEncoder.encode(ApplicationInfo.build,"UTF-8") + "&currentNightly=" + (ApplicationInfo.nightly?"1":"0") + " HTTP/1.1\r\n"
                     + "Host: www.free-decompiler.com\r\n"
                     + "X-Accept-Versions: " + acceptVersions + "\r\n"
                     + "X-Update-Major: " + UPDATE_SYSTEM_MAJOR + "\r\n"

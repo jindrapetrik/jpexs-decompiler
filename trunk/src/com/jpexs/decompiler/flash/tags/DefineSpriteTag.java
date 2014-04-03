@@ -314,4 +314,17 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
         return getTimeline().getOutline(frame, time, ratio, stateUnderCursor, mouseButton, transformation);
     }
+
+    @Override
+    public boolean isModified() {
+        if(super.isModified()){
+            return true;
+        }
+        for(Tag t:subTags){
+            if(t.isModified()){
+                return true;
+            }
+        }
+        return false;
+    }        
 }

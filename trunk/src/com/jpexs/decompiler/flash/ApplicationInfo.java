@@ -30,7 +30,7 @@ public class ApplicationInfo {
     public static final String VENDOR = "JPEXS";
     public static String version = "";
     public static String build = "";
-    public static String nightly = "";
+    public static boolean nightly = false;
     public static String applicationVerName;
     public static String shortApplicationVerName;
     public static final String PROJECT_PAGE = "http://www.free-decompiler.com/flash";
@@ -47,8 +47,8 @@ public class ApplicationInfo {
             prop.load(ApplicationInfo.class.getResourceAsStream("/project.properties"));
             version = prop.getProperty("version");
             build = prop.getProperty("build");
-            nightly = prop.getProperty("nightly");
-            if (nightly.equals("true")) {
+            nightly = prop.getProperty("nightly").equals("true");
+            if (nightly) {
                 version = version + " nightly build " + build;
             }
         } catch (IOException | NullPointerException ex) {
