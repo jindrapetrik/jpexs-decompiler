@@ -49,6 +49,8 @@ public abstract class AssignableAVM2Item extends AVM2Item {
         this(null);
     }
 
+    public abstract AssignableAVM2Item copy();
+    
     public AssignableAVM2Item(GraphTargetItem storeValue) {
         super(null, PRECEDENCE_PRIMARY);
         this.assignedValue = storeValue;

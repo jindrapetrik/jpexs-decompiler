@@ -65,6 +65,19 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
     public GraphTargetItem redirect;
 
+    @Override
+    public AssignableAVM2Item copy() {
+        NameAVM2Item c = new NameAVM2Item(type, line, variableName, assignedValue, definition, openedNamespaces);
+        c.setNs(ns);
+        c.regNumber = regNumber;
+        c.unresolved = unresolved;
+        c.nsKind = nsKind;
+        c.setIndex(index);
+        return c;
+    }
+    
+    
+
     public void setNs(GraphTargetItem ns) {
         this.ns = ns;
     }

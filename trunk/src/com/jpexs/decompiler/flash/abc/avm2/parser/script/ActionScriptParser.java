@@ -1450,10 +1450,14 @@ public class ActionScriptParser {
                 if (!(expr instanceof AssignableAVM2Item)) {
                     throw new ParseException("Invalid assignment", lexer.yyline());
                 }
-                ((AssignableAVM2Item) expr).setAssignedValue(assigned);
+                AssignableAVM2Item as = ((AssignableAVM2Item)expr).copy();
+                if(as instanceof NameAVM2Item){
+                    variables.add((NameAVM2Item)as);
+                }
+                as.setAssignedValue(assigned);
                 if (expr instanceof NameAVM2Item) {
                     ((NameAVM2Item) expr).setDefinition(false);
-                    ret = expr;
+                    ret = as;
                 }
                 ret = expr;
                 break;

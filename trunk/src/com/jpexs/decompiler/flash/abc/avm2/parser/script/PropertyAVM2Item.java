@@ -59,6 +59,14 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem index;
     private List<Integer> openedNamespaces;
 
+    @Override
+    public AssignableAVM2Item copy() {
+        PropertyAVM2Item p =new PropertyAVM2Item(object, propertyName, index, abc, otherABCs, openedNamespaces);
+        return p;
+    }
+    
+    
+
     public PropertyAVM2Item(GraphTargetItem object, String propertyName, GraphTargetItem index, ABC abc, List<ABC> otherABCs, List<Integer> openedNamespaces) {
         this.propertyName = propertyName;
         this.object = object;
