@@ -270,6 +270,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -646,11 +647,13 @@ public class SWFInputStream extends InputStream {
             return new byte[0];
         }
         byte[] ret = new byte[count];
+        int i = 0;
         try {
-            for (int i = 0; i < count; i++) {
+            for (i = 0; i < count; i++) {
                 ret[i] = (byte) readEx();
             }
         } catch (EOFException | EndOfStreamException ex) {
+            ret = Arrays.copyOf(ret, i); // truncate array
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, null, ex);
         }
         return ret;

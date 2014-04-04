@@ -660,7 +660,7 @@ public class Helper {
          }
          }*/
         int length = data.length;
-        if (length > limit) {
+        if (limit != -1 && length > limit) {
             length = limit;
         }
 
@@ -717,7 +717,7 @@ public class Helper {
         }
 
         writer.newLine();
-        if (data.length > limit) {
+        if (limit != -1 && data.length > limit) {
             writer.appendNoHilight(AppStrings.translate("binaryData.truncateWarning").replace("%count%", Integer.toString(data.length - limit)));
         }
 
