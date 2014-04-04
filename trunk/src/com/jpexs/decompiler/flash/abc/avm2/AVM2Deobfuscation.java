@@ -85,6 +85,9 @@ public class AVM2Deobfuscation {
     }
 
     public String builtInNs(String ns) {
+        if(ns == null){
+            return null;
+        }
         if (ns.equals("http://www.adobe.com/2006/actionscript/flash/proxy")) {
             return "flash.utils.flash_proxy";
         }
