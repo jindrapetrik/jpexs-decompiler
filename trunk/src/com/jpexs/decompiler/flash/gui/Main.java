@@ -375,6 +375,7 @@ public class Main {
         @Override
         protected Object doInBackground() throws Exception {
             boolean first = true;
+            SWF firstSWF = null;
             for (final SWFSourceInfo sourceInfo : sourceInfos) {
                 SWFList swfs = null;
                 try {
@@ -391,6 +392,9 @@ public class Main {
                 final SWFList swfs1 = swfs;
                 final boolean first1 = first;
                 first = false;
+                if(firstSWF == null){
+                    firstSWF = swfs1.get(0);
+                }
                 try {
                     Main.startWork(AppStrings.translate("work.creatingwindow") + "...");
                     View.execInEventDispatch(new Runnable() {
@@ -407,6 +411,7 @@ public class Main {
             }
 
             loadingDialog.setVisible(false);
+            final SWF fswf = firstSWF;
             View.execInEventDispatch(new Runnable() {
                 @Override
                 public void run() {
@@ -414,6 +419,9 @@ public class Main {
                         mainFrame.setVisible(true);
                     }
                     Main.stopWork();
+                    if (mainFrame != null && Configuration.gotoMainClassOnStartup.get()) {
+                        mainFrame.getPanel().gotoDocumentClass(fswf);
+                    }
                 }
             });
 
