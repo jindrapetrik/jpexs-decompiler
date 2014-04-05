@@ -62,7 +62,7 @@ public abstract class Trait implements Serializable {
                         break;
                     }
                     nsname = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants));
-                    if (nsname.equals("-")) {
+                    if (nsname == null) {
                         break;
                     }
                     if (nsname.contains(".")) {
@@ -88,7 +88,7 @@ public abstract class Trait implements Serializable {
                 }
             }
 
-            if ((!nsname.contains(":")) && (!nsname.isEmpty())) {
+            if (nsname!=null && (!nsname.contains(":")) && (!nsname.isEmpty())) {
                 ret += " " + nsname;
             }
             if (ns != null) {
@@ -127,7 +127,7 @@ public abstract class Trait implements Serializable {
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
             String nsname = ns.getName(abc.constants);
-            writer.appendNoHilight("package " + nsname).newLine();
+            writer.appendNoHilight("package " + nsname).newLine(); //assume not null name
             writer.appendNoHilight("{").newLine();
             writer.indent();
             toString(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
@@ -141,7 +141,6 @@ public abstract class Trait implements Serializable {
     public void convertPackaged(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            String nsname = ns.getName(abc.constants);
             convert(parent, path, abcTags, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         }
     }
@@ -170,6 +169,6 @@ public abstract class Trait implements Serializable {
         Namespace ns = name.getNamespace(abc.constants);
         String packageName = ns.getName(abc.constants);
         String objectName = name.getName(abc.constants, new ArrayList<String>());
-        return packageName + "." + objectName;
+        return packageName + "." + objectName; //assume not null name
     }
 }

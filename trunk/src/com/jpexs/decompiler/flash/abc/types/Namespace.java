@@ -94,11 +94,24 @@ public class Namespace {
         }
         return kindStr;
     }
-
+    
     public String getName(ConstantPool constants) {
         if (name_index == 0) {
             return null;
         }
         return constants.getString(name_index);
+    }
+    
+    public boolean hasName(String name, ConstantPool constants){
+        if(name == null && name_index==0){
+            return true;
+        }
+        if(name == null){
+            return false;
+        }
+        if(name_index == 0){
+            return false;
+        }
+        return constants.getString(name_index).equals(name);
     }
 }

@@ -38,7 +38,7 @@ public class NameSpaceAVM2Item extends AVM2Item {
             return writer.append("*");
         }
         ConstantPool constants = localData.constantsAvm2;
-        return writer.append(constants.getNamespace(namespaceIndex).toString(constants));
+        return writer.append(constants.getNamespace(namespaceIndex).toString(constants)); //assume not null name
     }
 
     @Override

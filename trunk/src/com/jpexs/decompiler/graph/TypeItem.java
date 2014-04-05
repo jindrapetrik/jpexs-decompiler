@@ -103,7 +103,7 @@ public class TypeItem extends GraphTargetItem{
         for(InstanceInfo ii:abc.instance_info){
             Multiname mname=abc.constants.constant_multiname.get(ii.name_index);
             if(mname.getName(abc.constants, new ArrayList<String>()).equals(name)){
-                if(mname.getNamespace(abc.constants).getName(abc.constants).equals(pkg)){
+                if(mname.getNamespace(abc.constants).hasName(pkg,abc.constants)){
                     return ii.name_index;
                 }
             }

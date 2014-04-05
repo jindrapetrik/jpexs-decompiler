@@ -135,7 +135,7 @@ public class ValueKind {
             case CONSTANT_ExplicitNamespace:
             case CONSTANT_StaticProtectedNs:
             case CONSTANT_PrivateNs:
-                ret = "\"" + constants.getNamespace(value_index).getName(constants) + "\"";
+                ret = "\"" + constants.getNamespace(value_index).getName(constants) + "\"";  //assume not null name
                 break;
         }
         return ret;
@@ -177,7 +177,7 @@ public class ValueKind {
             case CONSTANT_ExplicitNamespace:
             case CONSTANT_StaticProtectedNs:
             case CONSTANT_PrivateNs:
-                ret = constants.getNamespace(value_index).getKindStr() + "(\"" + constants.getNamespace(value_index).getName(constants) + "\")";
+                ret = constants.getNamespace(value_index).getKindStr() + "(\"" + constants.getNamespace(value_index).getName(constants) + "\")"; //assume not null name
                 break;
         }
         return ret;

@@ -748,7 +748,7 @@ public class ABC {
                 if (t instanceof TraitSlotConst) {
                     TraitSlotConst s = ((TraitSlotConst) t);
                     if (s.isNamespace()) {
-                        String key = constants.getNamespace(s.value_index).getName(constants);
+                        String key = constants.getNamespace(s.value_index).getName(constants); //assume not null
                         String val = constants.getMultiname(s.name_index).getNameWithNamespace(constants);
                         namespaceMap.put(key, val);
                     }

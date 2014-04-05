@@ -96,7 +96,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 newimport = oldimport;
                 newimport += "." + name;
             }
-            if (newimport.isEmpty()) {
+            if (newimport!=null && newimport.isEmpty()) {
                 newimport = null;
             }
             if (newimport != null) {
@@ -149,7 +149,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
             return;
         }
-        if (newimport.equals("-")) {
+        if (newimport == null) {
             newimport = "";
         }
         //if (!newimport.equals("")) {
@@ -298,7 +298,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     private List<String> getImportsUsages(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
         //constructor
 
-        String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
+        String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants); //assume not null name
 
         parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.getMultiname(abc.instance_info.get(class_info).name_index), packageName, fullyQualifiedNames);
 
@@ -337,7 +337,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     public GraphTextWriter toString(Trait parent, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         writer.startClass(class_info);
-        String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
+        String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants); //assume not null name
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abcTags) {
             for (ScriptInfo si : tag.getABC().script_info) {
