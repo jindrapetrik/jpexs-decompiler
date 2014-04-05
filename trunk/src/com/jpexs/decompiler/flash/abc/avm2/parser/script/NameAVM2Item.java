@@ -23,16 +23,25 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNanIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNullIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertSIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -158,9 +167,23 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
     }
 
+    private GraphTargetItem getDefaultValue(String type){
+        switch(type){
+            case "int":
+                return new IntegerValueAVM2Item(null, 0L);
+            case "Number":
+                return new NanAVM2Item(null);
+            default:
+                return new NullAVM2Item(null);
+        }
+    }
+    
     private AVM2Instruction generateCoerce(SourceGenerator generator, String type) {
         AVM2Instruction ins;
         switch (type) {
+            case "int":
+                ins = ins(new ConvertIIns());
+                break;
             case "*":
                 ins = ins(new CoerceAIns());
                 break;
@@ -180,7 +203,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
             throw new RuntimeException("No register set for " + variableName);
         }
         if (definition && assignedValue == null) {
-            return new ArrayList<>();
+            assignedValue = getDefaultValue(type==null?"*":type.toString());
         }
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         Reference<Integer> ns_temp = new Reference<>(-1);
@@ -245,7 +268,8 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
 
         if (assignedValue != null) {
-            return toSourceMerge(localData, generator, assignedValue, (!("int".equals("" + assignedValue.returnType()) && "int".equals("" + type))) ? generateCoerce(generator, "" + type) : null, needsReturn
+            List<String> basicTypes = Arrays.asList("int","Number");
+            return toSourceMerge(localData, generator, assignedValue, !((""+assignedValue.returnType()).equals(""+type)&&(basicTypes.contains(""+type))) ? generateCoerce(generator, "" + type) : null, needsReturn
                     ? ins(new DupIns()) : null, generateSetLoc(regNumber));
         } else {
             return toSourceMerge(localData, generator, generateGetLoc(regNumber),
@@ -387,6 +411,10 @@ public class NameAVM2Item extends AssignableAVM2Item {
             );
         }
 
+        if(!needsReturn){
+            return toSourceMerge(localData, generator,
+                ins(isInteger?new IncLocalIIns():new IncLocalIns(),regNumber));
+        }
         return toSourceMerge(localData, generator,
                 //Start get original
                 generateGetLoc(regNumber),

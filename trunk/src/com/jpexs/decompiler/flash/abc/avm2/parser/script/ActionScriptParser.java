@@ -1456,10 +1456,9 @@ public class ActionScriptParser {
                 }
                 as.setAssignedValue(assigned);
                 if (expr instanceof NameAVM2Item) {
-                    ((NameAVM2Item) expr).setDefinition(false);
-                    ret = as;
+                    ((NameAVM2Item) expr).setDefinition(false);                    
                 }
-                ret = expr;
+                ret = as;
                 break;
             case INCREMENT: //postincrement
                 if (!(expr instanceof AssignableAVM2Item)) {

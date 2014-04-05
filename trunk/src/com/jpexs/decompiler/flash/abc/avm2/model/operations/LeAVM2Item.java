@@ -18,7 +18,11 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessEqualsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfEqIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfLeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNLeIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -28,12 +32,24 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
 
-public class LeAVM2Item extends BinaryOpItem implements LogicalOpItem {
+public class LeAVM2Item extends BinaryOpItem implements LogicalOpItem,IfCondition {
 
     public LeAVM2Item(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<=");
     }
 
+    @Override
+    public InstructionDefinition getIfDefinition() {
+        return new IfLeIns();
+    }
+
+    @Override
+    public InstructionDefinition getIfNotDefinition() {
+        return new IfNLeIns();
+    }
+    
+    
+    
     @Override
     public GraphTargetItem invert() {
         return new GtAVM2Item(src, leftSide, rightSide);

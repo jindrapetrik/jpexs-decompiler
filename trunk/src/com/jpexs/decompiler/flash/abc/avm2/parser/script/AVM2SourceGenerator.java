@@ -22,9 +22,12 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.EqualsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewClassIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfEqIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfFalseIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfTrueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
@@ -34,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrict
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.InitPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.LabelIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
@@ -49,6 +53,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.TryAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.IfCondition;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
@@ -166,14 +171,25 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return list;
     }
 
+    private List<GraphSourceItem> condition(SourceGeneratorLocalData localData, GraphTargetItem t, int offset){
+        if(t instanceof IfCondition){
+            IfCondition ic=(IfCondition)t;
+            return GraphTargetItem.toSourceMerge(localData, this, ic.getLeftSide(),ic.getRightSide(),ins(ic.getIfDefinition(),offset));
+        }
+        return GraphTargetItem.toSourceMerge(localData, this, t, ins(new IfTrueIns(),offset));
+    }
+    
+    private List<GraphSourceItem> notCondition(SourceGeneratorLocalData localData, GraphTargetItem t, int offset){
+        if(t instanceof IfCondition){
+            IfCondition ic=(IfCondition)t;
+            return GraphTargetItem.toSourceMerge(localData, this, ic.getLeftSide(),ic.getRightSide(),ins(ic.getIfNotDefinition(),offset));
+        }
+        return GraphTargetItem.toSourceMerge(localData, this, t, ins(new IfFalseIns(),offset));
+    }
+    
     private List<GraphSourceItem> generateIf(SourceGeneratorLocalData localData, GraphTargetItem expression, List<GraphTargetItem> onTrueCmds, List<GraphTargetItem> onFalseCmds, boolean ternar) {
         List<GraphSourceItem> ret = new ArrayList<>();
-        if (false) {//expression instanceof Inverted) {
-            //ret.addAll(((Inverted) expression).invert().toSource(localData, this));
-        } else {
-            ret.addAll(expression.toSource(localData, this));
-            ret.add(ins(new NotIns()));
-        }
+        //ret.addAll(notCondition(localData, expression));        
         List<AVM2Instruction> onTrue = null;
         List<AVM2Instruction> onFalse = null;
         if (ternar) {
@@ -189,23 +205,23 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 onFalse = generateToActionList(localData, onFalseCmds);
             }
         }
-        byte[] onTrueBytes = insToBytes(onTrue);
-        int onTrueLen = onTrueBytes.length;
-
-        AVM2Instruction ifaif = ins(new IfTrueIns(), 0);
-        ret.add(ifaif);
-        ret.addAll(onTrue);
-        ifaif.operands[0] = (onTrueLen);
         AVM2Instruction ajmp = null;
         if (onFalse != null) {
             if (!((!nonempty(onTrue).isEmpty())
                     && ((onTrue.get(onTrue.size() - 1).definition instanceof ContinueJumpIns)
                     || ((onTrue.get(onTrue.size() - 1).definition instanceof BreakJumpIns))))) {
                 ajmp = ins(new JumpIns(), 0);
-                ret.add(ajmp);
-                onTrueLen += ajmp.getBytes().length;
+                onTrue.add(ajmp);
             }
-            ifaif.operands[0] = onTrueLen;
+        }
+        
+        byte[] onTrueBytes = insToBytes(onTrue);
+        int onTrueLen = onTrueBytes.length;
+
+        ret.addAll(notCondition(localData, expression, onTrueLen));
+        ret.addAll(onTrue);        
+        
+        if (onFalse != null) {
             byte[] onFalseBytes = insToBytes(onFalse);
             int onFalseLen = onFalseBytes.length;
             if (ajmp != null) {
@@ -260,70 +276,102 @@ public class AVM2SourceGenerator implements SourceGenerator {
         List<AVM2Instruction> whileExpr = new ArrayList<>();
 
         List<GraphTargetItem> ex = new ArrayList<>(item.expression);
-        if (!ex.isEmpty()) {
-            GraphTargetItem lastItem = ex.remove(ex.size() - 1);
+        GraphTargetItem lastItem = null;
+        if (!ex.isEmpty()) {            
+            lastItem = ex.remove(ex.size() - 1);
+            while(lastItem instanceof CommaExpressionItem){
+                CommaExpressionItem cei=(CommaExpressionItem)lastItem;
+                ex.addAll(cei.commands);
+                lastItem = ex.remove(ex.size() - 1);
+            }
             whileExpr.addAll(generateToActionList(localData, ex));
-            whileExpr.addAll(toInsList(lastItem.toSource(localData, this))); //Want result
         }
-
-        List<AVM2Instruction> whileBody = generateToActionList(localData, item.commands);
-        whileExpr.add(ins(new NotIns()));
-        AVM2Instruction whileaif = ins(new IfTrueIns(), 0);
-        whileExpr.add(whileaif);
-        AVM2Instruction whileajmp = ins(new JumpIns(), 0);
-        whileBody.add(whileajmp);
-        int whileExprLen = insToBytes(whileExpr).length;
-        int whileBodyLen = insToBytes(whileBody).length;
-        whileajmp.operands[0] = (-(whileExprLen
-                + whileBodyLen));
-        whileaif.operands[0] = (whileBodyLen);
-        ret.addAll(whileExpr);
-        fixLoop(whileBody, whileBodyLen, -whileExprLen, item.loop.id);
+        List<AVM2Instruction> whileBody = generateToActionList(localData, item.commands);        
+        AVM2Instruction forwardJump = ins(new JumpIns(),0);
+        ret.add(forwardJump);
+        whileBody.add(0,ins(new LabelIns()));
         ret.addAll(whileBody);
+        int whileBodyLen = insToBytes(whileBody).length;
+        forwardJump.operands[0] = whileBodyLen;
+        whileExpr.addAll(toInsList(condition(localData, lastItem, 0)));
+        int whileExprLen = insToBytes(whileExpr).length;
+        whileExpr.get(whileExpr.size()-1).operands[0] = -(whileExprLen+whileBodyLen); //Assuming last is if instruction
+        ret.addAll(whileExpr);
+        fixLoop(whileBody, whileBodyLen + whileExprLen, whileBodyLen, item.loop.id);
         return ret;
     }
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DoWhileItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
-        List<AVM2Instruction> doExpr = generateToActionList(localData, item.expression);
-        List<AVM2Instruction> doBody = generateToActionList(localData, item.commands);
+        List<AVM2Instruction> whileExpr = new ArrayList<>();
 
-        int doBodyLen = insToBytes(doBody).length;
-        int doExprLen = insToBytes(doExpr).length;
-
-        ret.addAll(doBody);
-        ret.addAll(doExpr);
-        AVM2Instruction doif = ins(new IfTrueIns(), 0);
-        ret.add(doif);
-        doif.operands[0] = (-doBodyLen - doExprLen - doif.getBytes().length);
-        fixLoop(doBody, doBodyLen + doExprLen + doif.getBytes().length, doBodyLen, item.loop.id);
+        List<GraphTargetItem> ex = new ArrayList<>(item.expression);
+        GraphTargetItem lastItem = null;
+        if (!ex.isEmpty()) {            
+            lastItem = ex.remove(ex.size() - 1);
+            while(lastItem instanceof CommaExpressionItem){
+                CommaExpressionItem cei=(CommaExpressionItem)lastItem;
+                ex.addAll(cei.commands);
+                lastItem = ex.remove(ex.size() - 1);
+            }
+            whileExpr.addAll(generateToActionList(localData, ex));
+        }
+        List<AVM2Instruction> dowhileBody = generateToActionList(localData, item.commands);        
+        List<AVM2Instruction> labelBody = new ArrayList<>();
+        labelBody.add(ins(new LabelIns()));
+        int labelBodyLen = insToBytes(labelBody).length;
+        
+        AVM2Instruction forwardJump = ins(new JumpIns(),labelBodyLen);
+        ret.add(forwardJump);
+        ret.addAll(labelBody);        
+        ret.addAll(dowhileBody);        
+        int dowhileBodyLen = insToBytes(dowhileBody).length;
+        whileExpr.addAll(toInsList(condition(localData, lastItem, 0)));
+        int dowhileExprLen = insToBytes(whileExpr).length;
+        whileExpr.get(whileExpr.size()-1).operands[0] = -(dowhileExprLen+dowhileBodyLen+labelBodyLen); //Assuming last is if instruction
+        ret.addAll(whileExpr);
+        fixLoop(dowhileBody, dowhileBodyLen + dowhileExprLen, dowhileBodyLen, item.loop.id);
         return ret;
     }
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
-        List<AVM2Instruction> forExpr = generateToActionList(localData, item.expression);
-        List<AVM2Instruction> forBody = generateToActionList(localData, item.commands);
-        List<AVM2Instruction> forFinalCommands = generateToActionList(localData, item.finalCommands);
+        List<AVM2Instruction> forExpr = new ArrayList<>();
 
-        forExpr.add(ins(new NotIns()));
-        AVM2Instruction foraif = ins(new IfTrueIns(), 0);
-        forExpr.add(foraif);
-        AVM2Instruction forajmp = ins(new JumpIns(), 0);
-        int forajmpLen = forajmp.getBytes().length;
-        int forExprLen = insToBytes(forExpr).length;
-        int forBodyLen = insToBytes(forBody).length;
-        int forFinalLen = insToBytes(forFinalCommands).length;
-        forajmp.operands[0] = (-(forExprLen
-                + forBodyLen + forFinalLen + forajmpLen));
-        foraif.operands[0] = (forBodyLen + forFinalLen + forajmpLen);
-        ret.addAll(forExpr);
+        List<GraphTargetItem> ex = new ArrayList<>();       
+        ex.add(item.expression);
+        
+        GraphTargetItem lastItem = null;
+        if (!ex.isEmpty()) {            
+            lastItem = ex.remove(ex.size() - 1);
+            while(lastItem instanceof CommaExpressionItem){
+                CommaExpressionItem cei=(CommaExpressionItem)lastItem;
+                ex.addAll(cei.commands);
+                lastItem = ex.remove(ex.size() - 1);
+            }
+            forExpr.addAll(generateToActionList(localData, ex));
+        }
+        List<AVM2Instruction> forBody = generateToActionList(localData, item.commands);       
+        List<AVM2Instruction> forFinalCommands = generateToActionList(localData, item.finalCommands);       
+        
+        
+        ret.addAll(generateToActionList(localData, item.firstCommands));   
+        
+        AVM2Instruction forwardJump = ins(new JumpIns(),0);
+        ret.add(forwardJump);
+        forBody.add(0,ins(new LabelIns()));
         ret.addAll(forBody);
         ret.addAll(forFinalCommands);
-        ret.add(forajmp);
-        fixLoop(forBody, forBodyLen + forFinalLen + forajmpLen, forBodyLen, item.loop.id);
+        int forBodyLen = insToBytes(forBody).length;
+        int forFinalCLen = insToBytes(forFinalCommands).length;
+        forwardJump.operands[0] = forBodyLen+forFinalCLen;
+        forExpr.addAll(toInsList(condition(localData, lastItem, 0)));
+        int forExprLen = insToBytes(forExpr).length;
+        forExpr.get(forExpr.size()-1).operands[0] = -(forExprLen+forBodyLen+forFinalCLen); //Assuming last is if instruction
+        ret.addAll(forExpr);
+        fixLoop(forBody, forBodyLen + forFinalCLen + forExprLen, forBodyLen, item.loop.id);
         return ret;
     }
     private long uniqLast = 0;

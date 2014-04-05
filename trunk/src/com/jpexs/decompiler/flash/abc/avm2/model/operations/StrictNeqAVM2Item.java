@@ -18,8 +18,12 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictNeIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -29,11 +33,23 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
 
-public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem {
+public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem,IfCondition {
 
     public StrictNeqAVM2Item(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "!==");
     }
+    
+    @Override
+    public InstructionDefinition getIfDefinition() {
+        return new IfStrictNeIns();
+    }
+
+    @Override
+    public InstructionDefinition getIfNotDefinition() {
+        return new IfStrictEqIns();
+    }
+    
+    
 
     @Override
     public GraphTargetItem invert() {

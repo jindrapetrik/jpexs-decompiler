@@ -47,7 +47,7 @@ public class NanAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return new TypeItem("Number");
     }
 
     @Override
