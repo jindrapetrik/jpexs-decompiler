@@ -144,13 +144,6 @@ public abstract class GraphTargetItem implements Serializable {
         return false;
     }
 
-    /*public double toNumber() {
-     return 0;
-     }
-
-     public boolean toBoolean() {
-     return Double.compare(toNumber(), 0.0) != 0;
-     }*/
     public Object getResult() {
         return null;
     }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -59,6 +60,9 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane {
     @Override
     public void setText(String t) {
         lastLine = -1;
+        if (Configuration.debugMode.get() && t.length() > 4192) {
+            t = t.substring(0, 4192);
+        }
         super.setText(t);
         setCaretPosition(0); //scroll to top
     }
