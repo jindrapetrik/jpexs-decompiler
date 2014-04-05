@@ -111,16 +111,16 @@ public abstract class AVM2Item extends GraphTargetItem {
         return ret;
     }
 
-    protected AVM2Instruction ins(InstructionDefinition def, int... operands) {
+    public static AVM2Instruction ins(InstructionDefinition def, int... operands) {
         return new AVM2Instruction(0, def, operands, new byte[0]);
     }
 
-    protected int getFreeRegister(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public static int getFreeRegister(SourceGeneratorLocalData localData, SourceGenerator generator) {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         return g.getFreeRegister(localData);
     }
 
-    protected void killRegister(SourceGeneratorLocalData localData, SourceGenerator generator, int regNumber) {
+    public static void killRegister(SourceGeneratorLocalData localData, SourceGenerator generator, int regNumber) {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         g.killRegister(localData, regNumber);
     }

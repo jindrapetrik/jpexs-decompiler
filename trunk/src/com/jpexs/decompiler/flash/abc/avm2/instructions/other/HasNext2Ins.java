@@ -43,4 +43,11 @@ public class HasNext2Ins extends InstructionDefinition {
         //stack.push("_loc_" + objectReg + ".hasNext(cnt=_loc_" + indexReg + ")");
         stack.push(new HasNextAVM2Item(ins, new LocalRegAVM2Item(ins, indexReg, localRegs.get(indexReg)), localRegs.get(objectReg)));
     }
+
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
+    
+    
 }

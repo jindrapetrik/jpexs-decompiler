@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertSIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -164,8 +165,10 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
     }
 
-    private GraphTargetItem getDefaultValue(String type){
+    public static GraphTargetItem getDefaultValue(String type){
         switch(type){
+            case "*":
+                return new UndefinedAVM2Item(null);
             case "int":
                 return new IntegerValueAVM2Item(null, 0L);
             case "Number":
@@ -175,7 +178,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
     }
     
-    private AVM2Instruction generateCoerce(SourceGenerator generator, String type) {
+    public static AVM2Instruction generateCoerce(SourceGenerator generator, String type) {
         AVM2Instruction ins;
         switch (type) {
             case "int":
@@ -199,8 +202,8 @@ public class NameAVM2Item extends AssignableAVM2Item {
         if (variableName != null && regNumber == -1 && ns == null) {
             throw new RuntimeException("No register set for " + variableName);
         }
-        if (definition && assignedValue == null) {
-            assignedValue = getDefaultValue(type==null?"*":type.toString());
+        if (definition && assignedValue == null) {            
+            return new ArrayList<GraphSourceItem>();
         }
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         Reference<Integer> ns_temp = new Reference<>(-1);

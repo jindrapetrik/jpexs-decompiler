@@ -987,62 +987,34 @@ public class ActionScriptParser {
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new DoWhileItem(null, dloop, doBody, doExpr);
                 break;
-            case FOR:
-                expectedType(SymbolType.PARENT_OPEN);
+            case FOR:                
                 s = lex();
                 boolean forin = false;
                 boolean each = false;
-                GraphTargetItem collection = null;
-                String objIdent = null;
-                int innerExprReg = 0;
+                GraphTargetItem collection = null;                
                 if (s.type == SymbolType.EACH) {
                     each = true;
                     forin = true;
+                    s = lex();
                 }
-                if (s.type == SymbolType.VAR || s.type == SymbolType.IDENTIFIER || each) {
-                    ParsedSymbol s2 = null;
-                    ParsedSymbol ssel = s;
-                    if (s.type == SymbolType.VAR) {
-                        s2 = lex();
-                        ssel = s2;
+                expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);                
+                GraphTargetItem firstCommand=command(importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, false, variables);
+                if(firstCommand instanceof NameAVM2Item){
+                    NameAVM2Item nai=(NameAVM2Item)firstCommand;
+                    if(nai.isDefinition() && nai.getAssignedValue() == null){
+                        firstCommand = expressionRemainder(openedNamespaces, firstCommand, registerVars, inFunction, inMethod, true, variables, importedClasses);
                     }
-
-                    if (forin) {
-                        expected(ssel, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.VAR);
-                    }
-
-                    if (ssel.type == SymbolType.IDENTIFIER) {
-                        objIdent = ssel.value.toString();
-
-                        ParsedSymbol s3 = lex();
-                        if (s3.type == SymbolType.IN) {
-                            if (inFunction) {
-                                for (int i = 0; i < 256; i++) {
-                                    if (!registerVars.containsValue(i)) {
-                                        registerVars.put(objIdent, i);
-                                        innerExprReg = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            collection = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
-                            forin = true;
-                        } else {
-                            lexer.pushback(s3);
-                            if (s2 != null) {
-                                lexer.pushback(s2);
-                            }
-                            lexer.pushback(s);
-                        }
-                    } else {
-                        if (s2 != null) {
-                            lexer.pushback(s2);
-                        }
-                        lexer.pushback(s);
-                    }
-                } else {
-                    lexer.pushback(s);
                 }
+                InAVM2Item inexpr = null;
+                if(firstCommand instanceof InAVM2Item){
+                    forin = true;
+                    inexpr = (InAVM2Item)firstCommand;
+                }else{
+                    if(forin){
+                        throw new ParseException("In expression required", lexer.yyline());
+                    }
+                }
+                                
                 Loop floop = new Loop(uniqId(), null, null);
                 loops.push(floop);
                 if (loopLabel != null) {
@@ -1052,9 +1024,9 @@ public class ActionScriptParser {
                 GraphTargetItem forExpr = null;
                 List<GraphTargetItem> forFirstCommands = new ArrayList<>();
                 if (!forin) {
-                    GraphTargetItem fc = command(importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables);
-                    if (fc != null) { //can be empty command
-                        forFirstCommands.add(fc);
+                    //GraphTargetItem firstCommand = command(importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables);
+                    if (firstCommand != null) { //can be empty command
+                        forFirstCommands.add(firstCommand);
                     }
                     forExpr = (expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                     expectedType(SymbolType.SEMICOLON);
@@ -1063,15 +1035,12 @@ public class ActionScriptParser {
                 expectedType(SymbolType.PARENT_CLOSE);
                 List<GraphTargetItem> forBody = new ArrayList<>();
                 forBody.add(command(importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, true, variables));
-                if (forin) {
-
-                    NameAVM2Item obj = new NameAVM2Item(new UnboundedTypeItem(), lexer.yyline(), objIdent, null, false, openedNamespaces);
-                    variables.add(obj);
+                if (forin) {                   
                     if (each) {
-                        ret = new ForEachInAVM2Item(null, floop, new InAVM2Item(null, obj, collection), forBody);
+                        ret = new ForEachInAVM2Item(null, floop, inexpr, forBody);
                     } else {
 
-                        ret = new ForInAVM2Item(null, floop, new InAVM2Item(null, obj, collection), forBody);
+                        ret = new ForInAVM2Item(null, floop, inexpr, forBody);
                     }
                 } else {
                     ret = new ForItem(null, floop, forFirstCommands, forExpr, forFinalCommands, forBody);
@@ -1314,6 +1283,9 @@ public class ActionScriptParser {
                     }
                     ret = name;
                 }
+                break;
+            case IN:
+                ret = new InAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 break;
             case TERNAR:
                 GraphTargetItem terOnTrue = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);

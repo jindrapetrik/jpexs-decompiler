@@ -34,13 +34,17 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.HasNext2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.InitPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.LabelIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.NextNameIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.NextValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
@@ -50,6 +54,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.TryAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.IfCondition;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
@@ -70,6 +76,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -82,6 +89,7 @@ import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
@@ -91,6 +99,7 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -296,6 +305,81 @@ public class AVM2SourceGenerator implements SourceGenerator {
         whileExpr.get(whileExpr.size()-1).operands[0] = -(whileExprLen+whileBodyLen); //Assuming last is if instruction
         ret.addAll(whileExpr);
         fixLoop(whileBody, whileBodyLen + whileExprLen, whileBodyLen, item.loop.id);
+        return ret;
+    }
+    
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForEachInAVM2Item item) {
+        return generateForIn(localData,item.expression.collection,(AssignableAVM2Item)item.expression.object,item.commands,true);
+    }
+    
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForInAVM2Item item) {
+        return generateForIn(localData,item.expression.collection,(AssignableAVM2Item)item.expression.object,item.commands,false);
+    }
+    
+    public List<GraphSourceItem> generateForIn(SourceGeneratorLocalData localData,GraphTargetItem collection, AssignableAVM2Item assignable,List<GraphTargetItem> commands, final boolean each) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        final Reference<Integer> counterReg = new Reference<>(0);
+        final Reference<Integer> collectionReg = new Reference<>(0);
+        
+        ret.addAll(GraphTargetItem.toSourceMerge(localData, this, 
+                ins(new PushByteIns(),0),
+                AssignableAVM2Item.setTemp(localData, this, counterReg),
+                collection,
+                NameAVM2Item.generateCoerce(this, "*"),
+                AssignableAVM2Item.setTemp(localData, this, collectionReg)                
+                ));
+                
+        
+        GraphTargetItem assigned=new GraphTargetItem() {
+
+            @Override
+            public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+                return null;
+            }
+
+            @Override
+            public boolean hasReturnValue() {
+                return true;
+            }
+
+            @Override
+            public GraphTargetItem returnType() {
+                return TypeItem.UNBOUNDED;
+            }
+
+            @Override
+            public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+                return toSourceMerge(localData, generator, 
+                AssignableAVM2Item.getTemp(localData, generator, collectionReg),
+                AssignableAVM2Item.getTemp(localData, generator, counterReg),
+                ins(each?new NextValueIns():new NextNameIns())
+                );
+            }                        
+        };
+        assignable.setAssignedValue(assigned);
+        
+        List<AVM2Instruction> forBody = toInsList(GraphTargetItem.toSourceMerge(localData, this, 
+                ins(new LabelIns()),
+                assignable.toSourceIgnoreReturnValue(localData, this)
+                ));
+               
+        forBody.addAll(generateToActionList(localData, commands));
+        int forBodyLen = insToBytes(forBody).length;
+        
+        AVM2Instruction forwardJump = ins(new JumpIns(),forBodyLen);
+        ret.add(forwardJump);
+        
+        List<AVM2Instruction> expr = new ArrayList<>();
+        expr.add(ins(new HasNext2Ins(),collectionReg.getVal(),counterReg.getVal()));
+        AVM2Instruction backIf = ins(new IfTrueIns(),0);
+        expr.add(backIf);
+        
+        int exprLen = insToBytes(expr).length;
+        backIf.operands[0] = -(exprLen + forBodyLen);
+        
+        ret.addAll(forBody);
+        ret.addAll(expr);
+        ret.addAll(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(collectionReg,counterReg)));
         return ret;
     }
 
@@ -1335,6 +1419,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
         for (int i = 0; i < registerNames.size(); i++) {
             localData.registerVars.put(registerNames.get(i), i);
         }
+        List<NameAVM2Item> declarations=new ArrayList<>();
+        for (NameAVM2Item n : fun.subvariables) {
+            if(n.isDefinition() && n.getAssignedValue() == null){
+                NameAVM2Item d=new NameAVM2Item(n.type, n.line, n.getVariableName(), NameAVM2Item.getDefaultValue(""+n.type), true, n.openedNamespaces);
+                d.setRegNumber(n.getRegNumber());
+                declarations.add(d);
+            }
+        }
+        fun.body.addAll(0,declarations);
     }
 
     public int resolveType(String objType) {

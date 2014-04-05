@@ -66,7 +66,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
         this.assignedValue = storeValue;
     }
 
-    protected List<GraphSourceItem> dupSetTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
+    public static List<GraphSourceItem> dupSetTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
         register.setVal(getFreeRegister(localData, generator));
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.add(ins(new DupIns()));
@@ -74,14 +74,14 @@ public abstract class AssignableAVM2Item extends AVM2Item {
         return ret;
     }
 
-    protected List<GraphSourceItem> setTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
+    public static List<GraphSourceItem> setTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
         register.setVal(getFreeRegister(localData, generator));
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.add(generateSetLoc(register.getVal()));
         return ret;
     }
 
-    protected List<GraphSourceItem> getTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
+    public static List<GraphSourceItem> getTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
         if (register.getVal() < 0) {
             return new ArrayList<>();
         }
@@ -98,7 +98,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
      return ret;
      }*/
     @SuppressWarnings("unchecked")
-    protected List<GraphSourceItem> killTemp(SourceGeneratorLocalData localData, SourceGenerator generator, List<Reference<Integer>> registers) {
+    public static List<GraphSourceItem> killTemp(SourceGeneratorLocalData localData, SourceGenerator generator, List<Reference<Integer>> registers) {
         List<GraphSourceItem> ret = new ArrayList<>();
         for (Reference<Integer> register : registers) {
             if (register.getVal() < 0) {
@@ -111,7 +111,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
         return ret;
     }
 
-    protected AVM2Instruction generateSetLoc(int regNumber) {
+    public static AVM2Instruction generateSetLoc(int regNumber) {
         switch (regNumber) {
             case 0:
                 return ins(new SetLocal0Ins());
@@ -126,7 +126,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
         }
     }
 
-    protected AVM2Instruction generateGetLoc(int regNumber) {
+    public static AVM2Instruction generateGetLoc(int regNumber) {
         switch (regNumber) {
             case 0:
                 return ins(new GetLocal0Ins());
