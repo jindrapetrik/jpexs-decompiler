@@ -26,8 +26,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsI
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewClassIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfFalseIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictNeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfTrueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
@@ -98,6 +100,7 @@ import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -466,111 +469,67 @@ public class AVM2SourceGenerator implements SourceGenerator {
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
-        HashMap<String, Integer> registerVars = getRegisterVars(localData);
-        int exprReg = 0;
-        for (int i = 0; i < 256; i++) {
-            if (!registerVars.containsValue(i)) {
-                registerVars.put("__switch" + uniqId(), i);
-                exprReg = i;
-                break;
-            }
-        }
+        Reference<Integer> switchedReg = new Reference<>(0);
+        AVM2Instruction forwardJump = ins(new JumpIns(),0);
+        ret.add(forwardJump);
+       
 
-        ret.addAll(toInsList(item.switchedObject.toSource(localData, this)));
-
-        boolean firstCase = true;
-        List<List<AVM2Instruction>> caseIfs = new ArrayList<>();
-        List<List<AVM2Instruction>> caseCmds = new ArrayList<>();
-        List<List<List<AVM2Instruction>>> caseExprsAll = new ArrayList<>();
-
-        loopm:
-        for (int m = 0; m < item.caseValues.size(); m++) {
-            List<List<AVM2Instruction>> caseExprs = new ArrayList<>();
-            List<AVM2Instruction> caseIfsOne = new ArrayList<>();
-            int mapping = item.valuesMapping.get(m);
-            for (; m < item.caseValues.size(); m++) {
-                int newmapping = item.valuesMapping.get(m);
-                if (newmapping != mapping) {
-                    m--;
-                    break;
-                }
-                List<AVM2Instruction> curCaseExpr = generateToActionList(localData, item.caseValues.get(m));
-                caseExprs.add(curCaseExpr);
-                if (firstCase) {
-                    curCaseExpr.add(0, ins(new DupIns(), exprReg));
-                    curCaseExpr.add(0, ins(new SetLocalIns(), exprReg));
-                } else {
-                    curCaseExpr.add(0, ins(new GetLocalIns(), exprReg));
-                }
-                curCaseExpr.add(ins(new StrictEqualsIns()));
-                AVM2Instruction aif = ins(new IfTrueIns(), 0);
-                caseIfsOne.add(aif);
-                curCaseExpr.add(aif);
-                ret.addAll(curCaseExpr);
-                firstCase = false;
-            }
-            caseExprsAll.add(caseExprs);
-            caseIfs.add(caseIfsOne);
-            List<AVM2Instruction> caseCmd = generateToActionList(localData, item.caseCommands.get(mapping));
-            caseCmds.add(caseCmd);
+        List<AVM2Instruction> cases=new ArrayList<>();
+        cases.addAll(toInsList(new IntegerValueAVM2Item(null, (long)item.caseValues.size()).toSource(localData, this)));   
+        int cLen = insToBytes(cases).length;
+        List<AVM2Instruction> caseLast=new ArrayList<>();
+        caseLast.add(0,ins(new JumpIns(),cLen));
+        caseLast.addAll(0,toInsList(new IntegerValueAVM2Item(null, (long)item.caseValues.size()).toSource(localData, this)));   
+        int cLastLen = insToBytes(caseLast).length;
+        caseLast.add(0,ins(new JumpIns(),cLastLen));
+        cases.addAll(0,caseLast);
+        
+        List<AVM2Instruction> preCases=new ArrayList<>();        
+        preCases.addAll(toInsList(item.switchedObject.toSource(localData, this)));
+        preCases.addAll(toInsList(AssignableAVM2Item.setTemp(localData, this, switchedReg)));
+        
+        for(int i=item.caseValues.size()-1;i>=0;i--){            
+            List<AVM2Instruction> sub=new ArrayList<>();            
+            sub.addAll(toInsList(new IntegerValueAVM2Item(null, (long)i).toSource(localData, this)));          
+            sub.add(ins(new JumpIns(),insToBytes(cases).length));
+            int subLen = insToBytes(sub).length;
+            
+            cases.addAll(0,sub);
+            cases.add(0,ins(new IfStrictNeIns(), subLen));
+            cases.addAll(0,toInsList(AssignableAVM2Item.getTemp(localData, this, switchedReg)));            
+            cases.addAll(0,toInsList(item.caseValues.get(i).toSource(localData, this)));                        
         }
-        AVM2Instruction defJump = ins(new JumpIns(), 0);
-        ret.add(defJump);
-        List<AVM2Instruction> defCmd = new ArrayList<>();
-        if (!item.defaultCommands.isEmpty()) {
-            defCmd = generateToActionList(localData, item.defaultCommands);
+        cases.addAll(0,preCases);
+                
+        
+        
+        AVM2Instruction lookupOp = new AVM2Instruction(0, new LookupSwitchIns(), new int[item.caseValues.size()+1+1+1], new byte[0]);
+        cases.addAll(toInsList(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(switchedReg))));        
+        List<AVM2Instruction> bodies = new ArrayList<>();
+        List<Integer> bodiesOffsets=new ArrayList<>();
+        int defOffset;
+        int casesLen = insToBytes(cases).length;
+        bodies.addAll(generateToActionList(localData, item.defaultCommands));
+        bodies.add(0,ins(new LabelIns()));
+        bodies.add(ins(new BreakJumpIns(item.loop.id),0));  //There could be two breaks when default clause ends with break, but official compiler does this too, so who cares...
+        defOffset = -(insToBytes(bodies).length + casesLen);
+        for(int i=item.caseCommands.size()-1;i>=0;i--){            
+            bodies.addAll(0,generateToActionList(localData, item.caseCommands.get(i)));
+            bodies.add(0,ins(new LabelIns()));
+            bodiesOffsets.add(0,-(insToBytes(bodies).length + casesLen));
         }
-        for (List<AVM2Instruction> caseCmd : caseCmds) {
-            ret.addAll(caseCmd);
+        lookupOp.operands[0] = defOffset;        
+        lookupOp.operands[1] = item.valuesMapping.size();
+        lookupOp.operands[2 + item.caseValues.size()] = defOffset;
+        for(int i=0;i<item.valuesMapping.size();i++){         
+            lookupOp.operands[2 + i] = bodiesOffsets.get(item.valuesMapping.get(i));
         }
-        ret.addAll(defCmd);
-
-        List<List<Integer>> exprLengths = new ArrayList<>();
-        for (List<List<AVM2Instruction>> caseExprs : caseExprsAll) {
-            List<Integer> lengths = new ArrayList<>();
-            for (List<AVM2Instruction> caseExpr : caseExprs) {
-                lengths.add(insToBytes(caseExpr).length);
-            }
-            exprLengths.add(lengths);
-        }
-        List<Integer> caseLengths = new ArrayList<>();
-        for (List<AVM2Instruction> caseCmd : caseCmds) {
-            caseLengths.add(insToBytes(caseCmd).length);
-        }
-        int defLength = insToBytes(defCmd).length;
-
-        for (int i = 0; i < caseIfs.size(); i++) {
-            for (int c = 0; c < caseIfs.get(i).size(); c++) {
-                int jmpPos = 0;
-                for (int j = c + 1; j < caseIfs.get(i).size(); j++) {
-                    jmpPos += exprLengths.get(i).get(j);
-                }
-                for (int k = i + 1; k < caseIfs.size(); k++) {
-                    for (int m = 0; m < caseIfs.get(k).size(); m++) {
-                        jmpPos += exprLengths.get(k).get(m);
-                    }
-                }
-                jmpPos += defJump.getBytes().length;
-                for (int n = 0; n < i; n++) {
-                    jmpPos += caseLengths.get(n);
-                }
-                caseIfs.get(i).get(c).operands[0] = (jmpPos);
-            }
-        }
-        int defJmpPos = 0;
-        for (int i = 0; i < caseIfs.size(); i++) {
-            defJmpPos += caseLengths.get(i);
-        }
-
-        defJump.operands[0] = (defJmpPos);
-        List<AVM2Instruction> caseCmdsAll = new ArrayList<>();
-        int breakOffset = 0;
-        for (int i = 0; i < caseCmds.size(); i++) {
-            caseCmdsAll.addAll(caseCmds.get(i));
-            breakOffset += caseLengths.get(i);
-        }
-        breakOffset += defLength;
-        fixSwitch(caseCmdsAll, breakOffset, item.loop.id);
+        
+        forwardJump.operands[0] = insToBytes(bodies).length;
+        ret.addAll(bodies);
+        ret.addAll(cases);
+        ret.add(lookupOp);
+        fixSwitch(toInsList(ret), insToBytes(toInsList(ret)).length, uniqLast);
         return ret;
     }
 
