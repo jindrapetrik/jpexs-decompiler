@@ -69,12 +69,13 @@ public class RemoveObjectTag extends CharacterIdTag implements RemoveTag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public RemoveObjectTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "RemoveObject", data, pos);
+    public RemoveObjectTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "RemoveObject", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterId = sis.readUI16();
         depth = sis.readUI16();

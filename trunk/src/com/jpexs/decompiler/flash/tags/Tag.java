@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
@@ -33,6 +34,8 @@ import com.jpexs.decompiler.flash.tags.gfx.ExporterInfoTag;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -49,6 +52,10 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
      * Identifier of tag type
      */
     protected int id;
+    /**
+     * Original header data in the tag
+     */
+    protected byte[] headerData;
     /**
      * Data in the tag
      */
@@ -116,12 +123,14 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
      * @param swf
      * @param id Tag type identifier
      * @param name Tag name
+     * @param headerData
      * @param data Bytes of data
      * @param pos
      */
-    public Tag(SWF swf, int id, String name, byte[] data, long pos) {
+    public Tag(SWF swf, int id, String name, byte[] headerData, byte[] data, long pos) {
         this.id = id;
         this.tagName = name;
+        this.headerData = headerData;
         this.data = data;
         this.pos = pos;
         this.swf = swf;
@@ -294,6 +303,15 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     }
 
     /**
+     * Gets original read header data
+     *
+     * @return Bytes of data
+     */
+    public byte[] getOriginalHeaderData() {
+        return headerData;
+    }
+
+    /**
      * Gets original read data
      *
      * @return Bytes of data
@@ -302,15 +320,62 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         return data;
     }
 
-    public void setOriginalData(byte[] data) {
-        this.data = data;
+    public void createOriginalData() {
+        data = getData();
+        headerData = getHeader(data);
     }
 
-    public byte[] getDataOrOriginalData() {
-        if (isModified()) {
-            return getData();
+    protected byte[] getHeader(byte[] data) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+
+            SWFOutputStream sos = new SWFOutputStream(baos, swf.version);
+            int tagLength = data.length;
+            int tagID = getId();
+            int tagIDLength = (tagID << 6);
+            if ((tagLength <= 62) && (!forceWriteAsLong)) {
+                tagIDLength += tagLength;
+                sos.writeUI16(tagIDLength);
+            } else {
+                tagIDLength += 0x3f;
+                sos.writeUI16(tagIDLength);
+                sos.writeSI32(tagLength);
+            }
+        } catch (IOException iex) {
         }
-        return data;
+        return baos.toByteArray();
+    }
+
+    public static byte[] getTagHeader(int tagIDTagLength, long tagLength, boolean writeLong, int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+
+            SWFOutputStream sos = new SWFOutputStream(baos, version);
+            sos.writeUI16(tagIDTagLength);
+            if (writeLong) {
+                sos.writeSI32(tagLength);
+            }
+        } catch (IOException iex) {
+        }
+        return baos.toByteArray();
+    }
+    
+    /**
+     * Writes Tag value to the stream
+     *
+     * @param sos SWF output stream
+     * @throws IOException
+     */
+    public void writeTag(SWFOutputStream sos) throws IOException {
+        if (isModified()) {
+            byte[] newData = getData();
+            sos.write(getHeader(newData));
+            sos.write(newData);
+            return;
+        }
+        
+        sos.write(headerData);
+        sos.write(data);
     }
 
     /**

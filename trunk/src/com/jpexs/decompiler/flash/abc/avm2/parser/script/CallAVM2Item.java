@@ -68,8 +68,8 @@ public class CallAVM2Item extends AVM2Item {
             String pkgName = "";
             cname = localData.currentClass;
             if (cname.contains(".")) {
-                pkgName = cname.substring(0, cname.lastIndexOf("."));
-                cname = cname.substring(cname.lastIndexOf(".") + 1);
+                pkgName = cname.substring(0, cname.lastIndexOf('.'));
+                cname = cname.substring(cname.lastIndexOf('.') + 1);
             }
             GraphTargetItem obj = null;
             Reference<String> outName = new Reference<>("");

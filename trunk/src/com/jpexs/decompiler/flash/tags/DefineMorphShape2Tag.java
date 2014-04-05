@@ -138,12 +138,13 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag,
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineMorphShape2Tag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineMorphShape2", data, pos);
+    public DefineMorphShape2Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineMorphShape2", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterId = sis.readUI16();
         startBounds = sis.readRECT();

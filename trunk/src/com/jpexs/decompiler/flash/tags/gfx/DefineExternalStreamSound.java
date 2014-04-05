@@ -75,12 +75,13 @@ public class DefineExternalStreamSound extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineExternalStreamSound(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineExternalStreamSound", data, pos);
+    public DefineExternalStreamSound(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineExternalStreamSound", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         soundFormat = sis.readUI16();
         bits = sis.readUI16();

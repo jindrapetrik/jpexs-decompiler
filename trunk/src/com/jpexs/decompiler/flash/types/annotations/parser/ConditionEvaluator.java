@@ -103,7 +103,7 @@ public class ConditionEvaluator {
         } catch (IOException | EmptyStackException ex) {
             throw new ParseException("Invalid condition:" + prepareCond(), lex.yyline());
         }
-        if (prepareCond().equals("")) {
+        if (prepareCond().isEmpty()) {
             return true;
         }
         if (stack.size() != 1) {

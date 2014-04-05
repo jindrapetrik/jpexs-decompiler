@@ -86,12 +86,13 @@ public class CSMTextSettingsTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public CSMTextSettingsTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "CSMTextSettings", data, pos);
+    public CSMTextSettingsTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "CSMTextSettings", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         textID = sis.readUI16();
         useFlashType = (int) sis.readUB(2);

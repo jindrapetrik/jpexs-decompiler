@@ -99,12 +99,13 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineButtonTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineButton", data, pos);
+    public DefineButtonTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineButton", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         buttonId = sis.readUI16();
         characters = sis.readBUTTONRECORDList(false);

@@ -32,11 +32,11 @@ public class SoundStreamBlockTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public SoundStreamBlockTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "SoundStreamBlock", data, pos);      //all data is streamSoundData
-    }
+    public SoundStreamBlockTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "SoundStreamBlock", headerData, data, pos);          }
 }

@@ -61,12 +61,13 @@ public class StartSoundTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public StartSoundTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "StartSound", data, pos);
+    public StartSoundTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "StartSound", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         soundId = sis.readUI16();
         soundInfo = sis.readSOUNDINFO();

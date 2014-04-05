@@ -67,12 +67,13 @@ public class DefineExternalGradient extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineExternalGradient(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineExternalGradient", data, pos);
+    public DefineExternalGradient(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineExternalGradient", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         gradientId = sis.readUI16();
         bitmapsFormat = sis.readUI16();

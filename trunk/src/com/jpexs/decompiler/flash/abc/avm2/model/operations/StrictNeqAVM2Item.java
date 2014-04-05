@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictNeIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;

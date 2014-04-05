@@ -36,8 +36,8 @@ public class SymbolClassTag extends Tag {
     public String[] names;
     public static final int ID = 76;
 
-    public SymbolClassTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "SymbolClass", data, pos);
+    public SymbolClassTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "SymbolClass", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         int numSymbols = sis.readUI16();
         tags = new int[numSymbols];

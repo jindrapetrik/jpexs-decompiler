@@ -75,7 +75,6 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -284,8 +283,8 @@ public class ActionScriptParser {
                     String iname = importedClasses.get(i);
                     String ipkg = "";
                     if (iname.contains(".")) {
-                        ipkg = iname.substring(0, iname.lastIndexOf("."));
-                        iname = iname.substring(iname.lastIndexOf(".") + 1);
+                        ipkg = iname.substring(0, iname.lastIndexOf('.'));
+                        iname = iname.substring(iname.lastIndexOf('.') + 1);
                     }
                     if (iname.equals(parts.get(0))) {
                         k = 0;
@@ -305,7 +304,7 @@ public class ActionScriptParser {
             }
             name = parts.get(k);
 
-            String fname = pkg.equals("") ? name : pkg + "." + name;
+            String fname = pkg.isEmpty() ? name : pkg + "." + name;
 
             for (ABC a : allAbcs) {
                 int c = a.findClassByName(fname);
@@ -321,7 +320,7 @@ public class ActionScriptParser {
                 String nsname = ns.getName(abc.constants);
                 if (nsKind == Namespace.KIND_PACKAGE) {
                     for (ABC a : allAbcs) {
-                        int c = a.findClassByName(nsname.equals("") ? fname : nsname + "." + fname);
+                        int c = a.findClassByName(nsname.isEmpty() ? fname : nsname + "." + fname);
                         if (c != -1) {
                             pkg = nsname;
                             break loopk;
@@ -693,7 +692,7 @@ public class ActionScriptParser {
                         nval = s.value.toString();
                         s = lex();
                     } else {
-                        nval = (packageName.equals("") ? classNameStr : packageName + ":" + classNameStr) + "/" + nname;
+                        nval = (packageName.isEmpty() ? classNameStr : packageName + ":" + classNameStr) + "/" + nname;
                     }
                     if (s.type != SymbolType.SEMICOLON) {
                         lexer.pushback(s);
@@ -768,15 +767,15 @@ public class ActionScriptParser {
         int publicNs = namespace;
         int protectedStaticNs = 0;
 
-        openedNamespaces.add(protectedNs = abc.constants.addNamespace(new Namespace(Namespace.KIND_PROTECTED, abc.constants.getStringId(packageName.equals("") ? classNameStr : packageName + ":" + classNameStr, true))));
-        openedNamespaces.add(protectedStaticNs = abc.constants.addNamespace(new Namespace(Namespace.KIND_STATIC_PROTECTED, abc.constants.getStringId(packageName.equals("") ? classNameStr : packageName + ":" + classNameStr, true))));
+        openedNamespaces.add(protectedNs = abc.constants.addNamespace(new Namespace(Namespace.KIND_PROTECTED, abc.constants.getStringId(packageName.isEmpty() ? classNameStr : packageName + ":" + classNameStr, true))));
+        openedNamespaces.add(protectedStaticNs = abc.constants.addNamespace(new Namespace(Namespace.KIND_STATIC_PROTECTED, abc.constants.getStringId(packageName.isEmpty() ? classNameStr : packageName + ":" + classNameStr, true))));
 
         List<Integer> indices = new ArrayList<>();
         List<String> names = new ArrayList<>();
         List<String> namespaces = new ArrayList<>();
         AVM2SourceGenerator.parentNamesAddNames(abc, otherABCs, ((TypeItem) extendsStr).resolveClass(abc), indices, names, namespaces);
         for (int i = 0; i < names.size(); i++) {
-            if (namespaces.get(i).equals("")) {
+            if (namespaces.get(i).isEmpty()) {
                 continue;
             }
             openedNamespaces.add(abc.constants.getNamespaceId(new Namespace(Namespace.KIND_STATIC_PROTECTED, abc.constants.getStringId(namespaces.get(i) + ":" + names.get(i), true)), 0, true));
@@ -1589,10 +1588,10 @@ public class ActionScriptParser {
                     lexer.pushback(s);
                     GraphTargetItem num = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                     if (num instanceof IntegerValueAVM2Item) {
-                        ((IntegerValueAVM2Item) num).value = -(Long) ((IntegerValueAVM2Item) num).value;
+                        ((IntegerValueAVM2Item) num).value = -((IntegerValueAVM2Item) num).value;
                         ret = num;
                     } else if (num instanceof FloatValueAVM2Item) {
-                        Double d = (Double) ((FloatValueAVM2Item) num).value;
+                        Double d = ((FloatValueAVM2Item) num).value;
                         if (d.isInfinite()) {
                             ((FloatValueAVM2Item) num).value = Double.NEGATIVE_INFINITY;
                         } else {
@@ -1782,10 +1781,10 @@ public class ActionScriptParser {
         int privateNs = 0;
         int publicNs = 0;
         if (fileName.contains("/")) {
-            fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+            fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
         }
         if (fileName.contains("\\")) {
-            fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+            fileName = fileName.substring(fileName.lastIndexOf('\\') + 1);
         }
         String className = fileName;
         if (className.endsWith(".as")) {
@@ -1797,7 +1796,7 @@ public class ActionScriptParser {
         openedNamespaces.add(publicNs = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId("", true)), 0, true));
 
         openedNamespaces.add(abc.constants.addNamespace(new Namespace(Namespace.KIND_PRIVATE, 0))); //abc.constants.getStringId(fileName + "$", true)
-        if (!name.equals("")) {
+        if (!name.isEmpty()) {
             openedNamespaces.add(publicNs = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(name, true)), 0, true));
         }
 

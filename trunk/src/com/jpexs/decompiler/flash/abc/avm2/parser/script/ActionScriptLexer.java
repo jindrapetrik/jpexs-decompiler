@@ -853,7 +853,7 @@ public final class ActionScriptLexer {
         return yychar;
     }
 
-    private Stack<ParsedSymbol> pushedBack = new Stack<ParsedSymbol>();
+    private Stack<ParsedSymbol> pushedBack = new Stack<>();
 
     public int yyline() {
         return yyline + 1;
@@ -995,6 +995,7 @@ public final class ActionScriptLexer {
 
     /**
      * Closes the input stream.
+     * @throws java.io.IOException
      */
     public final void yyclose() throws java.io.IOException {
         zzAtEOF = true;            /* indicate end of file */
@@ -1035,6 +1036,7 @@ public final class ActionScriptLexer {
 
     /**
      * Returns the current lexical state.
+     * @return 
      */
     public final int yystate() {
         return zzLexicalState;
@@ -1051,6 +1053,7 @@ public final class ActionScriptLexer {
 
     /**
      * Returns the text matched by the current regular expression.
+     * @return 
      */
     public final String yytext() {
         return new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
@@ -1072,6 +1075,7 @@ public final class ActionScriptLexer {
 
     /**
      * Returns the length of the matched text region.
+     * @return 
      */
     public final int yylength() {
         return zzMarkedPos - zzStartRead;
@@ -1123,6 +1127,7 @@ public final class ActionScriptLexer {
      *
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
+     * @throws com.jpexs.decompiler.flash.abc.avm2.parser.ParseException
      */
     public ParsedSymbol yylex() throws java.io.IOException, ParseException {
         int zzInput;
@@ -1587,7 +1592,7 @@ public final class ActionScriptLexer {
                     String s = yytext();
                     s = s.substring(1, s.length() - 1);
                     if (s.contains(" ")) {
-                        s = s.substring(0, s.indexOf(" "));
+                        s = s.substring(0, s.indexOf(' '));
                     }
                     xmlTagName = s;
                     string.append(yytext());

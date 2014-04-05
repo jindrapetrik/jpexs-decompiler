@@ -66,12 +66,13 @@ public class DefineSubImage extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineSubImage(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineSubImage", data, pos);
+    public DefineSubImage(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineSubImage", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterId = sis.readUI16();
         imageCharacterId = sis.readUI16();

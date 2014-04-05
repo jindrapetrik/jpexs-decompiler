@@ -46,8 +46,8 @@ public class ProductInfoTag extends Tag {
     public long compilationDateHigh;
     public static final int ID = 41;
 
-    public ProductInfoTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "ProductInfo", data, pos);
+    public ProductInfoTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "ProductInfo", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         /*
          * 0: Unknown

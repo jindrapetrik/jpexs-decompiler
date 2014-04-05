@@ -97,8 +97,8 @@ public class TypeItem extends GraphTargetItem{
         String name = fullTypeName;
         String pkg = "";
         if(name.contains(".")){
-            pkg = name.substring(0,name.lastIndexOf("."));
-            name = name.substring(name.lastIndexOf(".")+1);
+            pkg = name.substring(0,name.lastIndexOf('.'));
+            name = name.substring(name.lastIndexOf('.')+1);
         }
         for(InstanceInfo ii:abc.instance_info){
             Multiname mname=abc.constants.constant_multiname.get(ii.name_index);

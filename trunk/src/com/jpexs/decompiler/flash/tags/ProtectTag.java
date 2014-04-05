@@ -60,12 +60,13 @@ public class ProtectTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public ProtectTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "Protect", data, pos);
+    public ProtectTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "Protect", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         if (sis.available() > 0) {
             passwordHash = sis.readString();

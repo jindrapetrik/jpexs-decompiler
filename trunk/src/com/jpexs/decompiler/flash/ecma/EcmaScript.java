@@ -100,13 +100,13 @@ public class EcmaScript {
             if (ny.isNaN()) {
                 return new Undefined();
             }
-            if (((Double) nx).compareTo((Double) ny) == 0) {
+            if ((nx).compareTo(ny) == 0) {
                 return false;
             }
-            if ((Double.compare((Double) nx, -0.0) == 0) && (Double.compare((Double) ny, 0.0) == 0)) {
+            if ((Double.compare(nx, -0.0) == 0) && (Double.compare(ny, 0.0) == 0)) {
                 return false;
             }
-            if ((Double.compare((Double) nx, 0.0) == 0) && (Double.compare((Double) ny, -0.0) == 0)) {
+            if ((Double.compare(nx, 0.0) == 0) && (Double.compare(ny, -0.0) == 0)) {
                 return false;
             }
             if (nx.isInfinite() && nx > 0) {

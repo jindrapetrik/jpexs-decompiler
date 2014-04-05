@@ -302,12 +302,13 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public PlaceObject3Tag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "PlaceObject3", data, pos);
+    public PlaceObject3Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "PlaceObject3", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         placeFlagHasClipActions = sis.readUB(1) == 1;
         placeFlagHasClipDepth = sis.readUB(1) == 1;

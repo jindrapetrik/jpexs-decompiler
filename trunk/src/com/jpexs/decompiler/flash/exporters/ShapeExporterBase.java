@@ -506,15 +506,11 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     }
 
     protected void appendFillStyles(List<FILLSTYLE> v1, FILLSTYLE[] v2) {
-        for (int i = 0; i < v2.length; i++) {
-            v1.add(v2[i]);
-        }
+        v1.addAll(Arrays.asList(v2));
     }
 
     protected void appendLineStyles(List<LINESTYLE> v1, LINESTYLE[] v2) {
-        for (int i = 0; i < v2.length; i++) {
-            v1.add(v2[i]);
-        }
+        v1.addAll(Arrays.asList(v2));
     }
 
     protected void appendEdges(List<IEdge> v1, List<IEdge> v2) {

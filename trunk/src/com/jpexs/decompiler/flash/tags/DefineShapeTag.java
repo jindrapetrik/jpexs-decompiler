@@ -60,8 +60,8 @@ public class DefineShapeTag extends ShapeTag {
         return shapeBounds;
     }
 
-    public DefineShapeTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineShape", data, pos);
+    public DefineShapeTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineShape", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();

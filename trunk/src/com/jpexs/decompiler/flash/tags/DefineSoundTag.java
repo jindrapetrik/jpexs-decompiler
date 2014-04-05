@@ -97,12 +97,13 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineSoundTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineSound", data, pos);
+    public DefineSoundTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineSound", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         soundId = sis.readUI16();
         soundFormat = (int) sis.readUB(4);

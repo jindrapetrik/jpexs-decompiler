@@ -101,12 +101,13 @@ public class DefineButtonSoundTag extends CharacterIdTag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineButtonSoundTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineButtonSound", data, pos);
+    public DefineButtonSoundTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineButtonSound", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         buttonId = sis.readUI16();
         buttonSoundChar0 = sis.readUI16();

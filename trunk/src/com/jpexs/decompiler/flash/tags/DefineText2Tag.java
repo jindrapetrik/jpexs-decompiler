@@ -456,12 +456,13 @@ public class DefineText2Tag extends TextTag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineText2Tag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineText2", data, pos);
+    public DefineText2Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineText2", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterID = sis.readUI16();
         textBounds = sis.readRECT();

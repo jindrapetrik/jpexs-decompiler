@@ -70,6 +70,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
      * A series of tags
      */
     public List<Tag> subTags;
+    public boolean hasEndTag;
 
     public static final int ID = 39;
 
@@ -190,6 +191,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param level
      * @param pos
@@ -198,12 +200,17 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public DefineSpriteTag(SWF swf, byte[] data, int level, long pos, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
-        super(swf, ID, "DefineSprite", data, pos);
+    public DefineSpriteTag(SWF swf, byte[] headerData, byte[] data, int level, long pos, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
+        super(swf, ID, "DefineSprite", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version, pos);
         spriteId = sis.readUI16();
         frameCount = sis.readUI16();
-        subTags = sis.readTagList(swf, this, level + 1, parallel, skipUnusualTags, true, swf.gfx);
+        List<Tag> subTags = sis.readTagList(swf, this, level + 1, parallel, skipUnusualTags, true, swf.gfx);
+        if (subTags.get(subTags.size() - 1).getId() == EndTag.ID) {
+            hasEndTag = true;
+            subTags.remove(subTags.size() - 1);
+        }
+        this.subTags = subTags;
     }
     static int c = 0;
 
@@ -226,7 +233,9 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         try {
             sos.writeUI16(spriteId);
             sos.writeUI16(frameCount);
-            sos.writeTags(subTags);
+            if (hasEndTag) {
+                sos.writeTags(subTags);
+            }
             sos.writeUI16(0);
             sos.close();
         } catch (IOException e) {

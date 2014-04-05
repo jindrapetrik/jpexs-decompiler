@@ -58,12 +58,13 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DoInitActionTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DoInitAction", data, pos);
+    public DoInitActionTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DoInitAction", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         spriteId = sis.readUI16();
         //actions = sis.readActionList();
@@ -127,7 +128,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
                 baos.write(0);
                 baos.write(0);
                 prevLength += 2;
-                byte[] header = SWFOutputStream.getTagHeader(this, data, getVersion());
+                byte[] header = getHeader(data);
                 baos.write(header);
                 prevLength += header.length;
             }

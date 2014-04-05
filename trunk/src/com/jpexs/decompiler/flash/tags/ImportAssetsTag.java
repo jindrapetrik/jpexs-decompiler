@@ -54,12 +54,13 @@ public class ImportAssetsTag extends Tag implements ImportTag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public ImportAssetsTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "ImportAssets", data, pos);
+    public ImportAssetsTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "ImportAssets", headerData, data, pos);
         tags = new ArrayList<>();
         names = new ArrayList<>();
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);

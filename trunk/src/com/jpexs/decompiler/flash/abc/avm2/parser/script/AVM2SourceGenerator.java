@@ -22,11 +22,9 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.EqualsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewClassIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfFalseIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfTrueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
@@ -611,7 +609,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     public void generateClass(int namespace, int initScope, PackageAVM2Item pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems) throws ParseException {
-        localData.currentClass = pkg.packageName.equals("") ? name : pkg.packageName + "." + name;
+        localData.currentClass = pkg.packageName.isEmpty() ? name : pkg.packageName + "." + name;
         List<GraphSourceItem> ret = new ArrayList<>();
         if (extendsVal == null && !isInterface) {
             extendsVal = new TypeItem("Object");
@@ -720,8 +718,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         String name = type.toString();
         TypeItem nameItem = (TypeItem) type;
         if (name.contains(".")) {
-            pkg = name.substring(0, name.lastIndexOf("."));
-            name = name.substring(name.lastIndexOf(".") + 1);
+            pkg = name.substring(0, name.lastIndexOf('.'));
+            name = name.substring(name.lastIndexOf('.') + 1);
         }
 
         /*int nsKind = Namespace.KIND_PACKAGE;

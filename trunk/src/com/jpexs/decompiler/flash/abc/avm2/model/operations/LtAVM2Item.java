@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessThanIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfLtIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNLtIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;

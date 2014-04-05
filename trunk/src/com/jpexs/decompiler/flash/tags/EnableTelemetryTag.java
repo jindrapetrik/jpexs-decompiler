@@ -69,12 +69,13 @@ public class EnableTelemetryTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public EnableTelemetryTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "", data, pos);
+    public EnableTelemetryTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         reserved = (int) sis.readUB(16);
         if (sis.available() > 0) {

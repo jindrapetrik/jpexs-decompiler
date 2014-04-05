@@ -421,7 +421,7 @@ public class DefineTextTag extends TextTag {
     }
 
     public DefineTextTag(SWF swf, int characterID, RECT textBounds, MATRIX textMatrix, List<TEXTRECORD> textRecords) {
-        super(swf, ID, "DefineText", null, 0);
+        super(swf, ID, "DefineText", null, null, 0);
         this.characterID = characterID;
         this.textBounds = textBounds;
         this.textMatrix = textMatrix;
@@ -467,12 +467,13 @@ public class DefineTextTag extends TextTag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineTextTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineText", data, pos);
+    public DefineTextTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineText", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterID = sis.readUI16();
         textBounds = sis.readRECT();

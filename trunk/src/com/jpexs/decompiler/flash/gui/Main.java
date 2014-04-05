@@ -1050,7 +1050,7 @@ public class Main {
 
         String acceptVersions = "";
         for (String a : accepted) {
-            if (!acceptVersions.equals("")) {
+            if (!acceptVersions.isEmpty()) {
                 acceptVersions += ",";
             }
             acceptVersions += a;

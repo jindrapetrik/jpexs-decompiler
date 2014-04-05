@@ -87,12 +87,13 @@ public class FontTextureInfo extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public FontTextureInfo(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "FontTextureInfo", data, pos);
+    public FontTextureInfo(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "FontTextureInfo", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         textureID = sis.readUI32();
         textureFormat = sis.readUI16();

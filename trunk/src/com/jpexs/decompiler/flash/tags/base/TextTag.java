@@ -59,8 +59,8 @@ import java.util.Map;
  */
 public abstract class TextTag extends CharacterTag implements BoundedTag, DrawableTag {
 
-    public TextTag(SWF swf, int id, String name, byte[] data, long pos) {
-        super(swf, id, name, data, pos);
+    public TextTag(SWF swf, int id, String name, byte[] headerData, byte[] data, long pos) {
+        super(swf, id, name, headerData, data, pos);
     }
 
     public abstract MATRIX getTextMatrix();

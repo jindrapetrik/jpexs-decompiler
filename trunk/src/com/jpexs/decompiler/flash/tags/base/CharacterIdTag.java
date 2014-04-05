@@ -29,8 +29,8 @@ import java.util.List;
  */
 public abstract class CharacterIdTag extends Tag {
 
-    public CharacterIdTag(SWF swf, int id, String name, byte[] data, long pos) {
-        super(swf, id, name, data, pos);
+    public CharacterIdTag(SWF swf, int id, String name, byte[] headerData, byte[] data, long pos) {
+        super(swf, id, name, headerData, data, pos);
     }
 
     public abstract int getCharacterId();
@@ -66,7 +66,7 @@ public abstract class CharacterIdTag extends Tag {
         if (getCharacterId() != -1) {
             return super.getName() + " (" + getCharacterId() + nameAppend + ")";
         }
-        if (!nameAppend.equals("")) {
+        if (!nameAppend.isEmpty()) {
             return super.getName() + " (" + nameAppend + ")";
         }
         return super.getName();

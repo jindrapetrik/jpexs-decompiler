@@ -908,6 +908,7 @@ public class SWFInputStream extends InputStream {
                     case SoundStreamHead2Tag.ID:
                     case SoundStreamBlockTag.ID:
                     case VideoFrameTag.ID:
+                    case EndTag.ID:
                         doParse = true;
                         break;
                     default:
@@ -929,6 +930,10 @@ public class SWFInputStream extends InputStream {
                     Future<Tag> future = executor.submit(new TagResolutionTask(swf, tag, level, parallel, skipUnusualTags, gfx));
                     futureResults.add(future);
                 }
+            }
+            
+            if (tag.getId() == EndTag.ID) {
+                break;
             }
         }
 
@@ -952,131 +957,132 @@ public class SWFInputStream extends InputStream {
         Tag ret;
 
         byte[] data = tag.getData();
+        byte[] headerData = tag.getOriginalHeaderData();
         long pos = tag.getPos();
         try {
             switch (tag.getId()) {
                 case 0:
-                    ret = new EndTag(swf, data, pos);
+                    ret = new EndTag(swf, headerData, data, pos);
                     break;
                 case 1:
-                    ret = new ShowFrameTag(swf, pos);
+                    ret = new ShowFrameTag(swf, headerData, data, pos);
                     break;
                 case 2:
-                    ret = new DefineShapeTag(swf, data, pos);
+                    ret = new DefineShapeTag(swf, headerData, data, pos);
                     break;
                 //case 3: FreeCharacter
                 case 4:
-                    ret = new PlaceObjectTag(swf, data, pos);
+                    ret = new PlaceObjectTag(swf, headerData, data, pos);
                     break;
                 case 5:
-                    ret = new RemoveObjectTag(swf, data, pos);
+                    ret = new RemoveObjectTag(swf, headerData, data, pos);
                     break;
                 case 6:
-                    ret = new DefineBitsTag(swf, data, pos);
+                    ret = new DefineBitsTag(swf, headerData, data, pos);
                     break;
                 case 7:
-                    ret = new DefineButtonTag(swf, data, pos);
+                    ret = new DefineButtonTag(swf, headerData, data, pos);
                     break;
                 case 8:
-                    ret = new JPEGTablesTag(swf, data, pos);
+                    ret = new JPEGTablesTag(swf, headerData, data, pos);
                     break;
                 case 9:
-                    ret = new SetBackgroundColorTag(swf, data, pos);
+                    ret = new SetBackgroundColorTag(swf, headerData, data, pos);
                     break;
                 case 10:
-                    ret = new DefineFontTag(swf, data, pos);
+                    ret = new DefineFontTag(swf, headerData, data, pos);
                     break;
                 case 11:
-                    ret = new DefineTextTag(swf, data, pos);
+                    ret = new DefineTextTag(swf, headerData, data, pos);
                     break;
                 case 12:
-                    ret = new DoActionTag(swf, data, pos);
+                    ret = new DoActionTag(swf, headerData, data, pos);
                     break;
                 case 13:
-                    ret = new DefineFontInfoTag(swf, data, pos);
+                    ret = new DefineFontInfoTag(swf, headerData, data, pos);
                     break;
                 case 14:
-                    ret = new DefineSoundTag(swf, data, pos);
+                    ret = new DefineSoundTag(swf, headerData, data, pos);
                     break;
                 case 15:
-                    ret = new StartSoundTag(swf, data, pos);
+                    ret = new StartSoundTag(swf, headerData, data, pos);
                     break;
                 //case 16:
                 case 17:
-                    ret = new DefineButtonSoundTag(swf, data, pos);
+                    ret = new DefineButtonSoundTag(swf, headerData, data, pos);
                     break;
                 case 18:
-                    ret = new SoundStreamHeadTag(swf, data, pos);
+                    ret = new SoundStreamHeadTag(swf, headerData, data, pos);
                     break;
                 case 19:
-                    ret = new SoundStreamBlockTag(swf, data, pos);
+                    ret = new SoundStreamBlockTag(swf, headerData, data, pos);
                     break;
                 case 21:
-                    ret = new DefineBitsJPEG2Tag(swf, data, pos);
+                    ret = new DefineBitsJPEG2Tag(swf, headerData, data, pos);
                     break;
                 case 20:
-                    ret = new DefineBitsLosslessTag(swf, data, pos);
+                    ret = new DefineBitsLosslessTag(swf, headerData, data, pos);
                     break;
                 case 22:
-                    ret = new DefineShape2Tag(swf, data, pos);
+                    ret = new DefineShape2Tag(swf, headerData, data, pos);
                     break;
                 case 23:
-                    ret = new DefineButtonCxformTag(swf, data, pos);
+                    ret = new DefineButtonCxformTag(swf, headerData, data, pos);
                     break;
                 case 24:
-                    ret = new ProtectTag(swf, data, pos);
+                    ret = new ProtectTag(swf, headerData, data, pos);
                     break;
                 //case 25: PathsArePostscript
                 case 26:
-                    ret = new PlaceObject2Tag(swf, data, pos);
+                    ret = new PlaceObject2Tag(swf, headerData, data, pos);
                     break;
                 //case 27: 
                 case 28:
-                    ret = new RemoveObject2Tag(swf, data, pos);
+                    ret = new RemoveObject2Tag(swf, headerData, data, pos);
                     break;
                 //case 29: SyncFrame
                 //case 30:
                 //case 31: FreeAll
                 case 32:
-                    ret = new DefineShape3Tag(swf, data, pos);
+                    ret = new DefineShape3Tag(swf, headerData, data, pos);
                     break;
                 case 33:
-                    ret = new DefineText2Tag(swf, data, pos);
+                    ret = new DefineText2Tag(swf, headerData, data, pos);
                     break;
                 case 34:
-                    ret = new DefineButton2Tag(swf, data, pos);
+                    ret = new DefineButton2Tag(swf, headerData, data, pos);
                     break;
                 case 35:
-                    ret = new DefineBitsJPEG3Tag(swf, data, pos);
+                    ret = new DefineBitsJPEG3Tag(swf, headerData, data, pos);
                     break;
                 case 36:
-                    ret = new DefineBitsLossless2Tag(swf, data, pos);
+                    ret = new DefineBitsLossless2Tag(swf, headerData, data, pos);
                     break;
                 case 37:
-                    ret = new DefineEditTextTag(swf, data, pos);
+                    ret = new DefineEditTextTag(swf, headerData, data, pos);
                     break;
                 //case 38: DefineVideo
                 case 39:
-                    ret = new DefineSpriteTag(swf, data, level, pos, parallel, skipUnusualTags);
+                    ret = new DefineSpriteTag(swf, headerData, data, level, pos, parallel, skipUnusualTags);
                     break;
                 //case 40: NameCharacter
                 case 41:
-                    ret = new ProductInfoTag(swf, data, pos);
+                    ret = new ProductInfoTag(swf, headerData, data, pos);
                     break;
                 //case 42: DefineTextFormat
                 case 43:
-                    ret = new FrameLabelTag(swf, data, pos);
+                    ret = new FrameLabelTag(swf, headerData, data, pos);
                     break;
                 //case 44:
                 case 45:
-                    ret = new SoundStreamHead2Tag(swf, data, pos);
+                    ret = new SoundStreamHead2Tag(swf, headerData, data, pos);
                     break;
                 case 46:
-                    ret = new DefineMorphShapeTag(swf, data, pos);
+                    ret = new DefineMorphShapeTag(swf, headerData, data, pos);
                     break;
                 //case 47: GenerateFrame
                 case 48:
-                    ret = new DefineFont2Tag(swf, data, pos);
+                    ret = new DefineFont2Tag(swf, headerData, data, pos);
                     break;
                 //case 49: GeneratorCommand
                 //case 50: DefineCommandObject
@@ -1084,148 +1090,148 @@ public class SWFInputStream extends InputStream {
                 //case 52: ExternalFont
                 //case 53-55
                 case 56:
-                    ret = new ExportAssetsTag(swf, data, pos);
+                    ret = new ExportAssetsTag(swf, headerData, data, pos);
                     break;
                 case 57:
-                    ret = new ImportAssetsTag(swf, data, pos);
+                    ret = new ImportAssetsTag(swf, headerData, data, pos);
                     break;
                 case 58:
-                    ret = new EnableDebuggerTag(swf, data, pos);
+                    ret = new EnableDebuggerTag(swf, headerData, data, pos);
                     break;
                 case 59:
-                    ret = new DoInitActionTag(swf, data, pos);
+                    ret = new DoInitActionTag(swf, headerData, data, pos);
                     break;
                 case 60:
-                    ret = new DefineVideoStreamTag(swf, data, pos);
+                    ret = new DefineVideoStreamTag(swf, headerData, data, pos);
                     break;
                 case 61:
-                    ret = new VideoFrameTag(swf, data, pos);
+                    ret = new VideoFrameTag(swf, headerData, data, pos);
                     break;
                 case 62:
-                    ret = new DefineFontInfo2Tag(swf, data, pos);
+                    ret = new DefineFontInfo2Tag(swf, headerData, data, pos);
                     break;
                 case 63:
-                    ret = new DebugIDTag(swf, data, pos);
+                    ret = new DebugIDTag(swf, headerData, data, pos);
                     break;
                 case 64:
-                    ret = new EnableDebugger2Tag(swf, data, pos);
+                    ret = new EnableDebugger2Tag(swf, headerData, data, pos);
                     break;
                 case 65:
-                    ret = new ScriptLimitsTag(swf, data, pos);
+                    ret = new ScriptLimitsTag(swf, headerData, data, pos);
                     break;
                 case 66:
-                    ret = new SetTabIndexTag(swf, data, pos);
+                    ret = new SetTabIndexTag(swf, headerData, data, pos);
                     break;
                 //case 67-68:
                 case 69:
-                    ret = new FileAttributesTag(swf, data, pos);
+                    ret = new FileAttributesTag(swf, headerData, data, pos);
                     break;
                 case 70:
-                    ret = new PlaceObject3Tag(swf, data, pos);
+                    ret = new PlaceObject3Tag(swf, headerData, data, pos);
                     break;
                 case 71:
-                    ret = new ImportAssets2Tag(swf, data, pos);
+                    ret = new ImportAssets2Tag(swf, headerData, data, pos);
                     break;
                 case 72:
-                    ret = new DoABCTag(swf, data, pos);
+                    ret = new DoABCTag(swf, headerData, data, pos);
                     break;
                 case 73:
-                    ret = new DefineFontAlignZonesTag(swf, data, pos);
+                    ret = new DefineFontAlignZonesTag(swf, headerData, data, pos);
                     break;
                 case 74:
-                    ret = new CSMTextSettingsTag(swf, data, pos);
+                    ret = new CSMTextSettingsTag(swf, headerData, data, pos);
                     break;
                 case 75:
-                    ret = new DefineFont3Tag(swf, data, pos);
+                    ret = new DefineFont3Tag(swf, headerData, data, pos);
                     break;
                 case 76:
-                    ret = new SymbolClassTag(swf, data, pos);
+                    ret = new SymbolClassTag(swf, headerData, data, pos);
                     break;
                 case 77:
-                    ret = new MetadataTag(swf, data, pos);
+                    ret = new MetadataTag(swf, headerData, data, pos);
                     break;
                 case 78:
-                    ret = new DefineScalingGridTag(swf, data, pos);
+                    ret = new DefineScalingGridTag(swf, headerData, data, pos);
                     break;
                 //case 79-81:
                 case 82:
-                    ret = new DoABCDefineTag(swf, data, pos);
+                    ret = new DoABCDefineTag(swf, headerData, data, pos);
                     break;
                 case 83:
-                    ret = new DefineShape4Tag(swf, data, pos);
+                    ret = new DefineShape4Tag(swf, headerData, data, pos);
                     break;
                 case 84:
-                    ret = new DefineMorphShape2Tag(swf, data, pos);
+                    ret = new DefineMorphShape2Tag(swf, headerData, data, pos);
                     break;
                 //case 85:
                 case 86:
-                    ret = new DefineSceneAndFrameLabelDataTag(swf, data, pos);
+                    ret = new DefineSceneAndFrameLabelDataTag(swf, headerData, data, pos);
                     break;
                 case 87:
-                    ret = new DefineBinaryDataTag(swf, data, pos);
+                    ret = new DefineBinaryDataTag(swf, headerData, data, pos);
                     break;
                 case 88:
-                    ret = new DefineFontNameTag(swf, data, pos);
+                    ret = new DefineFontNameTag(swf, headerData, data, pos);
                     break;
                 case 89:
-                    ret = new StartSound2Tag(swf, data, pos);
+                    ret = new StartSound2Tag(swf, headerData, data, pos);
                     break;
                 case 90:
-                    ret = new DefineBitsJPEG4Tag(swf, data, pos);
+                    ret = new DefineBitsJPEG4Tag(swf, headerData, data, pos);
                     break;
                 case 91:
-                    ret = new DefineFont4Tag(swf, data, pos);
+                    ret = new DefineFont4Tag(swf, headerData, data, pos);
                     break;
                 //case 92: certificate
                 case 93:
-                    ret = new EnableTelemetryTag(swf, data, pos);
+                    ret = new EnableTelemetryTag(swf, headerData, data, pos);
                     break;
                 case 94:
-                    ret = new PlaceObject4Tag(swf, data, pos);
+                    ret = new PlaceObject4Tag(swf, headerData, data, pos);
                     break;
                 default:
                     if (gfx) {   //GFX tags only in GFX files. There may be incorrect GFX tags in non GFX files
                         switch (tag.getId()) {
                             case 1000:
-                                ret = new ExporterInfoTag(swf, data, pos);
+                                ret = new ExporterInfoTag(swf, headerData, data, pos);
                                 break;
                             case 1001:
-                                ret = new DefineExternalImage(swf, data, pos);
+                                ret = new DefineExternalImage(swf, headerData, data, pos);
                                 break;
                             case 1002:
-                                ret = new FontTextureInfo(swf, data, pos);
+                                ret = new FontTextureInfo(swf, headerData, data, pos);
                                 break;
                             case 1003:
-                                ret = new DefineExternalGradient(swf, data, pos);
+                                ret = new DefineExternalGradient(swf, headerData, data, pos);
                                 break;
                             case 1004:
-                                ret = new DefineGradientMap(swf, data, pos);
+                                ret = new DefineGradientMap(swf, headerData, data, pos);
                                 break;
                             case 1005:
-                                ret = new DefineCompactedFont(swf, data, pos);
+                                ret = new DefineCompactedFont(swf, headerData, data, pos);
                                 break;
                             case 1006:
-                                ret = new DefineExternalSound(swf, data, pos);
+                                ret = new DefineExternalSound(swf, headerData, data, pos);
                                 break;
                             case 1007:
-                                ret = new DefineExternalStreamSound(swf, data, pos);
+                                ret = new DefineExternalStreamSound(swf, headerData, data, pos);
                                 break;
                             case 1008:
-                                ret = new DefineSubImage(swf, data, pos);
+                                ret = new DefineSubImage(swf, headerData, data, pos);
                                 break;
                             case 1009:
-                                ret = new DefineExternalImage2(swf, data, pos);
+                                ret = new DefineExternalImage2(swf, headerData, data, pos);
                                 break;
                             default:
-                                ret = new UnknownTag(swf, tag.getId(), data, pos);
+                                ret = new UnknownTag(swf, tag.getId(), headerData, data, pos);
                         }
                     } else {
-                        ret = new UnknownTag(swf, tag.getId(), data, pos);
+                        ret = new UnknownTag(swf, tag.getId(), headerData, data, pos);
                     }
             }
         } catch (IOException ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", ex);
-            ret = new Tag(swf, tag.getId(), "ErrorTag", data, pos);
+            ret = new Tag(swf, tag.getId(), "ErrorTag", headerData, data, pos);
         }
         ret.previousTag = tag.previousTag;
         ret.forceWriteAsLong = tag.forceWriteAsLong;
@@ -1251,9 +1257,6 @@ public class SWFInputStream extends InputStream {
     public Tag readTag(SWF swf, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags, boolean gfx) throws IOException, InterruptedException {
         int tagIDTagLength = readUI16();
         int tagID = (tagIDTagLength) >> 6;
-        if (tagID == 0) {
-            return null;
-        }
 
         logger.log(Level.INFO, "Reading tag. ID={0}, position: {1}", new Object[]{tagID, pos});
 
@@ -1264,7 +1267,7 @@ public class SWFInputStream extends InputStream {
             readLong = true;
         }
         byte[] data = readBytes((int) tagLength);
-        Tag ret = new Tag(swf, tagID, "Unresolved", data, pos);
+        Tag ret = new Tag(swf, tagID, "Unresolved", Tag.getTagHeader(tagIDTagLength, tagLength, readLong, swf.version), data, pos);
         ret.forceWriteAsLong = readLong;
 
         if (resolve) {
@@ -1675,6 +1678,7 @@ public class SWFInputStream extends InputStream {
      * Reads one CLIPACTIONRECORD value from the stream
      *
      * @param swf
+     * @param tag
      * @return CLIPACTIONRECORD value
      * @throws IOException
      */
@@ -1691,6 +1695,7 @@ public class SWFInputStream extends InputStream {
      * Reads one CLIPACTIONS value from the stream
      *
      * @param swf
+     * @param tag
      * @return CLIPACTIONS value
      * @throws IOException
      */
@@ -2032,6 +2037,7 @@ public class SWFInputStream extends InputStream {
      * Reads list of BUTTONCONDACTION values from the stream
      *
      * @param swf
+     * @param tag
      * @return List of BUTTONCONDACTION values
      * @throws IOException
      */
@@ -2049,6 +2055,7 @@ public class SWFInputStream extends InputStream {
      * Reads one BUTTONCONDACTION value from the stream
      *
      * @param swf
+     * @param tag
      * @return BUTTONCONDACTION value
      * @throws IOException
      */

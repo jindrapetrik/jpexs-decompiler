@@ -91,7 +91,7 @@ public class FontPreviewDialog extends AppDialog {
         } catch (IOException ex) {
             Logger.getLogger(FontPreviewDialog.class.getName()).log(Level.SEVERE, "Cannot read font preview dialog sample texts", ex);
         }
-        return new DefaultComboBoxModel<>(sampleTexts.toArray(new String[0]));
+        return new DefaultComboBoxModel<>(sampleTexts.toArray(new String[sampleTexts.size()]));
     }
 
     /**

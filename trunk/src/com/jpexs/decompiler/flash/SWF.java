@@ -79,6 +79,7 @@ import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
@@ -204,6 +205,7 @@ public final class SWF implements TreeItem, Timelined {
      * Tags inside of file
      */
     public List<Tag> tags = new ArrayList<>();
+    public boolean hasEndTag;
     /**
      * ExportRectangle for the display
      */
@@ -282,7 +284,7 @@ public final class SWF implements TreeItem, Timelined {
             Tag t = tags.get(i);
             if (t instanceof DefineSpriteTag) {
                 if (!isSpriteValid((DefineSpriteTag) t, new ArrayList<Integer>())) {
-                    tags.set(i, new Tag(this, t.getId(), "InvalidSprite", t.getData(), t.getPos()));
+                    tags.set(i, new Tag(this, t.getId(), "InvalidSprite", t.getOriginalHeaderData(), t.getOriginalData(), t.getPos()));
                 }
             }
         }
@@ -349,7 +351,9 @@ public final class SWF implements TreeItem, Timelined {
             sos.writeUI16(frameCount);
 
             sos.writeTags(tags);
-            sos.writeUI16(0);
+            if (hasEndTag) {
+                sos.writeUI16(0);
+            }
             sos.close();
             if (compressed && lzma) {
                 os.write('Z');
@@ -578,7 +582,12 @@ public final class SWF implements TreeItem, Timelined {
         sis.readUI8(); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        tags = sis.readTagList(this, this, 0, parallelRead, true, !checkOnly, gfx);
+        List<Tag> tags = sis.readTagList(this, this, 0, parallelRead, true, !checkOnly, gfx);
+        if (tags.get(tags.size() - 1).getId() == EndTag.ID) {
+            hasEndTag = true;
+            tags.remove(tags.size() - 1);
+        }
+        this.tags = tags;
         if (!checkOnly) {
             checkInvalidSprites();
             updateInnerTagsForShowFrameTags();

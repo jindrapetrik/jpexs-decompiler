@@ -657,7 +657,7 @@ public final class TextLexer {
                     if (string != null) {
                         String ret = string.toString();
                         string = null;
-                        return new ParsedSymbol(SymbolType.TEXT, ret.toString());
+                        return new ParsedSymbol(SymbolType.TEXT, ret);
                     }
                 }
                 case 21:

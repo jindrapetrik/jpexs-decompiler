@@ -46,11 +46,11 @@ public class FileAttributesTag extends Tag {
     public static final int ID = 69;
 
     public FileAttributesTag() {
-        super(null, ID, "FileAttributes", new byte[]{}, 0);
+        super(null, ID, "FileAttributes", new byte[0], new byte[0], 0);
     }
 
-    public FileAttributesTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "FileAttributes", data, pos);
+    public FileAttributesTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "FileAttributes", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         reserved1 = sis.readUB(1) == 1; // reserved
         // UB[1] == 0  (reserved)

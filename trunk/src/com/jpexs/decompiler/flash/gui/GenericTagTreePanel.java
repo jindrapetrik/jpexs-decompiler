@@ -239,7 +239,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 if (swfArray != null) {
                                     itemStr = swfArray.value();
                                 }
-                                if (itemStr.equals("")) {
+                                if (itemStr.isEmpty()) {
                                     itemStr = AppStrings.translate("generictag.array.item");
                                 }
                                 if (ReflectionTools.needsIndex(fnode.field)) {
@@ -519,7 +519,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 Conditional cond = fnode.field.getAnnotation(Conditional.class);
                 if (cond != null) {
                     ConditionEvaluator ev = new ConditionEvaluator(cond);
-                    String parentPath = currentPath.indexOf(".") == -1 ? "" : currentPath.substring(0, currentPath.lastIndexOf("."));
+                    String parentPath = currentPath.indexOf('.') == -1 ? "" : currentPath.substring(0, currentPath.lastIndexOf('.'));
                     try {
                         for (String cname : ev.getFields()) {
                             String fullParh = parentPath + "." + cname;
@@ -705,7 +705,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
         if (swfArray.count() > 0) {
             result += "[" + swfArray.count() + "]";
-        } else if (!swfArray.countField().equals("")) {
+        } else if (!swfArray.countField().isEmpty()) {
             result += "[" + swfArray.countField() + "]";
         }
         return result;
@@ -726,7 +726,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 result += " + " + swfType.countAdd();
             }
             result += "]";
-        } else if (!swfType.countField().equals("")) {
+        } else if (!swfType.countField().isEmpty()) {
             result += "[" + swfType.countField();
             if (swfType.countAdd() > 0) {
                 result += " + " + swfType.countAdd();
@@ -822,7 +822,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private void addItem(Object obj, Field field, int index) {
         SWFArray swfArray = field.getAnnotation(SWFArray.class);
-        if (swfArray != null && !swfArray.countField().equals("")) { //Fields with same countField must be enlarged too
+        if (swfArray != null && !swfArray.countField().isEmpty()) { //Fields with same countField must be enlarged too
             Field fields[] = obj.getClass().getDeclaredFields();
             List<Integer> sameFlds = new ArrayList<>();
             for (int f = 0; f < fields.length; f++) {
@@ -868,7 +868,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private void removeItem(Object obj, Field field, int index) {
         SWFArray swfArray = field.getAnnotation(SWFArray.class);
-        if (swfArray != null && !swfArray.countField().equals("")) { //Fields with same countField must be removed from too
+        if (swfArray != null && !swfArray.countField().isEmpty()) { //Fields with same countField must be removed from too
             Field fields[] = obj.getClass().getDeclaredFields();
             for (int f = 0; f < fields.length; f++) {
                 SWFArray fieldSwfArray = fields[f].getAnnotation(SWFArray.class);

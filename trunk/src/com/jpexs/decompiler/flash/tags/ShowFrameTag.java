@@ -52,14 +52,16 @@ public class ShowFrameTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param pos
+     * @param data
      */
-    public ShowFrameTag(SWF swf, long pos) {
-        super(swf, ID, "ShowFrame", new byte[0], pos);
+    public ShowFrameTag(SWF swf, byte[] headerData, byte[] data, long pos) {
+        super(swf, ID, "ShowFrame", headerData, data, pos);
     }
 
     public ShowFrameTag(SWF swf) {
-        super(swf, ID, "ShowFrame", null, 0);
+        super(swf, ID, "ShowFrame", null, null, 0);
     }
 
     public static boolean isNestedTagType(int tagTypeId) {

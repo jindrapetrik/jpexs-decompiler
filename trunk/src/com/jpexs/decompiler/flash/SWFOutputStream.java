@@ -418,45 +418,12 @@ public class SWFOutputStream extends OutputStream {
     public void writeTags(List<Tag> tags) throws IOException {
         for (Tag tag : tags) {
             //try {
-            writeTag(tag);
+            tag.writeTag(this);
             /*} catch (NotSameException nse) {
              throw new RuntimeException("error in tag "+tag+" at pos "+Helper.formatHex((int)tag.getPos(), 8), nse);
              }*/
             //NotSameException must be processed in order to catch it elsewhere
         }
-    }
-
-    public static byte[] getTagHeader(Tag tag, byte[] data, int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-
-            SWFOutputStream sos = new SWFOutputStream(baos, version);
-            int tagLength = data.length;
-            int tagID = tag.getId();
-            int tagIDLength = (tagID << 6);
-            if ((tagLength <= 62) && (!tag.forceWriteAsLong)) {
-                tagIDLength += tagLength;
-                sos.writeUI16(tagIDLength);
-            } else {
-                tagIDLength += 0x3f;
-                sos.writeUI16(tagIDLength);
-                sos.writeSI32(tagLength);
-            }
-        } catch (IOException iex) {
-        }
-        return baos.toByteArray();
-    }
-
-    /**
-     * Writes Tag value to the stream
-     *
-     * @param tag Tag value
-     * @throws IOException
-     */
-    public void writeTag(Tag tag) throws IOException {
-        byte[] data = tag.getDataOrOriginalData();
-        write(getTagHeader(tag, data, version));
-        write(data);
     }
 
     /**

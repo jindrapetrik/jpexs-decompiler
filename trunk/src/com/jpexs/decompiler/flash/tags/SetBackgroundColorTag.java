@@ -29,14 +29,14 @@ public class SetBackgroundColorTag extends Tag {
     public RGB backgroundColor;
     public static final int ID = 9;
 
-    public SetBackgroundColorTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "SetBackgroundColor", data, pos);
+    public SetBackgroundColorTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "SetBackgroundColor", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         backgroundColor = sis.readRGB();
     }
 
     public SetBackgroundColorTag(SWF swf, RGB backgroundColor) {
-        super(swf, ID, "SetBackgroundColor", null, 0);
+        super(swf, ID, "SetBackgroundColor", null, null, 0);
         this.backgroundColor = backgroundColor;
     }
 

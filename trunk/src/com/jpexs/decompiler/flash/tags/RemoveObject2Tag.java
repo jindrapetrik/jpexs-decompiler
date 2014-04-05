@@ -30,8 +30,8 @@ public class RemoveObject2Tag extends Tag implements RemoveTag {
     public int depth;
     public static final int ID = 28;
 
-    public RemoveObject2Tag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "RemoveObject2", data, pos);
+    public RemoveObject2Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "RemoveObject2", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         depth = sis.readUI16();
     }

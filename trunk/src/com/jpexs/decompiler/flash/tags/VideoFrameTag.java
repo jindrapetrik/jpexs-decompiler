@@ -63,12 +63,13 @@ public class VideoFrameTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public VideoFrameTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "VideoFrame", data, pos);
+    public VideoFrameTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "VideoFrame", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         streamID = sis.readUI16();
         frameNum = sis.readUI16();

@@ -1934,7 +1934,7 @@ public final class ActionScriptLexer {
                     String s = yytext();
                     s = s.substring(1, s.length() - 1);
                     if (s.contains(" ")) {
-                        s = s.substring(0, s.indexOf(" "));
+                        s = s.substring(0, s.indexOf(' '));
                     }
                     xmlTagName = s;
                     string.append(yytext());

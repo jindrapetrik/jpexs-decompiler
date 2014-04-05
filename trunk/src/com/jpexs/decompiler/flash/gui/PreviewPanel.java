@@ -526,7 +526,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                 /*FileAttributesTag fa = new FileAttributesTag();
                  sos2.writeTag(fa);
                  */
-                sos2.writeTag(new SetBackgroundColorTag(null, new RGB(backgroundColor)));
+                new SetBackgroundColorTag(null, new RGB(backgroundColor)).writeTag(sos2);
 
                 if (tagObj instanceof FrameNodeItem) {
                     FrameNodeItem fn = (FrameNodeItem) tagObj;
@@ -559,7 +559,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         Set<Integer> needed = t.getDeepNeededCharacters(swf.characters);
                         for (int n : needed) {
                             if (!doneCharacters.contains(n)) {
-                                sos2.writeTag(classicTag(swf.characters.get(n)));
+                                classicTag(swf.characters.get(n)).writeTag(sos2);
                                 doneCharacters.add(n);
                             }
                         }
@@ -569,7 +569,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                                 doneCharacters.add(((CharacterTag) t).getCharacterId());
                             }
                         }
-                        sos2.writeTag(classicTag(t));
+                        classicTag(t).writeTag(sos2);
 
                         if (parent != null) {
                             if (t instanceof PlaceObjectTypeTag) {
@@ -589,28 +589,28 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                                     mat.translateX += width / 2;
                                     mat.translateY += height / 2;
                                 }
-                                sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
+                                new PlaceObject2Tag(null, false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null).writeTag(sos2);
 
                             }
                         }
                     }
-                    sos2.writeTag(new ShowFrameTag(null));
+                    new ShowFrameTag(null).writeTag(sos2);
                 } else {
 
                     if (tagObj instanceof DefineBitsTag) {
                         JPEGTablesTag jtt = swf.jtt;
                         if (jtt != null) {
-                            sos2.writeTag(jtt);
+                            jtt.writeTag(sos2);
                         }
                     } else if (tagObj instanceof AloneTag) {
                     } else {
                         Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(swf.characters);
                         for (int n : needed) {
-                            sos2.writeTag(classicTag(swf.characters.get(n)));
+                            classicTag(swf.characters.get(n)).writeTag(sos2);
                         }
                     }
 
-                    sos2.writeTag(classicTag((Tag) tagObj));
+                    classicTag((Tag) tagObj).writeTag(sos2);
 
                     int chtId = 0;
                     if (tagObj instanceof CharacterTag) {
@@ -663,34 +663,34 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             rec.add(tr);
                             mat.translateX = x * width / cols;
                             mat.translateY = y * height / rows;
-                            sos2.writeTag(new DefineTextTag(null, 999 + f, new RECT(0, width, 0, height), new MATRIX(), rec));
-                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
+                            new DefineTextTag(null, 999 + f, new RECT(0, width, 0, height), new MATRIX(), rec).writeTag(sos2);
+                            new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null).writeTag(sos2);
                             x++;
                         }
-                        sos2.writeTag(new ShowFrameTag(null));
+                        new ShowFrameTag(null).writeTag(sos2);
                     } else if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
-                        sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                        sos2.writeTag(new ShowFrameTag(null));
+                        new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null).writeTag(sos2);
+                        new ShowFrameTag(null).writeTag(sos2);
                         int numFrames = 100;
                         for (int ratio = 0; ratio < 65536; ratio += 65536 / numFrames) {
-                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null));
-                            sos2.writeTag(new ShowFrameTag(null));
+                            new PlaceObject2Tag(null, false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null).writeTag(sos2);
+                            new ShowFrameTag(null).writeTag(sos2);
                         }
                     } else if (tagObj instanceof SoundStreamHeadTypeTag) {
                         for (SoundStreamBlockTag blk : soundFrames) {
-                            sos2.writeTag(blk);
-                            sos2.writeTag(new ShowFrameTag(null));
+                            blk.writeTag(sos2);
+                            new ShowFrameTag(null).writeTag(sos2);
                         }
                     } else if (tagObj instanceof DefineSoundTag) {
                         ExportAssetsTag ea = new ExportAssetsTag();
                         DefineSoundTag ds = (DefineSoundTag) tagObj;
                         ea.tags.add(ds.soundId);
                         ea.names.add("my_define_sound");
-                        sos2.writeTag(ea);
+                        ea.writeTag(sos2);
                         List<Action> actions;
                         DoActionTag doa;
 
-                        doa = new DoActionTag(swf, new byte[]{}, 0);
+                        doa = new DoActionTag(swf, new byte[0], new byte[0], 0);
                         actions = ASMParser.parse(0, 0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
                                 + "Push \"_root\"\n"
@@ -707,8 +707,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                                 + "Pop\n"
                                 + "Stop", swf.version, false);
                         doa.setActions(actions);
-                        sos2.writeTag(doa);
-                        sos2.writeTag(new ShowFrameTag(null));
+                        doa.writeTag(sos2);
+                        new ShowFrameTag(null).writeTag(sos2);
 
                         actions = ASMParser.parse(0, 0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
@@ -734,8 +734,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                                 + "Pop\n"
                                 + "Stop", swf.version, false);
                         doa.setActions(actions);
-                        sos2.writeTag(doa);
-                        sos2.writeTag(new ShowFrameTag(null));
+                        doa.writeTag(sos2);
+                        new ShowFrameTag(null).writeTag(sos2);
 
                         actions = ASMParser.parse(0, 0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
@@ -778,23 +778,23 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                                 + "Pop\n"
                                 + "Stop", swf.version, false);
                         doa.setActions(actions);
-                        sos2.writeTag(doa);
-                        sos2.writeTag(new ShowFrameTag(null));
+                        doa.writeTag(sos2);
+                        new ShowFrameTag(null).writeTag(sos2);
 
                         actions = ASMParser.parse(0, 0, false,
                                 "StopSounds\n"
                                 + "Stop", swf.version, false);
                         doa.setActions(actions);
-                        sos2.writeTag(doa);
-                        sos2.writeTag(new ShowFrameTag(null));
+                        doa.writeTag(sos2);
+                        new ShowFrameTag(null).writeTag(sos2);
 
-                        sos2.writeTag(new ShowFrameTag(null));
+                        new ShowFrameTag(null).writeTag(sos2);
                         if (flashPanel != null) {
                             flashPanel.specialPlayback = true;
                         }
                     } else if (tagObj instanceof DefineVideoStreamTag) {
 
-                        sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
+                        new PlaceObject2Tag(null, false, false, false, false, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null).writeTag(sos2);
                         List<VideoFrameTag> frs = new ArrayList<>(videoFrames.values());
                         Collections.sort(frs, new Comparator<VideoFrameTag>() {
                             @Override
@@ -807,20 +807,20 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         for (VideoFrameTag f : frs) {
                             if (!first) {
                                 ratio++;
-                                sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, false, false, true, 1, 0, null, null, ratio, null, 0, null));
+                                new PlaceObject2Tag(null, false, false, false, true, false, false, false, true, 1, 0, null, null, ratio, null, 0, null).writeTag(sos2);
                             }
-                            sos2.writeTag(f);
-                            sos2.writeTag(new ShowFrameTag(null));
+                            f.writeTag(sos2);
+                            new ShowFrameTag(null).writeTag(sos2);
                             first = false;
                         }
                     } else {
-                        sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                        sos2.writeTag(new ShowFrameTag(null));
+                        new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null).writeTag(sos2);
+                        new ShowFrameTag(null).writeTag(sos2);
                     }
 
                 }//not showframe
 
-                sos2.writeTag(new EndTag(null));
+                new EndTag(null).writeTag(sos2);
                 data = baos.toByteArray();
             }
 

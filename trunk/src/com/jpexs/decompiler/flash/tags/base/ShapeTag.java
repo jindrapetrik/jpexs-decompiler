@@ -31,8 +31,8 @@ import java.awt.Shape;
  */
 public abstract class ShapeTag extends CharacterTag implements BoundedTag, DrawableTag {
 
-    public ShapeTag(SWF swf, int id, String name, byte[] data, long pos) {
-        super(swf, id, name, data, pos);
+    public ShapeTag(SWF swf, int id, String name, byte[] headerData, byte[] data, long pos) {
+        super(swf, id, name, headerData, data, pos);
     }
 
     public abstract SHAPEWITHSTYLE getShapes();

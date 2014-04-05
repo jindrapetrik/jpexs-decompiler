@@ -59,12 +59,13 @@ public class DebugIDTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DebugIDTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DebugID", data, pos);
+    public DebugIDTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DebugID", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         debugId = sis.readBytesEx(16);
     }

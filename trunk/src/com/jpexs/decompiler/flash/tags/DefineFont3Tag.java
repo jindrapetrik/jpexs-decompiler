@@ -110,8 +110,8 @@ public class DefineFont3Tag extends FontTag {
         return codeTable.indexOf((Integer) (int) c);
     }
 
-    public DefineFont3Tag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineFont3", data, pos);
+    public DefineFont3Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineFont3", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         fontId = sis.readUI16();
         fontFlagsHasLayout = sis.readUB(1) == 1;

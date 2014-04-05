@@ -102,12 +102,13 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public PlaceObjectTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "PlaceObject", data, pos);
+    public PlaceObjectTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "PlaceObject", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         characterId = sis.readUI16();
         depth = sis.readUI16();
@@ -118,7 +119,7 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
     }
 
     public PlaceObjectTag(SWF swf, int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
-        super(swf, ID, "PlaceObject", null, 0);
+        super(swf, ID, "PlaceObject", null, null, 0);
         this.characterId = characterId;
         this.depth = depth;
         this.matrix = matrix;

@@ -48,7 +48,7 @@ public class ExportAssetsTag extends Tag {
     public static final int ID = 56;
 
     public ExportAssetsTag() {
-        super(null, ID, "ExportAssets", new byte[]{}, 0);
+        super(null, ID, "ExportAssets", new byte[0], new byte[0], 0);
         tags = new ArrayList<>();
         names = new ArrayList<>();
     }
@@ -57,12 +57,13 @@ public class ExportAssetsTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public ExportAssetsTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "ExportAssets", data, pos);
+    public ExportAssetsTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "ExportAssets", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         int count = sis.readUI16();
         tags = new ArrayList<>();

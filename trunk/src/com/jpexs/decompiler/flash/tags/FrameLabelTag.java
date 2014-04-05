@@ -38,8 +38,8 @@ public class FrameLabelTag extends Tag {
         return namedAnchor;
     }
 
-    public FrameLabelTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "FrameLabel", data, pos);
+    public FrameLabelTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "FrameLabel", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         name = sis.readString();
         if (sis.available() > 0) {

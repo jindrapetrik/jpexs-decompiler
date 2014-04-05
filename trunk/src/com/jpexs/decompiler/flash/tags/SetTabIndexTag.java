@@ -67,12 +67,13 @@ public class SetTabIndexTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public SetTabIndexTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "SetTabIndex", data, pos);
+    public SetTabIndexTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "SetTabIndex", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         depth = sis.readUI16();
         tabIndex = sis.readUI16();

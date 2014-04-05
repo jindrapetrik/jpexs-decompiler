@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -51,11 +50,12 @@ public class DoActionTag extends Tag implements ASMSource {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      */
-    public DoActionTag(SWF swf, byte[] data, long pos) {
-        super(swf, ID, "DoAction", data, pos);
+    public DoActionTag(SWF swf, byte[] headerData, byte[] data, long pos) {
+        super(swf, ID, "DoAction", headerData, data, pos);
         actionBytes = data;
     }
 
@@ -114,7 +114,7 @@ public class DoActionTag extends Tag implements ASMSource {
                 byte[] prevData = previousTag.getData();
                 baos.write(prevData);
                 prevLength = prevData.length;
-                byte[] header = SWFOutputStream.getTagHeader(this, data, getVersion());
+                byte[] header = getHeader(data);
                 baos.write(header);
                 prevLength += header.length;
             }

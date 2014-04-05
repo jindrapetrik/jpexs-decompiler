@@ -2030,7 +2030,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             try {
                                 SWF swf = it.getSwf();
                                 if (it instanceof DefineBitsTag) {
-                                    DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, it.getOriginalData(), it.getPos(), it.getCharacterId(), data);
+                                    DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, it.getOriginalHeaderData(), it.getOriginalData(), it.getPos(), it.getCharacterId(), data);
                                     jpeg2Tag.setModified(true);
                                     swf.tags.set(swf.tags.indexOf(it), jpeg2Tag);
                                     swf.updateCharacters();

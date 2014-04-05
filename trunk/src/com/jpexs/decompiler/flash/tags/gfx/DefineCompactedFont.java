@@ -86,12 +86,13 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineCompactedFont(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineCompactedFont", data, pos);
+    public DefineCompactedFont(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineCompactedFont", headerData, data, pos);
 
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         fontId = sis.readUI16();

@@ -266,7 +266,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         final JScrollBar sb = genericTagPropertiesEditPanelScrollPanel.getVerticalScrollBar();
         final int val = sb.getValue(); //save scroll top
         SWFType swfType = field.getAnnotation(SWFType.class);
-        if (swfType != null && !swfType.countField().equals("")) { //Fields with same countField must be removed from too
+        if (swfType != null && !swfType.countField().isEmpty()) { //Fields with same countField must be removed from too
             Field fields[] = obj.getClass().getDeclaredFields();
             for (int f = 0; f < fields.length; f++) {
                 SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
@@ -318,7 +318,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         final JScrollBar sb = genericTagPropertiesEditPanelScrollPanel.getVerticalScrollBar();
         final int val = sb.getValue(); //save scroll top
         SWFType swfType = field.getAnnotation(SWFType.class);
-        if (swfType != null && !swfType.countField().equals("")) { //Fields with same countField must be enlarged too
+        if (swfType != null && !swfType.countField().isEmpty()) { //Fields with same countField must be enlarged too
             Field fields[] = obj.getClass().getDeclaredFields();
             for (int f = 0; f < fields.length; f++) {
                 SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
@@ -450,7 +450,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 result += " + " + swfType.countAdd();
             }
             result += "]";
-        } else if (!swfType.countField().equals("")) {
+        } else if (!swfType.countField().isEmpty()) {
             result += "[" + swfType.countField();
             if (swfType.countAdd() > 0) {
                 result += " + " + swfType.countAdd();
@@ -510,7 +510,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 Field f = path.get(i);
                 int index = indices.get(i);
                 String par = p;
-                if (!p.equals("")) {
+                if (!p.isEmpty()) {
                     p += ".";
                 }
                 p += f.getName();
@@ -526,7 +526,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                         Map<String, Boolean> fields = new HashMap<>();
                         for (String fld : fieldNames) {
                             String ckey = "";
-                            if (!par.equals("")) {
+                            if (!par.isEmpty()) {
                                 ckey = par + ".";
                             }
                             ckey += fld;

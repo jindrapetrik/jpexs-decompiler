@@ -80,12 +80,13 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public DefineSceneAndFrameLabelDataTag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineSceneAndFrameLabelData", data, pos);
+    public DefineSceneAndFrameLabelDataTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "DefineSceneAndFrameLabelData", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         int sceneCount = (int) sis.readEncodedU32();
         sceneOffsets = new long[sceneCount];

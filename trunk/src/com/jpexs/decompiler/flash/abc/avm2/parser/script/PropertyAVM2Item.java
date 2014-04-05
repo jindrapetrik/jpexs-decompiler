@@ -437,8 +437,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             String pkgName = "";
             cname = localData.currentClass;
             if (cname.contains(".")) {
-                pkgName = cname.substring(0, cname.lastIndexOf("."));
-                cname = cname.substring(cname.lastIndexOf(".") + 1);
+                pkgName = cname.substring(0, cname.lastIndexOf('.'));
+                cname = cname.substring(cname.lastIndexOf('.') + 1);
             }
             Reference<String> outName = new Reference<>("");
             Reference<String> outNs = new Reference<>("");

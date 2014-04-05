@@ -66,12 +66,13 @@ public class EnableDebugger2Tag extends Tag {
      * Constructor
      *
      * @param swf
+     * @param headerData
      * @param data Data bytes
      * @param pos
      * @throws IOException
      */
-    public EnableDebugger2Tag(SWF swf, byte[] data, long pos) throws IOException {
-        super(swf, ID, "EnableDebugger2", data, pos);
+    public EnableDebugger2Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
+        super(swf, ID, "EnableDebugger2", headerData, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         reserved = sis.readUI16();
         passwordHash = sis.readString();
