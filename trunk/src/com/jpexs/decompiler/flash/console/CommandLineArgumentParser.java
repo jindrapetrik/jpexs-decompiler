@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.abc.RenameType;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
@@ -276,6 +277,8 @@ public class CommandLineArgumentParser {
             parseRenameInvalidIdentifiers(args);
         } else if (nextParam.equals("-dumpswf")) {
             parseDumpSwf(args);
+        } else if (nextParam.equals("-as3compiler")) {
+            ActionScriptParser.compile(args.remove(),args.remove());
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?")) {
             printHeader();
             printCmdLineUsage();

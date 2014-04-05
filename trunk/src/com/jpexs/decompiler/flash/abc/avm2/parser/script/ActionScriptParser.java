@@ -1883,14 +1883,9 @@ public class ActionScriptParser {
         this.otherABCs = otherABCs;
     }
 
-    public static void main(String[] args) {
-        if (args.length < 2) {
-            return;
-        }
-        Main.initLogging(false);
+    public static void compile(String src, String dst) {        
+        System.err.println("WARNING: AS3 compiler is not finished yet. This is only used for debuggging!");
         try {
-            String src = args[0];
-            String dst = args[1];
             SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
             SWF swf = new SWF(swc.getSWF("library.swf"), true);
             List<ABC> playerABCs = new ArrayList<>();

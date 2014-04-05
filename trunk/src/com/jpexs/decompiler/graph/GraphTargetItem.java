@@ -215,7 +215,7 @@ public abstract class GraphTargetItem implements Serializable {
         return ret;
     }
 
-    protected List<GraphSourceItem> toSourceMerge(SourceGeneratorLocalData localData, SourceGenerator gen, Object... tar) {
+    public static List<GraphSourceItem> toSourceMerge(SourceGeneratorLocalData localData, SourceGenerator gen, Object... tar) {
         List<GraphSourceItem> ret = new ArrayList<>();
         for (Object o : tar) {
             if (o == null) {

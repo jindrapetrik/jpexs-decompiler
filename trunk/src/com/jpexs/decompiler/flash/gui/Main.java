@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
