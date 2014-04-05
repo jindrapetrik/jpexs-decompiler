@@ -38,5 +38,7 @@ public class SoundStreamBlockTag extends Tag {
      * @throws IOException
      */
     public SoundStreamBlockTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "SoundStreamBlock", headerData, data, pos);          }
+        super(swf, ID, "SoundStreamBlock", headerData, data, pos);
+        //all data is streamSoundData
+    }
 }
