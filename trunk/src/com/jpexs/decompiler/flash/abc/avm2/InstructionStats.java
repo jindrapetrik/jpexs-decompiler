@@ -27,6 +27,8 @@ public class InstructionStats {
     public boolean seen = false;
     public int stackpos = 0;
     public int scopepos = 0;
+    public int stackpos_after = 0;
+    public int scopepos_after = 0;
     public AVM2Instruction ins;
 
     public InstructionStats(AVM2Instruction ins) {

@@ -95,11 +95,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
     public int getSlotScope() {
         return slotScope;
     }
-    
-    
-    
-    
-    
 
     public void setNs(GraphTargetItem ns) {
         this.ns = ns;
@@ -111,12 +106,12 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
     public int getSlotNumber() {
         return slotNumber;
-    }        
+    }
 
     public void setSlotNumber(int slotNumber) {
         this.slotNumber = slotNumber;
-    }   
-    
+    }
+
     public int getRegNumber() {
         return regNumber;
     }
@@ -189,8 +184,8 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
     }
 
-    public static GraphTargetItem getDefaultValue(String type){
-        switch(type){
+    public static GraphTargetItem getDefaultValue(String type) {
+        switch (type) {
             case "*":
                 return new UndefinedAVM2Item(null);
             case "int":
@@ -201,7 +196,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
                 return new NullAVM2Item(null);
         }
     }
-    
+
     public static AVM2Instruction generateCoerce(SourceGenerator generator, String type) {
         AVM2Instruction ins;
         switch (type) {
@@ -223,10 +218,10 @@ public class NameAVM2Item extends AssignableAVM2Item {
     }
 
     private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) {
-        if (variableName != null && regNumber == -1 && slotNumber == -1  && ns == null) {
+        if (variableName != null && regNumber == -1 && slotNumber == -1 && ns == null) {
             throw new RuntimeException("No register or slot set for " + variableName);
         }
-        if (definition && assignedValue == null) {            
+        if (definition && assignedValue == null) {
             return new ArrayList<GraphSourceItem>();
         }
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
@@ -276,7 +271,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         if (index != null) {
             if (assignedValue != null) {
                 return toSourceMerge(localData, generator,
-                        generateGetLoc(regNumber),generateGetSlot(slotScope,slotNumber), index, assignedValue,
+                        generateGetLoc(regNumber), generateGetSlot(slotScope, slotNumber), index, assignedValue,
                         needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
                         ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
                         needsReturn ? getTemp(localData, generator, ret_temp) : null,
@@ -292,25 +287,23 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
 
         if (assignedValue != null) {
-            List<String> basicTypes = Arrays.asList("int","Number");
-            if(slotNumber>-1)
-            {
-                return toSourceMerge(localData, generator, 
-                        ins(new GetScopeObjectIns(),slotScope),
-                        assignedValue, !((""+assignedValue.returnType()).equals(""+type)&&(basicTypes.contains(""+type))) ? generateCoerce(generator, "" + type) : null, needsReturn
-                    ? dupSetTemp(localData, generator, ret_temp) : null, generateSetLoc(regNumber),slotNumber>-1?
-                            ins(new SetSlotIns(),slotNumber)
-                            :null,
-                needsReturn?getTemp(localData, generator, ret_temp):null,
-                killTemp(localData, generator, Arrays.asList(ret_temp)));
-            }
-            else{
-            
-            return toSourceMerge(localData, generator, assignedValue, !((""+assignedValue.returnType()).equals(""+type)&&(basicTypes.contains(""+type))) ? generateCoerce(generator, "" + type) : null, needsReturn
-                    ? ins(new DupIns()) : null, generateSetLoc(regNumber));
+            List<String> basicTypes = Arrays.asList("int", "Number");
+            if (slotNumber > -1) {
+                return toSourceMerge(localData, generator,
+                        ins(new GetScopeObjectIns(), slotScope),
+                        assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(generator, "" + type) : null, needsReturn
+                        ? dupSetTemp(localData, generator, ret_temp) : null, generateSetLoc(regNumber), slotNumber > -1
+                        ? ins(new SetSlotIns(), slotNumber)
+                        : null,
+                        needsReturn ? getTemp(localData, generator, ret_temp) : null,
+                        killTemp(localData, generator, Arrays.asList(ret_temp)));
+            } else {
+
+                return toSourceMerge(localData, generator, assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(generator, "" + type) : null, needsReturn
+                        ? ins(new DupIns()) : null, generateSetLoc(regNumber));
             }
         } else {
-            return toSourceMerge(localData, generator, generateGetLoc(regNumber),generateGetSlot(slotScope,slotNumber),
+            return toSourceMerge(localData, generator, generateGetLoc(regNumber), generateGetSlot(slotScope, slotNumber),
                     needsReturn ? null : ins(new PopIns()));
         }
     }
@@ -431,7 +424,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
         if (index != null) {
             return toSourceMerge(localData, generator,
-                    generateGetLoc(regNumber),generateGetSlot(slotScope,slotNumber), dupSetTemp(localData, generator, name_temp), index, dupSetTemp(localData, generator, index_temp),
+                    generateGetLoc(regNumber), generateGetSlot(slotScope, slotNumber), dupSetTemp(localData, generator, name_temp), index, dupSetTemp(localData, generator, index_temp),
                     //Start get original
                     //generateGetLoc(regNumber), getTemp(localData, generator, index_temp),
                     ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
@@ -449,23 +442,23 @@ public class NameAVM2Item extends AssignableAVM2Item {
             );
         }
 
-        if(!needsReturn){
-            if(slotNumber>-1){
+        if (!needsReturn) {
+            if (slotNumber > -1) {
                 return toSourceMerge(localData, generator,
-                        ins(new GetScopeObjectIns(),slotScope),
-                        generateGetSlot(slotScope,slotNumber),
+                        ins(new GetScopeObjectIns(), slotScope),
+                        generateGetSlot(slotScope, slotNumber),
                         (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())),
-                        ins(new SetSlotIns(),slotNumber)
+                        ins(new SetSlotIns(), slotNumber)
                 );
-            }else{
+            } else {
                 return toSourceMerge(localData, generator,
-                    ins(isInteger?new IncLocalIIns():new IncLocalIns(),regNumber));
+                        ins(isInteger ? new IncLocalIIns() : new IncLocalIns(), regNumber));
             }
         }
         return toSourceMerge(localData, generator,
-                slotNumber>-1?ins(new GetScopeObjectIns(),slotScope):null,
+                slotNumber > -1 ? ins(new GetScopeObjectIns(), slotScope) : null,
                 //Start get original
-                generateGetLoc(regNumber),generateGetSlot(slotScope,slotNumber),
+                generateGetLoc(regNumber), generateGetSlot(slotScope, slotNumber),
                 //End get original
                 !isInteger ? ins(new ConvertDIns()) : null,
                 //End get original
@@ -473,7 +466,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
                 needsReturn ? ins(new DupIns()) : null,
                 (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
                 generateSetLoc(regNumber),
-                slotNumber>-1?ins(new SetSlotIns(),slotNumber):null
+                slotNumber > -1 ? ins(new SetSlotIns(), slotNumber) : null
         );
     }
 

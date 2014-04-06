@@ -1,6 +1,5 @@
 TODO List for AS3 parser/compiler:
 ------------------------------
-- finally clause
 - E4X (XML)
 - typenames (Vectors)
 - inner functions (activation, slots, etc.)

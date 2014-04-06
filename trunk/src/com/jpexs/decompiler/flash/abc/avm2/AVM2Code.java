@@ -1848,14 +1848,15 @@ public class AVM2Code implements Serializable {
 
     private boolean walkCode(CodeStats stats, int pos, int stack, int scope, ABC abc) {
         while (pos < code.size()) {
+            AVM2Instruction ins = code.get(pos);
             if (stats.instructionStats[pos].seen) {
                 //check stack mismatch here
-                return true;
+                return true;                
             }
             stats.instructionStats[pos].seen = true;
             stats.instructionStats[pos].stackpos = stack;
             stats.instructionStats[pos].scopepos = scope;
-            AVM2Instruction ins = code.get(pos);
+
             int stackDelta = ins.definition.getStackDelta(ins, abc);
             int scopeDelta = ins.definition.getScopeStackDelta(ins, abc);
             int oldStack = stack;
@@ -1863,6 +1864,9 @@ public class AVM2Code implements Serializable {
             //+" deltaScope:"+(scopeDelta>0?"+"+scopeDelta:scopeDelta)+" stack:"+stack+" scope:"+scope);
             stack += stackDelta;
             scope += scopeDelta;
+
+            stats.instructionStats[pos].stackpos_after = stack;
+            stats.instructionStats[pos].scopepos_after = scope;
 
             if (stack > stats.maxstack) {
                 stats.maxstack = stack;
@@ -1914,6 +1918,9 @@ public class AVM2Code implements Serializable {
             }
             if (ins.definition instanceof LookupSwitchIns) {
                 for (int i = 0; i < ins.operands.length; i++) {
+                    if (i == 1) {
+                        continue;
+                    }
                     try {
                         int newpos = adr2pos(pos2adr(pos) + ins.operands[i]);
                         if (!walkCode(stats, newpos, stack, scope, abc)) {
@@ -1935,29 +1942,51 @@ public class AVM2Code implements Serializable {
             return null;
         }
         int scopePos = -1;
-        for (ABCException ex : body.exceptions) {
+        int prevStart = 0;
+        for (int e=0;e<body.exceptions.length;e++) {
+            ABCException ex = body.exceptions[e];
             try {
-                if(scopePos==-1){
-                    scopePos=stats.instructionStats[adr2pos(ex.end)-1].scopepos;
+                if (scopePos == -1) {
+                    scopePos = stats.instructionStats[adr2pos(ex.end) - 1].scopepos_after;
                 }
                 List<Integer> visited = new ArrayList<>();
-                for(int i=0;i<stats.instructionStats.length;i++){
-                    if(stats.instructionStats[i].seen){
+                for (int i = 0; i < stats.instructionStats.length; i++) {
+                    if (stats.instructionStats[i].seen) {
                         visited.add(i);
                     }
                 }
-                if (!walkCode(stats, adr2pos(ex.target), 1/*exception*/, scopePos, abc)) {
+                if (!walkCode(stats, adr2pos(ex.target), 1 + (ex.isFinally() ? 1 : 0), scopePos, abc)) {
                     return null;
                 }
                 int maxIp = 0;
                 //searching for visited instruction in second run which has maximum position
-                for(int i=0;i<stats.instructionStats.length;i++){
-                    if(stats.instructionStats[i].seen && !visited.contains(i)){
+                for (int i = 0; i < stats.instructionStats.length; i++) {
+                    if (stats.instructionStats[i].seen && !visited.contains(i)) {
                         maxIp = i;
                     }
                 }
-                scopePos = stats.instructionStats[maxIp].scopepos;
+                scopePos = stats.instructionStats[maxIp].scopepos_after;
+                int stackPos = stats.instructionStats[maxIp].stackpos_after;
+                int nextIp = maxIp + 1; 
+                if(code.get(maxIp).definition instanceof JumpIns){
+                    nextIp = adr2pos(pos2adr(nextIp)+code.get(maxIp).operands[0]);
+                }
+                int origScopePos = stats.instructionStats[nextIp].scopepos;
+                int origStackPos = stats.instructionStats[nextIp].stackpos;
+                
+                if (prevStart==ex.start && ex.isFinally() && !code.get(nextIp).isExit() && stats.instructionStats[nextIp].seen) {
+                    for (int i = 0; i < stats.instructionStats.length; i++) {
+                        stats.instructionStats[i].seen = false;
+                    }
+                    //Rerun rest with new scopePos, stackPos
+                    if (!walkCode(stats, nextIp, origStackPos+1/*magic!*/, scopePos - 1 /*magic!*/, abc)) {
+                        return null;
+                    }
+                    scopePos--;
+                }
+                prevStart = ex.start;                
             } catch (ConvertException ex1) {
+                //ignore
             }
         }
         //stats.maxscope+=initScope;

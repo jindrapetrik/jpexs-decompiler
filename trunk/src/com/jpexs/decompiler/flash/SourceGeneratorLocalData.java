@@ -16,11 +16,15 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -33,6 +37,9 @@ public class SourceGeneratorLocalData implements Serializable {
     public Boolean inMethod;
     public Integer forInLevel;
     public List<ABCException> exceptions = new ArrayList<>();
+    public List<Integer> finallyCatches = new ArrayList<Integer>();
+    public Map<Integer,Integer> finallyCounter = new HashMap<>();
+    public int finallyRegister = -1;
     public String currentClass;
     public int activationReg = 0;
 
