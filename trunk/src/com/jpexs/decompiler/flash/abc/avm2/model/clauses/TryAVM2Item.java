@@ -16,12 +16,16 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.NameAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -148,4 +152,11 @@ public class TryAVM2Item extends AVM2Item implements Block {
     public boolean hasReturnValue() {
         return false;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+        return ((AVM2SourceGenerator)generator).generate(localData, this);
+    }
+    
+    
 }

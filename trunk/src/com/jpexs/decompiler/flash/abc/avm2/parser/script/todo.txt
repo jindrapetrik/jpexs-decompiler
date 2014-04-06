@@ -1,11 +1,10 @@
 TODO List for AS3 parser/compiler:
 ------------------------------
-- exceptions (try/catch)
 - finally clause
 - E4X (XML)
 - typenames (Vectors)
 - inner functions (activation, slots, etc.)
-- with
+- with (+ in catch clause)
 - delete property
 - default xml namespace
 - custom namespace modifiers

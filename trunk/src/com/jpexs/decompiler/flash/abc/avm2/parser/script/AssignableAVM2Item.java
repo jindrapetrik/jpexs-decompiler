@@ -29,6 +29,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetSlotIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSlotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -113,6 +116,8 @@ public abstract class AssignableAVM2Item extends AVM2Item {
 
     public static AVM2Instruction generateSetLoc(int regNumber) {
         switch (regNumber) {
+            case -1:
+                return null;
             case 0:
                 return ins(new SetLocal0Ins());
             case 1:
@@ -128,6 +133,8 @@ public abstract class AssignableAVM2Item extends AVM2Item {
 
     public static AVM2Instruction generateGetLoc(int regNumber) {
         switch (regNumber) {
+            case -1:
+                return  null;
             case 0:
                 return ins(new GetLocal0Ins());
             case 1:
@@ -140,5 +147,25 @@ public abstract class AssignableAVM2Item extends AVM2Item {
                 return ins(new GetLocalIns(), regNumber);
         }
     }
+    
+    public static List<GraphSourceItem> generateGetSlot(int slotScope,int slotNumber){
+        if(slotNumber==-1){
+            return null;
+        }
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(ins(new GetScopeObjectIns(),slotScope));
+        ret.add(ins(new GetSlotIns(),slotNumber));
+        return ret;
+    }
 
+    public static List<GraphSourceItem> generateSetSlot(SourceGeneratorLocalData localData,SourceGenerator generator, GraphTargetItem val,int slotScope,int slotNumber){
+        if(slotNumber==-1){
+            return null;
+        }
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(ins(new GetScopeObjectIns(),slotScope));
+        ret.addAll(val.toSource(localData, generator));
+        ret.add(ins(new SetSlotIns(),slotNumber));
+        return ret;
+    }
 }

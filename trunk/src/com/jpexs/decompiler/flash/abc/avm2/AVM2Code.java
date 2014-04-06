@@ -1934,15 +1934,33 @@ public class AVM2Code implements Serializable {
         if (!walkCode(stats, 0, 0, initScope, abc)) {
             return null;
         }
+        int scopePos = -1;
         for (ABCException ex : body.exceptions) {
             try {
-                int exStart = adr2pos(ex.start);
-                if (!walkCode(stats, adr2pos(ex.target), stats.instructionStats[exStart].stackpos, stats.instructionStats[exStart].scopepos, abc)) {
+                if(scopePos==-1){
+                    scopePos=stats.instructionStats[adr2pos(ex.end)-1].scopepos;
+                }
+                List<Integer> visited = new ArrayList<>();
+                for(int i=0;i<stats.instructionStats.length;i++){
+                    if(stats.instructionStats[i].seen){
+                        visited.add(i);
+                    }
+                }
+                if (!walkCode(stats, adr2pos(ex.target), 1/*exception*/, scopePos, abc)) {
                     return null;
                 }
+                int maxIp = 0;
+                //searching for visited instruction in second run which has maximum position
+                for(int i=0;i<stats.instructionStats.length;i++){
+                    if(stats.instructionStats[i].seen && !visited.contains(i)){
+                        maxIp = i;
+                    }
+                }
+                scopePos = stats.instructionStats[maxIp].scopepos;
             } catch (ConvertException ex1) {
             }
         }
+        //stats.maxscope+=initScope;
         return stats;
     }
 

@@ -27,7 +27,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSlotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
@@ -36,6 +38,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertSIns;
+import static com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item.ins;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
@@ -69,6 +72,8 @@ public class NameAVM2Item extends AssignableAVM2Item {
     private GraphTargetItem ns = null;
     private int regNumber = -1;
     public boolean unresolved = false;
+    private int slotNumber = -1;
+    private int slotScope = 0;
 
     public GraphTargetItem redirect;
 
@@ -82,6 +87,17 @@ public class NameAVM2Item extends AssignableAVM2Item {
         c.setIndex(index);
         return c;
     }
+
+    public void setSlotScope(int slotScope) {
+        this.slotScope = slotScope;
+    }
+
+    public int getSlotScope() {
+        return slotScope;
+    }
+    
+    
+    
     
     
 
@@ -93,6 +109,14 @@ public class NameAVM2Item extends AssignableAVM2Item {
         this.regNumber = regNumber;
     }
 
+    public int getSlotNumber() {
+        return slotNumber;
+    }        
+
+    public void setSlotNumber(int slotNumber) {
+        this.slotNumber = slotNumber;
+    }   
+    
     public int getRegNumber() {
         return regNumber;
     }
@@ -199,8 +223,8 @@ public class NameAVM2Item extends AssignableAVM2Item {
     }
 
     private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) {
-        if (variableName != null && regNumber == -1 && ns == null) {
-            throw new RuntimeException("No register set for " + variableName);
+        if (variableName != null && regNumber == -1 && slotNumber == -1  && ns == null) {
+            throw new RuntimeException("No register or slot set for " + variableName);
         }
         if (definition && assignedValue == null) {            
             return new ArrayList<GraphSourceItem>();
@@ -252,7 +276,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         if (index != null) {
             if (assignedValue != null) {
                 return toSourceMerge(localData, generator,
-                        generateGetLoc(regNumber), index, assignedValue,
+                        generateGetLoc(regNumber),generateGetSlot(slotScope,slotNumber), index, assignedValue,
                         needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
                         ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
                         needsReturn ? getTemp(localData, generator, ret_temp) : null,
@@ -269,10 +293,24 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
         if (assignedValue != null) {
             List<String> basicTypes = Arrays.asList("int","Number");
+            if(slotNumber>-1)
+            {
+                return toSourceMerge(localData, generator, 
+                        ins(new GetScopeObjectIns(),slotScope),
+                        assignedValue, !((""+assignedValue.returnType()).equals(""+type)&&(basicTypes.contains(""+type))) ? generateCoerce(generator, "" + type) : null, needsReturn
+                    ? dupSetTemp(localData, generator, ret_temp) : null, generateSetLoc(regNumber),slotNumber>-1?
+                            ins(new SetSlotIns(),slotNumber)
+                            :null,
+                needsReturn?getTemp(localData, generator, ret_temp):null,
+                killTemp(localData, generator, Arrays.asList(ret_temp)));
+            }
+            else{
+            
             return toSourceMerge(localData, generator, assignedValue, !((""+assignedValue.returnType()).equals(""+type)&&(basicTypes.contains(""+type))) ? generateCoerce(generator, "" + type) : null, needsReturn
                     ? ins(new DupIns()) : null, generateSetLoc(regNumber));
+            }
         } else {
-            return toSourceMerge(localData, generator, generateGetLoc(regNumber),
+            return toSourceMerge(localData, generator, generateGetLoc(regNumber),generateGetSlot(slotScope,slotNumber),
                     needsReturn ? null : ins(new PopIns()));
         }
     }
@@ -393,7 +431,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
         if (index != null) {
             return toSourceMerge(localData, generator,
-                    generateGetLoc(regNumber), dupSetTemp(localData, generator, name_temp), index, dupSetTemp(localData, generator, index_temp),
+                    generateGetLoc(regNumber),generateGetSlot(slotScope,slotNumber), dupSetTemp(localData, generator, name_temp), index, dupSetTemp(localData, generator, index_temp),
                     //Start get original
                     //generateGetLoc(regNumber), getTemp(localData, generator, index_temp),
                     ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
@@ -412,19 +450,31 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
 
         if(!needsReturn){
-            return toSourceMerge(localData, generator,
-                ins(isInteger?new IncLocalIIns():new IncLocalIns(),regNumber));
+            if(slotNumber>-1){
+                return toSourceMerge(localData, generator,
+                        ins(new GetScopeObjectIns(),slotScope),
+                        generateGetSlot(slotScope,slotNumber),
+                        (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())),
+                        ins(new SetSlotIns(),slotNumber)
+                );
+            }else{
+                return toSourceMerge(localData, generator,
+                    ins(isInteger?new IncLocalIIns():new IncLocalIns(),regNumber));
+            }
         }
         return toSourceMerge(localData, generator,
+                slotNumber>-1?ins(new GetScopeObjectIns(),slotScope):null,
                 //Start get original
-                generateGetLoc(regNumber),
+                generateGetLoc(regNumber),generateGetSlot(slotScope,slotNumber),
                 //End get original
                 !isInteger ? ins(new ConvertDIns()) : null,
                 //End get original
                 (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
                 needsReturn ? ins(new DupIns()) : null,
                 (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
-                generateSetLoc(regNumber));
+                generateSetLoc(regNumber),
+                slotNumber>-1?ins(new SetSlotIns(),slotNumber):null
+        );
     }
 
 }

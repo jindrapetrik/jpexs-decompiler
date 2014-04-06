@@ -39,9 +39,11 @@ public class FunctionAVM2Item extends AVM2Item {
     public GraphTargetItem retType;
     public int line;
     public boolean hasRest;
+    public boolean needsActivation;
 
-    public FunctionAVM2Item(int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
+    public FunctionAVM2Item(boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
         super(null, NOPRECEDENCE);
+        this.needsActivation = needsActivation;
         this.namespace = namespace;
         this.paramNames = paramNames;
         this.body = body;
