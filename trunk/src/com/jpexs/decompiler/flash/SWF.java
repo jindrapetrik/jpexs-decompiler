@@ -1539,7 +1539,7 @@ public final class SWF implements TreeItem, Timelined {
             tim = getTimeline();
         } else {
             tim = ((Timelined) characters.get(containerId)).getTimeline();
-            path = File.separator + characters.get(containerId).getExportFileName();
+            path = File.separator + Helper.makeFileName(characters.get(containerId).getExportFileName());
         }
         if (frames == null) {
             int frameCnt = tim.frames.size();

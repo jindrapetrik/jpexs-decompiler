@@ -103,7 +103,7 @@ public class TagNode extends ContainerNode {
         for (TreeNode node : nodeList) {
             String name = "";
             if (node.item instanceof Exportable) {
-                name = ((Exportable) node.item).getExportFileName();
+                name = Helper.makeFileName(((Exportable) node.item).getExportFileName());
             } else {
                 name = Helper.makeFileName(node.item.toString());
             }
@@ -116,19 +116,21 @@ public class TagNode extends ContainerNode {
             existingNames.add(name);
             if (node.subNodes.isEmpty()) {
                 if ((node.item instanceof ASMSource) && (node.export)) {
-                    if (!dir.exists()) {
-                        if (!dir.mkdirs()) {
-                            if (!dir.exists()) {
-                                continue;
-                            }
-                        }
-                    }
                     boolean retry;
                     do {
                         retry = false;
                         try {
-                            String f = outdir + name + ".as";
                             int currentIndex = index.getAndIncrement();
+
+                            if (!dir.exists()) {
+                                if (!dir.mkdirs()) {
+                                    if (!dir.exists()) {
+                                        throw new IOException("Cannot create directory " + outdir);
+                                    }
+                                }
+                            }
+
+                            String f = outdir + name + ".as";
                             if (ev != null) {
                                 ev.handleEvent("exporting", "Exporting " + currentIndex + "/" + count + " " + f);
                             }

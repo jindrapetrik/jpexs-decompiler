@@ -221,8 +221,8 @@ public class NameAVM2Item extends AssignableAVM2Item {
         if (variableName != null && regNumber == -1 && slotNumber == -1 && ns == null) {
             throw new RuntimeException("No register or slot set for " + variableName);
         }
-        if (definition && assignedValue == null) {
-            return new ArrayList<GraphSourceItem>();
+        if (definition && assignedValue == null) {            
+            return new ArrayList<>();
         }
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         Reference<Integer> ns_temp = new Reference<>(-1);

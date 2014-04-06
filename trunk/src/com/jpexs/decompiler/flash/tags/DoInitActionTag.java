@@ -198,7 +198,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
         } else {
             pathParts = new String[]{expName};
         }
-        return Helper.makeFileName(pathParts[pathParts.length - 1]);
+        return pathParts[pathParts.length - 1];
     }
 
     @Override
