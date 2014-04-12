@@ -72,12 +72,12 @@ public class DeclarationAVM2Item extends AVM2Item {
         writer.append("var ");
         return assignment.toString(writer, localData);
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem(type);
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return false;

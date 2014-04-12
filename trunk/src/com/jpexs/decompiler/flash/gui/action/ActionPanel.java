@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
@@ -758,6 +759,8 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 } catch (IOException ex) {
                     Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, "IOException during action compiling", ex);
                 } catch (ParseException ex) {
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                } catch (CompilationException ex) {
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 break;

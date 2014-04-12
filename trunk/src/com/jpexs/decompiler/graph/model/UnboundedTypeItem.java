@@ -45,8 +45,6 @@ public class UnboundedTypeItem extends AVM2Item {
     public String toString() {
         return "*";
     }
-    
-    
 
     @Override
     public boolean hasReturnValue() {

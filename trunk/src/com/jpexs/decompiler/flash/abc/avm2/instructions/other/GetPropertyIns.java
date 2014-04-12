@@ -49,8 +49,8 @@ public class GetPropertyIns extends InstructionDefinition {
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         int ret = -1 + 1;
         int multinameIndex = ins.operands[0];
-        int kind=abc.constants.getMultiname(multinameIndex).kind;
-        if(kind != Multiname.MULTINAMEL && kind!= Multiname.MULTINAMELA){
+        int kind = abc.constants.getMultiname(multinameIndex).kind;
+        if (kind != Multiname.MULTINAMEL && kind != Multiname.MULTINAMELA) {
             if (abc.constants.getMultiname(multinameIndex).needsName()) {
                 ret--;
             }

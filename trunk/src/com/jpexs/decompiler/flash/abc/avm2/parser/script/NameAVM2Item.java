@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -217,11 +218,11 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return ins;
     }
 
-    private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) {
+    private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         if (variableName != null && regNumber == -1 && slotNumber == -1 && ns == null) {
             throw new RuntimeException("No register or slot set for " + variableName);
         }
-        if (definition && assignedValue == null) {            
+        if (definition && assignedValue == null) {
             return new ArrayList<>();
         }
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
@@ -309,7 +310,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (redirect != null) {
             return redirect.toSource(localData, generator);
         }
@@ -318,7 +319,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
     }
 
     @Override
-    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (redirect != null) {
             return redirect.toSourceIgnoreReturnValue(localData, generator);
         }
@@ -358,7 +359,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
     }
 
     @Override
-    public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, boolean post, boolean decrement, boolean needsReturn) {
+    public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, boolean post, boolean decrement, boolean needsReturn) throws CompilationException {
         if (redirect != null) {
             return ((AssignableAVM2Item) redirect).toSourceChange(localData, generator, post, decrement, needsReturn);
         }

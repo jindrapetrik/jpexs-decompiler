@@ -106,17 +106,17 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
     private static final String CARDTEXTPANEL = "Text card";
     private static final String CARDFONTPANEL = "Font card";
-    
+
     private static final String ACTION_EDIT_GENERIC_TAG = "EDITGENERICTAG";
     private static final String ACTION_SAVE_GENERIC_TAG = "SAVEGENERICTAG";
     private static final String ACTION_CANCEL_GENERIC_TAG = "CANCELGENERICTAG";
 
     private static final String ACTION_PREV_FONTS = "PREVFONTS";
     private static final String ACTION_NEXT_FONTS = "NEXTFONTS";
-    
+
     private final MainPanel mainPanel;
     private final JPanel viewerCards;
-    
+
     private PlayerControls flashControls;
     private final FlashPlayerPanel flashPanel;
     private File tempFile;
@@ -146,7 +146,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     private FontPanel fontPanel;
     private int fontPageNum;
     private TextPanel textPanel;
-    
+
     private boolean splitsInited;
 
     public PreviewPanel(MainPanel mainPanel, FlashPlayerPanel flashPanel) {
@@ -165,18 +165,18 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
         viewerCards = new JPanel();
         viewerCards.setLayout(new CardLayout());
-        
+
         viewerCards.add(createFlashPlayerPanel(flashPanel), FLASH_VIEWER_CARD);
         viewerCards.add(createImagesCard(), DRAW_PREVIEW_CARD);
         viewerCards.add(createBinaryCard(), BINARY_TAG_CARD);
         viewerCards.add(createGenericTagCard(), GENERIC_TAG_CARD);
         setLeftComponent(viewerCards);
-        
+
         createParametersPanel();
 
         showCardLeft(FLASH_VIEWER_CARD);
     }
-    
+
     private void createParametersPanel() {
         displayWithPreview = new JPanel(new CardLayout());
 
@@ -195,7 +195,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         parametersPanel.add(displayWithPreview, BorderLayout.CENTER);
         setRightComponent(parametersPanel);
     }
-    
+
     private JPanel createImageButtonsPanel() {
         replaceImageButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("edit16"));
         replaceImageButton.setMargin(new Insets(3, 3, 3, 10));
@@ -208,31 +208,31 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         prevFontsButton.setActionCommand(ACTION_PREV_FONTS);
         prevFontsButton.addActionListener(this);
         prevFontsButton.setVisible(false);
-        
+
         nextFontsButton = new JButton(mainPanel.translate("button.next"), View.getIcon("next16"));
         nextFontsButton.setMargin(new Insets(3, 3, 3, 10));
         nextFontsButton.setActionCommand(ACTION_NEXT_FONTS);
         nextFontsButton.addActionListener(this);
         nextFontsButton.setVisible(false);
-        
+
         ButtonsPanel imageButtonsPanel = new ButtonsPanel();
         imageButtonsPanel.add(replaceImageButton);
         imageButtonsPanel.add(prevFontsButton);
         imageButtonsPanel.add(nextFontsButton);
         return imageButtonsPanel;
     }
-    
+
     private JPanel createBinaryButtonsPanel() {
         replaceBinaryButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("edit16"));
         replaceBinaryButton.setMargin(new Insets(3, 3, 3, 10));
         replaceBinaryButton.setActionCommand(MainPanel.ACTION_REPLACE);
         replaceBinaryButton.addActionListener(mainPanel);
-        
+
         ButtonsPanel binaryButtonsPanel = new ButtonsPanel();
         binaryButtonsPanel.add(replaceBinaryButton);
         return binaryButtonsPanel;
     }
-    
+
     private JPanel createGenericTagButtonsPanel() {
         editButton = new JButton(mainPanel.translate("button.edit"), View.getIcon("edit16"));
         editButton.setMargin(new Insets(3, 3, 3, 10));
@@ -248,14 +248,14 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         cancelButton.setActionCommand(ACTION_CANCEL_GENERIC_TAG);
         cancelButton.addActionListener(this);
         cancelButton.setVisible(false);
-        
+
         ButtonsPanel genericTagButtonsPanel = new ButtonsPanel();
         genericTagButtonsPanel.add(editButton);
         genericTagButtonsPanel.add(saveButton);
         genericTagButtonsPanel.add(cancelButton);
         return genericTagButtonsPanel;
     }
-    
+
     private JPanel createFlashPlayerPanel(FlashPlayerPanel flashPanel) {
         JPanel pan = new JPanel(new BorderLayout());
         JLabel prevLabel = new HeaderLabel(mainPanel.translate("swfpreview"));
@@ -294,7 +294,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         pan.add(leftComponent, BorderLayout.CENTER);
         return pan;
     }
-    
+
     private JPanel createImagesCard() {
         JPanel shapesCard = new JPanel(new BorderLayout());
         JPanel previewPanel = new JPanel(new BorderLayout());
@@ -336,12 +336,12 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         CardLayout cl = (CardLayout) (viewerCards.getLayout());
         cl.show(viewerCards, card);
     }
-    
+
     private void showCardRight(String card) {
         CardLayout cl = (CardLayout) (displayWithPreview.getLayout());
         cl.show(displayWithPreview, card);
     }
-    
+
     public void setSplitsInited() {
         splitsInited = true;
     }
@@ -349,11 +349,11 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
     public TextPanel getTextPanel() {
         return textPanel;
     }
-    
+
     public void setParametersPanelVisible(boolean show) {
         parametersPanel.setVisible(show);
     }
-    
+
     public void showFlashViewerPanel() {
         parametersPanel.setVisible(false);
         showCardLeft(FLASH_VIEWER_CARD);
@@ -365,18 +365,18 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         imagePlayControls.setMedia(imagePanel);
         imagePanel.setTimelined(timelined, swf, frame);
     }
-    
+
     public void showImagePanel(SerializableImage image) {
         showCardLeft(DRAW_PREVIEW_CARD);
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
         imagePanel.setImage(image);
     }
-    
+
     public void setMedia(MediaDisplay media) {
         imagePlayControls.setMedia(media);
     }
-    
+
     public void showFontPanel(FontTag fontTag) {
         fontPageNum = 0;
         showFontPage(fontTag);
@@ -398,7 +398,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             showImagePanel(MainPanel.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum);
         }
     }
-    
+
     public static int getFontPageCount(FontTag fontTag) {
         int pageCount = (fontTag.getGlyphShapeTable().size() - 1) / SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW + 1;
         if (pageCount < 1) {
@@ -406,7 +406,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         }
         return pageCount;
     }
-    
+
     public void showTextPanel(TextTag textTag) {
         if (mainPanel.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             showImagePanel(MainPanel.makeTimelined(textTag), textTag.getSwf(), 0);
@@ -417,24 +417,24 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         setDividerLocation(Configuration.guiPreviewSplitPaneDividerLocation.get(getWidth() / 2));
         textPanel.setText(textTag.getFormattedText());
     }
-    
+
     public void setEditText(boolean edit) {
         textPanel.setEditText(edit);
     }
-    
+
     public void clear() {
         imagePanel.stop();
         binaryPanel.setBinaryData(null);
         genericTagPanel.clear();
         fontPanel.clear();
     }
-    
+
     public void showBinaryPanel(byte[] data) {
         showCardLeft(BINARY_TAG_CARD);
         binaryPanel.setBinaryData(data);
         parametersPanel.setVisible(false);
     }
-    
+
     public void showGenericTagPanel(Tag tag) {
         showCardLeft(GENERIC_TAG_CARD);
         editButton.setVisible(true);
@@ -443,7 +443,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
         genericTagPanel.setEditMode(false, tag);
         parametersPanel.setVisible(false);
     }
-    
+
     public void setImageReplaceButtonVisible(boolean show) {
         replaceImageButton.setVisible(show);
         prevFontsButton.setVisible(false);
@@ -863,7 +863,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             Logger.getLogger(PreviewPanel.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);
         }
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {

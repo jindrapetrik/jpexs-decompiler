@@ -362,7 +362,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         }
         return baos.toByteArray();
     }
-    
+
     /**
      * Writes Tag value to the stream
      *
@@ -376,7 +376,7 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
             sos.write(newData);
             return;
         }
-        
+
         sos.write(headerData);
         sos.write(data);
     }

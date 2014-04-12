@@ -117,7 +117,7 @@ public class SoundTagPlayer implements MediaDisplay {
             }
         }
     }
-    
+
     public void play(boolean async) {
 
         waitStop();

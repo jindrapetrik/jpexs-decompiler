@@ -53,7 +53,7 @@ public class FontPanel extends javax.swing.JPanel {
     public FontTag getFontTag() {
         return fontTag;
     }
-    
+
     public void clear() {
         fontTag = null;
     }

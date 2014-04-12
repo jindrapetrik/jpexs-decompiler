@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -31,17 +30,17 @@ import java.util.Objects;
  *
  * @author JPEXS
  */
-public class TypeItem extends GraphTargetItem{
+public class TypeItem extends GraphTargetItem {
 
     public static TypeItem BOOLEAN = new TypeItem("Boolean");
     public static TypeItem STRING = new TypeItem("String");
     public static TypeItem ARRAY = new TypeItem("Array");
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
-    
+
     public String fullTypeName;
-    
+
     public TypeItem(String fullTypeName) {
-        super(null,NOPRECEDENCE);
+        super(null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
     }
 
@@ -67,17 +66,12 @@ public class TypeItem extends GraphTargetItem{
         return true;
     }
 
-    
-    
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append(fullTypeName);
         return writer;
     }
 
-    
-    
-    
     @Override
     public GraphTargetItem returnType() {
         return this;
@@ -92,33 +86,31 @@ public class TypeItem extends GraphTargetItem{
     public String toString() {
         return fullTypeName;
     }
-    
-    public int resolveClass(ABC abc){
+
+    public int resolveClass(ABC abc) {
         String name = fullTypeName;
         String pkg = "";
-        if(name.contains(".")){
-            pkg = name.substring(0,name.lastIndexOf('.'));
-            name = name.substring(name.lastIndexOf('.')+1);
+        if (name.contains(".")) {
+            pkg = name.substring(0, name.lastIndexOf('.'));
+            name = name.substring(name.lastIndexOf('.') + 1);
         }
-        for(InstanceInfo ii:abc.instance_info){
-            Multiname mname=abc.constants.constant_multiname.get(ii.name_index);
-            if(mname.getName(abc.constants, new ArrayList<String>()).equals(name)){
-                if(mname.getNamespace(abc.constants).hasName(pkg,abc.constants)){
+        for (InstanceInfo ii : abc.instance_info) {
+            Multiname mname = abc.constants.constant_multiname.get(ii.name_index);
+            if (mname.getName(abc.constants, new ArrayList<String>()).equals(name)) {
+                if (mname.getNamespace(abc.constants).hasName(pkg, abc.constants)) {
                     return ii.name_index;
                 }
             }
         }
-        for(int i=1;i<abc.constants.constant_multiname.size();i++){
-            Multiname mname=abc.constants.constant_multiname.get(i);
-            if(name.equals(mname.getName(abc.constants, new ArrayList<String>()))){
-                if(pkg.equals(mname.getNamespace(abc.constants).getName(abc.constants))){
+        for (int i = 1; i < abc.constants.constant_multiname.size(); i++) {
+            Multiname mname = abc.constants.constant_multiname.get(i);
+            if (name.equals(mname.getName(abc.constants, new ArrayList<String>()))) {
+                if (pkg.equals(mname.getNamespace(abc.constants).getName(abc.constants))) {
                     return i;
                 }
             }
         }
-        return abc.constants.getMultinameId(new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(pkg, true)), 0,true), 0,0, new ArrayList<Integer>()), true);
+        return abc.constants.getMultinameId(new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(pkg, true)), 0, true), 0, 0, new ArrayList<Integer>()), true);
     }
-    
-    
-    
+
 }

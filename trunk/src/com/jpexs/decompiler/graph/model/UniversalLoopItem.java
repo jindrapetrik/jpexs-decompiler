@@ -98,8 +98,9 @@ public class UniversalLoopItem extends LoopItem implements Block {
     public boolean hasReturnValue() {
         return false;
     }
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
+    }
 }

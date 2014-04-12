@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -26,17 +25,17 @@ import java.util.Objects;
  *
  * @author JPEXS
  */
-public class TypeFunctionItem extends GraphTargetItem{
+public class TypeFunctionItem extends GraphTargetItem {
 
     public static TypeFunctionItem BOOLEAN = new TypeFunctionItem("Boolean");
     public static TypeFunctionItem STRING = new TypeFunctionItem("String");
     public static TypeFunctionItem ARRAY = new TypeFunctionItem("Array");
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
-    
+
     public String fullTypeName;
-    
+
     public TypeFunctionItem(String fullTypeName) {
-        super(null,NOPRECEDENCE);
+        super(null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
     }
 
@@ -62,17 +61,12 @@ public class TypeFunctionItem extends GraphTargetItem{
         return true;
     }
 
-    
-    
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append(fullTypeName);
         return writer;
     }
 
-    
-    
-    
     @Override
     public GraphTargetItem returnType() {
         return this;
@@ -82,10 +76,10 @@ public class TypeFunctionItem extends GraphTargetItem{
     public boolean hasReturnValue() {
         return true;
     }
-    
+
     @Override
     public String toString() {
-        return "Function["+fullTypeName+"]";
+        return "Function[" + fullTypeName + "]";
     }
-    
+
 }

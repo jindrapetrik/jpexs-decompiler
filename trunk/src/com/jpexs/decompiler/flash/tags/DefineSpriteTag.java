@@ -325,14 +325,14 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
 
     @Override
     public boolean isModified() {
-        if(super.isModified()){
+        if (super.isModified()) {
             return true;
         }
-        for(Tag t:subTags){
-            if(t.isModified()){
+        for (Tag t : subTags) {
+            if (t.isModified()) {
                 return true;
             }
         }
         return false;
-    }        
+    }
 }

@@ -46,5 +46,5 @@ public class HasNextIns extends InstructionDefinition {
     @Override
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         return -2 + 1;
-    }       
+    }
 }

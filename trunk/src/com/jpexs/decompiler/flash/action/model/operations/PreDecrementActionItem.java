@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDecrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -50,7 +51,7 @@ public class PreDecrementActionItem extends UnaryOpItem {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         List<GraphSourceItem> ret = new ArrayList<>();
         GraphTargetItem val = value;
@@ -93,8 +94,7 @@ public class PreDecrementActionItem extends UnaryOpItem {
         }
         return ret;
     }
-    
-    
+
     @Override
     public GraphTargetItem returnType() {
         return value.returnType();

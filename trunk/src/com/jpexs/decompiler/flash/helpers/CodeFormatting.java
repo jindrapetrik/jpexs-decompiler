@@ -25,7 +25,7 @@ public class CodeFormatting {
     public String newLineChars = "\r\n";
     public String indentString = "   ";
     public boolean beginBlockOnNewLine = true;
-    
+
     // spaces
     // before parentheses
     public boolean spaceBeforeParenthesesMethodCallParentheses = false;

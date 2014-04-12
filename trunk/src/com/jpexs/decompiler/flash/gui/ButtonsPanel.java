@@ -32,10 +32,10 @@ import javax.swing.JPanel;
 public class ButtonsPanel extends JPanel {
 
     private ComponentListener listener;
-    
+
     public ButtonsPanel() {
         super(new FlowLayout());
-        
+
         listener = new ComponentListener() {
 
             @Override
@@ -56,7 +56,7 @@ public class ButtonsPanel extends JPanel {
                 updateVisibility();
             }
         };
-        
+
         this.addContainerListener(new ContainerListener() {
 
             @Override

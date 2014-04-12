@@ -71,13 +71,13 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.SubtractAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.TypeOfAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.URShiftAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
-import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -129,13 +129,13 @@ public class ActionScriptParser {
         return uniqLast;
     }
 
-    private List<GraphTargetItem> commands(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, Stack<Loop> loops, Map<Loop, String> loopLabels, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private List<GraphTargetItem> commands(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, Stack<Loop> loops, Map<Loop, String> loopLabels, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         List<GraphTargetItem> ret = new ArrayList<>();
         if (debugMode) {
             System.out.println("commands:");
         }
         GraphTargetItem cmd = null;
-        while ((cmd = command(needsActivation,importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables)) != null) {
+        while ((cmd = command(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables)) != null) {
             ret.add(cmd);
         }
         if (debugMode) {
@@ -144,7 +144,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private GraphTargetItem type(List<String> importedClasses, List<Integer> openedNamespaces, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private GraphTargetItem type(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         ParsedSymbol s = lex();
         if (s.type == SymbolType.MULTIPLY) {
             return new UnboundedTypeItem();
@@ -153,20 +153,21 @@ public class ActionScriptParser {
         } else {
             lexer.pushback(s);
         }
-        return name(true, openedNamespaces, null, false, false, variables, importedClasses);
+
+        return name(needsActivation, true, openedNamespaces, null, false, false, variables, importedClasses);
     }
 
-    private GraphTargetItem memberOrCall(List<String> importedClasses, List<Integer> openedNamespaces, GraphTargetItem newcmds, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private GraphTargetItem memberOrCall(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, GraphTargetItem newcmds, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         ParsedSymbol s = lex();
         GraphTargetItem ret = newcmds;
         while (s.isType(SymbolType.DOT, SymbolType.PARENT_OPEN)) {
             switch (s.type) {
                 case DOT:
                     lexer.pushback(s);
-                    ret = member(importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
+                    ret = member(needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
                     break;
                 case PARENT_OPEN:
-                    ret = new CallAVM2Item(ret, call(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                    ret = new CallAVM2Item(ret, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                     break;
             }
             s = lex();
@@ -175,7 +176,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private GraphTargetItem member(List<String> importedClasses, List<Integer> openedNamespaces, GraphTargetItem obj, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private GraphTargetItem member(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, GraphTargetItem obj, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         GraphTargetItem ret = obj;
         ParsedSymbol s = lex();
         while (s.isType(SymbolType.DOT)) {
@@ -185,164 +186,166 @@ public class ActionScriptParser {
             s = lex();
             GraphTargetItem index = null;
             if (s.type == SymbolType.BRACKET_OPEN) {
-                index = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                index = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                 expectedType(SymbolType.BRACKET_CLOSE);
             } else {
                 lexer.pushback(s);
             }
-            ret = new PropertyAVM2Item(ret, propName, index, abc, otherABCs, openedNamespaces);
+            ret = new PropertyAVM2Item(ret, propName, index, abc, otherABCs, openedNamespaces, new ArrayList<MethodBody>());
         }
         lexer.pushback(s);
         return ret;
     }
 
-    private GraphTargetItem name(boolean typeOnly, List<Integer> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<NameAVM2Item> variables, List<String> importedClasses) throws IOException, ParseException {
+    private GraphTargetItem name(Reference<Boolean> needsActivation, boolean typeOnly, List<Integer> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables, List<String> importedClasses) throws IOException, ParseException {
         ParsedSymbol s = lex();
         expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
-        List<String> parts = new ArrayList<>();
-        parts.add(s.value.toString());
+        String name = s.value.toString();
         s = lex();
         while (s.type == SymbolType.DOT) {
             s = lex();
             expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
-            parts.add(s.value.toString());
+            name += "." + s.value.toString();
             s = lex();
         }
         GraphTargetItem index = null;
         if (s.type == SymbolType.BRACKET_OPEN) {
-            index = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+            index = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
             expectedType(SymbolType.BRACKET_CLOSE);
         } else {
             lexer.pushback(s);
         }
         if (!typeOnly) {
-            for (NameAVM2Item n : variables) {
-                if (n.getVariableName().equals(parts.get(0))) {
-                    NameAVM2Item ni = new NameAVM2Item(n.type, lexer.yyline(), n.getVariableName(), null, false, openedNamespaces);
-                    variables.add(ni);
-                    GraphTargetItem ret = ni;
-                    if (parts.size() == 1) {
-                        ((NameAVM2Item) ret).setIndex(index);
-                    }
-                    for (int i = 1; i < parts.size(); i++) {
-                        ret = new PropertyAVM2Item(ret, parts.get(i), i == parts.size() - 1 ? index : null, abc, otherABCs, openedNamespaces);
-                    }
+            /*for (NameAVM2Item n : variables) {
+             if (n.getVariableName().equals(parts.get(0))) {
+             NameAVM2Item ni = new NameAVM2Item(n.type, lexer.yyline(), n.getVariableName(), null, false, openedNamespaces);
+             variables.add(ni);
+             GraphTargetItem ret = ni;
+             if (parts.size() == 1) {
+             ((NameAVM2Item) ret).setIndex(index);
+             }
+             for (int i = 1; i < parts.size(); i++) {
+             ret = new PropertyAVM2Item(ret, parts.get(i), i == parts.size() - 1 ? index : null, abc, otherABCs, openedNamespaces);
+             }
 
-                    return ret;
-                }
-            }
+             return ret;
+             }
+             }*/
         }
 
-        List<ABC> allAbcs = new ArrayList<>();
-        allAbcs.add(abc);
-        allAbcs.addAll(otherABCs);
-        //search for variable in openedNamespaces
-        if (!typeOnly) {
-            for (int i = 0; i < openedNamespaces.size(); i++) {
-                int nsIndex = openedNamespaces.get(i);
-                Namespace ns = abc.constants.constant_namespace.get(nsIndex);
-                int nsKind = ns.kind;
-                loopabc:
-                for (ABC a : allAbcs) {
-                    for (int h = 0; h < a.instance_info.size(); h++) {
-                        InstanceInfo ii = a.instance_info.get(h);
-                        Multiname n = a.constants.constant_multiname.get(ii.name_index);
-                        if (n.getNamespace(a.constants).getName(a.constants).equals(ns.getName(abc.constants)) && n.getNamespace(a.constants).kind == nsKind) {
+        /*List<ABC> allAbcs = new ArrayList<>();
+         allAbcs.add(abc);
+         allAbcs.addAll(otherABCs);
+         //search for variable in openedNamespaces
+         if (!typeOnly) {
+         for (int i = 0; i < openedNamespaces.size(); i++) {
+         int nsIndex = openedNamespaces.get(i);
+         Namespace ns = abc.constants.constant_namespace.get(nsIndex);
+         int nsKind = ns.kind;
+         loopabc:
+         for (ABC a : allAbcs) {
+         for (int h = 0; h < a.instance_info.size(); h++) {
+         InstanceInfo ii = a.instance_info.get(h);
+         Multiname n = a.constants.constant_multiname.get(ii.name_index);
+         if (n.getNamespace(a.constants).getName(a.constants).equals(ns.getName(abc.constants)) && n.getNamespace(a.constants).kind == nsKind) {
 
-                            //found opened class
-                            Reference<String> outName = new Reference<>("");
-                            Reference<String> outNs = new Reference<>("");
-                            Reference<String> outPropNs = new Reference<>("");
-                            Reference<Integer> outPropNsKind = new Reference<>(1);
-                            Reference<String> outPropType = new Reference<>("");
-                            if (AVM2SourceGenerator.searchPrototypeChain(false, allAbcs, n.getNamespace(a.constants).getName(a.constants), n.getName(a.constants, new ArrayList<String>()), parts.get(0), outName, outNs, outPropNs, outPropNsKind, outPropType)) {
-                                return new PropertyAVM2Item(null, parts.get(0), index, abc, otherABCs, openedNamespaces);
-                            }
-                        }
-                    }
-                }
+         //found opened class
+         Reference<String> outName = new Reference<>("");
+         Reference<String> outNs = new Reference<>("");
+         Reference<String> outPropNs = new Reference<>("");
+         Reference<Integer> outPropNsKind = new Reference<>(1);
+         Reference<String> outPropType = new Reference<>("");
+         if (AVM2SourceGenerator.searchPrototypeChain(false, allAbcs, n.getNamespace(a.constants).getName(a.constants), n.getName(a.constants, new ArrayList<String>()), parts.get(0), outName, outNs, outPropNs, outPropNsKind, outPropType)) {
+         return new PropertyAVM2Item(null, parts.get(0), index, abc, otherABCs, openedNamespaces);
+         }
+         }
+         }
+         }
 
-            }
-        }
+         }
+         }
 
-        //variable not found, gonna search types
-        String pkg = "";
-        String name = null;
-        int foundNsKind = Namespace.KIND_PACKAGE;
-        int k;
-        loopk:
-        for (k = parts.size() - 1; k >= 0; k--) {
+         //variable not found, gonna search types
+         String pkg = "";
+         String name = null;
+         int foundNsKind = Namespace.KIND_PACKAGE;
+         int k;
+         loopk:
+         for (k = parts.size() - 1; k >= 0; k--) {
 
-            if (typeOnly) {
-                if (k < parts.size() - 1) {
-                    k = -1;
-                    break loopk;
-                }
-            }
-            if (k == 0 || typeOnly) {
-                for (int i = 0; i < importedClasses.size(); i++) {
-                    String iname = importedClasses.get(i);
-                    String ipkg = "";
-                    if (iname.contains(".")) {
-                        ipkg = iname.substring(0, iname.lastIndexOf('.'));
-                        iname = iname.substring(iname.lastIndexOf('.') + 1);
-                    }
-                    if (iname.equals(parts.get(0))) {
-                        k = 0;
-                        pkg = ipkg;
-                        name = iname;
-                        break loopk;
-                    }
+         if (typeOnly) {
+         if (k < parts.size() - 1) {
+         k = -1;
+         break loopk;
+         }
+         }
+         if (k == 0 || typeOnly) {
+         for (int i = 0; i < importedClasses.size(); i++) {
+         String iname = importedClasses.get(i);
+         String ipkg = "";
+         if (iname.contains(".")) {
+         ipkg = iname.substring(0, iname.lastIndexOf('.'));
+         iname = iname.substring(iname.lastIndexOf('.') + 1);
+         }
+         if (iname.equals(parts.get(0))) {
+         k = 0;
+         pkg = ipkg;
+         name = iname;
+         break loopk;
+         }
 
-                }
-            }
-            pkg = "";
-            for (int j = 0; j <= k - 1; j++) {
-                if (!"".equals(pkg)) {
-                    pkg += ".";
-                }
-                pkg += parts.get(j);
-            }
-            name = parts.get(k);
+         }
+         }
+         pkg = "";
+         for (int j = 0; j <= k - 1; j++) {
+         if (!"".equals(pkg)) {
+         pkg += ".";
+         }
+         pkg += parts.get(j);
+         }
+         name = parts.get(k);
 
-            String fname = pkg.isEmpty() ? name : pkg + "." + name;
+         String fname = pkg.isEmpty() ? name : pkg + "." + name;
 
-            for (ABC a : allAbcs) {
-                int c = a.findClassByName(fname);
-                if (c != -1) {
-                    break loopk;
-                }
-            }
+         for (ABC a : allAbcs) {
+         int c = a.findClassByName(fname);
+         if (c != -1) {
+         break loopk;
+         }
+         }
 
-            for (int i = 0; i < openedNamespaces.size(); i++) {
-                int nsIndex = openedNamespaces.get(i);
-                Namespace ns = abc.constants.constant_namespace.get(nsIndex);
-                int nsKind = ns.kind;
-                String nsname = ns.getName(abc.constants);
-                if (nsKind == Namespace.KIND_PACKAGE) {
-                    for (ABC a : allAbcs) {
-                        int c = a.findClassByName(nsname.isEmpty() ? fname : nsname + "." + fname);
-                        if (c != -1) {
-                            pkg = nsname;
-                            break loopk;
-                        }
-                    }
-                }
-            }
-        }
+         for (int i = 0; i < openedNamespaces.size(); i++) {
+         int nsIndex = openedNamespaces.get(i);
+         Namespace ns = abc.constants.constant_namespace.get(nsIndex);
+         int nsKind = ns.kind;
+         String nsname = ns.getName(abc.constants);
+         if (nsKind == Namespace.KIND_PACKAGE) {
+         for (ABC a : allAbcs) {
+         int c = a.findClassByName(nsname.isEmpty() ? fname : nsname + "." + fname);
+         if (c != -1) {
+         pkg = nsname;
+         break loopk;
+         }
+         }
+         }
+         }
+         }
 
-        if (k == -1) {
-            NameAVM2Item ret = new NameAVM2Item(null, lexer.yyline(), Helper.joinStrings(parts, "."), null, false, openedNamespaces);
-            ret.unresolved = true;
-            ret.setIndex(index);
-            variables.add(ret);
-            return ret;
-            //throw new ParseException("Cannot find variable or type:" + Helper.joinStrings(parts, "."), lexer.yyline());
-        }
-        GraphTargetItem ret = new TypeItem("".equals(pkg) ? name : pkg + "." + name);
-        for (int i = 1; i < parts.size(); i++) {
-            ret = new PropertyAVM2Item(ret, parts.get(i), i == parts.size() - 1 ? index : null, abc, otherABCs, openedNamespaces);
-        }
+         if (k == -1) {
+         NameAVM2Item ret = new NameAVM2Item(null, lexer.yyline(), Helper.joinStrings(parts, "."), null, false, openedNamespaces);
+         ret.unresolved = true;
+         ret.setIndex(index);
+         variables.add(ret);
+         return ret;
+         //throw new ParseException("Cannot find variable or type:" + Helper.joinStrings(parts, "."), lexer.yyline());
+         }
+         GraphTargetItem ret = new TypeItem("".equals(pkg) ? name : pkg + "." + name);
+         for (int i = 1; i < parts.size(); i++) {
+         ret = new PropertyAVM2Item(ret, parts.get(i), i == parts.size() - 1 ? index : null, abc, otherABCs, openedNamespaces);
+         }*/
+        UnresolvedAVM2Item ret = new UnresolvedAVM2Item(importedClasses, typeOnly, null, lexer.yyline(), name, null, openedNamespaces);
+        ret.setIndex(index);
+        variables.add(ret);
         return ret;
     }
 
@@ -384,7 +387,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private List<GraphTargetItem> call(List<String> importedClasses, List<Integer> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private List<GraphTargetItem> call(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         List<GraphTargetItem> ret = new ArrayList<>();
         //expected(SymbolType.PARENT_OPEN); //MUST BE HANDLED BY CALLER
         ParsedSymbol s = lex();
@@ -392,19 +395,19 @@ public class ActionScriptParser {
             if (s.type != SymbolType.COMMA) {
                 lexer.pushback(s);
             }
-            ret.add(expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+            ret.add(expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
             s = lex();
             expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
         }
         return ret;
     }
 
-    private MethodAVM2Item method(List<String> importedClasses, boolean override, boolean isFinal, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean isStatic, int namespace, boolean withBody, String functionName, boolean isMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
-        FunctionAVM2Item f = function(importedClasses, namespace, thisType, openedNamespaces, withBody, functionName, isMethod, variables);
-        return new MethodAVM2Item(f.needsActivation,f.hasRest, f.line, override, isFinal, isStatic, f.namespace, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
+    private MethodAVM2Item method(Reference<Boolean> needsActivation, List<String> importedClasses, boolean override, boolean isFinal, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean isStatic, int namespace, boolean withBody, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
+        FunctionAVM2Item f = function(needsActivation, importedClasses, namespace, thisType, openedNamespaces, withBody, functionName, isMethod, variables);
+        return new MethodAVM2Item(f.needsActivation, f.hasRest, f.line, override, isFinal, isStatic, f.namespace, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
     }
 
-    private FunctionAVM2Item function(List<String> importedClasses, int namespace, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean withBody, String functionName, boolean isMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private FunctionAVM2Item function(Reference<Boolean> needsActivation, List<String> importedClasses, int namespace, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean withBody, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         int line = lexer.yyline();
         ParsedSymbol s;
         expectedType(SymbolType.PARENT_OPEN);
@@ -428,13 +431,13 @@ public class ActionScriptParser {
             s = lex();
             if (!hasRest) {
                 if (s.type == SymbolType.COLON) {
-                    paramTypes.add(type(importedClasses, openedNamespaces, variables));
+                    paramTypes.add(type(needsActivation, importedClasses, openedNamespaces, variables));
                     s = lex();
                 } else {
                     paramTypes.add(new UnboundedTypeItem());
                 }
                 if (s.type == SymbolType.ASSIGN) {
-                    paramValues.add(expression(importedClasses, openedNamespaces, null, isMethod, isMethod, isMethod, variables));
+                    paramValues.add(expression(new Reference<Boolean>(false), importedClasses, openedNamespaces, null, isMethod, isMethod, isMethod, variables));
                 } else {
                     if (!paramValues.isEmpty()) {
                         throw new ParseException("Some of parameters do not have default values", lexer.yyline());
@@ -452,36 +455,36 @@ public class ActionScriptParser {
         s = lex();
         GraphTargetItem retType;
         if (s.type == SymbolType.COLON) {
-            retType = type(importedClasses, openedNamespaces, variables);
+            retType = type(needsActivation, importedClasses, openedNamespaces, variables);
         } else {
             retType = new UnboundedTypeItem();
             lexer.pushback(s);
         }
         List<GraphTargetItem> body = null;
-        List<NameAVM2Item> subvariables = new ArrayList<>();
+        List<AssignableAVM2Item> subvariables = new ArrayList<>();
         subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), "this", null, true, openedNamespaces));
         for (int i = 0; i < paramNames.size(); i++) {
             subvariables.add(new NameAVM2Item(paramTypes.get(i), lexer.yyline(), paramNames.get(i), null, true, openedNamespaces));
         }
         subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), "arguments", null, true, openedNamespaces));
         int parCnt = subvariables.size();
-        Reference<Boolean> needsActivation = new Reference<>(false);
+        Reference<Boolean> needsActivation2 = new Reference<>(false);
         if (withBody) {
-            expectedType(SymbolType.CURLY_OPEN);            
-            body = commands(needsActivation, importedClasses, openedNamespaces, new Stack<Loop>(), new HashMap<Loop, String>(), new HashMap<String, Integer>(), true, isMethod, 0, subvariables);
+            expectedType(SymbolType.CURLY_OPEN);
+            body = commands(needsActivation2, importedClasses, openedNamespaces, new Stack<Loop>(), new HashMap<Loop, String>(), new HashMap<String, Integer>(), true, isMethod, 0, subvariables);
             expectedType(SymbolType.CURLY_CLOSE);
         }
 
         for (int i = 0; i < parCnt; i++) {
             subvariables.remove(0);
         }
-        return new FunctionAVM2Item(needsActivation.getVal(), namespace, hasRest, line, functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+        return new FunctionAVM2Item(needsActivation2.getVal(), namespace, hasRest, line, functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }
 
-    private GraphTargetItem traits(List<String> importedClasses, int privateNs, int protectedNs, int publicNs, int packageInternalNs, int protectedStaticNs, List<Integer> openedNamespaces, String packageName, String classNameStr, boolean isInterface, List<GraphTargetItem> traits) throws ParseException, IOException {
+    private GraphTargetItem traits(List<String> importedClasses, int privateNs, int protectedNs, int publicNs, int packageInternalNs, int protectedStaticNs, List<Integer> openedNamespaces, String packageName, String classNameStr, boolean isInterface, List<GraphTargetItem> traits) throws ParseException, IOException, CompilationException {
         ParsedSymbol s;
         GraphTargetItem constr = null;
-        List<NameAVM2Item> variables = new ArrayList<>();
+        List<AssignableAVM2Item> variables = new ArrayList<>();
         TypeItem thisType = new TypeItem("".equals(packageName) ? classNameStr : packageName + "." + classNameStr);
         looptrait:
         while (true) {
@@ -558,20 +561,20 @@ public class ActionScriptParser {
                         throw new ParseException("Override flag not allowed for classes", lexer.yyline());
                     }
 
-                    //GraphTargetItem classTypeStr = type(importedClasses, openedNamespaces, variables);
+                    //GraphTargetItem classTypeStr = type(needsActivation, importedClasses, openedNamespaces, variables);
                     s = lex();
                     expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
                     String classTypeStr = s.value.toString();
                     GraphTargetItem extendsTypeStr = null;
                     s = lex();
                     if (s.type == SymbolType.EXTENDS) {
-                        extendsTypeStr = type(importedClasses, openedNamespaces, variables);
+                        extendsTypeStr = type(new Reference<Boolean>(false), importedClasses, openedNamespaces, variables);
                         s = lex();
                     }
                     List<GraphTargetItem> implementsTypeStrs = new ArrayList<>();
                     if (s.type == SymbolType.IMPLEMENTS) {
                         do {
-                            GraphTargetItem implementsTypeStr = type(importedClasses, openedNamespaces, variables);
+                            GraphTargetItem implementsTypeStr = type(new Reference<Boolean>(false), importedClasses, openedNamespaces, variables);
                             implementsTypeStrs.add(implementsTypeStr);
                             s = lex();
                         } while (s.type == SymbolType.COMMA);
@@ -593,7 +596,7 @@ public class ActionScriptParser {
                     if (isDynamic) {
                         throw new ParseException("Dynamic flag not allowed for interfaces", lexer.yyline());
                     }
-                    //GraphTargetItem interfaceTypeStr = type(importedClasses, openedNamespaces, variables);
+                    //GraphTargetItem interfaceTypeStr = type(needsActivation, importedClasses, openedNamespaces, variables);
                     s = lex();
                     expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
                     String intTypeStr = s.value.toString();
@@ -602,7 +605,7 @@ public class ActionScriptParser {
 
                     if (s.type == SymbolType.EXTENDS) {
                         do {
-                            GraphTargetItem intExtendsTypeStr = type(importedClasses, openedNamespaces, variables);
+                            GraphTargetItem intExtendsTypeStr = type(new Reference<Boolean>(false), importedClasses, openedNamespaces, variables);
                             intExtendsTypeStrs.add(intExtendsTypeStr);
                             s = lex();
                         } while (s.type == SymbolType.COMMA);
@@ -647,29 +650,29 @@ public class ActionScriptParser {
                         if (isFinal) {
                             throw new ParseException("Final flag not allowed for constructor", lexer.yyline());
                         }
-                        constr = (method(importedClasses, false, false, thisType, openedNamespaces, false, namespace, !isInterface, "", true, variables));
+                        constr = (method(new Reference<Boolean>(false), importedClasses, false, false, thisType, openedNamespaces, false, namespace, !isInterface, "", true, variables));
                     } else {
                         if (isStatic) {
                             GraphTargetItem t;
-                            MethodAVM2Item ft = method(importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, !isInterface, fname, true, variables);
+                            MethodAVM2Item ft = method(new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, !isInterface, fname, true, variables);
                             traits.add(ft);
                             if (isGetter || isSetter) {
                                 throw new ParseException("Getter or Setter cannot be static", lexer.yyline());
                             }
                         } else {
-                            MethodAVM2Item ft = method(importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, !isInterface, fname, true, variables);
+                            MethodAVM2Item ft = method(new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, !isInterface, fname, true, variables);
                             GraphTargetItem t;
                             if (isGetter) {
                                 if (!ft.paramTypes.isEmpty()) {
                                     throw new ParseException("Getter can't have any parameters", lexer.yyline());
                                 }
-                                GetterAVM2Item g = new GetterAVM2Item(ft.needsActivation,ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                GetterAVM2Item g = new GetterAVM2Item(ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = g;
                             } else if (isSetter) {
                                 if (ft.paramTypes.size() != 1) {
                                     throw new ParseException("Getter must have exactly one parameter", lexer.yyline());
                                 }
-                                SetterAVM2Item st = new SetterAVM2Item(ft.needsActivation,ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                SetterAVM2Item st = new SetterAVM2Item(ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = st;
                             } else {
                                 t = ft;
@@ -721,14 +724,14 @@ public class ActionScriptParser {
                     s = lex();
                     GraphTargetItem type = null;
                     if (s.type == SymbolType.COLON) {
-                        type = type(importedClasses, openedNamespaces, variables);
+                        type = type(new Reference<Boolean>(false), importedClasses, openedNamespaces, variables);
                         s = lex();
                     }
 
                     GraphTargetItem value = null;
 
                     if (s.type == SymbolType.ASSIGN) {
-                        value = expression(importedClasses, openedNamespaces, new HashMap<String, Integer>(), false, false, true, variables);
+                        value = expression(new Reference<Boolean>(false), importedClasses, openedNamespaces, new HashMap<String, Integer>(), false, false, true, variables);
                         s = lex();
                     }
                     GraphTargetItem tar;
@@ -751,7 +754,7 @@ public class ActionScriptParser {
         return constr;
     }
 
-    private GraphTargetItem classTraits(int packageInternalNs, List<String> importedClasses, int privateNs, boolean isDynamic, boolean isFinal, List<Integer> openedNamespaces, String packageName, int namespace, boolean isInterface, String nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private GraphTargetItem classTraits(int packageInternalNs, List<String> importedClasses, int privateNs, boolean isDynamic, boolean isFinal, List<Integer> openedNamespaces, String packageName, int namespace, boolean isInterface, String nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<AssignableAVM2Item> variables) throws IOException, ParseException, CompilationException {
 
         GraphTargetItem ret = null;
 
@@ -774,7 +777,7 @@ public class ActionScriptParser {
         List<Integer> indices = new ArrayList<>();
         List<String> names = new ArrayList<>();
         List<String> namespaces = new ArrayList<>();
-        AVM2SourceGenerator.parentNamesAddNames(abc, otherABCs, ((TypeItem) extendsStr).resolveClass(abc), indices, names, namespaces);
+        AVM2SourceGenerator.parentNamesAddNames(abc, otherABCs, ((TypeItem) ((UnresolvedAVM2Item) extendsStr).resolve(new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), new ArrayList<AssignableAVM2Item>())).resolveClass(abc), indices, names, namespaces);
         for (int i = 0; i < names.size(); i++) {
             if (namespaces.get(i).isEmpty()) {
                 continue;
@@ -791,12 +794,12 @@ public class ActionScriptParser {
         }
     }
 
-    private GraphTargetItem expressionCommands(ParsedSymbol s, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private GraphTargetItem expressionCommands(ParsedSymbol s, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         GraphTargetItem ret = null;
         switch (s.type) {
             /*case INT:
              expectedType(SymbolType.PARENT_OPEN);                
-             ret = new ToIntegerAVM2Item(null, expression(importedClasses, openedNamespaces,openedNamespacesKinds,registerVars, inFunction, inMethod, true, variables));
+             ret = new ToIntegerAVM2Item(null, expression(needsActivation, importedClasses, openedNamespaces,openedNamespacesKinds,registerVars, inFunction, inMethod, true, variables));
              expectedType(SymbolType.PARENT_CLOSE);
              break;
              case NUMBER_OP:
@@ -807,7 +810,7 @@ public class ActionScriptParser {
              ret = memberOrCall(vi, registerVars, inFunction, inMethod, variables);
              } else {
              expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
-             ret = new ToNumberAVM2Item(null, expression(importedClasses, openedNamespaces,openedNamespacesKinds,registerVars, inFunction, inMethod, true, variables));
+             ret = new ToNumberAVM2Item(null, expression(needsActivation, importedClasses, openedNamespaces,openedNamespacesKinds,registerVars, inFunction, inMethod, true, variables));
              expectedType(SymbolType.PARENT_CLOSE);
              }
              break;
@@ -821,7 +824,7 @@ public class ActionScriptParser {
              ret = memberOrCall(vi2, registerVars, inFunction, inMethod, variables);
              } else {
              expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
-             ret = new ToStringAVM2Item(null, expression(importedClasses, openedNamespaces,openedNamespacesKinds,registerVars, inFunction, inMethod, true, variables));
+             ret = new ToStringAVM2Item(null, expression(needsActivation, importedClasses, openedNamespaces,openedNamespacesKinds,registerVars, inFunction, inMethod, true, variables));
              expectedType(SymbolType.PARENT_CLOSE);
              ret = memberOrCall(ret, registerVars, inFunction, inMethod, variables);
              }
@@ -832,7 +835,7 @@ public class ActionScriptParser {
         //return ret;
     }
 
-    private GraphTargetItem command(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, Stack<Loop> loops, Map<Loop, String> loopLabels, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, boolean mustBeCommand, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private GraphTargetItem command(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, Stack<Loop> loops, Map<Loop, String> loopLabels, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, boolean mustBeCommand, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         LexBufferer buf = new LexBufferer();
         lexer.addListener(buf);
         GraphTargetItem ret = null;
@@ -858,23 +861,23 @@ public class ActionScriptParser {
         switch (s.type) {
             case USE:
                 expectedType(SymbolType.NAMESPACE);
-                GraphTargetItem ns = type(importedClasses, openedNamespaces, variables);
+                GraphTargetItem ns = type(needsActivation, importedClasses, openedNamespaces, variables);
                 openedNamespaces.add(abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE /*FIXME?*/, abc.constants.getStringId(ns.toString(), true)), 0, true));
                 break;
             case WITH:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem wvar = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//(name(false, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                GraphTargetItem wvar = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//(name(false, openedNamespaces, registerVars, inFunction, inMethod, variables));
                 if (!isNameOrProp(wvar)) {
                     throw new ParseException("Not a property or name", lexer.yyline());
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
                 expectedType(SymbolType.CURLY_OPEN);
-                List<GraphTargetItem> wcmd = commands(needsActivation,importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, variables);
+                List<GraphTargetItem> wcmd = commands(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, variables);
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = new WithAVM2Item(null, wvar, wcmd);
                 break;
             /*case DELETE:
-             GraphTargetItem varDel = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, registerVars, inFunction, inMethod, variables);
+             GraphTargetItem varDel = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, registerVars, inFunction, inMethod, variables);
              if(!isNameOrProp(varDel)){
              throw new ParseException("Not a property or name", lexer.yyline());
              }
@@ -891,7 +894,8 @@ public class ActionScriptParser {
             case FUNCTION:
                 s = lexer.lex();
                 expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
-                ret = (function(importedClasses, 0/*?*/, TypeItem.UNBOUNDED, openedNamespaces, true, s.value.toString(), false, variables));
+                needsActivation.setVal(true);
+                ret = (function(needsActivation, importedClasses, 0/*?*/, TypeItem.UNBOUNDED, openedNamespaces, true, s.value.toString(), false, variables));
                 break;
             case VAR:
                 s = lex();
@@ -900,14 +904,14 @@ public class ActionScriptParser {
                 s = lex();
                 GraphTargetItem type;
                 if (s.type == SymbolType.COLON) {
-                    type = type(importedClasses, openedNamespaces, variables);
+                    type = type(needsActivation, importedClasses, openedNamespaces, variables);
                     s = lex();
                 } else {
                     type = new UnboundedTypeItem();
                 }
 
                 if (s.type == SymbolType.ASSIGN) {
-                    GraphTargetItem varval = (expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                    GraphTargetItem varval = (expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                     ret = new NameAVM2Item(type, lexer.yyline(), varIdentifier, varval, true, openedNamespaces);
                     variables.add((NameAVM2Item) ret);
                 } else {
@@ -922,7 +926,7 @@ public class ActionScriptParser {
                 break;
             /*case INCREMENT: //preincrement
              case DECREMENT: //predecrement
-             GraphTargetItem varincdec = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, registerVars, inFunction, inMethod, variables);
+             GraphTargetItem varincdec = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, registerVars, inFunction, inMethod, variables);
              if(!isNameOrProp(varincdec)){
              throw new ParseException("Not a property or name", lexer.yyline());
              }
@@ -935,7 +939,7 @@ public class ActionScriptParser {
             case SUPER: //constructor call
                 ParsedSymbol ss2 = lex();
                 if (ss2.type == SymbolType.PARENT_OPEN) {
-                    List<GraphTargetItem> args = call(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables);
+                    List<GraphTargetItem> args = call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables);
                     ret = new ConstructSuperAVM2Item(null, new LocalRegAVM2Item(null, 0, null), args);
                 } else {//no costructor call, but it could be calling parent methods... => handle in expression
                     lexer.pushback(ss2);
@@ -944,7 +948,7 @@ public class ActionScriptParser {
                 break;
             case IF:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem ifExpr = (expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                GraphTargetItem ifExpr = (expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 expectedType(SymbolType.PARENT_CLOSE);
                 GraphTargetItem onTrue = command(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables);
                 List<GraphTargetItem> onTrueList = new ArrayList<>();
@@ -988,34 +992,34 @@ public class ActionScriptParser {
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new DoWhileItem(null, dloop, doBody, doExpr);
                 break;
-            case FOR:                
+            case FOR:
                 s = lex();
                 boolean forin = false;
                 boolean each = false;
-                GraphTargetItem collection = null;                
+                GraphTargetItem collection = null;
                 if (s.type == SymbolType.EACH) {
                     each = true;
                     forin = true;
                     s = lex();
                 }
-                expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);                
-                GraphTargetItem firstCommand=command(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, false, variables);
-                if(firstCommand instanceof NameAVM2Item){
-                    NameAVM2Item nai=(NameAVM2Item)firstCommand;
-                    if(nai.isDefinition() && nai.getAssignedValue() == null){
-                        firstCommand = expressionRemainder(openedNamespaces, firstCommand, registerVars, inFunction, inMethod, true, variables, importedClasses);
+                expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
+                GraphTargetItem firstCommand = command(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, false, variables);
+                if (firstCommand instanceof NameAVM2Item) {
+                    NameAVM2Item nai = (NameAVM2Item) firstCommand;
+                    if (nai.isDefinition() && nai.getAssignedValue() == null) {
+                        firstCommand = expressionRemainder(needsActivation, openedNamespaces, firstCommand, registerVars, inFunction, inMethod, true, variables, importedClasses);
                     }
                 }
                 InAVM2Item inexpr = null;
-                if(firstCommand instanceof InAVM2Item){
+                if (firstCommand instanceof InAVM2Item) {
                     forin = true;
-                    inexpr = (InAVM2Item)firstCommand;
-                }else{
-                    if(forin){
+                    inexpr = (InAVM2Item) firstCommand;
+                } else {
+                    if (forin) {
                         throw new ParseException("In expression required", lexer.yyline());
                     }
                 }
-                                
+
                 Loop floop = new Loop(uniqId(), null, null);
                 loops.push(floop);
                 if (loopLabel != null) {
@@ -1029,14 +1033,14 @@ public class ActionScriptParser {
                     if (firstCommand != null) { //can be empty command
                         forFirstCommands.add(firstCommand);
                     }
-                    forExpr = (expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                    forExpr = (expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                     expectedType(SymbolType.SEMICOLON);
                     forFinalCommands.add(command(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables));
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
                 List<GraphTargetItem> forBody = new ArrayList<>();
                 forBody.add(command(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, true, variables));
-                if (forin) {                   
+                if (forin) {
                     if (each) {
                         ret = new ForEachInAVM2Item(null, floop, inexpr, forBody);
                     } else {
@@ -1054,7 +1058,7 @@ public class ActionScriptParser {
                     loopLabels.put(sloop, loopLabel);
                 }
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem switchExpr = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                GraphTargetItem switchExpr = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                 expectedType(SymbolType.PARENT_CLOSE);
                 expectedType(SymbolType.CURLY_OPEN);
                 s = lex();
@@ -1075,7 +1079,7 @@ public class ActionScriptParser {
                 while (s.type == SymbolType.CASE) {
                     List<GraphTargetItem> caseExprs = new ArrayList<>();
                     while (s.type == SymbolType.CASE) {
-                        GraphTargetItem curCaseExpr = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                        GraphTargetItem curCaseExpr = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                         caseExprs.add(curCaseExpr);
                         expectedType(SymbolType.COLON);
                         s = lex();
@@ -1156,7 +1160,7 @@ public class ActionScriptParser {
                 ret = new ContinueItem(null, cloopId);
                 break;
             case RETURN:
-                GraphTargetItem retexpr = expression(importedClasses, openedNamespaces, true, registerVars, inFunction, inMethod, true, variables);
+                GraphTargetItem retexpr = expression(needsActivation, importedClasses, openedNamespaces, true, registerVars, inFunction, inMethod, true, variables);
                 if (retexpr == null) {
                     ret = new ReturnVoidAVM2Item(null);
                 } else {
@@ -1179,28 +1183,38 @@ public class ActionScriptParser {
 
                     String enamestr = s.value.toString();
                     expectedType(SymbolType.COLON);
-                    GraphTargetItem etype = type(importedClasses, openedNamespaces, variables);
+                    GraphTargetItem etype = type(needsActivation, importedClasses, openedNamespaces, variables);
                     NameAVM2Item e = new NameAVM2Item(etype, lexer.yyline(), enamestr, new ExceptionAVM2Item(null)/*?*/, true/*?*/, openedNamespaces);
                     variables.add(e);
                     catchExceptions.add(e);
                     e.setSlotNumber(1);
                     e.setSlotScope(2); //?
-                    expectedType(SymbolType.PARENT_CLOSE);                    
+                    expectedType(SymbolType.PARENT_CLOSE);
                     List<GraphTargetItem> cc = new ArrayList<>();
                     cc.add(command(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables));
                     catchCommands.add(cc);
                     s = lex();
                     found = true;
                 }
-                for(int i=varCnt;i<variables.size();i++){
-                    for(NameAVM2Item e:catchExceptions){
-                        if(variables.get(i).getVariableName().equals(e.getVariableName())){
-                            variables.get(i).setSlotNumber(e.getSlotNumber());
-                            variables.get(i).setSlotScope(e.getSlotScope());
+                //TODO:
+                for (int i = varCnt; i < variables.size(); i++) {
+                    AssignableAVM2Item av = variables.get(i);
+                    if (av instanceof UnresolvedAVM2Item) {
+                        UnresolvedAVM2Item ui = (UnresolvedAVM2Item) av;
+                        for (NameAVM2Item e : catchExceptions) {
+                            if (ui.getVariableName().equals(e.getVariableName())) {
+                                try {
+                                    ui.resolve(new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), variables);
+                                } catch (CompilationException ex) {
+                                    //ignore
+                                }
+                                ui.setSlotNumber(e.getSlotNumber());
+                                ui.setSlotScope(e.getSlotScope());
+                            }
                         }
                     }
                 }
-                
+
                 List<GraphTargetItem> finallyCommands = null;
                 if (s.type == SymbolType.FINALLY) {
                     finallyCommands = new ArrayList<>();
@@ -1217,7 +1231,7 @@ public class ActionScriptParser {
                 ret = tai;
                 break;
             case THROW:
-                ret = new ThrowAVM2Item(null, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                ret = new ThrowAVM2Item(null, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 break;
             default:
                 GraphTargetItem valcmd = expressionCommands(s, registerVars, inFunction, inMethod, forinlevel, variables);
@@ -1229,7 +1243,7 @@ public class ActionScriptParser {
                     return null;
                 }
                 lexer.pushback(s);
-                ret = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                ret = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                 if (debugMode) {
                     System.out.println("/command");
                 }
@@ -1240,7 +1254,7 @@ public class ActionScriptParser {
         lexer.removeListener(buf);
         if (ret == null) {  //can be popped expression            
             buf.pushAllBack(lexer);
-            ret = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+            ret = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
         }
         s = lex();
         if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
@@ -1251,8 +1265,8 @@ public class ActionScriptParser {
 
     }
 
-    private GraphTargetItem expression(List<String> importedClasses, List<Integer> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<NameAVM2Item> variables) throws IOException, ParseException {
-        return expression(importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, allowRemainder, variables);
+    private GraphTargetItem expression(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables) throws IOException, ParseException {
+        return expression(needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, allowRemainder, variables);
     }
 
     private GraphTargetItem fixPrecedence(GraphTargetItem expr) {
@@ -1273,14 +1287,14 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private GraphTargetItem expressionRemainder(List<Integer> openedNamespaces, GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<NameAVM2Item> variables, List<String> importedClasses) throws IOException, ParseException {
+    private GraphTargetItem expressionRemainder(Reference<Boolean> needsActivation, List<Integer> openedNamespaces, GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables, List<String> importedClasses) throws IOException, ParseException {
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
         switch (s.type) {
             case NAMESPACE_OP:
                 s = lex();
                 if (s.type == SymbolType.BRACKET_OPEN) {
-                    GraphTargetItem index = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                    GraphTargetItem index = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                     NameAVM2Item name = new NameAVM2Item(new UnboundedTypeItem(), lexer.yyline(), null, null, false, openedNamespaces);
                     name.setIndex(index);
                     name.setNs(expr);
@@ -1288,10 +1302,11 @@ public class ActionScriptParser {
                     expectedType(SymbolType.BRACKET_CLOSE);
                 } else {
                     lexer.pushback(s);
-                    GraphTargetItem name = name(false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
-                    if (name instanceof NameAVM2Item) {
-                        ((NameAVM2Item) name).setNs(expr);
-                        ((NameAVM2Item) name).unresolved = false;
+                    GraphTargetItem name = name(needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
+                    if (name instanceof UnresolvedAVM2Item) {
+                        ((UnresolvedAVM2Item) name).setNs(expr);
+                        //((UnresolvedAVM2Item) name).unresolved = false;
+                        //TODO
                     } else {
                         throw new ParseException("Not a property name", lexer.yyline());
                     }
@@ -1299,82 +1314,82 @@ public class ActionScriptParser {
                 }
                 break;
             case IN:
-                ret = new InAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                ret = new InAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 break;
             case TERNAR:
-                GraphTargetItem terOnTrue = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                GraphTargetItem terOnTrue = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                 expectedType(SymbolType.COLON);
-                GraphTargetItem terOnFalse = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                GraphTargetItem terOnFalse = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                 ret = new TernarOpItem(null, expr, terOnTrue, terOnFalse);
                 break;
             case SHIFT_LEFT:
-                ret = new LShiftAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new LShiftAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case SHIFT_RIGHT:
-                ret = new RShiftAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new RShiftAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case USHIFT_RIGHT:
-                ret = new URShiftAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new URShiftAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case BITAND:
-                ret = new BitAndAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new BitAndAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case BITOR:
-                ret = new BitOrAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new BitOrAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case DIVIDE:
-                ret = new DivideAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new DivideAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case MODULO:
-                ret = new ModuloAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new ModuloAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case EQUALS:
-                ret = new EqAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new EqAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case STRICT_EQUALS:
-                ret = new StrictEqAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new StrictEqAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case NOT_EQUAL:
-                ret = new NeqAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new NeqAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case STRICT_NOT_EQUAL:
-                ret = new StrictNeqAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new StrictNeqAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case LOWER_THAN:
-                ret = new LtAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new LtAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case LOWER_EQUAL:
-                ret = new LeAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new LeAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case GREATER_THAN:
-                ret = new GtAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new GtAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case GREATER_EQUAL:
-                ret = new GeAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new GeAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case AND:
-                ret = new AndItem(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new AndItem(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case OR:
-                ret = new OrItem(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new OrItem(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case MINUS:
-                ret = new SubtractAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new SubtractAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case MULTIPLY:
-                ret = new MultiplyAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new MultiplyAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case PLUS:
-                ret = new AddAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new AddAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case XOR:
-                ret = new BitXorAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new BitXorAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case AS:
                 //TODO
                 break;
             case INSTANCEOF:
-                ret = new InstanceOfAVM2Item(null, expr, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new InstanceOfAVM2Item(null, expr, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 break;
             case IS:
 
@@ -1392,7 +1407,7 @@ public class ActionScriptParser {
             case ASSIGN_SHIFT_RIGHT:
             case ASSIGN_USHIFT_RIGHT:
             case ASSIGN_XOR:
-                GraphTargetItem assigned = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                GraphTargetItem assigned = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                 switch (s.type) {
                     case ASSIGN:
                         //assigned = assigned;
@@ -1435,13 +1450,13 @@ public class ActionScriptParser {
                 if (!(expr instanceof AssignableAVM2Item)) {
                     throw new ParseException("Invalid assignment", lexer.yyline());
                 }
-                AssignableAVM2Item as = ((AssignableAVM2Item)expr).copy();
-                if(as instanceof NameAVM2Item){
-                    variables.add((NameAVM2Item)as);
+                AssignableAVM2Item as = ((AssignableAVM2Item) expr).copy();
+                if ((as instanceof UnresolvedAVM2Item) || (as instanceof NameAVM2Item)) {
+                    variables.add(as);
                 }
                 as.setAssignedValue(assigned);
                 if (expr instanceof NameAVM2Item) {
-                    ((NameAVM2Item) expr).setDefinition(false);                    
+                    ((NameAVM2Item) expr).setDefinition(false);
                 }
                 ret = as;
                 break;
@@ -1461,14 +1476,14 @@ public class ActionScriptParser {
             case BRACKET_OPEN: //member
             case PARENT_OPEN: //function call
                 lexer.pushback(s);
-                ret = memberOrCall(importedClasses, openedNamespaces, expr, registerVars, inFunction, inMethod, variables);
+                ret = memberOrCall(needsActivation, importedClasses, openedNamespaces, expr, registerVars, inFunction, inMethod, variables);
                 break;
 
             default:
                 lexer.pushback(s);
                 if (expr instanceof ParenthesisItem) {
                     if (isType(((ParenthesisItem) expr).value)) {
-                        GraphTargetItem expr2 = expression(importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables);
+                        GraphTargetItem expr2 = expression(needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables);
                         if (expr2 != null) {
                             ret = new CoerceAVM2Item(null, ((ParenthesisItem) expr).value, expr2);
                         }
@@ -1503,7 +1518,7 @@ public class ActionScriptParser {
         return false;
     }
 
-    private int brackets(List<String> importedClasses, List<Integer> openedNamespaces, List<GraphTargetItem> ret, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private int brackets(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, List<GraphTargetItem> ret, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         ParsedSymbol s = lex();
         int arrCnt = 0;
         if (s.type == SymbolType.BRACKET_OPEN) {
@@ -1514,7 +1529,7 @@ public class ActionScriptParser {
                     lexer.pushback(s);
                 }
                 arrCnt++;
-                ret.add(expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                ret.add(expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 s = lex();
                 if (!s.isType(SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
                     expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE);
@@ -1527,7 +1542,7 @@ public class ActionScriptParser {
         return arrCnt;
     }
 
-    private GraphTargetItem commaExpression(Reference<Boolean> needsActivation,List<String> importedClasses, List<Integer> openedNamespaces, Stack<Loop> loops, Map<Loop, String> loopLabels, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forInLevel, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private GraphTargetItem commaExpression(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, Stack<Loop> loops, Map<Loop, String> loopLabels, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forInLevel, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         GraphTargetItem cmd = null;
         List<GraphTargetItem> expr = new ArrayList<>();
         ParsedSymbol s;
@@ -1540,7 +1555,7 @@ public class ActionScriptParser {
         } while (s.type == SymbolType.COMMA && cmd != null);
         lexer.pushback(s);
         if (cmd == null) {
-            expr.add(expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+            expr.add(expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
         } else {
             if (!cmd.hasReturnValue()) {
                 throw new ParseException("Expression expected", lexer.yyline());
@@ -1549,7 +1564,7 @@ public class ActionScriptParser {
         return new CommaExpressionItem(null, expr);
     }
 
-    private GraphTargetItem expression(List<String> importedClasses, List<Integer> openedNamespaces, boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<NameAVM2Item> variables) throws IOException, ParseException {
+    private GraphTargetItem expression(Reference<Boolean> needsActivation, List<String> importedClasses, List<Integer> openedNamespaces, boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         if (debugMode) {
             System.out.println("expression:");
         }
@@ -1572,7 +1587,7 @@ public class ActionScriptParser {
                     existsRemainder = true;
                 } else {
                     lexer.pushback(s);
-                    GraphTargetItem num = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                    GraphTargetItem num = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                     if (num instanceof IntegerValueAVM2Item) {
                         ((IntegerValueAVM2Item) num).value = -((IntegerValueAVM2Item) num).value;
                         ret = num;
@@ -1591,7 +1606,7 @@ public class ActionScriptParser {
                 break;
             case TYPEOF:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new TypeOfAVM2Item(null, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                ret = new TypeOfAVM2Item(null, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 expectedType(SymbolType.PARENT_CLOSE);
                 existsRemainder = true;
                 break;
@@ -1622,9 +1637,9 @@ public class ActionScriptParser {
                     expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING);
 
                     GraphTargetItem n = new StringAVM2Item(null, s.value.toString());
-//expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
+//expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
                     expectedType(SymbolType.COLON);
-                    GraphTargetItem v = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
+                    GraphTargetItem v = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
 
                     NameValuePair nv = new NameValuePair(n, v);
                     nvs.add(nv);
@@ -1638,7 +1653,7 @@ public class ActionScriptParser {
             case BRACKET_OPEN: //Array literal or just brackets
                 lexer.pushback(s);
                 List<GraphTargetItem> inBrackets = new ArrayList<>();
-                int arrCnt = brackets(importedClasses, openedNamespaces, inBrackets, registerVars, inFunction, inMethod, variables);
+                int arrCnt = brackets(needsActivation, importedClasses, openedNamespaces, inBrackets, registerVars, inFunction, inMethod, variables);
                 ret = new NewArrayAVM2Item(null, inBrackets);
                 break;
             case FUNCTION:
@@ -1649,8 +1664,8 @@ public class ActionScriptParser {
                 } else {
                     lexer.pushback(s);
                 }
-                ret = function(importedClasses, 0/*?*/, TypeItem.UNBOUNDED, openedNamespaces, true, fname, false, variables);
-                //TODO
+                needsActivation.setVal(true);
+                ret = function(needsActivation, importedClasses, 0/*?*/, TypeItem.UNBOUNDED, openedNamespaces, true, fname, false, variables);
                 break;
             case NAN:
                 ret = new NanAVM2Item(null);
@@ -1669,7 +1684,7 @@ public class ActionScriptParser {
                 existsRemainder = true;
                 break;
             case DELETE:
-                GraphTargetItem varDel = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, registerVars, inFunction, inMethod, variables);
+                GraphTargetItem varDel = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, registerVars, inFunction, inMethod, variables);
                 if (!isNameOrProp(varDel)) {
                     throw new ParseException("Not a property or name", lexer.yyline());
                 }
@@ -1682,7 +1697,7 @@ public class ActionScriptParser {
                 break;
             case INCREMENT:
             case DECREMENT: //preincrement
-                GraphTargetItem varincdec = expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, registerVars, inFunction, inMethod, variables);
+                GraphTargetItem varincdec = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, registerVars, inFunction, inMethod, variables);
                 if (!isNameOrProp(varincdec)) {
                     throw new ParseException("Not a property or name", lexer.yyline());
                 }
@@ -1695,27 +1710,27 @@ public class ActionScriptParser {
                 existsRemainder = true;
                 break;
             case NOT:
-                ret = new NotItem(null, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                ret = new NotItem(null, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 existsRemainder = true;
                 break;
             case PARENT_OPEN:
-                ret = new ParenthesisItem(null, expression(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                ret = new ParenthesisItem(null, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = memberOrCall(importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
+                ret = memberOrCall(needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
                 existsRemainder = true;
                 break;
             case NEW:
-                GraphTargetItem newvar = name(true, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
+                GraphTargetItem newvar = name(needsActivation, true, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new ConstructSomethingAVM2Item(newvar, call(importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                ret = new ConstructSomethingAVM2Item(newvar, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                 existsRemainder = true;
                 break;
             case IDENTIFIER:
             case THIS:
             case SUPER:
                 lexer.pushback(s);
-                GraphTargetItem var = name(false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
-                var = memberOrCall(importedClasses, openedNamespaces, var, registerVars, inFunction, inMethod, variables);
+                GraphTargetItem var = name(needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
+                var = memberOrCall(needsActivation, importedClasses, openedNamespaces, var, registerVars, inFunction, inMethod, variables);
                 ret = var;
                 existsRemainder = true;
                 break;
@@ -1731,7 +1746,7 @@ public class ActionScriptParser {
         if (allowRemainder && existsRemainder) {
             GraphTargetItem rem = ret;
             do {
-                rem = expressionRemainder(openedNamespaces, rem, registerVars, inFunction, inMethod, assocRight, variables, importedClasses);
+                rem = expressionRemainder(needsActivation, openedNamespaces, rem, registerVars, inFunction, inMethod, assocRight, variables, importedClasses);
                 if (rem != null) {
                     ret = rem;
                 }
@@ -1746,7 +1761,7 @@ public class ActionScriptParser {
     private ActionScriptLexer lexer = null;
     private List<String> constantPool;
 
-    private PackageAVM2Item parsePackage(String fileName) throws IOException, ParseException {
+    private PackageAVM2Item parsePackage(String fileName) throws IOException, ParseException, CompilationException {
         ParsedSymbol s = lex();
         expected(s, lexer.yyline(), SymbolType.PACKAGE);
         String name = "";
@@ -1833,7 +1848,7 @@ public class ActionScriptParser {
         return new PackageAVM2Item(name, items);
     }
 
-    public PackageAVM2Item packageFromString(String str, String fileName) throws ParseException, IOException {
+    public PackageAVM2Item packageFromString(String str, String fileName) throws ParseException, IOException, CompilationException {
         this.constantPool = constantPool;
         lexer = new ActionScriptLexer(new StringReader(str));
 
@@ -1844,7 +1859,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    public void addScriptFromTree(PackageAVM2Item pkg, boolean documentClass) throws ParseException {
+    public void addScriptFromTree(PackageAVM2Item pkg, boolean documentClass) throws ParseException, CompilationException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abc, otherABCs);
         List<AVM2Instruction> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
@@ -1858,7 +1873,7 @@ public class ActionScriptParser {
         abc.script_info.add(gen.generateScriptInfo(pkg, localData, pkg.items, documentClass));
     }
 
-    public void addScript(String s, boolean documentClass, String fileName) throws ParseException, IOException {
+    public void addScript(String s, boolean documentClass, String fileName) throws ParseException, IOException, CompilationException {
         PackageAVM2Item pkg = packageFromString(s, fileName);
         addScriptFromTree(pkg, documentClass);
     }
@@ -1868,7 +1883,7 @@ public class ActionScriptParser {
         this.otherABCs = otherABCs;
     }
 
-    public static void compile(String src, String dst) {        
+    public static void compile(String src, String dst) {
         System.err.println("WARNING: AS3 compiler is not finished yet. This is only used for debuggging!");
         try {
             SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));

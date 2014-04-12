@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -46,7 +47,7 @@ public class BlockItem extends GraphTargetItem {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return generator.generate(localData, commands);
     }
 
@@ -54,9 +55,9 @@ public class BlockItem extends GraphTargetItem {
     public boolean hasReturnValue() {
         return false;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
+    }
 }

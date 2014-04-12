@@ -201,11 +201,11 @@ public abstract class GraphTargetItem implements Serializable {
         return equals(target);
     }
 
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return new ArrayList<>();
     }
 
-    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator);
     }
 
@@ -215,7 +215,7 @@ public abstract class GraphTargetItem implements Serializable {
         return ret;
     }
 
-    public static List<GraphSourceItem> toSourceMerge(SourceGeneratorLocalData localData, SourceGenerator gen, Object... tar) {
+    public static List<GraphSourceItem> toSourceMerge(SourceGeneratorLocalData localData, SourceGenerator gen, Object... tar) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         for (Object o : tar) {
             if (o == null) {

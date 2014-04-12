@@ -114,6 +114,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.AndItem;
@@ -1708,7 +1709,7 @@ public class ActionScriptParser {
         return retTree;
     }
 
-    public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool) {
+    public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
         ActionSourceGenerator gen = new ActionSourceGenerator(constantPool);
         List<Action> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
@@ -1723,7 +1724,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    public List<Action> actionsFromString(String s) throws ParseException, IOException {
+    public List<Action> actionsFromString(String s) throws ParseException, IOException, CompilationException {
         List<String> constantPool = new ArrayList<>();
         List<GraphTargetItem> tree = treeFromString(s, constantPool);
         return actionsFromTree(tree, constantPool);

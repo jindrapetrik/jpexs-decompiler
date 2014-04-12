@@ -47,6 +47,5 @@ public class GetLexIns extends InstructionDefinition {
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         return 1;
     }
- 
-    
+
 }

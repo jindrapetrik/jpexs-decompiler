@@ -14,19 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.avm2.parser.script;
-
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import java.util.List;
+package com.jpexs.decompiler.graph;
 
 /**
  *
  * @author JPEXS
  */
-public class SetterAVM2Item extends MethodAVM2Item {
+public class CompilationException extends Exception {
 
-    public SetterAVM2Item(boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespace, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
-        super(needsActivation, hasRest, line, override, isFinal, isStatic, namespace, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+    public int line;
+    public String text;
+
+    public CompilationException(String message, int line) {
+        super("Compilation error on line " + line + ": " + message);
+        this.line = line;
+        this.text = message;
     }
 
 }

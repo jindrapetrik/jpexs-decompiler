@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.EqualsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNeIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -46,9 +47,6 @@ public class EqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
     public InstructionDefinition getIfNotDefinition() {
         return new IfNeIns();
     }
-    
-    
-    
 
     @Override
     public Object getResult() {
@@ -61,7 +59,7 @@ public class EqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new EqualsIns(), new int[]{}, new byte[0])
         );

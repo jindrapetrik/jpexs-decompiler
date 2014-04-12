@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -58,8 +59,8 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
         return true;
     }
 
-   @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (object instanceof AssignableAVM2Item) {
             return ((AssignableAVM2Item) object).toSourceChange(localData, generator, true, false, true);
         }
@@ -67,7 +68,7 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     }
 
     @Override
-    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (object instanceof AssignableAVM2Item) {
             return ((AssignableAVM2Item) object).toSourceChange(localData, generator, true, false, false);
         }

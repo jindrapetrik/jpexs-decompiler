@@ -45,6 +45,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionExtends;
 import com.jpexs.decompiler.flash.action.swf7.ActionImplementsOp;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -73,7 +74,7 @@ import java.util.List;
 public class ActionSourceGenerator implements SourceGenerator {
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
         ret.add(new ActionPushDuplicate());
@@ -88,7 +89,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
         ret.add(new ActionPushDuplicate());
@@ -117,7 +118,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         return list;
     }
 
-    private List<GraphSourceItem> generateIf(SourceGeneratorLocalData localData, GraphTargetItem expression, List<GraphTargetItem> onTrueCmds, List<GraphTargetItem> onFalseCmds, boolean ternar) {
+    private List<GraphSourceItem> generateIf(SourceGeneratorLocalData localData, GraphTargetItem expression, List<GraphTargetItem> onTrueCmds, List<GraphTargetItem> onFalseCmds, boolean ternar) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         if (expression instanceof Inverted) {
             ret.addAll(((Inverted) expression).invert().toSource(localData, this));
@@ -169,7 +170,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, IfItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, IfItem item) throws CompilationException {
         return generateIf(localData, item.expression, item.onTrue, item.onFalse, false);
     }
 
@@ -196,7 +197,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TernarOpItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TernarOpItem item) throws CompilationException {
         List<GraphTargetItem> onTrue = new ArrayList<>();
         onTrue.add(item.onTrue);
         List<GraphTargetItem> onFalse = new ArrayList<>();
@@ -205,7 +206,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, WhileItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, WhileItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         List<Action> whileExpr = new ArrayList<>();
 
@@ -234,7 +235,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DoWhileItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DoWhileItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         List<Action> doExpr = generateToActionList(localData, item.expression);
         List<Action> doBody = generateToActionList(localData, item.commands);
@@ -252,7 +253,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         List<Action> forExpr = generateToActionList(localData, item.expression);
         List<Action> forBody = generateToActionList(localData, item.commands);
@@ -284,7 +285,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         HashMap<String, Integer> registerVars = getRegisterVars(localData);
         int exprReg = 0;
@@ -394,7 +395,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NotItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NotItem item) throws CompilationException {
         if (item.getOriginal() instanceof Inverted) {
             GraphTargetItem norig = ((Inverted) item).invert();
             return norig.toSource(localData, this);
@@ -430,16 +431,16 @@ public class ActionSourceGenerator implements SourceGenerator {
         return ret;
     }
 
-    private List<Action> generateToActionList(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) {
+    private List<Action> generateToActionList(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws CompilationException {
         return toActionList(generate(localData, commands));
     }
 
-    private List<Action> generateToActionList(SourceGeneratorLocalData localData, GraphTargetItem command) {
+    private List<Action> generateToActionList(SourceGeneratorLocalData localData, GraphTargetItem command) throws CompilationException {
         return toActionList(command.toSource(localData, this));
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         for (GraphTargetItem item : commands) {
             ret.addAll(item.toSourceIgnoreReturnValue(localData, this));
@@ -621,7 +622,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         return new ActionPush(new ConstantIndex(index));
     }
 
-    public List<GraphSourceItem> generateTraits(SourceGeneratorLocalData localData, boolean isInterface, GraphTargetItem name, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> functions, List<MyEntry<GraphTargetItem, GraphTargetItem>> vars, List<GraphTargetItem> staticFunctions, List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars) {
+    public List<GraphSourceItem> generateTraits(SourceGeneratorLocalData localData, boolean isInterface, GraphTargetItem name, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> functions, List<MyEntry<GraphTargetItem, GraphTargetItem>> vars, List<GraphTargetItem> staticFunctions, List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars) throws CompilationException {
         List<String> extendsStr = getVarParts(extendsVal);
         List<GraphSourceItem> ret = new ArrayList<>();
         List<String> nameStr = getVarParts(name);
@@ -749,7 +750,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, CommaExpressionItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, CommaExpressionItem item) throws CompilationException {
         if (item.commands.isEmpty()) {
             return new ArrayList<>();
         }

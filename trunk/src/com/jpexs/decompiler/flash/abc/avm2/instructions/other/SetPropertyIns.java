@@ -135,7 +135,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         int ret = -2;
         int multinameIndex = ins.operands[0];
         int multinameKind = abc.constants.getMultiname(multinameIndex).kind;
-        if(multinameKind == Multiname.MULTINAMEL || multinameKind == Multiname.MULTINAMELA){
+        if (multinameKind == Multiname.MULTINAMEL || multinameKind == Multiname.MULTINAMELA) {
             return 0;
         }
         if (abc.constants.getMultiname(multinameIndex).needsName()) {

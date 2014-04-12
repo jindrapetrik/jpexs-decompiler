@@ -38,31 +38,31 @@ import java.util.List;
  */
 public interface SourceGenerator {
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, IfItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, IfItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TernarOpItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TernarOpItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, WhileItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, WhileItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DoWhileItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DoWhileItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NotItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NotItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DuplicateItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DuplicateItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, BreakItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, BreakItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ContinueItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ContinueItem item) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, List<GraphTargetItem> commands);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws CompilationException;
 
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, CommaExpressionItem item);
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, CommaExpressionItem item) throws CompilationException;
 }

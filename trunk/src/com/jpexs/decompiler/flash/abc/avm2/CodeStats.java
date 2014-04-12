@@ -29,7 +29,8 @@ public class CodeStats {
 
     public int maxstack = 0;
     public int maxscope = 0;
-    public int maxlocal = -1;
+    public int maxlocal = 1;
+    public int initscope = 0;
     public boolean has_set_dxns = false;
     public boolean has_activation = false;
     public InstructionStats[] instructionStats;

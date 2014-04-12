@@ -88,7 +88,7 @@ public abstract class Trait implements Serializable {
                 }
             }
 
-            if (nsname!=null && (!nsname.contains(":")) && (!nsname.isEmpty())) {
+            if (nsname != null && (!nsname.contains(":")) && (!nsname.isEmpty())) {
                 ret += " " + nsname;
             }
             if (ns != null) {

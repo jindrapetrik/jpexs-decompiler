@@ -16,9 +16,14 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
@@ -33,7 +38,7 @@ public class FunctionAVM2Item extends AVM2Item {
     public int namespace;
     public List<String> paramNames;
     public List<GraphTargetItem> body;
-    public List<NameAVM2Item> subvariables;
+    public List<AssignableAVM2Item> subvariables;
     public List<GraphTargetItem> paramTypes;
     public List<GraphTargetItem> paramValues;
     public GraphTargetItem retType;
@@ -41,7 +46,7 @@ public class FunctionAVM2Item extends AVM2Item {
     public boolean hasRest;
     public boolean needsActivation;
 
-    public FunctionAVM2Item(boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<NameAVM2Item> subvariables, GraphTargetItem retType) {
+    public FunctionAVM2Item(boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
         super(null, NOPRECEDENCE);
         this.needsActivation = needsActivation;
         this.namespace = namespace;
@@ -63,12 +68,17 @@ public class FunctionAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return retType;
+        return new TypeItem("Function");
     }
 
     @Override
     public boolean hasReturnValue() {
         return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return ((AVM2SourceGenerator) generator).generate(localData, this);
     }
 
 }

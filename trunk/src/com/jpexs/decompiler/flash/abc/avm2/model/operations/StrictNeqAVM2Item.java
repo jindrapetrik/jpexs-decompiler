@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsI
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictNeIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -32,12 +33,12 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
 
-public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem,IfCondition {
+public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {
 
     public StrictNeqAVM2Item(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "!==");
     }
-    
+
     @Override
     public InstructionDefinition getIfDefinition() {
         return new IfStrictNeIns();
@@ -47,8 +48,6 @@ public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem,IfC
     public InstructionDefinition getIfNotDefinition() {
         return new IfStrictEqIns();
     }
-    
-    
 
     @Override
     public GraphTargetItem invert() {
@@ -64,7 +63,7 @@ public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem,IfC
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new StrictEqualsIns(), new int[]{}, new byte[0]),
                 new AVM2Instruction(0, new NotIns(), new int[]{}, new byte[0])

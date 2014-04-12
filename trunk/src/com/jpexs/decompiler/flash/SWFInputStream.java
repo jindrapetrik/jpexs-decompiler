@@ -931,7 +931,7 @@ public class SWFInputStream extends InputStream {
                     futureResults.add(future);
                 }
             }
-            
+
             if (tag.getId() == EndTag.ID) {
                 break;
             }

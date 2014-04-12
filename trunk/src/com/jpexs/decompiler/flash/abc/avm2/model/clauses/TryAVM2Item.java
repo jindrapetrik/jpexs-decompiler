@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.NameAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -142,21 +143,20 @@ public class TryAVM2Item extends AVM2Item implements Block {
     public boolean needsSemicolon() {
         return false;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return false;
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
-        return ((AVM2SourceGenerator)generator).generate(localData, this);
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return ((AVM2SourceGenerator) generator).generate(localData, this);
     }
-    
-    
+
 }

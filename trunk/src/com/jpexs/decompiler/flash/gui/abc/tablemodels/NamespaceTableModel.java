@@ -123,7 +123,7 @@ public class NamespaceTableModel implements TableModel {
                     return "-";
                 }
                 String val = abc.constants.getNamespace(rowIndex).getName(abc.constants);
-                if(val == null){
+                if (val == null) {
                     val = "-";
                 }
                 return val;

@@ -40,9 +40,9 @@ public class TrueItem extends GraphTargetItem {
     public boolean hasReturnValue() {
         return true;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.BOOLEAN;
-    } 
+    }
 }

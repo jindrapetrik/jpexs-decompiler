@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -39,7 +40,7 @@ public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2I
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (value instanceof AssignableAVM2Item) {
             return ((AssignableAVM2Item) value).toSourceChange(localData, generator, false, true, true);
         }
@@ -47,13 +48,13 @@ public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2I
     }
 
     @Override
-    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (value instanceof AssignableAVM2Item) {
             return ((AssignableAVM2Item) value).toSourceChange(localData, generator, false, true, false);
         }
         return new ArrayList<>(); //?
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return value.returnType();

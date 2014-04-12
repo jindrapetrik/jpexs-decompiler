@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessThanIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfLtIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNLtIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -31,7 +32,7 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
 
-public class LtAVM2Item extends BinaryOpItem implements LogicalOpItem,IfCondition {
+public class LtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {
 
     public LtAVM2Item(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<");
@@ -46,9 +47,7 @@ public class LtAVM2Item extends BinaryOpItem implements LogicalOpItem,IfConditio
     public InstructionDefinition getIfNotDefinition() {
         return new IfNLtIns();
     }
-    
-    
-    
+
     @Override
     public GraphTargetItem invert() {
         return new GeAVM2Item(src, leftSide, rightSide);
@@ -60,7 +59,7 @@ public class LtAVM2Item extends BinaryOpItem implements LogicalOpItem,IfConditio
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new LessThanIns(), new int[]{}, new byte[0])
         );

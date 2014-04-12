@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -64,7 +65,7 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         }
     }
 
-    protected List<GraphSourceItem> toSourceCall(SourceGeneratorLocalData localData, SourceGenerator gen, List<GraphTargetItem> list) {
+    protected List<GraphSourceItem> toSourceCall(SourceGeneratorLocalData localData, SourceGenerator gen, List<GraphTargetItem> list) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             ret.addAll(0, list.get(i).toSource(localData, gen));
@@ -74,14 +75,14 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
     }
 
     @Override
-    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         List<GraphSourceItem> ret = toSource(localData, generator);
         if (hasReturnValue()) {
             ret.add(new ActionPop());
         }
         return ret;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem();

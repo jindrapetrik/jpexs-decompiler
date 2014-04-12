@@ -19,6 +19,7 @@ package com.jpexs.decompiler.graph.model;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.operations.Inverted;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -67,7 +68,7 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return generator.generate(localData, this);
     }
 
@@ -75,9 +76,9 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
     public boolean hasReturnValue() {
         return true;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.BOOLEAN;
-    } 
+    }
 }

@@ -275,7 +275,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         statusPanel.setStatus(s);
     }
 
-    
     public void setWorkStatus(String s, CancellableWorker worker) {
         statusPanel.setWorkStatus(s, worker);
     }
@@ -351,7 +350,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         if (item instanceof ImageTag && ((ImageTag) item).importSupported()) {
                             replaceSelectionMenuItem.setVisible(true);
                         }
-                        
+
                         if (item instanceof DefineBinaryDataTag) {
                             replaceSelectionMenuItem.setVisible(true);
                         }
@@ -560,7 +559,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
         displayPanel = new JPanel(new CardLayout());
 
-
         previewPanel = new PreviewPanel(this, flashPanel);
         displayPanel.add(previewPanel, CARDPREVIEWPANEL);
         displayPanel.add(createFolderPreviewCard(), CARDFOLDERPREVIEWPANEL);
@@ -721,8 +719,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             updateUi(swf);
 
             /*if (first && Configuration.gotoMainClassOnStartup.get()) {
-                gotoDocumentClass(swf);
-            }*/
+             gotoDocumentClass(swf);
+             }*/
             first = false;
         }
     }
@@ -2172,7 +2170,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public boolean isInternalFlashViewerSelected() {
         return mainMenu.isInternalFlashViewerSelected();
     }
-    
+
     public void reload(boolean forceReload) {
         TreeNode treeNode = (TreeNode) tagTree.getLastSelectedPathComponent();
         if (treeNode == null) {

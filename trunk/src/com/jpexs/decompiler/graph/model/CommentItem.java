@@ -68,9 +68,9 @@ public class CommentItem extends GraphTargetItem {
     public boolean hasReturnValue() {
         return false;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
+    }
 }

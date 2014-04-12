@@ -54,9 +54,9 @@ public class IntegerValueItem extends GraphTargetItem {
     public boolean hasReturnValue() {
         return true;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
+    }
 }

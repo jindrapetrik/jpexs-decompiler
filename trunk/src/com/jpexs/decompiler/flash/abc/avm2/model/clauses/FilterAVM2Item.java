@@ -45,12 +45,12 @@ public class FilterAVM2Item extends AVM2Item {
         expression.toString(writer, localData);
         return writer.append(")");
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
-    
+    }
+
     @Override
     public boolean hasReturnValue() {
         return false;

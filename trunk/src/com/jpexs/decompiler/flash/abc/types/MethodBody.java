@@ -224,11 +224,11 @@ public class MethodBody implements Cloneable, Serializable {
         if (stats == null) {
             return false;
         }
-        if(stats.has_activation){
+        if (stats.has_activation) {
             initScope++;
         }
         max_stack = stats.maxstack;
-        max_scope_depth = stats.maxscope+(stats.has_activation?1:0);
+        max_scope_depth = stats.maxscope + (stats.has_activation ? 1 : 0);
         max_regs = stats.maxlocal;
         init_scope_depth = initScope;
         abc.method_info.get(method_info).setFlagSetsdxns(stats.has_set_dxns);

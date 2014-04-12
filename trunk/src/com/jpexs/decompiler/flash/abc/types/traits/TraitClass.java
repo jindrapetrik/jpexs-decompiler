@@ -96,7 +96,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 newimport = oldimport;
                 newimport += "." + name;
             }
-            if (newimport!=null && newimport.isEmpty()) {
+            if (newimport != null && newimport.isEmpty()) {
                 newimport = null;
             }
             if (newimport != null) {

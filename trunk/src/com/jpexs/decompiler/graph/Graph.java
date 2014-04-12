@@ -89,7 +89,6 @@ public class Graph {
         }
     }
 
-
     public GraphPart deepCopy(GraphPart part, List<GraphPart> visited, List<GraphPart> copies) {
         if (visited == null) {
             visited = new ArrayList<>();

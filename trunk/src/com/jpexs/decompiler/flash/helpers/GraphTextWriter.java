@@ -173,11 +173,11 @@ public abstract class GraphTextWriter {
     public GraphTextWriter endBlock() {
         return endBlock("}");
     }
-    
+
     public GraphTextWriter space() {
         return append(" ");
     }
-    
+
     public GraphTextWriter spaceBeforeCallParenthesies(int argCount) {
         if (argCount > 0) {
             if (formatting.spaceBeforeParenthesesMethodCallParentheses) {

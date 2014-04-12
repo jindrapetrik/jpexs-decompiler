@@ -33,7 +33,7 @@ public class InActionItem extends BinaryOpItem {
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return false;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.BOOLEAN;

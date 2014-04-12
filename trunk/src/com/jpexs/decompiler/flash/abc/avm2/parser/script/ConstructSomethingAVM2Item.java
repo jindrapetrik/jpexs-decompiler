@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -43,17 +44,22 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
-        if (name instanceof TypeItem) {
-            TypeItem prop = (TypeItem) name;
-            int type_index = ((AVM2SourceGenerator) generator).resolveType(name.toString());
+        GraphTargetItem resname = name;
+        if (resname instanceof UnresolvedAVM2Item) {
+            resname = ((UnresolvedAVM2Item) resname).resolved;
+        }
+
+        if (resname instanceof TypeItem) {
+            TypeItem prop = (TypeItem) resname;
+            int type_index = ((AVM2SourceGenerator) generator).resolveType(resname.toString());
             return toSourceMerge(localData, generator,
                     new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index, arguments.size()}, new byte[0]), arguments,
                     new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index, arguments.size()}, new byte[0])
             );
         }
-        if (name instanceof NameAVM2Item) {
+        if (resname instanceof NameAVM2Item) {
             //TODO
         }
         return new ArrayList<>();

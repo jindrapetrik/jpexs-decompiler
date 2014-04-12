@@ -538,7 +538,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         if (timeline.getFrameCount() <= frame) {
             return;
         }
-        
+
         getOutlines();
         Matrix mat = new Matrix();
         mat.translateX = swf.displayRect.Xmin;

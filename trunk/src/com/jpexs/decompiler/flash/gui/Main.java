@@ -391,7 +391,7 @@ public class Main {
                 final SWFList swfs1 = swfs;
                 final boolean first1 = first;
                 first = false;
-                if(firstSWF == null){
+                if (firstSWF == null) {
                     firstSWF = swfs1.get(0);
                 }
                 try {
@@ -892,11 +892,11 @@ public class Main {
      * @param args the command line arguments
      * @throws IOException
      */
-    public static void main(String[] args) throws IOException {  
+    public static void main(String[] args) throws IOException {
         startFreeMemThread();
         initLogging(Configuration.debugMode.get());
         initLang();
-               
+
         if (Configuration.cacheOnDisk.get()) {
             Cache.setStorageType(Cache.STORAGE_FILES);
         } else {
@@ -1059,7 +1059,7 @@ public class Main {
             Socket sock = new Socket("www.free-decompiler.com", 80);
             OutputStream os = sock.getOutputStream();
             String currentLoc = Configuration.locale.get("en");
-            os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(ApplicationInfo.version,"UTF-8") + "&currentBuild=" + URLEncoder.encode(ApplicationInfo.build,"UTF-8") + "&currentNightly=" + (ApplicationInfo.nightly?"1":"0") + " HTTP/1.1\r\n"
+            os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(ApplicationInfo.version, "UTF-8") + "&currentBuild=" + URLEncoder.encode(ApplicationInfo.build, "UTF-8") + "&currentNightly=" + (ApplicationInfo.nightly ? "1" : "0") + " HTTP/1.1\r\n"
                     + "Host: www.free-decompiler.com\r\n"
                     + "X-Accept-Versions: " + acceptVersions + "\r\n"
                     + "X-Update-Major: " + UPDATE_SYSTEM_MAJOR + "\r\n"

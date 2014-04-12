@@ -49,9 +49,9 @@ public class ScriptEndItem extends GraphTargetItem implements ExitItem {
     public boolean hasReturnValue() {
         return false;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
+    }
 }

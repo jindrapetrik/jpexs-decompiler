@@ -330,7 +330,7 @@ public class Timeline {
         }
         return true;
     }
-    
+
     private boolean isSingleFrame(int frame) {
         Frame frameObj = frames.get(frame);
         for (int i = 1; i <= getMaxDepth(); i++) {

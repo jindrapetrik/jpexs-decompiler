@@ -278,7 +278,7 @@ public class CommandLineArgumentParser {
         } else if (nextParam.equals("-dumpswf")) {
             parseDumpSwf(args);
         } else if (nextParam.equals("-as3compiler")) {
-            ActionScriptParser.compile(args.remove(),args.remove());
+            ActionScriptParser.compile(args.remove(), args.remove());
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?")) {
             printHeader();
             printCmdLineUsage();

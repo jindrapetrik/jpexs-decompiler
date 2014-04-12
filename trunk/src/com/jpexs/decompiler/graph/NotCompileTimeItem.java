@@ -55,9 +55,9 @@ public class NotCompileTimeItem extends GraphTargetItem {
     public boolean hasReturnValue() {
         return object.hasReturnValue();
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
-    } 
+    }
 }

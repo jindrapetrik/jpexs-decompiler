@@ -23,7 +23,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -54,11 +56,14 @@ public class CallAVM2Item extends AVM2Item {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
 
         GraphTargetItem callable = name;
+        if (callable instanceof UnresolvedAVM2Item) {
+            callable = ((UnresolvedAVM2Item) callable).resolved;
+        }
         if (callable instanceof NameAVM2Item) {
             NameAVM2Item n = (NameAVM2Item) callable;
             List<ABC> allAbcs = new ArrayList<>();
@@ -82,7 +87,7 @@ public class CallAVM2Item extends AVM2Item {
                 nobj.setRegNumber(0);
                 obj = nobj;
             }
-            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), n.getIndex(), g.abc, g.allABCs, n.openedNamespaces);
+            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), n.getIndex(), g.abc, g.allABCs, n.openedNamespaces, new ArrayList<MethodBody>());
             p.setAssignedValue(n.getAssignedValue());
             callable = p;
         }
@@ -91,24 +96,50 @@ public class CallAVM2Item extends AVM2Item {
             PropertyAVM2Item prop = (PropertyAVM2Item) callable;
             Object obj = prop.object;
             if (obj == null) {
-                obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty()}, new byte[0]);
+
+                List<ABC> allAbcs = new ArrayList<>();
+                allAbcs.add(g.abc);
+                allAbcs.addAll(g.allABCs);
+                String cname;
+                String pkgName = "";
+                cname = localData.currentClass;
+                if (cname.contains(".")) {
+                    pkgName = cname.substring(0, cname.lastIndexOf('.'));
+                    cname = cname.substring(cname.lastIndexOf('.') + 1);
+                }
+                Reference<String> outName = new Reference<>("");
+                Reference<String> outNs = new Reference<>("");
+                Reference<String> outPropNs = new Reference<>("");
+                Reference<Integer> outPropNsKind = new Reference<>(1);
+                Reference<String> outPropType = new Reference<>("");
+                if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType)) {
+                    NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, new ArrayList<Integer>());
+                    nobj.setRegNumber(0);
+                    obj = nobj;
+                } else {
+                    obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty(localData)}, new byte[0]);
+                }
             }
             return toSourceMerge(localData, generator, obj, prop.index, arguments,
-                    new AVM2Instruction(0, new CallPropertyIns(), new int[]{prop.resolveProperty(), arguments.size()}, new byte[0])
+                    new AVM2Instruction(0, new CallPropertyIns(), new int[]{prop.resolveProperty(localData), arguments.size()}, new byte[0])
             );
         }
         return new ArrayList<>();
     }
 
     @Override
-    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
 
         GraphTargetItem callable = name;
+        if (callable instanceof UnresolvedAVM2Item) {
+            callable = ((UnresolvedAVM2Item) callable).resolved;
+        }
+
         if (callable instanceof NameAVM2Item) {
             NameAVM2Item n = (NameAVM2Item) callable;
-            PropertyAVM2Item p = new PropertyAVM2Item(null, n.getVariableName(), n.getIndex(), g.abc, g.allABCs, n.openedNamespaces);
+            PropertyAVM2Item p = new PropertyAVM2Item(null, n.getVariableName(), n.getIndex(), g.abc, g.allABCs, n.openedNamespaces, new ArrayList<MethodBody>());
             p.setAssignedValue(n.getAssignedValue());
             callable = p;
         }
@@ -117,10 +148,10 @@ public class CallAVM2Item extends AVM2Item {
             PropertyAVM2Item prop = (PropertyAVM2Item) callable;
             Object obj = prop.object;
             if (obj == null) {
-                obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty()}, new byte[0]);
+                obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty(localData)}, new byte[0]);
             }
             return toSourceMerge(localData, generator, obj, prop.index, arguments,
-                    new AVM2Instruction(0, new CallPropVoidIns(), new int[]{prop.resolveProperty(), arguments.size()}, new byte[0])
+                    new AVM2Instruction(0, new CallPropVoidIns(), new int[]{prop.resolveProperty(localData), arguments.size()}, new byte[0])
             );
         }
 

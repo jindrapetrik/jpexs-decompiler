@@ -34,7 +34,7 @@ import javax.swing.JScrollPane;
  * @author JPEXS
  */
 public class TextPanel extends JPanel implements ActionListener {
-    
+
     private static final String ACTION_EDIT_TEXT = "EDITTEXT";
     private static final String ACTION_CANCEL_TEXT = "CANCELTEXT";
     private static final String ACTION_SAVE_TEXT = "SAVETEXT";
@@ -87,14 +87,14 @@ public class TextPanel extends JPanel implements ActionListener {
     public SearchPanel<TextTag> getSearchPanel() {
         return textSearchPanel;
     }
-    
+
     public void setText(String text) {
         textValue.setContentType("text/swf_text");
         // textValue.setFont(new Font("Monospaced", Font.PLAIN, 13));
         textValue.setText(text);
         textValue.setCaretPosition(0);
     }
-    
+
     public void setEditText(boolean edit) {
         textValue.setEditable(edit);
         textSaveButton.setVisible(edit);

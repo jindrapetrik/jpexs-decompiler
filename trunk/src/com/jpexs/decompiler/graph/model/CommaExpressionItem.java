@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -51,7 +52,7 @@ public class CommaExpressionItem extends GraphTargetItem {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return generator.generate(localData, this);
     }
 
@@ -59,9 +60,9 @@ public class CommaExpressionItem extends GraphTargetItem {
     public boolean hasReturnValue() {
         return false;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
-        return commands.isEmpty()?TypeItem.UNBOUNDED:commands.get(commands.size()-1).returnType();
-    } 
+        return commands.isEmpty() ? TypeItem.UNBOUNDED : commands.get(commands.size() - 1).returnType();
+    }
 }

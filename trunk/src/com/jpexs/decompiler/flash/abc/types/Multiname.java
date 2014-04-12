@@ -158,7 +158,7 @@ public class Multiname {
         String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants);
         int sub = -1;
         for (int n = 1; n < constants.getNamespaceCount(); n++) {
-            if (constants.getNamespace(n).kind == type && constants.getNamespace(n).hasName(constants.getNamespace(index).getName(constants),constants)) {
+            if (constants.getNamespace(n).kind == type && constants.getNamespace(n).hasName(constants.getNamespace(index).getName(constants), constants)) {
                 sub++;
             }
             if (n == index) {
