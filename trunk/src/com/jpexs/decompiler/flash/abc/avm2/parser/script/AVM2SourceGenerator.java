@@ -347,7 +347,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 ins(new PushByteIns(), 0),
                 AssignableAVM2Item.setTemp(localData, this, counterReg),
                 collection,
-                NameAVM2Item.generateCoerce(this, "*"),
+                NameAVM2Item.generateCoerce(this, TypeItem.UNBOUNDED),
                 AssignableAVM2Item.setTemp(localData, this, collectionReg)
         ));
 
@@ -1180,45 +1180,27 @@ public class AVM2SourceGenerator implements SourceGenerator {
             return 0;
         }
 
-        TypeItem nameItem = (TypeItem) type;
+        TypeItem nameItem = (TypeItem) type;    
+        name = nameItem.fullTypeName;        
         if (name.contains(".")) {
             pkg = name.substring(0, name.lastIndexOf('.'));
             name = name.substring(name.lastIndexOf('.') + 1);
         }
-
-        /*int nsKind = Namespace.KIND_PACKAGE;
-         if (pkg.equals("")) {
-         for (int i = 0; i < nameItem.openedNamespaces.size(); i++) {
-         String ns = nameItem.openedNamespaces.get(i);
-         String nspkg = ns;
-         String nsclass = null;
-         if (nspkg.contains(":")) {
-         nsclass = nspkg.substring(nspkg.indexOf(":") + 1);
-         nspkg = nspkg.substring(0, nspkg.indexOf(":"));
-         }
-         if (nsclass == null) {
-         List<ABC> abcs = new ArrayList<>();
-         abcs.add(abc);
-         abcs.addAll(allABCs);
-         loopabc:
-         for (ABC a : abcs) {
-         for (InstanceInfo ii : a.instance_info) {
-         Multiname n = a.constants.constant_multiname.get(ii.name_index);
-         if (n.getNamespace(a.constants).getName(a.constants).equals(nspkg) && n.getName(a.constants, new ArrayList<String>()).equals(name)) {
-         pkg = nspkg;
-         nsKind = n.getNamespace(a.constants).kind;
-         break loopabc;
-         }
-         }
-         }
-         } else if (name.equals(nsclass)) {
-         pkg = nspkg;
-         nsKind = nameItem.openedNamespacesKind.get(i);
-         break;
-         }
-         }
-         }*/
-        return abc.constants.getMultinameId(new Multiname(Multiname.QNAME, str(name), namespace(Namespace.KIND_PACKAGE/*?*/, pkg), 0, 0, new ArrayList<Integer>()), true);
+        if(!nameItem.subtypes.isEmpty()){ //It's vector => TypeName
+            List<Integer> params = new ArrayList<>();
+            for(String p:nameItem.subtypes){
+                String ppkg = "";
+                if (p.contains(".")) {
+                    ppkg = p.substring(0, p.lastIndexOf('.'));
+                    p = p.substring(p.lastIndexOf('.') + 1);
+                }
+                params.add(abc.constants.getMultinameId(new Multiname(Multiname.QNAME, str(p), namespace(Namespace.KIND_PACKAGE/*?*/, ppkg), 0, 0, new ArrayList<Integer>()), true));        
+            }
+            int qname = abc.constants.getMultinameId(new Multiname(Multiname.QNAME, str(name), namespace(Namespace.KIND_PACKAGE/*?*/, pkg), 0, 0, new ArrayList<Integer>()), true);        
+            return abc.constants.getMultinameId(new Multiname(Multiname.TYPENAME, 0,0, 0, qname, params), true);
+        }else{
+            return abc.constants.getMultinameId(new Multiname(Multiname.QNAME, str(name), namespace(Namespace.KIND_PACKAGE/*?*/, pkg), 0, 0, new ArrayList<Integer>()), true);
+        }
     }
 
     public int ident(GraphTargetItem name) {

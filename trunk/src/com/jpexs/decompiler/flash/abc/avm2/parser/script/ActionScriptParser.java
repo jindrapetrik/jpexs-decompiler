@@ -208,142 +208,36 @@ public class ActionScriptParser {
             name += "." + s.value.toString();
             s = lex();
         }
+        List<String> params=new ArrayList<>();
+        if(s.type == SymbolType.TYPENAME){
+            s = lex();
+            do{
+                String p = "";
+                expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                p = s.value.toString();
+                s = lex();
+                while (s.type == SymbolType.DOT) {
+                    s = lex();
+                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    name += "." + s.value.toString();
+                    s = lex();
+                }
+                params.add(p);
+            }while(s.type == SymbolType.COMMA);
+            expected(s, lexer.yyline(), SymbolType.GREATER_THAN);
+            s = lex();
+            /*if(!openedNamespaces.contains(AS3vecNs)){
+                openedNamespaces.add(AS3vecNs);
+            } */   
+        }
         GraphTargetItem index = null;
         if (s.type == SymbolType.BRACKET_OPEN) {
             index = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
             expectedType(SymbolType.BRACKET_CLOSE);
         } else {
             lexer.pushback(s);
-        }
-        if (!typeOnly) {
-            /*for (NameAVM2Item n : variables) {
-             if (n.getVariableName().equals(parts.get(0))) {
-             NameAVM2Item ni = new NameAVM2Item(n.type, lexer.yyline(), n.getVariableName(), null, false, openedNamespaces);
-             variables.add(ni);
-             GraphTargetItem ret = ni;
-             if (parts.size() == 1) {
-             ((NameAVM2Item) ret).setIndex(index);
-             }
-             for (int i = 1; i < parts.size(); i++) {
-             ret = new PropertyAVM2Item(ret, parts.get(i), i == parts.size() - 1 ? index : null, abc, otherABCs, openedNamespaces);
-             }
-
-             return ret;
-             }
-             }*/
-        }
-
-        /*List<ABC> allAbcs = new ArrayList<>();
-         allAbcs.add(abc);
-         allAbcs.addAll(otherABCs);
-         //search for variable in openedNamespaces
-         if (!typeOnly) {
-         for (int i = 0; i < openedNamespaces.size(); i++) {
-         int nsIndex = openedNamespaces.get(i);
-         Namespace ns = abc.constants.constant_namespace.get(nsIndex);
-         int nsKind = ns.kind;
-         loopabc:
-         for (ABC a : allAbcs) {
-         for (int h = 0; h < a.instance_info.size(); h++) {
-         InstanceInfo ii = a.instance_info.get(h);
-         Multiname n = a.constants.constant_multiname.get(ii.name_index);
-         if (n.getNamespace(a.constants).getName(a.constants).equals(ns.getName(abc.constants)) && n.getNamespace(a.constants).kind == nsKind) {
-
-         //found opened class
-         Reference<String> outName = new Reference<>("");
-         Reference<String> outNs = new Reference<>("");
-         Reference<String> outPropNs = new Reference<>("");
-         Reference<Integer> outPropNsKind = new Reference<>(1);
-         Reference<String> outPropType = new Reference<>("");
-         if (AVM2SourceGenerator.searchPrototypeChain(false, allAbcs, n.getNamespace(a.constants).getName(a.constants), n.getName(a.constants, new ArrayList<String>()), parts.get(0), outName, outNs, outPropNs, outPropNsKind, outPropType)) {
-         return new PropertyAVM2Item(null, parts.get(0), index, abc, otherABCs, openedNamespaces);
-         }
-         }
-         }
-         }
-
-         }
-         }
-
-         //variable not found, gonna search types
-         String pkg = "";
-         String name = null;
-         int foundNsKind = Namespace.KIND_PACKAGE;
-         int k;
-         loopk:
-         for (k = parts.size() - 1; k >= 0; k--) {
-
-         if (typeOnly) {
-         if (k < parts.size() - 1) {
-         k = -1;
-         break loopk;
-         }
-         }
-         if (k == 0 || typeOnly) {
-         for (int i = 0; i < importedClasses.size(); i++) {
-         String iname = importedClasses.get(i);
-         String ipkg = "";
-         if (iname.contains(".")) {
-         ipkg = iname.substring(0, iname.lastIndexOf('.'));
-         iname = iname.substring(iname.lastIndexOf('.') + 1);
-         }
-         if (iname.equals(parts.get(0))) {
-         k = 0;
-         pkg = ipkg;
-         name = iname;
-         break loopk;
-         }
-
-         }
-         }
-         pkg = "";
-         for (int j = 0; j <= k - 1; j++) {
-         if (!"".equals(pkg)) {
-         pkg += ".";
-         }
-         pkg += parts.get(j);
-         }
-         name = parts.get(k);
-
-         String fname = pkg.isEmpty() ? name : pkg + "." + name;
-
-         for (ABC a : allAbcs) {
-         int c = a.findClassByName(fname);
-         if (c != -1) {
-         break loopk;
-         }
-         }
-
-         for (int i = 0; i < openedNamespaces.size(); i++) {
-         int nsIndex = openedNamespaces.get(i);
-         Namespace ns = abc.constants.constant_namespace.get(nsIndex);
-         int nsKind = ns.kind;
-         String nsname = ns.getName(abc.constants);
-         if (nsKind == Namespace.KIND_PACKAGE) {
-         for (ABC a : allAbcs) {
-         int c = a.findClassByName(nsname.isEmpty() ? fname : nsname + "." + fname);
-         if (c != -1) {
-         pkg = nsname;
-         break loopk;
-         }
-         }
-         }
-         }
-         }
-
-         if (k == -1) {
-         NameAVM2Item ret = new NameAVM2Item(null, lexer.yyline(), Helper.joinStrings(parts, "."), null, false, openedNamespaces);
-         ret.unresolved = true;
-         ret.setIndex(index);
-         variables.add(ret);
-         return ret;
-         //throw new ParseException("Cannot find variable or type:" + Helper.joinStrings(parts, "."), lexer.yyline());
-         }
-         GraphTargetItem ret = new TypeItem("".equals(pkg) ? name : pkg + "." + name);
-         for (int i = 1; i < parts.size(); i++) {
-         ret = new PropertyAVM2Item(ret, parts.get(i), i == parts.size() - 1 ? index : null, abc, otherABCs, openedNamespaces);
-         }*/
-        UnresolvedAVM2Item ret = new UnresolvedAVM2Item(importedClasses, typeOnly, null, lexer.yyline(), name, null, openedNamespaces);
+        }       
+        UnresolvedAVM2Item ret = new UnresolvedAVM2Item(params,importedClasses, typeOnly, null, lexer.yyline(), name, null, openedNamespaces);
         ret.setIndex(index);
         variables.add(ret);
         return ret;
@@ -408,6 +302,7 @@ public class ActionScriptParser {
     }
 
     private FunctionAVM2Item function(Reference<Boolean> needsActivation, List<String> importedClasses, int namespace, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean withBody, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
+        openedNamespaces = new ArrayList<>(openedNamespaces); //local copy
         int line = lexer.yyline();
         ParsedSymbol s;
         expectedType(SymbolType.PARENT_OPEN);
@@ -1752,7 +1647,7 @@ public class ActionScriptParser {
             case NEW:
                 GraphTargetItem newvar = name(needsActivation, true, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new ConstructSomethingAVM2Item(newvar, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                ret = new ConstructSomethingAVM2Item(openedNamespaces,newvar, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                 existsRemainder = true;
                 break;
             case IDENTIFIER:
@@ -1825,7 +1720,7 @@ public class ActionScriptParser {
         int packageInternalNs = 0;
         openedNamespaces.add(packageInternalNs = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abc.constants.getStringId(name, true)), 0, true));
         openedNamespaces.add(publicNs = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId("", true)), 0, true));
-
+        
         openedNamespaces.add(abc.constants.addNamespace(new Namespace(Namespace.KIND_PRIVATE, 0))); //abc.constants.getStringId(fileName + "$", true)
         if (!name.isEmpty()) {
             openedNamespaces.add(publicNs = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(name, true)), 0, true));

@@ -23,7 +23,9 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,10 +40,16 @@ public class TypeItem extends GraphTargetItem {
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
 
     public String fullTypeName;
+    public List<String> subtypes = new ArrayList<>();
 
-    public TypeItem(String fullTypeName) {
+    public TypeItem(String fullTypeName){
+        this(fullTypeName,new ArrayList<String>());
+    }
+    
+    public TypeItem(String fullTypeName,List<String> subtypes) {
         super(null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
+        this.subtypes.addAll(subtypes);
     }
 
     @Override
@@ -84,12 +92,20 @@ public class TypeItem extends GraphTargetItem {
 
     @Override
     public String toString() {
-        return fullTypeName;
+        String add="";
+        if(!subtypes.isEmpty()){
+            add+=".<";
+            add+=Helper.joinStrings(subtypes, ",");
+            add+=">";
+        }
+        return fullTypeName+add;
     }
+       
 
     public int resolveClass(ABC abc) {
         String name = fullTypeName;
         String pkg = "";
+        int name_index = 0;
         if (name.contains(".")) {
             pkg = name.substring(0, name.lastIndexOf('.'));
             name = name.substring(name.lastIndexOf('.') + 1);
@@ -98,7 +114,8 @@ public class TypeItem extends GraphTargetItem {
             Multiname mname = abc.constants.constant_multiname.get(ii.name_index);
             if (mname.getName(abc.constants, new ArrayList<String>()).equals(name)) {
                 if (mname.getNamespace(abc.constants).hasName(pkg, abc.constants)) {
-                    return ii.name_index;
+                    name_index = ii.name_index;
+                    break;
                 }
             }
         }
@@ -106,11 +123,22 @@ public class TypeItem extends GraphTargetItem {
             Multiname mname = abc.constants.constant_multiname.get(i);
             if (name.equals(mname.getName(abc.constants, new ArrayList<String>()))) {
                 if (pkg.equals(mname.getNamespace(abc.constants).getName(abc.constants))) {
-                    return i;
+                    name_index = i;
+                    break;
                 }
             }
         }
-        return abc.constants.getMultinameId(new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(pkg, true)), 0, true), 0, 0, new ArrayList<Integer>()), true);
+        if(name_index == 0){
+            name_index = abc.constants.getMultinameId(new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(pkg, true)), 0, true), 0, 0, new ArrayList<Integer>()), true);
+        }
+        if(subtypes.isEmpty()){
+            return name_index;
+        }
+        List<Integer> params=new ArrayList<>();
+        for(String s:subtypes){
+            params.add(new TypeItem(s).resolveClass(abc));            
+        }
+        return abc.constants.getMultinameId(new Multiname(Multiname.TYPENAME,0,0,0,name_index,params),true);
     }
 
 }

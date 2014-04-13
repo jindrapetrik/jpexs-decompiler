@@ -50,7 +50,7 @@ public class GetPropertyIns extends InstructionDefinition {
         int ret = -1 + 1;
         int multinameIndex = ins.operands[0];
         int kind = abc.constants.getMultiname(multinameIndex).kind;
-        if (kind != Multiname.MULTINAMEL && kind != Multiname.MULTINAMELA) {
+        if (kind != Multiname.MULTINAMEL && kind != Multiname.MULTINAMELA) {  //FIXME!!!
             if (abc.constants.getMultiname(multinameIndex).needsName()) {
                 ret--;
             }

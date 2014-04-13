@@ -105,7 +105,7 @@ Identifier = [:jletter:][:jletterdigit:]*
 
 IdentifierNs = {Identifier} ":" {Identifier}
 
-TypeNameSpec = ".<" {Identifier} ">"
+TypeNameSpec = ".<"
 
 /* XML */
 XMLIdentifier = {Identifier} | {IdentifierNs}
@@ -280,7 +280,7 @@ SingleCharacter = [^\r\n\'\\]
   {LineTerminator}               { yyline++;}
   /* whitespace */
   {WhiteSpace}                   { /*ignore*/ }  
-  {TypeNameSpec}                 { String t=yytext(); return new ParsedSymbol(SymbolGroup.TYPENAME,SymbolType.TYPENAME,t.substring(2,t.length()-1)); }
+  {TypeNameSpec}                 { return new ParsedSymbol(SymbolGroup.TYPENAME,SymbolType.TYPENAME,yytext()); }
   {XMLBeginOneTag}                  {string.setLength(0);
                                     yybegin(XML); 
                                     String s=yytext();                                    

@@ -1,6 +1,6 @@
 TODO List for AS3 parser/compiler:
 ------------------------------
 - E4X (XML)
-- typenames (Vectors)
 - default xml namespace
 - custom namespace modifiers
+- fix setproperty, getproperty stats calculation (stack pos)

@@ -220,6 +220,7 @@ public class MethodBody implements Cloneable, Serializable {
     }
 
     public boolean autoFillStats(ABC abc, int initScope) {
+        //System.out.println("--------------");
         CodeStats stats = code.getStats(abc, this, initScope);
         if (stats == null) {
             return false;

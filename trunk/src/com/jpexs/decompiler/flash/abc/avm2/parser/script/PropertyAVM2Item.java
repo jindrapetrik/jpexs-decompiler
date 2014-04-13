@@ -94,7 +94,24 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     }
 
     private void resolve(SourceGeneratorLocalData localData, Reference<String> objectType, Reference<String> propertyType, Reference<Integer> propertyIndex) {
-        String objType = object == null ? null : object.returnType().toString();
+        String objType = null;
+        String objSubType = null;
+        if(object != null){
+            GraphTargetItem oretType = object.returnType();
+            if(oretType instanceof UnresolvedAVM2Item){
+                UnresolvedAVM2Item ur=(UnresolvedAVM2Item)oretType;
+                oretType = ur.resolved;
+            }
+            if(oretType instanceof TypeItem){
+                TypeItem t=(TypeItem)oretType;
+                objType = t.fullTypeName;
+                if(!t.subtypes.isEmpty()){
+                    objSubType = t.subtypes.get(0);
+                }
+            }else{
+                objType = oretType.toString();
+            }
+        }
         String propType = "";
         int propIndex = 0;
         if (scopeStack.isEmpty()) { //Everything is multiname when with command
@@ -225,6 +242,17 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 List<ABC> abcs = new ArrayList<>();
                 abcs.add(abc);
                 abcs.addAll(otherABCs);
+                if(objType.equals("__AS3__.vec.Vector")){
+                    if("int".equals(objSubType)){
+                        objType = "__AS3__.vec.Vector$int";
+                    }else if("Number".equals(objSubType)){
+                        objType = "__AS3__.vec.Vector$double";
+                    }else if("uint".equals(objSubType)){
+                        objType = "__AS3__.vec.Vector$uint";
+                    }else{
+                        objType = "__AS3__.vec.Vector$object";
+                    }                    
+                }
                 loopa:
                 for (ABC a : abcs) {
                     for (InstanceInfo ii : a.instance_info) {

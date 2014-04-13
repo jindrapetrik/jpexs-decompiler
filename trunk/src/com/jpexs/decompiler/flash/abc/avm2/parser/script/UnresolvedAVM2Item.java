@@ -38,6 +38,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,10 +60,11 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     private boolean mustBeType;
     public List<String> importedClasses;
     public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
+    public List<String> subtypes;
 
     @Override
     public AssignableAVM2Item copy() {
-        UnresolvedAVM2Item c = new UnresolvedAVM2Item(importedClasses, mustBeType, type, line, name, assignedValue, openedNamespaces);
+        UnresolvedAVM2Item c = new UnresolvedAVM2Item(subtypes, importedClasses, mustBeType, type, line, name, assignedValue, openedNamespaces);
         c.setNs(ns);
         c.nsKind = nsKind;
         c.setIndex(index);
@@ -152,7 +154,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return name;
     }
 
-    public UnresolvedAVM2Item(List<String> importedClasses, boolean mustBeType, GraphTargetItem type, int line, String name, GraphTargetItem storeValue, List<Integer> openedNamespaces) {
+    public UnresolvedAVM2Item(List<String> subtypes, List<String> importedClasses, boolean mustBeType, GraphTargetItem type, int line, String name, GraphTargetItem storeValue, List<Integer> openedNamespaces) {
         super(storeValue);
         this.name = name;
         this.assignedValue = storeValue;
@@ -161,6 +163,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         this.openedNamespaces = openedNamespaces;
         this.mustBeType = mustBeType;
         this.importedClasses = importedClasses;
+        this.subtypes = subtypes;
     }
 
     public boolean isDefinition() {
@@ -342,6 +345,18 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             }
             if (impName.equals(parts.get(0))) {
                 TypeItem ret = new TypeItem(imp);
+                for (String s : subtypes) {
+                    if (!subtypes.isEmpty() && parts.size() > 1) {
+                        continue;
+                    }
+                    UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<String>(), importedClasses, true, null, line, s, null, openedNamespaces);
+                    su.resolve(paramTypes, paramNames, abc, otherAbcs, callStack, variables);
+                    if (!(su.resolved instanceof TypeItem)) {
+                        throw new CompilationException("Not a type", line);
+                    }
+                    TypeItem st = (TypeItem) su.resolved;
+                    ret.subtypes.add(st.fullTypeName);
+                }
                 resolved = ret;
                 for (int i = 1; i < parts.size(); i++) {
                     resolved = new PropertyAVM2Item(resolved, parts.get(i), null, abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
@@ -360,18 +375,70 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             }
         }
 
-        //Search for types in opened namespaces
+        //Search all fully qualitfied types
         List<ABC> allAbcs = new ArrayList<>();
         allAbcs.add(abc);
         allAbcs.addAll(otherAbcs);
+        for (int i = 0; i < parts.size(); i++) {
+            String fname = Helper.joinStrings(parts.subList(0, i + 1), ".");
+            for (ABC a : allAbcs) {
+                for (int c = 0; c < a.instance_info.size(); c++) {
+                    if (fname.equals(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants))) {
+                        if (!subtypes.isEmpty() && parts.size() > i + 1) {
+                            continue;
+                        }
+                        TypeItem ret = new TypeItem(fname);
+                        for (String s : subtypes) {
+                            UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<String>(), importedClasses, true, null, line, s, null, openedNamespaces);
+                            su.resolve(paramTypes, paramNames, abc, otherAbcs, callStack, variables);
+                            if (!(su.resolved instanceof TypeItem)) {
+                                throw new CompilationException("Not a type", line);
+                            }
+                            TypeItem st = (TypeItem) su.resolved;
+                            ret.subtypes.add(st.fullTypeName);
+                        }
+                        resolved = ret;
+                        for (int j = i + 1; j < parts.size(); j++) {
+                            resolved = new PropertyAVM2Item(resolved, parts.get(j), null, abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
+                            if (j == parts.size() - 1) {
+                                ((PropertyAVM2Item) resolved).index = index;
+                                ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+                            }
+                        }
+                        if (parts.size() == i + 1 && index != null) {
+                            throw new CompilationException("Types do not have indices", line);
+                        }
+                        if (parts.size() == i + 1 && assignedValue != null) {
+                            throw new CompilationException("Cannot assign type", line);
+                        }
+
+                        return ret;
+                    }
+                }
+            }
+        }
+        
+        //Search for types in opened namespaces        
         for (int ni : openedNamespaces) {
-            Namespace ons = abc.constants.getNamespace(ni);
+            Namespace ons = abc.constants.getNamespace(ni);            
             for (ABC a : allAbcs) {
                 for (int c = 0; c < a.instance_info.size(); c++) {
                     if ((a == abc && a.instance_info.get(c).getName(a.constants).namespace_index == ni) || (ons.kind != Namespace.KIND_PRIVATE && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants).hasName(ons.getName(abc.constants), a.constants))) {
                         String cname = a.instance_info.get(c).getName(a.constants).getName(a.constants, new ArrayList<String>());
-                        if (cname.equals(parts.get(0))) {
+                        if (parts.get(0).equals(cname)) {
+                            if (!subtypes.isEmpty() && parts.size() > 1) {
+                                continue;
+                            }
                             TypeItem ret = new TypeItem(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants));
+                            for (String s : subtypes) {
+                                UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<String>(), importedClasses, true, null, line, s, null, openedNamespaces);
+                                su.resolve(paramTypes, paramNames, abc, otherAbcs, callStack, variables);
+                                if (!(su.resolved instanceof TypeItem)) {
+                                    throw new CompilationException("Not a type", line);
+                                }
+                                TypeItem st = (TypeItem) su.resolved;
+                                ret.subtypes.add(st.fullTypeName);
+                            }
                             resolved = ret;
                             for (int i = 1; i < parts.size(); i++) {
                                 resolved = new PropertyAVM2Item(resolved, parts.get(i), null, abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
@@ -413,6 +480,24 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             return ret;
         }
 
+        if(!subtypes.isEmpty() && parts.size()==1 && parts.get(0).equals("Vector")){
+            TypeItem ret = new TypeItem("__AS3__.vec.Vector");
+            for (String s : subtypes) {
+                UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<String>(), importedClasses, true, null, line, s, null, openedNamespaces);
+                su.resolve(paramTypes, paramNames, abc, otherAbcs, callStack, variables);
+                if (!(su.resolved instanceof TypeItem)) {
+                    throw new CompilationException("Not a type", line);
+                }
+                TypeItem st = (TypeItem) su.resolved;
+                ret.subtypes.add(st.fullTypeName);
+            }
+            resolved = ret;
+            return ret;
+        }
+        
+        if(mustBeType){
+            throw new CompilationException("Not a type", line);
+        }
         resolved = null;
         GraphTargetItem ret = null;
         for (int i = 0; i < parts.size(); i++) {

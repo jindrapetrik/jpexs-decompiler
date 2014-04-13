@@ -61,6 +61,6 @@ public class ApplyTypeIns extends InstructionDefinition {
 
     @Override
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -ins.operands[0] + 1;
+        return -ins.operands[0] - 1 + 1;
     }
 }
