@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewActivati
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewCatchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewClassIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewObjectIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfFalseIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictNeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfTrueIns;
@@ -44,6 +45,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.NextNameIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.NextValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSlotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
@@ -589,8 +591,22 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, FunctionAVM2Item item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
+        int scope = 0;
+        if(!item.functionName.equals("")){
+            ret.add(ins(new NewObjectIns(),0));
+            ret.add(ins(new PushWithIns()));
+            scope=localData.scopeStack.size();
+            localData.scopeStack.add(new PropertyAVM2Item(null, item.functionName, null, abc, allABCs, new ArrayList<Integer>(), localData.callStack));
+        }
         ret.add(ins(new NewFunctionIns(), method(localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, null, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));
-
+        if(!item.functionName.equals("")){
+            ret.add(ins(new DupIns()));
+            ret.add(ins(new GetScopeObjectIns(),scope));
+            ret.add(ins(new SwapIns()));
+            ret.add(ins(new SetPropertyIns(),abc.constants.getMultinameId(new Multiname(Multiname.QNAME, abc.constants.getStringId(item.functionName, true), abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(localData.pkg, true)), 0, true), 0, 0, new ArrayList<Integer>()), true)));
+            ret.add(ins(new PopScopeIns()));
+            localData.scopeStack.remove(localData.scopeStack.size()-1);
+        }
         return ret;
     }
 
