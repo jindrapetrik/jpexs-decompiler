@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.NameAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -40,6 +41,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
     public List<NameAVM2Item> catchExceptions2;
     public List<List<GraphTargetItem>> catchCommands;
     public List<GraphTargetItem> finallyCommands;
+    public List<List<AssignableAVM2Item>> catchVariables = new ArrayList<List<AssignableAVM2Item>>();
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {

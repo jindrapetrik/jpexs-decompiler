@@ -16,9 +16,15 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -28,6 +34,7 @@ public class WithAVM2Item extends AVM2Item {
 
     public GraphTargetItem scope;
     public List<GraphTargetItem> items;
+    public List<AssignableAVM2Item> subvariables = new ArrayList<AssignableAVM2Item>();
 
     public WithAVM2Item(AVM2Instruction instruction, GraphTargetItem scope, List<GraphTargetItem> items) {
         super(instruction, NOPRECEDENCE);
@@ -73,4 +80,10 @@ public class WithAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return false;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return ((AVM2SourceGenerator) generator).generate(localData, this);
+    }
+
 }

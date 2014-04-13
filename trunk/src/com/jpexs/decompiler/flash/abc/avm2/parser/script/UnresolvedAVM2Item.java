@@ -58,6 +58,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem resolved;
     private boolean mustBeType;
     public List<String> importedClasses;
+    public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
 
     @Override
     public AssignableAVM2Item copy() {
@@ -302,33 +303,35 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             return resolved;
         }
 
-        //search for variable
-        for (AssignableAVM2Item a : variables) {
-            if (a instanceof NameAVM2Item) {
-                NameAVM2Item n = (NameAVM2Item) a;
-                if (n.isDefinition() && parts.get(0).equals(n.getVariableName())) {
-                    NameAVM2Item ret = new NameAVM2Item(n.type, n.line, parts.get(0), null, false, openedNamespaces);
-                    ret.setSlotScope(n.getSlotScope());
-                    ret.setSlotNumber(n.getSlotNumber());
-                    ret.setRegNumber(n.getRegNumber());
-                    resolved = ret;
-                    for (int i = 1; i < parts.size(); i++) {
-                        resolved = new PropertyAVM2Item(resolved, parts.get(i), null, abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
-                        if (i == parts.size() - 1) {
-                            ((PropertyAVM2Item) resolved).index = index;
-                            ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+        if (scopeStack.isEmpty()) { //Everything is multiname property in with command
+
+            //search for variable
+            for (AssignableAVM2Item a : variables) {
+                if (a instanceof NameAVM2Item) {
+                    NameAVM2Item n = (NameAVM2Item) a;
+                    if (n.isDefinition() && parts.get(0).equals(n.getVariableName())) {
+                        NameAVM2Item ret = new NameAVM2Item(n.type, n.line, parts.get(0), null, false, openedNamespaces);
+                        ret.setSlotScope(n.getSlotScope());
+                        ret.setSlotNumber(n.getSlotNumber());
+                        ret.setRegNumber(n.getRegNumber());
+                        resolved = ret;
+                        for (int i = 1; i < parts.size(); i++) {
+                            resolved = new PropertyAVM2Item(resolved, parts.get(i), null, abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
+                            if (i == parts.size() - 1) {
+                                ((PropertyAVM2Item) resolved).index = index;
+                                ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+                            }
                         }
+                        if (parts.size() == 1) {
+                            ret.setIndex(index);
+                            ret.setAssignedValue(assignedValue);
+                        }
+                        ret.setNs(n.getNs());
+                        return ret;
                     }
-                    if (parts.size() == 1) {
-                        ret.setIndex(index);
-                        ret.setAssignedValue(assignedValue);
-                    }
-                    ret.setNs(n.getNs());
-                    return ret;
                 }
             }
         }
-
         //Search for types in imported classes
         for (String imp : importedClasses) {
             String impName = imp;
@@ -415,6 +418,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         for (int i = 0; i < parts.size(); i++) {
             resolved = new PropertyAVM2Item(resolved, parts.get(i), (i == parts.size() - 1) ? index : null, abc, otherAbcs, openedNamespaces, callStack);
             if (ret == null) {
+                ((PropertyAVM2Item) resolved).scopeStack = scopeStack;
                 ret = resolved;
             }
         }

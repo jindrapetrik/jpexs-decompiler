@@ -865,6 +865,7 @@ public class ActionScriptParser {
                 openedNamespaces.add(abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE /*FIXME?*/, abc.constants.getStringId(ns.toString(), true)), 0, true));
                 break;
             case WITH:
+                needsActivation.setVal(true);
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem wvar = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//(name(false, openedNamespaces, registerVars, inFunction, inMethod, variables));
                 if (!isNameOrProp(wvar)) {
@@ -872,9 +873,18 @@ public class ActionScriptParser {
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
                 expectedType(SymbolType.CURLY_OPEN);
-                List<GraphTargetItem> wcmd = commands(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, variables);
+                List<AssignableAVM2Item> withVars = new ArrayList<>();
+                List<GraphTargetItem> wcmd = commands(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, withVars);
+                variables.addAll(withVars);
+                for (AssignableAVM2Item a : withVars) {
+                    if (a instanceof UnresolvedAVM2Item) {
+                        UnresolvedAVM2Item ua = (UnresolvedAVM2Item) a;
+                        ua.scopeStack.add(0, wvar);
+                    }
+                }
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = new WithAVM2Item(null, wvar, wcmd);
+                ((WithAVM2Item) ret).subvariables = withVars;
                 break;
             /*case DELETE:
              GraphTargetItem varDel = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(false, openedNamespaces, registerVars, inFunction, inMethod, variables);
@@ -1176,6 +1186,7 @@ public class ActionScriptParser {
                 List<List<GraphTargetItem>> catchCommands = new ArrayList<>();
                 List<NameAVM2Item> catchExceptions = new ArrayList<>();
                 int varCnt = variables.size();
+                List<List<AssignableAVM2Item>> catchesVars = new ArrayList<>();
                 while (s.type == SymbolType.CATCH) {
                     expectedType(SymbolType.PARENT_OPEN);
                     s = lex();
@@ -1188,10 +1199,30 @@ public class ActionScriptParser {
                     variables.add(e);
                     catchExceptions.add(e);
                     e.setSlotNumber(1);
-                    e.setSlotScope(2); //?
+                    e.setSlotScope(Integer.MAX_VALUE); //will be changed later
                     expectedType(SymbolType.PARENT_CLOSE);
                     List<GraphTargetItem> cc = new ArrayList<>();
-                    cc.add(command(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables));
+                    List<AssignableAVM2Item> catchVars = new ArrayList<>();
+                    cc.add(command(needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, catchVars));
+                    catchesVars.add(catchVars);
+                    variables.addAll(catchVars);
+
+                    for (AssignableAVM2Item a : catchVars) {
+                        if (a instanceof UnresolvedAVM2Item) {
+                            UnresolvedAVM2Item ui = (UnresolvedAVM2Item) a;
+                            if (ui.getVariableName().equals(e.getVariableName())) {
+                                try {
+                                    ui.resolve(new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), variables);
+                                } catch (CompilationException ex) {
+                                    //ignore
+                                }
+                                ui.setSlotNumber(e.getSlotNumber());
+                                ui.setSlotScope(e.getSlotScope());
+                            }
+
+                        }
+                    }
+
                     catchCommands.add(cc);
                     s = lex();
                     found = true;
@@ -1227,6 +1258,7 @@ public class ActionScriptParser {
                 }
                 lexer.pushback(s);
                 TryAVM2Item tai = new TryAVM2Item(tryCommands, null, catchCommands, finallyCommands);
+                tai.catchVariables = catchesVars;
                 tai.catchExceptions2 = catchExceptions;
                 ret = tai;
                 break;
@@ -1496,6 +1528,9 @@ public class ActionScriptParser {
     }
 
     private boolean isNameOrProp(GraphTargetItem item) {
+        if (item instanceof UnresolvedAVM2Item) {
+            return true; //we don't know yet
+        }
         if (item instanceof NameAVM2Item) {
             return true;
         }
