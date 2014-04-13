@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -49,11 +48,13 @@ public class GetPropertyIns extends InstructionDefinition {
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         int ret = -1 + 1;
         int multinameIndex = ins.operands[0];
-        int kind = abc.constants.getMultiname(multinameIndex).kind;
-        if (kind != Multiname.MULTINAMEL && kind != Multiname.MULTINAMELA) {  //FIXME!!!
-            if (abc.constants.getMultiname(multinameIndex).needsName()) {
-                ret--;
-            }
+        //Note: In official compiler, the stack can be wrong(greater) for some MULTINAMEL/A, e.g. increments
+        /*
+                        var arr=[1,2,3];
+			return arr[2]++;
+         */
+        if (abc.constants.getMultiname(multinameIndex).needsName()) {
+            ret--;
         }
         if (abc.constants.getMultiname(multinameIndex).needsNs()) {
             ret--;

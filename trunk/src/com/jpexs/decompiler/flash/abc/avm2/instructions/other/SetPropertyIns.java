@@ -134,10 +134,11 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         int ret = -2;
         int multinameIndex = ins.operands[0];
-        int multinameKind = abc.constants.getMultiname(multinameIndex).kind;
-        if (multinameKind == Multiname.MULTINAMEL || multinameKind == Multiname.MULTINAMELA) { //FIXME!!!
-            return 0;
-        }
+        //Note: In official compiler, the stack can be wrong(greater) for some MULTINAMEL/A, e.g. increments
+        /*
+                var arr=[1,2,3];
+		trace(arr[2]++);
+        */
         if (abc.constants.getMultiname(multinameIndex).needsName()) {
             ret--;
         }
