@@ -1723,12 +1723,7 @@ public class ActionScriptParser {
                 if (!isNameOrProp(varDel)) {
                     throw new ParseException("Not a property or name", lexer.yyline());
                 }
-                if (varDel instanceof GetPropertyAVM2Item) {
-                    GetPropertyAVM2Item gm = (GetPropertyAVM2Item) varDel;
-                    ret = new DeletePropertyAVM2Item(null, gm.object, gm.propertyName);
-                } else {
-                    throw new ParseException("Not a property", lexer.yyline());
-                }
+                ret = new DeletePropertyAVM2Item(varDel, lexer.yyline());
                 break;
             case INCREMENT:
             case DECREMENT: //preincrement
