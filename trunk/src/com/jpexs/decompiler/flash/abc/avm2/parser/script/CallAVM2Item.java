@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -82,7 +83,8 @@ public class CallAVM2Item extends AVM2Item {
             Reference<String> outPropNs = new Reference<>("");
             Reference<Integer> outPropNsKind = new Reference<>(1);
             Reference<String> outPropType = new Reference<>("");
-            if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropType)) {
+            Reference<ValueKind> outPropValue = new Reference<>(null);
+            if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), n.line, "this", null, false, n.openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;
@@ -112,7 +114,8 @@ public class CallAVM2Item extends AVM2Item {
                 Reference<String> outPropNs = new Reference<>("");
                 Reference<Integer> outPropNsKind = new Reference<>(1);
                 Reference<String> outPropType = new Reference<>("");
-                if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType)) {
+                Reference<ValueKind> outPropValue = new Reference<>(null);
+                if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, new ArrayList<Integer>());
                     nobj.setRegNumber(0);
                     obj = nobj;

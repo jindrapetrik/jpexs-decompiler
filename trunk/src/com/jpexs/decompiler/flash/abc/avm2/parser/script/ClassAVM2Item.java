@@ -37,6 +37,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
     public int protectedNs;
     public boolean isDynamic;
     public boolean isFinal;
+    public List<Integer> openedNamespaces;
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
@@ -47,7 +48,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         return ret;
     }
 
-    public ClassAVM2Item(int protectedNs, boolean isDynamic, boolean isFinal, int namespace, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> traits) {
+    public ClassAVM2Item(List<Integer> openedNamespaces, int protectedNs, boolean isDynamic, boolean isFinal, int namespace, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.protectedNs = protectedNs;
         this.className = className;
@@ -58,6 +59,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         this.namespace = namespace;
         this.isDynamic = isDynamic;
         this.isFinal = isFinal;
+        this.openedNamespaces = openedNamespaces;
     }
 
     @Override

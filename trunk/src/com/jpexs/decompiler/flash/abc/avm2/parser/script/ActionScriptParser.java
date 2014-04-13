@@ -73,6 +73,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.URShiftAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -296,9 +297,9 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private MethodAVM2Item method(Reference<Boolean> needsActivation, List<String> importedClasses, boolean override, boolean isFinal, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean isStatic, int namespace, boolean withBody, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
+    private MethodAVM2Item method(String customAccess, Reference<Boolean> needsActivation, List<String> importedClasses, boolean override, boolean isFinal, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean isStatic, int namespace, boolean withBody, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         FunctionAVM2Item f = function(needsActivation, importedClasses, namespace, thisType, openedNamespaces, withBody, functionName, isMethod, variables);
-        return new MethodAVM2Item(f.needsActivation, f.hasRest, f.line, override, isFinal, isStatic, f.namespace, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
+        return new MethodAVM2Item(customAccess,f.needsActivation, f.hasRest, f.line, override, isFinal, isStatic, f.namespace, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
     }
 
     private FunctionAVM2Item function(Reference<Boolean> needsActivation, List<String> importedClasses, int namespace, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean withBody, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
@@ -391,27 +392,28 @@ public class ActionScriptParser {
             boolean isOverride = false;
             boolean isFinal = false;
             boolean isDynamic = false;
+            String customAccess = null;
             //TODO: namespace name
             //TODO: final, dynamic
-            while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC)) {
+            while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.IDENTIFIER)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new ParseException("Only one final keyword allowed", lexer.yyline());
                     }
                     isFinal = true;
-                }
+                }else
                 if (s.type == SymbolType.DYNAMIC) {
                     if (isDynamic) {
                         throw new ParseException("Only one dynamic keyword allowed", lexer.yyline());
                     }
                     isDynamic = true;
-                }
+                }else
                 if (s.type == SymbolType.OVERRIDE) {
                     if (isOverride) {
                         throw new ParseException("Only one override keyword allowed", lexer.yyline());
                     }
                     isOverride = true;
-                }
+                }else
                 if (s.type == SymbolType.STATIC) {
                     if (isInterface) {
                         throw new ParseException("Interface cannot have static traits", lexer.yyline());
@@ -423,6 +425,9 @@ public class ActionScriptParser {
                         throw new ParseException("Only one static keyword allowed", lexer.yyline());
                     }
                     isStatic = true;
+                } else if(s.type == SymbolType.IDENTIFIER){
+                    customAccess = s.value.toString();
+                    namespace = -2;
                 } else {
                     if (namespace != -1) {
                         throw new ParseException("Only one access identifier allowed", lexer.yyline());
@@ -475,6 +480,9 @@ public class ActionScriptParser {
                         } while (s.type == SymbolType.COMMA);
                     }
                     expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
+                    if(customAccess!=null){
+                        throw new ParseException("Class cannot have custom namespace", lexer.yyline());
+                    }
                     traits.add((classTraits(packageInternalNs, importedClasses, privateNs, isDynamic, isFinal, openedNamespaces, packageName, namespace, false, classTypeStr, extendsTypeStr, implementsTypeStrs, variables)));
                     expectedType(SymbolType.CURLY_CLOSE);
                     break;
@@ -506,6 +514,9 @@ public class ActionScriptParser {
                         } while (s.type == SymbolType.COMMA);
                     }
                     expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
+                    if(customAccess!=null){
+                        throw new ParseException("Interface cannot have custom namespace", lexer.yyline());
+                    }
                     traits.add((classTraits(packageInternalNs, importedClasses, privateNs, false, isFinal, openedNamespaces, packageName, namespace, true, intTypeStr, null, intExtendsTypeStrs, variables)));
                     expectedType(SymbolType.CURLY_CLOSE);
                     break;
@@ -545,29 +556,29 @@ public class ActionScriptParser {
                         if (isFinal) {
                             throw new ParseException("Final flag not allowed for constructor", lexer.yyline());
                         }
-                        constr = (method(new Reference<Boolean>(false), importedClasses, false, false, thisType, openedNamespaces, false, namespace, !isInterface, "", true, variables));
+                        constr = (method(customAccess,new Reference<Boolean>(false), importedClasses, false, false, thisType, openedNamespaces, false, namespace, !isInterface, "", true, variables));
                     } else {
                         if (isStatic) {
                             GraphTargetItem t;
-                            MethodAVM2Item ft = method(new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, !isInterface, fname, true, variables);
+                            MethodAVM2Item ft = method(customAccess,new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, !isInterface, fname, true, variables);
                             traits.add(ft);
                             if (isGetter || isSetter) {
                                 throw new ParseException("Getter or Setter cannot be static", lexer.yyline());
                             }
                         } else {
-                            MethodAVM2Item ft = method(new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, !isInterface, fname, true, variables);
+                            MethodAVM2Item ft = method(customAccess,new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, !isInterface, fname, true, variables);
                             GraphTargetItem t;
                             if (isGetter) {
                                 if (!ft.paramTypes.isEmpty()) {
                                     throw new ParseException("Getter can't have any parameters", lexer.yyline());
                                 }
-                                GetterAVM2Item g = new GetterAVM2Item(ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                GetterAVM2Item g = new GetterAVM2Item(customAccess,ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = g;
                             } else if (isSetter) {
                                 if (ft.paramTypes.size() != 1) {
                                     throw new ParseException("Getter must have exactly one parameter", lexer.yyline());
                                 }
-                                SetterAVM2Item st = new SetterAVM2Item(ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                SetterAVM2Item st = new SetterAVM2Item(customAccess,ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = st;
                             } else {
                                 t = ft;
@@ -597,7 +608,7 @@ public class ActionScriptParser {
                         lexer.pushback(s);
                     }
 
-                    ConstAVM2Item ns = new ConstAVM2Item(true, namespace, nname, new TypeItem("Namespace"), new StringAVM2Item(null, nval));
+                    ConstAVM2Item ns = new ConstAVM2Item(customAccess,true, namespace, nname, new TypeItem("Namespace"), new StringAVM2Item(null, nval));
                     traits.add(ns);
                     break;
                 case CONST:
@@ -631,9 +642,9 @@ public class ActionScriptParser {
                     }
                     GraphTargetItem tar;
                     if (isConst) {
-                        tar = new ConstAVM2Item(isStatic, namespace, vcname, type, value);
+                        tar = new ConstAVM2Item(customAccess,isStatic, namespace, vcname, type, value);
                     } else {
-                        tar = new SlotAVM2Item(isStatic, namespace, vcname, type, value);
+                        tar = new SlotAVM2Item(customAccess,isStatic, namespace, vcname, type, value);
                     }
                     traits.add(tar);
                     if (s.type != SymbolType.SEMICOLON) {
@@ -683,9 +694,9 @@ public class ActionScriptParser {
         GraphTargetItem constr = traits(importedClasses, privateNs, protectedNs, publicNs, packageInternalNs, protectedStaticNs, openedNamespaces, packageName, classNameStr, isInterface, traits);
 
         if (isInterface) {
-            return new InterfaceAVM2Item(isFinal, namespace, classNameStr, implementsStr, traits);
+            return new InterfaceAVM2Item(openedNamespaces,isFinal, namespace, classNameStr, implementsStr, traits);
         } else {
-            return new ClassAVM2Item(protectedNs, isDynamic, isFinal, namespace, classNameStr, extendsStr, implementsStr, constr, traits);
+            return new ClassAVM2Item(openedNamespaces,protectedNs, isDynamic, isFinal, namespace, classNameStr, extendsStr, implementsStr, constr, traits);
         }
     }
 

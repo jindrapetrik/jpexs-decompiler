@@ -31,6 +31,7 @@ public class ConstAVM2Item extends AVM2Item {
     private boolean isStatic;
     public String var;
     public GraphTargetItem type;
+    public String customNamespace;
 
     public int getNamespace() {
         return namespace;
@@ -40,13 +41,14 @@ public class ConstAVM2Item extends AVM2Item {
         return isStatic;
     }
 
-    public ConstAVM2Item(boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value) {
+    public ConstAVM2Item(String customNamespace,boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value) {
         super(null, NOPRECEDENCE);
         this.namespace = namespace;
         this.value = value;
         this.isStatic = isStatic;
         this.var = var;
         this.type = type;
+        this.customNamespace = customNamespace;
     }
 
     @Override

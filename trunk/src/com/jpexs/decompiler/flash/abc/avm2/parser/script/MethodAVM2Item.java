@@ -30,12 +30,14 @@ public class MethodAVM2Item extends FunctionAVM2Item {
     private boolean isStatic;
     private boolean isFinal;
     private boolean override;
+    public String customNamespace;
 
-    public MethodAVM2Item(boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespace, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+    public MethodAVM2Item(String customNamespace, boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespace, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
         super(needsActivation, namespace, hasRest, line, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
         this.isStatic = isStatic;
         this.override = override;
         this.isFinal = isFinal;
+        this.customNamespace = customNamespace;
     }
 
     public boolean isOverride() {
