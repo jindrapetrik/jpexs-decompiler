@@ -216,7 +216,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 ins = ins(new CoerceSIns());
                 break;
             default:
-                int type_index = new TypeItem(type).resolveClass(((AVM2SourceGenerator) generator).abc);
+                int type_index = AVM2SourceGenerator.resolveType(new TypeItem(type),((AVM2SourceGenerator) generator).abc);
                 ins = ins(new CoerceIns(), type_index);
                 break;
         }

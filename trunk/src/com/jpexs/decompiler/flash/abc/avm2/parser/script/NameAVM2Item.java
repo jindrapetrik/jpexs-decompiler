@@ -221,12 +221,12 @@ public class NameAVM2Item extends AssignableAVM2Item {
                         ins = ins(new CoerceSIns());
                         break;
                     default:
-                        int type_index = type.resolveClass(((AVM2SourceGenerator) generator).abc);
+                        int type_index = AVM2SourceGenerator.resolveType(type,((AVM2SourceGenerator) generator).abc);
                         ins = ins(new CoerceIns(), type_index);
                         break;
                 }
             } else {
-                int type_index = type.resolveClass(((AVM2SourceGenerator) generator).abc);
+                int type_index = AVM2SourceGenerator.resolveType(type,((AVM2SourceGenerator) generator).abc);
                 ins = ins(new CoerceIns(), type_index);
             }
         }

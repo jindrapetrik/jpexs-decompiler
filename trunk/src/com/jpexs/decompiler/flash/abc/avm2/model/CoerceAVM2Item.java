@@ -116,7 +116,7 @@ public class CoerceAVM2Item extends AVM2Item {
                 ins = new AVM2Instruction(0, new CoerceSIns(), new int[]{}, new byte[0]);
                 break;
             default:
-                int type_index = new TypeItem(type).resolveClass(((AVM2SourceGenerator) generator).abc);
+                int type_index = AVM2SourceGenerator.resolveType(new TypeItem(type),(((AVM2SourceGenerator) generator).abc));
                 ins = new AVM2Instruction(0, new CoerceIns(), new int[]{type_index}, new byte[0]);
                 break;
         }

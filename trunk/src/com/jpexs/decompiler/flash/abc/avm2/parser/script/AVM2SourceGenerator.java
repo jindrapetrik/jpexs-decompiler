@@ -36,8 +36,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetSlotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.HasNext2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.InitPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.LabelIns;
@@ -1077,6 +1079,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         Trait[] it = generateTraitsPhase1(pkg, name, superName, false, localData, traitItems, instanceInfo.instance_traits);
         Trait[] st = generateTraitsPhase1(pkg, name, superName, true, localData, traitItems, classInfo.static_traits);
         generateTraitsPhase2(pkg.packageName,traitItems, it, openedNamespaces, localData);
+        generateTraitsPhase2(pkg.packageName,traitItems, st, openedNamespaces, localData);
         generateTraitsPhase3(initScope, pkg, name, superName, false, localData, traitItems, instanceInfo.instance_traits, it);
         generateTraitsPhase3(initScope, pkg, name, superName, true, localData, traitItems, classInfo.static_traits, st);
         if (constructor == null) {
@@ -1259,6 +1262,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         newlocalData.pkg = localData.pkg;
         newlocalData.callStack.addAll(localData.callStack);
         newlocalData.traitUsages = localData.traitUsages;
+        newlocalData.currentScript = localData.currentScript;
+        newlocalData.documentClass = localData.documentClass;
         localData = newlocalData;
 
         localData.activationReg = 0;
@@ -1714,7 +1719,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 if (mai.isStatic() != generateStatic) {
                     continue;
                 }
-                ((TraitMethodGetterSetter) traits[k]).method_info = method(new ArrayList<MethodBody>(), pkg.packageName, mai.needsActivation, mai.subvariables, initScope + 1/*class scope*/, mai.hasRest, mai.line, className, superName, false, localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
+                ((TraitMethodGetterSetter) traits[k]).method_info = method(new ArrayList<MethodBody>(), pkg.packageName, mai.needsActivation, mai.subvariables, initScope + (mai.isStatic()?0:1), mai.hasRest, mai.line, className, superName, false, localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
             } else if (item instanceof FunctionAVM2Item) {
                 FunctionAVM2Item fai = (FunctionAVM2Item) item;
                 ((TraitFunction) traits[k]).method_info = method(new ArrayList<MethodBody>(), pkg.packageName, fai.needsActivation, fai.subvariables, initScope, fai.hasRest, fai.line, className, superName, false, localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
@@ -1823,7 +1828,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 tmgs.kindType = (item instanceof MethodAVM2Item) ? Trait.TRAIT_METHOD : ((item instanceof GetterAVM2Item) ? Trait.TRAIT_GETTER : Trait.TRAIT_SETTER);
                 //tmgs.name_index = traitName(((MethodAVM2Item) item).namespace, ((MethodAVM2Item) item).functionName);
                 tmgs.disp_id = 0; //0 = disable override optimization;  TODO: handle this
-                if (mai.isFinal()) {
+                if (mai.isFinal()||mai.isStatic()) {
                     tmgs.kindFlags |= Trait.ATTR_Final;
                 }
                 if (mai.isOverride()) {
@@ -1845,8 +1850,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return traits;
     }
 
-    public ScriptInfo generateScriptInfo(PackageAVM2Item pkg, SourceGeneratorLocalData localData, List<GraphTargetItem> commands, boolean documentClass) throws ParseException, CompilationException {
+    public ScriptInfo generateScriptInfo(PackageAVM2Item pkg, SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws ParseException, CompilationException {
         ScriptInfo si = new ScriptInfo();
+        localData.currentScript = si;
         Trait[] traitArr = generateTraitsPhase1(pkg, null, null, false, localData, commands, si.traits);
         generateTraitsPhase2(pkg.packageName,commands, traitArr, new ArrayList<Integer>(), localData);
         MethodInfo mi = new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]);
@@ -1855,6 +1861,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         mb.code = new AVM2Code();
         mb.code.code.add(ins(new GetLocal0Ins()));
         mb.code.code.add(ins(new PushScopeIns()));
+        
 
         int traitScope = 1;
 
@@ -1863,7 +1870,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 TraitClass tc = (TraitClass) t;
                 List<Integer> parents = new ArrayList<>();
                 parentNamesAddNames(abc, allABCs, abc.instance_info.get(tc.class_info).name_index, parents, new ArrayList<String>(), new ArrayList<String>());
-                if (documentClass) {
+                if (localData.documentClass) {
                     mb.code.code.add(ins(new GetScopeObjectIns(), 0));
                     traitScope++;
                 } else {
@@ -1885,7 +1892,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         mb.code.code.add(ins(new ReturnVoidIns()));
-        mb.autoFillStats(abc, documentClass ? 1 : 0);
+        mb.autoFillStats(abc, localData.documentClass ? 1 : 0);
         abc.addMethodBody(mb);
         si.init_index = mb.method_info;
         localData.pkg = pkg.packageName;
@@ -2066,5 +2073,67 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
         return 0;
+    }
+
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TypeItem item) throws CompilationException {
+        String currentFullClassName = localData.currentClass==null?null:(localData.pkg.equals("")?localData.currentClass:localData.pkg+"."+localData.currentClass);
+        
+        if(localData.documentClass && item.toString().equals(currentFullClassName)){            
+            int slotId = 0;
+            int c = abc.findClassByName(currentFullClassName);
+            for(Trait t:localData.currentScript.traits.traits){
+                if(t instanceof TraitClass){
+                    TraitClass tc=(TraitClass)t;
+                    if(tc.class_info == c){
+                        slotId = tc.slot_id;
+                        break;
+                    }
+                }
+            }
+            return GraphTargetItem.toSourceMerge(localData, this, ins(new GetGlobalScopeIns()),ins(new GetSlotIns(),slotId));
+        }else{                        
+            return GraphTargetItem.toSourceMerge(localData, this, ins(new GetLexIns(),resolveType(item, abc)));
+        }
+    }
+    
+    
+    public static int resolveType(TypeItem type,ABC abc) {
+        String name = type.fullTypeName;
+        String pkg = "";
+        int name_index = 0;
+        if (name.contains(".")) {
+            pkg = name.substring(0, name.lastIndexOf('.'));
+            name = name.substring(name.lastIndexOf('.') + 1);
+        }
+        for (InstanceInfo ii : abc.instance_info) {
+            Multiname mname = abc.constants.constant_multiname.get(ii.name_index);
+            if (mname.getName(abc.constants, new ArrayList<String>()).equals(name)) {
+                if (mname.getNamespace(abc.constants).hasName(pkg, abc.constants)) {
+                    name_index = ii.name_index;
+                    break;
+                }
+            }
+        }
+        for (int i = 1; i < abc.constants.constant_multiname.size(); i++) {
+            Multiname mname = abc.constants.constant_multiname.get(i);
+            if (name.equals(mname.getName(abc.constants, new ArrayList<String>()))) {
+                if (pkg.equals(mname.getNamespace(abc.constants).getName(abc.constants))) {
+                    name_index = i;
+                    break;
+                }
+            }
+        }
+        if(name_index == 0){
+            name_index = abc.constants.getMultinameId(new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId(pkg, true)), 0, true), 0, 0, new ArrayList<Integer>()), true);
+        }
+        if(type.subtypes.isEmpty()){
+            return name_index;
+        }
+        List<Integer> params=new ArrayList<>();
+        for(String s:type.subtypes){
+            params.add(resolveType(new TypeItem(s),abc));            
+        }
+        return abc.constants.getMultinameId(new Multiname(Multiname.TYPENAME,0,0,0,name_index,params),true);
     }
 }

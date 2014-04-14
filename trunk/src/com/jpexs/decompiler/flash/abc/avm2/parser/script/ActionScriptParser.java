@@ -683,7 +683,7 @@ public class ActionScriptParser {
         List<Integer> indices = new ArrayList<>();
         List<String> names = new ArrayList<>();
         List<String> namespaces = new ArrayList<>();
-        AVM2SourceGenerator.parentNamesAddNames(abc, otherABCs, ((TypeItem) ((UnresolvedAVM2Item) extendsStr).resolve(new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), new ArrayList<AssignableAVM2Item>())).resolveClass(abc), indices, names, namespaces);
+        AVM2SourceGenerator.parentNamesAddNames(abc, otherABCs, AVM2SourceGenerator.resolveType(((TypeItem) ((UnresolvedAVM2Item) extendsStr).resolve(new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), new ArrayList<AssignableAVM2Item>())),abc), indices, names, namespaces);
         for (int i = 0; i < names.size(); i++) {
             if (namespaces.get(i).isEmpty()) {
                 continue;
@@ -1806,7 +1806,8 @@ public class ActionScriptParser {
                 className = ((ClassAVM2Item) it).className;
             }
         }
-        abc.script_info.add(gen.generateScriptInfo(pkg, localData, pkg.items, documentClass));
+        localData.documentClass = documentClass;
+        abc.script_info.add(gen.generateScriptInfo(pkg, localData, pkg.items));
     }
 
     public void addScript(String s, boolean documentClass, String fileName) throws ParseException, IOException, CompilationException {

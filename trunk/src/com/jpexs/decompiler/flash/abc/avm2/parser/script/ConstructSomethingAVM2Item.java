@@ -70,7 +70,6 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
         if (resname instanceof UnresolvedAVM2Item) {
             resname = ((UnresolvedAVM2Item) resname).resolved;
         }
-
         if (resname instanceof TypeItem) {
             TypeItem prop = (TypeItem) resname;
             if(!prop.subtypes.isEmpty()){ //It's Vector - TypeName

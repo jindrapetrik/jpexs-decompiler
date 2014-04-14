@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -47,6 +48,8 @@ public class SourceGeneratorLocalData implements Serializable {
     public Map<MethodBody, List<Integer>> traitUsages = new HashMap<>();
     public String pkg = "";
     public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
+    public boolean documentClass;
+    public ScriptInfo currentScript;
 
     public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {
         this.registerVars = registerVars;

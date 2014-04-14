@@ -49,6 +49,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
@@ -763,4 +764,12 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.addAll(lastExpr.toSource(localData, this));
         return ret;
     }
+
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TypeItem item) throws CompilationException {
+        //Unsupported in AS1/2
+        return new ArrayList<>();
+    }
+    
+    
 }
