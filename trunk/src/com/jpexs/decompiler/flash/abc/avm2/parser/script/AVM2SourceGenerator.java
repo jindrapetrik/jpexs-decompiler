@@ -1730,6 +1730,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public Trait[] generateTraitsPhase1(PackageAVM2Item pkg, String className, String superName, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts) throws ParseException, CompilationException {
         Trait[] traits = new Trait[items.size()];
         int slot_id = 1;
+        int disp_id = 3; //1 and 2 are for constructor
         for (int k = 0; k < items.size(); k++) {
             GraphTargetItem item = items.get(k);
             if (item instanceof InterfaceAVM2Item) {
@@ -1827,7 +1828,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 TraitMethodGetterSetter tmgs = new TraitMethodGetterSetter();
                 tmgs.kindType = (item instanceof MethodAVM2Item) ? Trait.TRAIT_METHOD : ((item instanceof GetterAVM2Item) ? Trait.TRAIT_GETTER : Trait.TRAIT_SETTER);
                 //tmgs.name_index = traitName(((MethodAVM2Item) item).namespace, ((MethodAVM2Item) item).functionName);
-                tmgs.disp_id = 0; //0 = disable override optimization;  TODO: handle this
+                tmgs.disp_id = mai.isStatic()?disp_id++:0; //For a reason, there is disp_id only for static methods (or not?)
                 if (mai.isFinal()||mai.isStatic()) {
                     tmgs.kindFlags |= Trait.ATTR_Final;
                 }
