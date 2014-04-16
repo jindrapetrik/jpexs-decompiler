@@ -56,7 +56,7 @@ public class PathExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void endShape(double xMin, double yMin, double xMax, double yMax) {
+    public void endShape() {
 
     }
 

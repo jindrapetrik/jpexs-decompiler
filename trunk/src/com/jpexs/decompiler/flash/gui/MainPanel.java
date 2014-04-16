@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.MorphshapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
@@ -234,7 +235,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     // play morph shape in 2 second(s)
     // this settings should be synchronized with frameCount and frameRate
-    // settings in Mainpanel.createAndShowTempSwf
+    // settings in MainPanel.createAndShowTempSwf
     static final int morphShapeAnimationLength = 2;
 
     static final int morphShapeAnimationFrameRate = 30;
@@ -1138,6 +1139,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (nodeType == TreeNodeType.SHAPE) {
                     ret.add((Tag) n.getItem());
                 }
+                if (nodeType == TreeNodeType.MORPH_SHAPE) {
+                    ret.add((Tag) n.getItem());
+                }
                 if (nodeType == TreeNodeType.AS) {
                     ret.add(n);
                 }
@@ -1183,6 +1187,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 List<ScriptPack> as3scripts = new ArrayList<>();
                 List<Tag> images = new ArrayList<>();
                 List<Tag> shapes = new ArrayList<>();
+                List<Tag> morphshapes = new ArrayList<>();
                 List<Tag> movies = new ArrayList<>();
                 List<Tag> sounds = new ArrayList<>();
                 List<Tag> texts = new ArrayList<>();
@@ -1203,6 +1208,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         }
                         if (nodeType == TreeNodeType.SHAPE) {
                             shapes.add((Tag) n.getItem());
+                        }
+                        if (nodeType == TreeNodeType.MORPH_SHAPE) {
+                            morphshapes.add((Tag) n.getItem());
                         }
                         if (nodeType == TreeNodeType.AS) {
                             as12scripts.add(n);
@@ -1258,6 +1266,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 final ScriptExportMode scriptMode = export.getValue(ScriptExportMode.class);
                 ret.addAll(swf.exportImages(handler, selFile + File.separator + "images", images, export.getValue(ImageExportMode.class)));
                 ret.addAll(SWF.exportShapes(handler, selFile + File.separator + "shapes", shapes, export.getValue(ShapeExportMode.class)));
+                ret.addAll(SWF.exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes, export.getValue(MorphshapeExportMode.class)));
                 ret.addAll(swf.exportTexts(handler, selFile + File.separator + "texts", texts, export.getValue(TextExportMode.class)));
                 ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies, export.getValue(MovieExportMode.class)));
                 ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, export.getValue(SoundExportMode.class)));
@@ -1666,6 +1675,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             } else {
                                 swf.exportImages(errorHandler, selFile + File.separator + "images", export.getValue(ImageExportMode.class));
                                 swf.exportShapes(errorHandler, selFile + File.separator + "shapes", export.getValue(ShapeExportMode.class));
+                                swf.exportMorphShapes(errorHandler, selFile + File.separator + "morphshapes", export.getValue(MorphshapeExportMode.class));
                                 swf.exportTexts(errorHandler, selFile + File.separator + "texts", export.getValue(TextExportMode.class));
                                 swf.exportMovies(errorHandler, selFile + File.separator + "movies", export.getValue(MovieExportMode.class));
                                 swf.exportSounds(errorHandler, selFile + File.separator + "sounds", export.getValue(SoundExportMode.class));

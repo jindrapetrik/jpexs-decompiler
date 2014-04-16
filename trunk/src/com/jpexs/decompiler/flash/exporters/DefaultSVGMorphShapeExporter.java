@@ -26,16 +26,17 @@ import com.jpexs.decompiler.flash.types.SHAPE;
  *
  * @author JPEXS, Claus Wahlers
  */
-public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
+public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBase {
 
     protected static final String DRAW_COMMAND_L = "L";
     protected static final String DRAW_COMMAND_Q = "Q";
 
     protected String currentDrawCommand = "";
     protected String pathData;
+    protected String pathDataEnd;
 
-    public DefaultSVGShapeExporter(SHAPE shape, ColorTransform colorTransform) {
-        super(shape, colorTransform);
+    public DefaultSVGMorphShapeExporter(SHAPE shape, SHAPE endShape, ColorTransform colorTransform) {
+        super(shape, endShape, colorTransform);
     }
 
     @Override
@@ -93,37 +94,49 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void moveTo(double x, double y) {
+    public void moveTo(double x, double y, double x2, double y2) {
         currentDrawCommand = "";
         pathData += "M"
                 + roundPixels20(x / SWF.unitDivisor) + " "
                 + roundPixels20(y / SWF.unitDivisor) + " ";
+        pathDataEnd += "M"
+                + roundPixels20(x2 / SWF.unitDivisor) + " "
+                + roundPixels20(y2 / SWF.unitDivisor) + " ";
     }
 
     @Override
-    public void lineTo(double x, double y) {
+    public void lineTo(double x, double y, double x2, double y2) {
         if (!currentDrawCommand.equals(DRAW_COMMAND_L)) {
             currentDrawCommand = DRAW_COMMAND_L;
             pathData += "L";
+            pathDataEnd += "L";
         }
         pathData += roundPixels20(x / SWF.unitDivisor) + " "
                 + roundPixels20(y / SWF.unitDivisor) + " ";
+        pathDataEnd += roundPixels20(x2 / SWF.unitDivisor) + " "
+                + roundPixels20(y2 / SWF.unitDivisor) + " ";
     }
 
     @Override
-    public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
+    public void curveTo(double controlX, double controlY, double anchorX, double anchorY, double controlX2, double controlY2, double anchorX2, double anchorY2) {
         if (!currentDrawCommand.equals(DRAW_COMMAND_Q)) {
             currentDrawCommand = DRAW_COMMAND_Q;
             pathData += "Q";
+            pathDataEnd += "Q";
         }
         pathData += roundPixels20(controlX / SWF.unitDivisor) + " "
                 + roundPixels20(controlY / SWF.unitDivisor) + " "
                 + roundPixels20(anchorX / SWF.unitDivisor) + " "
                 + roundPixels20(anchorY / SWF.unitDivisor) + " ";
+        pathDataEnd += roundPixels20(controlX2 / SWF.unitDivisor) + " "
+                + roundPixels20(controlY2 / SWF.unitDivisor) + " "
+                + roundPixels20(anchorX2 / SWF.unitDivisor) + " "
+                + roundPixels20(anchorY2 / SWF.unitDivisor) + " ";
     }
 
     protected void finalizePath() {
         pathData = "";
+        pathDataEnd = "";
         currentDrawCommand = "";
     }
 

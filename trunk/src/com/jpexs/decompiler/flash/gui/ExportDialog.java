@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.MorphshapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
@@ -31,6 +32,7 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -68,8 +70,8 @@ public class ExportDialog extends AppDialog {
         "scripts",
         "binaryData",
         "frames",
-        "fonts"
-    //,"morphshapes"
+        "fonts",
+        "morphshapes"
     };
 
     //Display options only when these classes found
@@ -82,8 +84,8 @@ public class ExportDialog extends AppDialog {
         {TreeNode.class, ScriptPack.class},
         {DefineBinaryDataTag.class},
         {FrameNodeItem.class},
-        {FontTag.class}
-    //,{MorphShapeTag.class}
+        {FontTag.class},
+        {MorphShapeTag.class}
     };
 
     //Enum classes for values
@@ -96,8 +98,8 @@ public class ExportDialog extends AppDialog {
         ScriptExportMode.class,
         BinaryDataExportMode.class,
         FramesExportMode.class,
-        FontExportMode.class
-    //MorphshapeExportMode.class
+        FontExportMode.class,
+        MorphshapeExportMode.class
     };
 
     private final JComboBox[] combos;

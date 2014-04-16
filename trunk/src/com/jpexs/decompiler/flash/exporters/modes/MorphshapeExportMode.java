@@ -22,8 +22,9 @@ package com.jpexs.decompiler.flash.exporters.modes;
  */
 public enum MorphshapeExportMode {
 
-    //TODO: implement morphshape export
-    PNG,
-    GIF,
-    AVI
+    //TODO: implement other morphshape export modes
+    SVG
+    //PNG,
+    //GIF,
+    //AVI
 }

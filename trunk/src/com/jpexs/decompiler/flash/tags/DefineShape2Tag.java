@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -60,7 +61,8 @@ public class DefineShape2Tag extends ShapeTag {
 
     @Override
     public String toSVG() {
-        SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(), new ColorTransform() /*FIXME?*/);
+        ExportRectangle rect = new ExportRectangle(getRect());
+        SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(), rect, new ColorTransform() /*FIXME?*/);
         exporter.export();
         return exporter.getSVG();
     }

@@ -46,7 +46,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class BitmapExporter extends ShapeExporterBase implements IShapeExporter {
+public class BitmapExporter extends ShapeExporterBase {
 
     private SerializableImage image;
     private Graphics2D graphics;
@@ -94,7 +94,7 @@ public class BitmapExporter extends ShapeExporterBase implements IShapeExporter 
     }
 
     @Override
-    public void endShape(double xMin, double yMin, double xMax, double yMax) {
+    public void endShape() {
     }
 
     @Override

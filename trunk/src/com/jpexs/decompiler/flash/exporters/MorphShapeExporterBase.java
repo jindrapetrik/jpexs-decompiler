@@ -41,21 +41,26 @@ import java.util.Map;
  *
  * @author JPEXS, Claus Wahlers
  */
-public abstract class ShapeExporterBase implements IShapeExporter {
+public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
 
     protected final SHAPE shape;
+    protected final SHAPE shapeEnd;
 
     protected List<FILLSTYLE> _fillStyles;
     protected List<LINESTYLE> _lineStyles;
 
-    protected List<Map<Integer, List<IEdge>>> _fillEdgeMaps;
-    protected List<Map<Integer, List<IEdge>>> _lineEdgeMaps;
+    protected List<FILLSTYLE> _fillStylesEnd;
+    protected List<LINESTYLE> _lineStylesEnd;
+    
+    protected List<Map<Integer, List<IMorphEdge>>> _fillEdgeMaps;
+    protected List<Map<Integer, List<IMorphEdge>>> _lineEdgeMaps;
 
     private boolean edgeMapsCreated;
     protected ColorTransform colorTransform;
 
-    public ShapeExporterBase(SHAPE shape, ColorTransform colorTransform) {
+    public MorphShapeExporterBase(SHAPE shape, SHAPE endShape, ColorTransform colorTransform) {
         this.shape = shape;
+        this.shapeEnd = endShape;
         this.colorTransform = colorTransform;
         _fillStyles = new ArrayList<>();
         _lineStyles = new ArrayList<>();
@@ -63,6 +68,13 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             SHAPEWITHSTYLE shapeWithStyle = (SHAPEWITHSTYLE) shape;
             _fillStyles.addAll(Arrays.asList(shapeWithStyle.fillStyles.fillStyles));
             _lineStyles.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
+        }
+        _fillStylesEnd = new ArrayList<>();
+        _lineStylesEnd = new ArrayList<>();
+        if (endShape instanceof SHAPEWITHSTYLE) {
+            SHAPEWITHSTYLE shapeWithStyle = (SHAPEWITHSTYLE) endShape;
+            _fillStylesEnd.addAll(Arrays.asList(shapeWithStyle.fillStyles.fillStyles));
+            _lineStylesEnd.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
         }
     }
 
@@ -86,21 +98,34 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     }
 
     protected void createEdgeMaps(List<FILLSTYLE> fillStyles, List<LINESTYLE> lineStyles, 
-            List<Map<Integer, List<IEdge>>> fillEdgeMaps, List<Map<Integer, List<IEdge>>> lineEdgeMaps) {
+            List<Map<Integer, List<IMorphEdge>>> fillEdgeMaps, List<Map<Integer, List<IMorphEdge>>> lineEdgeMaps) {
         if (!edgeMapsCreated) {
             int xPos = 0;
             int yPos = 0;
+            int xPosEnd = 0;
+            int yPosEnd = 0;
             int fillStyleIdxOffset = 0;
             int lineStyleIdxOffset = 0;
             int currentFillStyleIdx0 = 0;
             int currentFillStyleIdx1 = 0;
             int currentLineStyleIdx = 0;
-            List<IEdge> subPath = new ArrayList<>();
-            Map<Integer, List<IEdge>> currentFillEdgeMap = new HashMap<>();
-            Map<Integer, List<IEdge>> currentLineEdgeMap = new HashMap<>();
+            List<IMorphEdge> subPath = new ArrayList<>();
+            Map<Integer, List<IMorphEdge>> currentFillEdgeMap = new HashMap<>();
+            Map<Integer, List<IMorphEdge>> currentLineEdgeMap = new HashMap<>();
             List<SHAPERECORD> records = shape.shapeRecords;
+            List<SHAPERECORD> recordsEnd = shapeEnd.shapeRecords;
+            if (records.size() != recordsEnd.size()) {
+                throw new Error("Begin and end shaperecord list length should be the same.");
+            }
             for (int i = 0; i < records.size(); i++) {
                 SHAPERECORD shapeRecord = records.get(i);
+                SHAPERECORD shapeRecordEnd = recordsEnd.get(i);
+                if ((shapeRecord instanceof StyleChangeRecord && !(shapeRecordEnd instanceof StyleChangeRecord)) ||
+                    (shapeRecord instanceof StraightEdgeRecord && !(shapeRecordEnd instanceof StraightEdgeRecord)) ||
+                    (shapeRecord instanceof CurvedEdgeRecord && !(shapeRecordEnd instanceof CurvedEdgeRecord)) ||
+                    (shapeRecord instanceof EndShapeRecord && !(shapeRecordEnd instanceof EndShapeRecord))) {
+                    throw new Error("Begin and end shaperecord should have the same type.");
+                }
                 if (shapeRecord instanceof StyleChangeRecord) {
                     StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
                     if (styleChangeRecord.stateLineStyle || styleChangeRecord.stateFillStyle0 || styleChangeRecord.stateFillStyle1) {
@@ -118,8 +143,9 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     if (styleChangeRecord.stateLineStyle && styleChangeRecord.lineStyle == 0
                             && styleChangeRecord.stateFillStyle0 && styleChangeRecord.fillStyle0 == 0
                             && styleChangeRecord.stateFillStyle1 && styleChangeRecord.fillStyle1 == 0) {
-                        cleanEdgeMap(currentFillEdgeMap);
-                        cleanEdgeMap(currentLineEdgeMap);
+                        // do not clean the edges for morphshapes
+                        //cleanEdgeMap(currentFillEdgeMap);
+                        //cleanEdgeMap(currentLineEdgeMap);
                         fillEdgeMaps.add(currentFillEdgeMap);
                         lineEdgeMaps.add(currentLineEdgeMap);
                         currentFillEdgeMap = new HashMap<>();
@@ -151,6 +177,12 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         xPos = styleChangeRecord.moveDeltaX;
                         yPos = styleChangeRecord.moveDeltaY;
                     }
+
+                    StyleChangeRecord styleChangeRecordEnd = (StyleChangeRecord) shapeRecordEnd;
+                    if (styleChangeRecordEnd.stateMoveTo) {
+                        xPosEnd = styleChangeRecordEnd.moveDeltaX;
+                        yPosEnd = styleChangeRecordEnd.moveDeltaY;
+                    }
                 } else if (shapeRecord instanceof StraightEdgeRecord) {
                     StraightEdgeRecord straightEdgeRecord = (StraightEdgeRecord) shapeRecord;
                     PointInt from = new PointInt(xPos, yPos);
@@ -165,7 +197,22 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         }
                     }
                     PointInt to = new PointInt(xPos, yPos);
-                    subPath.add(new StraightEdge(from, to, currentLineStyleIdx, currentFillStyleIdx1));
+
+                    StraightEdgeRecord straightEdgeRecordEnd = (StraightEdgeRecord) shapeRecordEnd;
+                    PointInt fromEnd = new PointInt(xPosEnd, yPosEnd);
+                    if (straightEdgeRecordEnd.generalLineFlag) {
+                        xPosEnd += straightEdgeRecordEnd.deltaX;
+                        yPosEnd += straightEdgeRecordEnd.deltaY;
+                    } else {
+                        if (straightEdgeRecordEnd.vertLineFlag) {
+                            yPosEnd += straightEdgeRecordEnd.deltaY;
+                        } else {
+                            xPosEnd += straightEdgeRecordEnd.deltaX;
+                        }
+                    }
+                    PointInt toEnd = new PointInt(xPosEnd, yPosEnd);
+
+                    subPath.add(new StraightMorphEdge(from, to, fromEnd, toEnd, currentLineStyleIdx, currentFillStyleIdx1));
                 } else if (shapeRecord instanceof CurvedEdgeRecord) {
                     CurvedEdgeRecord curvedEdgeRecord = (CurvedEdgeRecord) shapeRecord;
                     PointInt from = new PointInt(xPos, yPos);
@@ -175,12 +222,23 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     yPos = yPosControl + curvedEdgeRecord.anchorDeltaY;
                     PointInt control = new PointInt(xPosControl, yPosControl);
                     PointInt to = new PointInt(xPos, yPos);
-                    subPath.add(new CurvedEdge(from, control, to, currentLineStyleIdx, currentFillStyleIdx1));
+
+                    CurvedEdgeRecord curvedEdgeRecordEnd = (CurvedEdgeRecord) shapeRecordEnd;
+                    PointInt fromEnd = new PointInt(xPosEnd, yPosEnd);
+                    int xPosControlEnd = xPosEnd + curvedEdgeRecordEnd.controlDeltaX;
+                    int yPosControlEnd = yPosEnd + curvedEdgeRecordEnd.controlDeltaY;
+                    xPosEnd = xPosControlEnd + curvedEdgeRecordEnd.anchorDeltaX;
+                    yPosEnd = yPosControlEnd + curvedEdgeRecordEnd.anchorDeltaY;
+                    PointInt controlEnd = new PointInt(xPosControlEnd, yPosControlEnd);
+                    PointInt toEnd = new PointInt(xPosEnd, yPosEnd);
+
+                    subPath.add(new CurvedMorphEdge(from, control, to, fromEnd, controlEnd, toEnd, currentLineStyleIdx, currentFillStyleIdx1));
                 } else if (shapeRecord instanceof EndShapeRecord) {
                     // We're done. Process the last subpath, if any
                     processSubPath(subPath, currentLineStyleIdx, currentFillStyleIdx0, currentFillStyleIdx1, currentFillEdgeMap, currentLineEdgeMap);
-                    cleanEdgeMap(currentFillEdgeMap);
-                    cleanEdgeMap(currentLineEdgeMap);
+                    // do not clean the edges for morphshapes
+                    //cleanEdgeMap(currentFillEdgeMap);
+                    //cleanEdgeMap(currentLineEdgeMap);
                     fillEdgeMaps.add(currentFillEdgeMap);
                     lineEdgeMaps.add(currentLineEdgeMap);
                 }
@@ -189,9 +247,9 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected void processSubPath(List<IEdge> subPath, int lineStyleIdx, int fillStyleIdx0, int fillStyleIdx1, 
-            Map<Integer, List<IEdge>> currentFillEdgeMap, Map<Integer, List<IEdge>> currentLineEdgeMap) {
-        List<IEdge> path;
+    protected void processSubPath(List<IMorphEdge> subPath, int lineStyleIdx, int fillStyleIdx0, int fillStyleIdx1, 
+            Map<Integer, List<IMorphEdge>> currentFillEdgeMap, Map<Integer, List<IMorphEdge>> currentLineEdgeMap) {
+        List<IMorphEdge> path;
         if (fillStyleIdx0 != 0) {
             path = currentFillEdgeMap.get(fillStyleIdx0);
             if (path == null) {
@@ -221,13 +279,13 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     }
 
     protected void exportFillPath(int groupIndex) {
-        List<IEdge> path = createPathFromEdgeMap(_fillEdgeMaps.get(groupIndex));
+        List<IMorphEdge> path = createPathFromEdgeMap(_fillEdgeMaps.get(groupIndex));
         PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
         int fillStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
             beginFills();
             for (int i = 0; i < path.size(); i++) {
-                IEdge e = path.get(i);
+                IMorphEdge e = path.get(i);
                 if (fillStyleIdx != e.getFillStyleIdx()) {
                     if (fillStyleIdx != Integer.MAX_VALUE) {
                         endFill();
@@ -278,13 +336,13 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     }
                 }
                 if (!pos.equals(e.getFrom())) {
-                    moveTo(e.getFrom().x, e.getFrom().y);
+                    moveTo(e.getFrom().x, e.getFrom().y, e.getFromEnd().x, e.getFromEnd().y);
                 }
-                if (e instanceof CurvedEdge) {
-                    CurvedEdge c = (CurvedEdge) e;
-                    curveTo(c.getControl().x, c.getControl().y, c.to.x, c.to.y);
+                if (e instanceof CurvedMorphEdge) {
+                    CurvedMorphEdge c = (CurvedMorphEdge) e;
+                    curveTo(c.getControl().x, c.getControl().y, c.to.x, c.to.y, c.getControlEnd().x, c.getControlEnd().y, c.toEnd.x, c.toEnd.y);
                 } else {
-                    lineTo(e.getTo().x, e.getTo().y);
+                    lineTo(e.getTo().x, e.getTo().y, e.getToEnd().x, e.getToEnd().y);
                 }
                 pos = e.getTo();
             }
@@ -296,14 +354,14 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     }
 
     protected void exportLinePath(int groupIndex) {
-        List<IEdge> path = createPathFromEdgeMap(_lineEdgeMaps.get(groupIndex));
+        List<IMorphEdge> path = createPathFromEdgeMap(_lineEdgeMaps.get(groupIndex));
         PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
         int lineStyleIdx = Integer.MAX_VALUE;
         LINESTYLE lineStyle;
         if (path.size() > 0) {
             beginLines();
             for (int i = 0; i < path.size(); i++) {
-                IEdge e = path.get(i);
+                IMorphEdge e = path.get(i);
                 if (lineStyleIdx != e.getLineStyleIdx()) {
                     lineStyleIdx = e.getLineStyleIdx();
                     pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -372,13 +430,13 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     }
                 }
                 if (!e.getFrom().equals(pos)) {
-                    moveTo(e.getFrom().x, e.getFrom().y);
+                    moveTo(e.getFrom().x, e.getFrom().y, e.getFromEnd().x, e.getFromEnd().y);
                 }
-                if (e instanceof CurvedEdge) {
-                    CurvedEdge c = (CurvedEdge) e;
-                    curveTo(c.getControl().x, c.getControl().y, c.to.x, c.to.y);
+                if (e instanceof CurvedMorphEdge) {
+                    CurvedMorphEdge c = (CurvedMorphEdge) e;
+                    curveTo(c.getControl().x, c.getControl().y, c.to.x, c.to.y, c.getControlEnd().x, c.getControlEnd().y, c.toEnd.x, c.toEnd.y);
                 } else {
-                    lineTo(e.getTo().x, e.getTo().y);
+                    lineTo(e.getTo().x, e.getTo().y, e.getToEnd().x, e.getToEnd().y);
                 }
                 pos = e.getTo();
             }
@@ -386,8 +444,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected List<IEdge> createPathFromEdgeMap(Map<Integer, List<IEdge>> edgeMap) {
-        List<IEdge> newPath = new ArrayList<>();
+    protected List<IMorphEdge> createPathFromEdgeMap(Map<Integer, List<IMorphEdge>> edgeMap) {
+        List<IMorphEdge> newPath = new ArrayList<>();
         List<Integer> styleIdxArray = new ArrayList<>();
         for (Integer styleIdx : edgeMap.keySet()) {
             styleIdxArray.add(styleIdx);
@@ -399,24 +457,24 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         return newPath;
     }
 
-    protected void cleanEdgeMap(Map<Integer, List<IEdge>> edgeMap) {
+    protected void cleanEdgeMap(Map<Integer, List<IMorphEdge>> edgeMap) {
         for (Integer styleIdx : edgeMap.keySet()) {
-            List<IEdge> subPath = edgeMap.get(styleIdx);
+            List<IMorphEdge> subPath = edgeMap.get(styleIdx);
             if (subPath != null && subPath.size() > 0) {
                 int idx;
-                IEdge prevEdge = null;
-                List<IEdge> tmpPath = new ArrayList<>();
-                Map<String, List<IEdge>> coordMap = createCoordMap(subPath);
+                IMorphEdge prevEdge = null;
+                List<IMorphEdge> tmpPath = new ArrayList<>();
+                Map<String, List<IMorphEdge>> coordMap = createCoordMap(subPath);
                 while (subPath.size() > 0) {
                     idx = 0;
                     while (idx < subPath.size()) {
                         if (prevEdge == null || prevEdge.getTo().equals(subPath.get(idx).getFrom())) {
-                            IEdge edge = subPath.remove(idx);
+                            IMorphEdge edge = subPath.remove(idx);
                             tmpPath.add(edge);
                             removeEdgeFromCoordMap(coordMap, edge);
                             prevEdge = edge;
                         } else {
-                            IEdge edge = findNextEdgeInCoordMap(coordMap, prevEdge);
+                            IMorphEdge edge = findNextEdgeInCoordMap(coordMap, prevEdge);
                             if (edge != null) {
                                 idx = subPath.indexOf(edge);
                             } else {
@@ -431,14 +489,14 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected Map<String, List<IEdge>> createCoordMap(List<IEdge> path) {
-        Map<String, List<IEdge>> coordMap = new HashMap<>();
+    protected Map<String, List<IMorphEdge>> createCoordMap(List<IMorphEdge> path) {
+        Map<String, List<IMorphEdge>> coordMap = new HashMap<>();
         for (int i = 0; i < path.size(); i++) {
             PointInt from = path.get(i).getFrom();
             String key = from.x + "_" + from.y;
-            List<IEdge> coordMapArray = coordMap.get(key);
+            List<IMorphEdge> coordMapArray = coordMap.get(key);
             if (coordMapArray == null) {
-                List<IEdge> list = new ArrayList<>();
+                List<IMorphEdge> list = new ArrayList<>();
                 list.add(path.get(i));
                 coordMap.put(key, list);
             } else {
@@ -448,9 +506,9 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         return coordMap;
     }
 
-    protected void removeEdgeFromCoordMap(Map<String, List<IEdge>> coordMap, IEdge edge) {
+    protected void removeEdgeFromCoordMap(Map<String, List<IMorphEdge>> coordMap, IMorphEdge edge) {
         String key = edge.getFrom().x + "_" + edge.getFrom().y;
-        List<IEdge> coordMapArray = coordMap.get(key);
+        List<IMorphEdge> coordMapArray = coordMap.get(key);
         if (coordMapArray != null) {
             if (coordMapArray.size() == 1) {
                 coordMap.remove(key);
@@ -463,9 +521,9 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected IEdge findNextEdgeInCoordMap(Map<String, List<IEdge>> coordMap, IEdge edge) {
+    protected IMorphEdge findNextEdgeInCoordMap(Map<String, List<IMorphEdge>> coordMap, IMorphEdge edge) {
         String key = edge.getTo().x + "_" + edge.getTo().y;
-        List<IEdge> coordMapArray = coordMap.get(key);
+        List<IMorphEdge> coordMapArray = coordMap.get(key);
         if (coordMapArray != null && coordMapArray.size() > 0) {
             return coordMapArray.get(0);
         }
@@ -480,7 +538,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         v1.addAll(Arrays.asList(v2));
     }
 
-    protected void appendEdges(List<IEdge> v1, List<IEdge> v2) {
+    protected void appendEdges(List<IMorphEdge> v1, List<IMorphEdge> v2) {
         for (int i = 0; i < v2.size(); i++) {
             v1.add(v2.get(i));
         }

@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.types.RGB;
  *
  * @author JPEXS
  */
-public interface IShapeExporter {
+public interface IMorphShapeExporter {
 
     public void beginShape();
 
@@ -50,9 +50,9 @@ public interface IShapeExporter {
 
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio);
 
-    public void moveTo(double x, double y);
+    public void moveTo(double x, double y, double x2, double y2);
 
-    public void lineTo(double x, double y);
+    public void lineTo(double x, double y, double x2, double y2);
 
-    public void curveTo(double controlX, double controlY, double anchorX, double anchorY);
+    public void curveTo(double controlX, double controlY, double anchorX, double anchorY, double controlX2, double controlY2, double anchorX2, double anchorY2);
 }

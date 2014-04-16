@@ -20,8 +20,10 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
+import com.jpexs.decompiler.flash.exporters.SVGMorphShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -142,6 +144,16 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag, 
         rect.Xmax = Math.max(startBounds.Xmax, endBounds.Xmax);
         rect.Ymax = Math.max(startBounds.Ymax, endBounds.Ymax);
         return rect;
+    }
+
+    @Override
+    public String toSVG() {
+        ExportRectangle rect = new ExportRectangle(getRect());
+        SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
+        SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
+        SVGMorphShapeExporter exporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, rect, new ColorTransform() /*FIXME?*/);
+        exporter.export();
+        return exporter.getSVG();
     }
 
     @Override

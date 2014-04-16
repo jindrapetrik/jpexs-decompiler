@@ -59,7 +59,7 @@ import org.w3c.dom.Element;
  *
  * @author JPEXS, Claus Wahlers
  */
-public class SVGShapeExporter extends DefaultSVGShapeExporter {
+public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
     protected static final String sNamespace = "http://www.w3.org/2000/svg";
     protected static final String xlinkNamespace = "http://www.w3.org/1999/xlink";
@@ -74,8 +74,8 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     private double maxLineWidth;
     private final ExportRectangle bounds;
 
-    public SVGShapeExporter(SWF swf, SHAPE shape, ExportRectangle bounds, ColorTransform colorTransform) {
-        super(shape, colorTransform);
+    public SVGMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, ExportRectangle bounds, ColorTransform colorTransform) {
+        super(shape, endShape, colorTransform);
         this.swf = swf;
         this.bounds = bounds;
     }
@@ -105,13 +105,13 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             DocumentType svgDocType = impl.createDocumentType("svg", "-//W3C//DTD SVG 1.0//EN",
                     "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd");
             _svg = impl.createDocument(sNamespace, "svg", svgDocType);
-            _svgG.setAttribute("transform", "matrix(1, 0, 0, 1, "
-                    + roundPixels20(-bounds.xMin / (double) SWF.unitDivisor) + ", " + roundPixels20(-bounds.yMin / (double) SWF.unitDivisor) + ")");
             Element svgRoot = _svg.getDocumentElement();
             svgRoot.setAttribute("xmlns:xlink", xlinkNamespace);
             _svgDefs = _svg.createElement("defs");
             svgRoot.appendChild(_svgDefs);
             _svgG = _svg.createElement("g");
+            _svgG.setAttribute("transform", "matrix(1, 0, 0, 1, "
+                    + roundPixels20(-bounds.xMin / (double) SWF.unitDivisor) + ", " + roundPixels20(-bounds.yMin / (double) SWF.unitDivisor) + ")");
             svgRoot.appendChild(_svgG);
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(SVGShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
@@ -283,6 +283,12 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     protected void finalizePath() {
         if (path != null && !"".equals(pathData)) {
             path.setAttribute("d", pathData.trim());
+            Element animatePath = _svg.createElement("animate");
+            animatePath.setAttribute("dur", "2s"); // todo
+            animatePath.setAttribute("repeatCount", "indefinite");
+            animatePath.setAttribute("attributeName", "d");
+            animatePath.setAttribute("values", pathData.trim() + ";" + pathDataEnd.trim());
+            path.appendChild(animatePath);
             _svgG.appendChild(path);
         }
         path = _svg.createElement("path");

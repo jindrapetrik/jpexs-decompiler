@@ -99,6 +99,7 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -1479,24 +1480,6 @@ public final class SWF implements TreeItem, Timelined {
         fos.write(chunkBytes);
     }
 
-    //TODO: implement morphshape export. How to handle 65536 frames?
-    public List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MorphshapeExportMode mode) throws IOException {
-        List<File> ret = new ArrayList<>();
-        if (tags.isEmpty()) {
-            return ret;
-        }
-        File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
-        throw new UnsupportedOperationException("Not implemented");
-        //return ret;
-    }
-
     private static void makeAVI(List<BufferedImage> images, int frameRate, File file) throws IOException {
         if (images.isEmpty()) {
             return;
@@ -1840,7 +1823,7 @@ public final class SWF implements TreeItem, Timelined {
                 }
             }
         }
-        loopb:
+
         for (final Tag t : tags) {
             if (t instanceof ShapeTag) {
                 int characterID = 0;
@@ -1884,6 +1867,50 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
+    //TODO: implement morphshape export. How to handle 65536 frames?
+    public static List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MorphshapeExportMode mode) throws IOException {
+        List<File> ret = new ArrayList<>();
+        if (tags.isEmpty()) {
+            return ret;
+        }
+        File foutdir = new File(outdir);
+        if (!foutdir.exists()) {
+            if (!foutdir.mkdirs()) {
+                if (!foutdir.exists()) {
+                    throw new IOException("Cannot create directory " + outdir);
+                }
+            }
+        }
+
+        for (final Tag t : tags) {
+            if (t instanceof MorphShapeTag) {
+                int characterID = 0;
+                if (t instanceof CharacterTag) {
+                    characterID = ((CharacterTag) t).getCharacterId();
+                }
+                String ext = "svg";
+
+                final File file = new File(outdir + File.separator + characterID + "." + ext);
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        MorphShapeTag mst = (MorphShapeTag) t;
+                        switch (mode) {
+                            case SVG:
+                                try (FileOutputStream fos = new FileOutputStream(file)) {
+                                    fos.write(Utf8Helper.getBytes(mst.toSVG()));
+                                }
+                                break;
+                        }
+
+                    }
+                }, handler).run();
+                ret.add(file);
+            }
+        }
+        return ret;
+    }
+
     public static List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, BinaryDataExportMode mode) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
@@ -1897,7 +1924,7 @@ public final class SWF implements TreeItem, Timelined {
                 }
             }
         }
-        loopb:
+
         for (final Tag t : tags) {
             if (t instanceof DefineBinaryDataTag) {
                 int characterID = ((DefineBinaryDataTag) t).getCharacterId();
@@ -1962,6 +1989,10 @@ public final class SWF implements TreeItem, Timelined {
 
     public void exportShapes(AbortRetryIgnoreHandler handler, String outdir, ShapeExportMode mode) throws IOException {
         exportShapes(handler, outdir, tags, mode);
+    }
+
+    public void exportMorphShapes(AbortRetryIgnoreHandler handler, String outdir, MorphshapeExportMode mode) throws IOException {
+        exportMorphShapes(handler, outdir, tags, mode);
     }
 
     public void exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, BinaryDataExportMode mode) throws IOException {

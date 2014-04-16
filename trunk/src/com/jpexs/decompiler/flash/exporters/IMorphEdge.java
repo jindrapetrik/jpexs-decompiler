@@ -14,35 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
-
-import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
-import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
-import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.SHAPE;
-import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+package com.jpexs.decompiler.flash.exporters;
 
 /**
  *
  * @author JPEXS
  */
-public interface MorphShapeTag {
+public interface IMorphEdge {
 
-    public RECT getStartBounds();
+    public PointInt getFrom();
 
-    public RECT getEndBounds();
+    public PointInt getTo();
 
-    public MORPHFILLSTYLEARRAY getFillStyles();
+    public PointInt getFromEnd();
 
-    public MORPHLINESTYLEARRAY getLineStyles();
+    public PointInt getToEnd();
 
-    public SHAPE getStartEdges();
+    public int getLineStyleIdx();
 
-    public SHAPE getEndEdges();
+    public int getFillStyleIdx();
 
-    public abstract String toSVG();
-
-    public int getShapeNum();
-
-    public SHAPEWITHSTYLE getShapeAtRatio(int ratio);
+    public IMorphEdge reverseWithNewFillStyle(int newFillStyleIdx);
 }
