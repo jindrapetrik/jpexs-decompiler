@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.TranslateException;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -92,7 +93,7 @@ public class RecompileTest {
                         ActionScriptParser par = new ActionScriptParser();
                         try {
                             asm.setActions(par.actionsFromString(as));
-                        } catch (ParseException ex) {
+                        } catch (ParseException | CompilationException ex) {
                             fail("Unable to parse: " + item.getSwf().getShortFileName() + "/" + item.toString());
                         }
                         writer = new HilightedTextWriter(new CodeFormatting(), false);
@@ -101,7 +102,7 @@ public class RecompileTest {
                         as2 = asm.removePrefixAndSuffix(as2);
                         try {
                             asm.setActions(par.actionsFromString(as2));
-                        } catch (ParseException ex) {
+                        } catch (ParseException | CompilationException ex) {
                             fail("Unable to parse: " + item.getSwf().getShortFileName() + "/" + item.toString());
                         }
                         writer = new HilightedTextWriter(new CodeFormatting(), false);

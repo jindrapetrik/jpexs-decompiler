@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.graph.CompilationException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class ActionScript2ParserTest extends ActionStript2TestBase {
         try {
             ActionScriptParser par = new ActionScriptParser();
             asm.setActions(par.actionsFromString(script));
-        } catch (IOException | ParseException ex) {
+        } catch (IOException | CompilationException | ParseException ex) {
             fail("Unable to parse: " + script);
         }
     }
