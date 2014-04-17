@@ -344,9 +344,6 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             double rotateSkew1 = roundPixels400(matrix.rotateSkew1);
             double scaleX = roundPixels400(matrix.scaleX);
             double scaleY = roundPixels400(matrix.scaleY);
-            String matrixStr = "matrix(" + scaleX + ", " + rotateSkew0
-                    + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")";
-            gradient.setAttribute("gradientTransform", matrixStr);
             
             double translateXEnd = roundPixels400(matrixEnd.translateX / SWF.unitDivisor);
             double translateYEnd = roundPixels400(matrixEnd.translateY / SWF.unitDivisor);
@@ -360,6 +357,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             animateRotate.setAttribute("repeatCount", "indefinite");
             animateRotate.setAttribute("attributeName", "gradientTransform");
             animateRotate.setAttribute("type", "rotate");
+            animateRotate.setAttribute("additive", "sum");
             animateRotate.setAttribute("from", rotateSkew0 + " " + rotateSkew1);
             animateRotate.setAttribute("to", rotateSkew0End + " " + rotateSkew1End);
 
@@ -368,6 +366,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             animateScale.setAttribute("repeatCount", "indefinite");
             animateScale.setAttribute("attributeName", "gradientTransform");
             animateScale.setAttribute("type", "scale");
+            animateScale.setAttribute("additive", "sum");
             animateScale.setAttribute("from", scaleX + " " + scaleY);
             animateScale.setAttribute("to", scaleXEnd + " " + scaleYEnd);
             
@@ -376,12 +375,13 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             animateTranslate.setAttribute("repeatCount", "indefinite");
             animateTranslate.setAttribute("attributeName", "gradientTransform");
             animateTranslate.setAttribute("type", "translate");
+            animateTranslate.setAttribute("additive", "sum");
             animateTranslate.setAttribute("from", translateX + " " + translateY);
             animateTranslate.setAttribute("to", translateXEnd + " " + translateYEnd);
             
+            gradient.appendChild(animateTranslate);
             gradient.appendChild(animateRotate);
             gradient.appendChild(animateScale);
-            gradient.appendChild(animateTranslate);
         }
         for (int i = 0; i < gradientRecords.length; i++) {
             GRADRECORD record = gradientRecords[i];
