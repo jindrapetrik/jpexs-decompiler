@@ -82,7 +82,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         // Create edge maps
         _fillEdgeMaps = new ArrayList<>();
         _lineEdgeMaps = new ArrayList<>();
-        createEdgeMaps(_fillStyles, _lineStyles, _fillEdgeMaps, _lineEdgeMaps);
+        createEdgeMaps(_fillStyles, _lineStyles, _fillStylesEnd, _lineStylesEnd, _fillEdgeMaps, _lineEdgeMaps);
         
         // Let the doc handler know that a shape export starts
         beginShape();
@@ -97,7 +97,8 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         endShape();
     }
 
-    protected void createEdgeMaps(List<FILLSTYLE> fillStyles, List<LINESTYLE> lineStyles, 
+    protected void createEdgeMaps(List<FILLSTYLE> fillStyles, List<LINESTYLE> lineStyles,
+            List<FILLSTYLE> fillStylesEnd, List<LINESTYLE> lineStylesEnd,
             List<Map<Integer, List<IMorphEdge>>> fillEdgeMaps, List<Map<Integer, List<IMorphEdge>>> lineEdgeMaps) {
         if (!edgeMapsCreated) {
             int xPos = 0;
@@ -137,6 +138,8 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         lineStyleIdxOffset = lineStyles.size();
                         appendFillStyles(fillStyles, styleChangeRecord.fillStyles.fillStyles);
                         appendLineStyles(lineStyles, styleChangeRecord.lineStyles.lineStyles);
+                        appendFillStyles(fillStylesEnd, styleChangeRecord.fillStyles.fillStyles);
+                        appendLineStyles(lineStylesEnd, styleChangeRecord.lineStyles.lineStyles);
                     }
                     // Check if all styles are reset to 0.
                     // This (probably) means that a new group starts with the next record
@@ -294,21 +297,25 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                     pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
                     try {
                         Matrix matrix;
+                        Matrix matrixEnd;
                         FILLSTYLE fillStyle = _fillStyles.get(fillStyleIdx - 1);
+                        FILLSTYLE fillStyleEnd = _fillStylesEnd.get(fillStyleIdx - 1);
                         switch (fillStyle.fillStyleType) {
                             case FILLSTYLE.SOLID:
                                 // Solid fill
-                                beginFill(colorTransform.apply(fillStyle.color));
+                                beginFill(colorTransform.apply(fillStyle.color), colorTransform.apply(fillStyleEnd.color));
                                 break;
                             case FILLSTYLE.LINEAR_GRADIENT:
                             case FILLSTYLE.RADIAL_GRADIENT:
                             case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
                                 // Gradient fill
                                 matrix = new Matrix(fillStyle.gradientMatrix);
+                                matrixEnd = new Matrix(fillStyleEnd.gradientMatrix);
                                 beginGradientFill(
                                         fillStyle.fillStyleType,
                                         colorTransform.apply(fillStyle.gradient.gradientRecords),
                                         matrix,
+                                        matrixEnd,
                                         fillStyle.gradient.spreadMode,
                                         fillStyle.gradient.interpolationMode,
                                         (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0
@@ -332,7 +339,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                     } catch (Exception ex) {
                         // Font shapes define no fillstyles per se, but do reference fillstyle index 1,
                         // which represents the font color. We just report null in this case.
-                        beginFill(null);
+                        beginFill(null, null);
                     }
                 }
                 if (!pos.equals(e.getFrom())) {
@@ -357,7 +364,6 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         List<IMorphEdge> path = createPathFromEdgeMap(_lineEdgeMaps.get(groupIndex));
         PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
         int lineStyleIdx = Integer.MAX_VALUE;
-        LINESTYLE lineStyle;
         if (path.size() > 0) {
             beginLines();
             for (int i = 0; i < path.size(); i++) {
@@ -365,10 +371,12 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                 if (lineStyleIdx != e.getLineStyleIdx()) {
                     lineStyleIdx = e.getLineStyleIdx();
                     pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    LINESTYLE lineStyle = null;
+                    LINESTYLE lineStyleEnd = null;
                     try {
                         lineStyle = _lineStyles.get(lineStyleIdx - 1);
+                        lineStyleEnd = _lineStylesEnd.get(lineStyleIdx - 1);
                     } catch (Exception ex) {
-                        lineStyle = null;
                     }
                     if (lineStyle != null) {
                         String scaleMode = "NORMAL";
@@ -396,7 +404,9 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         }
                         lineStyle(
                                 lineStyle.width,
+                                lineStyleEnd.width,
                                 colorTransform.apply(lineStyle.color),
+                                colorTransform.apply(lineStyleEnd.color),
                                 pixelHintingFlag,
                                 scaleMode,
                                 startCapStyle,
@@ -407,16 +417,20 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         if (hasFillFlag) {
                             LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;
                             FILLSTYLE fillStyle = lineStyle2.fillType;
+                            LINESTYLE2 lineStyle2End = (LINESTYLE2) lineStyleEnd;
+                            FILLSTYLE fillStyleEnd = lineStyle2End.fillType;
                             switch (fillStyle.fillStyleType) {
                                 case FILLSTYLE.LINEAR_GRADIENT:
                                 case FILLSTYLE.RADIAL_GRADIENT:
                                 case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
                                     // Gradient fill
                                     Matrix matrix = new Matrix(fillStyle.gradientMatrix);
+                                    Matrix matrixEnd = new Matrix(fillStyleEnd.gradientMatrix);
                                     lineGradientStyle(
                                             fillStyle.fillStyleType,
                                             fillStyle.gradient.gradientRecords,
                                             matrix,
+                                            matrixEnd,
                                             fillStyle.gradient.spreadMode,
                                             fillStyle.gradient.interpolationMode,
                                             (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0
@@ -426,7 +440,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         }
                     } else {
                         // We should never get here
-                        lineStyle(1, new RGB(Color.BLACK), false, "NORMAL", 0, 0, 0, 3);
+                        lineStyle(1, 1, new RGB(Color.BLACK), new RGB(Color.BLACK), false, "NORMAL", 0, 0, 0, 3);
                     }
                 }
                 if (!e.getFrom().equals(pos)) {

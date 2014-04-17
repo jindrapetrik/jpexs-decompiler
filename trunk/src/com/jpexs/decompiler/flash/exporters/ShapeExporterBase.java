@@ -299,7 +299,6 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         List<IEdge> path = createPathFromEdgeMap(_lineEdgeMaps.get(groupIndex));
         PointInt pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
         int lineStyleIdx = Integer.MAX_VALUE;
-        LINESTYLE lineStyle;
         if (path.size() > 0) {
             beginLines();
             for (int i = 0; i < path.size(); i++) {
@@ -307,10 +306,10 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 if (lineStyleIdx != e.getLineStyleIdx()) {
                     lineStyleIdx = e.getLineStyleIdx();
                     pos = new PointInt(Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    LINESTYLE lineStyle = null;
                     try {
                         lineStyle = _lineStyles.get(lineStyleIdx - 1);
                     } catch (Exception ex) {
-                        lineStyle = null;
                     }
                     if (lineStyle != null) {
                         String scaleMode = "NORMAL";

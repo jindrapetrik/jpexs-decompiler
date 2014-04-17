@@ -120,13 +120,17 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     }
 
     @Override
-    public void beginFill(RGB color) {
+    public void beginFill(RGB color, RGB colorEnd) {
         if (color == null) {
             color = new RGB(Color.BLACK);
+        }
+        if (colorEnd == null) {
+            colorEnd = new RGB(Color.BLACK);
         }
         finalizePath();
         path.setAttribute("stroke", "none");
         path.setAttribute("fill", color.toHexRGB());
+        path.appendChild(createAnimateElement("fill", color.toHexRGB(), colorEnd.toHexRGB()));
         if (color instanceof RGBA) {
             RGBA colorA = (RGBA) color;
             if (colorA.alpha != 255) {
@@ -136,12 +140,12 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     }
 
     @Override
-    public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
                 ? _svg.createElement("linearGradient")
                 : _svg.createElement("radialGradient");
-        populateGradientElement(gradient, type, gradientRecords, matrix, spreadMethod, interpolationMethod, focalPointRatio);
+        populateGradientElement(gradient, type, gradientRecords, matrix, matrixEnd, spreadMethod, interpolationMethod, focalPointRatio);
         int id = gradients.indexOf(gradient);
         if (id < 0) {
             // todo: filter same gradients
@@ -218,20 +222,26 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     }
 
     @Override
-    public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
+    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
         if (thickness > maxLineWidth) {
             maxLineWidth = thickness;
         }
         thickness /= SWF.unitDivisor;
+        thicknessEnd /= SWF.unitDivisor;
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", color.toHexRGB());
+        path.appendChild(createAnimateElement("stroke", color.toHexRGB(), colorEnd.toHexRGB()));
         path.setAttribute("stroke-width", Double.toString(thickness == 0 ? 1 : thickness));
+        path.appendChild(createAnimateElement("stroke-width", thickness, thicknessEnd));
+        
         if (color instanceof RGBA) {
             RGBA colorA = (RGBA) color;
             if (colorA.alpha != 255) {
                 path.setAttribute("stroke-opacity", Float.toString(colorA.getAlphaFloat()));
             }
+            RGBA colorAEnd = (RGBA) colorEnd;
+            path.appendChild(createAnimateElement("fill-opacity", colorA.getAlphaFloat(), colorAEnd.getAlphaFloat()));
         }
         switch (startCaps) {
             case LINESTYLE2.NO_CAP:
@@ -261,12 +271,12 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     }
 
     @Override
-    public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         path.removeAttribute("stroke-opacity");
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
                 ? _svg.createElement("linearGradient")
                 : _svg.createElement("radialGradient");
-        populateGradientElement(gradient, type, gradientRecords, matrix, spreadMethod, interpolationMethod, focalPointRatio);
+        populateGradientElement(gradient, type, gradientRecords, matrix, matrixEnd, spreadMethod, interpolationMethod, focalPointRatio);
         int id = gradients.indexOf(gradient);
         if (id < 0) {
             // todo: filter same gradients
@@ -279,23 +289,27 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         _svgDefs.appendChild(gradient);
     }
 
+    private Element createAnimateElement(String attributeName, Object startValue, Object endValue) {
+        Element animate = _svg.createElement("animate");
+        animate.setAttribute("dur", "2s"); // todo
+        animate.setAttribute("repeatCount", "indefinite");
+        animate.setAttribute("attributeName", attributeName);
+        animate.setAttribute("values", startValue + ";" + endValue);
+        return animate;
+    }
+    
     @Override
     protected void finalizePath() {
         if (path != null && !"".equals(pathData)) {
             path.setAttribute("d", pathData.trim());
-            Element animatePath = _svg.createElement("animate");
-            animatePath.setAttribute("dur", "2s"); // todo
-            animatePath.setAttribute("repeatCount", "indefinite");
-            animatePath.setAttribute("attributeName", "d");
-            animatePath.setAttribute("values", pathData.trim() + ";" + pathDataEnd.trim());
-            path.appendChild(animatePath);
+            path.appendChild(createAnimateElement("d", pathData.trim(), pathDataEnd.trim()));
             _svgG.appendChild(path);
         }
         path = _svg.createElement("path");
         super.finalizePath();
     }
 
-    protected void populateGradientElement(Element gradient, int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    protected void populateGradientElement(Element gradient, int type, GRADRECORD[] gradientRecords, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         gradient.setAttribute("gradientUnits", "userSpaceOnUse");
         if (type == FILLSTYLE.LINEAR_GRADIENT) {
             gradient.setAttribute("x1", "-819.2");
@@ -330,8 +344,44 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             double rotateSkew1 = roundPixels400(matrix.rotateSkew1);
             double scaleX = roundPixels400(matrix.scaleX);
             double scaleY = roundPixels400(matrix.scaleY);
-            gradient.setAttribute("gradientTransform", "matrix(" + scaleX + ", " + rotateSkew0
-                    + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
+            String matrixStr = "matrix(" + scaleX + ", " + rotateSkew0
+                    + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")";
+            gradient.setAttribute("gradientTransform", matrixStr);
+            
+            double translateXEnd = roundPixels400(matrixEnd.translateX / SWF.unitDivisor);
+            double translateYEnd = roundPixels400(matrixEnd.translateY / SWF.unitDivisor);
+            double rotateSkew0End = roundPixels400(matrixEnd.rotateSkew0);
+            double rotateSkew1End = roundPixels400(matrixEnd.rotateSkew1);
+            double scaleXEnd = roundPixels400(matrixEnd.scaleX);
+            double scaleYEnd = roundPixels400(matrixEnd.scaleY);
+
+            Element animateRotate = _svg.createElement("animateTransform");
+            animateRotate.setAttribute("dur", "2s"); // todo
+            animateRotate.setAttribute("repeatCount", "indefinite");
+            animateRotate.setAttribute("attributeName", "gradientTransform");
+            animateRotate.setAttribute("type", "rotate");
+            animateRotate.setAttribute("from", rotateSkew0 + " " + rotateSkew1);
+            animateRotate.setAttribute("to", rotateSkew0End + " " + rotateSkew1End);
+
+            Element animateScale = _svg.createElement("animateTransform");
+            animateScale.setAttribute("dur", "2s"); // todo
+            animateScale.setAttribute("repeatCount", "indefinite");
+            animateScale.setAttribute("attributeName", "gradientTransform");
+            animateScale.setAttribute("type", "scale");
+            animateScale.setAttribute("from", scaleX + " " + scaleY);
+            animateScale.setAttribute("to", scaleXEnd + " " + scaleYEnd);
+            
+            Element animateTranslate = _svg.createElement("animateTransform");
+            animateTranslate.setAttribute("dur", "2s"); // todo
+            animateTranslate.setAttribute("repeatCount", "indefinite");
+            animateTranslate.setAttribute("attributeName", "gradientTransform");
+            animateTranslate.setAttribute("type", "translate");
+            animateTranslate.setAttribute("from", translateX + " " + translateY);
+            animateTranslate.setAttribute("to", translateXEnd + " " + translateYEnd);
+            
+            gradient.appendChild(animateRotate);
+            gradient.appendChild(animateScale);
+            gradient.appendChild(animateTranslate);
         }
         for (int i = 0; i < gradientRecords.length; i++) {
             GRADRECORD record = gradientRecords[i];

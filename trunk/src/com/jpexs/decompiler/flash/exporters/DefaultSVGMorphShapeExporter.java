@@ -65,12 +65,12 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
     }
 
     @Override
-    public void beginFill(RGB color) {
+    public void beginFill(RGB color, RGB colorEnd) {
         finalizePath();
     }
 
     @Override
-    public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
     }
 
@@ -85,12 +85,12 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
     }
 
     @Override
-    public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
+    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
     }
 
     @Override
-    public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio) {
     }
 
     @Override
