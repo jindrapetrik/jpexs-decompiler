@@ -33,7 +33,7 @@ import java.util.Stack;
 public class HasNext2Ins extends InstructionDefinition {
 
     public HasNext2Ins() {
-        super(0x32, "hasnext2", new int[]{AVM2Code.OPT_U8, AVM2Code.OPT_U8});
+        super(0x32, "hasnext2", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX, AVM2Code.DAT_LOCAL_REG_INDEX});
     }
 
     @Override
