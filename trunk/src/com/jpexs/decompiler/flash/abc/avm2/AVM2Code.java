@@ -1265,7 +1265,7 @@ public class AVM2Code implements Serializable {
         List<GraphTargetItem> output = new ArrayList<>();
         String ret = "";
         int ip = start;
-        try {
+        //try {
             //int addr;
             iploop:
             while (ip <= end) {
@@ -1477,8 +1477,20 @@ public class AVM2Code implements Serializable {
                     nft.functionName = functionName;
                     ip++;
                 } else {
+                    try{
                     ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
-
+                    }catch(RuntimeException re){
+                        /*String last="";
+                        int len=5;
+                        for(int i=(ip-len<0?0:ip-len);i<ip+len && ip<code.size();i++){
+                            if(i==ip){
+                                last+=">";
+                            }
+                            last+=""+i+": "+code.get(i).toString()+"\r\n";
+                        }
+                        Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "ins list:\r\n{0}", last);*/
+                        throw re;
+                    }
                     ip++;
                     //addr = pos2adr(ip);
                 }
@@ -1491,9 +1503,9 @@ public class AVM2Code implements Serializable {
              clearTemporaryRegisters(output);
              }*/
             return new ConvertOutput(stack, output);
-        } catch (ConvertException cex) {
+        /*} catch (ConvertException cex) {
             throw cex;
-        }
+        }*/
     }
 
     public int getRegisterCount() {

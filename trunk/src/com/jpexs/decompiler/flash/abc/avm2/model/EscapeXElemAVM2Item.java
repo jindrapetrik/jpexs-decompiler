@@ -16,11 +16,17 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXElemIns;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 
 /**
  *
@@ -28,17 +34,16 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class EscapeXElemAVM2Item extends AVM2Item {
 
-    public GraphTargetItem expression;
-
+    
     public EscapeXElemAVM2Item(AVM2Instruction instruction, GraphTargetItem expression) {
         super(instruction, NOPRECEDENCE);
-        this.expression = expression;
+        this.value = expression;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("{");
-        expression.toString(writer, localData);
+        value.toString(writer, localData);
         return writer.append("}");
     }
 
@@ -51,4 +56,11 @@ public class EscapeXElemAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return true;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSourceMerge(localData, generator, value, ins(new EscXElemIns()));
+    }
+    
+    
 }

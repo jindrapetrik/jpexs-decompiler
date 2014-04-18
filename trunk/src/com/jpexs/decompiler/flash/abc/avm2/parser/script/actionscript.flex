@@ -19,6 +19,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
+import java.io.StringReader;
 
 %% 
 
@@ -31,6 +32,25 @@ import java.util.ArrayList;
 %throws ParseException
 
 %{
+
+    private String sourceCode;
+
+    public ActionScriptLexer(String sourceCode){
+        this(new StringReader(sourceCode));
+        this.sourceCode = sourceCode;       
+    }
+
+    public void yypushbackstr(String s, int state)
+    {
+        sourceCode=s+sourceCode.substring(yychar+yylength());
+        yyreset(new StringReader(sourceCode));
+        yybegin(state);
+    }
+
+    public void yypushbackstr(String s)
+    {
+        yypushbackstr(s,YYINITIAL);
+    }
 
     StringBuffer string = new StringBuffer();
 
@@ -103,15 +123,57 @@ EndOfLineComment = "//" {InputCharacter}* {LineTerminator}?
 /* identifiers */
 Identifier = [:jletter:][:jletterdigit:]*
 
-IdentifierNs = {Identifier} ":" {Identifier}
-
 TypeNameSpec = ".<"
 
 /* XML */
-XMLIdentifier = {Identifier} | {IdentifierNs}
-XMLAttribute = " "* {XMLIdentifier} " "* "=" " "* \" {InputCharacter}* \" " "*
-XMLBeginOneTag = "<" {XMLIdentifier} {XMLAttribute}* ">"
-XMLEndTag = "</" {XMLIdentifier} ">"
+
+XmlS = (\u0020 | \u0009 | \u000D | \u000A)+
+
+XmlCommentStart = "<!--"
+XmlCommentEnd = "-->"
+
+XmlNameStartChar = ":" | [A-Z] | "_" | [a-z]
+XmlNameStartCharUnicode = [\u00C0-\u00D6]   |
+        [\u00D8-\u00F6] |
+        [\u00F8-\u02FF] |
+        [\u0370-\u037D] |
+        [\u037F-\u1FFF] |
+        [\u200C-\u200D] |
+        [\u2070-\u218F] |
+        [\u2C00-\u2FEF] |
+        [\u3001-\uD7FF] |
+        [\uF900-\uFDCF] |
+        [\uFDF0-\uFFFD] |
+        [\u10000-\uEFFFF]
+
+XmlNameChar = {XmlNameStartChar} | "-" | "." | [0-9] | \u00B7
+XmlNameCharUnicode = [\u0300-\u036F] | [\u0203F-\u2040]
+XmlName = {XmlNameStartChar} {XmlNameChar}*
+XmlNameUnicode = ({XmlNameStartChar}|{XmlNameStartCharUnicode}) ({XmlNameChar}|{XmlNameCharUnicode})*
+
+/* XML Processing Instructions */
+XmlInstrStart = "<?" {XmlName}
+XmlInstrEnd   = "?>"
+
+/* CDATA  */
+XmlCDataStart = "<![CDATA["
+XmlCDataEnd   = "]]>"
+
+/* Tags */
+XmlOpenTagStart = "<" {XmlName}
+XmlOpenTagClose = "/>"
+XmlOpenTagEnd = ">"
+
+XmlCloseTag = "</" {XmlName} {XmlS}* ">"
+
+/* attribute */
+XmlAttribute = {XmlName} "="
+
+/* string and character literals */
+XmlDQuoteStringChar = [^\r\n\"]
+XmlSQuoteStringChar = [^\r\n\']
+
+
 
 /* integer literals */
 DecIntegerLiteral = 0 | [1-9][0-9]*
@@ -134,7 +196,7 @@ Exponent = [eE] [+-]? [0-9]+
 StringCharacter = [^\r\n\"\\]
 SingleCharacter = [^\r\n\'\\]
 
-%state STRING, CHARLITERAL, XMLSTARTTAG, XML
+%state STRING, CHARLITERAL,XMLOPENTAG,XMLOPENTAGATTRIB,XMLINSTROPENTAG,XMLINSTRATTRIB,XMLCDATA,XMLCOMMENT,XML
 
 %%
 
@@ -281,38 +343,217 @@ SingleCharacter = [^\r\n\'\\]
   /* whitespace */
   {WhiteSpace}                   { /*ignore*/ }  
   {TypeNameSpec}                 { return new ParsedSymbol(SymbolGroup.TYPENAME,SymbolType.TYPENAME,yytext()); }
-  {XMLBeginOneTag}                  {string.setLength(0);
-                                    yybegin(XML); 
-                                    String s=yytext();                                    
-                                    s=s.substring(1,s.length()-1);
-                                    if(s.contains(" ")){
-                                       s=s.substring(0,s.indexOf(" "));
-                                    }
-                                    xmlTagName = s;
-                                    string.append(yytext());
+  {XmlOpenTagStart}              {
+                                    yybegin(XMLOPENTAG);
+                                    string.setLength(0);
+                                    return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTTAG_BEGIN, yytext());
                                  }
+  "<{"                           {  return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTVARTAG_BEGIN, yytext()); }
   /* identifiers */ 
   {Identifier}                   { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.IDENTIFIER, yytext()); }  
 }
 
-<XMLSTARTTAG> {
-   {XMLAttribute}                { string.append( yytext() );}
+<XMLOPENTAG> {
+   {XmlAttribute}                 {
+                                    yybegin(XMLOPENTAGATTRIB);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRIBUTENAME, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }
+   "{"                            {
+                                    yybegin(YYINITIAL);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRNAMEVAR_BEGIN, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }
+   {XmlOpenTagEnd}                {
+                                    yybegin(XML);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTTAG_END, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }
+   {XmlOpenTagClose}              {
+                                    yybegin(XML);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTFINISHTAG_END, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }                                 
+   {LineTerminator}               { string.append( yytext() );  yyline++;}
+   {WhiteSpace}                   { string.append( yytext() ); }   
+}
+
+
+
+<XMLOPENTAGATTRIB> {
+    \"{XmlDQuoteStringChar}*\"      {
+                                        yybegin(XMLOPENTAG);
+                                        return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRIBUTEVALUE, yytext());
+                                    }
+    "{"                             {
+                                      yybegin(YYINITIAL);
+                                      return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRVALVAR_BEGIN, yytext()); 
+                                    }                                
+}
+
+
+<XMLINSTROPENTAG> {
+   {XmlAttribute}                 {
+                                    yybegin(XMLINSTRATTRIB);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRIBUTENAME, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }
+   "{"                            {
+                                    yybegin(YYINITIAL);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_INSTRATTRNAMEVAR_BEGIN, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }
+   {XmlInstrEnd}                  {
+                                    yybegin(XML);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_INSTR_END, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }                                 
    {LineTerminator}               { string.append( yytext() );  yyline++;}
    {WhiteSpace}                   { string.append( yytext() ); }
-   ">"                             { yybegin(XML);  string.append( yytext() );}
 }
-<XML> {
-   {XMLBeginOneTag}                 { string.append( yytext() );}
-   {XMLEndTag}                   { string.append( yytext() );
-                                   String endtagname=yytext();
-                                   endtagname=endtagname.substring(2,endtagname.length()-1);                                   
-                                   if(endtagname.equals(xmlTagName)){
-                                       yybegin(YYINITIAL);
-                                       return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML, string.toString());
-                                   }
-                                 }
+
+<XMLINSTRATTRIB> {
+    \"{XmlDQuoteStringChar}*\"      {
+                                        yybegin(XMLINSTROPENTAG);
+                                        return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRIBUTEVALUE, yytext());
+                                    }
+    \"{XmlSQuoteStringChar}*\"      {
+                                        yybegin(XMLINSTROPENTAG);
+                                        return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRIBUTEVALUE, yytext());
+                                    }                                   
+    "{"                             {
+                                      yybegin(YYINITIAL);
+                                      return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_INSTRATTRVALVAR_BEGIN, yytext()); 
+                                    }                                
+}
+
+
+<XMLCDATA> {
+    {XmlCDataEnd}                         {
+                                     string.append(yytext());
+                                     yybegin(XML);
+                                     String ret = string.toString();
+                                     string.setLength(0);
+                                     return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_CDATA, ret);
+                                  }
+ {LineTerminator}                 { string.append( yytext() );  yyline++;}
+    .|\n                          { string.append( yytext() ); }
+}
+
+<XMLCOMMENT> {
+   {XmlCommentEnd}                          {
+                                     string.append(yytext());
+                                     yybegin(XML);
+                                     String ret = string.toString();
+                                     string.setLength(0);
+                                     return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_COMMENT, ret);
+                                  }
    {LineTerminator}               { string.append( yytext() );  yyline++;}
-   .|\n                          { string.append( yytext() ); }
+   .|\n                           { string.append(yytext());}
+}
+
+<XML> {
+   {XmlCDataStart}                    {
+                                    String ret=string.toString(); string.setLength(0); string.append(yytext() ); yybegin(XMLCDATA);
+                                    if(!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT,ret);
+                                  }
+   {XmlInstrStart}                {
+                                    yybegin(XMLINSTROPENTAG);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_INSTR_BEGIN, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }
+   "<?{"                          {
+                                    yybegin(YYINITIAL);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_INSTRVARTAG_BEGIN, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }
+   {XmlCommentStart}                        {
+                                     String ret=string.toString(); string.setLength(0); string.append(yytext()); yybegin(XMLCOMMENT);
+                                     if(!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT,ret);
+                                  }
+   {XmlOpenTagStart}              {
+                                    yybegin(XMLOPENTAG);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTTAG_BEGIN, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }
+   {XmlCloseTag}                  { 
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_FINISHTAG, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }   
+
+   "<{"                           {
+                                    yybegin(YYINITIAL);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTVARTAG_BEGIN, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }
+   "</{"                          { 
+                                    yybegin(YYINITIAL);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_FINISHVARTAG_BEGIN, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  } 
+   "{"                            { 
+                                    yybegin(YYINITIAL);
+                                    pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_VAR_BEGIN, yytext()));
+                                    if(string.length()>0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  } 
+   {LineTerminator}               { string.append( yytext() );  yyline++;}
+   .|\n                           { string.append( yytext() ); }
 }
 
 <STRING> {

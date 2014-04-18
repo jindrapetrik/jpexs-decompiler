@@ -128,7 +128,7 @@ public enum SymbolType {
     //Other
     STRING,
     COMMENT,
-    XML,
+    //XML,
     IDENTIFIER,
     INTEGER,
     DOUBLE,
@@ -181,5 +181,24 @@ public enum SymbolType {
     //PRINTASBITMAPNUM,
     //UNLOADMOVIE,
     //UNLOADMOVIENUM,
-    FINAL
+    FINAL,
+    XML_STARTTAG_BEGIN, // <xxx
+    XML_STARTVARTAG_BEGIN, // <{
+    XML_STARTTAG_END, // >
+    XML_FINISHVARTAG_BEGIN, // </{
+    XML_FINISHTAG, //  </xxx>
+    XML_STARTFINISHTAG_END, // /> 
+    XML_COMMENT, // <!-- ... -->
+    XML_CDATA, //<![CDATA[ ... ]]>
+    XML_INSTR_BEGIN, // <?xxx
+    XML_INSTR_END, // ?>
+    XML_VAR_BEGIN, // {
+    XML_ATTRIBUTENAME, // aaa=
+    XML_ATTRIBUTEVALUE, // "vvv"
+    XML_TEXT,
+    XML_ATTRNAMEVAR_BEGIN, // {...}=
+    XML_ATTRVALVAR_BEGIN, // aaa={
+    XML_INSTRATTRNAMEVAR_BEGIN, // {...}=
+    XML_INSTRATTRVALVAR_BEGIN, // aaa={
+    XML_INSTRVARTAG_BEGIN // <?{
 }
