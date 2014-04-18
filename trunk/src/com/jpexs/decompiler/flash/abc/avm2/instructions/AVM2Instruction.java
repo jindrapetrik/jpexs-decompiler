@@ -70,7 +70,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
                     case AVM2Code.OPT_S24:
                         aos.writeS24(operands[i]);
                         break;
-                    case AVM2Code.OPT_U30:
+                    case AVM2Code.OPT_U30:                        
                         aos.writeU30(operands[i]);
                         break;
                     case AVM2Code.OPT_U8:

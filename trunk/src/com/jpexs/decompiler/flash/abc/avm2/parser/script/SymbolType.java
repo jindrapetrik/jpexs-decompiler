@@ -200,5 +200,6 @@ public enum SymbolType {
     XML_ATTRVALVAR_BEGIN, // aaa={
     XML_INSTRATTRNAMEVAR_BEGIN, // {...}=
     XML_INSTRATTRVALVAR_BEGIN, // aaa={
-    XML_INSTRVARTAG_BEGIN // <?{
+    XML_INSTRVARTAG_BEGIN, // <?{
+    FILTER
 }

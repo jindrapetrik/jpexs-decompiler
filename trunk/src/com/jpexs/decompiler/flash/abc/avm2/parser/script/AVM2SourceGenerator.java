@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewActivationIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewCatchIns;
@@ -55,10 +56,12 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushWithIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.SwapIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.CheckFilterIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
@@ -260,6 +263,75 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
             ret.addAll(onFalse);
         }
+        return ret;
+    }
+    
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, XMLFilterAVM2Item item) throws CompilationException {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        final Reference<Integer> counterReg = new Reference<>(0);
+        final Reference<Integer> collectionReg = new Reference<>(0);
+        final Reference<Integer> xmlListReg = new Reference<>(0);
+        List<GraphSourceItem> xmlListSetTemp = AssignableAVM2Item.setTemp(localData, this, xmlListReg);
+        ret.addAll(GraphTargetItem.toSourceMerge(localData, this,
+                ins(new PushByteIns(), 0),
+                AssignableAVM2Item.setTemp(localData, this, counterReg),
+                item.object,
+                ins(new CheckFilterIns()),
+                NameAVM2Item.generateCoerce(this, TypeItem.UNBOUNDED),
+                AssignableAVM2Item.setTemp(localData, this, collectionReg),
+                ins(new GetLexIns(),abc.constants.getMultinameId(new Multiname(Multiname.QNAME, abc.constants.getStringId("XMLList", true), abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<Integer>()), true)),
+                ins(new PushStringIns(),abc.constants.getStringId("", true)),
+                ins(new ConstructIns(),1),
+                xmlListSetTemp
+        ));     
+        final Reference<Integer> tempVal1 = new Reference<>(0);
+        final Reference<Integer> tempVal2 = new Reference<>(0);
+        
+        List<AVM2Instruction> forBody = toInsList(GraphTargetItem.toSourceMerge(localData, this,
+                ins(new LabelIns()),
+                AssignableAVM2Item.getTemp(localData, this, collectionReg),
+                AssignableAVM2Item.getTemp(localData, this, counterReg),
+                ins(new NextValueIns()),
+                AssignableAVM2Item.dupSetTemp(localData, this, tempVal1),
+                AssignableAVM2Item.dupSetTemp(localData, this, tempVal2),
+                ins(new PushWithIns())                
+        ));
+        localData.scopeStack.add(new LocalRegAVM2Item(null, tempVal2.getVal(), null));
+        forBody.addAll(toInsList(item.value.toSource(localData, this)));
+        List<AVM2Instruction> trueBody = new ArrayList<>();
+        trueBody.addAll(toInsList(AssignableAVM2Item.getTemp(localData, this, xmlListReg)));
+        trueBody.addAll(toInsList(AssignableAVM2Item.getTemp(localData, this, counterReg)));
+        trueBody.addAll(toInsList(AssignableAVM2Item.getTemp(localData, this, tempVal1)));
+        int nss[] = new int[item.openedNamespaces.size()];
+        for(int i=0;i<item.openedNamespaces.size();i++){
+            nss[i] = item.openedNamespaces.get(i);
+        }
+        trueBody.add(ins(new SetPropertyIns(),abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0,  abc.constants.getNamespaceSetId(new NamespaceSet(nss), true), 0, new ArrayList<Integer>()), true)));
+        forBody.add(ins(new IfFalseIns(),insToBytes(trueBody).length));
+        forBody.addAll(trueBody);
+        forBody.add(ins(new PopScopeIns()));
+        localData.scopeStack.remove(localData.scopeStack.size()-1);
+        forBody.addAll(toInsList(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(tempVal2,tempVal1))));
+        
+        
+        
+        int forBodyLen = insToBytes(forBody).length;
+        AVM2Instruction forwardJump = ins(new JumpIns(), forBodyLen);
+        ret.add(forwardJump);
+
+        List<AVM2Instruction> expr = new ArrayList<>();
+        expr.add(ins(new HasNext2Ins(), collectionReg.getVal(), counterReg.getVal()));
+        AVM2Instruction backIf = ins(new IfTrueIns(), 0);
+        expr.add(backIf);
+
+        int exprLen = insToBytes(expr).length;
+        backIf.operands[0] = -(exprLen + forBodyLen);
+
+        ret.addAll(forBody);
+        ret.addAll(expr);
+        ret.addAll(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(collectionReg, counterReg)));
+        ret.addAll(AssignableAVM2Item.getTemp(localData, this, xmlListReg));
+        ret.addAll(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(xmlListReg)));
         return ret;
     }
 

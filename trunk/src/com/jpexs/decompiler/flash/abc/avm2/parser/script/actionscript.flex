@@ -313,6 +313,7 @@ SingleCharacter = [^\r\n\'\\]
   "typeof"                       { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.TYPEOF,yytext());  } 
   "void"                         { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.VOID,yytext());  } 
   "@"                            { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ATTRIBUTE,yytext());  } 
+  ".("                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.FILTER,yytext()); }
   
   /* string literal */
   \"                             {  

@@ -121,7 +121,7 @@ import java.util.logging.Logger;
 public class ActionScriptParser {
 
     private long uniqLast = 0;
-    private final boolean debugMode = true;
+    private final boolean debugMode = false;
     private static final String AS3_NAMESPACE = "http://adobe.com/AS3/2006/builtin";
 
     private ABC abc;
@@ -202,8 +202,13 @@ public class ActionScriptParser {
 
     private GraphTargetItem name(Reference<Boolean> needsActivation, boolean typeOnly, List<Integer> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables, List<String> importedClasses) throws IOException, ParseException {
         ParsedSymbol s = lex();
+        String name = "";
+        if(s.type == SymbolType.ATTRIBUTE){            
+            name += "@";
+            s = lex();
+        }
         expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
-        String name = s.value.toString();
+        name += s.value.toString();        
         s = lex();
         while (s.type == SymbolType.DOT) {
             s = lex();
@@ -1440,6 +1445,12 @@ public class ActionScriptParser {
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
         switch (s.type) {
+            case FILTER:
+                needsActivation.setVal(true);
+                ret = new XMLFilterAVM2Item(expr,expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables), openedNamespaces);
+                expectedType(SymbolType.PARENT_CLOSE);
+                allowRemainder = true;
+                break;
             case NAMESPACE_OP:
                 s = lex();
                 if (s.type == SymbolType.BRACKET_OPEN) {
@@ -1885,6 +1896,7 @@ public class ActionScriptParser {
             case IDENTIFIER:
             case THIS:
             case SUPER:
+            case ATTRIBUTE:
                 lexer.pushback(s);
                 GraphTargetItem var = name(needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
                 var = memberOrCall(needsActivation, importedClasses, openedNamespaces, var, registerVars, inFunction, inMethod, variables);
