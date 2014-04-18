@@ -23,7 +23,8 @@ import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
-import com.jpexs.decompiler.flash.exporters.SVGMorphShapeExporter;
+import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
+import com.jpexs.decompiler.flash.exporters.morphshape.SVGMorphShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -147,7 +148,7 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag, 
     }
 
     @Override
-    public String toSVG() {
+    public String toSVG(SVGExporterContext exporterContext) {
         ExportRectangle rect = new ExportRectangle(getRect());
         SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
         SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);

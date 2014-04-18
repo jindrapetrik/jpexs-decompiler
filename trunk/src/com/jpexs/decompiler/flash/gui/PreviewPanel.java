@@ -504,9 +504,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             }
 
             if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
-                // this setting should be synchronized with ImagePanel.morphShapeAnimationLength
-                frameCount = 100;
-                frameRate = 50;
+                frameRate = MainPanel.morphShapeAnimationFrameRate;
+                frameCount = MainPanel.morphShapeAnimationLength * frameRate;
             }
 
             if (tagObj instanceof DefineSoundTag) {
@@ -671,8 +670,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                     } else if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
                         new PlaceObject2Tag(swf, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null).writeTag(sos2);
                         new ShowFrameTag(swf).writeTag(sos2);
-                        int numFrames = 100;
-                        for (int ratio = 0; ratio < 65536; ratio += 65536 / numFrames) {
+                        for (int ratio = 0; ratio < 65536; ratio += 65536 / frameCount) {
                             new PlaceObject2Tag(swf, false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null).writeTag(sos2);
                             new ShowFrameTag(swf).writeTag(sos2);
                         }

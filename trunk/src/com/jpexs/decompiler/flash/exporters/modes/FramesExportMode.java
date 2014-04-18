@@ -24,5 +24,6 @@ public enum FramesExportMode {
 
     PNG,
     GIF,
-    AVI
+    AVI,
+    SVG
 }
