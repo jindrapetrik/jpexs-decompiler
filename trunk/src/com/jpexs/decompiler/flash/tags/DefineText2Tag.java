@@ -494,9 +494,8 @@ public class DefineText2Tag extends TextTag {
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int ratio, int level) {
-        return "";
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
+        return staticTextToSVG(swf, textRecords, 2, getTextMatrix(), colorTransform);
     }
 
     @Override

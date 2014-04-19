@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -264,7 +266,6 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         int textHeight = 12;
         int x = 0;
         int y = 0;
-        Graphics2D g = (Graphics2D) image.getGraphics();
         List<SHAPE> glyphs = new ArrayList<>();
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
@@ -302,6 +303,52 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 }
             }
         }
+    }
+
+    public static String staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, MATRIX textMatrix, ColorTransform colorTransform) {
+        Color textColor = new Color(0, 0, 0);
+        FontTag font = null;
+        int textHeight = 12;
+        int x = 0;
+        int y = 0;
+        List<SHAPE> glyphs = new ArrayList<>();
+        SVGExporter svgExporter = new SVGExporter(null, new ColorTransform());
+        for (TEXTRECORD rec : textRecords) {
+            if (rec.styleFlagsHasColor) {
+                if (numText == 2) {
+                    textColor = colorTransform.apply(rec.textColorA.toColor());
+                } else {
+                    textColor = colorTransform.apply(rec.textColor.toColor());
+                }
+            }
+            if (rec.styleFlagsHasFont) {
+                font = (FontTag) swf.characters.get(rec.fontId);
+                glyphs = font.getGlyphShapeTable();
+                textHeight = rec.textHeight;
+            }
+            if (rec.styleFlagsHasXOffset) {
+                x = rec.xOffset;
+            }
+            if (rec.styleFlagsHasYOffset) {
+                y = rec.yOffset;
+            }
+
+            double rat = textHeight / 1024.0 / font.getDivider();
+
+            for (GLYPHENTRY entry : rec.glyphEntries) {
+                Matrix matTr = Matrix.getTranslateInstance(x, y);
+                Matrix mat = new Matrix(textMatrix).concatenate(matTr).concatenate(Matrix.getScaleInstance(rat));
+                if (entry.glyphIndex != -1) {
+                    // shapeNum: 1
+                    SHAPE shape = glyphs.get(entry.glyphIndex);
+                    svgExporter.createNewGroup(mat);
+                    SVGShapeExporter exporter = new SVGShapeExporter(swf, shape, svgExporter, textColor, new ColorTransform() /*FIXME?*/);
+                    exporter.export();
+                    x += entry.glyphAdvance;
+                }
+            }
+        }
+        return svgExporter.getSVG();
     }
 
     @Override

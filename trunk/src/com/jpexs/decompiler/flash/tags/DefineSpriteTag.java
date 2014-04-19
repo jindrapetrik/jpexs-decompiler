@@ -290,7 +290,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int ratio, int level) throws IOException {
+    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) throws IOException {
         return SWF.frameToSvg(getTimeline(), 0, 0, null, 0, exporterContext, getRect(), new ColorTransform(), null, level + 1);
     }
 

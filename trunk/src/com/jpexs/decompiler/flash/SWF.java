@@ -1872,7 +1872,7 @@ public final class SWF implements TreeItem, Timelined {
                         switch (mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(Utf8Helper.getBytes(st.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), -2, 0)));
+                                    fos.write(Utf8Helper.getBytes(st.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), -2, new CXFORMWITHALPHA(), 0)));
                                 }
                                 break;
                             case PNG:
@@ -1928,7 +1928,7 @@ public final class SWF implements TreeItem, Timelined {
                         switch (mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(Utf8Helper.getBytes(mst.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), -2, 0)));
+                                    fos.write(Utf8Helper.getBytes(mst.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), -2, new CXFORMWITHALPHA(), 0)));
                                 }
                                 break;
                         }
@@ -2588,7 +2588,7 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public static String frameToSvg(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporterContext exporterContext, RECT displayRect, ColorTransform colorTransform, Color backGroundColor, int level) throws IOException {
-        SVGExporter exporter = new SVGExporter(timeline.swf, new ExportRectangle(displayRect), colorTransform);
+        SVGExporter exporter = new SVGExporter(new ExportRectangle(displayRect), colorTransform);
         if (backGroundColor != null) {
             exporter.setBackGroundColor(backGroundColor);
         }
@@ -2662,7 +2662,7 @@ public final class SWF implements TreeItem, Timelined {
                     exporterContext.exportedTags.put(drawableTag, assetFileName);
                     File file = new File(assetsDir + File.separator + assetFileName);
                     try (FileOutputStream fos = new FileOutputStream(file)) {
-                        fos.write(Utf8Helper.getBytes(drawable.toSVG(exporterContext, layer.ratio, level + 1)));
+                        fos.write(Utf8Helper.getBytes(drawable.toSVG(exporterContext, layer.ratio, clrTrans, level + 1)));
                     }
                 }
                 RECT boundRect = drawable.getRect();

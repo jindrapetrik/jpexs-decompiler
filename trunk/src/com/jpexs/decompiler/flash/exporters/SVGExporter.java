@@ -40,6 +40,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -53,16 +54,10 @@ public class SVGExporter {
     protected Document _svg;
     protected Element _svgDefs;
     protected Element _svgG;
-    protected Element path;
-    protected List<Element> gradients;
+    public List<Element> gradients;
     protected int lastPatternId;
-    private final SWF swf;
-    private double maxLineWidth;
-    private final ExportRectangle bounds;
 
-    public SVGExporter(SWF swf, ExportRectangle bounds, ColorTransform colorTransform) {
-        this.swf = swf;
-        this.bounds = bounds;
+    public SVGExporter(ExportRectangle bounds, ColorTransform colorTransform) {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
@@ -75,16 +70,47 @@ public class SVGExporter {
             svgRoot.setAttribute("xmlns:xlink", xlinkNamespace);
             _svgDefs = _svg.createElement("defs");
             svgRoot.appendChild(_svgDefs);
-            _svgG = _svg.createElement("g");
-            _svgG.setAttribute("transform", "matrix(1, 0, 0, 1, "
-                    + roundPixels20(-bounds.xMin / (double) SWF.unitDivisor) + ", " + roundPixels20(-bounds.yMin / (double) SWF.unitDivisor) + ")");
-            svgRoot.appendChild(_svgG);
+            if (bounds != null) {
+                createNewGroup(bounds);
+            }
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(SVGExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
         gradients = new ArrayList<>();
     }
 
+    public final void createNewGroup(ExportRectangle bounds) {
+        _svgG = _svg.createElement("g");
+        _svgG.setAttribute("transform", "matrix(1, 0, 0, 1, "
+                + roundPixels20(-bounds.xMin / (double) SWF.unitDivisor) + ", " + roundPixels20(-bounds.yMin / (double) SWF.unitDivisor) + ")");
+        _svg.getDocumentElement().appendChild(_svgG);
+    }
+    
+    public final void createNewGroup(Matrix transform) {
+        _svgG = _svg.createElement("g");
+        double translateX = roundPixels400(transform.translateX / SWF.unitDivisor);
+        double translateY = roundPixels400(transform.translateY / SWF.unitDivisor);
+        double rotateSkew0 = roundPixels400(transform.rotateSkew0);
+        double rotateSkew1 = roundPixels400(transform.rotateSkew1);
+        double scaleX = roundPixels400(transform.scaleX);
+        double scaleY = roundPixels400(transform.scaleY);
+        _svgG.setAttribute("transform", "matrix(" + scaleX + ", " + rotateSkew0
+                + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
+        _svg.getDocumentElement().appendChild(_svgG);
+    }
+    
+    public void addToGroup(Node newChild) {
+        _svgG.appendChild(newChild);
+    }
+    
+    public void addToDefs(Node newChild) {
+        _svgDefs.appendChild(newChild);
+    }
+    
+    public Element createElement(String tagName) {
+        return _svg.createElement(tagName);
+    }
+    
     public String getSVG() {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         StringWriter writer = new StringWriter();

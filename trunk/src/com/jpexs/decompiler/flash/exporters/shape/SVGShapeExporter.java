@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.SVGExporter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -35,26 +35,9 @@ import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 
 /**
@@ -63,74 +46,29 @@ import org.w3c.dom.Element;
  */
 public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
-    protected static final String sNamespace = "http://www.w3.org/2000/svg";
-    protected static final String xlinkNamespace = "http://www.w3.org/1999/xlink";
-
-    protected Document _svg;
-    protected Element _svgDefs;
-    protected Element _svgG;
     protected Element path;
-    protected List<Element> gradients;
     protected int lastPatternId;
+    private final Color defaultColor;
     private final SWF swf;
-    private double maxLineWidth;
-    private final ExportRectangle bounds;
+    private final SVGExporter exporter;
     private final String shapeId;
 
-    public SVGShapeExporter(SWF swf, SHAPE shape, ExportRectangle bounds, ColorTransform colorTransform) {
-        this(swf, shape, bounds, colorTransform, "");
+    public SVGShapeExporter(SWF swf, SHAPE shape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform) {
+        this(swf, shape, exporter, defaultColor, colorTransform, "");
     }
 
-    public SVGShapeExporter(SWF swf, SHAPE shape, ExportRectangle bounds, ColorTransform colorTransform, String shapeId) {
+    public SVGShapeExporter(SWF swf, SHAPE shape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, String shapeId) {
         super(shape, colorTransform);
         this.swf = swf;
-        this.bounds = bounds;
+        this.defaultColor = defaultColor;
+        this.exporter = exporter;
         this.shapeId = shapeId;
-    }
-
-    public String getSVG() {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        StringWriter writer = new StringWriter();
-        try {
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-            DOMSource source = new DOMSource(_svg);
-            StreamResult result = new StreamResult(writer);
-            transformer.transform(source, result);
-        } catch (TransformerException ex) {
-            Logger.getLogger(SVGShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return writer.toString();
-    }
-
-    @Override
-    public void beginShape() {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            DOMImplementation impl = docBuilder.getDOMImplementation();
-            DocumentType svgDocType = impl.createDocumentType("svg", "-//W3C//DTD SVG 1.0//EN",
-                    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd");
-            _svg = impl.createDocument(sNamespace, "svg", svgDocType);
-            Element svgRoot = _svg.getDocumentElement();
-            svgRoot.setAttribute("xmlns:xlink", xlinkNamespace);
-            _svgDefs = _svg.createElement("defs");
-            svgRoot.appendChild(_svgDefs);
-            _svgG = _svg.createElement("g");
-            _svgG.setAttribute("transform", "matrix(1, 0, 0, 1, "
-                    + roundPixels20(-bounds.xMin / (double) SWF.unitDivisor) + ", " + roundPixels20(-bounds.yMin / (double) SWF.unitDivisor) + ")");
-            svgRoot.appendChild(_svgG);
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(SVGShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        gradients = new ArrayList<>();
     }
 
     @Override
     public void beginFill(RGB color) {
         if (color == null) {
-            color = new RGB(Color.BLACK);
+            color = new RGB(defaultColor == null ? Color.BLACK : defaultColor);
         }
         finalizePath();
         path.setAttribute("stroke", "none");
@@ -148,21 +86,21 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
-                ? _svg.createElement("linearGradient")
-                : _svg.createElement("radialGradient");
+                ? exporter.createElement("linearGradient")
+                : exporter.createElement("radialGradient");
         populateGradientElement(gradient, type, gradientRecords, matrix, spreadMethod, interpolationMethod, focalPointRatio);
-        int id = gradients.indexOf(gradient);
+        int id = exporter.gradients.indexOf(gradient);
         if (id < 0) {
             // todo: filter same gradients
-            id = gradients.size();
-            gradients.add(gradient);
+            id = exporter.gradients.size();
+            exporter.gradients.add(gradient);
         }
         String gradientId = "gradient" + shapeId + id;
         gradient.setAttribute("id", gradientId);
         path.setAttribute("stroke", "none");
         path.setAttribute("fill", "url(#" + gradientId + ")");
         path.setAttribute("fill-rule", "evenodd");
-        _svgDefs.appendChild(gradient);
+        exporter.addToDefs(gradient);
     }
 
     @Override
@@ -205,7 +143,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 }
                 String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
                 path.setAttribute("style", "fill:url(#" + patternId + ")");
-                Element pattern = _svg.createElement("pattern");
+                Element pattern = exporter.createElement("pattern");
                 pattern.setAttribute("id", patternId);
                 pattern.setAttribute("patternUnits", "userSpaceOnUse");
                 pattern.setAttribute("overflow", "visible");
@@ -222,12 +160,12 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                     pattern.setAttribute("patternTransform", "matrix(" + scaleX + ", " + rotateSkew0
                             + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
                 }
-                Element imageElement = _svg.createElement("image");
+                Element imageElement = exporter.createElement("image");
                 imageElement.setAttribute("width", "" + width);
                 imageElement.setAttribute("height", "" + height);
                 imageElement.setAttribute("xlink:href", "data:image/" + format + ";base64," + base64ImgData);
                 pattern.appendChild(imageElement);
-                _svgG.appendChild(pattern);
+                exporter.addToGroup(pattern);
             }
         }
     }
@@ -235,9 +173,6 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        if (thickness > maxLineWidth) {
-            maxLineWidth = thickness;
-        }
         thickness /= SWF.unitDivisor;
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", color.toHexRGB());
@@ -279,28 +214,28 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         path.removeAttribute("stroke-opacity");
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
-                ? _svg.createElement("linearGradient")
-                : _svg.createElement("radialGradient");
+                ? exporter.createElement("linearGradient")
+                : exporter.createElement("radialGradient");
         populateGradientElement(gradient, type, gradientRecords, matrix, spreadMethod, interpolationMethod, focalPointRatio);
-        int id = gradients.indexOf(gradient);
+        int id = exporter.gradients.indexOf(gradient);
         if (id < 0) {
             // todo: filter same gradients
-            id = gradients.size();
-            gradients.add(gradient);
+            id = exporter.gradients.size();
+            exporter.gradients.add(gradient);
         }
         gradient.setAttribute("id", "gradient" + id);
         path.setAttribute("stroke", "url(#gradient" + id + ")");
         path.setAttribute("fill", "none");
-        _svgDefs.appendChild(gradient);
+        exporter.addToDefs(gradient);
     }
 
     @Override
     protected void finalizePath() {
         if (path != null && !"".equals(pathData)) {
             path.setAttribute("d", pathData.trim());
-            _svgG.appendChild(path);
+            exporter.addToGroup(path);
         }
-        path = _svg.createElement("path");
+        path = exporter.createElement("path");
         super.finalizePath();
     }
 
@@ -344,7 +279,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         }
         for (int i = 0; i < gradientRecords.length; i++) {
             GRADRECORD record = gradientRecords[i];
-            Element gradientEntry = _svg.createElement("stop");
+            Element gradientEntry = exporter.createElement("stop");
             gradientEntry.setAttribute("offset", Double.toString(record.ratio / 255.0));
             RGB color = record.color;
             //if(colors.get(i) != 0) { 
