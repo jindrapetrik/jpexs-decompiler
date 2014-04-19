@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -27,7 +26,7 @@ import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
  *
  * @author JPEXS
  */
-public interface MorphShapeTag {
+public interface MorphShapeTag extends DrawableTag {
 
     public RECT getStartBounds();
 
@@ -40,8 +39,6 @@ public interface MorphShapeTag {
     public SHAPE getStartEdges();
 
     public SHAPE getEndEdges();
-
-    public String toSVG(SVGExporterContext exporterContext, int level);
 
     public int getShapeNum();
 

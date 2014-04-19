@@ -504,8 +504,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             }
 
             if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
-                frameRate = MainPanel.morphShapeAnimationFrameRate;
-                frameCount = MainPanel.morphShapeAnimationLength * frameRate;
+                frameRate = MainPanel.MORPH_SHAPE_ANIMATION_FRAME_RATE;
+                frameCount = MainPanel.MORPH_SHAPE_ANIMATION_LENGTH * frameRate;
             }
 
             if (tagObj instanceof DefineSoundTag) {

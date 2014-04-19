@@ -234,9 +234,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
 
     // play morph shape in 2 second(s)
-    public static final int morphShapeAnimationLength = 2;
+    public static final int MORPH_SHAPE_ANIMATION_LENGTH = 2;
 
-    public static final int morphShapeAnimationFrameRate = 30;
+    public static final int MORPH_SHAPE_ANIMATION_FRAME_RATE = 30;
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
@@ -2521,8 +2521,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
                 tim = new Timeline(tag.getSwf(), new ArrayList<Tag>(), ((CharacterTag) tag).getCharacterId(), getRect());
                 if (tag instanceof MorphShapeTag) {
-                    tim.frameRate = morphShapeAnimationFrameRate;
-                    int framesCnt = tim.frameRate * morphShapeAnimationLength;
+                    tim.frameRate = MORPH_SHAPE_ANIMATION_FRAME_RATE;
+                    int framesCnt = tim.frameRate * MORPH_SHAPE_ANIMATION_LENGTH;
                     for (int i = 0; i < framesCnt; i++) {
                         Frame f = new Frame(tim);
                         DepthState ds = new DepthState(tag.getSwf(), f);

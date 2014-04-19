@@ -939,7 +939,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int level) {
+    public String toSVG(SVGExporterContext exporterContext, int ratio, int level) {
         return "";
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

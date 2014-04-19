@@ -94,7 +94,7 @@ public class DefineShapeTag extends ShapeTag {
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int level) {
+    public String toSVG(SVGExporterContext exporterContext, int ratio, int level) {
         ExportRectangle rect = new ExportRectangle(getRect());
         SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(), rect, new ColorTransform() /*FIXME?*/);
         exporter.export();

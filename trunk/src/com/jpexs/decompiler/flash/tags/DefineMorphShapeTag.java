@@ -25,8 +25,8 @@ import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.exporters.morphshape.SVGMorphShapeExporter;
+import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -60,7 +60,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag, DrawableTag {
+public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
 
     @SWFType(BasicType.UI16)
     public int characterId;
@@ -145,16 +145,6 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag, 
         rect.Xmax = Math.max(startBounds.Xmax, endBounds.Xmax);
         rect.Ymax = Math.max(startBounds.Ymax, endBounds.Ymax);
         return rect;
-    }
-
-    @Override
-    public String toSVG(SVGExporterContext exporterContext, int level) {
-        ExportRectangle rect = new ExportRectangle(getRect());
-        SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
-        SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
-        SVGMorphShapeExporter exporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, rect, new ColorTransform() /*FIXME?*/);
-        exporter.export();
-        return exporter.getSVG();
     }
 
     @Override
@@ -319,6 +309,23 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag, 
         // key contains the hashCode of the finalRecord object, and it is always 
         // recreated
         BitmapExporter.export(swf, shape, null, image, transformation, colorTransform);
+    }
+
+    @Override
+    public String toSVG(SVGExporterContext exporterContext, int ratio, int level) {
+        ExportRectangle rect = new ExportRectangle(getRect());
+        if (ratio == -2) {
+            SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
+            SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
+            SVGMorphShapeExporter exporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, rect, new ColorTransform() /*FIXME?*/);
+            exporter.export();
+            return exporter.getSVG();
+        } else {
+            SHAPEWITHSTYLE shapes = getShapeAtRatio(ratio);
+            SVGShapeExporter exporter = new SVGShapeExporter(swf, shapes, rect, new ColorTransform() /*FIXME?*/);
+            exporter.export();
+            return exporter.getSVG();
+        }
     }
 
     @Override

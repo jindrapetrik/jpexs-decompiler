@@ -260,7 +260,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int level) {
+    public String toSVG(SVGExporterContext exporterContext, int ratio, int level) {
         return "";
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

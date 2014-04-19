@@ -33,7 +33,7 @@ public interface DrawableTag extends BoundedTag {
 
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform);
 
-    public String toSVG(SVGExporterContext exporterContext, int level) throws IOException;
+    public String toSVG(SVGExporterContext exporterContext, int ratio, int level) throws IOException;
 
     public Point getImagePos(int frame);
 
