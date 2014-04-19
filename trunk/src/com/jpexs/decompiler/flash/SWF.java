@@ -1564,9 +1564,10 @@ public final class SWF implements TreeItem, Timelined {
                     @Override
                     public void run() throws IOException {
                         int frame = fframes.get(fi);
-                        File f = new File(foutdir + File.separator + fframes.get(fi) + ".svg");
+                        File f = new File(foutdir + File.separator + frame + ".svg");
                         try (FileOutputStream fos = new FileOutputStream(f)) {
-                            fos.write(Utf8Helper.getBytes(frameToSvg(ftim, frame, 0, null, 0, new SVGExporterContext(foutdir.toString()), ftim.displayRect, new ColorTransform(), fbackgroundColor, 0)));
+                            SVGExporterContext exportContext = new SVGExporterContext(foutdir.toString(), "assets_" + frame);
+                            fos.write(Utf8Helper.getBytes(frameToSvg(ftim, frame, 0, null, 0, exportContext, ftim.displayRect, new ColorTransform(), fbackgroundColor, 0)));
                         }
                         ret.add(f);
                     }
@@ -1863,6 +1864,7 @@ public final class SWF implements TreeItem, Timelined {
                 }
 
                 final File file = new File(outdir + File.separator + characterID + "." + ext);
+                final int fcharacterID = characterID;
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
@@ -1870,7 +1872,7 @@ public final class SWF implements TreeItem, Timelined {
                         switch (mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(Utf8Helper.getBytes(st.toSVG(new SVGExporterContext(outdir), 0)));
+                                    fos.write(Utf8Helper.getBytes(st.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), 0)));
                                 }
                                 break;
                             case PNG:
@@ -1918,6 +1920,7 @@ public final class SWF implements TreeItem, Timelined {
                 String ext = "svg";
 
                 final File file = new File(outdir + File.separator + characterID + "." + ext);
+                final int fcharacterID = characterID;
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
@@ -1925,7 +1928,7 @@ public final class SWF implements TreeItem, Timelined {
                         switch (mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(Utf8Helper.getBytes(mst.toSVG(new SVGExporterContext(outdir), 0)));
+                                    fos.write(Utf8Helper.getBytes(mst.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), 0)));
                                 }
                                 break;
                         }
@@ -2646,7 +2649,7 @@ public final class SWF implements TreeItem, Timelined {
                 if (exporterContext.exportedTags.containsKey(drawableTag)) {
                     assetFileName = exporterContext.exportedTags.get(drawableTag);
                 } else {
-                    String assetsDir = exporterContext.outDir + File.separator + "assets";
+                    String assetsDir = exporterContext.outDir + File.separator + exporterContext.assetsDir;
                     File foutdir = new File(assetsDir);
                     if (!foutdir.exists()) {
                         if (!foutdir.mkdirs()) {
@@ -2667,7 +2670,7 @@ public final class SWF implements TreeItem, Timelined {
 
                 // TODO: if (layer.filters != null)
                 // TODO: if (layer.blendMode > 1)
-                String assetPath = level == 0 ? "assets" + File.separator + assetFileName : assetFileName;
+                String assetPath = level == 0 ? exporterContext.assetsDir + File.separator + assetFileName : assetFileName;
                 Matrix mat = new Matrix(layer.matrix);
                 mat.translate(rect.xMin, rect.yMin);
                 exporter.addImage(mat, boundRect, assetPath);

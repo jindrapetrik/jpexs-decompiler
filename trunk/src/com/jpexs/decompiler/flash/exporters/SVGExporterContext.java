@@ -27,9 +27,11 @@ import java.util.Map;
 public class SVGExporterContext {
 
     public String outDir;
+    public String assetsDir;
     public Map<Tag, String> exportedTags = new HashMap<>();
 
-    public SVGExporterContext(String outDir) {
+    public SVGExporterContext(String outDir, String assetsDir) {
         this.outDir = outDir;
+        this.assetsDir = assetsDir;
     }
 }
