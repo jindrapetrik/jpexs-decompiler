@@ -54,7 +54,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private ABC abc;
     private ScriptPack script;
     public int lastTraitIndex = 0;
-    private boolean ignoreCarret = false;
+    public boolean ignoreCarret = false;
     private boolean reset = false;
     private final ABCPanel abcPanel;
     private int classIndex = -1;

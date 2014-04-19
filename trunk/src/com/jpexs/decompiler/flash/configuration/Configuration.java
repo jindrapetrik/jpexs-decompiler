@@ -595,32 +595,42 @@ public class Configuration {
         return ret;
     }
 
-    public static File getPlayerSWC() {
+    public static File getFlashLibPath() {
         try {
             String home = getFFDecHome();
             File libsdir = new File(home + "flashlib");
-            if (libsdir.exists()) {
-                File libs[] = libsdir.listFiles(new FilenameFilter() {
-
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        return name.toLowerCase().startsWith("playerglobal");
-                    }
-                });
-                List<String> libnames = new ArrayList<>();
-                for (File f : libs) {
-                    libnames.add(f.getName());
-                }
-                Collections.sort(libnames);
-                if (!libnames.isEmpty()) {
-                    return new File(libsdir.getAbsolutePath() + File.separator + libnames.get(libnames.size() - 1));
-                } else {
-                    return null;
-                }
+            if (!libsdir.exists()) {
+                libsdir.mkdirs();
             }
+            return libsdir;
         } catch (IOException ex) {
-
+            return null;
         }
+
+    }
+
+    public static File getPlayerSWC() {
+        File libsdir = getFlashLibPath();
+        if (libsdir!=null && libsdir.exists()) {
+            File libs[] = libsdir.listFiles(new FilenameFilter() {
+
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().startsWith("playerglobal");
+                }
+            });
+            List<String> libnames = new ArrayList<>();
+            for (File f : libs) {
+                libnames.add(f.getName());
+            }
+            Collections.sort(libnames);
+            if (!libnames.isEmpty()) {
+                return new File(libsdir.getAbsolutePath() + File.separator + libnames.get(libnames.size() - 1));
+            } else {
+                return null;
+            }
+        }
+
         return null;
     }
 }

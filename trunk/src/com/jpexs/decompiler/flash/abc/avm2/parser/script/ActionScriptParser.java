@@ -2017,6 +2017,7 @@ public class ActionScriptParser {
         if (s.type != SymbolType.CURLY_OPEN) {
             expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
             name = s.value.toString();
+            s = lex();
         }
         while (s.type != SymbolType.CURLY_OPEN) {
             expected(s, lexer.yyline(), SymbolType.DOT);
@@ -2097,7 +2098,6 @@ public class ActionScriptParser {
     }
 
     public PackageAVM2Item packageFromString(String str, String fileName) throws ParseException, IOException, CompilationException {
-        this.constantPool = constantPool;
         lexer = new ActionScriptLexer(new StringReader(str));
 
         PackageAVM2Item ret = parsePackage(fileName);
@@ -2132,6 +2132,20 @@ public class ActionScriptParser {
         this.otherABCs = otherABCs;
     }
 
+    
+    public static void compile(String src, ABC abc, boolean documentClass,String fileName) throws ParseException, IOException, InterruptedException, CompilationException {
+        SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
+        SWF swf = new SWF(swc.getSWF("library.swf"), true);
+        List<ABC> playerABCs = new ArrayList<>();
+        for (Tag t : swf.tags) {
+            if (t instanceof ABCContainerTag) {
+                playerABCs.add(((ABCContainerTag) t).getABC());
+            }
+        }
+        ActionScriptParser parser = new ActionScriptParser(abc, playerABCs);
+        parser.addScript(src, documentClass, fileName);
+    }
+    
     public static void compile(String src, String dst) {
         System.err.println("WARNING: AS3 compiler is not finished yet. This is only used for debuggging!");
         try {

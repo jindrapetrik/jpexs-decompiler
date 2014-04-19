@@ -739,6 +739,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 } catch (IOException ex) {
                 } catch (ParseException ex) {
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    editor.gotoLine((int)ex.line);
                 }
                 break;
             case ACTION_EDIT_DECOMPILED:

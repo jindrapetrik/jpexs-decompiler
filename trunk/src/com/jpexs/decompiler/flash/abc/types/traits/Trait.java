@@ -96,7 +96,11 @@ public abstract class Trait implements Serializable {
             }
         }
         if (isStatic) {
-            ret += " static";
+            if((this instanceof TraitSlotConst)&&((TraitSlotConst)this).isNamespace()){
+                //static is automatic
+            }else{
+                ret += " static";
+            }
         }
         if ((kindFlags & ATTR_Final) > 0) {
             if (!isStatic) {

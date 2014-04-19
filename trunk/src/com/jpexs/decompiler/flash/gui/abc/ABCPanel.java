@@ -26,6 +26,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -55,7 +57,10 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -71,6 +76,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -90,6 +98,7 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
@@ -123,6 +132,15 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     private NewTraitDialog newTraitDialog;
     public JLabel scriptNameLabel;
 
+    static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
+    static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
+    static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
+    
+    public JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
+    public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    public JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
+    public JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
+    
     static final String ACTION_ADD_TRAIT = "ADDTRAIT";
 
     public boolean search(String txt, boolean ignoreCase, boolean regexp) {
@@ -361,10 +379,34 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         iconDecPanel.add(scriptNameLabel);
         iconDecPanel.add(iconsPanel);
         iconDecPanel.add(decompiledScrollPane);
+        
+        JPanel decButtonsPan = new JPanel(new FlowLayout());
+        decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
+        decButtonsPan.add(editDecompiledButton);
+        decButtonsPan.add(experimentalLabel);
+        decButtonsPan.add(saveDecompiledButton);
+        decButtonsPan.add(cancelDecompiledButton);
+
+        editDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
+        saveDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
+        cancelDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
+        
+        saveDecompiledButton.addActionListener(this);
+        saveDecompiledButton.setActionCommand(ACTION_SAVE_DECOMPILED);
+        editDecompiledButton.addActionListener(this);
+        editDecompiledButton.setActionCommand(ACTION_EDIT_DECOMPILED);
+
+        cancelDecompiledButton.addActionListener(this);
+        cancelDecompiledButton.setActionCommand(ACTION_CANCEL_DECOMPILED);
+        saveDecompiledButton.setVisible(false);
+        cancelDecompiledButton.setVisible(false);
+        decButtonsPan.setAlignmentX(0);
+                
 
         JPanel decPanel = new JPanel(new BorderLayout());
         decPanel.add(searchPanel, BorderLayout.NORTH);
         decPanel.add(iconDecPanel, BorderLayout.CENTER);
+        decPanel.add(decButtonsPan, BorderLayout.SOUTH);
         detailPanel = new DetailPanel(this);
         JPanel panB = new JPanel();
         panB.setLayout(new BorderLayout());
@@ -380,7 +422,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
-                Configuration.guiAvm2SplitPaneDividerLocation.set((int) pce.getNewValue());
+                if(!directEditing){
+                    Configuration.guiAvm2SplitPaneDividerLocation.set((int) pce.getNewValue());
+                }
             }
         });
         decompiledTextArea.setContentType("text/actionscript");
@@ -543,9 +587,124 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         searchPanel.showQuickFindDialog(decompiledTextArea);
     }
 
+    
+    public String lastDecompiled = null;
+    public boolean directEditing = false;
+    private int detWidth = 0;
+    private int detsp = 0;
+    
+    public void setDecompiledEditMode(boolean val) {
+        if (val) {
+            lastDecompiled = decompiledTextArea.getText();
+            decompiledTextArea.setEditable(true);
+            saveDecompiledButton.setVisible(true);
+            editDecompiledButton.setVisible(false);
+            experimentalLabel.setVisible(false);
+            cancelDecompiledButton.setVisible(true);
+            decompiledTextArea.getCaret().setVisible(true);
+            decLabel.setIcon(View.getIcon("editing16"));
+            directEditing = true;
+            detWidth = detailPanel.getWidth();
+            detsp = splitPane.getDividerLocation();
+            detailPanel.setVisible(false);
+        } else {
+            decompiledTextArea.setText(lastDecompiled);
+            decompiledTextArea.setEditable(false);
+            saveDecompiledButton.setVisible(false);
+            editDecompiledButton.setVisible(true);
+            experimentalLabel.setVisible(true);
+            cancelDecompiledButton.setVisible(false);
+            decompiledTextArea.getCaret().setVisible(true);
+            decLabel.setIcon(null);
+            directEditing = false;   
+            detailPanel.setVisible(true);            
+            detailPanel.setSize(detailPanel.getHeight(), detWidth);
+            splitPane.setDividerLocation(detsp);
+        }
+        decompiledTextArea.ignoreCarret = directEditing;
+        
+        decompiledTextArea.requestFocusInWindow();
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case ACTION_EDIT_DECOMPILED:
+                File swc = Configuration.getPlayerSWC();
+                final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
+                if(swc == null){
+                    if(View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.needed").replace("%adobehomepage%",adobePage),AppStrings.translate("message.action.playerglobal.title"),JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE)==JOptionPane.OK_OPTION){
+                        
+                        java.awt.Desktop desktop = null;
+                        if (java.awt.Desktop.isDesktopSupported()) {
+                            desktop = java.awt.Desktop.getDesktop();
+                            if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
+                                try {
+                                    java.net.URI uri = new java.net.URI(adobePage);
+                                    desktop.browse(uri);
+                                } catch (URISyntaxException | IOException ex) {
+                                }
+                            } else {
+                                desktop = null;
+                            }
+                        }
+                        
+                        int ret = 0;
+                        do{                            
+                            ret = View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.place").replace("%libpath%", Configuration.getFlashLibPath().getAbsolutePath()),AppStrings.translate("message.action.playerglobal.title"),JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);                                                        
+                            swc = Configuration.getPlayerSWC();
+                        }while(ret == JOptionPane.OK_OPTION && swc == null);
+                        if(ret == JOptionPane.OK_OPTION){
+                            setDecompiledEditMode(true);
+                        }
+                    }
+                }else{
+                    setDecompiledEditMode(true);
+                }
+                break;
+            case ACTION_CANCEL_DECOMPILED:
+                setDecompiledEditMode(false);
+                break;
+            case ACTION_SAVE_DECOMPILED:
+                ScriptPack pack = decompiledTextArea.getScriptLeaf();
+                String scriptName = pack.getPathScriptName()+".as";
+                int oldIndex = pack.scriptIndex;
+                int newIndex = abc.script_info.size();
+                String documentClass = "";
+                loopt:for (Tag t : swf.tags) {
+                    if (t instanceof SymbolClassTag) {
+                        SymbolClassTag sc = (SymbolClassTag) t;
+                        for (int i = 0; i < sc.tags.length; i++) {
+                            if (sc.tags[i] == 0) {
+                                documentClass = sc.names[i];
+                                break loopt;
+                            }
+                        }
+                    }
+                }
+                boolean isDocumentClass = documentClass.equals(pack.getPath().toString());
+                
+                try {                                        
+                    ActionScriptParser.compile(decompiledTextArea.getText(), abc,isDocumentClass, scriptName);                    
+                    //Move newly added script to its position
+                    abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
+                    abc.script_info.remove(newIndex);
+                    ((Tag)abc.parentTag).setModified(true);
+                    lastDecompiled = decompiledTextArea.getText();
+                    decompiledTextArea.setClassIndex(-1);
+                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
+                    setDecompiledEditMode(false);
+                    reload();                    
+                } catch (ParseException ex) {
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    decompiledTextArea.gotoLine((int)ex.line);
+                } catch (CompilationException ex) {
+                    View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    decompiledTextArea.gotoLine((int)ex.line);
+                } catch (IOException|InterruptedException ex) {
+                    //ignore                    
+                }                                
+                break;
             case ACTION_ADD_TRAIT:
                 int class_index = decompiledTextArea.getClassIndex();
                 if (class_index < 0) {
