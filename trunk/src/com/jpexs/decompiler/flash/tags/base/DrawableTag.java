@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.Point;
+import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.helpers.SerializableImage;
@@ -30,6 +31,8 @@ import java.awt.Shape;
 public interface DrawableTag extends BoundedTag {
 
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform);
+
+    public String toSVG(SVGExporterContext exporterContext);
 
     public Point getImagePos(int frame);
 

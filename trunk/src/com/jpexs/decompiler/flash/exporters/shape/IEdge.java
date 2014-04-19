@@ -14,25 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.exporters;
+package com.jpexs.decompiler.flash.exporters.shape;
+
+import com.jpexs.decompiler.flash.exporters.PointInt;
 
 /**
  *
  * @author JPEXS
  */
-public interface IMorphEdge {
+public interface IEdge {
 
     public PointInt getFrom();
 
     public PointInt getTo();
 
-    public PointInt getFromEnd();
-
-    public PointInt getToEnd();
-
     public int getLineStyleIdx();
 
     public int getFillStyleIdx();
 
-    public IMorphEdge reverseWithNewFillStyle(int newFillStyleIdx);
+    public IEdge reverseWithNewFillStyle(int newFillStyleIdx);
 }

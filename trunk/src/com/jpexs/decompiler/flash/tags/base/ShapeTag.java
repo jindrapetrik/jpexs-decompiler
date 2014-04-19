@@ -37,8 +37,6 @@ public abstract class ShapeTag extends CharacterTag implements BoundedTag, Drawa
 
     public abstract SHAPEWITHSTYLE getShapes();
 
-    public abstract String toSVG();
-
     public abstract int getShapeNum();
 
     @Override

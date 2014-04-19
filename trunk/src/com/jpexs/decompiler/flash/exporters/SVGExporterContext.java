@@ -20,21 +20,6 @@ package com.jpexs.decompiler.flash.exporters;
  *
  * @author JPEXS
  */
-public class CurvedEdge extends StraightEdge implements IEdge {
-
-    private final PointInt control;
-
-    CurvedEdge(PointInt from, PointInt control, PointInt to, int lineStyleIdx, int fillStyleIdx) {
-        super(from, to, lineStyleIdx, fillStyleIdx);
-        this.control = control;
-    }
-
-    public PointInt getControl() {
-        return control;
-    }
-
-    @Override
-    public IEdge reverseWithNewFillStyle(int newFillStyleIdx) {
-        return new CurvedEdge(to, control, from, lineStyleIdx, newFillStyleIdx);
-    }
+public class SVGExporterContext {
+    
 }

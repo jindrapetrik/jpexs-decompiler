@@ -234,11 +234,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
 
     // play morph shape in 2 second(s)
-    // this settings should be synchronized with frameCount and frameRate
-    // settings in MainPanel.createAndShowTempSwf
-    static final int morphShapeAnimationLength = 2;
+    public static final int morphShapeAnimationLength = 2;
 
-    static final int morphShapeAnimationFrameRate = 30;
+    public static final int morphShapeAnimationFrameRate = 30;
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 

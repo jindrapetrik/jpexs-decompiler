@@ -21,7 +21,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Point;
-import com.jpexs.decompiler.flash.exporters.SVGShapeExporter;
+import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
+import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -93,7 +94,7 @@ public class DefineShapeTag extends ShapeTag {
     }
 
     @Override
-    public String toSVG() {
+    public String toSVG(SVGExporterContext exporterContext) {
         ExportRectangle rect = new ExportRectangle(getRect());
         SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(), rect, new ColorTransform() /*FIXME?*/);
         exporter.export();

@@ -14,8 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.exporters;
+package com.jpexs.decompiler.flash.exporters.shape;
 
+import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGB;
@@ -24,7 +25,7 @@ import com.jpexs.decompiler.flash.types.RGB;
  *
  * @author JPEXS
  */
-public interface IMorphShapeExporter {
+public interface IShapeExporter {
 
     public void beginShape();
 
@@ -38,21 +39,21 @@ public interface IMorphShapeExporter {
 
     public void endLines();
 
-    public void beginFill(RGB color, RGB colorEnd);
+    public void beginFill(RGB color);
 
-    public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio);
+    public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio);
 
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform);
 
     public void endFill();
 
-    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit);
+    public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit);
 
-    public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio);
+    public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio);
 
-    public void moveTo(double x, double y, double x2, double y2);
+    public void moveTo(double x, double y);
 
-    public void lineTo(double x, double y, double x2, double y2);
+    public void lineTo(double x, double y);
 
-    public void curveTo(double controlX, double controlY, double anchorX, double anchorY, double controlX2, double controlY2, double anchorX2, double anchorY2);
+    public void curveTo(double controlX, double controlY, double anchorX, double anchorY);
 }

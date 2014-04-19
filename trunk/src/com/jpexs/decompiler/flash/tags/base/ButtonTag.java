@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -57,6 +58,11 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
         SWF.frameToImage(getTimeline(), frame, time, stateUnderCursor, mouseButton, image, transformation, colorTransform);
     }
 
+    @Override
+    public String toSVG(SVGExporterContext exporterContext) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
     public DefineButtonSoundTag getSounds() {
         for (Tag t : swf.tags) {
             if (t instanceof DefineButtonSoundTag) {

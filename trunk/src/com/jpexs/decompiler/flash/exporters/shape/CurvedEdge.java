@@ -14,21 +14,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.exporters;
+package com.jpexs.decompiler.flash.exporters.shape;
+
+import com.jpexs.decompiler.flash.exporters.PointInt;
 
 /**
  *
  * @author JPEXS
  */
-public interface IEdge {
+public class CurvedEdge extends StraightEdge implements IEdge {
 
-    public PointInt getFrom();
+    private final PointInt control;
 
-    public PointInt getTo();
+    CurvedEdge(PointInt from, PointInt control, PointInt to, int lineStyleIdx, int fillStyleIdx) {
+        super(from, to, lineStyleIdx, fillStyleIdx);
+        this.control = control;
+    }
 
-    public int getLineStyleIdx();
+    public PointInt getControl() {
+        return control;
+    }
 
-    public int getFillStyleIdx();
-
-    public IEdge reverseWithNewFillStyle(int newFillStyleIdx);
+    @Override
+    public IEdge reverseWithNewFillStyle(int newFillStyleIdx) {
+        return new CurvedEdge(to, control, from, lineStyleIdx, newFillStyleIdx);
+    }
 }

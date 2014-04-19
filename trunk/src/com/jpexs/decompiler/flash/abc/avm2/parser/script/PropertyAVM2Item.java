@@ -64,7 +64,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     private List<Integer> openedNamespaces;
     private List<MethodBody> callStack;
     public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
-
+    
     @Override
     public AssignableAVM2Item copy() {
         PropertyAVM2Item p = new PropertyAVM2Item(object, propertyName, index, abc, otherABCs, openedNamespaces, callStack);
@@ -512,7 +512,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             String targetType = propType.getVal();
             String srcType = assignedValue.returnType().toString();
             GraphTargetItem st = assignedValue;
-            if (!targetType.equals(srcType)) {
+            if (!targetType.equals(srcType) && !propertyName.startsWith("@")) {
                 st = new CoerceAVM2Item(null, assignedValue, targetType);
             }
             return toSourceMerge(localData, generator, obj, index, st,
@@ -542,6 +542,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false);
     }
+
+    @Override
+    public String toString() {
+        return ""+object+"."+propertyName;
+    }        
 
     @Override
     public boolean hasReturnValue() {
