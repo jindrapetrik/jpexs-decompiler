@@ -40,6 +40,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -86,9 +87,8 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     }
 
     /*public void setNs(GraphTargetItem ns) {
-        this.ns = ns;
-    }*/
-
+     this.ns = ns;
+     }*/
     public void setRegNumber(int regNumber) {
         if (resolved instanceof NameAVM2Item) {
             ((NameAVM2Item) resolved).setRegNumber(regNumber);
@@ -114,11 +114,12 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         }
         return -1;
     }
-/*
-    public GraphTargetItem getNs() {
-        return ns;
-    }
-*/
+    /*
+     public GraphTargetItem getNs() {
+     return ns;
+     }
+     */
+
     public void appendName(String name) {
         this.name += "." + name;
     }
@@ -157,8 +158,6 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     public void setVariableName(String name) {
         this.name = name;
     }
-    
-    
 
     public UnresolvedAVM2Item(List<String> subtypes, List<String> importedClasses, boolean mustBeType, GraphTargetItem type, int line, String name, GraphTargetItem storeValue, List<Integer> openedNamespaces) {
         super(storeValue);
@@ -295,13 +294,10 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         List<String> parts = new ArrayList<>();
         if (name.contains(".")) {
             String partsArr[] = name.split("\\.");
-            for (String p : partsArr) {
-                parts.add(p);
-            }
+            parts.addAll(Arrays.asList(partsArr));
         } else {
             parts.add(name);
         }
-
 
         if (scopeStack.isEmpty()) { //Everything is multiname property in with command
 
@@ -337,8 +333,8 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             String impName = imp;
             String impPkg = "";
             if (impName.contains(".")) {
-                impPkg = impName.substring(0, impName.lastIndexOf("."));
-                impName = impName.substring(impName.lastIndexOf(".") + 1);
+                impPkg = impName.substring(0, impName.lastIndexOf('.'));
+                impName = impName.substring(impName.lastIndexOf('.') + 1);
             }
             if (impName.equals(parts.get(0))) {
                 TypeItem ret = new TypeItem(imp);

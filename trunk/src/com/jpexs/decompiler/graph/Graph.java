@@ -426,7 +426,7 @@ public class Graph {
          System.out.println(el);
          }
          System.out.println("</loops>");*/
-        getPrecontinues(path,localData, null, heads.get(0), allParts, loops, null);
+        getPrecontinues(path, localData, null, heads.get(0), allParts, loops, null);
         /*System.err.println("<loopspre>");
          for (Loop el : loops) {
          System.err.println(el);
@@ -691,8 +691,8 @@ public class Graph {
         return loopItem;
     }
 
-    private void getPrecontinues(String path,BaseLocalData localData, GraphPart parent, GraphPart part, List<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
-        markLevels(path,localData, part, allParts, loops);
+    private void getPrecontinues(String path, BaseLocalData localData, GraphPart parent, GraphPart part, List<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
+        markLevels(path, localData, part, allParts, loops);
         //Note: this also marks part as precontinue when there is if
         /*
          while(k<10){
@@ -745,11 +745,11 @@ public class Graph {
 
     private void markLevels(String path, BaseLocalData localData, GraphPart part, List<GraphPart> allParts, List<Loop> loops) throws InterruptedException {
         clearLoops(loops);
-        markLevels(path,localData, part, allParts, loops, new ArrayList<GraphPart>(), 1, new ArrayList<GraphPart>(), 0);
+        markLevels(path, localData, part, allParts, loops, new ArrayList<GraphPart>(), 1, new ArrayList<GraphPart>(), 0);
         clearLoops(loops);
     }
 
-    private void markLevels(String path,BaseLocalData localData, GraphPart part, List<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart, int level, List<GraphPart> visited, int recursionLevel) throws InterruptedException {
+    private void markLevels(String path, BaseLocalData localData, GraphPart part, List<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart, int level, List<GraphPart> visited, int recursionLevel) throws InterruptedException {
         boolean debugMode = false;
         if (stopPart == null) {
             stopPart = new ArrayList<>();
@@ -818,13 +818,13 @@ public class Graph {
                 stopParts2.add(stopPart.get(stopPart.size() - 1));
             }
             if (next != nextParts.get(0)) {
-                markLevels(path,localData, nextParts.get(0), allParts, loops, next == null ? stopPart : stopParts2, level + 1, visited, recursionLevel + 1);
+                markLevels(path, localData, nextParts.get(0), allParts, loops, next == null ? stopPart : stopParts2, level + 1, visited, recursionLevel + 1);
             }
             if (next != nextParts.get(1)) {
-                markLevels(path,localData, nextParts.get(1), allParts, loops, next == null ? stopPart : stopParts2, level + 1, visited, recursionLevel + 1);
+                markLevels(path, localData, nextParts.get(1), allParts, loops, next == null ? stopPart : stopParts2, level + 1, visited, recursionLevel + 1);
             }
             if (next != null) {
-                markLevels(path,localData, next, allParts, loops, stopPart, level, visited, recursionLevel + 1);
+                markLevels(path, localData, next, allParts, loops, stopPart, level, visited, recursionLevel + 1);
             }
         }
 
@@ -850,17 +850,17 @@ public class Graph {
                     }
                 }
                 if (next != p) {
-                    markLevels(path,localData, p, allParts, loops, stopPart2, level + 1, visited, recursionLevel + 1);
+                    markLevels(path, localData, p, allParts, loops, stopPart2, level + 1, visited, recursionLevel + 1);
                     vis.add(p);
                 }
             }
             if (next != null) {
-                markLevels(path,localData, next, allParts, loops, stopPart, level, visited, recursionLevel + 1);
+                markLevels(path, localData, next, allParts, loops, stopPart, level, visited, recursionLevel + 1);
             }
         }
 
         if (nextParts.size() == 1) {
-            markLevels(path,localData, nextParts.get(0), allParts, loops, stopPart, level, visited, recursionLevel + 1);
+            markLevels(path, localData, nextParts.get(0), allParts, loops, stopPart, level, visited, recursionLevel + 1);
         }
 
         for (GraphPart t : part.throwParts) {
@@ -876,14 +876,14 @@ public class Graph {
                     stopPart2 = stopPart;
                 }
 
-                markLevels(path,localData, t, allParts, loops, stopPart2, level, visited, recursionLevel + 1);
+                markLevels(path, localData, t, allParts, loops, stopPart2, level, visited, recursionLevel + 1);
             }
         }
 
         if (isLoop) {
             if (currentLoop.loopBreak != null) {
                 currentLoop.phase = 2;
-                markLevels(path,localData, currentLoop.loopBreak, allParts, loops, stopPart, level, visited, recursionLevel + 1);
+                markLevels(path, localData, currentLoop.loopBreak, allParts, loops, stopPart, level, visited, recursionLevel + 1);
             }
         }
     }

@@ -77,7 +77,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.URShiftAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -256,7 +255,7 @@ public class ActionScriptParser {
         String nsprop = null;
         if (s.type == SymbolType.NAMESPACE_OP) {
             if (name.contains(".")) {
-                nsname = name.substring(name.lastIndexOf(".") + 1);
+                nsname = name.substring(name.lastIndexOf('.') + 1);
             } else {
                 nsname = name;
             }
@@ -268,7 +267,7 @@ public class ActionScriptParser {
                 lexer.pushback(s);
             }
             if (name.contains(".")) {
-                name = name.substring(0, name.lastIndexOf("."));
+                name = name.substring(0, name.lastIndexOf('.'));
             } else {
                 name = null;
             }

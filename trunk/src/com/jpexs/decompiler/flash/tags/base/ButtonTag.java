@@ -59,10 +59,11 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String toSVG(SVGExporterContext exporterContext, int level) {
+        return "";
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     public DefineButtonSoundTag getSounds() {
         for (Tag t : swf.tags) {
             if (t instanceof DefineButtonSoundTag) {

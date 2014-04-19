@@ -42,8 +42,8 @@ import java.util.List;
 public class ConstructSomethingAVM2Item extends CallAVM2Item {
 
     public List<Integer> openedNamespaces;
-    
-    public ConstructSomethingAVM2Item(List<Integer> openedNamespaces,GraphTargetItem name, List<GraphTargetItem> arguments) {
+
+    public ConstructSomethingAVM2Item(List<Integer> openedNamespaces, GraphTargetItem name, List<GraphTargetItem> arguments) {
         super(name, arguments);
         this.openedNamespaces = openedNamespaces;
     }
@@ -54,15 +54,15 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
     }
 
     private int allNsSetWithVec(ABC abc) {
-        int nssa[] = new int[openedNamespaces.size()+1];
+        int nssa[] = new int[openedNamespaces.size() + 1];
         for (int i = 0; i < openedNamespaces.size(); i++) {
             nssa[i] = openedNamespaces.get(i);
         }
-        nssa[nssa.length-1] = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId("__AS3__.vec", true)), 0, true);                            
+        nssa[nssa.length - 1] = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId("__AS3__.vec", true)), 0, true);
         return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
-        
+
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
@@ -72,32 +72,32 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
         }
         if (resname instanceof TypeItem) {
             TypeItem prop = (TypeItem) resname;
-            if(!prop.subtypes.isEmpty()){ //It's Vector - TypeName
+            if (!prop.subtypes.isEmpty()) { //It's Vector - TypeName
                 //int qname = ((AVM2SourceGenerator) generator).resolveType(prop.fullTypeName);
-                String name = prop.fullTypeName.substring(prop.fullTypeName.lastIndexOf(".")+1);
-                ABC abc=((AVM2SourceGenerator)generator).abc;
-                int qname = abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME,abc.constants.getStringId(name,true) , 0,allNsSetWithVec(abc), 0, new ArrayList<Integer>()), true);
-                List<Integer> params=new ArrayList<>();
-                for(String p:prop.subtypes){
+                String name = prop.fullTypeName.substring(prop.fullTypeName.lastIndexOf('.') + 1);
+                ABC abc = ((AVM2SourceGenerator) generator).abc;
+                int qname = abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, abc.constants.getStringId(name, true), 0, allNsSetWithVec(abc), 0, new ArrayList<Integer>()), true);
+                List<Integer> params = new ArrayList<>();
+                for (String p : prop.subtypes) {
                     params.add(((AVM2SourceGenerator) generator).resolveType(p));
                 }
-                List<GraphSourceItem> ret=new ArrayList<>();
-                ret.add(ins(new GetLexIns(),qname));
-                for(int p:params){
-                    ret.add(ins(new GetLexIns(),p));
+                List<GraphSourceItem> ret = new ArrayList<>();
+                ret.add(ins(new GetLexIns(), qname));
+                for (int p : params) {
+                    ret.add(ins(new GetLexIns(), p));
                 }
-                ret.add(ins(new ApplyTypeIns(),params.size()));
+                ret.add(ins(new ApplyTypeIns(), params.size()));
                 ret.addAll(toSourceMerge(localData, generator, arguments,
-                        ins(new ConstructIns(),arguments.size())
-                        ));
+                        ins(new ConstructIns(), arguments.size())
+                ));
                 return ret;
-                        
-            }else{
-            int type_index = ((AVM2SourceGenerator) generator).resolveType(resname.toString());
-            return toSourceMerge(localData, generator,
-                    new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index, arguments.size()}, new byte[0]), arguments,
-                    new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index, arguments.size()}, new byte[0])
-            );
+
+            } else {
+                int type_index = ((AVM2SourceGenerator) generator).resolveType(resname.toString());
+                return toSourceMerge(localData, generator,
+                        new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index, arguments.size()}, new byte[0]), arguments,
+                        new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index, arguments.size()}, new byte[0])
+                );
             }
         }
         if (resname instanceof NameAVM2Item) {

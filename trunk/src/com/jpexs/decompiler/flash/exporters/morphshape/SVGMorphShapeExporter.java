@@ -240,7 +240,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         path.appendChild(createAnimateElement("stroke", color.toHexRGB(), colorEnd.toHexRGB()));
         path.setAttribute("stroke-width", Double.toString(thickness == 0 ? 1 : thickness));
         path.appendChild(createAnimateElement("stroke-width", thickness, thicknessEnd));
-        
+
         if (color instanceof RGBA) {
             RGBA colorA = (RGBA) color;
             if (colorA.alpha != 255) {
@@ -303,7 +303,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         animate.setAttribute("values", startValue + ";" + endValue);
         return animate;
     }
-    
+
     @Override
     protected void finalizePath() {
         if (path != null && !"".equals(pathData)) {
@@ -350,17 +350,17 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             double b = roundPixels400(matrix.rotateSkew1);
             double c = roundPixels400(matrix.rotateSkew0);
             double d = roundPixels400(matrix.scaleY);
-            double rotate = Math.atan(c / d);
+            double rotate = Math.atan2(c, d);
             double scaleX = Math.signum(a) * Math.sqrt(a * a + b * b);
             double scaleY = Math.signum(d) * Math.sqrt(c * c + d * d);
-            
+
             double translateXEnd = roundPixels400(matrixEnd.translateX / SWF.unitDivisor);
             double translateYEnd = roundPixels400(matrixEnd.translateY / SWF.unitDivisor);
             a = roundPixels400(matrixEnd.scaleX);
             b = roundPixels400(matrixEnd.rotateSkew1);
             c = roundPixels400(matrixEnd.rotateSkew0);
             d = roundPixels400(matrixEnd.scaleY);
-            double rotateEnd = Math.atan(c / d);
+            double rotateEnd = Math.atan2(c, d);
             double scaleXEnd = Math.signum(a) * Math.sqrt(a * a + b * b);
             double scaleYEnd = Math.signum(d) * Math.sqrt(c * c + d * d);
 
@@ -381,7 +381,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             animateScale.setAttribute("additive", "sum");
             animateScale.setAttribute("from", scaleX + " " + scaleY);
             animateScale.setAttribute("to", scaleXEnd + " " + scaleYEnd);
-            
+
             Element animateTranslate = _svg.createElement("animateTransform");
             animateTranslate.setAttribute("dur", "2s"); // todo
             animateTranslate.setAttribute("repeatCount", "indefinite");
@@ -390,7 +390,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             animateTranslate.setAttribute("additive", "sum");
             animateTranslate.setAttribute("from", translateX + " " + translateY);
             animateTranslate.setAttribute("to", translateXEnd + " " + translateYEnd);
-            
+
             gradient.appendChild(animateTranslate);
             gradient.appendChild(animateScale);
             gradient.appendChild(animateRotate);

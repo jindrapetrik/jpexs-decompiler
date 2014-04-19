@@ -35,7 +35,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -136,9 +135,9 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         int multinameIndex = ins.operands[0];
         //Note: In official compiler, the stack can be wrong(greater) for some MULTINAMEL/A, e.g. increments
         /*
-                var arr=[1,2,3];
-		trace(arr[2]++);
-        */
+         var arr=[1,2,3];
+         trace(arr[2]++);
+         */
         if (abc.constants.getMultiname(multinameIndex).needsName()) {
             ret--;
         }

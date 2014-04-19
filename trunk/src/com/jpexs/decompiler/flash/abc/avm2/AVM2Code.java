@@ -1266,203 +1266,202 @@ public class AVM2Code implements Serializable {
         String ret = "";
         int ip = start;
         //try {
-            //int addr;
-            iploop:
-            while (ip <= end) {
+        //int addr;
+        iploop:
+        while (ip <= end) {
 
-                if (ignoredIns.contains(ip)) {
-                    ip++;
-                    continue;
-                }
-                boolean processTry = processJumps;
-                //addr = pos2adr(ip);
-                int ipfix = fixIPAfterDebugLine(ip);
-                //int addrfix = pos2adr(ipfix);
-                int maxend = -1;
+            if (ignoredIns.contains(ip)) {
+                ip++;
+                continue;
+            }
+            boolean processTry = processJumps;
+            //addr = pos2adr(ip);
+            int ipfix = fixIPAfterDebugLine(ip);
+            //int addrfix = pos2adr(ipfix);
+            int maxend = -1;
 
-                if (ip > end) {
-                    break;
-                }
+            if (ip > end) {
+                break;
+            }
 
-                if (unknownJumps.contains(ip)) {
-                    unknownJumps.remove(Integer.valueOf(ip));
-                    throw new UnknownJumpException(stack, ip, output);
-                }
-                if (visited[ip]) {
-                    Logger.getLogger(AVM2Code.class.getName()).warning("Code already visited, ofs:" + Helper.formatAddress(pos2adr(ip)) + ", ip:" + ip);
-                    break;
-                }
-                visited[ip] = true;
-                AVM2Instruction ins = code.get(ip);
-                if (debugMode) {
-                    System.err.println("translating ip " + ip + " ins " + ins.toString() + " stack:" + stack.toString() + " scopeStack:" + scopeStack.toString());
-                }
-                if (ins.definition instanceof NewFunctionIns) {
-                    if (ip + 1 <= end) {
-                        if (code.get(ip + 1).definition instanceof PopIns) {
-                            ip += 2;
-                            continue;
-                        }
+            if (unknownJumps.contains(ip)) {
+                unknownJumps.remove(Integer.valueOf(ip));
+                throw new UnknownJumpException(stack, ip, output);
+            }
+            if (visited[ip]) {
+                Logger.getLogger(AVM2Code.class.getName()).warning("Code already visited, ofs:" + Helper.formatAddress(pos2adr(ip)) + ", ip:" + ip);
+                break;
+            }
+            visited[ip] = true;
+            AVM2Instruction ins = code.get(ip);
+            if (debugMode) {
+                System.err.println("translating ip " + ip + " ins " + ins.toString() + " stack:" + stack.toString() + " scopeStack:" + scopeStack.toString());
+            }
+            if (ins.definition instanceof NewFunctionIns) {
+                if (ip + 1 <= end) {
+                    if (code.get(ip + 1).definition instanceof PopIns) {
+                        ip += 2;
+                        continue;
                     }
                 }
-                /*if ((ip + 8 < code.size())) { //return in finally clause
-                 if (ins.definition instanceof SetLocalTypeIns) {
-                 if (code.get(ip + 1).definition instanceof PushByteIns) {
-                 AVM2Instruction jmp = code.get(ip + 2);
-                 if (jmp.definition instanceof JumpIns) {
-                 if (jmp.operands[0] == 0) {
-                 if (code.get(ip + 3).definition instanceof LabelIns) {
-                 if (code.get(ip + 4).definition instanceof PopIns) {
-                 if (code.get(ip + 5).definition instanceof LabelIns) {
-                 AVM2Instruction gl = code.get(ip + 6);
-                 if (gl.definition instanceof GetLocalTypeIns) {
-                 if (((GetLocalTypeIns) gl.definition).getRegisterId(gl) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins)) {
-                 AVM2Instruction ki = code.get(ip + 7);
-                 if (ki.definition instanceof KillIns) {
-                 if (ki.operands[0] == ((SetLocalTypeIns) ins.definition).getRegisterId(ins)) {
-                 if (code.get(ip + 8).definition instanceof ReturnValueIns) {
-                 ip = ip + 8;
-                 continue;
-                 }
-                 }
-                 }
-                 }
-                 }
-                 }
-                 }
-                 }
-                 }
-                 }
-                 }
-                 }
-                 }//*/
+            }
+            /*if ((ip + 8 < code.size())) { //return in finally clause
+             if (ins.definition instanceof SetLocalTypeIns) {
+             if (code.get(ip + 1).definition instanceof PushByteIns) {
+             AVM2Instruction jmp = code.get(ip + 2);
+             if (jmp.definition instanceof JumpIns) {
+             if (jmp.operands[0] == 0) {
+             if (code.get(ip + 3).definition instanceof LabelIns) {
+             if (code.get(ip + 4).definition instanceof PopIns) {
+             if (code.get(ip + 5).definition instanceof LabelIns) {
+             AVM2Instruction gl = code.get(ip + 6);
+             if (gl.definition instanceof GetLocalTypeIns) {
+             if (((GetLocalTypeIns) gl.definition).getRegisterId(gl) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins)) {
+             AVM2Instruction ki = code.get(ip + 7);
+             if (ki.definition instanceof KillIns) {
+             if (ki.operands[0] == ((SetLocalTypeIns) ins.definition).getRegisterId(ins)) {
+             if (code.get(ip + 8).definition instanceof ReturnValueIns) {
+             ip = ip + 8;
+             continue;
+             }
+             }
+             }
+             }
+             }
+             }
+             }
+             }
+             }
+             }
+             }
+             }
+             }//*/
 
-                /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { //Filling local register in catch clause
-                 if (code.get(ip + 1).definition instanceof DupIns) {
-                 if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
-                 ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
-                 ip += 3;
-                 continue;
-                 }
-                 }
-                 }*/
-                if ((ins.definition instanceof GetLocalTypeIns) && (!output.isEmpty()) && (output.get(output.size() - 1) instanceof SetLocalAVM2Item) && (((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex == ((GetLocalTypeIns) ins.definition).getRegisterId(ins)) && isKilled(((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex, start, end)) {
-                    SetLocalAVM2Item slt = (SetLocalAVM2Item) output.remove(output.size() - 1);
-                    stack.push(slt.getValue());
+            /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { //Filling local register in catch clause
+             if (code.get(ip + 1).definition instanceof DupIns) {
+             if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
+             ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
+             ip += 3;
+             continue;
+             }
+             }
+             }*/
+            if ((ins.definition instanceof GetLocalTypeIns) && (!output.isEmpty()) && (output.get(output.size() - 1) instanceof SetLocalAVM2Item) && (((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex == ((GetLocalTypeIns) ins.definition).getRegisterId(ins)) && isKilled(((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex, start, end)) {
+                SetLocalAVM2Item slt = (SetLocalAVM2Item) output.remove(output.size() - 1);
+                stack.push(slt.getValue());
+                ip++;
+            } else if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { //set_local_x,get_local_x..kill x
+                AVM2Instruction insAfter = code.get(ip + 1);
+                if ((insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
+                    GraphTargetItem before = stack.peek();
+                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
+                    stack.push(before);
+                    ip += 2;
+                    continue iploop;
+                } else {
+                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
                     ip++;
-                } else if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { //set_local_x,get_local_x..kill x
+                    continue iploop;
+                }
+            } else if (ins.definition instanceof DupIns) {
+                int nextPos;
+                do {
                     AVM2Instruction insAfter = code.get(ip + 1);
-                    if ((insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
-                        GraphTargetItem before = stack.peek();
-                        ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
-                        stack.push(before);
-                        ip += 2;
-                        continue iploop;
+                    AVM2Instruction insBefore = ins;
+                    if (ip - 1 >= start) {
+                        insBefore = code.get(ip - 1);
+                    }
+                    if (insAfter.definition instanceof ConvertBIns) { //SWF compiled with debug contain convert_b
+                        ip++;
+                        //addr = pos2adr(ip);
+                        insAfter = code.get(ip + 1);
+                    }
+
+                    boolean isAnd;
+                    if (processJumps && (insAfter.definition instanceof IfFalseIns)) {
+                        //stack.add("(" + stack.pop() + ")&&");
+                        isAnd = true;
+                    } else if (processJumps && (insAfter.definition instanceof IfTrueIns)) {
+                        //stack.add("(" + stack.pop() + ")||");
+                        isAnd = false;
+                    } else if (insAfter.definition instanceof SetLocalTypeIns) {
+                        //chained assignments
+                        int reg = (((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter));
+                        for (int t = ip + 1; t <= end - 1; t++) {
+                            if (code.get(t).definition instanceof KillIns) {
+                                if (code.get(t).operands[0] == reg) {
+                                    break;
+                                }
+                            }
+                            if (code.get(t).definition instanceof GetLocalTypeIns) {
+                                if (((GetLocalTypeIns) code.get(t).definition).getRegisterId(code.get(t)) == reg) {
+                                    if (code.get(t + 1).definition instanceof KillIns) {
+                                        if (code.get(t + 1).operands[0] == reg) {
+                                            ConvertOutput assignment = toSourceOutput(path, part, processJumps, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames, visited, localRegAssigmentIps, refs);
+                                            GraphTargetItem tar = assignment.output.remove(assignment.output.size() - 1);
+                                            tar.firstPart = part;
+                                            stack.push(tar);
+                                            ip = t + 2;
+                                            continue iploop;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (!isKilled(reg, 0, end)) {
+                            for (int i = ip; i >= start; i--) {
+                                if (code.get(i).definition instanceof DupIns) {
+                                    if (stack.isEmpty()) {
+                                        break;//FIXME?o
+                                    }
+                                    GraphTargetItem v = stack.pop();
+                                    stack.push(new LocalRegAVM2Item(ins, reg, v));
+                                    stack.push(v);
+                                } else {
+                                    break;
+                                }
+                            }
+                        } else {
+                            ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
+                        }
+                        ip++;
+                        break;
+                        //}
+
                     } else {
                         ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
                         ip++;
-                        continue iploop;
+                        break;
+                        //throw new ConvertException("Unknown pattern after DUP:" + insComparsion.toString());
                     }
-                } else if (ins.definition instanceof DupIns) {
-                    int nextPos;
-                    do {
-                        AVM2Instruction insAfter = code.get(ip + 1);
-                        AVM2Instruction insBefore = ins;
-                        if (ip - 1 >= start) {
-                            insBefore = code.get(ip - 1);
-                        }
-                        if (insAfter.definition instanceof ConvertBIns) { //SWF compiled with debug contain convert_b
-                            ip++;
-                            //addr = pos2adr(ip);
-                            insAfter = code.get(ip + 1);
-                        }
-
-                        boolean isAnd;
-                        if (processJumps && (insAfter.definition instanceof IfFalseIns)) {
-                            //stack.add("(" + stack.pop() + ")&&");
-                            isAnd = true;
-                        } else if (processJumps && (insAfter.definition instanceof IfTrueIns)) {
-                            //stack.add("(" + stack.pop() + ")||");
-                            isAnd = false;
-                        } else if (insAfter.definition instanceof SetLocalTypeIns) {
-                            //chained assignments
-                            int reg = (((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter));
-                            for (int t = ip + 1; t <= end - 1; t++) {
-                                if (code.get(t).definition instanceof KillIns) {
-                                    if (code.get(t).operands[0] == reg) {
-                                        break;
-                                    }
+                } while (ins.definition instanceof DupIns);
+            } else if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
+                ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
+                //ip = end + 1;
+                break;
+            } else if (ins.definition instanceof NewFunctionIns) {
+                String functionName = "";
+                if ((ip >= start + 2) && (ip <= end - 4)) {
+                    AVM2Instruction prev2 = code.get(ip - 2);
+                    if (prev2.definition instanceof NewObjectIns) {
+                        if (prev2.operands[0] == 0) {
+                            if (code.get(ip - 1).definition instanceof PushWithIns) {
+                                boolean hasDup = false;
+                                int plus = 0;
+                                if (code.get(ip + 1).definition instanceof DupIns) {
+                                    hasDup = true;
+                                    plus = 1;
                                 }
-                                if (code.get(t).definition instanceof GetLocalTypeIns) {
-                                    if (((GetLocalTypeIns) code.get(t).definition).getRegisterId(code.get(t)) == reg) {
-                                        if (code.get(t + 1).definition instanceof KillIns) {
-                                            if (code.get(t + 1).operands[0] == reg) {
-                                                ConvertOutput assignment = toSourceOutput(path, part, processJumps, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames, visited, localRegAssigmentIps, refs);
-                                                GraphTargetItem tar = assignment.output.remove(assignment.output.size() - 1);
-                                                tar.firstPart = part;
-                                                stack.push(tar);
-                                                ip = t + 2;
-                                                continue iploop;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            if (!isKilled(reg, 0, end)) {
-                                for (int i = ip; i >= start; i--) {
-                                    if (code.get(i).definition instanceof DupIns) {
-                                        if (stack.isEmpty()) {
-                                            break;//FIXME?o
-                                        }
-                                        GraphTargetItem v = stack.pop();
-                                        stack.push(new LocalRegAVM2Item(ins, reg, v));
-                                        stack.push(v);
-                                    } else {
-                                        break;
-                                    }
-                                }
-                            } else {
-                                ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
-                            }
-                            ip++;
-                            break;
-                            //}
-
-                        } else {
-                            ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
-                            ip++;
-                            break;
-                            //throw new ConvertException("Unknown pattern after DUP:" + insComparsion.toString());
-                        }
-                    } while (ins.definition instanceof DupIns);
-                } else if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
-                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
-                    //ip = end + 1;
-                    break;
-                } else if (ins.definition instanceof NewFunctionIns) {
-                    String functionName = "";
-                    if ((ip >= start + 2) && (ip <= end - 4)) {
-                        AVM2Instruction prev2 = code.get(ip - 2);
-                        if (prev2.definition instanceof NewObjectIns) {
-                            if (prev2.operands[0] == 0) {
-                                if (code.get(ip - 1).definition instanceof PushWithIns) {
-                                    boolean hasDup = false;
-                                    int plus = 0;
-                                    if (code.get(ip + 1).definition instanceof DupIns) {
-                                        hasDup = true;
-                                        plus = 1;
-                                    }
-                                    AVM2Instruction psco = code.get(ip + 1 + plus);
-                                    if (psco.definition instanceof GetScopeObjectIns) {
-                                        if (psco.operands[0] == scopeStack.size() - 1) {
-                                            if (code.get(ip + plus + 2).definition instanceof SwapIns) {
-                                                if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
-                                                    if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
-                                                        functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(constants, fullyQualifiedNames);
-                                                        scopeStack.pop();//with
-                                                        output.remove(output.size() - 1); //with
-                                                        ip = ip + plus + 4; //+1 below
-                                                    }
+                                AVM2Instruction psco = code.get(ip + 1 + plus);
+                                if (psco.definition instanceof GetScopeObjectIns) {
+                                    if (psco.operands[0] == scopeStack.size() - 1) {
+                                        if (code.get(ip + plus + 2).definition instanceof SwapIns) {
+                                            if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
+                                                if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
+                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(constants, fullyQualifiedNames);
+                                                    scopeStack.pop();//with
+                                                    output.remove(output.size() - 1); //with
+                                                    ip = ip + plus + 4; //+1 below
                                                 }
                                             }
                                         }
@@ -1471,41 +1470,42 @@ public class AVM2Code implements Serializable {
                             }
                         }
                     }
-                    //What to do when hasDup is false?
-                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
-                    NewFunctionAVM2Item nft = (NewFunctionAVM2Item) stack.peek();
-                    nft.functionName = functionName;
-                    ip++;
-                } else {
-                    try{
-                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
-                    }catch(RuntimeException re){
-                        /*String last="";
-                        int len=5;
-                        for(int i=(ip-len<0?0:ip-len);i<ip+len && ip<code.size();i++){
-                            if(i==ip){
-                                last+=">";
-                            }
-                            last+=""+i+": "+code.get(i).toString()+"\r\n";
-                        }
-                        Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "ins list:\r\n{0}", last);*/
-                        throw re;
-                    }
-                    ip++;
-                    //addr = pos2adr(ip);
                 }
+                //What to do when hasDup is false?
+                ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
+                NewFunctionAVM2Item nft = (NewFunctionAVM2Item) stack.peek();
+                nft.functionName = functionName;
+                ip++;
+            } else {
+                try {
+                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
+                } catch (RuntimeException re) {
+                    /*String last="";
+                     int len=5;
+                     for(int i=(ip-len<0?0:ip-len);i<ip+len && ip<code.size();i++){
+                     if(i==ip){
+                     last+=">";
+                     }
+                     last+=""+i+": "+code.get(i).toString()+"\r\n";
+                     }
+                     Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "ins list:\r\n{0}", last);*/
+                    throw re;
+                }
+                ip++;
+                //addr = pos2adr(ip);
+            }
 
-            }
-            if (debugMode) {
-                System.out.println("CLOSE SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
-            }
-            /*if (hideTemporaryRegisters) {
-             clearTemporaryRegisters(output);
-             }*/
-            return new ConvertOutput(stack, output);
+        }
+        if (debugMode) {
+            System.out.println("CLOSE SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
+        }
+        /*if (hideTemporaryRegisters) {
+         clearTemporaryRegisters(output);
+         }*/
+        return new ConvertOutput(stack, output);
         /*} catch (ConvertException cex) {
-            throw cex;
-        }*/
+         throw cex;
+         }*/
     }
 
     public int getRegisterCount() {

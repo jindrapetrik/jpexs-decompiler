@@ -939,10 +939,11 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String toSVG(SVGExporterContext exporterContext, int level) {
+        return "";
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     private FontTag getFontTag() {
         FontTag font = null;
         for (Tag tag : swf.tags) {

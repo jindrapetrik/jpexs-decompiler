@@ -17,10 +17,6 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
-import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
@@ -43,11 +39,11 @@ public class TypeItem extends GraphTargetItem {
     public String fullTypeName;
     public List<String> subtypes = new ArrayList<>();
 
-    public TypeItem(String fullTypeName){
-        this(fullTypeName,new ArrayList<String>());
+    public TypeItem(String fullTypeName) {
+        this(fullTypeName, new ArrayList<String>());
     }
-    
-    public TypeItem(String fullTypeName,List<String> subtypes) {
+
+    public TypeItem(String fullTypeName, List<String> subtypes) {
         super(null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
         this.subtypes.addAll(subtypes);
@@ -93,20 +89,17 @@ public class TypeItem extends GraphTargetItem {
 
     @Override
     public String toString() {
-        String add="";
-        if(!subtypes.isEmpty()){
-            add+=".<";
-            add+=Helper.joinStrings(subtypes, ",");
-            add+=">";
+        String add = "";
+        if (!subtypes.isEmpty()) {
+            add += ".<";
+            add += Helper.joinStrings(subtypes, ",");
+            add += ">";
         }
-        return fullTypeName+add;
+        return fullTypeName + add;
     }
-       
-
-    
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return generator.generate(localData, this);
-    }        
+    }
 }

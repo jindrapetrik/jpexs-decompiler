@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.awt.Color;
 import java.io.StringWriter;
@@ -104,7 +105,25 @@ public class SVGExporter {
         Attr attr = _svg.createAttribute("style");
         attr.setValue("background: " + new RGBA(backGroundColor).toHexARGB());
     }
-    
+
+    public void addImage(Matrix transform, RECT boundRect, String href) {
+        Element image = _svg.createElement("image");
+        if (transform != null) {
+            double translateX = roundPixels400(transform.translateX / SWF.unitDivisor);
+            double translateY = roundPixels400(transform.translateY / SWF.unitDivisor);
+            double rotateSkew0 = roundPixels400(transform.rotateSkew0);
+            double rotateSkew1 = roundPixels400(transform.rotateSkew1);
+            double scaleX = roundPixels400(transform.scaleX);
+            double scaleY = roundPixels400(transform.scaleY);
+            image.setAttribute("transform", "matrix(" + scaleX + ", " + rotateSkew0
+                    + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
+            image.setAttribute("width", Double.toString(boundRect.getWidth() / (double) SWF.unitDivisor));
+            image.setAttribute("height", Double.toString(boundRect.getHeight() / (double) SWF.unitDivisor));
+        }
+        image.setAttribute("xlink:href", href);
+        _svgG.appendChild(image);
+    }
+
     protected static double roundPixels20(double pixels) {
         return Math.round(pixels * 100) / 100.0;
     }

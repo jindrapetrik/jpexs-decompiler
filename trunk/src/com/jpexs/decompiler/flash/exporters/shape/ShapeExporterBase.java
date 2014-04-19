@@ -73,7 +73,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         _fillEdgeMaps = new ArrayList<>();
         _lineEdgeMaps = new ArrayList<>();
         createEdgeMaps(_fillStyles, _lineStyles, _fillEdgeMaps, _lineEdgeMaps);
-        
+
         // Let the doc handler know that a shape export starts
         beginShape();
         // Export fills and strokes for each group separately
@@ -87,7 +87,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         endShape();
     }
 
-    protected void createEdgeMaps(List<FILLSTYLE> fillStyles, List<LINESTYLE> lineStyles, 
+    protected void createEdgeMaps(List<FILLSTYLE> fillStyles, List<LINESTYLE> lineStyles,
             List<Map<Integer, List<IEdge>>> fillEdgeMaps, List<Map<Integer, List<IEdge>>> lineEdgeMaps) {
         if (!edgeMapsCreated) {
             int xPos = 0;
@@ -191,7 +191,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    protected void processSubPath(List<IEdge> subPath, int lineStyleIdx, int fillStyleIdx0, int fillStyleIdx1, 
+    protected void processSubPath(List<IEdge> subPath, int lineStyleIdx, int fillStyleIdx0, int fillStyleIdx1,
             Map<Integer, List<IEdge>> currentFillEdgeMap, Map<Integer, List<IEdge>> currentLineEdgeMap) {
         List<IEdge> path;
         if (fillStyleIdx0 != 0) {

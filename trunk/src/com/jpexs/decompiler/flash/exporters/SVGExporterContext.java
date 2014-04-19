@@ -16,10 +16,20 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
+import com.jpexs.decompiler.flash.tags.Tag;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author JPEXS
  */
 public class SVGExporterContext {
-    
+
+    public String outDir;
+    public Map<Tag, String> exportedTags = new HashMap<>();
+
+    public SVGExporterContext(String outDir) {
+        this.outDir = outDir;
+    }
 }

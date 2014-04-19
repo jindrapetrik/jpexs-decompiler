@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -32,12 +31,12 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class XMLFilterAVM2Item extends AVM2Item
-{    
+public class XMLFilterAVM2Item extends AVM2Item {
 
     public List<Integer> openedNamespaces;
     public GraphTargetItem object;
-    public XMLFilterAVM2Item(GraphTargetItem object, GraphTargetItem value,List<Integer> openedNamespaces) {
+
+    public XMLFilterAVM2Item(GraphTargetItem object, GraphTargetItem value, List<Integer> openedNamespaces) {
         super(null, NOPRECEDENCE);
         this.value = value;
         this.openedNamespaces = openedNamespaces;
@@ -61,8 +60,7 @@ public class XMLFilterAVM2Item extends AVM2Item
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return ((AVM2SourceGenerator)generator).generate(localData, this);
+        return ((AVM2SourceGenerator) generator).generate(localData, this);
     }
-    
-    
+
 }

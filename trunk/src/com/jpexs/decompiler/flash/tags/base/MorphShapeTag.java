@@ -41,7 +41,7 @@ public interface MorphShapeTag {
 
     public SHAPE getEndEdges();
 
-    public String toSVG(SVGExporterContext exporterContext);
+    public String toSVG(SVGExporterContext exporterContext, int level);
 
     public int getShapeNum();
 

@@ -61,6 +61,5 @@ public class DefaultXMLNamespace extends AVM2Item {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, ns, ins(new DXNSLateIns()));
     }
-    
-    
+
 }

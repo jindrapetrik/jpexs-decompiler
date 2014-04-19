@@ -100,7 +100,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag,
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext) {
+    public String toSVG(SVGExporterContext exporterContext, int level) {
         ExportRectangle rect = new ExportRectangle(getRect());
         SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
         SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);

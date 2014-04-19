@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXAttrIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXElemIns;
 import static com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item.ins;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -58,7 +57,7 @@ public class EscapeXAttrAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return true;
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, value, ins(new EscXAttrIns()));

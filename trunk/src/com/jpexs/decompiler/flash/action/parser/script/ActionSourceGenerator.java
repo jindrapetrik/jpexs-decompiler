@@ -770,6 +770,5 @@ public class ActionSourceGenerator implements SourceGenerator {
         //Unsupported in AS1/2
         return new ArrayList<>();
     }
-    
-    
+
 }

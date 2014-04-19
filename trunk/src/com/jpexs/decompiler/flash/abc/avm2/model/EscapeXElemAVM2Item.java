@@ -34,7 +34,6 @@ import java.util.List;
  */
 public class EscapeXElemAVM2Item extends AVM2Item {
 
-    
     public EscapeXElemAVM2Item(AVM2Instruction instruction, GraphTargetItem expression) {
         super(instruction, NOPRECEDENCE);
         this.value = expression;
@@ -61,6 +60,5 @@ public class EscapeXElemAVM2Item extends AVM2Item {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, value, ins(new EscXElemIns()));
     }
-    
-    
+
 }

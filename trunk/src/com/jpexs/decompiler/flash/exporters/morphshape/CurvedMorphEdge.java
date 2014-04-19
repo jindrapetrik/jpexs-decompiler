@@ -27,7 +27,7 @@ public class CurvedMorphEdge extends StraightMorphEdge implements IMorphEdge {
     private final PointInt control;
     private final PointInt controlEnd;
 
-    CurvedMorphEdge(PointInt from, PointInt control, PointInt to, 
+    CurvedMorphEdge(PointInt from, PointInt control, PointInt to,
             PointInt fromEnd, PointInt controlEnd, PointInt toEnd, int lineStyleIdx, int fillStyleIdx) {
         super(from, to, fromEnd, toEnd, lineStyleIdx, fillStyleIdx);
         this.control = control;

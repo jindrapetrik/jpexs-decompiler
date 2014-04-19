@@ -50,8 +50,8 @@ public class GetPropertyIns extends InstructionDefinition {
         int multinameIndex = ins.operands[0];
         //Note: In official compiler, the stack can be wrong(greater) for some MULTINAMEL/A, e.g. increments
         /*
-                        var arr=[1,2,3];
-			return arr[2]++;
+         var arr=[1,2,3];
+         return arr[2]++;
          */
         if (abc.constants.getMultiname(multinameIndex).needsName()) {
             ret--;

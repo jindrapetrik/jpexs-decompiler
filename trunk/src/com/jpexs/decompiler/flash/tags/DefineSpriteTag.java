@@ -290,10 +290,10 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String toSVG(SVGExporterContext exporterContext, int level) throws IOException {
+        return SWF.frameToSvg(getTimeline(), 0, 0, null, 0, exporterContext, getRect(), new ColorTransform(), null, level + 1);
     }
-    
+
     @Override
     public Point getImagePos(int frame) {
         return new Point(0, 0);

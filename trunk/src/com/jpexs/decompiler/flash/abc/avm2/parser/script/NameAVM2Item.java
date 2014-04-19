@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
@@ -37,7 +36,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertSIns;
 import static com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item.ins;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
@@ -221,12 +219,12 @@ public class NameAVM2Item extends AssignableAVM2Item {
                         ins = ins(new CoerceSIns());
                         break;
                     default:
-                        int type_index = AVM2SourceGenerator.resolveType(type,((AVM2SourceGenerator) generator).abc);
+                        int type_index = AVM2SourceGenerator.resolveType(type, ((AVM2SourceGenerator) generator).abc);
                         ins = ins(new CoerceIns(), type_index);
                         break;
                 }
             } else {
-                int type_index = AVM2SourceGenerator.resolveType(type,((AVM2SourceGenerator) generator).abc);
+                int type_index = AVM2SourceGenerator.resolveType(type, ((AVM2SourceGenerator) generator).abc);
                 ins = ins(new CoerceIns(), type_index);
             }
         }
@@ -242,14 +240,14 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
         String name = variableName;
         boolean attr = false;
-        if(name!=null && name.startsWith("@")){
+        if (name != null && name.startsWith("@")) {
             name = name.substring(1);
             attr = true;
         }
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         Reference<Integer> ns_temp = new Reference<>(-1);
         Reference<Integer> index_temp = new Reference<>(-1);
-        Reference<Integer> ret_temp = new Reference<>(-1);        
+        Reference<Integer> ret_temp = new Reference<>(-1);
 
         if (index != null) {
             if (assignedValue != null) {
@@ -355,8 +353,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
         
                 
          */
-
-        
 
         if (index != null) {
             return toSourceMerge(localData, generator,

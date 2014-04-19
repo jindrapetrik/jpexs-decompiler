@@ -494,10 +494,11 @@ public class DefineText2Tag extends TextTag {
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String toSVG(SVGExporterContext exporterContext, int level) {
+        return "";
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     @Override
     public Point getImagePos(int frame) {
         return new Point(textBounds.Xmin / 20, textBounds.Ymin / 20);

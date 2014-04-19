@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -61,14 +60,12 @@ public class XMLAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        AVM2SourceGenerator g=(AVM2SourceGenerator)generator;
-        return toSourceMerge(localData, generator, 
-                ins(new GetLexIns(),g.abc.constants.getMultinameId(new Multiname(Multiname.QNAME, g.abc.constants.getStringId("XML", true), g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE,g.abc.constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<Integer>()), true)),
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        return toSourceMerge(localData, generator,
+                ins(new GetLexIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.QNAME, g.abc.constants.getStringId("XML", true), g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<Integer>()), true)),
                 value,
-                ins(new ConstructIns(),1)
-                );
+                ins(new ConstructIns(), 1)
+        );
     }
-    
-    
-    
+
 }

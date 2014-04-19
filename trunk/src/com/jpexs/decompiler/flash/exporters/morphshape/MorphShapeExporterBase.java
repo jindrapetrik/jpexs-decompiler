@@ -53,7 +53,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
 
     protected List<FILLSTYLE> _fillStylesEnd;
     protected List<LINESTYLE> _lineStylesEnd;
-    
+
     protected List<Map<Integer, List<IMorphEdge>>> _fillEdgeMaps;
     protected List<Map<Integer, List<IMorphEdge>>> _lineEdgeMaps;
 
@@ -85,7 +85,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         _fillEdgeMaps = new ArrayList<>();
         _lineEdgeMaps = new ArrayList<>();
         createEdgeMaps(_fillStyles, _lineStyles, _fillStylesEnd, _lineStylesEnd, _fillEdgeMaps, _lineEdgeMaps);
-        
+
         // Let the doc handler know that a shape export starts
         beginShape();
         // Export fills and strokes for each group separately
@@ -123,10 +123,10 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
             for (int i = 0; i < records.size(); i++) {
                 SHAPERECORD shapeRecord = records.get(i);
                 SHAPERECORD shapeRecordEnd = recordsEnd.get(i);
-                if ((shapeRecord instanceof StyleChangeRecord && !(shapeRecordEnd instanceof StyleChangeRecord)) ||
-                    (shapeRecord instanceof StraightEdgeRecord && !(shapeRecordEnd instanceof StraightEdgeRecord)) ||
-                    (shapeRecord instanceof CurvedEdgeRecord && !(shapeRecordEnd instanceof CurvedEdgeRecord)) ||
-                    (shapeRecord instanceof EndShapeRecord && !(shapeRecordEnd instanceof EndShapeRecord))) {
+                if ((shapeRecord instanceof StyleChangeRecord && !(shapeRecordEnd instanceof StyleChangeRecord))
+                        || (shapeRecord instanceof StraightEdgeRecord && !(shapeRecordEnd instanceof StraightEdgeRecord))
+                        || (shapeRecord instanceof CurvedEdgeRecord && !(shapeRecordEnd instanceof CurvedEdgeRecord))
+                        || (shapeRecord instanceof EndShapeRecord && !(shapeRecordEnd instanceof EndShapeRecord))) {
                     throw new Error("Begin and end shaperecord should have the same type.");
                 }
                 if (shapeRecord instanceof StyleChangeRecord) {
@@ -252,7 +252,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         }
     }
 
-    protected void processSubPath(List<IMorphEdge> subPath, int lineStyleIdx, int fillStyleIdx0, int fillStyleIdx1, 
+    protected void processSubPath(List<IMorphEdge> subPath, int lineStyleIdx, int fillStyleIdx0, int fillStyleIdx1,
             Map<Integer, List<IMorphEdge>> currentFillEdgeMap, Map<Integer, List<IMorphEdge>> currentLineEdgeMap) {
         List<IMorphEdge> path;
         if (fillStyleIdx0 != 0) {

@@ -64,7 +64,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     private List<Integer> openedNamespaces;
     private List<MethodBody> callStack;
     public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
-    
+
     @Override
     public AssignableAVM2Item copy() {
         PropertyAVM2Item p = new PropertyAVM2Item(object, propertyName, index, abc, otherABCs, openedNamespaces, callStack);
@@ -301,9 +301,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             if (attr) {
                 pname = pname.substring(1);
             }
-            propIndex = abc.constants.getMultinameId(new Multiname(attr ? (pname.equals("") ? Multiname.MULTINAMELA : Multiname.MULTINAMEA) : Multiname.MULTINAME,
+            propIndex = abc.constants.getMultinameId(new Multiname(attr ? (pname.isEmpty() ? Multiname.MULTINAMELA : Multiname.MULTINAMEA) : Multiname.MULTINAME,
                     abc.constants.getStringId(pname, true), 0,
-                    attr && pname.equals("") ? abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abc.constants.getStringId(localData.pkg, true)), 0, true)}), true) : allNsSet(), 0, new ArrayList<Integer>()), true);
+                    attr && pname.isEmpty() ? abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abc.constants.getStringId(localData.pkg, true)), 0, true)}), true) : allNsSet(), 0, new ArrayList<Integer>()), true);
             propType = "*";
             objType = "*";
             propValue = null;
@@ -545,8 +545,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
     @Override
     public String toString() {
-        return ""+object+"."+propertyName;
-    }        
+        return "" + object + "." + propertyName;
+    }
 
     @Override
     public boolean hasReturnValue() {

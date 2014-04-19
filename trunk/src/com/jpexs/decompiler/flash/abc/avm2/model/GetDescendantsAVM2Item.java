@@ -35,7 +35,6 @@ public class GetDescendantsAVM2Item extends AVM2Item {
     public List<Integer> openedNamespaces;
     public String nameStr;
 
-    
     //constructor for compiler
     public GetDescendantsAVM2Item(GraphTargetItem object, String nameStr, List<Integer> openedNamespaces) {
         super(null, PRECEDENCE_PRIMARY);
@@ -43,7 +42,7 @@ public class GetDescendantsAVM2Item extends AVM2Item {
         this.nameStr = nameStr;
         this.openedNamespaces = openedNamespaces;
     }
-    
+
     public GetDescendantsAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem multiname) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.object = object;
@@ -69,8 +68,7 @@ public class GetDescendantsAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return ((AVM2SourceGenerator)generator).generate(localData, this);
+        return ((AVM2SourceGenerator) generator).generate(localData, this);
     }
-    
-    
+
 }
