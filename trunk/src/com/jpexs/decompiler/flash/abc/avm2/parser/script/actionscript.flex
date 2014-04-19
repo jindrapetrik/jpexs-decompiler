@@ -314,6 +314,7 @@ SingleCharacter = [^\r\n\'\\]
   "void"                         { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.VOID,yytext());  } 
   "@"                            { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ATTRIBUTE,yytext());  } 
   ".("                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.FILTER,yytext()); }
+  ".."                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.DESCENDANTS,yytext()); }
   
   /* string literal */
   \"                             {  

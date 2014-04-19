@@ -16,18 +16,35 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 
 public class GetDescendantsAVM2Item extends AVM2Item {
 
     public GraphTargetItem object;
-    public FullMultinameAVM2Item multiname;
+    public GraphTargetItem multiname;
+    public List<Integer> openedNamespaces;
+    public String nameStr;
 
-    public GetDescendantsAVM2Item(AVM2Instruction instruction, GraphTargetItem object, FullMultinameAVM2Item multiname) {
+    
+    //constructor for compiler
+    public GetDescendantsAVM2Item(GraphTargetItem object, String nameStr, List<Integer> openedNamespaces) {
+        super(null, PRECEDENCE_PRIMARY);
+        this.object = object;
+        this.nameStr = nameStr;
+        this.openedNamespaces = openedNamespaces;
+    }
+    
+    public GetDescendantsAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem multiname) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.object = object;
         this.multiname = multiname;
@@ -49,4 +66,11 @@ public class GetDescendantsAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return true;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return ((AVM2SourceGenerator)generator).generate(localData, this);
+    }
+    
+    
 }

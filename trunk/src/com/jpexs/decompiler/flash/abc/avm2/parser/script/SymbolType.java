@@ -201,5 +201,6 @@ public enum SymbolType {
     XML_INSTRATTRNAMEVAR_BEGIN, // {...}=
     XML_INSTRATTRVALVAR_BEGIN, // aaa={
     XML_INSTRVARTAG_BEGIN, // <?{
-    FILTER
+    FILTER,
+    DESCENDANTS
 }

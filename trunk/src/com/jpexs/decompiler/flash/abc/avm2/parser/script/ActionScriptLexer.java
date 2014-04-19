@@ -197,32 +197,32 @@ public final class ActionScriptLexer {
     "\1\35\1\36\1\37\1\40\1\41\2\42\1\43\1\1"+
     "\1\41\2\44\1\41\1\1\1\45\1\1\1\46\1\1"+
     "\1\47\2\1\1\50\1\1\1\51\2\41\2\52\1\41"+
-    "\1\53\1\3\1\0\1\54\1\55\1\0\1\56\1\57"+
-    "\1\60\1\61\1\62\1\63\1\64\1\65\1\66\1\67"+
-    "\1\70\1\71\1\72\1\0\1\73\1\57\1\74\1\0"+
-    "\2\74\7\6\1\75\1\76\2\6\1\77\16\6\1\100"+
-    "\1\101\1\102\4\6\1\103\13\6\1\104\1\105\1\106"+
-    "\1\107\1\110\1\111\1\112\1\113\1\114\1\115\1\116"+
-    "\1\115\1\117\1\120\1\121\1\122\1\123\1\124\1\0"+
-    "\1\125\1\0\1\126\1\0\1\127\1\130\1\0\1\131"+
-    "\5\0\1\132\1\0\1\133\2\3\2\0\1\134\1\135"+
-    "\1\136\1\137\1\140\1\0\1\57\1\141\2\142\1\74"+
-    "\1\6\1\143\13\6\1\144\4\6\1\145\3\6\1\146"+
-    "\6\6\1\147\12\6\1\150\1\6\1\151\1\6\1\152"+
-    "\1\115\1\0\1\131\1\153\1\154\1\0\1\155\2\0"+
-    "\1\156\1\157\1\0\1\160\1\142\1\74\4\6\1\161"+
-    "\1\162\2\6\1\163\11\6\1\164\1\165\1\6\1\166"+
-    "\11\6\1\167\5\6\1\170\1\6\1\0\1\171\1\172"+
-    "\1\0\1\142\1\74\1\173\1\174\2\6\1\175\1\6"+
-    "\1\176\1\177\1\6\1\200\1\6\1\201\3\6\1\202"+
-    "\11\6\1\203\5\6\1\0\1\142\1\74\3\6\1\204"+
-    "\1\6\1\205\1\206\2\6\1\207\3\6\1\210\3\6"+
-    "\1\211\4\6\1\212\1\6\1\0\1\142\1\74\1\213"+
-    "\1\6\1\214\10\6\1\215\1\216\1\6\1\217\1\220"+
-    "\1\6\1\0\1\142\1\74\1\221\1\222\1\223\3\6"+
-    "\1\224\3\6\1\225\1\0\1\142\1\74\1\226\1\6"+
-    "\1\227\1\6\1\230\1\231\1\232\1\142\1\74\1\233"+
-    "\1\234\6\74";
+    "\1\53\1\3\1\0\1\54\1\55\1\56\1\57\1\60"+
+    "\1\61\1\62\1\63\1\64\1\65\1\66\1\67\1\70"+
+    "\1\71\1\72\1\73\1\0\1\74\1\60\1\75\1\0"+
+    "\2\75\7\6\1\76\1\77\2\6\1\100\16\6\1\101"+
+    "\1\102\1\103\4\6\1\104\13\6\1\105\1\106\1\107"+
+    "\1\110\1\111\1\112\1\113\1\114\1\115\1\116\1\117"+
+    "\1\116\1\120\1\121\1\122\1\123\1\124\1\125\1\0"+
+    "\1\126\1\0\1\127\1\0\1\130\1\131\1\0\1\132"+
+    "\5\0\1\133\1\0\1\134\2\3\2\0\1\135\1\136"+
+    "\1\137\1\140\1\141\1\0\1\60\1\142\2\143\1\75"+
+    "\1\6\1\144\13\6\1\145\4\6\1\146\3\6\1\147"+
+    "\6\6\1\150\12\6\1\151\1\6\1\152\1\6\1\153"+
+    "\1\116\1\0\1\132\1\154\1\155\1\0\1\156\2\0"+
+    "\1\157\1\160\1\0\1\161\1\143\1\75\4\6\1\162"+
+    "\1\163\2\6\1\164\11\6\1\165\1\166\1\6\1\167"+
+    "\11\6\1\170\5\6\1\171\1\6\1\0\1\172\1\173"+
+    "\1\0\1\143\1\75\1\174\1\175\2\6\1\176\1\6"+
+    "\1\177\1\200\1\6\1\201\1\6\1\202\3\6\1\203"+
+    "\11\6\1\204\5\6\1\0\1\143\1\75\3\6\1\205"+
+    "\1\6\1\206\1\207\2\6\1\210\3\6\1\211\3\6"+
+    "\1\212\4\6\1\213\1\6\1\0\1\143\1\75\1\214"+
+    "\1\6\1\215\10\6\1\216\1\217\1\6\1\220\1\221"+
+    "\1\6\1\0\1\143\1\75\1\222\1\223\1\224\3\6"+
+    "\1\225\3\6\1\226\1\0\1\143\1\75\1\227\1\6"+
+    "\1\230\1\6\1\231\1\232\1\233\1\143\1\75\1\234"+
+    "\1\235\6\75";
 
   private static int [] zzUnpackAction() {
     int [] result = new int[426];
@@ -809,7 +809,7 @@ public final class ActionScriptLexer {
     "\25\1\7\11\4\1\1\11\2\1\2\11\3\1\1\11"+
     "\2\1\1\11\1\1\1\11\1\1\1\11\2\1\1\11"+
     "\1\1\2\11\1\1\1\11\2\1\1\11\1\1\1\0"+
-    "\2\11\1\0\1\11\1\1\1\11\2\1\2\11\1\1"+
+    "\2\11\1\1\1\11\1\1\1\11\2\1\2\11\1\1"+
     "\2\11\1\1\2\11\1\0\3\1\1\0\11\1\2\11"+
     "\44\1\11\11\1\1\1\11\1\1\6\11\1\0\1\11"+
     "\1\0\1\11\1\0\2\11\1\0\1\1\5\0\1\1"+
@@ -1275,151 +1275,151 @@ public final class ActionScriptLexer {
         case 1: 
           { 
           }
-        case 157: break;
+        case 158: break;
         case 2: 
           { yyline++;
           }
-        case 158: break;
+        case 159: break;
         case 3: 
           { /*ignore*/
           }
-        case 159: break;
+        case 160: break;
         case 4: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.DIVIDE,yytext());
           }
-        case 160: break;
+        case 161: break;
         case 5: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.MULTIPLY,yytext());
           }
-        case 161: break;
+        case 162: break;
         case 6: 
           { return new ParsedSymbol(SymbolGroup.IDENTIFIER,SymbolType.IDENTIFIER, yytext());
           }
-        case 162: break;
+        case 163: break;
         case 7: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.DOT,yytext());
           }
-        case 163: break;
+        case 164: break;
         case 8: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.LOWER_THAN,yytext());
           }
-        case 164: break;
+        case 165: break;
         case 9: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.NOT,yytext());
           }
-        case 165: break;
+        case 166: break;
         case 10: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.MINUS,yytext());
           }
-        case 166: break;
+        case 167: break;
         case 11: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.GREATER_THAN,yytext());
           }
-        case 167: break;
+        case 168: break;
         case 12: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.COLON,yytext());
           }
-        case 168: break;
+        case 169: break;
         case 13: 
           { return new ParsedSymbol(SymbolGroup.INTEGER,SymbolType.INTEGER,new Long(Long.parseLong((yytext()))));
           }
-        case 169: break;
+        case 170: break;
         case 14: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.TERNAR,yytext());
           }
-        case 170: break;
+        case 171: break;
         case 15: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.BRACKET_OPEN,yytext());
           }
-        case 171: break;
+        case 172: break;
         case 16: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.BRACKET_CLOSE,yytext());
           }
-        case 172: break;
+        case 173: break;
         case 17: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN,yytext());
           }
-        case 173: break;
+        case 174: break;
         case 18: 
           { string.setLength(0);
                                     yybegin(STRING);
           }
-        case 174: break;
+        case 175: break;
         case 19: 
           { string.setLength(0);
                                     yybegin(CHARLITERAL);
           }
-        case 175: break;
+        case 176: break;
         case 20: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.PLUS,yytext());
           }
-        case 176: break;
+        case 177: break;
         case 21: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.PARENT_OPEN,yytext());
           }
-        case 177: break;
+        case 178: break;
         case 22: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.PARENT_CLOSE,yytext());
           }
-        case 178: break;
+        case 179: break;
         case 23: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.CURLY_OPEN,yytext());
           }
-        case 179: break;
+        case 180: break;
         case 24: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.CURLY_CLOSE,yytext());
           }
-        case 180: break;
+        case 181: break;
         case 25: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.SEMICOLON,yytext());
           }
-        case 181: break;
+        case 182: break;
         case 26: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.COMMA,yytext());
           }
-        case 182: break;
+        case 183: break;
         case 27: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.NEGATE,yytext());
           }
-        case 183: break;
+        case 184: break;
         case 28: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.BITAND,yytext());
           }
-        case 184: break;
+        case 185: break;
         case 29: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.BITOR,yytext());
           }
-        case 185: break;
+        case 186: break;
         case 30: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.XOR,yytext());
           }
-        case 186: break;
+        case 187: break;
         case 31: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.MODULO,yytext());
           }
-        case 187: break;
+        case 188: break;
         case 32: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ATTRIBUTE,yytext());
           }
-        case 188: break;
+        case 189: break;
         case 33: 
           { string.append( yytext() );
           }
-        case 189: break;
+        case 190: break;
         case 34: 
           { yybegin(YYINITIAL);  yyline++;
           }
-        case 190: break;
+        case 191: break;
         case 35: 
           { yybegin(YYINITIAL); 
                                      // length also includes the trailing quote
                                      return new ParsedSymbol(SymbolGroup.STRING,SymbolType.STRING,string.toString());
           }
-        case 191: break;
+        case 192: break;
         case 36: 
           { string.append( yytext() );  yyline++;
           }
-        case 192: break;
+        case 193: break;
         case 37: 
           { yybegin(XML);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTTAG_END, yytext()));
@@ -1429,7 +1429,7 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 193: break;
+        case 194: break;
         case 38: 
           { yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRNAMEVAR_BEGIN, yytext()));
@@ -1439,12 +1439,12 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 194: break;
+        case 195: break;
         case 39: 
           { yybegin(YYINITIAL);
                                       return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRVALVAR_BEGIN, yytext());
           }
-        case 195: break;
+        case 196: break;
         case 40: 
           { yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_INSTRATTRNAMEVAR_BEGIN, yytext()));
@@ -1454,16 +1454,16 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 196: break;
+        case 197: break;
         case 41: 
           { yybegin(YYINITIAL);
                                       return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_INSTRATTRVALVAR_BEGIN, yytext());
           }
-        case 197: break;
+        case 198: break;
         case 42: 
           { string.append(yytext());
           }
-        case 198: break;
+        case 199: break;
         case 43: 
           { yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_VAR_BEGIN, yytext()));
@@ -1473,171 +1473,175 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 199: break;
+        case 200: break;
         case 44: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_DIVIDE,yytext());
           }
-        case 200: break;
+        case 201: break;
         case 45: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_MULTIPLY,yytext());
           }
-        case 201: break;
-        case 46: 
-          { return new ParsedSymbol(SymbolGroup.TYPENAME,SymbolType.TYPENAME,yytext());
-          }
         case 202: break;
-        case 47: 
-          { return new ParsedSymbol(SymbolGroup.DOUBLE,SymbolType.DOUBLE,new Double(Double.parseDouble((yytext()))));
+        case 46: 
+          { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.DESCENDANTS,yytext());
           }
         case 203: break;
-        case 48: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.FILTER,yytext());
+        case 47: 
+          { return new ParsedSymbol(SymbolGroup.TYPENAME,SymbolType.TYPENAME,yytext());
           }
         case 204: break;
-        case 49: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.SHIFT_LEFT,yytext());
+        case 48: 
+          { return new ParsedSymbol(SymbolGroup.DOUBLE,SymbolType.DOUBLE,new Double(Double.parseDouble((yytext()))));
           }
         case 205: break;
+        case 49: 
+          { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.FILTER,yytext());
+          }
+        case 206: break;
         case 50: 
+          { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.SHIFT_LEFT,yytext());
+          }
+        case 207: break;
+        case 51: 
           { yybegin(XMLOPENTAG);
                                     string.setLength(0);
                                     return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTTAG_BEGIN, yytext());
           }
-        case 206: break;
-        case 51: 
+        case 208: break;
+        case 52: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.LOWER_EQUAL,yytext());
           }
-        case 207: break;
-        case 52: 
+        case 209: break;
+        case 53: 
           { return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTVARTAG_BEGIN, yytext());
           }
-        case 208: break;
-        case 53: 
+        case 210: break;
+        case 54: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.NOT_EQUAL,yytext());
           }
-        case 209: break;
-        case 54: 
+        case 211: break;
+        case 55: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.DECREMENT,yytext());
           }
-        case 210: break;
-        case 55: 
+        case 212: break;
+        case 56: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_MINUS,yytext());
           }
-        case 211: break;
-        case 56: 
+        case 213: break;
+        case 57: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.SHIFT_RIGHT,yytext());
           }
-        case 212: break;
-        case 57: 
+        case 214: break;
+        case 58: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.GREATER_EQUAL,yytext());
           }
-        case 213: break;
-        case 58: 
+        case 215: break;
+        case 59: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.NAMESPACE_OP,yytext());
           }
-        case 214: break;
-        case 59: 
+        case 216: break;
+        case 60: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.EQUALS,yytext());
           }
-        case 215: break;
-        case 60: 
+        case 217: break;
+        case 61: 
           { return new ParsedSymbol(SymbolGroup.INTEGER,SymbolType.INTEGER,new Long(Long.parseLong(yytext(),8)));
           }
-        case 216: break;
-        case 61: 
+        case 218: break;
+        case 62: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_PLUS,yytext());
           }
-        case 217: break;
-        case 62: 
+        case 219: break;
+        case 63: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.INCREMENT,yytext());
           }
-        case 218: break;
-        case 63: 
+        case 220: break;
+        case 64: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.AS,yytext());
           }
-        case 219: break;
-        case 64: 
+        case 221: break;
+        case 65: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.IF,yytext());
           }
-        case 220: break;
-        case 65: 
+        case 222: break;
+        case 66: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.IS,yytext());
           }
-        case 221: break;
-        case 66: 
+        case 223: break;
+        case 67: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.IN,yytext());
           }
-        case 222: break;
-        case 67: 
+        case 224: break;
+        case 68: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.DO,yytext());
           }
-        case 223: break;
-        case 68: 
+        case 225: break;
+        case 69: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_BITAND,yytext());
           }
-        case 224: break;
-        case 69: 
+        case 226: break;
+        case 70: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.AND,yytext());
           }
-        case 225: break;
-        case 70: 
+        case 227: break;
+        case 71: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_BITOR,yytext());
           }
-        case 226: break;
-        case 71: 
+        case 228: break;
+        case 72: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.OR,yytext());
           }
-        case 227: break;
-        case 72: 
+        case 229: break;
+        case 73: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_XOR,yytext());
           }
-        case 228: break;
-        case 73: 
+        case 230: break;
+        case 74: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_MODULO,yytext());
           }
-        case 229: break;
-        case 74: 
+        case 231: break;
+        case 75: 
           { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1);
           }
-        case 230: break;
-        case 75: 
+        case 232: break;
+        case 76: 
           { string.append( '\"' );
           }
-        case 231: break;
-        case 76: 
+        case 233: break;
+        case 77: 
           { string.append( '\'' );
           }
-        case 232: break;
-        case 77: 
+        case 234: break;
+        case 78: 
           { char val = (char) Integer.parseInt(yytext().substring(1),8);
                         				   string.append( val );
           }
-        case 233: break;
-        case 78: 
+        case 235: break;
+        case 79: 
           { string.append( '\f' );
           }
-        case 234: break;
-        case 79: 
+        case 236: break;
+        case 80: 
           { string.append( '\\' );
           }
-        case 235: break;
-        case 80: 
+        case 237: break;
+        case 81: 
           { string.append( '\b' );
           }
-        case 236: break;
-        case 81: 
+        case 238: break;
+        case 82: 
           { string.append( '\r' );
           }
-        case 237: break;
-        case 82: 
+        case 239: break;
+        case 83: 
           { string.append( '\n' );
           }
-        case 238: break;
-        case 83: 
+        case 240: break;
+        case 84: 
           { string.append( '\t' );
           }
-        case 239: break;
-        case 84: 
+        case 241: break;
+        case 85: 
           { yybegin(XML);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTFINISHTAG_END, yytext()));
                                     if(string.length()>0){
@@ -1646,8 +1650,8 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 240: break;
-        case 85: 
+        case 242: break;
+        case 86: 
           { yybegin(XMLOPENTAGATTRIB);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRIBUTENAME, yytext()));
                                     if(string.length()>0){
@@ -1656,13 +1660,13 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 241: break;
-        case 86: 
+        case 243: break;
+        case 87: 
           { yybegin(XMLOPENTAG);
                                         return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRIBUTEVALUE, yytext());
           }
-        case 242: break;
-        case 87: 
+        case 244: break;
+        case 88: 
           { yybegin(XMLINSTRATTRIB);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRIBUTENAME, yytext()));
                                     if(string.length()>0){
@@ -1671,8 +1675,8 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 243: break;
-        case 88: 
+        case 245: break;
+        case 89: 
           { yybegin(XML);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_INSTR_END, yytext()));
                                     if(string.length()>0){
@@ -1681,13 +1685,13 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 244: break;
-        case 89: 
+        case 246: break;
+        case 90: 
           { yybegin(XMLINSTROPENTAG);
                                         return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_ATTRIBUTEVALUE, yytext());
           }
-        case 245: break;
-        case 90: 
+        case 247: break;
+        case 91: 
           { yybegin(XMLOPENTAG);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTTAG_BEGIN, yytext()));
                                     if(string.length()>0){
@@ -1696,8 +1700,8 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 246: break;
-        case 91: 
+        case 248: break;
+        case 92: 
           { yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_STARTVARTAG_BEGIN, yytext()));
                                     if(string.length()>0){
@@ -1706,84 +1710,84 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 247: break;
-        case 92: 
+        case 249: break;
+        case 93: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.REST,yytext());
           }
-        case 248: break;
-        case 93: 
+        case 250: break;
+        case 94: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_SHIFT_LEFT,yytext());
           }
-        case 249: break;
-        case 94: 
+        case 251: break;
+        case 95: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.STRICT_NOT_EQUAL,yytext());
           }
-        case 250: break;
-        case 95: 
+        case 252: break;
+        case 96: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.USHIFT_RIGHT,yytext());
           }
-        case 251: break;
-        case 96: 
+        case 253: break;
+        case 97: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_SHIFT_RIGHT,yytext());
           }
-        case 252: break;
-        case 97: 
+        case 254: break;
+        case 98: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.STRICT_EQUALS,yytext());
           }
-        case 253: break;
-        case 98: 
+        case 255: break;
+        case 99: 
           { return new ParsedSymbol(SymbolGroup.INTEGER,SymbolType.INTEGER,new Long(Long.parseLong(yytext().substring(2),16)));
           }
-        case 254: break;
-        case 99: 
+        case 256: break;
+        case 100: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FOR,yytext());
           }
-        case 255: break;
-        case 100: 
+        case 257: break;
+        case 101: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.SET,yytext());
           }
-        case 256: break;
-        case 101: 
+        case 258: break;
+        case 102: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.NEW,yytext());
           }
-        case 257: break;
-        case 102: 
+        case 259: break;
+        case 103: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.TRY,yytext());
           }
-        case 258: break;
-        case 103: 
+        case 260: break;
+        case 104: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.USE,yytext());
           }
-        case 259: break;
-        case 104: 
+        case 261: break;
+        case 105: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.VAR,yytext());
           }
-        case 260: break;
-        case 105: 
+        case 262: break;
+        case 106: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.GET,yytext());
           }
-        case 261: break;
-        case 106: 
+        case 263: break;
+        case 107: 
           { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.NAN,yytext());
           }
-        case 262: break;
-        case 107: 
+        case 264: break;
+        case 108: 
           { string.append(yytext());
                                      yybegin(XML);
                                      String ret = string.toString();
                                      string.setLength(0);
                                      return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_CDATA, ret);
           }
-        case 263: break;
-        case 108: 
+        case 265: break;
+        case 109: 
           { string.append(yytext());
                                      yybegin(XML);
                                      String ret = string.toString();
                                      string.setLength(0);
                                      return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_COMMENT, ret);
           }
-        case 264: break;
-        case 109: 
+        case 266: break;
+        case 110: 
           { yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_FINISHVARTAG_BEGIN, yytext()));
                                     if(string.length()>0){
@@ -1792,8 +1796,8 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 265: break;
-        case 110: 
+        case 267: break;
+        case 111: 
           { yybegin(XMLINSTROPENTAG);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_INSTR_BEGIN, yytext()));
                                     if(string.length()>0){
@@ -1802,8 +1806,8 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 266: break;
-        case 111: 
+        case 268: break;
+        case 112: 
           { yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_INSTRVARTAG_BEGIN, yytext()));
                                     if(string.length()>0){
@@ -1812,44 +1816,44 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 267: break;
-        case 112: 
+        case 269: break;
+        case 113: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ASSIGN_USHIFT_RIGHT,yytext());
           }
-        case 268: break;
-        case 113: 
+        case 270: break;
+        case 114: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.EACH,yytext());
           }
-        case 269: break;
-        case 114: 
+        case 271: break;
+        case 115: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.ELSE,yytext());
           }
-        case 270: break;
-        case 115: 
+        case 272: break;
+        case 116: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.CASE,yytext());
           }
-        case 271: break;
-        case 116: 
+        case 273: break;
+        case 117: 
           { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.NULL,yytext());
           }
-        case 272: break;
-        case 117: 
+        case 274: break;
+        case 118: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.TRUE,yytext());
           }
-        case 273: break;
-        case 118: 
+        case 275: break;
+        case 119: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.THIS,yytext());
           }
-        case 274: break;
-        case 119: 
+        case 276: break;
+        case 120: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.WITH,yytext());
           }
-        case 275: break;
-        case 120: 
+        case 277: break;
+        case 121: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.VOID,yytext());
           }
-        case 276: break;
-        case 121: 
+        case 278: break;
+        case 122: 
           { pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_FINISHTAG, yytext()));
                                     if(string.length()>0){
                                        pushback(new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT, string.toString()));
@@ -1857,149 +1861,149 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 277: break;
-        case 122: 
+        case 279: break;
+        case 123: 
           { String ret=string.toString(); string.setLength(0); string.append(yytext()); yybegin(XMLCOMMENT);
                                      if(!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT,ret);
           }
-        case 278: break;
-        case 123: 
+        case 280: break;
+        case 124: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FALSE,yytext());
           }
-        case 279: break;
-        case 124: 
+        case 281: break;
+        case 125: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FINAL,yytext());
           }
-        case 280: break;
-        case 125: 
+        case 282: break;
+        case 126: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.BREAK,yytext());
           }
-        case 281: break;
-        case 126: 
+        case 283: break;
+        case 127: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.CATCH,yytext());
           }
-        case 282: break;
-        case 127: 
+        case 284: break;
+        case 128: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.CONST,yytext());
           }
-        case 283: break;
-        case 128: 
+        case 285: break;
+        case 129: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.CLASS,yytext());
           }
-        case 284: break;
-        case 129: 
+        case 286: break;
+        case 130: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.SUPER,yytext());
           }
-        case 285: break;
-        case 130: 
+        case 287: break;
+        case 131: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.THROW,yytext());
           }
-        case 286: break;
-        case 131: 
+        case 288: break;
+        case 132: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.WHILE,yytext());
           }
-        case 287: break;
-        case 132: 
+        case 289: break;
+        case 133: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.RETURN,yytext());
           }
-        case 288: break;
-        case 133: 
+        case 290: break;
+        case 134: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.STATIC,yytext());
           }
-        case 289: break;
-        case 134: 
+        case 291: break;
+        case 135: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.SWITCH,yytext());
           }
-        case 290: break;
-        case 135: 
+        case 292: break;
+        case 136: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.TYPEOF,yytext());
           }
-        case 291: break;
-        case 136: 
+        case 293: break;
+        case 137: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.IMPORT,yytext());
           }
-        case 292: break;
-        case 137: 
+        case 294: break;
+        case 138: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.DELETE,yytext());
           }
-        case 293: break;
-        case 138: 
+        case 295: break;
+        case 139: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.PUBLIC,yytext());
           }
-        case 294: break;
-        case 139: 
+        case 296: break;
+        case 140: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FINALLY,yytext());
           }
-        case 295: break;
-        case 140: 
+        case 297: break;
+        case 141: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.EXTENDS,yytext());
           }
-        case 296: break;
-        case 141: 
+        case 298: break;
+        case 142: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.DEFAULT,yytext());
           }
-        case 297: break;
-        case 142: 
+        case 299: break;
+        case 143: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.DYNAMIC,yytext());
           }
-        case 298: break;
-        case 143: 
+        case 300: break;
+        case 144: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.PRIVATE,yytext());
           }
-        case 299: break;
-        case 144: 
+        case 301: break;
+        case 145: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.PACKAGE,yytext());
           }
-        case 300: break;
-        case 145: 
+        case 302: break;
+        case 146: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FUNCTION,yytext());
           }
-        case 301: break;
-        case 146: 
+        case 303: break;
+        case 147: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.CONTINUE,yytext());
           }
-        case 302: break;
-        case 147: 
+        case 304: break;
+        case 148: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.OVERRIDE,yytext());
           }
-        case 303: break;
-        case 148: 
+        case 305: break;
+        case 149: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.INTERNAL,yytext());
           }
-        case 304: break;
-        case 149: 
+        case 306: break;
+        case 150: 
           { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.INFINITY,yytext());
           }
-        case 305: break;
-        case 150: 
+        case 307: break;
+        case 151: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.NAMESPACE,yytext());
           }
-        case 306: break;
-        case 151: 
+        case 308: break;
+        case 152: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.INTERFACE,yytext());
           }
-        case 307: break;
-        case 152: 
+        case 309: break;
+        case 153: 
           { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.UNDEFINED,yytext());
           }
-        case 308: break;
-        case 153: 
+        case 310: break;
+        case 154: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.PROTECTED,yytext());
           }
-        case 309: break;
-        case 154: 
+        case 311: break;
+        case 155: 
           { String ret=string.toString(); string.setLength(0); string.append(yytext() ); yybegin(XMLCDATA);
                                     if(!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML,SymbolType.XML_TEXT,ret);
           }
-        case 310: break;
-        case 155: 
+        case 312: break;
+        case 156: 
           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.INSTANCEOF,yytext());
           }
-        case 311: break;
-        case 156: 
+        case 313: break;
+        case 157: 
           { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.IMPLEMENTS,yytext());
           }
-        case 312: break;
+        case 314: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
             zzAtEOF = true;

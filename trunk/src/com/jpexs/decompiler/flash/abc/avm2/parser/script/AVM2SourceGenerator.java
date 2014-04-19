@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetDescendantsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
@@ -65,6 +66,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.CheckFilterIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetDescendantsAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
@@ -145,6 +147,18 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return new AVM2Instruction(0, def, operands, new byte[0]);
     }
 
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, GetDescendantsAVM2Item item) throws CompilationException {
+        int nssa[] = new int[item.openedNamespaces.size()];
+        for (int i = 0; i < item.openedNamespaces.size(); i++) {
+            nssa[i] = item.openedNamespaces.get(i);
+        }
+        int nsset = abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
+        
+        return GraphTargetItem.toSourceMerge(localData, this, 
+                item.object,
+                ins(new GetDescendantsIns(),abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, abc.constants.getStringId(item.nameStr, true), 0, nsset, 0, new ArrayList<Integer>()), true))
+        );
+    }
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
