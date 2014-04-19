@@ -87,6 +87,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -653,13 +654,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                         do{                            
                             ret = View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.place").replace("%libpath%", Configuration.getFlashLibPath().getAbsolutePath()),AppStrings.translate("message.action.playerglobal.title"),JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);                                                        
                             swc = Configuration.getPlayerSWC();
-                        }while(ret == JOptionPane.OK_OPTION && swc == null);
-                        if(ret == JOptionPane.OK_OPTION){
-                            setDecompiledEditMode(true);
-                        }
+                        }while(ret == JOptionPane.OK_OPTION && swc == null);                        
                     }
-                }else{
-                    setDecompiledEditMode(true);
+                }
+                if(swc!=null){
+                    if(View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE,Configuration.warningExperimentalAS3Edit,JOptionPane.OK_OPTION)==JOptionPane.OK_OPTION){                        
+                        setDecompiledEditMode(true);
+                    }                    
                 }
                 break;
             case ACTION_CANCEL_DECOMPILED:

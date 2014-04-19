@@ -253,6 +253,15 @@ public class Configuration {
     @ConfigurationName("export.formats")
     public static final ConfigurationItem<String> lastSelectedExportFormats = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("warning.experimental.as12edit")
+    public static final ConfigurationItem<Boolean> warningExperimentalAS12Edit = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("warning.experimental.as3edit")
+    public static final ConfigurationItem<Boolean> warningExperimentalAS3Edit = null;
+    
+    
     private enum OSId {
 
         WINDOWS, OSX, UNIX

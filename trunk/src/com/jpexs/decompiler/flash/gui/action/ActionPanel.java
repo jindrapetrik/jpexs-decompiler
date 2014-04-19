@@ -743,7 +743,9 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 }
                 break;
             case ACTION_EDIT_DECOMPILED:
-                setDecompiledEditMode(true);
+                if(View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE,Configuration.warningExperimentalAS12Edit,JOptionPane.OK_OPTION)==JOptionPane.OK_OPTION){                                            
+                    setDecompiledEditMode(true);
+                }
                 break;
             case ACTION_CANCEL_DECOMPILED:
                 setDecompiledEditMode(false);

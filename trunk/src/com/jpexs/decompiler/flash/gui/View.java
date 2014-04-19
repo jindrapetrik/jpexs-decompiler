@@ -16,6 +16,10 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.AppStrings;
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -43,11 +47,13 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
@@ -356,6 +362,31 @@ public class View {
                 ret[0] = JOptionPane.showConfirmDialog(parentComponent, message, title, optionType, messageTyp);
             }
         });
+        return ret[0];
+    }
+    
+    
+    public static int showConfirmDialog(final Component parentComponent, String message, final String title, final int optionType, final int messageTyp, ConfigurationItem<Boolean> showAgainConfig, int defaultOption) {
+        
+        JLabel warLabel = new JLabel(message);
+        final JPanel warPanel = new JPanel(new BorderLayout());
+        warPanel.add(warLabel,BorderLayout.CENTER);
+        JCheckBox donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
+        donotShowAgainCheckBox.setSelected(!showAgainConfig.get());
+        warPanel.add(donotShowAgainCheckBox,BorderLayout.SOUTH);
+        
+        if(donotShowAgainCheckBox.isSelected()){
+            return defaultOption;
+        }
+        
+        final int ret[] = new int[1];
+        execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                ret[0] = JOptionPane.showConfirmDialog(parentComponent, warPanel, title, optionType, messageTyp);
+            }
+        });
+        showAgainConfig.set(!donotShowAgainCheckBox.isSelected());
         return ret[0];
     }
 
