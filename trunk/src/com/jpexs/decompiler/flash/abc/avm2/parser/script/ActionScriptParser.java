@@ -2024,6 +2024,7 @@ public class ActionScriptParser {
             s = lex();
             expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
             name += "." + s.value.toString();
+            s = lex();
         }
         List<GraphTargetItem> items = new ArrayList<>();
         List<Integer> openedNamespaces = new ArrayList<>();
