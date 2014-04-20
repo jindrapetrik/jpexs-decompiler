@@ -1153,7 +1153,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return abc;
     }
 
-    public void generateClass(List<Integer> openedNamespaces, int namespace, int initScope, PackageAVM2Item pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems) throws ParseException, CompilationException {
+    public void generateClass(List<AssignableAVM2Item> sinitVariables,boolean staticNeedsActivation, List<GraphTargetItem> staticInit,List<Integer> openedNamespaces, int namespace, int initScope, PackageAVM2Item pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems) throws ParseException, CompilationException {
         localData.currentClass = pkg.packageName.isEmpty() ? name : pkg.packageName + "." + name;
         List<GraphSourceItem> ret = new ArrayList<>();
         if (extendsVal == null && !isInterface) {
@@ -1174,32 +1174,31 @@ public class AVM2SourceGenerator implements SourceGenerator {
             instanceInfo.iinit_index = method(new ArrayList<MethodBody>(), pkg.packageName, m.needsActivation, m.subvariables, initScope + 1, m.hasRest, m.line, name, extendsVal != null ? extendsVal.toString() : null, true, localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
         }
 
+        
+        
         //Class initializer
-        MethodInfo mi = new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]);
-        MethodBody mb = new MethodBody();
-        mb.method_info = abc.addMethodInfo(mi);
-        mb.code = new AVM2Code();
-        mb.code.code = new ArrayList<>();
-        mb.code.code.add(ins(new GetLocal0Ins()));
-        mb.code.code.add(ins(new PushScopeIns()));
+        int staticMi = method(new ArrayList<MethodBody>(), pkg.packageName, staticNeedsActivation, sinitVariables, initScope, false,0, name, superName, false, localData, new ArrayList<GraphTargetItem>(),new ArrayList<String>(),new ArrayList<GraphTargetItem>(), staticInit, TypeItem.UNBOUNDED);
+        MethodBody mb=abc.findBody(staticMi);
+        
+        /*List<AVM2Instruction> initcode = new ArrayList<>();
         for (GraphTargetItem ti : traitItems) {
             if (ti instanceof SlotAVM2Item) {
                 SlotAVM2Item si = (SlotAVM2Item) ti;
                 if (si.isStatic()) {
-                    mb.code.code.add(ins(new FindPropertyStrictIns(), traitName(namespace, si.var)));
+                    initcode.add(ins(new FindPropertyStrictIns(), traitName(namespace, si.var)));
                     List<GraphTargetItem> tis = new ArrayList<>();
                     tis.add(si.value);
-                    mb.code.code.addAll(toInsList(generate(localData, tis)));
-                    mb.code.code.add(ins(new InitPropertyIns(), traitName(namespace, si.var)));
+                    initcode.addAll(toInsList(generate(localData, tis)));
+                    initcode.add(ins(new InitPropertyIns(), traitName(namespace, si.var)));
                 }
             }
         }
-        mb.code.code.add(ins(new ReturnVoidIns()));
-        mb.autoFillStats(abc, initScope);
+        if(mb.code.code.get(mb.code.code.size()-1).definition instanceof ReturnVoidIns){
+            mb.code.code.addAll(mb.code.code.size()-1,initcode);
+        }
+        mb.autoFillStats(abc, initScope);*/
 
-        abc.addMethodBody(mb);
-
-        classInfo.cinit_index = mb.method_info;
+        classInfo.cinit_index = staticMi;
 
         instanceInfo.interfaces = new int[implementsStr.size()];
         for (int i = 0; i < implementsStr.size(); i++) {
@@ -1231,7 +1230,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
          */
         if (cls instanceof ClassAVM2Item) {
             ClassAVM2Item cai = (ClassAVM2Item) cls;
-            generateClass(cai.openedNamespaces, namespace, initScope, pkg, ci, ii, localData, false, cai.className, cai.extendsOp.toString(), cai.extendsOp, cai.implementsOp, cai.constructor, cai.traits);
+            generateClass(cai.sinitVariables,cai.staticInitActivation,cai.staticInit,cai.openedNamespaces, namespace, initScope, pkg, ci, ii, localData, false, cai.className, cai.extendsOp.toString(), cai.extendsOp, cai.implementsOp, cai.constructor, cai.traits);
             if (!cai.isDynamic) {
                 ii.flags |= InstanceInfo.CLASS_SEALED;
             }
@@ -1243,7 +1242,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         if (cls instanceof InterfaceAVM2Item) {
             InterfaceAVM2Item iai = (InterfaceAVM2Item) cls;
-            generateClass(iai.openedNamespaces, namespace, initScope, pkg, ci, ii, localData, true, iai.name, null, null, iai.superInterfaces, null, iai.methods);
+            generateClass(new ArrayList<AssignableAVM2Item>(),false,new ArrayList<GraphTargetItem>(),iai.openedNamespaces, namespace, initScope, pkg, ci, ii, localData, true, iai.name, null, null, iai.superInterfaces, null, iai.methods);
             ii.flags |= InstanceInfo.CLASS_INTERFACE;
         }
 

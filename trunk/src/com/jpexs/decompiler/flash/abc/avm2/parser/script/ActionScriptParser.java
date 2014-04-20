@@ -456,7 +456,7 @@ public class ActionScriptParser {
         return new FunctionAVM2Item(needsActivation2.getVal(), namespace, hasRest, line, functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }
 
-    private GraphTargetItem traits(List<String> importedClasses, int privateNs, int protectedNs, int publicNs, int packageInternalNs, int protectedStaticNs, List<Integer> openedNamespaces, String packageName, String classNameStr, boolean isInterface, List<GraphTargetItem> traits) throws ParseException, IOException, CompilationException {
+    private GraphTargetItem traits(List<AssignableAVM2Item> sinitVariables,Reference<Boolean> sinitNeedsActivation,List<GraphTargetItem> staticInitializer, List<String> importedClasses, int privateNs, int protectedNs, int publicNs, int packageInternalNs, int protectedStaticNs, List<Integer> openedNamespaces, String packageName, String classNameStr, boolean isInterface, List<GraphTargetItem> traits) throws ParseException, IOException, CompilationException {
         ParsedSymbol s;
         GraphTargetItem constr = null;
         List<AssignableAVM2Item> variables = new ArrayList<>();
@@ -472,7 +472,14 @@ public class ActionScriptParser {
             boolean isFinal = false;
             boolean isDynamic = false;
             String customAccess = null;
-            //TODO: namespace name
+            
+            
+            if(s.type  == SymbolType.CURLY_OPEN){
+                staticInitializer.addAll(commands(sinitNeedsActivation, importedClasses, openedNamespaces, new Stack<Loop>(), new HashMap<Loop, String>(), new HashMap<String, Integer>(), true, false, 0, sinitVariables));
+                expectedType(SymbolType.CURLY_CLOSE);
+                s = lex();
+            }
+            
             //TODO: final, dynamic
             while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.IDENTIFIER)) {
                 if (s.type == SymbolType.FINAL) {
@@ -767,12 +774,15 @@ public class ActionScriptParser {
             openedNamespaces.add(abc.constants.getNamespaceId(new Namespace(Namespace.KIND_STATIC_PROTECTED, abc.constants.getStringId(namespaces.get(i) + ":" + names.get(i), true)), 0, true));
         }
 
-        GraphTargetItem constr = traits(importedClasses, privateNs, protectedNs, publicNs, packageInternalNs, protectedStaticNs, openedNamespaces, packageName, classNameStr, isInterface, traits);
+        Reference<Boolean> staticNeedsActivation = new Reference<>(false);
+        List<GraphTargetItem> staticInit = new ArrayList<>();
+        List<AssignableAVM2Item> sinitVariables = new ArrayList<>();
+        GraphTargetItem constr = traits(sinitVariables,staticNeedsActivation,staticInit,importedClasses, privateNs, protectedNs, publicNs, packageInternalNs, protectedStaticNs, openedNamespaces, packageName, classNameStr, isInterface, traits);
 
         if (isInterface) {
             return new InterfaceAVM2Item(openedNamespaces, isFinal, namespace, classNameStr, implementsStr, traits);
         } else {
-            return new ClassAVM2Item(openedNamespaces, protectedNs, isDynamic, isFinal, namespace, classNameStr, extendsStr, implementsStr, constr, traits);
+            return new ClassAVM2Item(openedNamespaces, protectedNs, isDynamic, isFinal, namespace, classNameStr, extendsStr, implementsStr, staticInit,staticNeedsActivation.getVal(),sinitVariables,constr, traits);
         }
     }
 
@@ -2093,7 +2103,7 @@ public class ActionScriptParser {
         }
         lexer.pushback(s);
 
-        traits(importedClasses, privateNs, 0, publicNs, packageInternalNs, 0, openedNamespaces, name, null, false, items);
+        traits(new ArrayList<AssignableAVM2Item>(),new Reference<Boolean>(false),new ArrayList<GraphTargetItem>(),importedClasses, privateNs, 0, publicNs, packageInternalNs, 0, openedNamespaces, name, null, false, items);
         expectedType(SymbolType.CURLY_CLOSE);
         return new PackageAVM2Item(name, items);
     }
