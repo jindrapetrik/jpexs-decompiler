@@ -143,11 +143,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
     public int getNsKind() {
         return nsKind;
     }
-
-    @Override
-    public void setAssignedValue(GraphTargetItem storeValue) {
-        this.assignedValue = storeValue;
-    }
+   
 
     public String getVariableName() {
         return variableName;

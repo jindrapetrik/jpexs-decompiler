@@ -34,6 +34,7 @@ import com.jpexs.decompiler.graph.TypeFunctionItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,11 +45,13 @@ public class CallAVM2Item extends AVM2Item {
 
     public GraphTargetItem name;
     public List<GraphTargetItem> arguments;
+    public int line;
 
-    public CallAVM2Item(GraphTargetItem name, List<GraphTargetItem> arguments) {
+    public CallAVM2Item(int line, GraphTargetItem name, List<GraphTargetItem> arguments) {
         super(null, NOPRECEDENCE);
         this.name = name;
         this.arguments = arguments;
+        this.line = line;
     }
 
     @Override
@@ -93,7 +96,12 @@ public class CallAVM2Item extends AVM2Item {
             p.setAssignedValue(n.getAssignedValue());
             callable = p;
         }
-
+        
+        if(callable instanceof TypeItem){           
+           TypeItem t=(TypeItem)callable;
+           callable = new PropertyAVM2Item(null, t.fullTypeName, g.abc, g.allABCs, new ArrayList<Integer>(), new ArrayList<MethodBody>());
+        }
+        
         if (callable instanceof PropertyAVM2Item) {
             PropertyAVM2Item prop = (PropertyAVM2Item) callable;
             Object obj = prop.object;
@@ -115,7 +123,7 @@ public class CallAVM2Item extends AVM2Item {
                 Reference<Integer> outPropNsKind = new Reference<>(1);
                 Reference<String> outPropType = new Reference<>("");
                 Reference<ValueKind> outPropValue = new Reference<>(null);
-                if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
+                if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal())?outName.getVal():outNs.getVal()+"."+outName.getVal()))) {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, new ArrayList<Integer>());
                     nobj.setRegNumber(0);
                     obj = nobj;
@@ -127,7 +135,8 @@ public class CallAVM2Item extends AVM2Item {
                     new AVM2Instruction(0, new CallPropertyIns(), new int[]{prop.resolveProperty(localData), arguments.size()}, new byte[0])
             );
         }
-        return new ArrayList<>();
+        throw new CompilationException("Cannot call a type", line);
+        //return new ArrayList<>();
     }
 
     @Override

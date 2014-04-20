@@ -173,7 +173,7 @@ public class ActionScriptParser {
                     ret = member(needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
                     break;
                 case PARENT_OPEN:
-                    ret = new CallAVM2Item(ret, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                    ret = new CallAVM2Item(lexer.yyline(),ret, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                     break;
             }
             s = lex();
@@ -2007,7 +2007,7 @@ public class ActionScriptParser {
             case NEW:
                 GraphTargetItem newvar = name(needsActivation, true, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new ConstructSomethingAVM2Item(openedNamespaces, newvar, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                ret = new ConstructSomethingAVM2Item(lexer.yyline(),openedNamespaces, newvar, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                 existsRemainder = true;
                 break;
             case IDENTIFIER:
