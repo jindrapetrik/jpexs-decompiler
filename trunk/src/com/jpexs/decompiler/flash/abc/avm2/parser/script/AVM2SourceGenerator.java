@@ -430,6 +430,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         final Reference<Integer> counterReg = new Reference<>(0);
         final Reference<Integer> collectionReg = new Reference<>(0);
 
+        if(assignable instanceof UnresolvedAVM2Item){
+            assignable = (AssignableAVM2Item)((UnresolvedAVM2Item)assignable).resolved;
+        }
+        
         ret.addAll(GraphTargetItem.toSourceMerge(localData, this,
                 ins(new PushByteIns(), 0),
                 AssignableAVM2Item.setTemp(localData, this, counterReg),
