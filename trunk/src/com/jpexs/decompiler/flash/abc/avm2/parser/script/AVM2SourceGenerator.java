@@ -683,7 +683,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             ret.add(ins(new NewObjectIns(), 0));
             ret.add(ins(new PushWithIns()));
             scope = localData.scopeStack.size();
-            localData.scopeStack.add(new PropertyAVM2Item(null, item.functionName, null, abc, allABCs, new ArrayList<Integer>(), localData.callStack));
+            localData.scopeStack.add(new PropertyAVM2Item(null, item.functionName, abc, allABCs, new ArrayList<Integer>(), localData.callStack));
         }
         ret.add(ins(new NewFunctionIns(), method(localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, null, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));
         if (!item.functionName.isEmpty()) {
@@ -1188,25 +1188,19 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 SlotAVM2Item si = (SlotAVM2Item) ti;
                 if (si.isStatic() && si.value!=null) {
                     sinitcode.add(ins(new FindPropertyStrictIns(), traitName(namespace, si.var)));
-                    List<GraphTargetItem> tis = new ArrayList<>();
-                    tis.add(si.value);
-                    sinitcode.addAll(toInsList(generate(localData, tis)));
-                    sinitcode.add(ins(new InitPropertyIns(), traitName(namespace, si.var)));
+                    sinitcode.addAll(toInsList(si.value.toSource(localData, this)));
+                    sinitcode.add(ins(new InitPropertyIns(), traitName(si.getNamespace(), si.var)));
                 }
                 if (!si.isStatic() && si.value!=null) {
-                    initcode.add(ins(new FindPropertyStrictIns(), traitName(namespace, si.var)));
-                    List<GraphTargetItem> tis = new ArrayList<>();
-                    tis.add(si.value);
-                    initcode.addAll(toInsList(generate(localData, tis)));
-                    initcode.add(ins(new InitPropertyIns(), traitName(namespace, si.var)));
+                    initcode.add(ins(new GetLocal0Ins()));
+                    initcode.addAll(toInsList(si.value.toSource(localData, this)));
+                    initcode.add(ins(new InitPropertyIns(), traitName(si.getNamespace(), si.var)));
                 }
             }
         }
         
         MethodBody initBody=abc.findBody(init);
-        if(initBody.code.code.get(initBody.code.code.size()-1).definition instanceof ReturnVoidIns){
-            initBody.code.code.addAll(initBody.code.code.size()-1,initcode);
-        }
+        initBody.code.code.addAll(constructor==null?0:2,initcode);//after getlocal0,pushscope
         
         if(sinitBody.code.code.get(sinitBody.code.code.size()-1).definition instanceof ReturnVoidIns){
             sinitBody.code.code.addAll(sinitBody.code.code.size()-1,sinitcode);
@@ -1214,6 +1208,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         sinitBody.markOffsets();
         sinitBody.autoFillStats(abc, initScope);       
         classInfo.cinit_index = staticMi;
+        initBody.autoFillStats(abc, initScope + 1);
 
         instanceInfo.interfaces = new int[implementsStr.size()];
         for (int i = 0; i < implementsStr.size(); i++) {
@@ -1274,7 +1269,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         if (type instanceof UnresolvedAVM2Item) {
-            type = ((UnresolvedAVM2Item) type).resolve(new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, allABCs, new ArrayList<MethodBody>(), new ArrayList<AssignableAVM2Item>());
+            String fullClass = localData.currentClass==null?null:(localData.pkg.equals("")?localData.currentClass:localData.pkg+"."+localData.currentClass);
+            type = ((UnresolvedAVM2Item) type).resolve(new TypeItem(fullClass),new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, allABCs, new ArrayList<MethodBody>(), new ArrayList<AssignableAVM2Item>());
         }
 
         String pkg = "";
@@ -1372,7 +1368,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
             if (an instanceof UnresolvedAVM2Item) {
                 UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
                 if (n.resolved == null) {
-                    GraphTargetItem res = n.resolve(paramTypes, paramNames, abc, allABCs, callStack, subvariables);
+                    String fullClass = localData.currentClass==null?null:(localData.pkg.equals("")?localData.currentClass:localData.pkg+"."+localData.currentClass);            
+                    GraphTargetItem res = n.resolve(new TypeItem(fullClass),paramTypes, paramNames, abc, allABCs, callStack, subvariables);
                     if (res instanceof AssignableAVM2Item) {
                         subvariables.set(i, (AssignableAVM2Item) res);
                     } else {
@@ -1447,7 +1444,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             if (an instanceof NameAVM2Item) {
                 NameAVM2Item n = (NameAVM2Item) an;
                 if (n.getVariableName() != null) {
-                    if (needsActivation) {
+                    if (!n.getVariableName().equals("this") && needsActivation) {
                         if (n.getSlotNumber() <= 0) {
                             n.setSlotNumber(slotNames.indexOf(n.getVariableName()));
                             n.setSlotScope(slotScope);
@@ -1506,7 +1503,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 if (n.getNs() != null) {
                     continue;
                 }
-
+                
+                if("this".equals(n.getVariableName()) || paramNames.contains(n.getVariableName())||"argmuments".equals(n.getVariableName())){
+                    continue;
+                }
+                
                 NameAVM2Item d = new NameAVM2Item(n.type, n.line, n.getVariableName(), NameAVM2Item.getDefaultValue("" + n.type), true, n.openedNamespaces);
                 //no index
                 if (needsActivation) {
@@ -1739,7 +1740,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     private int genNs(String custom, int namespace, List<Integer> openedNamespaces, SourceGeneratorLocalData localData) {
         if (custom != null) {
-            PropertyAVM2Item prop = new PropertyAVM2Item(null, custom, null, abc, allABCs, openedNamespaces, new ArrayList<MethodBody>());
+            PropertyAVM2Item prop = new PropertyAVM2Item(null, custom, abc, allABCs, openedNamespaces, new ArrayList<MethodBody>());
             Reference<ValueKind> value = new Reference<>(null);
             prop.resolve(localData, new Reference<String>(""), new Reference<String>(""), new Reference<Integer>(0), value);
             namespace = value.getVal().value_index;

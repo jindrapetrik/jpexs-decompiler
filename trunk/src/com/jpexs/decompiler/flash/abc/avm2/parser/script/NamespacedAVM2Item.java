@@ -55,16 +55,14 @@ import java.util.List;
  */
 public class NamespacedAVM2Item extends AssignableAVM2Item {
 
-    public GraphTargetItem index;
     public GraphTargetItem ns;
     public String name;
     public GraphTargetItem obj;
     public boolean attr;
     public List<Integer> openedNamespaces;
 
-    public NamespacedAVM2Item(GraphTargetItem index, GraphTargetItem ns, String name, GraphTargetItem obj, boolean attr, List<Integer> openedNamespaces, GraphTargetItem storeValue) {
+    public NamespacedAVM2Item(GraphTargetItem ns, String name, GraphTargetItem obj, boolean attr, List<Integer> openedNamespaces, GraphTargetItem storeValue) {
         super(storeValue);
-        this.index = index;
         this.ns = ns;
         this.name = name;
         this.obj = obj;
@@ -82,7 +80,7 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
 
     @Override
     public AssignableAVM2Item copy() {
-        return new NamespacedAVM2Item(index, ns, name, obj, attr, openedNamespaces, assignedValue);
+        return new NamespacedAVM2Item(ns, name, obj, attr, openedNamespaces, assignedValue);
     }
 
     @Override
@@ -92,7 +90,7 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         Reference<Integer> ns_temp = new Reference<>(-1);
         Reference<Integer> name_temp = new Reference<>(-1);
         Reference<Integer> ret_temp = new Reference<>(-1);
-        if (name == null && index != null) {
+        /*if (name == null && index != null) {
             return toSourceMerge(localData, generator,
                     ns, generateCoerce(generator, new TypeItem("Namespace")), index, ins(new ConvertSIns()),
                     ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
@@ -111,7 +109,9 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
                     getTemp(localData, generator, ret_temp),
                     ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
                     killTemp(localData, generator, Arrays.asList(ret_temp, name_temp, ns_temp)));
-        } else if (name != null && index == null) {
+        } else
+        */
+        if (name != null) {
             return toSourceMerge(localData, generator,
                     ns, generateCoerce(generator, new TypeItem("Namespace")),
                     ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<Integer>()), true)),
@@ -162,8 +162,8 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         if (name == null) {
             if (assignedValue != null) {
                 return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? generateCoerce(generator, new TypeItem("Namespace")) : null, obj == null ? index : null, ins(new ConvertSIns()), obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
-                        ns, generateCoerce(generator, new TypeItem("Namespace")), index, ins(new ConvertSIns()), assignedValue,
+                        obj == null ? ns : null, obj == null ? generateCoerce(generator, new TypeItem("Namespace")) : null, ins(new ConvertSIns()), obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                        ns, generateCoerce(generator, new TypeItem("Namespace")), ins(new ConvertSIns()), assignedValue,
                         needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
                         ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
                         needsReturn ? getTemp(localData, generator, ret_temp) : null,
@@ -171,8 +171,8 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
                 );
             } else {
                 return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? generateCoerce(generator, new TypeItem("Namespace")) : null, obj == null ? index : null, ins(new ConvertSIns()), obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
-                        ns, generateCoerce(generator, new TypeItem("Namespace")), index, ins(new ConvertSIns()), ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                        obj == null ? ns : null, obj == null ? generateCoerce(generator, new TypeItem("Namespace")) : null, ins(new ConvertSIns()), obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                        ns, generateCoerce(generator, new TypeItem("Namespace")), ins(new ConvertSIns()), ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
                         needsReturn ? null : ins(new PopIns()),
                         killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
                 );

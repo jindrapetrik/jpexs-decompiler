@@ -89,7 +89,7 @@ public class CallAVM2Item extends AVM2Item {
                 nobj.setRegNumber(0);
                 obj = nobj;
             }
-            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), n.getIndex(), g.abc, g.allABCs, n.openedNamespaces, new ArrayList<MethodBody>());
+            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), g.abc, g.allABCs, n.openedNamespaces, new ArrayList<MethodBody>());
             p.setAssignedValue(n.getAssignedValue());
             callable = p;
         }
@@ -123,7 +123,7 @@ public class CallAVM2Item extends AVM2Item {
                     obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty(localData)}, new byte[0]);
                 }
             }
-            return toSourceMerge(localData, generator, obj, prop.index, arguments,
+            return toSourceMerge(localData, generator, obj, arguments,
                     new AVM2Instruction(0, new CallPropertyIns(), new int[]{prop.resolveProperty(localData), arguments.size()}, new byte[0])
             );
         }
@@ -142,7 +142,7 @@ public class CallAVM2Item extends AVM2Item {
 
         if (callable instanceof NameAVM2Item) {
             NameAVM2Item n = (NameAVM2Item) callable;
-            PropertyAVM2Item p = new PropertyAVM2Item(null, n.getVariableName(), n.getIndex(), g.abc, g.allABCs, n.openedNamespaces, new ArrayList<MethodBody>());
+            PropertyAVM2Item p = new PropertyAVM2Item(null, n.getVariableName(), g.abc, g.allABCs, n.openedNamespaces, new ArrayList<MethodBody>());
             p.setAssignedValue(n.getAssignedValue());
             callable = p;
         }
@@ -153,7 +153,7 @@ public class CallAVM2Item extends AVM2Item {
             if (obj == null) {
                 obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty(localData)}, new byte[0]);
             }
-            return toSourceMerge(localData, generator, obj, prop.index, arguments,
+            return toSourceMerge(localData, generator, obj, arguments,
                     new AVM2Instruction(0, new CallPropVoidIns(), new int[]{prop.resolveProperty(localData), arguments.size()}, new byte[0])
             );
         }

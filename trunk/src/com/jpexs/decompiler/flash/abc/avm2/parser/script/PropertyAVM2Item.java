@@ -60,23 +60,21 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem object;
     public ABC abc;
     public List<ABC> otherABCs;
-    public GraphTargetItem index;
     private List<Integer> openedNamespaces;
     private List<MethodBody> callStack;
     public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
 
     @Override
     public AssignableAVM2Item copy() {
-        PropertyAVM2Item p = new PropertyAVM2Item(object, propertyName, index, abc, otherABCs, openedNamespaces, callStack);
+        PropertyAVM2Item p = new PropertyAVM2Item(object, propertyName, abc, otherABCs, openedNamespaces, callStack);
         return p;
     }
 
-    public PropertyAVM2Item(GraphTargetItem object, String propertyName, GraphTargetItem index, ABC abc, List<ABC> otherABCs, List<Integer> openedNamespaces, List<MethodBody> callStack) {
+    public PropertyAVM2Item(GraphTargetItem object, String propertyName, ABC abc, List<ABC> otherABCs, List<Integer> openedNamespaces, List<MethodBody> callStack) {
         this.propertyName = propertyName;
         this.object = object;
         this.otherABCs = otherABCs;
         this.abc = abc;
-        this.index = index;
         this.openedNamespaces = openedNamespaces;
         this.callStack = callStack;
     }
@@ -485,9 +483,6 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      }*/
     @Override
     public GraphTargetItem returnType() {
-        if (index != null) {
-            return TypeItem.UNBOUNDED;
-        }
         Reference<String> objType = new Reference<>("");
         Reference<String> propType = new Reference<>("");
         Reference<Integer> propIndex = new Reference<>(0);
@@ -511,23 +506,23 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         if (assignedValue != null) {
             String targetType = propType.getVal();
             String srcType = assignedValue.returnType().toString();
-            GraphTargetItem st = assignedValue;
+            GraphTargetItem coerced = assignedValue;
             if (!targetType.equals(srcType) && !propertyName.startsWith("@")) {
-                st = new CoerceAVM2Item(null, assignedValue, targetType);
+                coerced = new CoerceAVM2Item(null, assignedValue, targetType);
             }
-            return toSourceMerge(localData, generator, obj, index, st,
+
+            return toSourceMerge(localData, generator, obj, coerced,
                     needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
                     ins(new SetPropertyIns(), propertyId),
                     needsReturn ? getTemp(localData, generator, ret_temp) : null,
                     killTemp(localData, generator, Arrays.asList(ret_temp)));
         } else {
-            if (obj instanceof AVM2Instruction && (((AVM2Instruction) obj).definition instanceof FindPropertyStrictIns) && index == null) {
+            if (obj instanceof AVM2Instruction && (((AVM2Instruction) obj).definition instanceof FindPropertyStrictIns)) {
                 return toSourceMerge(localData, generator, ins(new GetLexIns(), propertyId),
                         needsReturn ? null : ins(new PopIns())
                 );
             }
-            return toSourceMerge(localData, generator, obj, index,
-                    ins(new GetPropertyIns(), propertyId),
+            return toSourceMerge(localData, generator, obj, ins(new GetPropertyIns(), propertyId),
                     needsReturn ? null : ins(new PopIns())
             );
         }
@@ -603,11 +598,10 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
         Reference<Integer> ret_temp = new Reference<>(-1);
         Reference<Integer> obj_temp = new Reference<>(-1);
-        Reference<Integer> index_temp = new Reference<>(-1);
 
         boolean isInteger = propType.getVal().equals("int");
 
-        List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, dupSetTemp(localData, generator, obj_temp), index, index != null ? dupSetTemp(localData, generator, index_temp) : null,
+        List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, dupSetTemp(localData, generator, obj_temp),
                 //Start get original
                 //getTemp(localData, generator, obj_temp),
                 //index!=null?getTemp(localData, generator, index_temp):null,
@@ -618,12 +612,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 needsReturn ? ins(new DupIns()) : null,
                 (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
                 setTemp(localData, generator, ret_temp),
-                getTemp(localData, generator, obj_temp),
-                index != null ? getTemp(localData, generator, index_temp) : null,
+                getTemp(localData, generator, obj_temp),                
                 getTemp(localData, generator, ret_temp),
                 ins(new SetPropertyIns(), propertyId),
                 //needsReturn?getTemp(localData, generator, ret_temp):null,
-                killTemp(localData, generator, Arrays.asList(ret_temp, obj_temp, index_temp)));
+                killTemp(localData, generator, Arrays.asList(ret_temp, obj_temp)));
         return ret;
     }
 
