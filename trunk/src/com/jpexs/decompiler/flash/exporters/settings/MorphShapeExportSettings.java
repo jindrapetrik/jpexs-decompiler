@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters.settings;
 
-import com.jpexs.decompiler.flash.exporters.modes.MorphshapeExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
 
 /**
  *
@@ -24,9 +24,9 @@ import com.jpexs.decompiler.flash.exporters.modes.MorphshapeExportMode;
  */
 public class MorphShapeExportSettings {
 
-    public MorphshapeExportMode mode;
+    public MorphShapeExportMode mode;
     
-    public MorphShapeExportSettings(MorphshapeExportMode mode) {
+    public MorphShapeExportSettings(MorphShapeExportMode mode) {
         this.mode = mode;
     }
 }
