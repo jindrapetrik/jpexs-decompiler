@@ -57,16 +57,23 @@ import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.PathExporter;
 import com.jpexs.decompiler.flash.exporters.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
-import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.MorphshapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
@@ -1266,12 +1273,12 @@ public final class SWF implements TreeItem, Timelined {
         }
     }
 
-    public void exportMovies(AbortRetryIgnoreHandler handler, String outdir, MovieExportMode mode) throws IOException {
-        exportMovies(handler, outdir, tags, mode);
+    public void exportMovies(AbortRetryIgnoreHandler handler, String outdir, MovieExportSettings settings) throws IOException {
+        exportMovies(handler, outdir, tags, settings);
     }
 
-    public void exportSounds(AbortRetryIgnoreHandler handler, String outdir, SoundExportMode mode) throws IOException {
-        exportSounds(handler, outdir, tags, mode);
+    public void exportSounds(AbortRetryIgnoreHandler handler, String outdir, SoundExportSettings settings) throws IOException {
+        exportSounds(handler, outdir, tags, settings);
     }
 
     public byte[] exportSound(SoundTag t, SoundExportMode mode) throws IOException {
@@ -1280,11 +1287,11 @@ public final class SWF implements TreeItem, Timelined {
         return baos.toByteArray();
     }
 
-    public void exportFonts(AbortRetryIgnoreHandler handler, String outdir, FontExportMode mode) throws IOException {
-        exportFonts(handler, outdir, tags, mode);
+    public void exportFonts(AbortRetryIgnoreHandler handler, String outdir, FontExportSettings settings) throws IOException {
+        exportFonts(handler, outdir, tags, settings);
     }
 
-    public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final FontExportMode mode) throws IOException {
+    public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final FontExportSettings settings) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1306,7 +1313,7 @@ public final class SWF implements TreeItem, Timelined {
                 new RetryTask(new RunnableIOEx() {
                     @Override
                     public void run() throws IOException {
-                        exportFont(st, mode, file);
+                        exportFont(st, settings.mode, file);
                     }
                 }, handler).run();
 
@@ -1513,7 +1520,7 @@ public final class SWF implements TreeItem, Timelined {
         }
     }
 
-    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, int containerId, List<Integer> frames, final FramesExportMode mode) throws IOException {
+    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, int containerId, List<Integer> frames, final FramesExportSettings settings) throws IOException {
         final List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1546,7 +1553,7 @@ public final class SWF implements TreeItem, Timelined {
         final List<Integer> fframes = frames;
 
         Color backgroundColor = null;
-        if (mode == FramesExportMode.AVI) {
+        if (settings.mode == FramesExportMode.AVI) {
             for (Tag t : tags) {
                 if (t instanceof SetBackgroundColorTag) {
                     SetBackgroundColorTag sb = (SetBackgroundColorTag) t;
@@ -1555,7 +1562,7 @@ public final class SWF implements TreeItem, Timelined {
             }
         }
 
-        if (mode == FramesExportMode.SVG) {
+        if (settings.mode == FramesExportMode.SVG) {
             for (int i = 0; i < frames.size(); i++) {
                 final int fi = i;
                 final Timeline ftim = tim;
@@ -1579,7 +1586,7 @@ public final class SWF implements TreeItem, Timelined {
         for (int frame : frames) {
             frameImages.add(frameToImageGet(tim, frame, 0, null, 0, tim.displayRect, new Matrix(), new ColorTransform(), backgroundColor).getBufferedImage());
         }
-        switch (mode) {
+        switch (settings.mode) {
             case GIF:
                 new RetryTask(new RunnableIOEx() {
                     @Override
@@ -1618,7 +1625,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final SoundExportMode mode) throws IOException {
+    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final SoundExportSettings settings) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1645,17 +1652,17 @@ public final class SWF implements TreeItem, Timelined {
                 SoundFormat fmt = st.getSoundFormat();
                 switch (fmt.getNativeExportFormat()) {
                     case SoundFormat.EXPORT_MP3:
-                        if (mode.hasMP3()) {
+                        if (settings.mode.hasMP3()) {
                             ext = "mp3";
                         }
                         break;
                     case SoundFormat.EXPORT_FLV:
-                        if (mode.hasFlv()) {
+                        if (settings.mode.hasFlv()) {
                             ext = "flv";
                         }
                         break;
                 }
-                if (mode == SoundExportMode.FLV) {
+                if (settings.mode == SoundExportMode.FLV) {
                     ext = "flv";
                 }
 
@@ -1665,7 +1672,7 @@ public final class SWF implements TreeItem, Timelined {
                     @Override
                     public void run() throws IOException {
                         try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                            exportSound(os, st, mode);
+                            exportSound(os, st, settings.mode);
                         }
                     }
                 }, handler).run();
@@ -1769,7 +1776,7 @@ public final class SWF implements TreeItem, Timelined {
         return fos.toByteArray();
     }
 
-    public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MovieExportMode mode) throws IOException {
+    public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MovieExportSettings settings) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1790,7 +1797,7 @@ public final class SWF implements TreeItem, Timelined {
                     @Override
                     public void run() throws IOException {
                         try (FileOutputStream fos = new FileOutputStream(file)) {
-                            fos.write(exportMovie(videoStream, mode));
+                            fos.write(exportMovie(videoStream, settings.mode));
                         }
                     }
                 }, handler).run();
@@ -1800,7 +1807,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final TextExportMode mode) throws IOException {
+    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final TextExportSettings settings) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1813,32 +1820,60 @@ public final class SWF implements TreeItem, Timelined {
                 }
             }
         }
-        for (final Tag t : tags) {
-            if (t instanceof TextTag) {
-                final File file = new File(outdir + File.separator + ((TextTag) t).getCharacterId() + ".txt");
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        try (FileOutputStream fos = new FileOutputStream(file)) {
-                            if (mode == TextExportMode.FORMATTED) {
-                                fos.write(Utf8Helper.getBytes(((TextTag) t).getFormattedText()));
-                            } else {
-                                fos.write(Utf8Helper.getBytes(((TextTag) t).getText()));
+
+        if (settings.singleFile) {
+            final File file = new File(outdir + File.separator + 
+                    (settings.mode == TextExportMode.FORMATTED ? "textsformatted.txt" : "textsplain.txt"));
+            final String nl = System.getProperty("line.separator");
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                for (final Tag t : tags) {
+                    if (t instanceof TextTag) {
+                        final TextTag textTag = (TextTag) t;
+                        new RetryTask(new RunnableIOEx() {
+                            @Override
+                            public void run() throws IOException {
+                                fos.write(Utf8Helper.getBytes("ID: " + textTag.getCharacterId() + nl));
+                                if (settings.mode == TextExportMode.FORMATTED) {
+                                    fos.write(Utf8Helper.getBytes(textTag.getFormattedText()));
+                                } else {
+                                    fos.write(Utf8Helper.getBytes(textTag.getText()));
+                                }
+                                fos.write(Utf8Helper.getBytes(nl + Configuration.textExportSingleFileSeparator.get() + nl));
+                            }
+                        }, handler).run();
+                    }
+                }
+            }
+            ret.add(file);
+        } else {
+            for (Tag t : tags) {
+                if (t instanceof TextTag) {
+                    final TextTag textTag = (TextTag) t;
+                    final File file = new File(outdir + File.separator + textTag.getCharacterId() + ".txt");
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            try (FileOutputStream fos = new FileOutputStream(file)) {
+                                if (settings.mode == TextExportMode.FORMATTED) {
+                                    fos.write(Utf8Helper.getBytes(textTag.getFormattedText()));
+                                } else {
+                                    fos.write(Utf8Helper.getBytes(textTag.getText()));
+                                }
                             }
                         }
-                    }
-                }, handler).run();
-                ret.add(file);
+                    }, handler).run();
+                    ret.add(file);
+                }
             }
         }
         return ret;
     }
 
-    public void exportTexts(AbortRetryIgnoreHandler handler, String outdir, TextExportMode mode) throws IOException {
-        exportTexts(handler, outdir, tags, mode);
+    public void exportTexts(AbortRetryIgnoreHandler handler, String outdir, TextExportSettings settings) throws IOException {
+        exportTexts(handler, outdir, tags, settings);
     }
 
-    public static List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final ShapeExportMode mode) throws IOException {
+    public static List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final ShapeExportSettings settings) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1859,7 +1894,7 @@ public final class SWF implements TreeItem, Timelined {
                     characterID = ((CharacterTag) t).getCharacterId();
                 }
                 String ext = "svg";
-                if (mode == ShapeExportMode.PNG) {
+                if (settings.mode == ShapeExportMode.PNG) {
                     ext = "png";
                 }
 
@@ -1869,7 +1904,7 @@ public final class SWF implements TreeItem, Timelined {
                     @Override
                     public void run() throws IOException {
                         ShapeTag st = (ShapeTag) t;
-                        switch (mode) {
+                        switch (settings.mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
                                     fos.write(Utf8Helper.getBytes(st.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), -2, new CXFORMWITHALPHA(), 0)));
@@ -1897,7 +1932,7 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     //TODO: implement morphshape export. How to handle 65536 frames?
-    public static List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final MorphshapeExportMode mode) throws IOException {
+    public static List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final MorphShapeExportSettings settings) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1925,7 +1960,7 @@ public final class SWF implements TreeItem, Timelined {
                     @Override
                     public void run() throws IOException {
                         MorphShapeTag mst = (MorphShapeTag) t;
-                        switch (mode) {
+                        switch (settings.mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
                                     fos.write(Utf8Helper.getBytes(mst.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), -2, new CXFORMWITHALPHA(), 0)));
@@ -1941,7 +1976,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public static List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, BinaryDataExportMode mode) throws IOException {
+    public static List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, BinaryDataExportSettings settings) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1973,7 +2008,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final ImageExportMode mode) throws IOException {
+    public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final ImageExportSettings settings) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1990,10 +2025,10 @@ public final class SWF implements TreeItem, Timelined {
             if (t instanceof ImageTag) {
 
                 String fileFormat = ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH);
-                if (mode == ImageExportMode.PNG) {
+                if (settings.mode == ImageExportMode.PNG) {
                     fileFormat = "png";
                 }
-                if (mode == ImageExportMode.JPEG) {
+                if (settings.mode == ImageExportMode.JPEG) {
                     fileFormat = "jpg";
                 }
 
@@ -2013,21 +2048,22 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public void exportImages(AbortRetryIgnoreHandler handler, String outdir, ImageExportMode mode) throws IOException {
-        exportImages(handler, outdir, tags, mode);
+    public void exportImages(AbortRetryIgnoreHandler handler, String outdir, ImageExportSettings settings) throws IOException {
+        exportImages(handler, outdir, tags, settings);
     }
 
-    public void exportShapes(AbortRetryIgnoreHandler handler, String outdir, ShapeExportMode mode) throws IOException {
-        exportShapes(handler, outdir, tags, mode);
+    public void exportShapes(AbortRetryIgnoreHandler handler, String outdir, ShapeExportSettings settings) throws IOException {
+        exportShapes(handler, outdir, tags, settings);
     }
 
-    public void exportMorphShapes(AbortRetryIgnoreHandler handler, String outdir, MorphshapeExportMode mode) throws IOException {
-        exportMorphShapes(handler, outdir, tags, mode);
+    public void exportMorphShapes(AbortRetryIgnoreHandler handler, String outdir, MorphShapeExportSettings settings) throws IOException {
+        exportMorphShapes(handler, outdir, tags, settings);
     }
 
-    public void exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, BinaryDataExportMode mode) throws IOException {
-        exportBinaryData(handler, outdir, tags, mode);
+    public void exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, BinaryDataExportSettings settings) throws IOException {
+        exportBinaryData(handler, outdir, tags, settings);
     }
+
     private final HashMap<String, String> deobfuscated = new HashMap<>();
     private List<MyEntry<DirectValueActionItem, ConstantPool>> allVariableNames = new ArrayList<>();
     private List<GraphSourceItem> allFunctions = new ArrayList<>();
@@ -2675,7 +2711,6 @@ public final class SWF implements TreeItem, Timelined {
                 exporter.addImage(mat, boundRect, assetPath);
 
                 // TODO: if (layer.clipDepth > -1)...
-                // TODO: g.setTransform(trans);
             }
         }
         return exporter.getSVG();

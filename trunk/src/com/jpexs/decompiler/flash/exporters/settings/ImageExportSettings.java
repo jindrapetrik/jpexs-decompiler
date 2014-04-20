@@ -14,17 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.exporters.modes;
+package com.jpexs.decompiler.flash.exporters.settings;
+
+import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 
 /**
  *
  * @author JPEXS
  */
-public enum MorphShapeExportMode {
+public class ImageExportSettings {
 
-    //TODO: implement other morphshape export modes
-    SVG
-    //PNG,
-    //GIF,
-    //AVI
+    public ImageExportMode mode;
+    
+    public ImageExportSettings(ImageExportMode mode) {
+        this.mode = mode;
+    }
 }

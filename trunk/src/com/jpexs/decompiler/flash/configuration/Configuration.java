@@ -253,6 +253,12 @@ public class Configuration {
     @ConfigurationName("export.formats")
     public static final ConfigurationItem<String> lastSelectedExportFormats = null;
 
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> textExportSingleFile = null;
+
+    @ConfigurationDefaultString("--- SEPARATOR ---")
+    public static final ConfigurationItem<String> textExportSingleFileSeparator = null;
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as12edit")
     public static final ConfigurationItem<Boolean> warningExperimentalAS12Edit = null;

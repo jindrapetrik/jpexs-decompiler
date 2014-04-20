@@ -36,6 +36,14 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.helpers.Helper;
@@ -613,7 +621,7 @@ public class CommandLineArgumentParser {
                     case "all_as":
                     case "all_pcode":
                     case "all_pcodehex":
-                    case "all_hex":
+                    case "all_hex": {
                         ScriptExportMode allExportMode = ScriptExportMode.AS;
                         if (!exportFormat.equals("all")) {
                             allExportMode = strToExportFormat(exportFormat.substring("all_".length() - 1));
@@ -621,38 +629,48 @@ public class CommandLineArgumentParser {
                             allExportMode = strToExportFormat(formats.get("script"));
                         }
                         System.out.println("Exporting images...");
-                        exfile.exportImages(handler, outDir.getAbsolutePath() + File.separator + "images", ImageExportMode.PNG_JPEG);
+                        exfile.exportImages(handler, outDir.getAbsolutePath() + File.separator + "images", new ImageExportSettings(ImageExportMode.PNG_JPEG));
                         System.out.println("Exporting shapes...");
-                        exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes", ShapeExportMode.SVG);
+                        exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes", new ShapeExportSettings(ShapeExportMode.SVG));
                         System.out.println("Exporting scripts...");
                         exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", allExportMode, Configuration.parallelSpeedUp.get());
                         System.out.println("Exporting movies...");
-                        exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies", MovieExportMode.FLV);
+                        exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies", new MovieExportSettings(MovieExportMode.FLV));
                         System.out.println("Exporting sounds...");
-                        exfile.exportSounds(handler, outDir.getAbsolutePath() + File.separator + "sounds", SoundExportMode.MP3_WAV_FLV);
+                        exfile.exportSounds(handler, outDir.getAbsolutePath() + File.separator + "sounds", new SoundExportSettings(SoundExportMode.MP3_WAV_FLV));
                         System.out.println("Exporting binaryData...");
-                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + File.separator + "binaryData", BinaryDataExportMode.RAW);
+                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + File.separator + "binaryData", new BinaryDataExportSettings(BinaryDataExportMode.RAW));
                         System.out.println("Exporting texts...");
 
                         String allTextFormat = formats.get("text");
                         if (allTextFormat == null) {
                             allTextFormat = "formatted";
                         }
-                        exfile.exportTexts(handler, outDir.getAbsolutePath() + File.separator + "texts", allTextFormat.equals("formatted") ? TextExportMode.FORMATTED : TextExportMode.PLAIN);
-                        break;
-                    case "image":
+                        Boolean singleTextFile = parseBooleanConfigValue(formats.get("singletext"));
+                        if (singleTextFile == null) {
+                            singleTextFile = Configuration.textExportSingleFile.get();
+                        }
+                        exfile.exportTexts(handler, outDir.getAbsolutePath() + File.separator + "texts",
+                                new TextExportSettings(allTextFormat.equals("formatted") ? TextExportMode.FORMATTED : TextExportMode.PLAIN, singleTextFile));
+                    }
+                    break;
+                    case "image": {
                         System.out.println("Exporting images...");
-                        exfile.exportImages(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "images" : ""), enumFromStr(formats.get("image"), ImageExportMode.class));
-                        break;
-                    case "shape":
+                        exfile.exportImages(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "images" : ""),
+                                new ImageExportSettings(enumFromStr(formats.get("image"), ImageExportMode.class)));
+                    }
+                    break;
+                    case "shape": {
                         System.out.println("Exporting shapes...");
-                        exfile.exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""), enumFromStr(formats.get("shape"), ShapeExportMode.class));
-                        break;
+                        exfile.exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""),
+                                new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class)));
+                    }
+                    break;
                     case "script":
                     case "as":
                     case "pcode":
                     case "pcodehex":
-                    case "hex":
+                    case "hex": {
                         System.out.println("Exporting scripts...");
                         boolean parallel = Configuration.parallelSpeedUp.get();
                         if (as3classes.isEmpty()) {
@@ -665,51 +683,76 @@ public class CommandLineArgumentParser {
                         } else {
                             exportOK = exportOK && exfile.exportActionScript(handler, outDir.getAbsolutePath(), enumFromStr(formats.get("script"), ScriptExportMode.class), parallel) != null;
                         }
-                        break;
-                    case "movie":
+                    }
+                    break;
+                    case "movie": {
                         System.out.println("Exporting movies...");
-                        exfile.exportMovies(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "movies" : ""), enumFromStr(formats.get("movie"), MovieExportMode.class));
-                        break;
-                    case "font":
+                        exfile.exportMovies(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "movies" : ""),
+                                new MovieExportSettings(enumFromStr(formats.get("movie"), MovieExportMode.class)));
+                    }
+                    break;
+                    case "font": {
                         System.out.println("Exporting fonts...");
-                        exfile.exportFonts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "fonts" : ""), enumFromStr(formats.get("font"), FontExportMode.class));
-                        break;
-                    case "frame":
+                        exfile.exportFonts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "fonts" : ""),
+                                new FontExportSettings(enumFromStr(formats.get("font"), FontExportMode.class)));
+                    }
+                    break;
+                    case "frame": {
                         System.out.println("Exporting frames...");
-                        exfile.exportFrames(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "frames" : ""), 0, null, enumFromStr(formats.get("frame"), FramesExportMode.class));
-                        break;
-                    case "sound":
+                        exfile.exportFrames(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "frames" : ""), 0, null,
+                                new FramesExportSettings(enumFromStr(formats.get("frame"), FramesExportMode.class)));
+                    }
+                    break;
+                    case "sound": {
                         System.out.println("Exporting sounds...");
-                        exfile.exportSounds(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "sounds" : ""), enumFromStr(formats.get("sound"), SoundExportMode.class));
-                        break;
-                    case "binarydata":
+                        exfile.exportSounds(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "sounds" : ""),
+                                new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)));
+                    }
+                    break;
+                    case "binarydata": {
                         System.out.println("Exporting binaryData...");
-                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "binaryData" : ""), enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class));
-                        break;
-                    case "text":
+                        exfile.exportBinaryData(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "binaryData" : ""),
+                                new BinaryDataExportSettings(enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class)));
+                    }
+                    break;
+                    case "text": {
                         System.out.println("Exporting texts...");
-                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), enumFromStr(formats.get("text"), TextExportMode.class));
-                        break;
-                    case "textplain":
+                        Boolean singleTextFile = parseBooleanConfigValue(formats.get("singletext"));
+                        if (singleTextFile == null) {
+                            singleTextFile = Configuration.textExportSingleFile.get();
+                        }
+                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""),
+                                new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile));
+                    }
+                    break;
+                    case "textplain": {
                         System.out.println("Exporting texts...");
-                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""), TextExportMode.PLAIN);
-                        break;
-                    case "fla":
+                        Boolean singleTextFile = parseBooleanConfigValue(formats.get("singletext"));
+                        if (singleTextFile == null) {
+                            singleTextFile = Configuration.textExportSingleFile.get();
+                        }
+                        exfile.exportTexts(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "texts" : ""),
+                                new TextExportSettings(TextExportMode.PLAIN, singleTextFile));
+                    }
+                    break;
+                    case "fla": {
                         System.out.println("Exporting FLA...");
                         FLAVersion flaVersion = FLAVersion.fromString(formats.get("fla"));
                         if (flaVersion == null) {
                             flaVersion = FLAVersion.CS6; //Defaults to CS6
                         }
                         exfile.exportFla(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "fla" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion);
-                        break;
-                    case "xfl":
+                    }
+                    break;
+                    case "xfl": {
                         System.out.println("Exporting XFL...");
                         FLAVersion xflVersion = FLAVersion.fromString(formats.get("xfl"));
                         if (xflVersion == null) {
                             xflVersion = FLAVersion.CS6; //Defaults to CS6                            
                         }
                         exfile.exportXfl(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "xfl" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), xflVersion);
-                        break;
+                    }
+                    break;
                     default:
                         exportOK = false;
                 }
