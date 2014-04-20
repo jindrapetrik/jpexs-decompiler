@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.exporters.ExportRectangle;
-import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
@@ -40,11 +39,6 @@ public class DefineShape3Tag extends ShapeTag {
     public RECT shapeBounds;
     public SHAPEWITHSTYLE shapes;
     public static final int ID = 32;
-
-    @Override
-    public Point getImagePos(int frame) {
-        return new Point(shapeBounds.Xmin / SWF.unitDivisor, shapeBounds.Ymin / SWF.unitDivisor);
-    }
 
     @Override
     public int getShapeNum() {

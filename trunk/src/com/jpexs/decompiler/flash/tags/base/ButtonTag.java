@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -59,9 +60,8 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
-        return "";
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) throws IOException {
+        return SWF.frameToSvg(getTimeline(), 0, 0, null, 0, exporterContext, getRect(), colorTransform, null, level + 1);
     }
 
     public DefineButtonSoundTag getSounds() {

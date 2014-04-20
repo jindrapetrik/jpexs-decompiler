@@ -2671,8 +2671,7 @@ public final class SWF implements TreeItem, Timelined {
                 // TODO: if (layer.filters != null)
                 // TODO: if (layer.blendMode > 1)
                 String assetPath = level == 0 ? exporterContext.assetsDir + File.separator + assetFileName : assetFileName;
-                Matrix mat = new Matrix(layer.matrix);
-                mat.translate(rect.xMin, rect.yMin);
+                Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
                 exporter.addImage(mat, boundRect, assetPath);
 
                 // TODO: if (layer.clipDepth > -1)...

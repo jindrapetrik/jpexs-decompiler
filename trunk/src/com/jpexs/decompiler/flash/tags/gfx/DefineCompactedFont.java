@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
@@ -106,11 +105,6 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
 
     public void rebuildShapeCache() {
         shapeCache = fonts.get(0).getGlyphShapes();
-    }
-
-    @Override
-    public Point getImagePos(int frame) {
-        return new Point(0, 0);
     }
 
     @Override

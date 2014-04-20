@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.Matrix;
-import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
@@ -511,12 +510,7 @@ public class DefineTextTag extends TextTag {
 
     @Override
     public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
-        return staticTextToSVG(swf, textRecords, 1, getTextMatrix(), colorTransform);
-    }
-
-    @Override
-    public Point getImagePos(int frame) {
-        return new Point(textBounds.Xmin / SWF.unitDivisor, textBounds.Ymin / SWF.unitDivisor);
+        return staticTextToSVG(swf, textRecords, 1, getRect(), getTextMatrix(), colorTransform);
     }
 
     @Override

@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -271,12 +270,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     @Override
     public boolean trackAsMenu() {
         return false;
-    }
-
-    @Override
-    public Point getImagePos(int frame) {
-        RECT r = getRect();
-        return new Point(r.Xmin / SWF.unitDivisor, r.Ymin / SWF.unitDivisor);
     }
 
     @Override

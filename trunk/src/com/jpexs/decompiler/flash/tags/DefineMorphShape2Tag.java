@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Matrix;
-import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.exporters.morphshape.SVGMorphShapeExporter;
@@ -344,13 +343,6 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
             exporter.export();
         }
         return svgExporter.getSVG();
-    }
-
-    @Override
-    public Point getImagePos(int frame) {
-        return new Point(
-                (startBounds.Xmin + (endBounds.Xmin - startBounds.Xmin) * frame / 65535) / SWF.unitDivisor,
-                (startBounds.Ymin + (endBounds.Ymin - startBounds.Ymin) * frame / 65535) / SWF.unitDivisor);
     }
 
     @Override

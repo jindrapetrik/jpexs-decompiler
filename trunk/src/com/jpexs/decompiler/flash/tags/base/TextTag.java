@@ -305,7 +305,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         }
     }
 
-    public static String staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, MATRIX textMatrix, ColorTransform colorTransform) {
+    public static String staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
         int textHeight = 12;
@@ -336,8 +336,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
             double rat = textHeight / 1024.0 / font.getDivider();
 
             for (GLYPHENTRY entry : rec.glyphEntries) {
-                Matrix matTr = Matrix.getTranslateInstance(x, y);
-                Matrix mat = new Matrix(textMatrix).concatenate(matTr).concatenate(Matrix.getScaleInstance(rat));
+                Matrix mat = (new Matrix(textMatrix).concatenate(Matrix.getTranslateInstance(x - bounds.Xmin, y - bounds.Ymin))).concatenate(Matrix.getScaleInstance(rat));
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);

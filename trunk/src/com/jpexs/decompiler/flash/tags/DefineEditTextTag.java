@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.Matrix;
-import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
@@ -954,11 +953,6 @@ public class DefineEditTextTag extends TextTag {
             }
         }
         return font;
-    }
-
-    @Override
-    public Point getImagePos(int frame) {
-        return new Point(bounds.Xmin / SWF.unitDivisor, bounds.Ymin / SWF.unitDivisor);
     }
 
     @Override

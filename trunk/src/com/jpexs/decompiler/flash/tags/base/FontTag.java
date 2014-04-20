@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.Matrix;
-import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
@@ -262,11 +261,6 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     @Override
     public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
         return "";
-    }
-
-    @Override
-    public Point getImagePos(int frame) {
-        return new Point(0, 0);
     }
 
     @Override

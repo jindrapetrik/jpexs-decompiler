@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.ExportRectangle;
-import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
@@ -101,15 +100,6 @@ public class DefineShapeTag extends ShapeTag {
         SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(), svgExporter, null, new ColorTransform() /*FIXME?*/);
         exporter.export();
         return svgExporter.getSVG();
-    }
-
-    /*    @Override
-     public void toImage(int frame, int ratio, java.awt.Point mousePos, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-     BitmapExporter.exportTo(swf, getShapes(), null, image, transformation, colorTransform);
-     }*/
-    @Override
-    public Point getImagePos(int frame) {
-        return new Point(shapeBounds.Xmin / SWF.unitDivisor, shapeBounds.Ymin / SWF.unitDivisor);
     }
 
     @Override

@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -243,12 +242,6 @@ public class DefineButton2Tag extends ButtonTag implements Container {
     @Override
     public boolean trackAsMenu() {
         return trackAsMenu;
-    }
-
-    @Override
-    public Point getImagePos(int frame) {
-        RECT r = getRect();
-        return new Point(r.Xmin / SWF.unitDivisor, r.Ymin / SWF.unitDivisor);
     }
 
     @Override

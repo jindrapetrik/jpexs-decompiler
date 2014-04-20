@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.Matrix;
-import com.jpexs.decompiler.flash.exporters.Point;
 import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -291,12 +290,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
 
     @Override
     public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) throws IOException {
-        return SWF.frameToSvg(getTimeline(), 0, 0, null, 0, exporterContext, getRect(), new ColorTransform(), null, level + 1);
-    }
-
-    @Override
-    public Point getImagePos(int frame) {
-        return new Point(0, 0);
+        return SWF.frameToSvg(getTimeline(), 0, 0, null, 0, exporterContext, getRect(), colorTransform, null, level + 1);
     }
 
     @Override
