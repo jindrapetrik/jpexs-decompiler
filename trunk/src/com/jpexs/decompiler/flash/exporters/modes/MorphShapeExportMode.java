@@ -20,7 +20,7 @@ package com.jpexs.decompiler.flash.exporters.modes;
  *
  * @author JPEXS
  */
-public enum MorphShapeExportMode2 {
+public enum MorphShapeExportMode {
 
     //TODO: implement other morphshape export modes
     SVG
