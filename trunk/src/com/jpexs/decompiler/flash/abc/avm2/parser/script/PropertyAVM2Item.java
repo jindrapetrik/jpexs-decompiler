@@ -509,8 +509,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             GraphTargetItem coerced = assignedValue;
             if (!targetType.equals(srcType) && !propertyName.startsWith("@")) {
                 coerced = new CoerceAVM2Item(null, assignedValue, targetType);
-            }
-
+            }            
             return toSourceMerge(localData, generator, obj, coerced,
                     needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
                     ins(new SetPropertyIns(), propertyId),
@@ -568,7 +567,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             List<ABC> abcs = new ArrayList<>();
             abcs.add(abc);
             abcs.addAll(otherABCs);
-            if (cname != null && AVM2SourceGenerator.searchPrototypeChain(true, abcs, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
+            if (cname != null && AVM2SourceGenerator.searchPrototypeChain(true, abcs, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal())?outName.getVal():outNs.getVal()+"."+outName.getVal()))   ) {                
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;

@@ -491,6 +491,9 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 ((PropertyAVM2Item) resolved).scopeStack = scopeStack;
                 ret = resolved;
             }
+            if(i == parts.size()-1){
+                ((PropertyAVM2Item)resolved).setAssignedValue(assignedValue);
+            }
         }
         return ret;
     }
