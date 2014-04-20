@@ -67,6 +67,14 @@ public class MethodBody implements Cloneable, Serializable {
         }
         return ret;
     }
+    
+    public void markOffsets(){
+        long offset = 0;
+        for(int i=0;i<code.code.size();i++){
+            code.code.get(i).offset = offset;
+            offset += code.code.get(i).getBytes().length;
+        }
+    }
 
     @Override
     public String toString() {

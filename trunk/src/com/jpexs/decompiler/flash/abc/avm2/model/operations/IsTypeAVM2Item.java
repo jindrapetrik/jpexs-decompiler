@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.IsTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.IsTypeLateIns;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -36,7 +37,7 @@ public class IsTypeAVM2Item extends BinaryOpItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new IsTypeIns(), new int[]{}, new byte[0])
+                new AVM2Instruction(0, new IsTypeLateIns(), new int[]{}, new byte[0])
         );
     }
 

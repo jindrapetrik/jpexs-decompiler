@@ -457,7 +457,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         if (paramNames.contains(parts.get(0)) || parts.get(0).equals("arguments")) {
             int ind = paramNames.indexOf(parts.get(0));
 
-            GraphTargetItem ret = new NameAVM2Item(ind == -1 ? TypeItem.UNBOUNDED : paramTypes.get(ind), line, name, null, false, openedNamespaces);
+            GraphTargetItem ret = new NameAVM2Item(ind == -1 ? TypeItem.UNBOUNDED : paramTypes.get(ind), line, parts.get(0), null, false, openedNamespaces);
             resolved = ret;
             for (int i = 1; i < parts.size(); i++) {
                 resolved = new PropertyAVM2Item(resolved, parts.get(i), null, abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
