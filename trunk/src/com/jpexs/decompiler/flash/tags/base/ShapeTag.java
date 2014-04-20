@@ -18,7 +18,11 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.Matrix;
+import com.jpexs.decompiler.flash.exporters.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
+import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
@@ -47,5 +51,14 @@ public abstract class ShapeTag extends CharacterTag implements BoundedTag, Drawa
     @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         BitmapExporter.export(swf, getShapes(), null, image, transformation, colorTransform);
+    }
+
+    @Override
+    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
+        ExportRectangle rect = new ExportRectangle(getRect());
+        SVGExporter svgExporter = new SVGExporter(rect, colorTransform);
+        SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(), svgExporter, null, colorTransform);
+        exporter.export();
+        return svgExporter.getSVG();
     }
 }

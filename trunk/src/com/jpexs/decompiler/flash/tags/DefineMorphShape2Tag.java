@@ -331,15 +331,15 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
     @Override
     public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
         ExportRectangle rect = new ExportRectangle(getRect());
-        SVGExporter svgExporter = new SVGExporter(rect, new ColorTransform());
+        SVGExporter svgExporter = new SVGExporter(rect, colorTransform);
         if (ratio == -2) {
             SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
             SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
-            SVGMorphShapeExporter exporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, svgExporter, null, new ColorTransform() /*FIXME?*/);
+            SVGMorphShapeExporter exporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, svgExporter, null, colorTransform);
             exporter.export();
         } else {
             SHAPEWITHSTYLE shapes = getShapeAtRatio(ratio);
-            SVGShapeExporter exporter = new SVGShapeExporter(swf, shapes, svgExporter, null, new ColorTransform() /*FIXME?*/);
+            SVGShapeExporter exporter = new SVGShapeExporter(swf, shapes, svgExporter, null, colorTransform);
             exporter.export();
         }
         return svgExporter.getSVG();

@@ -312,7 +312,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         int x = 0;
         int y = 0;
         List<SHAPE> glyphs = new ArrayList<>();
-        SVGExporter svgExporter = new SVGExporter(null, new ColorTransform());
+        SVGExporter svgExporter = new SVGExporter(null, colorTransform);
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
@@ -341,7 +341,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
                     svgExporter.createNewGroup(mat);
-                    SVGShapeExporter exporter = new SVGShapeExporter(swf, shape, svgExporter, textColor, new ColorTransform() /*FIXME?*/);
+                    SVGShapeExporter exporter = new SVGShapeExporter(swf, shape, svgExporter, textColor, colorTransform);
                     exporter.export();
                     x += entry.glyphAdvance;
                 }

@@ -18,13 +18,8 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.exporters.ExportRectangle;
-import com.jpexs.decompiler.flash.exporters.SVGExporter;
-import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
-import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
-import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
@@ -61,15 +56,6 @@ public class DefineShape4Tag extends ShapeTag {
     @Override
     public Set<Integer> getNeededCharacters() {
         return shapes.getNeededCharacters();
-    }
-
-    @Override
-    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
-        ExportRectangle rect = new ExportRectangle(getRect());
-        SVGExporter svgExporter = new SVGExporter(rect, new ColorTransform());
-        SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(), svgExporter, null, new ColorTransform() /*FIXME?*/);
-        exporter.export();
-        return svgExporter.getSVG();
     }
 
     @Override
