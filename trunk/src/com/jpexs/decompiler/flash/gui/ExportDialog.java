@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.MorphshapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
@@ -99,7 +99,7 @@ public class ExportDialog extends AppDialog {
         BinaryDataExportMode.class,
         FramesExportMode.class,
         FontExportMode.class,
-        MorphShapeExportMode.class
+        MorphshapeExportMode.class
     };
 
     private final JComboBox[] combos;

@@ -30,7 +30,7 @@ import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.MorphshapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
@@ -1276,7 +1276,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 ret.addAll(SWF.exportShapes(handler, selFile + File.separator + "shapes", shapes, 
                         new ShapeExportSettings(export.getValue(ShapeExportMode.class))));
                 ret.addAll(SWF.exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes, 
-                        new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class))));
+                        new MorphShapeExportSettings(export.getValue(MorphshapeExportMode.class))));
                 ret.addAll(swf.exportTexts(handler, selFile + File.separator + "texts", texts, 
                         new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get())));
                 ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies, 
@@ -1694,7 +1694,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                                 swf.exportShapes(errorHandler, selFile + File.separator + "shapes", 
                                         new ShapeExportSettings(export.getValue(ShapeExportMode.class)));
                                 swf.exportMorphShapes(errorHandler, selFile + File.separator + "morphshapes", 
-                                        new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class)));
+                                        new MorphShapeExportSettings(export.getValue(MorphshapeExportMode.class)));
                                 swf.exportTexts(errorHandler, selFile + File.separator + "texts", 
                                         new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get()));
                                 swf.exportMovies(errorHandler, selFile + File.separator + "movies", 
