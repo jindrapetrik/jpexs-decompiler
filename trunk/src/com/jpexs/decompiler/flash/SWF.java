@@ -57,6 +57,7 @@ import com.jpexs.decompiler.flash.exporters.Matrix;
 import com.jpexs.decompiler.flash.exporters.PathExporter;
 import com.jpexs.decompiler.flash.exporters.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
+import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
@@ -64,7 +65,6 @@ import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
@@ -114,7 +114,6 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
-import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Clip;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -1807,70 +1806,8 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final TextExportSettings settings) throws IOException {
-        List<File> ret = new ArrayList<>();
-        if (tags.isEmpty()) {
-            return ret;
-        }
-        File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
-
-        if (settings.singleFile) {
-            final File file = new File(outdir + File.separator + 
-                    (settings.mode == TextExportMode.FORMATTED ? "textsformatted.txt" : "textsplain.txt"));
-            final String nl = System.getProperty("line.separator");
-            try (FileOutputStream fos = new FileOutputStream(file)) {
-                for (final Tag t : tags) {
-                    if (t instanceof TextTag) {
-                        final TextTag textTag = (TextTag) t;
-                        new RetryTask(new RunnableIOEx() {
-                            @Override
-                            public void run() throws IOException {
-                                fos.write(Utf8Helper.getBytes("ID: " + textTag.getCharacterId() + nl));
-                                if (settings.mode == TextExportMode.FORMATTED) {
-                                    fos.write(Utf8Helper.getBytes(textTag.getFormattedText()));
-                                } else {
-                                    fos.write(Utf8Helper.getBytes(textTag.getText()));
-                                }
-                                fos.write(Utf8Helper.getBytes(nl + Configuration.textExportSingleFileSeparator.get() + nl));
-                            }
-                        }, handler).run();
-                    }
-                }
-            }
-            ret.add(file);
-        } else {
-            for (Tag t : tags) {
-                if (t instanceof TextTag) {
-                    final TextTag textTag = (TextTag) t;
-                    final File file = new File(outdir + File.separator + textTag.getCharacterId() + ".txt");
-                    new RetryTask(new RunnableIOEx() {
-                        @Override
-                        public void run() throws IOException {
-                            try (FileOutputStream fos = new FileOutputStream(file)) {
-                                if (settings.mode == TextExportMode.FORMATTED) {
-                                    fos.write(Utf8Helper.getBytes(textTag.getFormattedText()));
-                                } else {
-                                    fos.write(Utf8Helper.getBytes(textTag.getText()));
-                                }
-                            }
-                        }
-                    }, handler).run();
-                    ret.add(file);
-                }
-            }
-        }
-        return ret;
-    }
-
     public void exportTexts(AbortRetryIgnoreHandler handler, String outdir, TextExportSettings settings) throws IOException {
-        exportTexts(handler, outdir, tags, settings);
+        new TextExporter().exportTexts(handler, outdir, tags, settings);
     }
 
     public static List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final ShapeExportSettings settings) throws IOException {

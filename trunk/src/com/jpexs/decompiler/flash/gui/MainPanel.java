@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
@@ -117,6 +118,7 @@ import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -148,6 +150,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1277,7 +1280,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         new ShapeExportSettings(export.getValue(ShapeExportMode.class))));
                 ret.addAll(SWF.exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes, 
                         new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class))));
-                ret.addAll(swf.exportTexts(handler, selFile + File.separator + "texts", texts, 
+                ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + "texts", texts, 
                         new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get())));
                 ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies, 
                         new MovieExportSettings(export.getValue(MovieExportMode.class))));
@@ -1547,7 +1550,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (!selDir.endsWith(File.separator)) {
             selDir += File.separator;
         }
-        String fileName = (new File(swf.file).getName());
+        String fileName = new File(swf.file).getName();
         fileName = fileName.substring(0, fileName.length() - 4) + ".fla";
         fc.setSelectedFile(new File(selDir + fileName));
         List<FileFilter> flaFilters = new ArrayList<>();
@@ -1645,6 +1648,118 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }.execute();
         }
     }
+    
+    private Map<Integer, String[]> splitTextRecords(String texts) {
+        String[] textsArr = texts.split(Helper.newLine + Configuration.textExportSingleFileSeparator.get() + Helper.newLine);
+        String recordSeparator = Helper.newLine + Configuration.textExportSingleFileRecordSeparator.get() + Helper.newLine;
+        Map<Integer, String[]> result = new HashMap<>();
+        for (String text : textsArr) {
+            String[] textArr = text.split(Helper.newLine, 2);
+            String idLine = textArr[0];
+            if (idLine.startsWith("ID:")) {
+                int id = Integer.parseInt(idLine.substring(3).trim());
+                String[] records = textArr[1].split(recordSeparator);
+                result.put(id, records);
+            } else {
+                View.showMessageDialog(null, translate("error.text.import"), translate("error"), JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        return result;
+    }
+
+    public void importText(final SWF swf) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("import.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+            File textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
+            // try to import formatted texts
+            if (textsFile.exists()) {
+                String texts = Helper.readTextFile(textsFile.getPath());
+                Map<Integer, String[]> records = splitTextRecords(texts);
+                for (int characterId : records.keySet()) {
+                    for (Tag tag : swf.tags) {
+                        if (tag instanceof TextTag) {
+                            TextTag textTag = (TextTag) tag;
+                            if (textTag.getCharacterId() == characterId) {
+                                String[] currentRecords = records.get(characterId);
+                                saveText(textTag, currentRecords[0], null);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
+                // try to import plain texts
+                if (textsFile.exists()) {
+                    String texts = Helper.readTextFile(textsFile.getPath());
+                    Map<Integer, String[]> records = splitTextRecords(texts);
+                    for (int characterId : records.keySet()) {
+                        for (Tag tag : swf.tags) {
+                            if (tag instanceof TextTag) {
+                                TextTag textTag = (TextTag) tag;
+                                if (textTag.getCharacterId() == characterId) {
+                                    String[] currentRecords = records.get(characterId);
+                                    String text = textTag.getFormattedText();
+                                    saveText(textTag, text, currentRecords);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER));
+                    String[] files = textsFile.list(new FilenameFilter() {
+
+                        private Pattern pat = Pattern.compile("\\d+\\.txt", Pattern.CASE_INSENSITIVE);
+
+                        @Override
+                        public boolean accept(File dir, String name) {
+
+                            return pat.matcher(name).matches();
+                        }
+                    });
+
+                    for (String fileName : files) {
+                        String texts = Helper.readTextFile(Path.combine(textsFile.getPath(), fileName));
+                        int characterId = Integer.parseInt(fileName.split("\\.")[0]);
+                        String recordSeparator = Helper.newLine + Configuration.textExportSingleFileRecordSeparator.get() + Helper.newLine;
+                        boolean formatted = !texts.contains(recordSeparator) && texts.startsWith("[" + Helper.newLine);
+                        if (!formatted) {
+                            String[] records = texts.split(recordSeparator);
+                            for (Tag tag : swf.tags) {
+                                if (tag instanceof TextTag) {
+                                    TextTag textTag = (TextTag) tag;
+                                    if (textTag.getCharacterId() == characterId) {
+                                        String text = textTag.getFormattedText();
+                                        saveText(textTag, text, records);
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            for (Tag tag : swf.tags) {
+                                if (tag instanceof TextTag) {
+                                    TextTag textTag = (TextTag) tag;
+                                    if (textTag.getCharacterId() == characterId) {
+                                        saveText(textTag, texts, null);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            SWF.clearImageCache();
+            reload(true);
+        }
+    }
 
     private String selectExportDir() {
         JFileChooser chooser = new JFileChooser();
@@ -1653,7 +1768,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            final long timeBefore = System.currentTimeMillis();
             Main.startWork(translate("work.exporting") + "...");
             final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
@@ -1920,7 +2034,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         updateClassesList();
     }
 
-    public boolean saveText(TextTag textTag, String text) {
+    public boolean saveText(TextTag textTag, String formattedText, String[] texts) {
         try {
             if (textTag.setFormattedText(new MissingCharacterHandler() {
                 @Override
@@ -1939,7 +2053,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     return true;
 
                 }
-            }, text)) {
+            }, formattedText, texts)) {
                 textTag.setModified(true);
                 return true;
             }

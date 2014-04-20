@@ -104,6 +104,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     static final String ACTION_EXPORT_FLA = "EXPORTFLA";
     public static final String ACTION_EXPORT_SEL = "EXPORTSEL";
     static final String ACTION_EXPORT = "EXPORT";
+    static final String ACTION_IMPORT_TEXT = "IMPORTTEXT";
     static final String ACTION_CHECK_UPDATES = "CHECKUPDATES";
     static final String ACTION_HELP_US = "HELPUS";
     static final String ACTION_HOMEPAGE = "HOMEPAGE";
@@ -133,6 +134,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
     private JCommandButton exportAllCommandButton;
     private JCommandButton exportFlaCommandButton;
     private JCommandButton exportSelectionCommandButton;
+    private JCommandButton importTextCommandButton;
 
     private JCommandButton reloadCommandButton;
     private JCommandButton renameinvalidCommandButton;
@@ -312,7 +314,14 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         exportBand.addCommandButton(exportSelectionCommandButton, RibbonElementPriority.MEDIUM);
         exportBand.addCommandButton(saveasexeCommandButton, RibbonElementPriority.MEDIUM);
 
-        return new RibbonTask(translate("menu.file"), editBand, exportBand);
+        JRibbonBand importBand = new JRibbonBand(translate("menu.import"), null);
+        importBand.setResizePolicies(getResizePolicies(importBand));
+        importTextCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.import.text")), View.getResizableIcon("import32"));
+        assignListener(importTextCommandButton, ACTION_IMPORT_TEXT);
+
+        importBand.addCommandButton(importTextCommandButton, RibbonElementPriority.TOP);
+
+        return new RibbonTask(translate("menu.file"), editBand, exportBand, importBand);
     }
 
     private RibbonTask createToolsRibbonTask() {
@@ -508,6 +517,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         exportAllCommandButton.setEnabled(swfLoaded);
         exportFlaCommandButton.setEnabled(swfLoaded);
         exportSelectionCommandButton.setEnabled(swfLoaded);
+        importTextCommandButton.setEnabled(swfLoaded);
         reloadCommandButton.setEnabled(swfLoaded);
 
         renameinvalidCommandButton.setEnabled(swfLoaded);
@@ -693,6 +703,9 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 break;
             case ACTION_EXPORT_FLA:
                 mainFrame.panel.exportFla(mainFrame.panel.getCurrentSwf());
+                break;
+            case ACTION_IMPORT_TEXT:
+                mainFrame.panel.importText(mainFrame.panel.getCurrentSwf());
                 break;
             case ACTION_EXPORT_SEL:
             case ACTION_EXPORT:

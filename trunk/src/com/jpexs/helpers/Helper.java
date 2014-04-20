@@ -59,6 +59,8 @@ import java.util.regex.Pattern;
  */
 public class Helper {
 
+    public static String newLine = System.getProperty("line.separator");
+
     /**
      * Converts array of int values to string
      *
@@ -417,6 +419,10 @@ public class Helper {
         return baos.toByteArray();
     }
 
+    public static String readTextFile(String... file) {
+        return new String(readFile(file), Utf8Helper.charset);
+    }
+
     public static byte[] readStream(InputStream is) {
         if (is instanceof MemoryInputStream) {
             return ((MemoryInputStream) is).getAllRead();
@@ -446,12 +452,6 @@ public class Helper {
         }
     }
 
-    //public static String stripComments(String str) {
-    //    return str.replaceAll("<ffdec:hex>[^\r\n]*</ffdec:hex>\r?\n", "");
-    //}
-    //public static String hexToComments(String str) {
-    //    return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
-    //}
     public static String stackToString(Stack<GraphTargetItem> stack, LocalData localData) throws InterruptedException {
         String ret = "[";
         for (int i = stack.size() - 1; i >= 0; i--) {

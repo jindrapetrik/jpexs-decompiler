@@ -67,13 +67,14 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
 
     public abstract MATRIX getTextMatrix();
 
-    public abstract String getText();
+    public abstract String getText(String separator);
 
     public abstract List<Integer> getFontIds();
 
     public abstract String getFormattedText();
 
-    public abstract boolean setFormattedText(MissingCharacterHandler missingCharHandler, String text) throws ParseException;
+    // use the texts from the "texts" argument when it is not null
+    public abstract boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws ParseException;
 
     @Override
     public abstract int getCharacterId();

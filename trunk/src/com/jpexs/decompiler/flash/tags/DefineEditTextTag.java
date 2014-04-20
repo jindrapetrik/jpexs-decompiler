@@ -188,7 +188,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public String getText() {
+    public String getText(String separator) {
         String ret = "";
         if (hasText) {
             ret = initialText;
@@ -359,11 +359,11 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, String text) throws ParseException {
+    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws ParseException {
         try {
-            TextLexer lexer = new TextLexer(new StringReader(text));
+            TextLexer lexer = new TextLexer(new StringReader(formattedText));
             ParsedSymbol s = null;
-            text = "";
+            formattedText = "";
             RECT bounds = new RECT(this.bounds);
             boolean wordWrap = false;
             boolean multiline = false;
@@ -387,6 +387,7 @@ public class DefineEditTextTag extends TextTag {
             int leading = -1;
             String variableName = null;
 
+            int textIdx = 0;
             while ((s = lexer.yylex()) != null) {
                 switch (s.type) {
                     case PARAMETER:
@@ -557,14 +558,14 @@ public class DefineEditTextTag extends TextTag {
                         }
                         break;
                     case TEXT:
-                        text += (String) s.values[0];
+                        formattedText += (texts == null || textIdx >= texts.length) ? (String) s.values[0] : texts[textIdx++];
                         break;
                 }
             }
 
             this.bounds = bounds;
-            if (text.length() > 0) {
-                initialText = text;
+            if (formattedText.length() > 0) {
+                initialText = formattedText;
                 this.hasText = true;
             } else {
                 this.hasText = false;

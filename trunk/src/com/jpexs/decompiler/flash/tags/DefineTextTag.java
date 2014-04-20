@@ -81,10 +81,15 @@ public class DefineTextTag extends TextTag {
     }
 
     @Override
-    public String getText() {
+    public String getText(String separator) {
         FontTag fnt = null;
         String ret = "";
+        boolean first = true;
         for (TEXTRECORD rec : textRecords) {
+            if (!first) {
+                ret += Helper.newLine + separator + Helper.newLine;
+            }
+            first = false;
             if (rec.styleFlagsHasFont) {
                 for (Tag t : swf.tags) {
                     if (t instanceof FontTag) {
@@ -96,9 +101,9 @@ public class DefineTextTag extends TextTag {
                 }
             }
             if (rec.styleFlagsHasXOffset || rec.styleFlagsHasYOffset) {
-                if (!ret.isEmpty()) {
+                /*if (!ret.isEmpty()) {
                     ret += "\r\n";
-                }
+                }*/
             }
             ret += rec.getText(fnt);
         }
@@ -172,10 +177,10 @@ public class DefineTextTag extends TextTag {
     }
 
     @Override
-    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, String text) throws ParseException {
+    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws ParseException {
         List<TEXTRECORD> oldTextRecords = textRecords;
         try {
-            TextLexer lexer = new TextLexer(new StringReader(text));
+            TextLexer lexer = new TextLexer(new StringReader(formattedText));
             ParsedSymbol s = null;
             textRecords = new ArrayList<>();
             RGB color = null;
@@ -193,6 +198,7 @@ public class DefineTextTag extends TextTag {
             textMatrix.hasRotate = false;
             textMatrix.hasScale = false;
             RECT textBounds = new RECT();
+            int textIdx = 0;
             while ((s = lexer.yylex()) != null) {
                 switch (s.type) {
                     case PARAMETER:
@@ -353,7 +359,7 @@ public class DefineTextTag extends TextTag {
                             tr.styleFlagsHasYOffset = true;
                             y = null;
                         }
-                        String txt = (String) s.values[0];
+                        String txt = (texts == null || textIdx >= texts.length) ? (String) s.values[0] : texts[textIdx++];
                         tr.glyphEntries = new GLYPHENTRY[txt.length()];
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);

@@ -121,7 +121,7 @@ public class TextPanel extends JPanel implements ActionListener {
                 TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
                 if (item instanceof TextTag) {
                     TextTag textTag = (TextTag) item;
-                    if (mainPanel.saveText(textTag, textValue.getText())) {
+                    if (mainPanel.saveText(textTag, textValue.getText(), null)) {
                         setEditText(false);
                         mainPanel.reload(true);
                     }

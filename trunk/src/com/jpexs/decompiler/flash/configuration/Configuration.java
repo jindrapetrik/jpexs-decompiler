@@ -259,6 +259,9 @@ public class Configuration {
     @ConfigurationDefaultString("--- SEPARATOR ---")
     public static final ConfigurationItem<String> textExportSingleFileSeparator = null;
 
+    @ConfigurationDefaultString("--- RECORDSEPARATOR ---")
+    public static final ConfigurationItem<String> textExportSingleFileRecordSeparator = null;
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as12edit")
     public static final ConfigurationItem<Boolean> warningExperimentalAS12Edit = null;
