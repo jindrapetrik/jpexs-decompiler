@@ -130,9 +130,9 @@ public class CallAVM2Item extends AVM2Item {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, new ArrayList<Integer>());
                     nobj.setRegNumber(0);
                     obj = nobj;
-                }
-                propIndex = prop.resolveProperty(localData);
-            }            
+                }               
+            }    
+            propIndex = prop.resolveProperty(localData);
         }
                 
         if(propIndex!=-1){
