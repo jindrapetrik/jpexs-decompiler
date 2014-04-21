@@ -98,11 +98,11 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.AndItem;
@@ -164,7 +164,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
-        ret.add(new ActionPushDuplicate());
+        ret.add(ins(new DupIns()));
         ret.add(ins(new NotIns()));
         List<AVM2Instruction> andExpr = generateToActionList(localData, item.rightSide);
         andExpr.add(0, ins(new PopIns()));
@@ -194,7 +194,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
-        ret.add(new ActionPushDuplicate());
+        ret.add(ins(new DupIns()));
         List<AVM2Instruction> orExpr = generateToActionList(localData, item.rightSide);
         orExpr.add(0, ins(new PopIns()));
         int orExprLen = insToBytes(orExpr).length;
@@ -365,9 +365,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
             if (ins.definition instanceof JumpIns) {
                 if (ins.definition instanceof ContinueJumpIns) {
                     if (continueOffset != Integer.MAX_VALUE) {
-                        ins.operands[0] = (-pos + continueOffset);
+                        ins.operands[0] = (-pos + continueOffset);                        
+                        code.get(a).definition = new JumpIns();
                     }
-                    code.get(a).definition = new JumpIns();
                 }
                 if (ins.definition instanceof BreakJumpIns) {
                     ins.operands[0] = (-pos + breakOffset);
@@ -418,14 +418,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForEachInAVM2Item item) throws CompilationException {
-        return generateForIn(localData, item.expression.collection, (AssignableAVM2Item) item.expression.object, item.commands, true);
+        return generateForIn(localData,item.loop, item.expression.collection, (AssignableAVM2Item) item.expression.object, item.commands, true);
     }
 
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForInAVM2Item item) throws CompilationException {
-        return generateForIn(localData, item.expression.collection, (AssignableAVM2Item) item.expression.object, item.commands, false);
+        return generateForIn(localData,item.loop, item.expression.collection, (AssignableAVM2Item) item.expression.object, item.commands, false);
     }
 
-    public List<GraphSourceItem> generateForIn(SourceGeneratorLocalData localData, GraphTargetItem collection, AssignableAVM2Item assignable, List<GraphTargetItem> commands, final boolean each) throws CompilationException {
+    public List<GraphSourceItem> generateForIn(SourceGeneratorLocalData localData,Loop loop, GraphTargetItem collection, AssignableAVM2Item assignable, List<GraphTargetItem> commands, final boolean each) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         final Reference<Integer> counterReg = new Reference<>(0);
         final Reference<Integer> collectionReg = new Reference<>(0);
@@ -489,6 +489,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         int exprLen = insToBytes(expr).length;
         backIf.operands[0] = -(exprLen + forBodyLen);
 
+        fixLoop(forBody, forBodyLen + exprLen, forBodyLen, loop.id);
         ret.addAll(forBody);
         ret.addAll(expr);
         ret.addAll(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(collectionReg, counterReg)));
@@ -668,7 +669,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DuplicateItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
-        ret.add(new ActionPushDuplicate());
+        ret.add(ins(new DupIns()));
         return ret;
     }
 
@@ -1187,20 +1188,35 @@ public class AVM2SourceGenerator implements SourceGenerator {
         
         List<AVM2Instruction> sinitcode = new ArrayList<>();
         List<AVM2Instruction> initcode = new ArrayList<>();
-        for (GraphTargetItem ti : traitItems) {
-            if (ti instanceof SlotAVM2Item) {
-                SlotAVM2Item si = (SlotAVM2Item) ti;
-                if (si.isStatic() && si.value!=null) {
-                    sinitcode.add(ins(new FindPropertyStrictIns(), traitName(namespace, si.var)));
-                    sinitcode.addAll(toInsList(si.value.toSource(localData, this)));
-                    sinitcode.add(ins(new InitPropertyIns(), traitName(si.getNamespace(), si.var)));
+        for (GraphTargetItem ti : traitItems) {            
+            if ((ti instanceof SlotAVM2Item)||(ti instanceof ConstAVM2Item)) {
+                GraphTargetItem val = null;
+                boolean isStatic = false;
+                int ns=-1;
+                String tname=null;
+                if(ti instanceof SlotAVM2Item){
+                    val = ((SlotAVM2Item) ti).value;
+                    isStatic = ((SlotAVM2Item) ti).isStatic();
+                    ns = ((SlotAVM2Item) ti).getNamespace();
+                    tname = ((SlotAVM2Item) ti).var;
                 }
-                if (!si.isStatic() && si.value!=null) {
+                if(ti instanceof ConstAVM2Item){
+                    val = ((ConstAVM2Item) ti).value;
+                    isStatic = ((ConstAVM2Item) ti).isStatic();
+                    ns = ((ConstAVM2Item) ti).getNamespace();
+                    tname = ((ConstAVM2Item) ti).var;
+                }
+                if (isStatic && val!=null) {
+                    sinitcode.add(ins(new FindPropertyStrictIns(), traitName(namespace, tname)));
+                    sinitcode.addAll(toInsList(val.toSource(localData, this)));
+                    sinitcode.add(ins(new InitPropertyIns(), traitName(ns, tname)));
+                }
+                if (!isStatic && val!=null) {
                     //do not init basic values, that can be stored in trait
-                    if(!(si.value instanceof IntegerValueAVM2Item) && !(si.value instanceof StringAVM2Item) && !(si.value instanceof BooleanAVM2Item) && !(si.value instanceof NullAVM2Item) && !(si.value instanceof UndefinedAVM2Item)){
+                    if(!(val instanceof IntegerValueAVM2Item) && !(val instanceof StringAVM2Item) && !(val instanceof BooleanAVM2Item) && !(val instanceof NullAVM2Item) && !(val instanceof UndefinedAVM2Item)){
                         initcode.add(ins(new GetLocal0Ins()));
-                        initcode.addAll(toInsList(si.value.toSource(localData, this)));
-                        initcode.add(ins(new InitPropertyIns(), traitName(si.getNamespace(), si.var)));
+                        initcode.addAll(toInsList(val.toSource(localData, this)));
+                        initcode.add(ins(new InitPropertyIns(), traitName(ns, tname)));
                     }
                 }
             }
@@ -1210,7 +1226,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         initBody.code.code.addAll(constructor==null?0:2,initcode);//after getlocal0,pushscope
         
         if(sinitBody.code.code.get(sinitBody.code.code.size()-1).definition instanceof ReturnVoidIns){
-            sinitBody.code.code.addAll(sinitBody.code.code.size()-1,sinitcode);
+            sinitBody.code.code.addAll(2,sinitcode); //after getlocal0,pushscope
         }
         sinitBody.markOffsets();
         sinitBody.autoFillStats(abc, initScope);       

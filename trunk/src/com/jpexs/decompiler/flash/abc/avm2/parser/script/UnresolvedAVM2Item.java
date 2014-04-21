@@ -262,6 +262,9 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
+        if(resolved != null){
+            return resolved.returnType();
+        }
         if (type == null) {
             return TypeItem.UNBOUNDED;
         }
