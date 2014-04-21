@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -893,6 +894,7 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
+        AppStrings.setResourceClass(MainFrame.class);
         startFreeMemThread();
         initLogging(Configuration.debugMode.get());
         initLang();

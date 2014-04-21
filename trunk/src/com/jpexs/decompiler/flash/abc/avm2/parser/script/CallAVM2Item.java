@@ -34,7 +34,6 @@ import com.jpexs.decompiler.graph.TypeFunctionItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**

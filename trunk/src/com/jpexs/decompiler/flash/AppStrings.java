@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.gui.MainFrame;
 import java.util.ResourceBundle;
 
 /**
@@ -25,8 +24,14 @@ import java.util.ResourceBundle;
  */
 public class AppStrings {
 
-    private static ResourceBundle resourceBundle = ResourceBundle.getBundle(getResourcePath(MainFrame.class));
+    private static Class resourceClass;
+    private static ResourceBundle resourceBundle;
 
+    public static void setResourceClass(Class cls) {
+        resourceClass = cls;
+        updateLanguage();
+    }
+    
     public static String getResourcePath(Class cls) {
         String name = cls.getName();
         if (name.startsWith("com.jpexs.decompiler.flash.gui.")) {
@@ -46,6 +51,6 @@ public class AppStrings {
     }
 
     public static void updateLanguage() {
-        resourceBundle = ResourceBundle.getBundle(getResourcePath(MainFrame.class));
+        resourceBundle = ResourceBundle.getBundle(getResourcePath(resourceClass));
     }
 }

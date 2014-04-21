@@ -1295,7 +1295,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         if (type instanceof UnresolvedAVM2Item) {
-            String fullClass = localData.currentClass==null?null:(localData.pkg.equals("")?localData.currentClass:localData.pkg+"."+localData.currentClass);
+            String fullClass = localData.currentClass==null?null:(localData.pkg.isEmpty()?localData.currentClass:localData.pkg+"."+localData.currentClass);
             type = ((UnresolvedAVM2Item) type).resolve(new TypeItem(fullClass),new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, allABCs, new ArrayList<MethodBody>(), new ArrayList<AssignableAVM2Item>());
         }
 
@@ -1394,7 +1394,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             if (an instanceof UnresolvedAVM2Item) {
                 UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
                 if (n.resolved == null) {
-                    String fullClass = localData.currentClass==null?null:(localData.pkg.equals("")?localData.currentClass:localData.pkg+"."+localData.currentClass);            
+                    String fullClass = localData.currentClass==null?null:(localData.pkg.isEmpty()?localData.currentClass:localData.pkg+"."+localData.currentClass);            
                     GraphTargetItem res = n.resolve(new TypeItem(fullClass),paramTypes, paramNames, abc, allABCs, callStack, subvariables);
                     if (res instanceof AssignableAVM2Item) {
                         subvariables.set(i, (AssignableAVM2Item) res);

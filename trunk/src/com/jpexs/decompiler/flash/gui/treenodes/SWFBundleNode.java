@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.treenodes;
 
-import com.jpexs.decompiler.flash.gui.SWFList;
+import com.jpexs.decompiler.flash.treeitems.SWFList;
 import java.util.ArrayList;
 import java.util.List;
 

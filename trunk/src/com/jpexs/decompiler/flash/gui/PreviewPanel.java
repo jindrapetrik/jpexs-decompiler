@@ -493,7 +493,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             HashMap<Integer, VideoFrameTag> videoFrames = new HashMap<>();
             if (tagObj instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag vs = (DefineVideoStreamTag) tagObj;
-                swf.populateVideoFrames(vs.getCharacterId(), swf.tags, videoFrames);
+                SWF.populateVideoFrames(vs.getCharacterId(), swf.tags, videoFrames);
                 frameCount = videoFrames.size();
             }
 
