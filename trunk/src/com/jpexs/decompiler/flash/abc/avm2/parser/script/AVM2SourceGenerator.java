@@ -1904,7 +1904,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 tc.class_info = abc.instance_info.size() - 1;
                 tc.kindType = Trait.TRAIT_CLASS;
                 //tc.name_index = traitName(((InterfaceAVM2Item) item).namespace, ((InterfaceAVM2Item) item).name);
-                tc.slot_id = slot_id++;
+                tc.slot_id = 0; //?
                 ts.traits.add(tc);
                 traits[k] = tc;
             }
