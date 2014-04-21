@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
-import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
@@ -1014,9 +1013,6 @@ public class Main {
 
     public static void exit() {
         Configuration.saveConfig();
-        if (!GraphicsEnvironment.isHeadless()) {
-            FlashPlayerPanel.unload();
-        }
         System.exit(0);
     }
 

@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 public class FontExportSettings {
 
     public FontExportMode mode;
-    
+
     public FontExportSettings(FontExportMode mode) {
         this.mode = mode;
     }

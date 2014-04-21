@@ -75,10 +75,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
         String newimport = ns.getName(abc.constants);
         /*if ((ns.kind != Namespace.KIND_PACKAGE)
-                && (ns.kind != Namespace.KIND_NAMESPACE)
-                && (ns.kind != Namespace.KIND_STATIC_PROTECTED)) {
-            return false;
-        }*/
+         && (ns.kind != Namespace.KIND_NAMESPACE)
+         && (ns.kind != Namespace.KIND_STATIC_PROTECTED)) {
+         return false;
+         }*/
         /*if (ns.kind == Namespace.KIND_NAMESPACE)*/ {
             String oldimport = newimport;
             newimport = null;
@@ -118,7 +118,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     }
                     if (ns.kind == Namespace.KIND_PACKAGE) {
                         if (!pkg.equals(ignorePackage)) {
-                            if(!pkg.equals("__AS3__.vec")){ //Automatic import
+                            if (!pkg.equals("__AS3__.vec")) { //Automatic import
                                 imports.add(newimport);
                             }
                         }
@@ -161,7 +161,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
         if (!imports.contains(newimport)) {
             String pkg = newimport.substring(0, newimport.lastIndexOf('.'));
-            if(pkg.equals("__AS3__.vec")){ //special case - is imported always
+            if (pkg.equals("__AS3__.vec")) { //special case - is imported always
                 return;
             }
             if (!pkg.equals(ignorePackage)) {

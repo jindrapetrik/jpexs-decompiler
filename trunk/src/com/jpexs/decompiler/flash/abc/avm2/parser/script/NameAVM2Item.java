@@ -143,7 +143,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
     public int getNsKind() {
         return nsKind;
     }
-   
 
     public String getVariableName() {
         return variableName;

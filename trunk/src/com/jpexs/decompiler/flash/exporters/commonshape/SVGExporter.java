@@ -85,7 +85,7 @@ public class SVGExporter {
                 + roundPixels20(-bounds.xMin / (double) SWF.unitDivisor) + ", " + roundPixels20(-bounds.yMin / (double) SWF.unitDivisor) + ")");
         _svg.getDocumentElement().appendChild(_svgG);
     }
-    
+
     public final void createNewGroup(Matrix transform) {
         _svgG = _svg.createElement("g");
         double translateX = roundPixels400(transform.translateX / SWF.unitDivisor);
@@ -98,19 +98,19 @@ public class SVGExporter {
                 + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
         _svg.getDocumentElement().appendChild(_svgG);
     }
-    
+
     public void addToGroup(Node newChild) {
         _svgG.appendChild(newChild);
     }
-    
+
     public void addToDefs(Node newChild) {
         _svgDefs.appendChild(newChild);
     }
-    
+
     public Element createElement(String tagName) {
         return _svg.createElement(tagName);
     }
-    
+
     public String getSVG() {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         StringWriter writer = new StringWriter();

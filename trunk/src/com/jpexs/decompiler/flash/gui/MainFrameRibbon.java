@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -50,7 +51,17 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
         } catch (FlashUnsupportedException fue) {
         }
 
-        java.awt.Container cnt = getContentPane();
+        addWindowListener(new java.awt.event.WindowAdapter() {
+
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                if (panel != null) {
+                    panel.unloadFlashPlayer();
+                }
+            }
+        });
+
+        Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         JRibbon ribbon = getRibbon();
         cnt.add(ribbon, BorderLayout.NORTH);

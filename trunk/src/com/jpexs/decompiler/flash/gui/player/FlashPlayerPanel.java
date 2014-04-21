@@ -35,7 +35,9 @@ import java.awt.Graphics;
 import java.awt.Panel;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -45,7 +47,7 @@ import java.util.concurrent.TimeoutException;
  *
  * @author JPEXS
  */
-public class FlashPlayerPanel extends Panel implements MediaDisplay {
+public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
 
     private boolean executed = false;
     private String flash;
@@ -293,19 +295,9 @@ public class FlashPlayerPanel extends Panel implements MediaDisplay {
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
+    public void close() throws IOException {
         Kernel32.INSTANCE.CloseHandle(pipe);
         Kernel32.INSTANCE.TerminateProcess(process, 0);
-    }
-
-    public static void unload() {
-        /*if (Platform.isWindows()) {
-         for (int i = 0; i < processes.size(); i++) {
-         Kernel32.INSTANCE.CloseHandle(pipes.get(i));
-         Kernel32.INSTANCE.TerminateProcess(processes.get(i), 0);
-         }
-         }*/
     }
 
     @Override

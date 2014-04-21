@@ -91,26 +91,26 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         Reference<Integer> name_temp = new Reference<>(-1);
         Reference<Integer> ret_temp = new Reference<>(-1);
         /*if (name == null && index != null) {
-            return toSourceMerge(localData, generator,
-                    ns, generateCoerce(generator, new TypeItem("Namespace")), index, ins(new ConvertSIns()),
-                    ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
-                    dupSetTemp(localData, generator, name_temp),
-                    ns, generateCoerce(generator, new TypeItem("Namespace")),
-                    dupSetTemp(localData, generator, ns_temp),
-                    ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
-                    !isInteger ? ins(new ConvertDIns()) : null,
-                    //End get original
-                    (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
-                    needsReturn ? ins(new DupIns()) : null,
-                    (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
-                    setTemp(localData, generator, ret_temp),
-                    getTemp(localData, generator, name_temp),
-                    getTemp(localData, generator, ns_temp),
-                    getTemp(localData, generator, ret_temp),
-                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
-                    killTemp(localData, generator, Arrays.asList(ret_temp, name_temp, ns_temp)));
-        } else
-        */
+         return toSourceMerge(localData, generator,
+         ns, generateCoerce(generator, new TypeItem("Namespace")), index, ins(new ConvertSIns()),
+         ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+         dupSetTemp(localData, generator, name_temp),
+         ns, generateCoerce(generator, new TypeItem("Namespace")),
+         dupSetTemp(localData, generator, ns_temp),
+         ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+         !isInteger ? ins(new ConvertDIns()) : null,
+         //End get original
+         (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+         needsReturn ? ins(new DupIns()) : null,
+         (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+         setTemp(localData, generator, ret_temp),
+         getTemp(localData, generator, name_temp),
+         getTemp(localData, generator, ns_temp),
+         getTemp(localData, generator, ret_temp),
+         ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+         killTemp(localData, generator, Arrays.asList(ret_temp, name_temp, ns_temp)));
+         } else
+         */
         if (name != null) {
             return toSourceMerge(localData, generator,
                     ns, generateCoerce(generator, new TypeItem("Namespace")),

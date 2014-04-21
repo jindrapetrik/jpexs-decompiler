@@ -739,11 +739,11 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 } catch (IOException ex) {
                 } catch (ParseException ex) {
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                    editor.gotoLine((int)ex.line);
+                    editor.gotoLine((int) ex.line);
                 }
                 break;
             case ACTION_EDIT_DECOMPILED:
-                if(View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE,Configuration.warningExperimentalAS12Edit,JOptionPane.OK_OPTION)==JOptionPane.OK_OPTION){                                            
+                if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS12Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
                     setDecompiledEditMode(true);
                 }
                 break;

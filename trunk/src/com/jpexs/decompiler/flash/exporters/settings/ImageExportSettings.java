@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 public class ImageExportSettings {
 
     public ImageExportMode mode;
-    
+
     public ImageExportSettings(ImageExportMode mode) {
         this.mode = mode;
     }

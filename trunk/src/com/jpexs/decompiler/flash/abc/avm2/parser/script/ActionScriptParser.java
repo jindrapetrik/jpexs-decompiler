@@ -173,7 +173,7 @@ public class ActionScriptParser {
                     ret = member(needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
                     break;
                 case PARENT_OPEN:
-                    ret = new CallAVM2Item(lexer.yyline(),ret, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                    ret = new CallAVM2Item(lexer.yyline(), ret, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                     break;
             }
             s = lex();
@@ -188,22 +188,22 @@ public class ActionScriptParser {
         while (s.isType(SymbolType.DOT, SymbolType.BRACKET_OPEN)) {
             ParsedSymbol s2 = lex();
             boolean attr = false;
-            if(s.type == SymbolType.DOT){
-                if(s2.type == SymbolType.ATTRIBUTE){                    
+            if (s.type == SymbolType.DOT) {
+                if (s2.type == SymbolType.ATTRIBUTE) {
                     attr = true;
                     s = lex();
-                }else{
+                } else {
                     lexer.pushback(s2);
                 }
-                
-            }else{
-               lexer.pushback(s2);
+
+            } else {
+                lexer.pushback(s2);
             }
             if (s.type == SymbolType.BRACKET_OPEN) {
-                 GraphTargetItem index = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
-                 expectedType(SymbolType.BRACKET_CLOSE);
-                 ret = new IndexAVM2Item(attr, ret, index, null, openedNamespaces);
-                 s = lex();
+                GraphTargetItem index = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                expectedType(SymbolType.BRACKET_CLOSE);
+                ret = new IndexAVM2Item(attr, ret, index, null, openedNamespaces);
+                s = lex();
             } else {
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
@@ -216,7 +216,7 @@ public class ActionScriptParser {
                     ns = new UnresolvedAVM2Item(new ArrayList<String>(), importedClasses, false, null, lexer.yyline(), propName, null, openedNamespaces);
                     variables.add((UnresolvedAVM2Item) ns);
                     propName = s.value.toString();
-                }else{
+                } else {
                     lexer.pushback(s);
                 }
                 if (ns != null) {
@@ -336,12 +336,12 @@ public class ActionScriptParser {
         }
         if (s.type == SymbolType.BRACKET_OPEN) {
             lexer.pushback(s);
-            if(attrBracket){
-                lexer.pushback(new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ATTRIBUTE,"@"));
-                lexer.pushback(new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DOT,"."));
+            if (attrBracket) {
+                lexer.pushback(new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ATTRIBUTE, "@"));
+                lexer.pushback(new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DOT, "."));
             }
             ret = member(needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
-        }else{
+        } else {
             lexer.pushback(s);
         }
         return ret;
@@ -739,7 +739,7 @@ public class ActionScriptParser {
                     if (s.type == SymbolType.COLON) {
                         type = type(new Reference<Boolean>(false), importedClasses, openedNamespaces, new ArrayList<AssignableAVM2Item>());
                         s = lex();
-                    }else{
+                    } else {
                         type = TypeItem.UNBOUNDED;
                     }
 
@@ -2010,7 +2010,7 @@ public class ActionScriptParser {
             case NEW:
                 GraphTargetItem newvar = name(needsActivation, true, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new ConstructSomethingAVM2Item(lexer.yyline(),openedNamespaces, newvar, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                ret = new ConstructSomethingAVM2Item(lexer.yyline(), openedNamespaces, newvar, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                 existsRemainder = true;
                 break;
             case IDENTIFIER:

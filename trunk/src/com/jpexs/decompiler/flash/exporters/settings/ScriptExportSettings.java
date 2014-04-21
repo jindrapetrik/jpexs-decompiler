@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 public class ScriptExportSettings {
 
     public ScriptExportMode mode;
-    
+
     public ScriptExportSettings(ScriptExportMode mode) {
         this.mode = mode;
     }

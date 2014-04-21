@@ -102,8 +102,8 @@ public class DefineTextTag extends TextTag {
             }
             if (rec.styleFlagsHasXOffset || rec.styleFlagsHasYOffset) {
                 /*if (!ret.isEmpty()) {
-                    ret += "\r\n";
-                }*/
+                 ret += "\r\n";
+                 }*/
             }
             ret += rec.getText(fnt);
         }

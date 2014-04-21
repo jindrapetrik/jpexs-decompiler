@@ -42,5 +42,5 @@ public class AsTypeAVM2Item extends BinaryOpItem {
     @Override
     public GraphTargetItem returnType() {
         return rightSide;
-    }   
+    }
 }

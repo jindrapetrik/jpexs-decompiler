@@ -120,7 +120,7 @@ public class RecompileTest {
             }
         }
     }
-    
+
     private void testAS2DirectEditingOne(String filename) {
         try {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);

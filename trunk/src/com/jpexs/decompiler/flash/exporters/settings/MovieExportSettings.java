@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 public class MovieExportSettings {
 
     public MovieExportMode mode;
-    
+
     public MovieExportSettings(MovieExportMode mode) {
         this.mode = mode;
     }

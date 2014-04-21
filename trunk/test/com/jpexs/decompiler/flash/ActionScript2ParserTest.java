@@ -49,52 +49,52 @@ public class ActionScript2ParserTest extends ActionStript2TestBase {
             fail("Unable to parse: " + script);
         }
     }
-    
+
     @Test
     private void testAS2Parse1() {
         parseAS2(
-            "var x = true;\n" +
-            "while(x) { }");
+                "var x = true;\n"
+                + "while(x) { }");
     }
 
     @Test
     private void testAS2Parse2() {
         parseAS2(
-            "function test(a, b, c)\n" +
-            "{\n" +
-            "   return a != 0?b * 2:c;\n" +
-            "}");
+                "function test(a, b, c)\n"
+                + "{\n"
+                + "   return a != 0?b * 2:c;\n"
+                + "}");
     }
 
     @Test
     private void testAS2Parse3() {
         parseAS2(
-            "for(;i < 10;i++) { }");
+                "for(;i < 10;i++) { }");
     }
 
     @Test
     private void testAS2Parse4() {
         parseAS2(
-            "class cl1\n" +
-            "{\n" +
-            "   function stop()\n" +
-            "   {\n" +
-            "   }\n" +
-            "}");
+                "class cl1\n"
+                + "{\n"
+                + "   function stop()\n"
+                + "   {\n"
+                + "   }\n"
+                + "}");
     }
 
     @Test
     private void testAS2Parse5() {
         parseAS2(
-            "if(!test.T1)\n" +
-            "{\n" +
-            "   test.T1 = function()\n" +
-            "   {\n" +
-            "      super();\n" +
-            "   }.Initialize = function(obj)\n" +
-            "   {\n" +
-            "      var x = 1;\n" +
-            "   };\n" +
-            "}");
+                "if(!test.T1)\n"
+                + "{\n"
+                + "   test.T1 = function()\n"
+                + "   {\n"
+                + "      super();\n"
+                + "   }.Initialize = function(obj)\n"
+                + "   {\n"
+                + "      var x = 1;\n"
+                + "   };\n"
+                + "}");
     }
 }
