@@ -738,6 +738,8 @@ public class ActionScriptParser {
                     if (s.type == SymbolType.COLON) {
                         type = type(new Reference<Boolean>(false), importedClasses, openedNamespaces, new ArrayList<AssignableAVM2Item>());
                         s = lex();
+                    }else{
+                        type = TypeItem.UNBOUNDED;
                     }
 
                     GraphTargetItem value = null;
@@ -1870,10 +1872,10 @@ public class ActionScriptParser {
             case MINUS:
                 s = lex();
                 if (s.isType(SymbolType.DOUBLE)) {
-                    ret = new FloatValueAVM2Item(null, (Double) s.value);
+                    ret = new FloatValueAVM2Item(null, -(Double) s.value);
                     existsRemainder = true;
                 } else if (s.isType(SymbolType.INTEGER)) {
-                    ret = new IntegerValueAVM2Item(null, (Long) s.value);
+                    ret = new IntegerValueAVM2Item(null, -(Long) s.value);
                     existsRemainder = true;
                 } else {
                     lexer.pushback(s);

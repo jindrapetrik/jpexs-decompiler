@@ -106,7 +106,7 @@ public class IndexAVM2Item extends AssignableAVM2Item {
                 object,dupSetTemp(localData, generator, obj_temp),
                 index,dupSetTemp(localData, generator, index_temp),
                 ins(new GetPropertyIns(),indexPropIndex),
-                ins(new ConvertDIns()),
+                post?ins(new ConvertDIns()):null,
                 (!post)?(decrement?ins(new DecrementIns()):ins(new IncrementIns())):null,
                 needsReturn?ins(new DupIns()):null,
                 post?(decrement?ins(new DecrementIns()):ins(new IncrementIns())):null,

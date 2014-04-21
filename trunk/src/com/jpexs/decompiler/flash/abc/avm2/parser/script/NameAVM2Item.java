@@ -356,7 +356,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
                     //Start get original
                     //generateGetLoc(regNumber), getTemp(localData, generator, index_temp),
                     ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
-                    !isInteger ? ins(new ConvertDIns()) : null,
+                    (!isInteger && post) ? ins(new ConvertDIns()) : null,
                     //End get original
                     (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
                     needsReturn ? ins(new DupIns()) : null,

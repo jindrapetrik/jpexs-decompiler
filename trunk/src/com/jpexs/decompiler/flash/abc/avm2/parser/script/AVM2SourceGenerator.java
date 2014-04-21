@@ -1196,9 +1196,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     sinitcode.add(ins(new InitPropertyIns(), traitName(si.getNamespace(), si.var)));
                 }
                 if (!si.isStatic() && si.value!=null) {
-                    initcode.add(ins(new GetLocal0Ins()));
-                    initcode.addAll(toInsList(si.value.toSource(localData, this)));
-                    initcode.add(ins(new InitPropertyIns(), traitName(si.getNamespace(), si.var)));
+                    //do not init basic values, that can be stored in trait
+                    if(!(si.value instanceof IntegerValueAVM2Item) && !(si.value instanceof StringAVM2Item) && !(si.value instanceof BooleanAVM2Item) && !(si.value instanceof NullAVM2Item) && !(si.value instanceof UndefinedAVM2Item)){
+                        initcode.add(ins(new GetLocal0Ins()));
+                        initcode.addAll(toInsList(si.value.toSource(localData, this)));
+                        initcode.add(ins(new InitPropertyIns(), traitName(si.getNamespace(), si.var)));
+                    }
                 }
             }
         }

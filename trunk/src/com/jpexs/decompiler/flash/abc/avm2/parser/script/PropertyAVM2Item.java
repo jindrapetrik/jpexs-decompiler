@@ -605,7 +605,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 //getTemp(localData, generator, obj_temp),
                 //index!=null?getTemp(localData, generator, index_temp):null,
                 ins(new GetPropertyIns(), propertyId),
-                !isInteger ? ins(new ConvertDIns()) : null,
+                (!isInteger && post) ? ins(new ConvertDIns()) : null,
                 //End get original
                 (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
                 needsReturn ? ins(new DupIns()) : null,

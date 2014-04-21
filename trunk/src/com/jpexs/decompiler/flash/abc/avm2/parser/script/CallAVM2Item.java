@@ -97,14 +97,17 @@ public class CallAVM2Item extends AVM2Item {
             callable = p;
         }
         
+        
+        int propIndex = -1;
         if(callable instanceof TypeItem){           
            TypeItem t=(TypeItem)callable;
-           callable = new PropertyAVM2Item(null, t.fullTypeName, g.abc, g.allABCs, new ArrayList<Integer>(), new ArrayList<MethodBody>());
+           propIndex = AVM2SourceGenerator.resolveType(t, ((AVM2SourceGenerator)generator).abc);           
         }
+        Object obj = null;
         
         if (callable instanceof PropertyAVM2Item) {
             PropertyAVM2Item prop = (PropertyAVM2Item) callable;
-            Object obj = prop.object;
+            obj = prop.object;
             if (obj == null) {
 
                 List<ABC> allAbcs = new ArrayList<>();
@@ -127,16 +130,21 @@ public class CallAVM2Item extends AVM2Item {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, new ArrayList<Integer>());
                     nobj.setRegNumber(0);
                     obj = nobj;
-                } else {
-                    obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty(localData)}, new byte[0]);
                 }
+                propIndex = prop.resolveProperty(localData);
+            }            
+        }
+                
+        if(propIndex!=-1){
+            if(obj == null){
+                obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propIndex}, new byte[0]);
             }
             return toSourceMerge(localData, generator, obj, arguments,
-                    new AVM2Instruction(0, new CallPropertyIns(), new int[]{prop.resolveProperty(localData), arguments.size()}, new byte[0])
+                    ins(new CallPropertyIns(),propIndex,arguments.size())
             );
         }
-        throw new CompilationException("Cannot call a type", line);
-        //return new ArrayList<>();
+        
+        throw new CompilationException("Not a callable", line);
     }
 
     @Override
