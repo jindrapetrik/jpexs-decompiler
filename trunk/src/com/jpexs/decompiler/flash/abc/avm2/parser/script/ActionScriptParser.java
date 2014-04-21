@@ -437,6 +437,7 @@ public class ActionScriptParser {
                 }
                 if (s.type == SymbolType.ASSIGN) {
                     paramValues.add(expression(new Reference<Boolean>(false), importedClasses, openedNamespaces, null, isMethod, isMethod, isMethod, variables));
+                    s = lex();
                 } else {
                     if (!paramValues.isEmpty()) {
                         throw new ParseException("Some of parameters do not have default values", lexer.yyline());

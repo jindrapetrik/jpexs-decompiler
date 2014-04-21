@@ -227,7 +227,7 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public boolean autoFillStats(ABC abc, int initScope) {
+    public boolean autoFillStats(ABC abc, int initScope, boolean hasThis) {
         //System.out.println("--------------");
         CodeStats stats = code.getStats(abc, this, initScope);
         if (stats == null) {
@@ -242,6 +242,11 @@ public class MethodBody implements Cloneable, Serializable {
         init_scope_depth = initScope;
         abc.method_info.get(method_info).setFlagSetsdxns(stats.has_set_dxns);
         abc.method_info.get(method_info).setFlagNeed_activation(stats.has_activation);
+        MethodInfo mi = abc.method_info.get(method_info);
+        int min_regs = mi.param_types.length+(hasThis?1:0)+(mi.flagNeed_rest()?1:0);
+        if(max_regs<min_regs){
+            max_regs = min_regs;
+        }
         return true;
     }
 }
