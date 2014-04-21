@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
-import com.jpexs.decompiler.flash.exporters.PathExporter;
+import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;

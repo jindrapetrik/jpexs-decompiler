@@ -52,19 +52,20 @@ import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.exporters.ExportRectangle;
-import com.jpexs.decompiler.flash.exporters.Matrix;
-import com.jpexs.decompiler.flash.exporters.PathExporter;
-import com.jpexs.decompiler.flash.exporters.SVGExporter;
-import com.jpexs.decompiler.flash.exporters.SVGExporterContext;
+import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
+import com.jpexs.decompiler.flash.exporters.FontExporter;
+import com.jpexs.decompiler.flash.exporters.ImageExporter;
+import com.jpexs.decompiler.flash.exporters.MorphShapeExporter;
+import com.jpexs.decompiler.flash.exporters.MovieExporter;
+import com.jpexs.decompiler.flash.exporters.ShapeExporter;
+import com.jpexs.decompiler.flash.exporters.SoundExporter;
 import com.jpexs.decompiler.flash.exporters.TextExporter;
-import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporterContext;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
@@ -74,19 +75,12 @@ import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
-import com.jpexs.decompiler.flash.flv.AUDIODATA;
-import com.jpexs.decompiler.flash.flv.FLVOutputStream;
-import com.jpexs.decompiler.flash.flv.FLVTAG;
-import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.gui.SWFList;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
-import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
-import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
@@ -94,7 +88,6 @@ import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
@@ -106,14 +99,8 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
-import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
-import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
-import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.timeline.Clip;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -128,14 +115,11 @@ import com.jpexs.decompiler.flash.treenodes.ContainerNode;
 import com.jpexs.decompiler.flash.treenodes.FrameNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
-import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
-import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import com.jpexs.decompiler.graph.Graph;
@@ -149,10 +133,6 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import fontastic.FGlyph;
-import fontastic.FPoint;
-import fontastic.Fontastic;
-import fontastic.PVector;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -161,7 +141,6 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -176,7 +155,6 @@ import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -1261,7 +1239,7 @@ public final class SWF implements TreeItem, Timelined {
         return false;
     }
 
-    public void populateVideoFrames(int streamId, List<? extends ContainerItem> tags, HashMap<Integer, VideoFrameTag> output) {
+    public static void populateVideoFrames(int streamId, List<? extends ContainerItem> tags, HashMap<Integer, VideoFrameTag> output) {
         for (ContainerItem t : tags) {
             if (t instanceof VideoFrameTag) {
                 output.put(((VideoFrameTag) t).frameNum, (VideoFrameTag) t);
@@ -1273,179 +1251,15 @@ public final class SWF implements TreeItem, Timelined {
     }
 
     public void exportMovies(AbortRetryIgnoreHandler handler, String outdir, MovieExportSettings settings) throws IOException {
-        exportMovies(handler, outdir, tags, settings);
+        new MovieExporter().exportMovies(handler, outdir, tags, settings);
     }
 
     public void exportSounds(AbortRetryIgnoreHandler handler, String outdir, SoundExportSettings settings) throws IOException {
-        exportSounds(handler, outdir, tags, settings);
-    }
-
-    public byte[] exportSound(SoundTag t, SoundExportMode mode) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        exportSound(baos, t, mode);
-        return baos.toByteArray();
+        new SoundExporter().exportSounds(handler, outdir, tags, settings);
     }
 
     public void exportFonts(AbortRetryIgnoreHandler handler, String outdir, FontExportSettings settings) throws IOException {
-        exportFonts(handler, outdir, tags, settings);
-    }
-
-    public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final FontExportSettings settings) throws IOException {
-        List<File> ret = new ArrayList<>();
-        if (tags.isEmpty()) {
-            return ret;
-        }
-        File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
-        for (Tag t : tags) {
-            File newfile = null;
-            if (t instanceof FontTag) {
-                final FontTag st = (FontTag) t;
-                final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".ttf");
-                newfile = file;
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        exportFont(st, settings.mode, file);
-                    }
-                }, handler).run();
-
-                ret.add(newfile);
-
-            }
-
-        }
-        return ret;
-    }
-
-    public void exportFont(final FontTag t, FontExportMode mode, File file) throws IOException {
-        List<SHAPE> shapes = t.getGlyphShapeTable();
-        Fontastic f = new Fontastic(t.getFontName(), file);
-        String cop = t.getCopyright();
-
-        f.getEngine().setCopyrightYear(cop == null ? "" : cop);
-        f.setAuthor(ApplicationInfo.shortApplicationVerName);
-        f.setVersion("1.0");
-        f.setAscender(t.getAscent() / t.getDivider());
-        f.setDescender(t.getDescent() / t.getDivider());
-        //f.set
-
-        for (int i = 0; i < shapes.size(); i++) {
-            SHAPE s = shapes.get(i);
-            final List<FPoint[]> contours = new ArrayList<>();
-            PathExporter seb = new PathExporter(s, new ColorTransform()) {
-
-                private double transformX(double x) {
-                    return Math.ceil((double) (x / t.getDivider()));
-                }
-
-                private double transformY(double y) {
-                    return -Math.ceil((double) (y / t.getDivider()));
-                }
-
-                List<FPoint> path = new ArrayList<>();
-                private double lastX = 0;
-                private double lastY = 0;
-
-                @Override
-                protected void finalizePath() {
-                    FPoint[] points = path.toArray(new FPoint[path.size()]);
-                    if (points.length > 0) {
-                        contours.add(points);
-                    }
-                    path.clear();
-                }
-
-                @Override
-                public void moveTo(double x, double y) {
-                    finalizePath();
-                    lastX = x;
-                    lastY = y;
-                    path.add(new FPoint(new PVector(transformX(x), transformY(y))));
-                }
-
-                @Override
-                public void lineTo(double x, double y) {
-                    lastX = x;
-                    lastY = y;
-                    path.add(new FPoint(new PVector(transformX(x), transformY(y))));
-                }
-
-                @Override
-                public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
-                    lastX = anchorX;
-                    lastY = anchorY;
-                    path.add(new FPoint(
-                            new PVector(transformX(anchorX), transformY(anchorY)),
-                            new PVector(transformX(controlX), transformY(controlY))
-                    ));
-
-                }
-            };
-            seb.export();
-            char c = t.glyphToChar(i);
-            if (contours.isEmpty()) {
-                continue;
-            }
-            if (c == '.') {
-                continue;
-            }
-            final FGlyph g = f.addGlyph(c);
-            double adv = t.getGlyphAdvance(i);
-            if (adv != -1) {
-                g.setAdvanceWidth((int) adv);
-            } else {
-                g.setAdvanceWidth(t.getGlyphWidth(i) / t.getDivider() + 100);
-            }
-            for (FPoint[] cnt : contours) {
-                if (cnt.length == 0) {
-                    continue;
-                }
-                g.addContour(cnt);
-            }
-
-        }
-        f.buildFont();
-    }
-
-    public void exportSound(OutputStream fos, SoundTag t, SoundExportMode mode) throws IOException {
-        if (t instanceof SoundTag) {
-            SoundTag st = (SoundTag) t;
-            SoundFormat fmt = st.getSoundFormat();
-            int nativeFormat = fmt.getNativeExportFormat();
-
-            if (nativeFormat == SoundFormat.EXPORT_MP3 && mode.hasMP3()) {
-                fos.write(st.getRawSoundData());
-            } else if ((nativeFormat == SoundFormat.EXPORT_FLV && mode.hasFlv()) || mode == SoundExportMode.FLV) {
-                if (st instanceof DefineSoundTag) {
-                    FLVOutputStream flv = new FLVOutputStream(fos);
-                    flv.writeHeader(true, false);
-                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), st.getRawSoundData())));
-                } else if (st instanceof SoundStreamHeadTypeTag) {
-                    SoundStreamHeadTypeTag sh = (SoundStreamHeadTypeTag) st;
-                    FLVOutputStream flv = new FLVOutputStream(fos);
-                    flv.writeHeader(true, false);
-                    List<SoundStreamBlockTag> blocks = sh.getBlocks();
-
-                    int ms = (int) (1000.0f / ((float) frameRate));
-                    for (int b = 0; b < blocks.size(); b++) {
-                        byte[] data = blocks.get(b).getData();
-                        if (st.getSoundFormatId() == 2) { //MP3
-                            data = Arrays.copyOfRange(data, 4, data.length);
-                        }
-                        flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data)));
-                    }
-                }
-            } else {
-                fmt.createWav(new ByteArrayInputStream(st.getRawSoundData()), fos);
-            }
-        }
+        new FontExporter().exportFonts(handler, outdir, tags, settings);
     }
 
     private static void writeLE(OutputStream os, long val, int size) throws IOException {
@@ -1624,381 +1438,24 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final SoundExportSettings settings) throws IOException {
-        List<File> ret = new ArrayList<>();
-        if (tags.isEmpty()) {
-            return ret;
-        }
-        File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
-        for (Tag t : tags) {
-            File newfile = null;
-            int id = 0;
-            if (t instanceof DefineSoundTag) {
-                id = ((DefineSoundTag) t).soundId;
-            }
-
-            if (t instanceof SoundTag) {
-                final SoundTag st = (SoundTag) t;
-
-                String ext = "wav";
-                SoundFormat fmt = st.getSoundFormat();
-                switch (fmt.getNativeExportFormat()) {
-                    case SoundFormat.EXPORT_MP3:
-                        if (settings.mode.hasMP3()) {
-                            ext = "mp3";
-                        }
-                        break;
-                    case SoundFormat.EXPORT_FLV:
-                        if (settings.mode.hasFlv()) {
-                            ext = "flv";
-                        }
-                        break;
-                }
-                if (settings.mode == SoundExportMode.FLV) {
-                    ext = "flv";
-                }
-
-                final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + "." + ext);
-                newfile = file;
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                            exportSound(os, st, settings.mode);
-                        }
-                    }
-                }, handler).run();
-
-                ret.add(newfile);
-
-            }
-
-        }
-        return ret;
-    }
-
-    public byte[] exportMovie(DefineVideoStreamTag videoStream, MovieExportMode mode) throws IOException {
-        HashMap<Integer, VideoFrameTag> frames = new HashMap<>();
-        populateVideoFrames(videoStream.characterID, this.tags, frames);
-        if (frames.isEmpty()) {
-            return new byte[0];
-        }
-
-        //double ms = 1000.0f / ((float) frameRate);
-        ByteArrayOutputStream fos = new ByteArrayOutputStream();
-        //CopyOutputStream cos = new CopyOutputStream(fos, new FileInputStream("f:\\trunk\\testdata\\xfl\\xfl\\_obj\\streamvideo 7.flv"));
-        OutputStream tos = fos;
-        FLVOutputStream flv = new FLVOutputStream(tos);
-        flv.writeHeader(false, true);
-        //flv.writeTag(new FLVTAG(0, SCRIPTDATA.onMetaData(ms * frames.size() / 1000.0, videoStream.width, videoStream.height, 0, frameRate, videoStream.codecID, 0, 0, false, 0, fileSize)));
-        int horizontalAdjustment = 0;
-        int verticalAdjustment = 0;
-        for (int i = 0; i < frames.size(); i++) {
-            VideoFrameTag tag = frames.get(i);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            int frameType = 1;
-
-            if ((videoStream.codecID == DefineVideoStreamTag.CODEC_VP6)
-                    || (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA)) {
-                SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), version);
-                if (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA) {
-                    sis.readUI24(); //offsetToAlpha
-                }
-                int frameMode = (int) sis.readUB(1);
-
-                if (frameMode == 0) {
-                    frameType = 1; //intra
-                } else {
-                    frameType = 2; //inter
-                }
-                sis.readUB(6); //qp
-                int marker = (int) sis.readUB(1);
-                if (frameMode == 0) {
-                    int version = (int) sis.readUB(5);
-                    int version2 = (int) sis.readUB(2);
-                    sis.readUB(1);//interlace
-                    if (marker == 1 || version2 == 0) {
-                        sis.readUI16();//offset
-                    }
-                    int dim_y = sis.readUI8();
-                    int dim_x = sis.readUI8();
-                    sis.readUI8(); //render_y
-                    sis.readUI8(); //render_x
-                    horizontalAdjustment = (int) (dim_x * Math.ceil(((double) videoStream.width) / (double) dim_x)) - videoStream.width;
-                    verticalAdjustment = (int) (dim_y * Math.ceil(((double) videoStream.height) / (double) dim_y)) - videoStream.height;
-
-                }
-
-                SWFOutputStream sos = new SWFOutputStream(baos, version);
-                sos.writeUB(4, horizontalAdjustment);
-                sos.writeUB(4, verticalAdjustment);
-            }
-            if (videoStream.codecID == DefineVideoStreamTag.CODEC_SORENSON_H263) {
-                SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), version);
-                sis.readUB(17);//pictureStartCode
-                sis.readUB(5); //version
-                sis.readUB(8); //temporalReference
-                int pictureSize = (int) sis.readUB(3); //pictureSize
-                if (pictureSize == 0) {
-                    sis.readUB(8); //customWidth
-                    sis.readUB(8); //customHeight
-                }
-                if (pictureSize == 1) {
-                    sis.readUB(16); //customWidth
-                    sis.readUB(16); //customHeight
-                }
-                int pictureType = (int) sis.readUB(2);
-                switch (pictureType) {
-                    case 0: //intra
-                        frameType = 1; //keyframe
-                        break;
-                    case 1://inter
-                        frameType = 2;
-                        break;
-                    case 2: //disposable
-                        frameType = 3;
-                        break;
-                }
-            }
-
-            baos.write(tag.videoData);
-            flv.writeTag(new FLVTAG((int) Math.floor(i * 1000.0f / ((float) frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
-        }
-        return fos.toByteArray();
-    }
-
-    public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MovieExportSettings settings) throws IOException {
-        List<File> ret = new ArrayList<>();
-        if (tags.isEmpty()) {
-            return ret;
-        }
-        File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
-        for (Tag t : tags) {
-            if (t instanceof DefineVideoStreamTag) {
-                final DefineVideoStreamTag videoStream = (DefineVideoStreamTag) t;
-                final File file = new File(outdir + File.separator + ((DefineVideoStreamTag) t).getCharacterExportFileName() + ".flv");
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        try (FileOutputStream fos = new FileOutputStream(file)) {
-                            fos.write(exportMovie(videoStream, settings.mode));
-                        }
-                    }
-                }, handler).run();
-
-            }
-        }
-        return ret;
-    }
-
     public void exportTexts(AbortRetryIgnoreHandler handler, String outdir, TextExportSettings settings) throws IOException {
         new TextExporter().exportTexts(handler, outdir, tags, settings);
     }
 
-    public static List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final ShapeExportSettings settings) throws IOException {
-        List<File> ret = new ArrayList<>();
-        if (tags.isEmpty()) {
-            return ret;
-        }
-        File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
-
-        for (final Tag t : tags) {
-            if (t instanceof ShapeTag) {
-                int characterID = 0;
-                if (t instanceof CharacterTag) {
-                    characterID = ((CharacterTag) t).getCharacterId();
-                }
-                String ext = "svg";
-                if (settings.mode == ShapeExportMode.PNG) {
-                    ext = "png";
-                }
-
-                final File file = new File(outdir + File.separator + characterID + "." + ext);
-                final int fcharacterID = characterID;
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        ShapeTag st = (ShapeTag) t;
-                        switch (settings.mode) {
-                            case SVG:
-                                try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(Utf8Helper.getBytes(st.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), -2, new CXFORMWITHALPHA(), 0)));
-                                }
-                                break;
-                            case PNG:
-                                RECT rect = st.getRect();
-                                int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
-                                int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
-                                SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
-                                img.fillTransparent();
-                                Matrix m = new Matrix();
-                                m.translate(-rect.Xmin, -rect.Ymin);
-                                st.toImage(0, 0, 0, null, 0, img, m, new CXFORMWITHALPHA());
-                                ImageIO.write(img.getBufferedImage(), "PNG", new FileOutputStream(file));
-                                break;
-                        }
-
-                    }
-                }, handler).run();
-                ret.add(file);
-            }
-        }
-        return ret;
-    }
-
-    //TODO: implement morphshape export. How to handle 65536 frames?
-    public static List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final MorphShapeExportSettings settings) throws IOException {
-        List<File> ret = new ArrayList<>();
-        if (tags.isEmpty()) {
-            return ret;
-        }
-        File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
-
-        for (final Tag t : tags) {
-            if (t instanceof MorphShapeTag) {
-                int characterID = 0;
-                if (t instanceof CharacterTag) {
-                    characterID = ((CharacterTag) t).getCharacterId();
-                }
-                String ext = "svg";
-
-                final File file = new File(outdir + File.separator + characterID + "." + ext);
-                final int fcharacterID = characterID;
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        MorphShapeTag mst = (MorphShapeTag) t;
-                        switch (settings.mode) {
-                            case SVG:
-                                try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(Utf8Helper.getBytes(mst.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), -2, new CXFORMWITHALPHA(), 0)));
-                                }
-                                break;
-                        }
-
-                    }
-                }, handler).run();
-                ret.add(file);
-            }
-        }
-        return ret;
-    }
-
-    public static List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, BinaryDataExportSettings settings) throws IOException {
-        List<File> ret = new ArrayList<>();
-        if (tags.isEmpty()) {
-            return ret;
-        }
-        File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
-
-        for (final Tag t : tags) {
-            if (t instanceof DefineBinaryDataTag) {
-                int characterID = ((DefineBinaryDataTag) t).getCharacterId();
-                final File file = new File(outdir + File.separator + characterID + ".bin");
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        try (FileOutputStream fos = new FileOutputStream(file)) {
-                            fos.write(((DefineBinaryDataTag) t).binaryData);
-                        }
-                    }
-                }, handler).run();
-                ret.add(file);
-            }
-        }
-        return ret;
-    }
-
-    public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final ImageExportSettings settings) throws IOException {
-        List<File> ret = new ArrayList<>();
-        if (tags.isEmpty()) {
-            return ret;
-        }
-        File foutdir = new File(outdir);
-        if (!foutdir.exists()) {
-            if (!foutdir.mkdirs()) {
-                if (!foutdir.exists()) {
-                    throw new IOException("Cannot create directory " + outdir);
-                }
-            }
-        }
-        for (final Tag t : tags) {
-            if (t instanceof ImageTag) {
-
-                String fileFormat = ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH);
-                if (settings.mode == ImageExportMode.PNG) {
-                    fileFormat = "png";
-                }
-                if (settings.mode == ImageExportMode.JPEG) {
-                    fileFormat = "jpg";
-                }
-
-                final File file = new File(outdir + File.separator + ((ImageTag) t).getCharacterId() + "." + fileFormat);
-                final List<Tag> ttags = this.tags;
-                final String ffileFormat = fileFormat;
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-
-                        ImageIO.write(((ImageTag) t).getImage().getBufferedImage(), ffileFormat.toUpperCase(Locale.ENGLISH), file);
-                    }
-                }, handler).run();
-                ret.add(file);
-            }
-        }
-        return ret;
-    }
-
     public void exportImages(AbortRetryIgnoreHandler handler, String outdir, ImageExportSettings settings) throws IOException {
-        exportImages(handler, outdir, tags, settings);
+        new ImageExporter().exportImages(handler, outdir, tags, settings);
     }
 
     public void exportShapes(AbortRetryIgnoreHandler handler, String outdir, ShapeExportSettings settings) throws IOException {
-        exportShapes(handler, outdir, tags, settings);
+        new ShapeExporter().exportShapes(handler, outdir, tags, settings);
     }
 
     public void exportMorphShapes(AbortRetryIgnoreHandler handler, String outdir, MorphShapeExportSettings settings) throws IOException {
-        exportMorphShapes(handler, outdir, tags, settings);
+        new MorphShapeExporter().exportMorphShapes(handler, outdir, tags, settings);
     }
 
     public void exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, BinaryDataExportSettings settings) throws IOException {
-        exportBinaryData(handler, outdir, tags, settings);
+        new BinaryDataExporter().exportBinaryData(handler, outdir, tags, settings);
     }
 
     private final HashMap<String, String> deobfuscated = new HashMap<>();
@@ -2604,18 +2061,6 @@ public final class SWF implements TreeItem, Timelined {
 
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
-                int dframe = (time + layer.time) % drawable.getNumFrames();
-                if (character instanceof ButtonTag) {
-                    ButtonTag bt = (ButtonTag) character;
-                    dframe = ButtonTag.FRAME_UP;
-                    if (stateUnderCursor == layer) {
-                        if (mouseButton > 0) {
-                            dframe = ButtonTag.FRAME_DOWN;
-                        } else {
-                            dframe = ButtonTag.FRAME_OVER;
-                        }
-                    }
-                }
 
                 String assetFileName;
                 Tag drawableTag = (Tag) drawable;

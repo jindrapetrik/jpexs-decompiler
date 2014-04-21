@@ -26,6 +26,13 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
+import com.jpexs.decompiler.flash.exporters.FontExporter;
+import com.jpexs.decompiler.flash.exporters.ImageExporter;
+import com.jpexs.decompiler.flash.exporters.MorphShapeExporter;
+import com.jpexs.decompiler.flash.exporters.MovieExporter;
+import com.jpexs.decompiler.flash.exporters.ShapeExporter;
+import com.jpexs.decompiler.flash.exporters.SoundExporter;
 import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
@@ -1274,21 +1281,21 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
 
                 final ScriptExportMode scriptMode = export.getValue(ScriptExportMode.class);
-                ret.addAll(swf.exportImages(handler, selFile + File.separator + "images", images, 
+                ret.addAll(new ImageExporter().exportImages(handler, selFile + File.separator + "images", images, 
                         new ImageExportSettings(export.getValue(ImageExportMode.class))));
-                ret.addAll(SWF.exportShapes(handler, selFile + File.separator + "shapes", shapes, 
+                ret.addAll(new ShapeExporter().exportShapes(handler, selFile + File.separator + "shapes", shapes, 
                         new ShapeExportSettings(export.getValue(ShapeExportMode.class))));
-                ret.addAll(SWF.exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes, 
+                ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes, 
                         new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class))));
                 ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + "texts", texts, 
                         new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get())));
-                ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies, 
+                ret.addAll(new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", movies, 
                         new MovieExportSettings(export.getValue(MovieExportMode.class))));
-                ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, 
+                ret.addAll(new SoundExporter().exportSounds(handler, selFile + File.separator + "sounds", sounds, 
                         new SoundExportSettings(export.getValue(SoundExportMode.class))));
-                ret.addAll(SWF.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData, 
+                ret.addAll(new BinaryDataExporter().exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData, 
                         new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class))));
-                ret.addAll(swf.exportFonts(handler, selFile + File.separator + "fonts", fonts, 
+                ret.addAll(new FontExporter().exportFonts(handler, selFile + File.separator + "fonts", fonts, 
                         new FontExportSettings(export.getValue(FontExportMode.class))));
 
                 for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
@@ -1661,7 +1668,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 String[] records = textArr[1].split(recordSeparator);
                 result.put(id, records);
             } else {
-                View.showMessageDialog(null, translate("error.text.import"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                if (View.showConfirmDialog(this, translate("error.text.import"), translate("error"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+                    return null;
+                }
             }
         }
         return result;
@@ -1680,14 +1689,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             if (textsFile.exists()) {
                 String texts = Helper.readTextFile(textsFile.getPath());
                 Map<Integer, String[]> records = splitTextRecords(texts);
-                for (int characterId : records.keySet()) {
-                    for (Tag tag : swf.tags) {
-                        if (tag instanceof TextTag) {
-                            TextTag textTag = (TextTag) tag;
-                            if (textTag.getCharacterId() == characterId) {
-                                String[] currentRecords = records.get(characterId);
-                                saveText(textTag, currentRecords[0], null);
-                                break;
+                if (records != null) {
+                    for (int characterId : records.keySet()) {
+                        for (Tag tag : swf.tags) {
+                            if (tag instanceof TextTag) {
+                                TextTag textTag = (TextTag) tag;
+                                if (textTag.getCharacterId() == characterId) {
+                                    String[] currentRecords = records.get(characterId);
+                                    saveText(textTag, currentRecords[0], null);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -1698,15 +1709,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 if (textsFile.exists()) {
                     String texts = Helper.readTextFile(textsFile.getPath());
                     Map<Integer, String[]> records = splitTextRecords(texts);
-                    for (int characterId : records.keySet()) {
-                        for (Tag tag : swf.tags) {
-                            if (tag instanceof TextTag) {
-                                TextTag textTag = (TextTag) tag;
-                                if (textTag.getCharacterId() == characterId) {
-                                    String[] currentRecords = records.get(characterId);
-                                    String text = textTag.getFormattedText();
-                                    saveText(textTag, text, currentRecords);
-                                    break;
+                    if (records != null) {
+                        for (int characterId : records.keySet()) {
+                            for (Tag tag : swf.tags) {
+                                if (tag instanceof TextTag) {
+                                    TextTag textTag = (TextTag) tag;
+                                    if (textTag.getCharacterId() == characterId) {
+                                        String[] currentRecords = records.get(characterId);
+                                        String text = textTag.getFormattedText();
+                                        saveText(textTag, text, currentRecords);
+                                        break;
+                                    }
                                 }
                             }
                         }
