@@ -1607,7 +1607,7 @@ public class ActionScriptParser {
                 existsRemainder = true;
                 break;
             case NOT:
-                ret = new NotItem(null, expression(registerVars, inFunction, inMethod, true, variables));
+                ret = new NotItem(null, expression(registerVars, inFunction, inMethod, false, variables));
                 existsRemainder = true;
                 break;
             case PARENT_OPEN:
