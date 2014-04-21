@@ -691,8 +691,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     ((Tag) abc.parentTag).setModified(true);
                     lastDecompiled = decompiledTextArea.getText();
                     decompiledTextArea.setClassIndex(-1);
-                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
+                    navigator.setClassIndex(-1, oldIndex);
                     setDecompiledEditMode(false);
+                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));                    
                     reload();
                 } catch (ParseException ex) {
                     ex.printStackTrace();
