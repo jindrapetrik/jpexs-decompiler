@@ -34,7 +34,7 @@ public class DecrementAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         value.toString(writer, localData);
-        return writer.append("-1");
+        return writer.append(" - 1");
     }
 
     @Override
