@@ -180,7 +180,17 @@ public class CallAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        GraphTargetItem ti = name.returnType();
+        GraphTargetItem callable = name;
+        if(callable instanceof UnresolvedAVM2Item){
+            callable = ((UnresolvedAVM2Item)callable).resolved;
+        }
+        
+        if(callable instanceof TypeItem){
+            return TypeItem.UNBOUNDED;
+        }
+        
+        
+        GraphTargetItem ti = callable.returnType();
         if (ti instanceof TypeFunctionItem) {
             TypeFunctionItem tfi = (TypeFunctionItem) ti;
             return new TypeItem(tfi.fullTypeName);

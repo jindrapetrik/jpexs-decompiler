@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetDescendantsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalScopeIns;
@@ -1194,6 +1195,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 boolean isStatic = false;
                 int ns=-1;
                 String tname=null;
+                boolean isConst = false;
                 if(ti instanceof SlotAVM2Item){
                     val = ((SlotAVM2Item) ti).value;
                     isStatic = ((SlotAVM2Item) ti).isStatic();
@@ -1205,18 +1207,19 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     isStatic = ((ConstAVM2Item) ti).isStatic();
                     ns = ((ConstAVM2Item) ti).getNamespace();
                     tname = ((ConstAVM2Item) ti).var;
+                    isConst = true;
                 }
                 if (isStatic && val!=null) {
-                    sinitcode.add(ins(new FindPropertyStrictIns(), traitName(namespace, tname)));
+                    sinitcode.add(ins(new FindPropertyIns(), traitName(ns, tname)));
                     sinitcode.addAll(toInsList(val.toSource(localData, this)));
-                    sinitcode.add(ins(new InitPropertyIns(), traitName(ns, tname)));
+                    sinitcode.add(ins(isConst?new InitPropertyIns():new SetPropertyIns(), traitName(ns, tname)));
                 }
                 if (!isStatic && val!=null) {
                     //do not init basic values, that can be stored in trait
                     if(!(val instanceof IntegerValueAVM2Item) && !(val instanceof StringAVM2Item) && !(val instanceof BooleanAVM2Item) && !(val instanceof NullAVM2Item) && !(val instanceof UndefinedAVM2Item)){
                         initcode.add(ins(new GetLocal0Ins()));
                         initcode.addAll(toInsList(val.toSource(localData, this)));
-                        initcode.add(ins(new InitPropertyIns(), traitName(ns, tname)));
+                        initcode.add(ins(isConst?new InitPropertyIns():new SetPropertyIns(), traitName(ns, tname)));
                     }
                 }
             }
