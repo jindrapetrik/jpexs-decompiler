@@ -14,35 +14,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.exporters;
+package com.jpexs.decompiler.flash.exporters.commonshape;
+
+import com.jpexs.decompiler.flash.tags.Tag;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author JPEXS
  */
-public class PointInt {
+public class SVGExporterContext {
 
-    public int x;
-    public int y;
+    public String outDir;
+    public String assetsDir;
+    public Map<Tag, String> exportedTags = new HashMap<>();
 
-    public PointInt(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    @Override
-    public int hashCode() {
-        long bits = Double.doubleToLongBits(x);
-        bits ^= Double.doubleToLongBits(y) * 31;
-        return (((int) bits) ^ ((int) (bits >> 32)));
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof PointInt) {
-            PointInt pt = (PointInt) obj;
-            return (x == pt.x) && (y == pt.y);
-        }
-        return super.equals(obj);
+    public SVGExporterContext(String outDir, String assetsDir) {
+        this.outDir = outDir;
+        this.assetsDir = assetsDir;
     }
 }

@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
-import com.jpexs.decompiler.flash.exporters.PointInt;
+import com.jpexs.decompiler.flash.exporters.commonshape.PointInt;
 
 /**
  *

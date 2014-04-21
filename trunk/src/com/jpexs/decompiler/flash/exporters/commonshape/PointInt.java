@@ -14,18 +14,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.exporters;
+package com.jpexs.decompiler.flash.exporters.commonshape;
 
 /**
  *
  * @author JPEXS
  */
-public class Point {
+public class PointInt {
 
-    public double x;
-    public double y;
+    public int x;
+    public int y;
 
-    public Point(double x, double y) {
+    public PointInt(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -39,8 +39,8 @@ public class Point {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Point) {
-            Point pt = (Point) obj;
+        if (obj instanceof PointInt) {
+            PointInt pt = (PointInt) obj;
             return (x == pt.x) && (y == pt.y);
         }
         return super.equals(obj);

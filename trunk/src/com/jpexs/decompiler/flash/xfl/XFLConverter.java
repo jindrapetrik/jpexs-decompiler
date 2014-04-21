@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.MovieExporter;
+import com.jpexs.decompiler.flash.exporters.SoundExporter;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
@@ -1500,7 +1502,7 @@ public class XFLConverter {
                 SoundFormat fmt = st.getSoundFormat();
                 byte[] data = new byte[0];
                 try {
-                    data = swf.exportSound(st, SoundExportMode.MP3_WAV);
+                    data = new SoundExporter().exportSound(st, SoundExportMode.MP3_WAV);
                 } catch (IOException ex) {
                     Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -1547,7 +1549,7 @@ public class XFLConverter {
 
                 byte[] data = new byte[0];
                 try {
-                    data = swf.exportMovie(video, MovieExportMode.FLV);
+                    data = new MovieExporter().exportMovie(video, MovieExportMode.FLV);
                 } catch (IOException ex) {
                     Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
