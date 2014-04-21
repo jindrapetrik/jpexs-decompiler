@@ -1677,6 +1677,105 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         return result;
     }
 
+    private void importTextsSingleFile(File textsFile, SWF swf) {
+        String texts = Helper.readTextFile(textsFile.getPath());
+        Map<Integer, String[]> records = splitTextRecords(texts);
+        if (records != null) {
+            for (int characterId : records.keySet()) {
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof TextTag) {
+                        TextTag textTag = (TextTag) tag;
+                        if (textTag.getCharacterId() == characterId) {
+                            String[] currentRecords = records.get(characterId);
+                            String text = textTag.getFormattedText();
+                            if (!saveText(textTag, text, currentRecords)) {
+                                if (View.showConfirmDialog(this, translate("error.text.import"), translate("error"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+                                    return;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private void importTextsSingleFileFormatted(File textsFile, SWF swf) {
+        String texts = Helper.readTextFile(textsFile.getPath());
+        Map<Integer, String[]> records = splitTextRecords(texts);
+        if (records != null) {
+            for (int characterId : records.keySet()) {
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof TextTag) {
+                        TextTag textTag = (TextTag) tag;
+                        if (textTag.getCharacterId() == characterId) {
+                            String[] currentRecords = records.get(characterId);
+                            if (!saveText(textTag, currentRecords[0], null)) {
+                                if (View.showConfirmDialog(this, translate("error.text.import"), translate("error"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+                                    return;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private void importTextsMultipleFiles(String folder, SWF swf) {
+        File textsFolder = new File(Path.combine(folder, TextExporter.TEXT_EXPORT_FOLDER));
+        String[] files = textsFolder.list(new FilenameFilter() {
+
+            private Pattern pat = Pattern.compile("\\d+\\.txt", Pattern.CASE_INSENSITIVE);
+
+            @Override
+            public boolean accept(File dir, String name) {
+
+                return pat.matcher(name).matches();
+            }
+        });
+
+        for (String fileName : files) {
+            String texts = Helper.readTextFile(Path.combine(textsFolder.getPath(), fileName));
+            int characterId = Integer.parseInt(fileName.split("\\.")[0]);
+            String recordSeparator = Helper.newLine + Configuration.textExportSingleFileRecordSeparator.get() + Helper.newLine;
+            boolean formatted = !texts.contains(recordSeparator) && texts.startsWith("[" + Helper.newLine);
+            if (!formatted) {
+                String[] records = texts.split(recordSeparator);
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof TextTag) {
+                        TextTag textTag = (TextTag) tag;
+                        if (textTag.getCharacterId() == characterId) {
+                            String text = textTag.getFormattedText();
+                            if (!saveText(textTag, text, records)) {
+                                if (View.showConfirmDialog(this, translate("error.text.import"), translate("error"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+                                    return;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            } else {
+                for (Tag tag : swf.tags) {
+                    if (tag instanceof TextTag) {
+                        TextTag textTag = (TextTag) tag;
+                        if (textTag.getCharacterId() == characterId) {
+                            if (!saveText(textTag, texts, null)) {
+                                if (View.showConfirmDialog(this, translate("error.text.import"), translate("error"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+                                    return;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     public void importText(final SWF swf) {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
@@ -1688,85 +1787,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             File textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
             // try to import formatted texts
             if (textsFile.exists()) {
-                String texts = Helper.readTextFile(textsFile.getPath());
-                Map<Integer, String[]> records = splitTextRecords(texts);
-                if (records != null) {
-                    for (int characterId : records.keySet()) {
-                        for (Tag tag : swf.tags) {
-                            if (tag instanceof TextTag) {
-                                TextTag textTag = (TextTag) tag;
-                                if (textTag.getCharacterId() == characterId) {
-                                    String[] currentRecords = records.get(characterId);
-                                    saveText(textTag, currentRecords[0], null);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
+                importTextsSingleFileFormatted(textsFile, swf);
             } else {
                 textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
                 // try to import plain texts
                 if (textsFile.exists()) {
-                    String texts = Helper.readTextFile(textsFile.getPath());
-                    Map<Integer, String[]> records = splitTextRecords(texts);
-                    if (records != null) {
-                        for (int characterId : records.keySet()) {
-                            for (Tag tag : swf.tags) {
-                                if (tag instanceof TextTag) {
-                                    TextTag textTag = (TextTag) tag;
-                                    if (textTag.getCharacterId() == characterId) {
-                                        String[] currentRecords = records.get(characterId);
-                                        String text = textTag.getFormattedText();
-                                        saveText(textTag, text, currentRecords);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    importTextsSingleFile(textsFile, swf);
                 } else {
-                    textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FOLDER));
-                    String[] files = textsFile.list(new FilenameFilter() {
-
-                        private Pattern pat = Pattern.compile("\\d+\\.txt", Pattern.CASE_INSENSITIVE);
-
-                        @Override
-                        public boolean accept(File dir, String name) {
-
-                            return pat.matcher(name).matches();
-                        }
-                    });
-
-                    for (String fileName : files) {
-                        String texts = Helper.readTextFile(Path.combine(textsFile.getPath(), fileName));
-                        int characterId = Integer.parseInt(fileName.split("\\.")[0]);
-                        String recordSeparator = Helper.newLine + Configuration.textExportSingleFileRecordSeparator.get() + Helper.newLine;
-                        boolean formatted = !texts.contains(recordSeparator) && texts.startsWith("[" + Helper.newLine);
-                        if (!formatted) {
-                            String[] records = texts.split(recordSeparator);
-                            for (Tag tag : swf.tags) {
-                                if (tag instanceof TextTag) {
-                                    TextTag textTag = (TextTag) tag;
-                                    if (textTag.getCharacterId() == characterId) {
-                                        String text = textTag.getFormattedText();
-                                        saveText(textTag, text, records);
-                                        break;
-                                    }
-                                }
-                            }
-                        } else {
-                            for (Tag tag : swf.tags) {
-                                if (tag instanceof TextTag) {
-                                    TextTag textTag = (TextTag) tag;
-                                    if (textTag.getCharacterId() == characterId) {
-                                        saveText(textTag, texts, null);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    importTextsMultipleFiles(selFile, swf);
                 }
             }
 
