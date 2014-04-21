@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 public class FramesExportSettings {
 
     public FramesExportMode mode;
-    
+
     public FramesExportSettings(FramesExportMode mode) {
         this.mode = mode;
     }

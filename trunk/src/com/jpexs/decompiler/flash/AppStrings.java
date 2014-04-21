@@ -31,7 +31,7 @@ public class AppStrings {
         resourceClass = cls;
         updateLanguage();
     }
-    
+
     public static String getResourcePath(Class cls) {
         String name = cls.getName();
         if (name.startsWith("com.jpexs.decompiler.flash.gui.")) {

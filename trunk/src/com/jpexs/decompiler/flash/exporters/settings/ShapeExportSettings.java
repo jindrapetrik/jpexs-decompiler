@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 public class ShapeExportSettings {
 
     public ShapeExportMode mode;
-    
+
     public ShapeExportSettings(ShapeExportMode mode) {
         this.mode = mode;
     }

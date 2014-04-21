@@ -41,7 +41,7 @@ public class TextExporter {
     public static final String TEXT_EXPORT_FOLDER = "texts";
     public static final String TEXT_EXPORT_FILENAME_FORMATTED = "textsformatted.txt";
     public static final String TEXT_EXPORT_FILENAME_PLAIN = "textsplain.txt";
-    
+
     public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final TextExportSettings settings) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
@@ -57,8 +57,8 @@ public class TextExporter {
         }
 
         if (settings.singleFile) {
-            final File file = new File(outdir + File.separator + 
-                    (settings.mode == TextExportMode.FORMATTED ? TEXT_EXPORT_FILENAME_FORMATTED : TEXT_EXPORT_FILENAME_PLAIN));
+            final File file = new File(outdir + File.separator
+                    + (settings.mode == TextExportMode.FORMATTED ? TEXT_EXPORT_FILENAME_FORMATTED : TEXT_EXPORT_FILENAME_PLAIN));
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 for (final Tag t : tags) {
                     if (t instanceof TextTag) {

@@ -95,15 +95,14 @@ public class CallAVM2Item extends AVM2Item {
             p.setAssignedValue(n.getAssignedValue());
             callable = p;
         }
-        
-        
+
         int propIndex = -1;
-        if(callable instanceof TypeItem){           
-           TypeItem t=(TypeItem)callable;
-           propIndex = AVM2SourceGenerator.resolveType(t, ((AVM2SourceGenerator)generator).abc);           
+        if (callable instanceof TypeItem) {
+            TypeItem t = (TypeItem) callable;
+            propIndex = AVM2SourceGenerator.resolveType(t, ((AVM2SourceGenerator) generator).abc);
         }
         Object obj = null;
-        
+
         if (callable instanceof PropertyAVM2Item) {
             PropertyAVM2Item prop = (PropertyAVM2Item) callable;
             obj = prop.object;
@@ -125,24 +124,24 @@ public class CallAVM2Item extends AVM2Item {
                 Reference<Integer> outPropNsKind = new Reference<>(1);
                 Reference<String> outPropType = new Reference<>("");
                 Reference<ValueKind> outPropValue = new Reference<>(null);
-                if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal())?outName.getVal():outNs.getVal()+"."+outName.getVal()))) {
+                if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, new ArrayList<Integer>());
                     nobj.setRegNumber(0);
                     obj = nobj;
-                }               
-            }    
+                }
+            }
             propIndex = prop.resolveProperty(localData);
         }
-                
-        if(propIndex!=-1){
-            if(obj == null){
+
+        if (propIndex != -1) {
+            if (obj == null) {
                 obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propIndex}, new byte[0]);
             }
             return toSourceMerge(localData, generator, obj, arguments,
-                    ins(new CallPropertyIns(),propIndex,arguments.size())
+                    ins(new CallPropertyIns(), propIndex, arguments.size())
             );
         }
-        
+
         throw new CompilationException("Not a callable", line);
     }
 
@@ -180,15 +179,14 @@ public class CallAVM2Item extends AVM2Item {
     @Override
     public GraphTargetItem returnType() {
         GraphTargetItem callable = name;
-        if(callable instanceof UnresolvedAVM2Item){
-            callable = ((UnresolvedAVM2Item)callable).resolved;
+        if (callable instanceof UnresolvedAVM2Item) {
+            callable = ((UnresolvedAVM2Item) callable).resolved;
         }
-        
-        if(callable instanceof TypeItem){
+
+        if (callable instanceof TypeItem) {
             return TypeItem.UNBOUNDED;
         }
-        
-        
+
         GraphTargetItem ti = callable.returnType();
         if (ti instanceof TypeFunctionItem) {
             TypeFunctionItem tfi = (TypeFunctionItem) ti;

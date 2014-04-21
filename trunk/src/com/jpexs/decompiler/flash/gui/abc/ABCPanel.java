@@ -135,12 +135,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     static final String ACTION_SAVE_DECOMPILED = "SAVEDECOMPILED";
     static final String ACTION_EDIT_DECOMPILED = "EDITDECOMPILED";
     static final String ACTION_CANCEL_DECOMPILED = "CANCELDECOMPILED";
-    
+
     public JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
     public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
     public JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
     public JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
-    
+
     static final String ACTION_ADD_TRAIT = "ADDTRAIT";
 
     public boolean search(String txt, boolean ignoreCase, boolean regexp) {
@@ -379,7 +379,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         iconDecPanel.add(scriptNameLabel);
         iconDecPanel.add(iconsPanel);
         iconDecPanel.add(decompiledScrollPane);
-        
+
         JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
         decButtonsPan.add(editDecompiledButton);
@@ -390,7 +390,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         editDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
         saveDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
         cancelDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
-        
+
         saveDecompiledButton.addActionListener(this);
         saveDecompiledButton.setActionCommand(ACTION_SAVE_DECOMPILED);
         editDecompiledButton.addActionListener(this);
@@ -401,7 +401,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         saveDecompiledButton.setVisible(false);
         cancelDecompiledButton.setVisible(false);
         decButtonsPan.setAlignmentX(0);
-                
 
         JPanel decPanel = new JPanel(new BorderLayout());
         decPanel.add(searchPanel, BorderLayout.NORTH);
@@ -422,7 +421,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
-                if(!directEditing){
+                if (!directEditing) {
                     Configuration.guiAvm2SplitPaneDividerLocation.set((int) pce.getNewValue());
                 }
             }
@@ -587,12 +586,11 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         searchPanel.showQuickFindDialog(decompiledTextArea);
     }
 
-    
     public String lastDecompiled = null;
     public boolean directEditing = false;
     private int detWidth = 0;
     private int detsp = 0;
-    
+
     public void setDecompiledEditMode(boolean val) {
         if (val) {
             lastDecompiled = decompiledTextArea.getText();
@@ -616,25 +614,25 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             cancelDecompiledButton.setVisible(false);
             decompiledTextArea.getCaret().setVisible(true);
             decLabel.setIcon(null);
-            directEditing = false;   
-            detailPanel.setVisible(true);            
+            directEditing = false;
+            detailPanel.setVisible(true);
             detailPanel.setSize(detailPanel.getHeight(), detWidth);
             splitPane.setDividerLocation(detsp);
         }
         decompiledTextArea.ignoreCarret = directEditing;
-        
+
         decompiledTextArea.requestFocusInWindow();
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case ACTION_EDIT_DECOMPILED:
                 File swc = Configuration.getPlayerSWC();
                 final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
-                if(swc == null){
-                    if(View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.needed").replace("%adobehomepage%",adobePage),AppStrings.translate("message.action.playerglobal.title"),JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE)==JOptionPane.OK_OPTION){
-                        
+                if (swc == null) {
+                    if (View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.needed").replace("%adobehomepage%", adobePage), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION) {
+
                         java.awt.Desktop desktop = null;
                         if (java.awt.Desktop.isDesktopSupported()) {
                             desktop = java.awt.Desktop.getDesktop();
@@ -648,18 +646,18 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                                 desktop = null;
                             }
                         }
-                        
+
                         int ret = 0;
-                        do{                            
-                            ret = View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.place").replace("%libpath%", Configuration.getFlashLibPath().getAbsolutePath()),AppStrings.translate("message.action.playerglobal.title"),JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);                                                        
+                        do {
+                            ret = View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.place").replace("%libpath%", Configuration.getFlashLibPath().getAbsolutePath()), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
                             swc = Configuration.getPlayerSWC();
-                        }while(ret == JOptionPane.OK_OPTION && swc == null);                        
+                        } while (ret == JOptionPane.OK_OPTION && swc == null);
                     }
                 }
-                if(swc!=null){
-                    if(View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE,Configuration.warningExperimentalAS3Edit,JOptionPane.OK_OPTION)==JOptionPane.OK_OPTION){                        
+                if (swc != null) {
+                    if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
                         setDecompiledEditMode(true);
-                    }                    
+                    }
                 }
                 break;
             case ACTION_CANCEL_DECOMPILED:
@@ -667,11 +665,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 break;
             case ACTION_SAVE_DECOMPILED:
                 ScriptPack pack = decompiledTextArea.getScriptLeaf();
-                String scriptName = pack.getPathScriptName()+".as";
+                String scriptName = pack.getPathScriptName() + ".as";
                 int oldIndex = pack.scriptIndex;
                 int newIndex = abc.script_info.size();
                 String documentClass = "";
-                loopt:for (Tag t : swf.tags) {
+                loopt:
+                for (Tag t : swf.tags) {
                     if (t instanceof SymbolClassTag) {
                         SymbolClassTag sc = (SymbolClassTag) t;
                         for (int i = 0; i < sc.tags.length; i++) {
@@ -683,29 +682,29 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     }
                 }
                 boolean isDocumentClass = documentClass.equals(pack.getPath().toString());
-                
-                try {                                        
-                    ActionScriptParser.compile(decompiledTextArea.getText(), abc,isDocumentClass, scriptName);                    
+
+                try {
+                    ActionScriptParser.compile(decompiledTextArea.getText(), abc, isDocumentClass, scriptName);
                     //Move newly added script to its position
                     abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
                     abc.script_info.remove(newIndex);
-                    ((Tag)abc.parentTag).setModified(true);
+                    ((Tag) abc.parentTag).setModified(true);
                     lastDecompiled = decompiledTextArea.getText();
                     decompiledTextArea.setClassIndex(-1);
                     View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
                     setDecompiledEditMode(false);
-                    reload();                    
+                    reload();
                 } catch (ParseException ex) {
                     //ex.printStackTrace();
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                    decompiledTextArea.gotoLine((int)ex.line);
+                    decompiledTextArea.gotoLine((int) ex.line);
                 } catch (CompilationException ex) {
                     //ex.printStackTrace();
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                    decompiledTextArea.gotoLine((int)ex.line);                    
-                } catch (IOException|InterruptedException ex) {
+                    decompiledTextArea.gotoLine((int) ex.line);
+                } catch (IOException | InterruptedException ex) {
                     //ignore                    
-                }                                
+                }
                 break;
             case ACTION_ADD_TRAIT:
                 int class_index = decompiledTextArea.getClassIndex();

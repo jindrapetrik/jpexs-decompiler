@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.SubtractIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;

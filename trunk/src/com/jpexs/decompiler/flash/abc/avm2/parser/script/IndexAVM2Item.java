@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -54,23 +53,21 @@ public class IndexAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem index;
     public boolean attr;
 
-    public IndexAVM2Item(boolean attr,GraphTargetItem object, GraphTargetItem index, GraphTargetItem storeValue,List<Integer> openedNamespaces) {        
+    public IndexAVM2Item(boolean attr, GraphTargetItem object, GraphTargetItem index, GraphTargetItem storeValue, List<Integer> openedNamespaces) {
         super(storeValue);
         this.object = object;
         this.index = index;
         this.openedNamespaces = openedNamespaces;
         this.attr = attr;
     }
-    
-    
-    private int allNsSet(ABC abc) {            
+
+    private int allNsSet(ABC abc) {
         int nssa[] = new int[openedNamespaces.size()];
         for (int i = 0; i < openedNamespaces.size(); i++) {
             nssa[i] = openedNamespaces.get(i);
         }
         return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
     }
-    
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
@@ -89,72 +86,66 @@ public class IndexAVM2Item extends AssignableAVM2Item {
 
     @Override
     public AssignableAVM2Item copy() {
-        return new IndexAVM2Item(attr,object,index,assignedValue,openedNamespaces);
+        return new IndexAVM2Item(attr, object, index, assignedValue, openedNamespaces);
     }
 
     @Override
     public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, boolean post, boolean decrement, boolean needsReturn) throws CompilationException {
-        Reference<Integer> obj_temp=new Reference<>(-1);
-        Reference<Integer> index_temp=new Reference<>(-1);
+        Reference<Integer> obj_temp = new Reference<>(-1);
+        Reference<Integer> index_temp = new Reference<>(-1);
         Reference<Integer> val_temp = new Reference<>(-1);
-        AVM2SourceGenerator g=(AVM2SourceGenerator)generator;
-        int indexPropIndex = g.abc.constants.getMultinameId(new Multiname(attr?Multiname.MULTINAMELA:Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true);
-        
-        return toSourceMerge(localData, generator, 
-                object,dupSetTemp(localData, generator, obj_temp),
-                index,dupSetTemp(localData, generator, index_temp),
-                ins(new GetPropertyIns(),indexPropIndex),
-                post?ins(new ConvertDIns()):null,
-                (!post)?(decrement?ins(new DecrementIns()):ins(new IncrementIns())):null,
-                needsReturn?ins(new DupIns()):null,
-                post?(decrement?ins(new DecrementIns()):ins(new IncrementIns())):null,
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        int indexPropIndex = g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.MULTINAMELA : Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true);
+
+        return toSourceMerge(localData, generator,
+                object, dupSetTemp(localData, generator, obj_temp),
+                index, dupSetTemp(localData, generator, index_temp),
+                ins(new GetPropertyIns(), indexPropIndex),
+                post ? ins(new ConvertDIns()) : null,
+                (!post) ? (decrement ? ins(new DecrementIns()) : ins(new IncrementIns())) : null,
+                needsReturn ? ins(new DupIns()) : null,
+                post ? (decrement ? ins(new DecrementIns()) : ins(new IncrementIns())) : null,
                 setTemp(localData, generator, val_temp),
                 getTemp(localData, generator, obj_temp),
                 getTemp(localData, generator, index_temp),
                 getTemp(localData, generator, val_temp),
-                ins(new SetPropertyIns(),indexPropIndex),
-                killTemp(localData, generator, Arrays.asList(val_temp,obj_temp,index_temp))
-                );
-        
+                ins(new SetPropertyIns(), indexPropIndex),
+                killTemp(localData, generator, Arrays.asList(val_temp, obj_temp, index_temp))
+        );
+
     }
-    
-    
+
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
-         AVM2SourceGenerator g = (AVM2SourceGenerator)generator;   
-        int indexPropIndex = g.abc.constants.getMultinameId(new Multiname(attr?Multiname.MULTINAMELA:Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true);
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        int indexPropIndex = g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.MULTINAMELA : Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true);
         Reference<Integer> ret_temp = new Reference<>(-1);
-        
-        if(assignedValue!=null){
+
+        if (assignedValue != null) {
             return toSourceMerge(localData, generator,
-                        object,       
-                        index,
-                        assignedValue,                         
-                        needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
-                        ins(new SetPropertyIns(), indexPropIndex),
-                        needsReturn ? getTemp(localData, generator, ret_temp) : null,
-                        killTemp(localData, generator, Arrays.asList(ret_temp)));
-        }else{
+                    object,
+                    index,
+                    assignedValue,
+                    needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
+                    ins(new SetPropertyIns(), indexPropIndex),
+                    needsReturn ? getTemp(localData, generator, ret_temp) : null,
+                    killTemp(localData, generator, Arrays.asList(ret_temp)));
+        } else {
             return toSourceMerge(localData, generator,
-                        object,       
-                        index,                     
-                        ins(new GetPropertyIns(), indexPropIndex));
+                    object,
+                    index,
+                    ins(new GetPropertyIns(), indexPropIndex));
         }
-        
+
     }
-    
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-       return toSource(localData, generator, true);
+        return toSource(localData, generator, true);
     }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false);
     }
-    
-    
-    
-    
-    
+
 }

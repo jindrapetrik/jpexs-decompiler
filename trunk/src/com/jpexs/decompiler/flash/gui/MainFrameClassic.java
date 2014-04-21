@@ -45,6 +45,16 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
         } catch (FlashUnsupportedException fue) {
         }
 
+        addWindowListener(new java.awt.event.WindowAdapter() {
+
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                if (panel != null) {
+                    panel.unloadFlashPlayer();
+                }
+            }
+        });
+
         boolean externalFlashPlayerUnavailable = flashPanel == null;
         mainMenu = new MainFrameClassicMenu(this, externalFlashPlayerUnavailable);
 

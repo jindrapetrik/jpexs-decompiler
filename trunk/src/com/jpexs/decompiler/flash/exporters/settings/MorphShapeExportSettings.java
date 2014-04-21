@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
 public class MorphShapeExportSettings {
 
     public MorphShapeExportMode mode;
-    
+
     public MorphShapeExportSettings(MorphShapeExportMode mode) {
         this.mode = mode;
     }

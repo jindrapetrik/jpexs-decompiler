@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 public class BinaryDataExportSettings {
 
     public BinaryDataExportMode mode;
-    
+
     public BinaryDataExportSettings(BinaryDataExportMode mode) {
         this.mode = mode;
     }

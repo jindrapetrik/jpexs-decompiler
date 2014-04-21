@@ -363,21 +363,20 @@ public class View {
         });
         return ret[0];
     }
-    
-    
+
     public static int showConfirmDialog(final Component parentComponent, String message, final String title, final int optionType, final int messageTyp, ConfigurationItem<Boolean> showAgainConfig, int defaultOption) {
-        
+
         JLabel warLabel = new JLabel(message);
         final JPanel warPanel = new JPanel(new BorderLayout());
-        warPanel.add(warLabel,BorderLayout.CENTER);
+        warPanel.add(warLabel, BorderLayout.CENTER);
         JCheckBox donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
         donotShowAgainCheckBox.setSelected(!showAgainConfig.get());
-        warPanel.add(donotShowAgainCheckBox,BorderLayout.SOUTH);
-        
-        if(donotShowAgainCheckBox.isSelected()){
+        warPanel.add(donotShowAgainCheckBox, BorderLayout.SOUTH);
+
+        if (donotShowAgainCheckBox.isSelected()) {
             return defaultOption;
         }
-        
+
         final int ret[] = new int[1];
         execInEventDispatch(new Runnable() {
             @Override

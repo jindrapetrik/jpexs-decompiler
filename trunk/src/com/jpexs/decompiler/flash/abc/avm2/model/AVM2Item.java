@@ -46,7 +46,7 @@ public abstract class AVM2Item extends GraphTargetItem {
     }
 
     protected GraphTextWriter formatProperty(GraphTextWriter writer, GraphTargetItem object, GraphTargetItem propertyName, LocalData localData) throws InterruptedException {
-        boolean empty = object instanceof FindPropertyAVM2Item;        
+        boolean empty = object instanceof FindPropertyAVM2Item;
         if (object instanceof LocalRegAVM2Item) {
             if (((LocalRegAVM2Item) object).computedValue != null) {
                 if (((LocalRegAVM2Item) object).computedValue.getThroughNotCompilable() instanceof FindPropertyAVM2Item) {
@@ -55,13 +55,13 @@ public abstract class AVM2Item extends GraphTargetItem {
             }
         }
 
-        if(object instanceof FindPropertyAVM2Item){
-            FindPropertyAVM2Item fp=(FindPropertyAVM2Item)object;
-            if(fp.propertyName instanceof FullMultinameAVM2Item){
+        if (object instanceof FindPropertyAVM2Item) {
+            FindPropertyAVM2Item fp = (FindPropertyAVM2Item) object;
+            if (fp.propertyName instanceof FullMultinameAVM2Item) {
                 propertyName = fp.propertyName;
             }
         }
-        
+
         if (!empty) {
             if (object.getPrecedence() > PRECEDENCE_PRIMARY) {
                 writer.append("(");
@@ -77,7 +77,7 @@ public abstract class AVM2Item extends GraphTargetItem {
             }
         }
 
-        if (empty) {                        
+        if (empty) {
             return propertyName.toString(writer, localData);
         }
         if (propertyName instanceof FullMultinameAVM2Item) {

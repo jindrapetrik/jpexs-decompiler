@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 public class SoundExportSettings {
 
     public SoundExportMode mode;
-    
+
     public SoundExportSettings(SoundExportMode mode) {
         this.mode = mode;
     }

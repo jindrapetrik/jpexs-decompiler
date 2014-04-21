@@ -43,8 +43,8 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
 
     public List<Integer> openedNamespaces;
 
-    public ConstructSomethingAVM2Item(int line,List<Integer> openedNamespaces, GraphTargetItem name, List<GraphTargetItem> arguments) {
-        super(line,name, arguments);
+    public ConstructSomethingAVM2Item(int line, List<Integer> openedNamespaces, GraphTargetItem name, List<GraphTargetItem> arguments) {
+        super(line, name, arguments);
         this.openedNamespaces = openedNamespaces;
     }
 

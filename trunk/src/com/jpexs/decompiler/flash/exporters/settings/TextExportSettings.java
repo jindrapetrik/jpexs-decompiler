@@ -26,7 +26,7 @@ public class TextExportSettings {
 
     public TextExportMode mode;
     public boolean singleFile;
-    
+
     public TextExportSettings(TextExportMode mode, boolean singleFile) {
         this.mode = mode;
         this.singleFile = singleFile;

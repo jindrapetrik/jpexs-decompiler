@@ -265,12 +265,11 @@ public class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as12edit")
     public static final ConfigurationItem<Boolean> warningExperimentalAS12Edit = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as3edit")
     public static final ConfigurationItem<Boolean> warningExperimentalAS3Edit = null;
-    
-    
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
@@ -629,7 +628,7 @@ public class Configuration {
 
     public static File getPlayerSWC() {
         File libsdir = getFlashLibPath();
-        if (libsdir!=null && libsdir.exists()) {
+        if (libsdir != null && libsdir.exists()) {
             File libs[] = libsdir.listFiles(new FilenameFilter() {
 
                 @Override

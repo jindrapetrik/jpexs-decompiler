@@ -67,7 +67,7 @@ public class AS3Generator {
                     s.append("\", ");
                     HilightedTextWriter src = new HilightedTextWriter(new CodeFormatting(), false);
                     MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
-                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info.get(classId).instance_traits, true);            
+                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info.get(classId).instance_traits, true);
                     b.toString("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, src, new ArrayList<String>(), abc.instance_info.get(classId).instance_traits);
                     String[] srcs = src.toString().split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {

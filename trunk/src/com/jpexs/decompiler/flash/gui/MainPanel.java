@@ -1282,25 +1282,25 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 }
 
                 final ScriptExportMode scriptMode = export.getValue(ScriptExportMode.class);
-                ret.addAll(new ImageExporter().exportImages(handler, selFile + File.separator + "images", images, 
+                ret.addAll(new ImageExporter().exportImages(handler, selFile + File.separator + "images", images,
                         new ImageExportSettings(export.getValue(ImageExportMode.class))));
-                ret.addAll(new ShapeExporter().exportShapes(handler, selFile + File.separator + "shapes", shapes, 
+                ret.addAll(new ShapeExporter().exportShapes(handler, selFile + File.separator + "shapes", shapes,
                         new ShapeExportSettings(export.getValue(ShapeExportMode.class))));
-                ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes, 
+                ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + "morphshapes", morphshapes,
                         new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class))));
-                ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + "texts", texts, 
+                ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + "texts", texts,
                         new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get())));
-                ret.addAll(new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", movies, 
+                ret.addAll(new MovieExporter().exportMovies(handler, selFile + File.separator + "movies", movies,
                         new MovieExportSettings(export.getValue(MovieExportMode.class))));
-                ret.addAll(new SoundExporter().exportSounds(handler, selFile + File.separator + "sounds", sounds, 
+                ret.addAll(new SoundExporter().exportSounds(handler, selFile + File.separator + "sounds", sounds,
                         new SoundExportSettings(export.getValue(SoundExportMode.class))));
-                ret.addAll(new BinaryDataExporter().exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData, 
+                ret.addAll(new BinaryDataExporter().exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData,
                         new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class))));
-                ret.addAll(new FontExporter().exportFonts(handler, selFile + File.separator + "fonts", fonts, 
+                ret.addAll(new FontExporter().exportFonts(handler, selFile + File.separator + "fonts", fonts,
                         new FontExportSettings(export.getValue(FontExportMode.class))));
 
                 for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
-                    ret.addAll(swf.exportFrames(handler, selFile + File.separator + "frames", entry.getKey(), entry.getValue(), 
+                    ret.addAll(swf.exportFrames(handler, selFile + File.separator + "frames", entry.getKey(), entry.getValue(),
                             new FramesExportSettings(export.getValue(FramesExportMode.class))));
                 }
                 List<ABCContainerTag> abcList = swf.abcList;
@@ -1656,7 +1656,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }.execute();
         }
     }
-    
+
     private Map<Integer, String[]> splitTextRecords(String texts) {
         String[] textsArr = texts.split(Helper.newLine + Configuration.textExportSingleFileSeparator.get() + Helper.newLine);
         String recordSeparator = Helper.newLine + Configuration.textExportSingleFileRecordSeparator.get() + Helper.newLine;
@@ -1817,27 +1817,27 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                             if (onlySel) {
                                 exportSelection(errorHandler, selFile, export);
                             } else {
-                                swf.exportImages(errorHandler, selFile + File.separator + "images", 
+                                swf.exportImages(errorHandler, selFile + File.separator + "images",
                                         new ImageExportSettings(export.getValue(ImageExportMode.class)));
-                                swf.exportShapes(errorHandler, selFile + File.separator + "shapes", 
+                                swf.exportShapes(errorHandler, selFile + File.separator + "shapes",
                                         new ShapeExportSettings(export.getValue(ShapeExportMode.class)));
-                                swf.exportMorphShapes(errorHandler, selFile + File.separator + "morphshapes", 
+                                swf.exportMorphShapes(errorHandler, selFile + File.separator + "morphshapes",
                                         new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class)));
-                                swf.exportTexts(errorHandler, selFile + File.separator + "texts", 
+                                swf.exportTexts(errorHandler, selFile + File.separator + "texts",
                                         new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get()));
-                                swf.exportMovies(errorHandler, selFile + File.separator + "movies", 
+                                swf.exportMovies(errorHandler, selFile + File.separator + "movies",
                                         new MovieExportSettings(export.getValue(MovieExportMode.class)));
-                                swf.exportSounds(errorHandler, selFile + File.separator + "sounds", 
+                                swf.exportSounds(errorHandler, selFile + File.separator + "sounds",
                                         new SoundExportSettings(export.getValue(SoundExportMode.class)));
-                                swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData", 
+                                swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData",
                                         new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class)));
-                                swf.exportFonts(errorHandler, selFile + File.separator + "fonts", 
+                                swf.exportFonts(errorHandler, selFile + File.separator + "fonts",
                                         new FontExportSettings(export.getValue(FontExportMode.class)));
-                                swf.exportFrames(errorHandler, selFile + File.separator + "frames", 0, null, 
+                                swf.exportFrames(errorHandler, selFile + File.separator + "frames", 0, null,
                                         new FramesExportSettings(export.getValue(FramesExportMode.class)));
                                 for (CharacterTag c : swf.characters.values()) {
                                     if (c instanceof DefineSpriteTag) {
-                                        swf.exportFrames(errorHandler, selFile + File.separator + "frames", c.getCharacterId(), null, 
+                                        swf.exportFrames(errorHandler, selFile + File.separator + "frames", c.getCharacterId(), null,
                                                 new FramesExportSettings(export.getValue(FramesExportMode.class)));
                                     }
                                 }
@@ -2321,6 +2321,16 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
         previewPanel.setEditText(false);
         reload(false);
+    }
+
+    public void unloadFlashPlayer() {
+        if (flashPanel != null) {
+            try {
+                flashPanel.close();
+            } catch (IOException ex) {
+                // ignore
+            }
+        }
     }
 
     private void stopFlashPlayer() {
