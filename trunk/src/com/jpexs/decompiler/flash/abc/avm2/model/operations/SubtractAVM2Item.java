@@ -18,12 +18,16 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.SubtractIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import static com.jpexs.decompiler.graph.GraphTargetItem.toSourceMerge;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -65,6 +69,14 @@ public class SubtractAVM2Item extends BinaryOpItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        if (rightSide instanceof IntegerValueAVM2Item) {
+            IntegerValueAVM2Item iv = (IntegerValueAVM2Item) rightSide;
+            if (iv.value == 1) {
+                return toSourceMerge(localData, generator, leftSide,
+                        new AVM2Instruction(0, new DecrementIns(), new int[]{}, new byte[0])
+                );
+            }
+        }
         return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, new SubtractIns(), new int[]{}, new byte[0])
         );
