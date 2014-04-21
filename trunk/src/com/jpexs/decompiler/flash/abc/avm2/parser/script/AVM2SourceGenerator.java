@@ -1230,9 +1230,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
             sinitBody.code.code.addAll(2, sinitcode); //after getlocal0,pushscope
         }
         sinitBody.markOffsets();
-        sinitBody.autoFillStats(abc, initScope);
+        sinitBody.autoFillStats(abc, initScope,true);       
         classInfo.cinit_index = staticMi;
-        initBody.autoFillStats(abc, initScope + 1);
+        initBody.autoFillStats(abc, initScope + 1,true);
 
         instanceInfo.interfaces = new int[implementsStr.size()];
         for (int i = 0; i < implementsStr.size(); i++) {
@@ -1555,7 +1555,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         for (int i = 0; i < paramValues.size(); i++) {
-            optional[i] = getValueKind(Namespace.KIND_NAMESPACE/*FIXME*/, paramTypes.get(paramTypes.size() - paramValues.size() + i), paramTypes.get(i));
+            optional[i] = getValueKind(Namespace.KIND_NAMESPACE/*FIXME*/, paramTypes.get(paramTypes.size() - paramValues.size() + i), paramValues.get(i));
+            if(optional[i] == null){
+                throw new CompilationException("Default value must be compiletime constant", line);
+            }
         }
 
         MethodInfo mi = new MethodInfo(param_types, constructor ? 0 : typeName(localData, retType), 0/*name_index*/, 0, optional, new int[0]/*no param_names*/);
@@ -1709,7 +1712,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         mbody.markOffsets();
-        mbody.autoFillStats(abc, initScope);
+        mbody.autoFillStats(abc, initScope,className!=null);
         abc.addMethodBody(mbody);
 
         return mbody.method_info;
@@ -2014,7 +2017,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         mb.code.code.add(ins(new ReturnVoidIns()));
-        mb.autoFillStats(abc, localData.documentClass ? 1 : 0);
+        mb.autoFillStats(abc, localData.documentClass ? 1 : 0,false);
         abc.addMethodBody(mb);
         si.init_index = mb.method_info;
         localData.pkg = pkg.packageName;

@@ -695,11 +695,11 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     setDecompiledEditMode(false);
                     reload();
                 } catch (ParseException ex) {
-                    //ex.printStackTrace();
+                    ex.printStackTrace();
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     decompiledTextArea.gotoLine((int) ex.line);
                 } catch (CompilationException ex) {
-                    //ex.printStackTrace();
+                    ex.printStackTrace();
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     decompiledTextArea.gotoLine((int) ex.line);
                 } catch (IOException | InterruptedException ex) {
