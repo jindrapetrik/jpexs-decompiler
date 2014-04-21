@@ -45,8 +45,9 @@ public class FunctionAVM2Item extends AVM2Item {
     public int line;
     public boolean hasRest;
     public boolean needsActivation;
+    public boolean isInterface;
 
-    public FunctionAVM2Item(boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+    public FunctionAVM2Item(boolean isInterface, boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
         super(null, NOPRECEDENCE);
         this.needsActivation = needsActivation;
         this.namespace = namespace;
@@ -59,6 +60,7 @@ public class FunctionAVM2Item extends AVM2Item {
         this.retType = retType;
         this.line = line;
         this.hasRest = hasRest;
+        this.isInterface = isInterface;
     }
 
     @Override

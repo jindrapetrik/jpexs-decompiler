@@ -400,12 +400,12 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private MethodAVM2Item method(String customAccess, Reference<Boolean> needsActivation, List<String> importedClasses, boolean override, boolean isFinal, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean isStatic, int namespace, boolean withBody, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
-        FunctionAVM2Item f = function(needsActivation, importedClasses, namespace, thisType, openedNamespaces, withBody, functionName, isMethod, variables);
-        return new MethodAVM2Item(customAccess, f.needsActivation, f.hasRest, f.line, override, isFinal, isStatic, f.namespace, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
+    private MethodAVM2Item method(boolean isInterface, String customAccess, Reference<Boolean> needsActivation, List<String> importedClasses, boolean override, boolean isFinal, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean isStatic, int namespace, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
+        FunctionAVM2Item f = function(isInterface, needsActivation, importedClasses, namespace, thisType, openedNamespaces, functionName, isMethod, variables);
+        return new MethodAVM2Item(f.isInterface, customAccess, f.needsActivation, f.hasRest, f.line, override, isFinal, isStatic, f.namespace, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
     }
 
-    private FunctionAVM2Item function(Reference<Boolean> needsActivation, List<String> importedClasses, int namespace, GraphTargetItem thisType, List<Integer> openedNamespaces, boolean withBody, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
+    private FunctionAVM2Item function(boolean isInterface, Reference<Boolean> needsActivation, List<String> importedClasses, int namespace, GraphTargetItem thisType, List<Integer> openedNamespaces, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, ParseException {
         openedNamespaces = new ArrayList<>(openedNamespaces); //local copy
         int line = lexer.yyline();
         ParsedSymbol s;
@@ -469,16 +469,18 @@ public class ActionScriptParser {
         subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), "arguments", null, true, openedNamespaces));
         int parCnt = subvariables.size();
         Reference<Boolean> needsActivation2 = new Reference<>(false);
-        if (withBody) {
+        if (!isInterface) {
             expectedType(SymbolType.CURLY_OPEN);
             body = commands(needsActivation2, importedClasses, openedNamespaces, new Stack<Loop>(), new HashMap<Loop, String>(), new HashMap<String, Integer>(), true, isMethod, 0, subvariables);
             expectedType(SymbolType.CURLY_CLOSE);
+        } else {
+            expectedType(SymbolType.SEMICOLON);
         }
 
         for (int i = 0; i < parCnt; i++) {
             subvariables.remove(0);
         }
-        return new FunctionAVM2Item(needsActivation2.getVal(), namespace, hasRest, line, functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+        return new FunctionAVM2Item(isInterface, needsActivation2.getVal(), namespace, hasRest, line, functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }
 
     private GraphTargetItem traits(List<AssignableAVM2Item> sinitVariables, Reference<Boolean> sinitNeedsActivation, List<GraphTargetItem> staticInitializer, List<String> importedClasses, int privateNs, int protectedNs, int publicNs, int packageInternalNs, int protectedStaticNs, List<Integer> openedNamespaces, String packageName, String classNameStr, boolean isInterface, List<GraphTargetItem> traits) throws ParseException, IOException, CompilationException {
@@ -503,15 +505,13 @@ public class ActionScriptParser {
                 expectedType(SymbolType.CURLY_CLOSE);
                 s = lex();
             }
-
-            //TODO: final, dynamic
             while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.IDENTIFIER)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new ParseException("Only one final keyword allowed", lexer.yyline());
                     }
                     isFinal = true;
-                } else if (s.type == SymbolType.DYNAMIC) {
+                } else if (s.type == SymbolType.DYNAMIC) {                    
                     if (isDynamic) {
                         throw new ParseException("Only one dynamic keyword allowed", lexer.yyline());
                     }
@@ -543,18 +543,31 @@ public class ActionScriptParser {
                 switch (s.type) {
                     case PUBLIC:
                         namespace = publicNs;
+                        if (isInterface) {
+                            throw new ParseException("Interface cannot have public, private or protected modifier", lexer.yyline());
+                        }
                         break;
                     case PRIVATE:
                         namespace = privateNs;
+                        if (isInterface) {
+                            throw new ParseException("Interface cannot have public, private or protected modifier", lexer.yyline());
+                        }
                         break;
                     case PROTECTED:
                         namespace = protectedNs;
+                        if (isInterface) {
+                            throw new ParseException("Interface cannot have public, private or protected modifier", lexer.yyline());
+                        }
                         break;
                 }
                 s = lex();
             }
             if (namespace == -1) {
-                namespace = packageInternalNs;
+                if (isInterface) {
+                    namespace = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_NAMESPACE, abc.constants.getStringId(packageName.equals("") ? classNameStr : packageName + "." + classNameStr, true)), 0, true);
+                } else {
+                    namespace = packageInternalNs;
+                }
             }
             if (namespace == protectedNs && isStatic) {
                 namespace = protectedStaticNs;
@@ -663,29 +676,35 @@ public class ActionScriptParser {
                         if (isFinal) {
                             throw new ParseException("Final flag not allowed for constructor", lexer.yyline());
                         }
-                        constr = (method(customAccess, new Reference<Boolean>(false), importedClasses, false, false, thisType, openedNamespaces, false, namespace, !isInterface, "", true, constrVariables));
+                        if (isInterface) {
+                            throw new ParseException("Interface cannot have constructor", lexer.yyline());
+                        }
+                        constr = (method(false, customAccess, new Reference<Boolean>(false), importedClasses, false, false, thisType, openedNamespaces, false, namespace, "", true, constrVariables));
                     } else {
                         if (isStatic) {
+                            if (isInterface) {
+                                throw new ParseException("Interface cannot have static fields", lexer.yyline());
+                            }
                             GraphTargetItem t;
-                            MethodAVM2Item ft = method(customAccess, new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, !isInterface, fname, true, new ArrayList<AssignableAVM2Item>());
+                            MethodAVM2Item ft = method(false, customAccess, new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, fname, true, new ArrayList<AssignableAVM2Item>());
                             traits.add(ft);
                             if (isGetter || isSetter) {
                                 throw new ParseException("Getter or Setter cannot be static", lexer.yyline());
                             }
                         } else {
-                            MethodAVM2Item ft = method(customAccess, new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, !isInterface, fname, true, new ArrayList<AssignableAVM2Item>());
+                            MethodAVM2Item ft = method(isInterface, customAccess, new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, fname, true, new ArrayList<AssignableAVM2Item>());
                             GraphTargetItem t;
                             if (isGetter) {
                                 if (!ft.paramTypes.isEmpty()) {
                                     throw new ParseException("Getter can't have any parameters", lexer.yyline());
                                 }
-                                GetterAVM2Item g = new GetterAVM2Item(customAccess, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                GetterAVM2Item g = new GetterAVM2Item(isInterface, customAccess, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = g;
                             } else if (isSetter) {
                                 if (ft.paramTypes.size() != 1) {
                                     throw new ParseException("Getter must have exactly one parameter", lexer.yyline());
                                 }
-                                SetterAVM2Item st = new SetterAVM2Item(customAccess, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                SetterAVM2Item st = new SetterAVM2Item(isInterface, customAccess, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = st;
                             } else {
                                 t = ft;
@@ -697,6 +716,9 @@ public class ActionScriptParser {
                     //}
                     break;
                 case NAMESPACE:
+                    if (isInterface) {
+                        throw new ParseException("Interface cannot have namespace fields", lexer.yyline());
+                    }
                     s = lex();
                     expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
                     String nname = s.value.toString();
@@ -729,6 +751,9 @@ public class ActionScriptParser {
                     }
                     if (isDynamic) {
                         throw new ParseException("Dynamic flag not allowed for " + (isConst ? "consts" : "vars"), lexer.yyline());
+                    }
+                    if (isInterface) {
+                        throw new ParseException("Interface cannot have variable/const fields", lexer.yyline());
                     }
 
                     s = lex();
@@ -789,15 +814,17 @@ public class ActionScriptParser {
         openedNamespaces.add(protectedNs = abc.constants.addNamespace(new Namespace(Namespace.KIND_PROTECTED, abc.constants.getStringId(packageName.isEmpty() ? classNameStr : packageName + ":" + classNameStr, true))));
         openedNamespaces.add(protectedStaticNs = abc.constants.addNamespace(new Namespace(Namespace.KIND_STATIC_PROTECTED, abc.constants.getStringId(packageName.isEmpty() ? classNameStr : packageName + ":" + classNameStr, true))));
 
-        List<Integer> indices = new ArrayList<>();
-        List<String> names = new ArrayList<>();
-        List<String> namespaces = new ArrayList<>();
-        AVM2SourceGenerator.parentNamesAddNames(abc, otherABCs, AVM2SourceGenerator.resolveType(((TypeItem) ((UnresolvedAVM2Item) extendsStr).resolve(null, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), new ArrayList<AssignableAVM2Item>())), abc), indices, names, namespaces);
-        for (int i = 0; i < names.size(); i++) {
-            if (namespaces.get(i).isEmpty()) {
-                continue;
+        if (extendsStr != null) {
+            List<Integer> indices = new ArrayList<>();
+            List<String> names = new ArrayList<>();
+            List<String> namespaces = new ArrayList<>();
+            AVM2SourceGenerator.parentNamesAddNames(abc, otherABCs, AVM2SourceGenerator.resolveType(((TypeItem) ((UnresolvedAVM2Item) extendsStr).resolve(null, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), new ArrayList<AssignableAVM2Item>())), abc), indices, names, namespaces);
+            for (int i = 0; i < names.size(); i++) {
+                if (namespaces.get(i).isEmpty()) {
+                    continue;
+                }
+                openedNamespaces.add(abc.constants.getNamespaceId(new Namespace(Namespace.KIND_STATIC_PROTECTED, abc.constants.getStringId(namespaces.get(i) + ":" + names.get(i), true)), 0, true));
             }
-            openedNamespaces.add(abc.constants.getNamespaceId(new Namespace(Namespace.KIND_STATIC_PROTECTED, abc.constants.getStringId(namespaces.get(i) + ":" + names.get(i), true)), 0, true));
         }
 
         Reference<Boolean> staticNeedsActivation = new Reference<>(false);
@@ -1135,7 +1162,7 @@ public class ActionScriptParser {
                     s = lexer.lex();
                     expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
                     needsActivation.setVal(true);
-                    ret = (function(needsActivation, importedClasses, 0/*?*/, TypeItem.UNBOUNDED, openedNamespaces, true, s.value.toString(), false, variables));
+                    ret = (function(false, needsActivation, importedClasses, 0/*?*/, TypeItem.UNBOUNDED, openedNamespaces, s.value.toString(), false, variables));
                     break;
                 case VAR:
                     s = lex();
@@ -1958,7 +1985,7 @@ public class ActionScriptParser {
                     lexer.pushback(s);
                 }
                 needsActivation.setVal(true);
-                ret = function(needsActivation, importedClasses, 0/*?*/, TypeItem.UNBOUNDED, openedNamespaces, true, fname, false, variables);
+                ret = function(false, needsActivation, importedClasses, 0/*?*/, TypeItem.UNBOUNDED, openedNamespaces, fname, false, variables);
                 break;
             case NAN:
                 ret = new NanAVM2Item(null);
