@@ -34,8 +34,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertBIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertUIns;
 import static com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item.ins;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
@@ -64,7 +66,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
     private String variableName;
 
     private boolean definition;
-    private GraphTargetItem index;
     private int nsKind = -1;
     public List<Integer> openedNamespaces;
     public int line;
@@ -84,7 +85,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
         c.regNumber = regNumber;
         c.unresolved = unresolved;
         c.nsKind = nsKind;
-        c.setIndex(index);
         return c;
     }
 
@@ -128,13 +128,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
         this.definition = definition;
     }
 
-    public void setIndex(GraphTargetItem index) {
-        this.index = index;
-    }
-
-    public GraphTargetItem getIndex() {
-        return index;
-    }
 
     public void setNsKind(int nsKind) {
         this.nsKind = nsKind;
@@ -213,6 +206,12 @@ public class NameAVM2Item extends AssignableAVM2Item {
                     case "String":
                         ins = ins(new CoerceSIns());
                         break;
+                    case "Boolean":
+                        ins = ins(new ConvertBIns());
+                        break;
+                    case "uint":
+                        ins = ins(new ConvertUIns());
+                        break;
                     default:
                         int type_index = AVM2SourceGenerator.resolveType(type, ((AVM2SourceGenerator) generator).abc);
                         ins = ins(new CoerceIns(), type_index);
@@ -243,24 +242,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         Reference<Integer> ns_temp = new Reference<>(-1);
         Reference<Integer> index_temp = new Reference<>(-1);
         Reference<Integer> ret_temp = new Reference<>(-1);
-
-        if (index != null) {
-            if (assignedValue != null) {
-                return toSourceMerge(localData, generator,
-                        generateGetLoc(regNumber), generateGetSlot(slotScope, slotNumber), index, assignedValue,
-                        needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
-                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
-                        needsReturn ? getTemp(localData, generator, ret_temp) : null,
-                        killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
-                );
-            } else {
-                return toSourceMerge(localData, generator,
-                        generateGetLoc(regNumber), index,
-                        ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
-                        needsReturn ? null : ins(new PopIns())
-                );
-            }
-        }
+        
 
         if (assignedValue != null) {
             List<String> basicTypes = Arrays.asList("int", "Number");
@@ -324,9 +306,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        if (index != null) {
-            return TypeItem.UNBOUNDED;
-        }
         if (type == null) {
             return TypeItem.UNBOUNDED;
         }
@@ -348,27 +327,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
         
                 
          */
-
-        if (index != null) {
-            return toSourceMerge(localData, generator,
-                    generateGetLoc(regNumber), generateGetSlot(slotScope, slotNumber), dupSetTemp(localData, generator, name_temp), index, dupSetTemp(localData, generator, index_temp),
-                    //Start get original
-                    //generateGetLoc(regNumber), getTemp(localData, generator, index_temp),
-                    ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
-                    (!isInteger && post) ? ins(new ConvertDIns()) : null,
-                    //End get original
-                    (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
-                    needsReturn ? ins(new DupIns()) : null,
-                    (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
-                    setTemp(localData, generator, ret_temp),
-                    getTemp(localData, generator, name_temp),
-                    getTemp(localData, generator, index_temp),
-                    getTemp(localData, generator, ret_temp),
-                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
-                    killTemp(localData, generator, Arrays.asList(ret_temp, name_temp, index_temp))
-            );
-        }
-
         if (!needsReturn) {
             if (slotNumber > -1) {
                 return toSourceMerge(localData, generator,

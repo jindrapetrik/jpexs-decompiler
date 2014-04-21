@@ -21,6 +21,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertBIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertUIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
@@ -41,13 +45,13 @@ public class CoerceAVM2Item extends AVM2Item {
     public GraphTargetItem typeObj;
 
     public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, String type) {
-        super(instruction, NOPRECEDENCE);
+        super(instruction, value.getPrecedence());
         this.value = value;
         this.type = type;
     }
 
     public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem typeObj) {
-        super(instruction, NOPRECEDENCE);
+        super(instruction, value.getPrecedence());
         this.value = value;
         this.typeObj = typeObj;
     }
@@ -114,6 +118,18 @@ public class CoerceAVM2Item extends AVM2Item {
                 break;
             case "String":
                 ins = new AVM2Instruction(0, new CoerceSIns(), new int[]{}, new byte[0]);
+                break;
+            case "Boolean":
+                ins = new AVM2Instruction(0, new ConvertBIns(), new int[]{}, new byte[0]);
+                break;
+            case "int":
+                ins = new AVM2Instruction(0, new ConvertIIns(), new int[]{}, new byte[0]);
+                break;
+            case "uint":
+                ins = new AVM2Instruction(0, new ConvertUIns(), new int[]{}, new byte[0]);
+                break;
+            case "Number":
+                ins = new AVM2Instruction(0, new ConvertDIns(), new int[]{}, new byte[0]);
                 break;
             default:
                 int type_index = AVM2SourceGenerator.resolveType(new TypeItem(type), (((AVM2SourceGenerator) generator).abc));

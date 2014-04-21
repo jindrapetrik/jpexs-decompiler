@@ -64,6 +64,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushWithIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.SwapIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertBIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.CheckFilterIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
@@ -166,12 +167,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
+        if(!(""+item.leftSide.returnType()).equals("Boolean")){
+            ret.add(ins(new ConvertBIns()));
+        }
         ret.add(ins(new DupIns()));
-        ret.add(ins(new NotIns()));
         List<AVM2Instruction> andExpr = generateToActionList(localData, item.rightSide);
         andExpr.add(0, ins(new PopIns()));
         int andExprLen = insToBytes(andExpr).length;
-        ret.add(ins(new IfTrueIns(), andExprLen));
+        ret.add(ins(new IfFalseIns(), andExprLen));
         ret.addAll(andExpr);
         return ret;
 
@@ -196,6 +199,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
+        if(!(""+item.leftSide.returnType()).equals("Boolean")){
+            ret.add(ins(new ConvertBIns()));
+        }
         ret.add(ins(new DupIns()));
         List<AVM2Instruction> orExpr = generateToActionList(localData, item.rightSide);
         orExpr.add(0, ins(new PopIns()));
