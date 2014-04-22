@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -41,14 +42,13 @@ import javax.xml.bind.DatatypeConverter;
 
 /**
  *
- * @author JPEXS, Claus Wahlers
+ * @author JPEXS
  */
 public class CanvasShapeExporter extends ShapeExporterBase {
 
-
     protected String pathData = "";
     protected String shapeData = "";
-    protected String html = "";    
+    protected String html = "";
     protected String strokeData = "";
     protected String fillData = "";
     protected double deltaX = 0;
@@ -56,14 +56,12 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected Matrix fillMatrix = null;
     protected String lastRadColor = null;
     protected SWF swf;
+    protected int repeatCnt = 0;
 
     public String getHtml() {
         return html;
     }
 
-    
-    
-    
     public CanvasShapeExporter(SWF swf, SHAPE shape, ColorTransform colorTransform) {
         super(shape, colorTransform);
         deltaX = -shape.getBounds().Xmin;
@@ -79,24 +77,24 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     @Override
     public void endShape() {
         RECT r = shape.getBounds();
-        int width = (int)roundPixels20(r.getWidth() / SWF.unitDivisor);
-        int height = (int)roundPixels20(r.getHeight() / SWF.unitDivisor);
-        html = "<!DOCTYPE html>\r\n" +
-                "<html>\r\n" +
-                "<body>\r\n" +
-                "\r\n" +
-                "<canvas id=\"myCanvas\" width=\""+width+"\" height=\""+height+"\" style=\"border:1px solid #c3c3c3;\">\r\n" +
-                "Your browser does not support the HTML5 canvas tag.\r\n" +
-                "</canvas>\r\n" +
-                "\r\n" +
-                "<script>\r\n" +
-                "\r\n" +
-                "var c=document.getElementById(\"myCanvas\");\r\n" +
-                "var ctx=c.getContext(\"2d\");\r\n"+
-                shapeData+"\r\n"+
-                "</script>\r\n"+
-                "</body>\r\n"+
-                "</html>";
+        int width = (int) roundPixels20(r.getWidth() / SWF.unitDivisor);
+        int height = (int) roundPixels20(r.getHeight() / SWF.unitDivisor);
+        html = "<!DOCTYPE html>\r\n"
+                + "<html>\r\n"
+                + "<body>\r\n"
+                + "\r\n"
+                + "<canvas id=\"myCanvas\" width=\"" + width + "\" height=\"" + height + "\" style=\"border:1px solid #c3c3c3;\">\r\n"
+                + "Your browser does not support the HTML5 canvas tag.\r\n"
+                + "</canvas>\r\n"
+                + "\r\n"
+                + "<script>\r\n"
+                + "\r\n"
+                + "var c=document.getElementById(\"myCanvas\");\r\n"
+                + "var ctx=c.getContext(\"2d\");\r\n"
+                + shapeData + "\r\n"
+                + "</script>\r\n"
+                + "</body>\r\n"
+                + "</html>";
     }
 
     @Override
@@ -119,25 +117,27 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     @Override
     public void beginFill(RGB color) {
         finalizePath();
-        fillData += "ctx.fillStyle=\""+color(color)+"\";\r\n";
+        fillData += "ctx.fillStyle=\"" + color(color) + "\";\r\n";
     }
 
     @Override
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         finalizePath();
-        
-        
-        //TODO: repeating (spread mode)
-            
-        if(type == FILLSTYLE.LINEAR_GRADIENT){
-            Point start = matrix.transform(new Point(-16384, 0));
-            Point end = matrix.transform(new Point(16384, 0));
+
+        //TODO: How many repeats is ideal?        
+        final int REPEAT_CNT = 5;
+
+        repeatCnt = spreadMethod == GRADIENT.SPREAD_PAD_MODE ? 0 : REPEAT_CNT;
+
+        if (type == FILLSTYLE.LINEAR_GRADIENT) {
+            Point start = matrix.transform(new Point(-16384 - 32768 * repeatCnt, 0));
+            Point end = matrix.transform(new Point(16384 + 32768 * repeatCnt, 0));
             start.x += deltaX;
             start.y += deltaY;
             end.x += deltaX;
             end.y += deltaY;
-            fillData+="var grd=ctx.createLinearGradient("+Double.toString(start.x/SWF.unitDivisor)+","+Double.toString(start.y/SWF.unitDivisor)+","+Double.toString(end.x/SWF.unitDivisor)+","+Double.toString(end.y/SWF.unitDivisor)+");\r\n";            
-        }else{                        
+            fillData += "var grd=ctx.createLinearGradient(" + Double.toString(start.x / SWF.unitDivisor) + "," + Double.toString(start.y / SWF.unitDivisor) + "," + Double.toString(end.x / SWF.unitDivisor) + "," + Double.toString(end.y / SWF.unitDivisor) + ");\r\n";
+        } else {
             matrix.translateX /= SWF.unitDivisor;
             matrix.translateY /= SWF.unitDivisor;
             matrix.scaleX /= SWF.unitDivisor;
@@ -145,29 +145,42 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             matrix.rotateSkew0 /= SWF.unitDivisor;
             matrix.rotateSkew1 /= SWF.unitDivisor;
             fillMatrix = matrix;
-            
-            matrix.translateX += deltaX/SWF.unitDivisor;
-            matrix.translateY += deltaY/SWF.unitDivisor;
-            
-            fillData+="var grd=ctx.createRadialGradient(0,0,0,0,0,16384);\r\n";
+
+            matrix.translateX += deltaX / SWF.unitDivisor;
+            matrix.translateY += deltaY / SWF.unitDivisor;
+
+            fillData += "var grd=ctx.createRadialGradient(0,0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
         }
-        for(GRADRECORD r:gradientRecords){
-            fillData+="grd.addColorStop("+Double.toString(r.ratio / 255.0)+",\""+color(r.color)+"\");\r\n";
-            lastRadColor = color(r.color);
+        int repeatTotal = repeatCnt * 2 + 1;
+        double oneHeight = 1.0 / repeatTotal;
+        double pos = 0;
+        boolean revert = false;
+        if (type != FILLSTYLE.LINEAR_GRADIENT && spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
+            revert = true;
         }
-        fillData+="ctx.fillStyle = grd;\r\n";
+        for (int i = 0; i < repeatTotal; i++) {
+            if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
+                revert = !revert;
+            }
+            for (GRADRECORD r : gradientRecords) {
+                fillData += "grd.addColorStop(" + Double.toString(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0)) + ",\"" + color(r.color) + "\");\r\n";
+                lastRadColor = color(r.color);
+            }
+            pos += oneHeight;
+        }
+        fillData += "ctx.fillStyle = grd;\r\n";
     }
 
-    private String color(RGB rgb){
-        if(rgb instanceof RGBA){
-            RGBA rgba = (RGBA)rgb;
-            return "rgba("+rgba.red+","+rgba.green+","+rgba.blue+","+rgba.getAlphaFloat()+")";
-        }else{
+    private String color(RGB rgb) {
+        if (rgb instanceof RGBA) {
+            RGBA rgba = (RGBA) rgb;
+            return "rgba(" + rgba.red + "," + rgba.green + "," + rgba.blue + "," + rgba.getAlphaFloat() + ")";
+        } else {
             return rgb.toHexRGB();
         }
-        
+
     }
-    
+
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
@@ -207,10 +220,10 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                     matrix.rotateSkew0 /= SWF.unitDivisor;
                     matrix.rotateSkew1 /= SWF.unitDivisor;
                     fillMatrix = matrix;
-                   
+
                 }
-                
-                fillData += "var img = document.createElement(\"img\"); img.src=\"data:image/" + format + ";base64," + base64ImgData+"\";\r\n";
+
+                fillData += "var img = document.createElement(\"img\"); img.src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n";
                 fillData += "var pat=ctx.createPattern(img,\"repeat\");\r\n";
                 fillData += "ctx.fillStyle = pat;\r\n";
             }
@@ -226,9 +239,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
         thickness /= SWF.unitDivisor;
-        
-        strokeData += "ctx.strokeStyle=\""+color(color)+"\";\r\n";
-        strokeData += "ctx.lineWidth="+Double.toString(thickness == 0 ? 1 : thickness)+";\r\n";
+
+        strokeData += "ctx.strokeStyle=\"" + color(color) + "\";\r\n";
+        strokeData += "ctx.lineWidth=" + Double.toString(thickness == 0 ? 1 : thickness) + ";\r\n";
         switch (startCaps) {
             case LINESTYLE2.NO_CAP:
                 strokeData += "ctx.lineCap=\"butt\";\r\n";
@@ -249,7 +262,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 break;
             default:
                 strokeData += "ctx.lineJoin=\"miter\";\r\n";
-                strokeData += "ctx.miterLimit=" + Integer.toString(miterLimit)+";\r\n";
+                strokeData += "ctx.miterLimit=" + Integer.toString(miterLimit) + ";\r\n";
                 break;
         }
     }
@@ -282,37 +295,38 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         anchorX += deltaX;
         controlY += deltaY;
         anchorY += deltaY;
-        pathData += "ctx.quadraticCurveTo("+roundPixels20(controlX / SWF.unitDivisor) + ","
+        pathData += "ctx.quadraticCurveTo(" + roundPixels20(controlX / SWF.unitDivisor) + ","
                 + roundPixels20(controlY / SWF.unitDivisor) + ","
                 + roundPixels20(anchorX / SWF.unitDivisor) + ","
                 + roundPixels20(anchorY / SWF.unitDivisor) + ");\r\n";
     }
 
     protected void finalizePath() {
-        if(!"".equals(pathData)){
-            pathData = "ctx.setTransform(1,0,0,1,0,0);\r\nctx.beginPath();\r\n"+pathData+"ctx.closePath();\r\n"+strokeData;            
-            if(!"".equals(strokeData)){
+        if (!"".equals(pathData)) {
+            pathData = "ctx.setTransform(1,0,0,1,0,0);\r\nctx.beginPath();\r\n" + pathData + "ctx.closePath();\r\n" + strokeData;
+            if (!"".equals(strokeData)) {
                 pathData += "ctx.stroke();\r\n";
-            }                        
-            if(fillMatrix!=null){
-                if(lastRadColor!=null){
-                    pathData+="ctx.fillStyle=\""+lastRadColor+"\";\r\n ctx.fill(\"evenodd\");\r\n";
+            }
+            if (fillMatrix != null) {
+                if (lastRadColor != null) {
+                    pathData += "ctx.fillStyle=\"" + lastRadColor + "\";\r\n ctx.fill(\"evenodd\");\r\n";
                 }
                 pathData += "ctx.save();\r\n";
                 pathData += "ctx.clip();\r\n";
-                pathData += "ctx.setTransform("+fillMatrix.scaleX+","+fillMatrix.rotateSkew0+","+fillMatrix.rotateSkew1+","+fillMatrix.scaleY+","+fillMatrix.translateX+","+fillMatrix.translateY+");\r\n";
-                pathData += fillData;                    
-                pathData += "ctx.fillRect(-16384,-16384,2*16384,2*16384);\r\n";
+                pathData += "ctx.setTransform(" + fillMatrix.scaleX + "," + fillMatrix.rotateSkew0 + "," + fillMatrix.rotateSkew1 + "," + fillMatrix.scaleY + "," + fillMatrix.translateX + "," + fillMatrix.translateY + ");\r\n";
+                pathData += fillData;
+                pathData += "ctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
                 pathData += "ctx.restore();\r\n";
                 shapeData += pathData;
-            }else{           
-                if(!"".equals(fillData)){                
+            } else {
+                if (!"".equals(fillData)) {
                     pathData += "ctx.fill(\"evenodd\");\r\n";
                 }
-                shapeData += fillData+pathData;
-            }             
+                shapeData += fillData + pathData;
+            }
         }
-        
+
+        repeatCnt = 0;
         pathData = "";
         fillData = "";
         strokeData = "";
