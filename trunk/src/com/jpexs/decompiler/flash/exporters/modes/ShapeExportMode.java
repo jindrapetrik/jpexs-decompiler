@@ -23,5 +23,6 @@ package com.jpexs.decompiler.flash.exporters.modes;
 public enum ShapeExportMode {
 
     SVG,
-    PNG
+    PNG,
+    CANVAS
 }

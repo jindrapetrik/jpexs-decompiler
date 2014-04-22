@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporterContext;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
+import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -68,6 +69,9 @@ public class ShapeExporter {
                 if (settings.mode == ShapeExportMode.PNG) {
                     ext = "png";
                 }
+                if (settings.mode == ShapeExportMode.CANVAS) {
+                    ext = "html";
+                }
 
                 final File file = new File(outdir + File.separator + characterID + "." + ext);
                 final int fcharacterID = characterID;
@@ -91,6 +95,13 @@ public class ShapeExporter {
                                 m.translate(-rect.Xmin, -rect.Ymin);
                                 st.toImage(0, 0, 0, null, 0, img, m, new CXFORMWITHALPHA());
                                 ImageIO.write(img.getBufferedImage(), "PNG", new FileOutputStream(file));
+                                break;
+                            case CANVAS:
+                                try (FileOutputStream fos = new FileOutputStream(file)) {
+                                    CanvasShapeExporter cse = new CanvasShapeExporter(((Tag)st).getSwf(),st.getShapes(), new CXFORMWITHALPHA());
+                                    cse.export();                                                                        
+                                    fos.write(Utf8Helper.getBytes(cse.getHtml()));
+                                }
                                 break;
                         }
 
