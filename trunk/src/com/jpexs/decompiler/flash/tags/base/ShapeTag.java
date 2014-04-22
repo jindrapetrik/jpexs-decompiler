@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
+import java.io.IOException;
 
 /**
  *
@@ -54,7 +55,7 @@ public abstract class ShapeTag extends CharacterTag implements BoundedTag, Drawa
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
+    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) throws IOException{
         ExportRectangle rect = new ExportRectangle(getRect());
         SVGExporter svgExporter = new SVGExporter(rect, colorTransform);
         SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(), svgExporter, null, colorTransform);

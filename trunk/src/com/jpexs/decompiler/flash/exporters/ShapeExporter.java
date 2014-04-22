@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.File;
@@ -98,7 +99,10 @@ public class ShapeExporter {
                                 break;
                             case CANVAS:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    CanvasShapeExporter cse = new CanvasShapeExporter(((Tag)st).getSwf(),st.getShapes(), new CXFORMWITHALPHA());
+                                    SHAPE shp = st.getShapes();
+                                    int deltaX = -shp.getBounds().Xmin;
+                                    int deltaY = -shp.getBounds().Ymin;
+                                    CanvasShapeExporter cse = new CanvasShapeExporter(SWF.unitDivisor,((Tag)st).getSwf(),shp, new CXFORMWITHALPHA(),deltaX,deltaY);
                                     cse.export();                                                                        
                                     fos.write(Utf8Helper.getBytes(cse.getHtml()));
                                 }

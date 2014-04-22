@@ -57,16 +57,51 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected String lastRadColor = null;
     protected SWF swf;
     protected int repeatCnt = 0;
+    protected double unitDivisor;
 
+    
+    public static String getJsPrefix(){
+         return "var c=document.getElementById(\"myCanvas\");\r\n"
+                + "var ctx=c.getContext(\"2d\");\r\n";
+    }
+    
+    public static String getHtmlPrefix(int width,int height) {
+        return "<!DOCTYPE html>\r\n"
+                + "<html>\r\n"
+                + "<body>\r\n"
+                + "\r\n"
+                + "<canvas id=\"myCanvas\" width=\"" + width + "\" height=\"" + height + "\" style=\"border:1px solid #c3c3c3;\">\r\n"
+                + "Your browser does not support the HTML5 canvas tag.\r\n"
+                + "</canvas>\r\n"
+                + "\r\n"
+                + "<script>\r\n";                
+               
+    }
+    
+    public static String getHtmlSuffix(){
+        return  "\r\n"
+                + "</script>\r\n"
+                + "</body>\r\n"
+                + "</html>";
+    }
     public String getHtml() {
-        return html;
+        RECT r = shape.getBounds();
+        int width = (int) (r.getWidth() / unitDivisor);
+        int height = (int) (r.getHeight() / unitDivisor);
+        
+        return getHtmlPrefix(width, height)+getJsPrefix()+shapeData+getHtmlSuffix();
     }
 
-    public CanvasShapeExporter(SWF swf, SHAPE shape, ColorTransform colorTransform) {
-        super(shape, colorTransform);
-        deltaX = -shape.getBounds().Xmin;
-        deltaY = -shape.getBounds().Ymin;
+    public String getShapeData() {
+        return shapeData;
+    }
+    
+    
+
+    public CanvasShapeExporter(double unitDivisor,SWF swf, SHAPE shape, ColorTransform colorTransform, int deltaX, int deltaY) {
+        super(shape, colorTransform);        
         this.swf = swf;
+        this.unitDivisor = unitDivisor;
     }
 
     @Override
@@ -76,25 +111,6 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
     @Override
     public void endShape() {
-        RECT r = shape.getBounds();
-        int width = (int) roundPixels20(r.getWidth() / SWF.unitDivisor);
-        int height = (int) roundPixels20(r.getHeight() / SWF.unitDivisor);
-        html = "<!DOCTYPE html>\r\n"
-                + "<html>\r\n"
-                + "<body>\r\n"
-                + "\r\n"
-                + "<canvas id=\"myCanvas\" width=\"" + width + "\" height=\"" + height + "\" style=\"border:1px solid #c3c3c3;\">\r\n"
-                + "Your browser does not support the HTML5 canvas tag.\r\n"
-                + "</canvas>\r\n"
-                + "\r\n"
-                + "<script>\r\n"
-                + "\r\n"
-                + "var c=document.getElementById(\"myCanvas\");\r\n"
-                + "var ctx=c.getContext(\"2d\");\r\n"
-                + shapeData + "\r\n"
-                + "</script>\r\n"
-                + "</body>\r\n"
-                + "</html>";
     }
 
     @Override
@@ -136,18 +152,18 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             start.y += deltaY;
             end.x += deltaX;
             end.y += deltaY;
-            fillData += "var grd=ctx.createLinearGradient(" + Double.toString(start.x / SWF.unitDivisor) + "," + Double.toString(start.y / SWF.unitDivisor) + "," + Double.toString(end.x / SWF.unitDivisor) + "," + Double.toString(end.y / SWF.unitDivisor) + ");\r\n";
+            fillData += "var grd=ctx.createLinearGradient(" + Double.toString(start.x / unitDivisor) + "," + Double.toString(start.y / unitDivisor) + "," + Double.toString(end.x / unitDivisor) + "," + Double.toString(end.y / unitDivisor) + ");\r\n";
         } else {
-            matrix.translateX /= SWF.unitDivisor;
-            matrix.translateY /= SWF.unitDivisor;
-            matrix.scaleX /= SWF.unitDivisor;
-            matrix.scaleY /= SWF.unitDivisor;
-            matrix.rotateSkew0 /= SWF.unitDivisor;
-            matrix.rotateSkew1 /= SWF.unitDivisor;
+            matrix.translateX /= unitDivisor;
+            matrix.translateY /= unitDivisor;
+            matrix.scaleX /= unitDivisor;
+            matrix.scaleY /= unitDivisor;
+            matrix.rotateSkew0 /= unitDivisor;
+            matrix.rotateSkew1 /= unitDivisor;
             fillMatrix = matrix;
 
-            matrix.translateX += deltaX / SWF.unitDivisor;
-            matrix.translateY += deltaY / SWF.unitDivisor;
+            matrix.translateX += deltaX / unitDivisor;
+            matrix.translateY += deltaY / unitDivisor;
 
             fillData += "var grd=ctx.createRadialGradient(0,0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
         }
@@ -213,12 +229,12 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 }
                 String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
                 if (matrix != null) {
-                    matrix.translateX /= SWF.unitDivisor;
-                    matrix.translateY /= SWF.unitDivisor;
-                    matrix.scaleX /= SWF.unitDivisor;
-                    matrix.scaleY /= SWF.unitDivisor;
-                    matrix.rotateSkew0 /= SWF.unitDivisor;
-                    matrix.rotateSkew1 /= SWF.unitDivisor;
+                    matrix.translateX /= unitDivisor;
+                    matrix.translateY /= unitDivisor;
+                    matrix.scaleX /= unitDivisor;
+                    matrix.scaleY /= unitDivisor;
+                    matrix.rotateSkew0 /= unitDivisor;
+                    matrix.rotateSkew1 /= unitDivisor;
                     fillMatrix = matrix;
 
                 }
@@ -238,7 +254,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        thickness /= SWF.unitDivisor;
+        thickness /= unitDivisor;
 
         strokeData += "ctx.strokeStyle=\"" + color(color) + "\";\r\n";
         strokeData += "ctx.lineWidth=" + Double.toString(thickness == 0 ? 1 : thickness) + ";\r\n";
@@ -277,16 +293,16 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         x += deltaX;
         y += deltaY;
         pathData += "ctx.moveTo("
-                + roundPixels20(x / SWF.unitDivisor) + ","
-                + roundPixels20(y / SWF.unitDivisor) + ");\r\n";
+                + (x / unitDivisor) + ","
+                + (y / unitDivisor) + ");\r\n";
     }
 
     @Override
     public void lineTo(double x, double y) {
         x += deltaX;
         y += deltaY;
-        pathData += "ctx.lineTo(" + roundPixels20(x / SWF.unitDivisor) + ","
-                + roundPixels20(y / SWF.unitDivisor) + ");\r\n";
+        pathData += "ctx.lineTo(" + (x / unitDivisor) + ","
+                + (y / unitDivisor) + ");\r\n";
     }
 
     @Override
@@ -295,10 +311,10 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         anchorX += deltaX;
         controlY += deltaY;
         anchorY += deltaY;
-        pathData += "ctx.quadraticCurveTo(" + roundPixels20(controlX / SWF.unitDivisor) + ","
-                + roundPixels20(controlY / SWF.unitDivisor) + ","
-                + roundPixels20(anchorX / SWF.unitDivisor) + ","
-                + roundPixels20(anchorY / SWF.unitDivisor) + ");\r\n";
+        pathData += "ctx.quadraticCurveTo(" + (controlX / unitDivisor) + ","
+                + (controlY / unitDivisor) + ","
+                + (anchorX / unitDivisor) + ","
+                + (anchorY / unitDivisor) + ");\r\n";
     }
 
     protected void finalizePath() {
@@ -333,13 +349,5 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         strokeData = "";
         fillMatrix = null;
         lastRadColor = null;
-    }
-
-    protected double roundPixels20(double pixels) {
-        return Math.round(pixels * 100) / 100.0;
-    }
-
-    protected double roundPixels400(double pixels) {
-        return Math.round(pixels * 10000) / 10000.0;
     }
 }
