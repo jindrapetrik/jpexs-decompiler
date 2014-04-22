@@ -303,17 +303,15 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
-            pathData = "ctx.setTransform(1,0,0,1,0,0);\r\nctx.beginPath();\r\n" + pathData + "ctx.closePath();\r\n" + strokeData;
-            if (!"".equals(strokeData)) {
-                pathData += "ctx.stroke();\r\n";
-            }
+            pathData = "ctx.beginPath();\r\n" + pathData + "ctx.closePath();\r\n" + strokeData;
+            
             if (fillMatrix != null) {
                 if (lastRadColor != null) {
                     pathData += "ctx.fillStyle=\"" + lastRadColor + "\";\r\n ctx.fill(\"evenodd\");\r\n";
                 }
                 pathData += "ctx.save();\r\n";
                 pathData += "ctx.clip();\r\n";
-                pathData += "ctx.setTransform(" + fillMatrix.scaleX + "," + fillMatrix.rotateSkew0 + "," + fillMatrix.rotateSkew1 + "," + fillMatrix.scaleY + "," + fillMatrix.translateX + "," + fillMatrix.translateY + ");\r\n";
+                pathData += "ctx.transform(" + fillMatrix.scaleX + "," + fillMatrix.rotateSkew0 + "," + fillMatrix.rotateSkew1 + "," + fillMatrix.scaleY + "," + fillMatrix.translateX + "," + fillMatrix.translateY + ");\r\n";
                 pathData += fillData;
                 pathData += "ctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
                 pathData += "ctx.restore();\r\n";
@@ -323,6 +321,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                     pathData += "ctx.fill(\"evenodd\");\r\n";
                 }
                 shapeData += fillData + pathData;
+            }
+            if (!"".equals(strokeData)) {
+                shapeData += "ctx.stroke();\r\n";
             }
         }
 
