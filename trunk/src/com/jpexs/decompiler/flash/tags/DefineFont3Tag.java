@@ -107,7 +107,7 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public int charToGlyph(char c) {
-        return codeTable.indexOf((Integer) (int) c);
+        return codeTable.indexOf((int) c);
     }
 
     public DefineFont3Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {

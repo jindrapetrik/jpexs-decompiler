@@ -289,7 +289,7 @@ public class DefineFont2Tag extends FontTag {
 
     @Override
     public int charToGlyph(char c) {
-        return codeTable.indexOf((Integer) (int) c);
+        return codeTable.indexOf((int) c);
     }
 
     @Override

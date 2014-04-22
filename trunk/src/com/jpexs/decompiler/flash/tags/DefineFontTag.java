@@ -98,9 +98,9 @@ public class DefineFontTag extends FontTag {
     public int charToGlyph(char c) {
         ensureFontInfo();
         if (fontInfo2Tag != null) {
-            return fontInfo2Tag.codeTable.indexOf(c);
+            return fontInfo2Tag.codeTable.indexOf((int) c);
         } else if (fontInfoTag != null) {
-            return fontInfoTag.codeTable.indexOf(c);
+            return fontInfoTag.codeTable.indexOf((int) c);
         }
         return -1;
 
