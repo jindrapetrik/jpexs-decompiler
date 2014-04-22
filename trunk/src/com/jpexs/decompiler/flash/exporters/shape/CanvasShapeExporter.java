@@ -132,6 +132,10 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         if(type == FILLSTYLE.LINEAR_GRADIENT){
             Point start = matrix.transform(new Point(-16384, 0));
             Point end = matrix.transform(new Point(16384, 0));
+            start.x += deltaX;
+            start.y += deltaY;
+            end.x += deltaX;
+            end.y += deltaY;
             fillData+="var grd=ctx.createLinearGradient("+Double.toString(start.x/SWF.unitDivisor)+","+Double.toString(start.y/SWF.unitDivisor)+","+Double.toString(end.x/SWF.unitDivisor)+","+Double.toString(end.y/SWF.unitDivisor)+");\r\n";            
         }else{                        
             matrix.translateX /= SWF.unitDivisor;
@@ -141,6 +145,10 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             matrix.rotateSkew0 /= SWF.unitDivisor;
             matrix.rotateSkew1 /= SWF.unitDivisor;
             fillMatrix = matrix;
+            
+            matrix.translateX += deltaX/SWF.unitDivisor;
+            matrix.translateY += deltaY/SWF.unitDivisor;
+            
             fillData+="var grd=ctx.createRadialGradient(0,0,0,0,0,16384);\r\n";
         }
         for(GRADRECORD r:gradientRecords){
