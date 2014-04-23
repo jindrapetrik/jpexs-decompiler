@@ -2109,7 +2109,6 @@ public final class SWF implements TreeItem, Timelined {
                 }
                 CharacterTag character = timeline.swf.characters.get(layer.characterId);
                 if (character instanceof DefineSpriteTag && !processedCharacterIds.contains(character)) {
-                    System.out.println(layer.characterId);
                     processedCharacterIds.add(character);
                     DefineSpriteTag sp = (DefineSpriteTag) character;
                     getUsedRatios(sp.getTimeline(), null, usedRatios, processedCharacterIds);
@@ -2137,7 +2136,8 @@ public final class SWF implements TreeItem, Timelined {
         for (int frame = 0; frame < frames.size(); frame++) {
             sb.append("\t\tcase " + frame + ":\r\n");
             Frame frameObj = timeline.frames.get(frame);
-            for (int i = 1; i <= timeline.getMaxDepth(); i++) {
+            int maxDepth = timeline.getMaxDepth();
+            for (int i = 1; i <= maxDepth; i++) {
                 if (!frameObj.layers.containsKey(i)) {
                     continue;
                 }
