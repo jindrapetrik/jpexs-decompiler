@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporterContext;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -62,4 +63,13 @@ public abstract class ShapeTag extends CharacterTag implements BoundedTag, Drawa
         exporter.export();
         return svgExporter.getSVG();
     }
+
+    @Override
+    public String toHtmlCanvas(double unitDivisor) {
+        CanvasShapeExporter cse = new CanvasShapeExporter(null,unitDivisor, swf, getShapes(), new ColorTransform(), 0, 0);
+        cse.export();
+        return cse.getShapeData();
+    }
+    
+    
 }

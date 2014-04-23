@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -75,5 +76,12 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
         }
         return null;
     }
+
+    @Override
+    public String toHtmlCanvas(double unitDivisor) {        
+        return getTimeline().toHtmlCanvas(unitDivisor, Arrays.asList(0)); //TODO: handle states?
+    }
+    
+    
 
 }

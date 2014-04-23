@@ -102,7 +102,7 @@ public class ShapeExporter {
                                     SHAPE shp = st.getShapes();
                                     int deltaX = -shp.getBounds().Xmin;
                                     int deltaY = -shp.getBounds().Ymin;
-                                    CanvasShapeExporter cse = new CanvasShapeExporter(SWF.unitDivisor,((Tag)st).getSwf(),shp, new CXFORMWITHALPHA(),deltaX,deltaY);
+                                    CanvasShapeExporter cse = new CanvasShapeExporter(null,SWF.unitDivisor,((Tag)st).getSwf(),shp, new CXFORMWITHALPHA(),deltaX,deltaY);
                                     cse.export();                                                                        
                                     fos.write(Utf8Helper.getBytes(cse.getHtml()));
                                 }

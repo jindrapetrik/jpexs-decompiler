@@ -762,6 +762,14 @@ public class DefineEditTextTag extends TextTag {
 
     @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+        render(false, image, transformation, colorTransform);
+    }
+
+    
+    private String render(boolean canvas,SerializableImage image, Matrix transformation, ColorTransform colorTransform){
+        if(image == null){
+            return ""; //TODO: handle Html Canvas conversion 
+        }
         if (border) {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
@@ -936,8 +944,9 @@ public class DefineEditTextTag extends TextTag {
 
             staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
         }
-    }
-
+        return ""; //TODO: Return HTML Canvas converted
+    }            
+    
     @Override
     public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
         return "";
@@ -964,5 +973,10 @@ public class DefineEditTextTag extends TextTag {
     @Override
     public boolean isSingleFrame() {
         return true;
+    }
+    
+    @Override
+    public String toHtmlCanvas(double unitDivisor) {
+        return render(true, null, new Matrix(), new ColorTransform());
     }
 }

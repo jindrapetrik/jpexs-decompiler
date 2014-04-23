@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -58,6 +59,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected SWF swf;
     protected int repeatCnt = 0;
     protected double unitDivisor;
+    protected RGB basicFill;
 
     
     public static String getJsPrefix(){
@@ -98,10 +100,11 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     
     
 
-    public CanvasShapeExporter(double unitDivisor,SWF swf, SHAPE shape, ColorTransform colorTransform, int deltaX, int deltaY) {
+    public CanvasShapeExporter(RGB basicFill,double unitDivisor,SWF swf, SHAPE shape, ColorTransform colorTransform, int deltaX, int deltaY) {
         super(shape, colorTransform);        
         this.swf = swf;
         this.unitDivisor = unitDivisor;
+        this.basicFill = basicFill;
     }
 
     @Override
@@ -133,7 +136,10 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     @Override
     public void beginFill(RGB color) {
         finalizePath();
-        fillData += "ctx.fillStyle=\"" + color(color) + "\";\r\n";
+        if(color == null){
+            color  = basicFill;
+        }
+        fillData += "ctx.fillStyle=\"" + color(color) + "\";\r\n";        
     }
 
     @Override
@@ -165,6 +171,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             matrix.translateX += deltaX / unitDivisor;
             matrix.translateY += deltaY / unitDivisor;
 
+            //TODO: Focal point
+            
             fillData += "var grd=ctx.createRadialGradient(0,0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
         }
         int repeatTotal = repeatCnt * 2 + 1;
@@ -187,8 +195,12 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         fillData += "ctx.fillStyle = grd;\r\n";
     }
 
-    private String color(RGB rgb) {
-        if (rgb instanceof RGBA) {
+    public static String color(Color color) {
+        return color(new RGBA(color.getRed(),color.getGreen(),color.getBlue(),color.getAlpha()));
+    }
+    
+    public static String color(RGB rgb) {
+        if ((rgb instanceof RGBA)&&(((RGBA) rgb).alpha<255)) {
             RGBA rgba = (RGBA) rgb;
             return "rgba(" + rgba.red + "," + rgba.green + "," + rgba.blue + "," + rgba.getAlphaFloat() + ")";
         } else {

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  *
@@ -33,6 +34,8 @@ public interface DrawableTag extends BoundedTag {
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform);
 
     public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) throws IOException;
+    
+    public String toHtmlCanvas(double unitDivisor);
 
     public int getNumFrames();
 

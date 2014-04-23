@@ -335,4 +335,9 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         }
         return false;
     }
+
+    @Override
+    public String toHtmlCanvas(double unitDivisor) {
+        return getTimeline().toHtmlCanvas(unitDivisor, null);
+    }
 }

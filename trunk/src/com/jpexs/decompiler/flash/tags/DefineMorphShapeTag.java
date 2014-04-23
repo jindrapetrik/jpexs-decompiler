@@ -343,5 +343,9 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
         return transformation.toTransform().createTransformedShape(getShapeAtRatio(ratio).getOutline());
     }
-
+    
+    @Override
+    public String toHtmlCanvas(double unitDivisor) {
+        return ""; //TODO
+    }
 }

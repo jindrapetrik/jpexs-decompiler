@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
@@ -168,6 +169,12 @@ public class Timeline {
 
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         SWF.frameToImage(this, frame, time, stateUnderCursor, mouseButton, image, transformation, colorTransform);
+    }
+    
+    
+    public String toHtmlCanvas(double unitDivisor,List<Integer> frames){
+       // SWF.framesToHtmlCanvas(unitDivisor, null, null, this, frames, id, null, frameRate, displayRect, null, Color.darkGray, id)r
+       return null;
     }
 
     public void getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton, List<Integer> sounds, List<String> soundClasses) {

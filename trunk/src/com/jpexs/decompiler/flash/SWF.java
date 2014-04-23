@@ -2170,7 +2170,19 @@ public final class SWF implements TreeItem, Timelined {
                     f = layer.time % tim.getFrameCount();
                 }
                 if (!library.containsKey(layer.characterId)) {
-                    if (character instanceof ShapeTag) {
+                    
+                    if (character instanceof DefineSpriteTag) {
+                        DefineSpriteTag sp = (DefineSpriteTag) character;
+                        Timeline tim = sp.getTimeline();
+                        framesToHtmlCanvas(1, library, usedRatios, tim, null, 0, stateUnderCursor, mouseButton, displayRect, colorTransform, backGroundColor, level + 1);                        
+                        //placeMatrix = new Matrix();
+                        charStr = null;
+                    }else{
+                        if(character instanceof DrawableTag){
+                            charStr = ((DrawableTag)character).toHtmlCanvas(1);
+                        }
+                    }
+                    /*if (character instanceof ShapeTag) {
                         ShapeTag sh = (ShapeTag) character;
                         CanvasShapeExporter cse = new CanvasShapeExporter(1,timeline.swf, sh.getShapes(), colorTransform, 0, 0);
                         cse.export();
@@ -2195,7 +2207,7 @@ public final class SWF implements TreeItem, Timelined {
                             }
                         }
                         charStr = mb.toString();
-                    }
+                    }*/
                     if (charStr != null) {
                         library.put(layer.characterId, charStr);
                     }

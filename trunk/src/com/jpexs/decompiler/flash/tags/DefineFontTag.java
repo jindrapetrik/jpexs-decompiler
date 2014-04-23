@@ -323,5 +323,5 @@ public class DefineFontTag extends FontTag {
     @Override
     public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         return 0;
-    }
+    }        
 }

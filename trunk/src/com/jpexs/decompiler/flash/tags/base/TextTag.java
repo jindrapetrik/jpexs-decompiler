@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
+import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
@@ -33,6 +34,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
@@ -210,10 +212,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         return att;
     }
 
-    public static void drawBorder(SWF swf, SerializableImage image, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        Matrix mat = transformation.clone();
-        mat = mat.concatenate(new Matrix(textMatrix));
+    public static SHAPE getBorderShape(RGB borderColor, RGB fillColor, RECT rect){        
         SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
         shape.fillStyles = new FILLSTYLEARRAY();
         if (fillColor != null) {
@@ -258,7 +257,14 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         shape.shapeRecords.add(bottom);
         shape.shapeRecords.add(left);
         shape.shapeRecords.add(new EndShapeRecord());
-        BitmapExporter.export(swf, shape, null, image, mat, colorTransform);
+        return shape;
+    }
+    
+    public static void drawBorder(SWF swf, SerializableImage image, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
+        Graphics2D g = (Graphics2D) image.getGraphics();        
+        Matrix mat = transformation.clone();
+        mat = mat.concatenate(new Matrix(textMatrix));
+        BitmapExporter.export(swf, getBorderShape(borderColor, fillColor, rect), null, image, mat, colorTransform);
     }
 
     public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
@@ -306,6 +312,58 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         }
     }
 
+    
+    public static String staticTextToHtmlCanvas(double unitDivisor, SWF swf, List<TEXTRECORD> textRecords, int numText, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
+        Color textColor = new Color(0, 0, 0);
+        String ret = "";
+        FontTag font = null;
+        int textHeight = 12;
+        int x = 0;
+        int y = 0;
+        List<SHAPE> glyphs = new ArrayList<>();
+        SVGExporter svgExporter = new SVGExporter(null, colorTransform);
+        for (TEXTRECORD rec : textRecords) {
+            if (rec.styleFlagsHasColor) {
+                if (numText == 2) {
+                    textColor = colorTransform.apply(rec.textColorA.toColor());
+                } else {
+                    textColor = colorTransform.apply(rec.textColor.toColor());
+                }
+            }
+            if (rec.styleFlagsHasFont) {
+                font = (FontTag) swf.characters.get(rec.fontId);
+                glyphs = font.getGlyphShapeTable();
+                textHeight = rec.textHeight;
+            }
+            if (rec.styleFlagsHasXOffset) {
+                x = rec.xOffset;
+            }
+            if (rec.styleFlagsHasYOffset) {
+                y = rec.yOffset;
+            }
+
+            double rat = textHeight / 1024.0 / font.getDivider();
+
+            for (GLYPHENTRY entry : rec.glyphEntries) {
+                Matrix mat = (new Matrix(textMatrix).concatenate(Matrix.getTranslateInstance(x - bounds.Xmin, y - bounds.Ymin))).concatenate(Matrix.getScaleInstance(rat));
+                if (entry.glyphIndex != -1) {
+                    // shapeNum: 1
+                    ret += "ctx.save();\r\n";
+                    ret += "ctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
+                
+                    SHAPE shape = glyphs.get(entry.glyphIndex);
+                    svgExporter.createNewGroup(mat);
+                    CanvasShapeExporter exporter = new CanvasShapeExporter(new RGBA(textColor),unitDivisor, swf, shape, colorTransform,0,0);
+                    exporter.export();
+                    ret += exporter.getShapeData();
+                    ret += "ctx.restore();\r\n";
+                    x += entry.glyphAdvance;
+                }
+            }
+        }
+        return ret;
+    }
+    
     public static String staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;

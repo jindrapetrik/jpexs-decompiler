@@ -528,4 +528,9 @@ public class DefineTextTag extends TextTag {
     public boolean isSingleFrame() {
         return true;
     }
+    
+    @Override
+    public String toHtmlCanvas(double unitDivisor) {
+        return staticTextToHtmlCanvas(unitDivisor, swf, textRecords, 1, textBounds, textMatrix, new ColorTransform());
+    }
 }

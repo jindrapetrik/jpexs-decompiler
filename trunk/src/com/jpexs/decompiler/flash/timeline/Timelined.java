@@ -26,5 +26,5 @@ public interface Timelined extends BoundedTag {
 
     public Timeline getTimeline();
 
-    public void resetTimeline();
+    public void resetTimeline();    
 }
