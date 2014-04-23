@@ -1402,66 +1402,65 @@ public final class SWF implements TreeItem, Timelined {
         }
 
         if (settings.mode == FramesExportMode.CANVAS) {
-                final Timeline ftim = tim;
-                final Color fbackgroundColor = backgroundColor;
-                new RetryTask(new RunnableIOEx() {
-                    @Override
-                    public void run() throws IOException {
-                        File f = new File(foutdir + File.separator + "frames.js");
-                        File fmin = new File(foutdir + File.separator + "frames.min.js");
-                        int width = (int) (ftim.displayRect.getWidth() / SWF.unitDivisor);
-                        int height = (int) (ftim.displayRect.getHeight() / SWF.unitDivisor);
-                        try (FileOutputStream fos = new FileOutputStream(f)) {                            
-                            fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
-                            fos.write(Utf8Helper.getBytes("var frames = [];"));
-                            Map<Integer,String> library = new HashMap<>();
-                            framesToHtmlCanvas(SWF.unitDivisor, library, null, ftim, fframes, 0, null, 0, ftim.displayRect, new ColorTransform(), fbackgroundColor, 0);
-                                                        
-                            for (int c : library.keySet()) {
-                                fos.write(Utf8Helper.getBytes("function character"+c+"(ctx,frame,ratio){\r\n"));
-                                fos.write(Utf8Helper.getBytes(library.get(c)));
-                                fos.write(Utf8Helper.getBytes("}\r\n"));
-                            }
-                                
-                            
-                            fos.write(Utf8Helper.getBytes("var frame = 0;\r\n"));
-                            fos.write(Utf8Helper.getBytes("var frames = [];\r\n"));
-                            for(int i:fframes){
-                               fos.write(Utf8Helper.getBytes("frames.push("+i+");\r\n")); 
-                            }
-                            fos.write(Utf8Helper.getBytes("function nextFrame(ctx){\r\n"));
-                            fos.write(Utf8Helper.getBytes("\tctx.clearRect(0,0,"+width+","+height+");\r\n"));
-                            fos.write(Utf8Helper.getBytes("\tframe = (frame+1)%frames.length;\r\n"));
-                            fos.write(Utf8Helper.getBytes("\tcharacter"+timeline.id+"(ctx,frames[frame],0);\r\n"));
+            final Timeline ftim = tim;
+            final Color fbackgroundColor = backgroundColor;
+            new RetryTask(new RunnableIOEx() {
+                @Override
+                public void run() throws IOException {
+                    File f = new File(foutdir + File.separator + "frames.js");
+                    File fmin = new File(foutdir + File.separator + "frames.min.js");
+                    int width = (int) (ftim.displayRect.getWidth() / SWF.unitDivisor);
+                    int height = (int) (ftim.displayRect.getHeight() / SWF.unitDivisor);
+                    try (FileOutputStream fos = new FileOutputStream(f)) {
+                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
+                        fos.write(Utf8Helper.getBytes("var frames = [];"));
+                        Map<Integer, String> library = new HashMap<>();
+                        framesToHtmlCanvas(SWF.unitDivisor, library, null, ftim, fframes, 0, null, 0, ftim.displayRect, new ColorTransform(), fbackgroundColor, 0);
+
+                        for (int c : library.keySet()) {
+                            fos.write(Utf8Helper.getBytes("function character" + c + "(ctx,frame,ratio){\r\n"));
+                            fos.write(Utf8Helper.getBytes(library.get(c)));
                             fos.write(Utf8Helper.getBytes("}\r\n"));
-                            
-                            fos.write(Utf8Helper.getBytes("window.setInterval(function(){nextFrame(ctx)},"+(int)(1000.0/timeline.swf.frameRate)+");\r\n"));
                         }
-                        
-                        if(Configuration.packJavaScripts.get()){
-                            JPacker.main(new String[]{"-q","-b","62","-o",fmin.getAbsolutePath(),f.getAbsolutePath()});
-                            f.delete();
-                        }else{
-                            f.renameTo(fmin);
+
+                        fos.write(Utf8Helper.getBytes("var frame = 0;\r\n"));
+                        fos.write(Utf8Helper.getBytes("var frames = [];\r\n"));
+                        for (int i : fframes) {
+                            fos.write(Utf8Helper.getBytes("frames.push(" + i + ");\r\n"));
                         }
-                                                
-                        File fh = new File(foutdir + File.separator + "frames.html");
-                        try (FileOutputStream fos = new FileOutputStream(fh); FileInputStream fis=new FileInputStream(fmin)) { 
-                            fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlPrefix(width, height)));
-                            byte buf[] = new byte[1000];
-                            int cnt;
-                            while((cnt=fis.read(buf))>0){
-                                fos.write(buf,0,cnt);
-                            }
-                            fos.write(Utf8Helper.getBytes(";"));
-                            fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlSuffix()));
-                        }                        
-                        fmin.delete();
-                        
-                        ret.add(f);
+                        fos.write(Utf8Helper.getBytes("function nextFrame(ctx){\r\n"));
+                        fos.write(Utf8Helper.getBytes("\tctx.clearRect(0,0," + width + "," + height + ");\r\n"));
+                        fos.write(Utf8Helper.getBytes("\tframe = (frame+1)%frames.length;\r\n"));
+                        fos.write(Utf8Helper.getBytes("\tcharacter" + timeline.id + "(ctx,frames[frame],0);\r\n"));
+                        fos.write(Utf8Helper.getBytes("}\r\n"));
+
+                        fos.write(Utf8Helper.getBytes("window.setInterval(function(){nextFrame(ctx)}," + (int) (1000.0 / timeline.swf.frameRate) + ");\r\n"));
                     }
-                }, handler).run();
-            
+
+                    if (Configuration.packJavaScripts.get()) {
+                        JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
+                        f.delete();
+                    } else {
+                        f.renameTo(fmin);
+                    }
+
+                    File fh = new File(foutdir + File.separator + "frames.html");
+                    try (FileOutputStream fos = new FileOutputStream(fh); FileInputStream fis = new FileInputStream(fmin)) {
+                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlPrefix(width, height)));
+                        byte buf[] = new byte[1000];
+                        int cnt;
+                        while ((cnt = fis.read(buf)) > 0) {
+                            fos.write(buf, 0, cnt);
+                        }
+                        fos.write(Utf8Helper.getBytes(";"));
+                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlSuffix()));
+                    }
+                    fmin.delete();
+
+                    ret.add(f);
+                }
+            }, handler).run();
+
             return ret;
         }
 
@@ -2086,53 +2085,53 @@ public final class SWF implements TreeItem, Timelined {
         }
         return ret;
     }
-    
-    private static void getUsedRatios(Timeline timeline, List<Integer> frames,Map<Integer,List<Integer>> usedRatios){
-        if(frames == null){
+
+    private static void getUsedRatios(Timeline timeline, List<Integer> frames, Map<Integer, List<Integer>> usedRatios, HashSet<CharacterTag> processedCharacterIds) {
+        if (frames == null) {
             frames = new ArrayList<>();
-            for(int i=0;i<timeline.getFrameCount();i++){
+            for (int i = 0; i < timeline.getFrameCount(); i++) {
                 frames.add(i);
             }
         }
         for (int frame = 0; frame < frames.size(); frame++) {
             Frame frameObj = timeline.frames.get(frame);
-            for (int i = 1; i <= timeline.getMaxDepth(); i++) {
-                if (!frameObj.layers.containsKey(i)) {
-                    continue;
-                }
-                DepthState layer = frameObj.layers.get(i);
+            for (int depth : frameObj.layers.keySet()) {
+                DepthState layer = frameObj.layers.get(depth);
                 if (!timeline.swf.characters.containsKey(layer.characterId)) {
                     continue;
                 }
-                if(layer.ratio>-1){
-                    if(!usedRatios.containsKey(layer.characterId)){
-                        usedRatios.put(layer.characterId, new ArrayList<Integer>());
+                if (layer.ratio > -1) {
+                    List<Integer> usedRatiosForCharacter = usedRatios.get(layer.characterId);
+                    if (usedRatiosForCharacter == null) {
+                        usedRatiosForCharacter = new ArrayList<>();
+                        usedRatios.put(layer.characterId, usedRatiosForCharacter);
                     }
-                    usedRatios.get(layer.characterId).add(layer.ratio);
                 }
                 CharacterTag character = timeline.swf.characters.get(layer.characterId);
-                if(character instanceof DefineSpriteTag){
-                    DefineSpriteTag sp = (DefineSpriteTag)character;
-                    getUsedRatios(sp.getTimeline(),null,usedRatios);
+                if (character instanceof DefineSpriteTag && !processedCharacterIds.contains(character)) {
+                    System.out.println(layer.characterId);
+                    processedCharacterIds.add(character);
+                    DefineSpriteTag sp = (DefineSpriteTag) character;
+                    getUsedRatios(sp.getTimeline(), null, usedRatios, processedCharacterIds);
                 }
             }
         }
-        
+
     }
 
-    public static String framesToHtmlCanvas(double unitDivisor, Map<Integer, String> library, Map<Integer,List<Integer>> usedRatios,Timeline timeline, List<Integer> frames, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, ColorTransform colorTransform, Color backGroundColor, int level) throws IOException {
-        if(usedRatios == null){
+    public static String framesToHtmlCanvas(double unitDivisor, Map<Integer, String> library, Map<Integer, List<Integer>> usedRatios, Timeline timeline, List<Integer> frames, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, ColorTransform colorTransform, Color backGroundColor, int level) throws IOException {
+        if (usedRatios == null) {
             usedRatios = new HashMap<>();
-            getUsedRatios(timeline, frames, usedRatios);
+            getUsedRatios(timeline, frames, usedRatios, new HashSet<CharacterTag>());
         }
         StringBuilder sb = new StringBuilder();
-        if(frames == null){
+        if (frames == null) {
             frames = new ArrayList<>();
-            for(int i=0;i<timeline.getFrameCount();i++){
+            for (int i = 0; i < timeline.getFrameCount(); i++) {
                 frames.add(i);
             }
         }
-        sb.append("\tvar frame_cnt = "+timeline.getFrameCount()+";\r\n");
+        sb.append("\tvar frame_cnt = " + timeline.getFrameCount() + ";\r\n");
         sb.append("\tframe = frame % frame_cnt;\r\n");
         sb.append("\tswitch(frame){\r\n");
         for (int frame = 0; frame < frames.size(); frame++) {
@@ -2161,7 +2160,7 @@ public final class SWF implements TreeItem, Timelined {
                 placeMatrix.rotateSkew1 /= unitDivisor;
                 placeMatrix.translateX /= unitDivisor;
                 placeMatrix.translateY /= unitDivisor;
-                        
+
                 String charStr = null;
                 int f = 0;
                 if (character instanceof DefineSpriteTag) {
@@ -2170,44 +2169,44 @@ public final class SWF implements TreeItem, Timelined {
                     f = layer.time % tim.getFrameCount();
                 }
                 if (!library.containsKey(layer.characterId)) {
-                    
+
                     if (character instanceof DefineSpriteTag) {
                         DefineSpriteTag sp = (DefineSpriteTag) character;
                         Timeline tim = sp.getTimeline();
-                        framesToHtmlCanvas(1, library, usedRatios, tim, null, 0, stateUnderCursor, mouseButton, displayRect, colorTransform, backGroundColor, level + 1);                        
+                        framesToHtmlCanvas(1, library, usedRatios, tim, null, 0, stateUnderCursor, mouseButton, displayRect, colorTransform, backGroundColor, level + 1);
                         //placeMatrix = new Matrix();
                         charStr = null;
-                    }else{
-                        if(character instanceof DrawableTag){
-                            charStr = ((DrawableTag)character).toHtmlCanvas(1);
+                    } else {
+                        if (character instanceof DrawableTag) {
+                            charStr = ((DrawableTag) character).toHtmlCanvas(1);
                         }
                     }
                     /*if (character instanceof ShapeTag) {
-                        ShapeTag sh = (ShapeTag) character;
-                        CanvasShapeExporter cse = new CanvasShapeExporter(1,timeline.swf, sh.getShapes(), colorTransform, 0, 0);
-                        cse.export();
-                        charStr = cse.getShapeData();
-                    } else if (character instanceof DefineSpriteTag) {
-                        DefineSpriteTag sp = (DefineSpriteTag) character;
-                        Timeline tim = sp.getTimeline();
-                        framesToHtmlCanvas(1, library, usedRatios, tim, null, 0, stateUnderCursor, mouseButton, displayRect, colorTransform, backGroundColor, level + 1);                        
-                        //placeMatrix = new Matrix();
-                        charStr = null;
-                    } else if (character instanceof MorphShapeTag){
-                        MorphShapeTag ms=(MorphShapeTag)character;
-                        StringBuilder mb=new StringBuilder();
+                     ShapeTag sh = (ShapeTag) character;
+                     CanvasShapeExporter cse = new CanvasShapeExporter(1,timeline.swf, sh.getShapes(), colorTransform, 0, 0);
+                     cse.export();
+                     charStr = cse.getShapeData();
+                     } else if (character instanceof DefineSpriteTag) {
+                     DefineSpriteTag sp = (DefineSpriteTag) character;
+                     Timeline tim = sp.getTimeline();
+                     framesToHtmlCanvas(1, library, usedRatios, tim, null, 0, stateUnderCursor, mouseButton, displayRect, colorTransform, backGroundColor, level + 1);                        
+                     //placeMatrix = new Matrix();
+                     charStr = null;
+                     } else if (character instanceof MorphShapeTag){
+                     MorphShapeTag ms=(MorphShapeTag)character;
+                     StringBuilder mb=new StringBuilder();
                        
-                        if(usedRatios.containsKey(layer.characterId)){
-                            for(int r:usedRatios.get(layer.characterId)){
-                                mb.append("\tif(ratio == ").append(r).append("){\r\n");
-                                CanvasShapeExporter cse = new CanvasShapeExporter(1,timeline.swf, ms.getShapeAtRatio(r), colorTransform, 0, 0);
-                                cse.export();
-                                mb.append("\t\t"+cse.getShapeData().replaceAll("\n(.)", "\n\t\t$1"));
-                                mb.append("\t}\r\n");
-                            }
-                        }
-                        charStr = mb.toString();
-                    }*/
+                     if(usedRatios.containsKey(layer.characterId)){
+                     for(int r:usedRatios.get(layer.characterId)){
+                     mb.append("\tif(ratio == ").append(r).append("){\r\n");
+                     CanvasShapeExporter cse = new CanvasShapeExporter(1,timeline.swf, ms.getShapeAtRatio(r), colorTransform, 0, 0);
+                     cse.export();
+                     mb.append("\t\t"+cse.getShapeData().replaceAll("\n(.)", "\n\t\t$1"));
+                     mb.append("\t}\r\n");
+                     }
+                     }
+                     charStr = mb.toString();
+                     }*/
                     if (charStr != null) {
                         library.put(layer.characterId, charStr);
                     }
@@ -2222,7 +2221,7 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append(placeMatrix.translateX).append(",");
                     sb.append(placeMatrix.translateY);
                     sb.append(");\r\n");
-                    sb.append("\t\t\tcharacter" + layer.characterId + "(ctx," + f + ","+layer.ratio+");\r\n");
+                    sb.append("\t\t\tcharacter" + layer.characterId + "(ctx," + f + "," + layer.ratio + ");\r\n");
                     sb.append("\t\t\tctx.restore();\r\n");
                 }
             }
