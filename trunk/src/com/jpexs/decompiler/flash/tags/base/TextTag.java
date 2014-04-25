@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
@@ -42,6 +43,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
@@ -396,10 +398,30 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
-                    exporter.createSubGroup(mat, null);
-                    SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, textColor, colorTransform);
-                    shapeExporter.export();
-                    exporter.endGroup();
+                    char ch = font.glyphToChar(entry.glyphIndex);
+                    
+                    String charId = null;
+                    Map<Character, String> chs;
+                    if (exporter.exportedChars.containsKey(font)) {
+                        chs = exporter.exportedChars.get(font);
+                        if (chs.containsKey(ch)) {
+                            charId = chs.get(ch);
+                        }
+                    } else {
+                        chs = new HashMap<Character, String>();
+                        exporter.exportedChars.put(font, chs);
+                    }
+                    
+                    if (charId == null) {
+                        charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontName() + "_" + ch));
+                        exporter.createDefGroup(null, charId);
+                        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, textColor, colorTransform);
+                        shapeExporter.export();
+                        exporter.endGroup();
+                        chs.put(ch, charId);
+                    }
+
+                    exporter.addImage(mat, bounds, charId);
                     x += entry.glyphAdvance;
                 }
             }

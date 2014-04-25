@@ -60,6 +60,8 @@ public class SVGExporter {
     public List<Element> gradients;
     protected int lastPatternId;
     public Map<Tag, String> exportedTags = new HashMap<>();
+    public Map<Tag, Map<Character, String>> exportedChars = new HashMap<>();
+    private Map<String, Integer> lastIds = new HashMap<>();
 
     public SVGExporter(ExportRectangle bounds) {
 
@@ -87,8 +89,10 @@ public class SVGExporter {
 
     public final void createDefGroup(ExportRectangle bounds, String id) {
         Element g = _svg.createElement("g");
-        g.setAttribute("transform", "matrix(1, 0, 0, 1, "
-                + roundPixels20(-bounds.xMin / (double) SWF.unitDivisor) + ", " + roundPixels20(-bounds.yMin / (double) SWF.unitDivisor) + ")");
+        if (bounds != null) {
+            g.setAttribute("transform", "matrix(1, 0, 0, 1, "
+                    + roundPixels20(-bounds.xMin / (double) SWF.unitDivisor) + ", " + roundPixels20(-bounds.yMin / (double) SWF.unitDivisor) + ")");
+        }
         if (id != null) {
             g.setAttribute("id", id);
         }
@@ -101,7 +105,10 @@ public class SVGExporter {
     }
     
     public void endGroup() {
-        _svgGs.pop();
+        Element g = _svgGs.pop();
+        if (g.getChildNodes().getLength() == 0) {
+            g.getParentNode().removeChild(g);
+        }
     }
 
     public final void createSubGroup(Matrix transform, String id) {
@@ -172,6 +179,17 @@ public class SVGExporter {
         _svgGs.peek().appendChild(image);
     }
 
+    public String getUniqueId(String prefix) {
+        Integer lastId = lastIds.get(prefix);
+        if (lastId == null) {
+            lastId = 0;
+        } else {
+            lastId++;
+        }
+        lastIds.put(prefix, lastId);
+        return prefix + lastId;
+    }
+    
     protected static double roundPixels20(double pixels) {
         return Math.round(pixels * 100) / 100.0;
     }

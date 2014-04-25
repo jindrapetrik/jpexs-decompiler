@@ -176,6 +176,26 @@ public class Helper {
         }
         return ret;
     }
+
+    public static String getValidHtmlId(String text) {
+        // ID and NAME tokens must begin with a letter ([A-Za-z]) and 
+        // may be followed by any number of letters, digits ([0-9]), 
+        // hyphens ("-"), underscores ("_"), colons (":"), and periods (".").
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if ((ch >= 'a' && ch <= 'z')
+                    || (ch >= 'A' && ch <= 'Z')
+                    || (i > 0 && ((ch >= '0' && ch <= '9')
+                    || ch == '-' || ch == '_' || ch == ':' || ch == '.'))) {
+                sb.append(ch);
+            } else {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     private final static String SPACES12 = "            ";
     private final static String ZEROS8 = "00000000";
 

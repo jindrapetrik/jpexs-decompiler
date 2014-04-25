@@ -99,8 +99,11 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Clip;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -2279,7 +2282,7 @@ public final class SWF implements TreeItem, Timelined {
                 if (exporter.exportedTags.containsKey(drawableTag)) {
                     assetName = exporter.exportedTags.get(drawableTag);
                 } else {
-                    assetName = "asset" + exporter.exportedTags.size();
+                    assetName = getTagIdPrefix(drawableTag, exporter);
                     exporter.exportedTags.put(drawableTag, assetName);
                     exporter.createDefGroup(new ExportRectangle(drawable.getRect()), assetName);
                     drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
@@ -2298,6 +2301,22 @@ public final class SWF implements TreeItem, Timelined {
         }
     }
 
+    private static String getTagIdPrefix(Tag tag, SVGExporter exporter) {
+        if (tag instanceof ShapeTag) {
+            return exporter.getUniqueId("shape");
+        }
+        if (tag instanceof MorphShapeTag) {
+            return exporter.getUniqueId("morphshape");
+        }
+        if (tag instanceof DefineSpriteTag) {
+            return exporter.getUniqueId("sprite");
+        }
+        if (tag instanceof TextTag) {
+            return exporter.getUniqueId("text");
+        }
+        return exporter.getUniqueId("tag");
+    }
+    
     public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor) {
         String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode();
         SerializableImage image = getFromCache(key);
