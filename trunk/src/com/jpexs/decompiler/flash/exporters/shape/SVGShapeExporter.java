@@ -51,28 +51,24 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     private final Color defaultColor;
     private final SWF swf;
     private final SVGExporter exporter;
-    private final String shapeId;
 
     public SVGShapeExporter(SWF swf, SHAPE shape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform) {
-        this(swf, shape, exporter, defaultColor, colorTransform, "");
-    }
-
-    public SVGShapeExporter(SWF swf, SHAPE shape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, String shapeId) {
         super(shape, colorTransform);
         this.swf = swf;
         this.defaultColor = defaultColor;
         this.exporter = exporter;
-        this.shapeId = shapeId;
     }
 
     @Override
     public void beginFill(RGB color) {
-        if (color == null) {
-            color = new RGB(defaultColor == null ? Color.BLACK : defaultColor);
+        if (color == null && defaultColor != null) {
+            color = new RGB(defaultColor);
         }
         finalizePath();
         path.setAttribute("stroke", "none");
-        path.setAttribute("fill", color.toHexRGB());
+        if (color != null) {
+            path.setAttribute("fill", color.toHexRGB());
+        }
         path.setAttribute("fill-rule", "evenodd");
         if (color instanceof RGBA) {
             RGBA colorA = (RGBA) color;
@@ -95,7 +91,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             id = exporter.gradients.size();
             exporter.gradients.add(gradient);
         }
-        String gradientId = "gradient" + shapeId + id;
+        String gradientId = "gradient" + id;
         gradient.setAttribute("id", gradientId);
         path.setAttribute("stroke", "none");
         path.setAttribute("fill", "url(#" + gradientId + ")");
@@ -124,9 +120,6 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 int height = img.getHeight();
                 lastPatternId++;
                 String patternId = "PatternID_";
-                if (!shapeId.isEmpty()) {
-                    patternId += shapeId + "_";
-                }
                 patternId += lastPatternId;
                 String format = image.getImageFormat();
                 InputStream imageStream = image.getImageData();

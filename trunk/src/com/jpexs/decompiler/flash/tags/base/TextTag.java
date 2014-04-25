@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
@@ -58,6 +57,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -408,20 +408,27 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                             charId = chs.get(ch);
                         }
                     } else {
-                        chs = new HashMap<Character, String>();
+                        chs = new HashMap<>();
                         exporter.exportedChars.put(font, chs);
                     }
                     
                     if (charId == null) {
                         charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontName() + "_" + ch));
                         exporter.createDefGroup(null, charId);
-                        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, textColor, colorTransform);
+                        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform);
                         shapeExporter.export();
                         exporter.endGroup();
                         chs.put(ch, charId);
                     }
 
-                    exporter.addImage(mat, bounds, charId);
+                    Element charImage = exporter.addImage(mat, bounds, charId);
+                    if (textColor != null) {
+                        RGBA colorA = new RGBA(textColor);
+                        charImage.setAttribute("fill", colorA.toHexRGB());
+                        if (colorA.alpha != 255) {
+                            charImage.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
+                        }
+                    }
                     x += entry.glyphAdvance;
                 }
             }

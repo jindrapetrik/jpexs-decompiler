@@ -161,7 +161,7 @@ public class SVGExporter {
         attr.setValue("background: " + new RGBA(backGroundColor).toHexARGB());
     }
 
-    public void addImage(Matrix transform, RECT boundRect, String href) {
+    public Element addImage(Matrix transform, RECT boundRect, String href) {
         Element image = _svg.createElement("use");
         if (transform != null) {
             double translateX = roundPixels400(transform.translateX / SWF.unitDivisor);
@@ -177,6 +177,7 @@ public class SVGExporter {
         }
         image.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(image);
+        return image;
     }
 
     public String getUniqueId(String prefix) {
