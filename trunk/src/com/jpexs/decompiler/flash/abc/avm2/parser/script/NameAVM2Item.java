@@ -25,9 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSlotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
@@ -43,7 +41,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;

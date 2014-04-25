@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
-import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporterContext;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -61,8 +61,8 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) throws IOException {
-        return SWF.frameToSvg(getTimeline(), 0, 0, null, 0, exporterContext, getRect(), colorTransform, null, level + 1);
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
+        SWF.frameToSvg(getTimeline(), 0, 0, null, 0, exporter, colorTransform, level + 1);
     }
 
     public DefineButtonSoundTag getSounds() {

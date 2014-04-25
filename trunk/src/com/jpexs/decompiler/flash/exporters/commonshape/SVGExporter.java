@@ -17,13 +17,16 @@
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.awt.Color;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -53,11 +56,12 @@ public class SVGExporter {
 
     protected Document _svg;
     protected Element _svgDefs;
-    protected Element _svgG;
+    protected Stack<Element> _svgGs = new Stack<>();
     public List<Element> gradients;
     protected int lastPatternId;
+    public Map<Tag, String> exportedTags = new HashMap<>();
 
-    public SVGExporter(ExportRectangle bounds, ColorTransform colorTransform) {
+    public SVGExporter(ExportRectangle bounds) {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
@@ -71,7 +75,9 @@ public class SVGExporter {
             _svgDefs = _svg.createElement("defs");
             svgRoot.appendChild(_svgDefs);
             if (bounds != null) {
-                createNewGroup(bounds);
+                svgRoot.setAttribute("width", (bounds.getWidth() / SWF.unitDivisor) + "px");
+                svgRoot.setAttribute("height", (bounds.getHeight() / SWF.unitDivisor) + "px");
+                createDefGroup(bounds, null);
             }
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(SVGExporter.class.getName()).log(Level.SEVERE, null, ex);
@@ -79,28 +85,44 @@ public class SVGExporter {
         gradients = new ArrayList<>();
     }
 
-    public final void createNewGroup(ExportRectangle bounds) {
-        _svgG = _svg.createElement("g");
-        _svgG.setAttribute("transform", "matrix(1, 0, 0, 1, "
+    public final void createDefGroup(ExportRectangle bounds, String id) {
+        Element g = _svg.createElement("g");
+        g.setAttribute("transform", "matrix(1, 0, 0, 1, "
                 + roundPixels20(-bounds.xMin / (double) SWF.unitDivisor) + ", " + roundPixels20(-bounds.yMin / (double) SWF.unitDivisor) + ")");
-        _svg.getDocumentElement().appendChild(_svgG);
+        if (id != null) {
+            g.setAttribute("id", id);
+        }
+        if (_svgGs.size() == 0) {
+           _svg.getDocumentElement().appendChild(g);
+        } else {
+            _svgDefs.appendChild(g);
+        }
+        _svgGs.add(g);
+    }
+    
+    public void endGroup() {
+        _svgGs.pop();
     }
 
-    public final void createNewGroup(Matrix transform) {
-        _svgG = _svg.createElement("g");
+    public final void createSubGroup(Matrix transform, String id) {
+        Element g  = _svg.createElement("g");
         double translateX = roundPixels400(transform.translateX / SWF.unitDivisor);
         double translateY = roundPixels400(transform.translateY / SWF.unitDivisor);
         double rotateSkew0 = roundPixels400(transform.rotateSkew0);
         double rotateSkew1 = roundPixels400(transform.rotateSkew1);
         double scaleX = roundPixels400(transform.scaleX);
         double scaleY = roundPixels400(transform.scaleY);
-        _svgG.setAttribute("transform", "matrix(" + scaleX + ", " + rotateSkew0
+        g.setAttribute("transform", "matrix(" + scaleX + ", " + rotateSkew0
                 + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
-        _svg.getDocumentElement().appendChild(_svgG);
+        if (id != null) {
+            g.setAttribute("id", id);
+        }
+        _svgGs.peek().appendChild(g);
+        _svgGs.add(g);
     }
 
     public void addToGroup(Node newChild) {
-        _svgG.appendChild(newChild);
+        _svgGs.peek().appendChild(newChild);
     }
 
     public void addToDefs(Node newChild) {
@@ -133,7 +155,7 @@ public class SVGExporter {
     }
 
     public void addImage(Matrix transform, RECT boundRect, String href) {
-        Element image = _svg.createElement("image");
+        Element image = _svg.createElement("use");
         if (transform != null) {
             double translateX = roundPixels400(transform.translateX / SWF.unitDivisor);
             double translateY = roundPixels400(transform.translateY / SWF.unitDivisor);
@@ -146,8 +168,8 @@ public class SVGExporter {
             image.setAttribute("width", Double.toString(boundRect.getWidth() / (double) SWF.unitDivisor));
             image.setAttribute("height", Double.toString(boundRect.getHeight() / (double) SWF.unitDivisor));
         }
-        image.setAttribute("xlink:href", href);
-        _svgG.appendChild(image);
+        image.setAttribute("xlink:href", "#" + href);
+        _svgGs.peek().appendChild(image);
     }
 
     protected static double roundPixels20(double pixels) {

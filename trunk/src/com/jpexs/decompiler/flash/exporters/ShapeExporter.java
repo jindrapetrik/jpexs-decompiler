@@ -20,8 +20,9 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
-import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporterContext;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
@@ -83,7 +84,10 @@ public class ShapeExporter {
                         switch (settings.mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(Utf8Helper.getBytes(st.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), -2, new CXFORMWITHALPHA(), 0)));
+                                    ExportRectangle rect = new ExportRectangle(st.getRect());
+                                    SVGExporter exporter = new SVGExporter(rect);
+                                    st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                    fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                                 }
                                 break;
                             case PNG:

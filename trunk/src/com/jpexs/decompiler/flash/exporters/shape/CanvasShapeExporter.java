@@ -33,7 +33,6 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
-import java.awt.geom.AffineTransform;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

@@ -17,10 +17,8 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
-import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporterContext;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
@@ -56,12 +54,9 @@ public abstract class ShapeTag extends CharacterTag implements BoundedTag, Drawa
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) throws IOException{
-        ExportRectangle rect = new ExportRectangle(getRect());
-        SVGExporter svgExporter = new SVGExporter(rect, colorTransform);
-        SVGShapeExporter exporter = new SVGShapeExporter(swf, getShapes(), svgExporter, null, colorTransform);
-        exporter.export();
-        return svgExporter.getSVG();
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException{
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShapes(), exporter, null, colorTransform);
+        shapeExporter.export();
     }
 
     @Override

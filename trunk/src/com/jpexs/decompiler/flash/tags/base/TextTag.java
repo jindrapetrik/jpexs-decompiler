@@ -321,7 +321,6 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         int x = 0;
         int y = 0;
         List<SHAPE> glyphs = new ArrayList<>();
-        SVGExporter svgExporter = new SVGExporter(null, colorTransform);
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
@@ -352,7 +351,6 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                     ret += "ctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
                 
                     SHAPE shape = glyphs.get(entry.glyphIndex);
-                    svgExporter.createNewGroup(mat);
                     CanvasShapeExporter exporter = new CanvasShapeExporter(new RGBA(textColor),unitDivisor, swf, shape, colorTransform,0,0);
                     exporter.export();
                     ret += exporter.getShapeData();
@@ -364,14 +362,13 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         return ret;
     }
     
-    public static String staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
+    public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
         int textHeight = 12;
         int x = 0;
         int y = 0;
         List<SHAPE> glyphs = new ArrayList<>();
-        SVGExporter svgExporter = new SVGExporter(null, colorTransform);
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
@@ -399,14 +396,14 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
-                    svgExporter.createNewGroup(mat);
-                    SVGShapeExporter exporter = new SVGShapeExporter(swf, shape, svgExporter, textColor, colorTransform);
-                    exporter.export();
+                    exporter.createSubGroup(mat, null);
+                    SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, textColor, colorTransform);
+                    shapeExporter.export();
+                    exporter.endGroup();
                     x += entry.glyphAdvance;
                 }
             }
         }
-        return svgExporter.getSVG();
     }
 
     @Override

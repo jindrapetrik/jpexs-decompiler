@@ -19,7 +19,8 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
-import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporterContext;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -70,7 +71,10 @@ public class MorphShapeExporter {
                         switch (settings.mode) {
                             case SVG:
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(Utf8Helper.getBytes(mst.toSVG(new SVGExporterContext(outdir, "assets_" + fcharacterID), -2, new CXFORMWITHALPHA(), 0)));
+                                    ExportRectangle rect = new ExportRectangle(mst.getRect());
+                                    SVGExporter exporter = new SVGExporter(rect);
+                                    mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                    fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                                 }
                                 break;
                         }

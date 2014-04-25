@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
-import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporterContext;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -948,8 +948,7 @@ public class DefineEditTextTag extends TextTag {
     }            
     
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
-        return "";
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -35,7 +35,6 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;

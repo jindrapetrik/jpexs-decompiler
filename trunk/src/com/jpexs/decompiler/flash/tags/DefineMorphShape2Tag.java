@@ -19,10 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
-import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporterContext;
 import com.jpexs.decompiler.flash.exporters.morphshape.SVGMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
@@ -329,20 +327,17 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
     }
 
     @Override
-    public String toSVG(SVGExporterContext exporterContext, int ratio, ColorTransform colorTransform, int level) {
-        ExportRectangle rect = new ExportRectangle(getRect());
-        SVGExporter svgExporter = new SVGExporter(rect, colorTransform);
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
         if (ratio == -2) {
             SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
             SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
-            SVGMorphShapeExporter exporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, svgExporter, null, colorTransform);
-            exporter.export();
+            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, exporter, null, colorTransform);
+            shapeExporter.export();
         } else {
             SHAPEWITHSTYLE shapes = getShapeAtRatio(ratio);
-            SVGShapeExporter exporter = new SVGShapeExporter(swf, shapes, svgExporter, null, colorTransform);
-            exporter.export();
+            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shapes, exporter, null, colorTransform);
+            shapeExporter.export();
         }
-        return svgExporter.getSVG();
     }
 
     @Override

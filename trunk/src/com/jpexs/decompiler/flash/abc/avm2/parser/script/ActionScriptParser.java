@@ -564,7 +564,7 @@ public class ActionScriptParser {
             }
             if (namespace == -1) {
                 if (isInterface) {
-                    namespace = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_NAMESPACE, abc.constants.getStringId(packageName.equals("") ? classNameStr : packageName + ":" + classNameStr, true)), 0, true);
+                    namespace = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_NAMESPACE, abc.constants.getStringId(packageName.isEmpty() ? classNameStr : packageName + ":" + classNameStr, true)), 0, true);
                 } else {
                     namespace = packageInternalNs;
                 }

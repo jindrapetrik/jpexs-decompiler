@@ -64,7 +64,6 @@ import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
-import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporterContext;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
@@ -100,10 +99,8 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
-import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Clip;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -1391,8 +1388,12 @@ public final class SWF implements TreeItem, Timelined {
                         int frame = fframes.get(fi);
                         File f = new File(foutdir + File.separator + frame + ".svg");
                         try (FileOutputStream fos = new FileOutputStream(f)) {
-                            SVGExporterContext exportContext = new SVGExporterContext(foutdir.toString(), "assets_" + frame);
-                            fos.write(Utf8Helper.getBytes(frameToSvg(ftim, frame, 0, null, 0, exportContext, ftim.displayRect, new ColorTransform(), fbackgroundColor, 0)));
+                            SVGExporter exporter = new SVGExporter(new ExportRectangle(ftim.displayRect));
+                            if (fbackgroundColor != null) {
+                                exporter.setBackGroundColor(fbackgroundColor);
+                            }
+                            frameToSvg(ftim, frame, 0, null, 0, exporter, new ColorTransform(), 0);
+                            fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
                         ret.add(f);
                     }
@@ -2130,11 +2131,11 @@ public final class SWF implements TreeItem, Timelined {
                 frames.add(i);
             }
         }
-        sb.append("\tvar frame_cnt = " + timeline.getFrameCount() + ";\r\n");
+        sb.append("\tvar frame_cnt = ").append(timeline.getFrameCount()).append(";\r\n");
         sb.append("\tframe = frame % frame_cnt;\r\n");
         sb.append("\tswitch(frame){\r\n");
         for (int frame = 0; frame < frames.size(); frame++) {
-            sb.append("\t\tcase " + frame + ":\r\n");
+            sb.append("\t\tcase ").append(frame).append(":\r\n");
             Frame frameObj = timeline.frames.get(frame);
             int maxDepth = timeline.getMaxDepth();
             for (int i = 1; i <= maxDepth; i++) {
@@ -2221,7 +2222,7 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append(placeMatrix.translateX).append(",");
                     sb.append(placeMatrix.translateY);
                     sb.append(");\r\n");
-                    sb.append("\t\t\tcharacter" + layer.characterId + "(ctx," + f + "," + layer.ratio + ");\r\n");
+                    sb.append("\t\t\tcharacter").append(layer.characterId).append("(ctx,").append(f).append(",").append(layer.ratio).append(");\r\n");
                     sb.append("\t\t\tctx.restore();\r\n");
                 }
             }
@@ -2232,13 +2233,9 @@ public final class SWF implements TreeItem, Timelined {
         return null;
     }
 
-    public static String frameToSvg(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporterContext exporterContext, RECT displayRect, ColorTransform colorTransform, Color backGroundColor, int level) throws IOException {
-        SVGExporter exporter = new SVGExporter(new ExportRectangle(displayRect), colorTransform);
-        if (backGroundColor != null) {
-            exporter.setBackGroundColor(backGroundColor);
-        }
+    public static void frameToSvg(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level) throws IOException {
         if (timeline.frames.size() <= frame) {
-            return exporter.getSVG();
+            return;
         }
         Frame frameObj = timeline.frames.get(frame);
         // TODO g.setTransform(transformation.toTransform());
@@ -2277,40 +2274,28 @@ public final class SWF implements TreeItem, Timelined {
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
 
-                String assetFileName;
+                String assetName;
                 Tag drawableTag = (Tag) drawable;
-                if (exporterContext.exportedTags.containsKey(drawableTag)) {
-                    assetFileName = exporterContext.exportedTags.get(drawableTag);
+                if (exporter.exportedTags.containsKey(drawableTag)) {
+                    assetName = exporter.exportedTags.get(drawableTag);
                 } else {
-                    String assetsDir = exporterContext.outDir + File.separator + exporterContext.assetsDir;
-                    File foutdir = new File(assetsDir);
-                    if (!foutdir.exists()) {
-                        if (!foutdir.mkdirs()) {
-                            if (!foutdir.exists()) {
-                                throw new IOException("Cannot create directory " + assetsDir);
-                            }
-                        }
-                    }
-                    assetFileName = exporterContext.exportedTags.size() + ".svg";
-                    exporterContext.exportedTags.put(drawableTag, assetFileName);
-                    File file = new File(assetsDir + File.separator + assetFileName);
-                    try (FileOutputStream fos = new FileOutputStream(file)) {
-                        fos.write(Utf8Helper.getBytes(drawable.toSVG(exporterContext, layer.ratio, clrTrans, level + 1)));
-                    }
+                    assetName = "asset" + exporter.exportedTags.size();
+                    exporter.exportedTags.put(drawableTag, assetName);
+                    exporter.createDefGroup(new ExportRectangle(drawable.getRect()), assetName);
+                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
+                    exporter.endGroup();
                 }
                 RECT boundRect = drawable.getRect();
                 ExportRectangle rect = new ExportRectangle(boundRect);
 
                 // TODO: if (layer.filters != null)
                 // TODO: if (layer.blendMode > 1)
-                String assetPath = level == 0 ? exporterContext.assetsDir + File.separator + assetFileName : assetFileName;
                 Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                exporter.addImage(mat, boundRect, assetPath);
+                exporter.addImage(mat, boundRect, assetName);
 
                 // TODO: if (layer.clipDepth > -1)...
             }
         }
-        return exporter.getSVG();
     }
 
     public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor) {
