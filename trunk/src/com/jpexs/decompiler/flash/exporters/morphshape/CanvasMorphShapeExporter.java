@@ -384,7 +384,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             for (int j=0;j<gradientRecords.length;j++) {
                 GRADRECORD r = gradientRecords[j];
                 GRADRECORD r2 = gradientRecordsEnd[j];
-                lineFillData += "\tvar s="+useRatioDouble(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0), pos + (oneHeight * (revert ? 255 - r2.ratio : r2.ratio) / 255.0))+"\r\n";
+                lineFillData += "\tvar s="+useRatioDouble(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0), pos + (oneHeight * (revert ? 255 - r2.ratio : r2.ratio) / 255.0))+";\r\n";
                 lineFillData += "\tif(s<0) s = 0;\r\n\tif(s>1) s = 1;\r\n";
                 lineFillData += "\tgrd.addColorStop(s," + useRatioColor(r.color,r2.color) + ");\r\n";
                 lineLastRadColor = useRatioColor(r.color,r2.color);
