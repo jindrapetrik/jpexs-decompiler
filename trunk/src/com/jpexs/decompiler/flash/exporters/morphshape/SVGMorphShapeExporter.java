@@ -103,7 +103,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     }
 
     @Override
-    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
+    public void beginBitmapFill(int bitmapId, Matrix matrix, Matrix matrixEnd, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
         ImageTag image = null;
         for (Tag t : swf.tags) {
@@ -145,6 +145,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 pattern.setAttribute("width", "" + width);
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
+                //TODO: animate matrix
                 if (matrix != null) {
                     double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
                     double translateY = roundPixels400(matrix.translateY / SWF.unitDivisor);

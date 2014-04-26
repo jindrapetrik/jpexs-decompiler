@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.morphshape.CanvasMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.morphshape.SVGMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
@@ -69,6 +70,7 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
     public SHAPE startEdges;
     public SHAPE endEdges;
     public static final int ID = 46;
+    public static final int MAX_RATIO = 65535;
 
     @Override
     public Set<Integer> getNeededCharacters() {
@@ -221,8 +223,8 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
                 }
                 StyleChangeRecord scr = (StyleChangeRecord) scr1.clone();
                 if (scr1.stateMoveTo || scr2.stateMoveTo) {
-                    scr.moveDeltaX = startPosX + (endPosX - startPosX) * ratio / 65535;
-                    scr.moveDeltaY = startPosY + (endPosY - startPosY) * ratio / 65535;
+                    scr.moveDeltaX = startPosX + (endPosX - startPosX) * ratio / MAX_RATIO;
+                    scr.moveDeltaY = startPosY + (endPosY - startPosY) * ratio / MAX_RATIO;
                     scr.stateMoveTo = scr.moveDeltaX != posX || scr.moveDeltaY != posY;
                 }
                 finalRecords.add(scr);
@@ -255,10 +257,10 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
                     continue;
                 }
                 CurvedEdgeRecord cer = new CurvedEdgeRecord();
-                cer.controlDeltaX = cer1.controlDeltaX + (cer2.controlDeltaX - cer1.controlDeltaX) * ratio / 65535;
-                cer.controlDeltaY = cer1.controlDeltaY + (cer2.controlDeltaY - cer1.controlDeltaY) * ratio / 65535;
-                cer.anchorDeltaX = cer1.anchorDeltaX + (cer2.anchorDeltaX - cer1.anchorDeltaX) * ratio / 65535;
-                cer.anchorDeltaY = cer1.anchorDeltaY + (cer2.anchorDeltaY - cer1.anchorDeltaY) * ratio / 65535;
+                cer.controlDeltaX = cer1.controlDeltaX + (cer2.controlDeltaX - cer1.controlDeltaX) * ratio / MAX_RATIO;
+                cer.controlDeltaY = cer1.controlDeltaY + (cer2.controlDeltaY - cer1.controlDeltaY) * ratio / MAX_RATIO;
+                cer.anchorDeltaX = cer1.anchorDeltaX + (cer2.anchorDeltaX - cer1.anchorDeltaX) * ratio / MAX_RATIO;
+                cer.anchorDeltaY = cer1.anchorDeltaY + (cer2.anchorDeltaY - cer1.anchorDeltaY) * ratio / MAX_RATIO;
                 startPosX += cer1.controlDeltaX + cer1.anchorDeltaX;
                 startPosY += cer1.controlDeltaY + cer1.anchorDeltaY;
                 endPosX += cer2.controlDeltaX + cer2.anchorDeltaX;
@@ -281,8 +283,8 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
                 StraightEdgeRecord ser = new StraightEdgeRecord();
                 ser.generalLineFlag = true;
                 ser.vertLineFlag = false;
-                ser.deltaX = ser1.deltaX + (ser2.deltaX - ser1.deltaX) * ratio / 65535;
-                ser.deltaY = ser1.deltaY + (ser2.deltaY - ser1.deltaY) * ratio / 65535;
+                ser.deltaX = ser1.deltaX + (ser2.deltaX - ser1.deltaX) * ratio / MAX_RATIO;
+                ser.deltaY = ser1.deltaY + (ser2.deltaY - ser1.deltaY) * ratio / MAX_RATIO;
                 startPosX += ser1.deltaX;
                 startPosY += ser1.deltaY;
                 endPosX += ser2.deltaX;
@@ -341,6 +343,9 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
     
     @Override
     public String toHtmlCanvas(double unitDivisor) {
-        return ""; //TODO
+        CanvasMorphShapeExporter cmse = new CanvasMorphShapeExporter(swf, getShapeAtRatio(0), getShapeAtRatio(MAX_RATIO), new ColorTransform(), unitDivisor, 0, 0);
+        cmse.export();
+        
+        return cmse.getShapeData();
     }
 }

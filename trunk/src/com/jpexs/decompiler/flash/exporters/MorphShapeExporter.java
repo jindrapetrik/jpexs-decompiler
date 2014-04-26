@@ -19,9 +19,13 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
+import com.jpexs.decompiler.flash.exporters.morphshape.CanvasMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
+import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -60,7 +64,7 @@ public class MorphShapeExporter {
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterId();
                 }
-                String ext = "svg";
+                String ext = settings.mode==MorphShapeExportMode.CANVAS?"html":"svg";
 
                 final File file = new File(outdir + File.separator + characterID + "." + ext);
                 final int fcharacterID = characterID;
@@ -77,6 +81,15 @@ public class MorphShapeExporter {
                                     fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                                 }
                                 break;
+                            case CANVAS:
+                                try (FileOutputStream fos = new FileOutputStream(file)) {                                    
+                                    int deltaX = -Math.min(mst.getStartBounds().Xmin,mst.getEndBounds().Xmin);
+                                    int deltaY = -Math.min(mst.getStartBounds().Ymin,mst.getEndBounds().Ymin);
+                                    CanvasMorphShapeExporter cse = new CanvasMorphShapeExporter(((Tag)mst).getSwf(),mst.getShapeAtRatio(0),mst.getShapeAtRatio(DefineMorphShapeTag.MAX_RATIO), new CXFORMWITHALPHA(),SWF.unitDivisor,deltaX,deltaY);
+                                    cse.export();                                                                        
+                                    fos.write(Utf8Helper.getBytes(cse.getHtml()));
+                                }
+                                break;                                
                         }
 
                     }

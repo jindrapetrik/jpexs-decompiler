@@ -23,7 +23,8 @@ package com.jpexs.decompiler.flash.exporters.modes;
 public enum MorphShapeExportMode {
 
     //TODO: implement other morphshape export modes
-    SVG
+    SVG,
+    CANVAS
     //PNG,
     //GIF,
     //AVI

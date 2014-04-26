@@ -104,6 +104,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         this.swf = swf;
         this.unitDivisor = unitDivisor;
         this.basicFill = basicFill;
+        this.deltaX = deltaX;
+        this.deltaY = deltaY;
     }
 
     @Override
@@ -169,10 +171,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
             matrix.translateX += deltaX / unitDivisor;
             matrix.translateY += deltaY / unitDivisor;
-
-            //TODO: Focal point
-            
-            fillData += "var grd=ctx.createRadialGradient(0,0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
+                        
+            fillData += "var grd=ctx.createRadialGradient("+focalPointRatio*16384+",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
         }
         int repeatTotal = repeatCnt * 2 + 1;
         double oneHeight = 1.0 / repeatTotal;
@@ -247,7 +247,6 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                     matrix.rotateSkew0 /= unitDivisor;
                     matrix.rotateSkew1 /= unitDivisor;
                     fillMatrix = matrix;
-
                 }
 
                 fillData += "var img = document.createElement(\"img\"); img.src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n";
@@ -338,7 +337,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 }
                 pathData += "ctx.save();\r\n";
                 pathData += "ctx.clip();\r\n";
-                pathData += "ctx.transform(" + fillMatrix.scaleX + "," + fillMatrix.rotateSkew0 + "," + fillMatrix.rotateSkew1 + "," + fillMatrix.scaleY + "," + fillMatrix.translateX + "," + fillMatrix.translateY + ");\r\n";
+                pathData += "ctx.transform(" + fillMatrix.scaleX + "," + fillMatrix.rotateSkew0 + "," + fillMatrix.rotateSkew1 + "," + fillMatrix.scaleY + "," + fillMatrix.translateX + "," + fillMatrix.translateY + ");\r\n";                
                 pathData += fillData;
                 pathData += "ctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
                 pathData += "ctx.restore();\r\n";

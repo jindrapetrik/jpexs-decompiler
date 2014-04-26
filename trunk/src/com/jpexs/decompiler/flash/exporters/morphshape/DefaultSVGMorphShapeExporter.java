@@ -76,7 +76,7 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
     }
 
     @Override
-    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
+    public void beginBitmapFill(int bitmapId, Matrix matrix, Matrix matrixEnd, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
     }
 

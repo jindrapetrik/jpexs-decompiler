@@ -1441,12 +1441,12 @@ public final class SWF implements TreeItem, Timelined {
                         fos.write(Utf8Helper.getBytes("window.setInterval(function(){nextFrame(ctx)}," + (int) (1000.0 / timeline.swf.frameRate) + ");\r\n"));
                     }
 
-                    if (Configuration.packJavaScripts.get()) {
+                   /* if (Configuration.packJavaScripts.get()) {
                         JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
                         f.delete();
-                    } else {
+                    } else {*/
                         f.renameTo(fmin);
-                    }
+                    //}
 
                     File fh = new File(foutdir + File.separator + "frames.html");
                     try (FileOutputStream fos = new FileOutputStream(fh); FileInputStream fis = new FileInputStream(fmin)) {

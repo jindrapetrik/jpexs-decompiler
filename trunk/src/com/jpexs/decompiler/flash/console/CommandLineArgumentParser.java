@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FramesExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
@@ -40,6 +41,7 @@ import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FramesExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
@@ -546,6 +548,7 @@ public class CommandLineArgumentParser {
             "script",
             "image",
             "shape",
+            "morphshape",
             "movie",
             "sound",
             "binarydata",
@@ -664,6 +667,11 @@ public class CommandLineArgumentParser {
                         System.out.println("Exporting shapes...");
                         exfile.exportShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "shapes" : ""),
                                 new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class)));
+                    }
+                    case "morphshape": {
+                        System.out.println("Exporting morphshapes...");
+                        exfile.exportMorphShapes(handler, outDir.getAbsolutePath() + (exportFormats.length > 1 ? File.separator + "morphshapes" : ""),
+                                new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class)));
                     }
                     break;
                     case "script":

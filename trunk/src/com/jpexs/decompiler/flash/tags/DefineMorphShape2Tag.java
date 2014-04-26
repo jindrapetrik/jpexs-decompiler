@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.morphshape.CanvasMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.morphshape.SVGMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
@@ -77,6 +78,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
     public SHAPE startEdges;
     public SHAPE endEdges;
     public static final int ID = 84;
+    public static final int MAX_RATIO = 65535;
 
     @Override
     public Set<Integer> getNeededCharacters() {
@@ -358,6 +360,9 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
     
     @Override
     public String toHtmlCanvas(double unitDivisor) {
-        return ""; //TODO
+        CanvasMorphShapeExporter cmse = new CanvasMorphShapeExporter(swf, getShapeAtRatio(0), getShapeAtRatio(MAX_RATIO), new ColorTransform(), unitDivisor, 0, 0);
+        cmse.export();
+        
+        return cmse.getShapeData();
     }
 }
