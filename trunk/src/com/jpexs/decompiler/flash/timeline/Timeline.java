@@ -184,7 +184,11 @@ public class Timeline {
             if (ds != null) {
                 CharacterTag c = swf.characters.get(ds.characterId);
                 if (c instanceof Timelined) {
-                    int dframe = (time + ds.time) % ((Timelined) c).getTimeline().frames.size();
+                    int frameCount = ((Timelined) c).getTimeline().frames.size();
+                    if (frameCount == 0) {
+                        continue;
+                    }
+                    int dframe = (time + ds.time) % frameCount;
                     if (c instanceof ButtonTag) {
                         ButtonTag bt = (ButtonTag) c;
                         dframe = ButtonTag.FRAME_UP;
@@ -230,7 +234,11 @@ public class Timeline {
 
                 int dframe = 0;
                 if (c instanceof Timelined) {
-                    dframe = ds.time % ((Timelined) c).getTimeline().frames.size();
+                    int frameCount = ((Timelined) c).getTimeline().frames.size();
+                    if (frameCount == 0) {
+                        return;
+                    }
+                    dframe = ds.time % frameCount;
                     if (c instanceof ButtonTag) {
                         ButtonTag bt = (ButtonTag) c;
                         dframe = ButtonTag.FRAME_HITTEST;

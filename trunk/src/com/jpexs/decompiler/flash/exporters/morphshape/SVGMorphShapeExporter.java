@@ -145,16 +145,16 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 pattern.setAttribute("width", "" + width);
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
-                //TODO: animate matrix
                 if (matrix != null) {
-                    double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
+                    addMatrixAnimation(pattern, "patternTransform", matrix, matrixEnd);
+                    /*double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
                     double translateY = roundPixels400(matrix.translateY / SWF.unitDivisor);
                     double rotateSkew0 = roundPixels400(matrix.rotateSkew0 / SWF.unitDivisor);
                     double rotateSkew1 = roundPixels400(matrix.rotateSkew1 / SWF.unitDivisor);
                     double scaleX = roundPixels400(matrix.scaleX / SWF.unitDivisor);
                     double scaleY = roundPixels400(matrix.scaleY / SWF.unitDivisor);
                     pattern.setAttribute("patternTransform", "matrix(" + scaleX + ", " + rotateSkew0
-                            + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
+                            + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");*/
                 }
                 Element imageElement = exporter.createElement("image");
                 imageElement.setAttribute("width", "" + width);
@@ -251,6 +251,61 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         super.finalizePath();
     }
 
+    private void addMatrixAnimation(Element element, String attribute, Matrix matrix, Matrix matrixEnd) {
+        final int animationLength = 2; // todo
+        final String animationLengthStr = animationLength + "s";
+        double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
+        double translateY = roundPixels400(matrix.translateY / SWF.unitDivisor);
+        double a = roundPixels400(matrix.scaleX);
+        double b = roundPixels400(matrix.rotateSkew1);
+        double c = roundPixels400(matrix.rotateSkew0);
+        double d = roundPixels400(matrix.scaleY);
+        double rotate = Math.atan2(c, d);
+        double scaleX = Math.signum(a) * Math.sqrt(a * a + b * b);
+        double scaleY = Math.signum(d) * Math.sqrt(c * c + d * d);
+
+        double translateXEnd = roundPixels400(matrixEnd.translateX / SWF.unitDivisor);
+        double translateYEnd = roundPixels400(matrixEnd.translateY / SWF.unitDivisor);
+        a = roundPixels400(matrixEnd.scaleX);
+        b = roundPixels400(matrixEnd.rotateSkew1);
+        c = roundPixels400(matrixEnd.rotateSkew0);
+        d = roundPixels400(matrixEnd.scaleY);
+        double rotateEnd = Math.atan2(c, d);
+        double scaleXEnd = Math.signum(a) * Math.sqrt(a * a + b * b);
+        double scaleYEnd = Math.signum(d) * Math.sqrt(c * c + d * d);
+
+        Element animateRotate = exporter.createElement("animateTransform");
+        animateRotate.setAttribute("dur", animationLengthStr);
+        animateRotate.setAttribute("repeatCount", "indefinite");
+        animateRotate.setAttribute("attributeName", attribute);
+        animateRotate.setAttribute("type", "rotate");
+        animateRotate.setAttribute("additive", "sum");
+        animateRotate.setAttribute("from", Double.toString(rotate));
+        animateRotate.setAttribute("to", Double.toString(rotateEnd));
+
+        Element animateScale = exporter.createElement("animateTransform");
+        animateScale.setAttribute("dur", animationLengthStr);
+        animateScale.setAttribute("repeatCount", "indefinite");
+        animateScale.setAttribute("attributeName", attribute);
+        animateScale.setAttribute("type", "scale");
+        animateScale.setAttribute("additive", "sum");
+        animateScale.setAttribute("from", scaleX + " " + scaleY);
+        animateScale.setAttribute("to", scaleXEnd + " " + scaleYEnd);
+
+        Element animateTranslate = exporter.createElement("animateTransform");
+        animateTranslate.setAttribute("dur", animationLengthStr);
+        animateTranslate.setAttribute("repeatCount", "indefinite");
+        animateTranslate.setAttribute("attributeName", attribute);
+        animateTranslate.setAttribute("type", "translate");
+        animateTranslate.setAttribute("additive", "sum");
+        animateTranslate.setAttribute("from", translateX + " " + translateY);
+        animateTranslate.setAttribute("to", translateXEnd + " " + translateYEnd);
+
+        element.appendChild(animateTranslate);
+        element.appendChild(animateScale);
+        element.appendChild(animateRotate);
+    }
+    
     protected void populateGradientElement(Element gradient, int type, GRADRECORD[] gradientRecords, GRADRECORD[] gradientRecordsEnd, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         gradient.setAttribute("gradientUnits", "userSpaceOnUse");
         if (type == FILLSTYLE.LINEAR_GRADIENT) {
@@ -280,56 +335,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             gradient.setAttribute("color-interpolation", "linearRGB");
         }
         if (matrix != null) {
-            double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
-            double translateY = roundPixels400(matrix.translateY / SWF.unitDivisor);
-            double a = roundPixels400(matrix.scaleX);
-            double b = roundPixels400(matrix.rotateSkew1);
-            double c = roundPixels400(matrix.rotateSkew0);
-            double d = roundPixels400(matrix.scaleY);
-            double rotate = Math.atan2(c, d);
-            double scaleX = Math.signum(a) * Math.sqrt(a * a + b * b);
-            double scaleY = Math.signum(d) * Math.sqrt(c * c + d * d);
-
-            double translateXEnd = roundPixels400(matrixEnd.translateX / SWF.unitDivisor);
-            double translateYEnd = roundPixels400(matrixEnd.translateY / SWF.unitDivisor);
-            a = roundPixels400(matrixEnd.scaleX);
-            b = roundPixels400(matrixEnd.rotateSkew1);
-            c = roundPixels400(matrixEnd.rotateSkew0);
-            d = roundPixels400(matrixEnd.scaleY);
-            double rotateEnd = Math.atan2(c, d);
-            double scaleXEnd = Math.signum(a) * Math.sqrt(a * a + b * b);
-            double scaleYEnd = Math.signum(d) * Math.sqrt(c * c + d * d);
-
-            Element animateRotate = exporter.createElement("animateTransform");
-            animateRotate.setAttribute("dur", "2s"); // todo
-            animateRotate.setAttribute("repeatCount", "indefinite");
-            animateRotate.setAttribute("attributeName", "gradientTransform");
-            animateRotate.setAttribute("type", "rotate");
-            animateRotate.setAttribute("additive", "sum");
-            animateRotate.setAttribute("from", Double.toString(rotate));
-            animateRotate.setAttribute("to", Double.toString(rotateEnd));
-
-            Element animateScale = exporter.createElement("animateTransform");
-            animateScale.setAttribute("dur", "2s"); // todo
-            animateScale.setAttribute("repeatCount", "indefinite");
-            animateScale.setAttribute("attributeName", "gradientTransform");
-            animateScale.setAttribute("type", "scale");
-            animateScale.setAttribute("additive", "sum");
-            animateScale.setAttribute("from", scaleX + " " + scaleY);
-            animateScale.setAttribute("to", scaleXEnd + " " + scaleYEnd);
-
-            Element animateTranslate = exporter.createElement("animateTransform");
-            animateTranslate.setAttribute("dur", "2s"); // todo
-            animateTranslate.setAttribute("repeatCount", "indefinite");
-            animateTranslate.setAttribute("attributeName", "gradientTransform");
-            animateTranslate.setAttribute("type", "translate");
-            animateTranslate.setAttribute("additive", "sum");
-            animateTranslate.setAttribute("from", translateX + " " + translateY);
-            animateTranslate.setAttribute("to", translateXEnd + " " + translateYEnd);
-
-            gradient.appendChild(animateTranslate);
-            gradient.appendChild(animateScale);
-            gradient.appendChild(animateRotate);
+            addMatrixAnimation(gradient, "gradientTransform", matrix, matrixEnd);
         }
         for (int i = 0; i < gradientRecords.length; i++) {
             GRADRECORD record = gradientRecords[i];

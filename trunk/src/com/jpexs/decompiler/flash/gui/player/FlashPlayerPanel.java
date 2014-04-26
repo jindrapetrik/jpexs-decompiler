@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.player;
 
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -42,6 +43,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -246,6 +249,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         String exePath = appDir + "lib\\FlashPlayer.exe";
         File f = new File(exePath);
         if (!f.exists()) {
+            Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, "FlashPlayer.exe not found: " + f.getPath());
             return;
         }
 

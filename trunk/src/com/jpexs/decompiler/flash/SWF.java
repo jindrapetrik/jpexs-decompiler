@@ -2413,7 +2413,11 @@ public final class SWF implements TreeItem, Timelined {
                 DrawableTag drawable = (DrawableTag) character;
                 SerializableImage img;
                 Matrix drawMatrix = new Matrix();
-                int dframe = (time + layer.time) % drawable.getNumFrames();
+                int drawableFrameCount = drawable.getNumFrames();
+                if (drawableFrameCount == 0) {
+                    continue;
+                }
+                int dframe = (time + layer.time) % drawableFrameCount;
                 if (character instanceof ButtonTag) {
                     ButtonTag bt = (ButtonTag) character;
                     dframe = ButtonTag.FRAME_UP;
