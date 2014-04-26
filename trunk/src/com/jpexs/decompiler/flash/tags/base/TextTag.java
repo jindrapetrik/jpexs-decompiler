@@ -400,7 +400,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
             double rat = textHeight / 1024.0 / font.getDivider();
 
             exporter.createSubGroup(new Matrix(textMatrix), null);
-            if (true || exporter.useTextTag) {
+            if (exporter.useTextTag) {
                 StringBuilder text = new StringBuilder();
                 for (GLYPHENTRY entry : rec.glyphEntries) {
                     if (entry.glyphIndex != -1) {
@@ -419,7 +419,8 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 textElement.setAttribute("font-family", font.getFontName());
                 textElement.setTextContent(text.toString());
                 exporter.addToGroup(textElement);
-                exporter.addStyle(font.getFontName(), new FontExporter().exportFont(font, FontExportMode.TTF));
+                FontExportMode fontExportMode = FontExportMode.TTF; // todo: change this to WOFF
+                exporter.addStyle(font.getFontName(), new FontExporter().exportFont(font, fontExportMode), fontExportMode);
                 
                 if (hasOffset) {
                     exporter.endGroup();

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -204,7 +205,7 @@ public class SVGExporter {
         return image;
     }
 
-    public void addStyle(String fontFace, byte[] data) {
+    public void addStyle(String fontFace, byte[] data, FontExportMode mode) {
         if (!fontFaces.contains(fontFace)){
             fontFaces.add(fontFace);
             String base64Data = DatatypeConverter.printBase64Binary(data);
@@ -212,7 +213,14 @@ public class SVGExporter {
             value += Helper.newLine;
             value += "      @font-face {" + Helper.newLine;
             value += "        font-family: \"" + fontFace + "\";" + Helper.newLine;
-            value += "        src: url('data:font/truetype;base64,[" + base64Data + "]') format(\"truetype\");" + Helper.newLine;
+            switch (mode) {
+                case TTF:
+                    value += "        src: url('data:font/truetype;base64,[" + base64Data + "]') format(\"truetype\");" + Helper.newLine;
+                    break;
+                case WOFF:
+                    value += "        src: url('data:font/woff;base64,[" + base64Data + "]') format(\"woff\");" + Helper.newLine;
+                    break;
+            }
             value += "      }" + Helper.newLine;
             getStyle().setTextContent(value);
         }

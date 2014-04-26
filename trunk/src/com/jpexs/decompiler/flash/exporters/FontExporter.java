@@ -81,7 +81,15 @@ public class FontExporter {
 
     public byte[] exportFont(final FontTag t, FontExportMode mode) {
         try {
-            File f = File.createTempFile("temp", ".ttf");
+            String ext = null;
+            switch (mode) {
+                case TTF:
+                    ext = ".ttf";
+                    break;
+                case WOFF:
+                    ext = ".woff";
+            }
+            File f = File.createTempFile("temp", ext);
             exportFont(t, mode, f);
             return Helper.readFile(f.getPath());
         } catch (IOException ex) {
@@ -95,6 +103,7 @@ public class FontExporter {
         Fontastic f = new Fontastic(t.getFontName(), file);
         String cop = t.getCopyright();
 
+        // TODO: WOFF export
         f.getEngine().setCopyrightYear(cop == null ? "" : cop);
         f.setAuthor(ApplicationInfo.shortApplicationVerName);
         f.setVersion("1.0");

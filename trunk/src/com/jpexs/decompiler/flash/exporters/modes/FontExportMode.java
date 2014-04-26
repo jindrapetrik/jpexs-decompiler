@@ -22,5 +22,6 @@ package com.jpexs.decompiler.flash.exporters.modes;
  */
 public enum FontExportMode {
 
-    TTF
+    TTF,
+    WOFF
 }

@@ -20,20 +20,14 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.Point;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
-import static com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter.color;
-import static com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter.getHtmlPrefix;
-import static com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter.getHtmlSuffix;
-import static com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter.getJsPrefix;
 import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
-import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
@@ -44,7 +38,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 import javax.imageio.ImageIO;
-import javax.xml.bind.DatatypeConverter;
 
 /**
  *
