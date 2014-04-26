@@ -418,6 +418,15 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 textElement.setAttribute("font-size", Double.toString(rat * 1024));
                 textElement.setAttribute("font-family", font.getFontName());
                 textElement.setTextContent(text.toString());
+
+                if (textColor != null) {
+                    RGBA colorA = new RGBA(textColor);
+                    textElement.setAttribute("fill", colorA.toHexRGB());
+                    if (colorA.alpha != 255) {
+                        textElement.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
+                    }
+                }
+                
                 exporter.addToGroup(textElement);
                 FontExportMode fontExportMode = FontExportMode.TTF; // todo: change this to WOFF
                 exporter.addStyle(font.getFontName(), new FontExporter().exportFont(font, fontExportMode), fontExportMode);
