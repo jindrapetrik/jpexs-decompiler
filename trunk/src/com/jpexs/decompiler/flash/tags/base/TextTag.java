@@ -402,10 +402,12 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
             exporter.createSubGroup(new Matrix(textMatrix), null);
             if (exporter.useTextTag) {
                 StringBuilder text = new StringBuilder();
+                int totalAdvance = 0;
                 for (GLYPHENTRY entry : rec.glyphEntries) {
                     if (entry.glyphIndex != -1) {
                         char ch = font.glyphToChar(entry.glyphIndex);
                         text.append(ch);
+                        totalAdvance += entry.glyphAdvance;
                     }
                 }
 
@@ -417,6 +419,8 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 Element textElement = exporter.createElement("text");
                 textElement.setAttribute("font-size", Double.toString(rat * 1024));
                 textElement.setAttribute("font-family", font.getFontName());
+                textElement.setAttribute("textLength", Double.toString(totalAdvance / SWF.unitDivisor));
+                textElement.setAttribute("lengthAdjust", "spacing");
                 textElement.setTextContent(text.toString());
 
                 if (textColor != null) {
