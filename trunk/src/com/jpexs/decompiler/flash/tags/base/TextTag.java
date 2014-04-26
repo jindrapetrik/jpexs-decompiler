@@ -17,8 +17,10 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.FontExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
@@ -384,54 +386,86 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 glyphs = font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }
+            int offsetX = 0;
+            int offsetY = 0;
             if (rec.styleFlagsHasXOffset) {
-                x = rec.xOffset;
+                offsetX = rec.xOffset;
+                x = offsetX;
             }
             if (rec.styleFlagsHasYOffset) {
-                y = rec.yOffset;
+                offsetY = rec.yOffset;
+                y = offsetY;
             }
 
             double rat = textHeight / 1024.0 / font.getDivider();
 
-            for (GLYPHENTRY entry : rec.glyphEntries) {
-                Matrix mat = (new Matrix(textMatrix).concatenate(Matrix.getTranslateInstance(x - bounds.Xmin, y - bounds.Ymin))).concatenate(Matrix.getScaleInstance(rat));
-                if (entry.glyphIndex != -1) {
-                    // shapeNum: 1
-                    SHAPE shape = glyphs.get(entry.glyphIndex);
-                    char ch = font.glyphToChar(entry.glyphIndex);
-                    
-                    String charId = null;
-                    Map<Character, String> chs;
-                    if (exporter.exportedChars.containsKey(font)) {
-                        chs = exporter.exportedChars.get(font);
-                        if (chs.containsKey(ch)) {
-                            charId = chs.get(ch);
-                        }
-                    } else {
-                        chs = new HashMap<>();
-                        exporter.exportedChars.put(font, chs);
+            exporter.createSubGroup(new Matrix(textMatrix), null);
+            if (true || exporter.useTextTag) {
+                StringBuilder text = new StringBuilder();
+                for (GLYPHENTRY entry : rec.glyphEntries) {
+                    if (entry.glyphIndex != -1) {
+                        char ch = font.glyphToChar(entry.glyphIndex);
+                        text.append(ch);
                     }
-                    
-                    if (charId == null) {
-                        charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontName() + "_" + ch));
-                        exporter.createDefGroup(null, charId);
-                        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform);
-                        shapeExporter.export();
-                        exporter.endGroup();
-                        chs.put(ch, charId);
-                    }
+                }
 
-                    Element charImage = exporter.addImage(mat, bounds, charId);
-                    if (textColor != null) {
-                        RGBA colorA = new RGBA(textColor);
-                        charImage.setAttribute("fill", colorA.toHexRGB());
-                        if (colorA.alpha != 255) {
-                            charImage.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
+                boolean hasOffset = offsetX != 0 || offsetY != 0;
+                if (hasOffset) {
+                    exporter.createSubGroup(Matrix.getTranslateInstance(offsetX, offsetY), null);
+                }
+                
+                Element textElement = exporter.createElement("text");
+                textElement.setAttribute("font-size", Double.toString(rat * 1024));
+                textElement.setAttribute("font-family", font.getFontName());
+                textElement.setTextContent(text.toString());
+                exporter.addToGroup(textElement);
+                exporter.addStyle(font.getFontName(), new FontExporter().exportFont(font, FontExportMode.TTF));
+                
+                if (hasOffset) {
+                    exporter.endGroup();
+                }
+            } else {
+                for (GLYPHENTRY entry : rec.glyphEntries) {
+                    Matrix mat = Matrix.getTranslateInstance(x, y).concatenate(Matrix.getScaleInstance(rat));
+                    if (entry.glyphIndex != -1) {
+                        // shapeNum: 1
+                        SHAPE shape = glyphs.get(entry.glyphIndex);
+                        char ch = font.glyphToChar(entry.glyphIndex);
+
+                        String charId = null;
+                        Map<Character, String> chs;
+                        if (exporter.exportedChars.containsKey(font)) {
+                            chs = exporter.exportedChars.get(font);
+                            if (chs.containsKey(ch)) {
+                                charId = chs.get(ch);
+                            }
+                        } else {
+                            chs = new HashMap<>();
+                            exporter.exportedChars.put(font, chs);
                         }
+
+                        if (charId == null) {
+                            charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontName() + "_" + ch));
+                            exporter.createDefGroup(null, charId);
+                            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform);
+                            shapeExporter.export();
+                            exporter.endGroup();
+                            chs.put(ch, charId);
+                        }
+
+                        Element charImage = exporter.addUse(mat, bounds, charId);
+                        if (textColor != null) {
+                            RGBA colorA = new RGBA(textColor);
+                            charImage.setAttribute("fill", colorA.toHexRGB());
+                            if (colorA.alpha != 255) {
+                                charImage.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
+                            }
+                        }
+                        x += entry.glyphAdvance;
                     }
-                    x += entry.glyphAdvance;
                 }
             }
+            exporter.endGroup();
         }
     }
 

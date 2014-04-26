@@ -17,18 +17,22 @@
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.helpers.Helper;
 import java.awt.Color;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -39,6 +43,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
+import org.w3c.dom.CDATASection;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
@@ -56,12 +61,15 @@ public class SVGExporter {
 
     protected Document _svg;
     protected Element _svgDefs;
+    protected CDATASection _svgStyle;
     protected Stack<Element> _svgGs = new Stack<>();
     public List<Element> gradients;
     protected int lastPatternId;
     public Map<Tag, String> exportedTags = new HashMap<>();
     public Map<Tag, Map<Character, String>> exportedChars = new HashMap<>();
-    private Map<String, Integer> lastIds = new HashMap<>();
+    private final Map<String, Integer> lastIds = new HashMap<>();
+    private final HashSet<String> fontFaces = new HashSet<>();
+    public boolean useTextTag = Configuration.textExportExportFontFace.get();
 
     public SVGExporter(ExportRectangle bounds) {
 
@@ -74,8 +82,6 @@ public class SVGExporter {
             _svg = impl.createDocument(sNamespace, "svg", svgDocType);
             Element svgRoot = _svg.getDocumentElement();
             svgRoot.setAttribute("xmlns:xlink", xlinkNamespace);
-            _svgDefs = _svg.createElement("defs");
-            svgRoot.appendChild(_svgDefs);
             if (bounds != null) {
                 svgRoot.setAttribute("width", (bounds.getWidth() / SWF.unitDivisor) + "px");
                 svgRoot.setAttribute("height", (bounds.getHeight() / SWF.unitDivisor) + "px");
@@ -87,6 +93,24 @@ public class SVGExporter {
         gradients = new ArrayList<>();
     }
 
+    private Element getDefs() {
+        if (_svgDefs == null) {
+            _svgDefs = _svg.createElement("defs");
+            _svg.getDocumentElement().appendChild(_svgDefs);
+        }
+        return _svgDefs;
+    }
+    
+    private CDATASection getStyle() {
+        if (_svgStyle == null) {
+            Element style = _svg.createElement("style");
+            _svgStyle = _svg.createCDATASection("");
+            style.appendChild(_svgStyle);
+            _svgDefs.appendChild(style);
+        }
+        return _svgStyle;
+    }
+    
     public final void createDefGroup(ExportRectangle bounds, String id) {
         Element g = _svg.createElement("g");
         if (bounds != null) {
@@ -99,7 +123,7 @@ public class SVGExporter {
         if (_svgGs.size() == 0) {
            _svg.getDocumentElement().appendChild(g);
         } else {
-            _svgDefs.appendChild(g);
+            getDefs().appendChild(g);
         }
         _svgGs.add(g);
     }
@@ -133,7 +157,7 @@ public class SVGExporter {
     }
 
     public void addToDefs(Node newChild) {
-        _svgDefs.appendChild(newChild);
+        getDefs().appendChild(newChild);
     }
 
     public Element createElement(String tagName) {
@@ -161,7 +185,7 @@ public class SVGExporter {
         attr.setValue("background: " + new RGBA(backGroundColor).toHexARGB());
     }
 
-    public Element addImage(Matrix transform, RECT boundRect, String href) {
+    public Element addUse(Matrix transform, RECT boundRect, String href) {
         Element image = _svg.createElement("use");
         if (transform != null) {
             double translateX = roundPixels400(transform.translateX / SWF.unitDivisor);
@@ -180,6 +204,20 @@ public class SVGExporter {
         return image;
     }
 
+    public void addStyle(String fontFace, byte[] data) {
+        if (!fontFaces.contains(fontFace)){
+            fontFaces.add(fontFace);
+            String base64Data = DatatypeConverter.printBase64Binary(data);
+            String value = getStyle().getTextContent();
+            value += Helper.newLine;
+            value += "      @font-face {" + Helper.newLine;
+            value += "        font-family: \"" + fontFace + "\";" + Helper.newLine;
+            value += "        src: url('data:font/truetype;base64,[" + base64Data + "]') format(\"truetype\");" + Helper.newLine;
+            value += "      }" + Helper.newLine;
+            getStyle().setTextContent(value);
+        }
+    }
+    
     public String getUniqueId(String prefix) {
         Integer lastId = lastIds.get(prefix);
         if (lastId == null) {

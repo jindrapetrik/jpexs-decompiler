@@ -2291,7 +2291,7 @@ public final class SWF implements TreeItem, Timelined {
                 // TODO: if (layer.filters != null)
                 // TODO: if (layer.blendMode > 1)
                 Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                exporter.addImage(mat, boundRect, assetName);
+                exporter.addUse(mat, boundRect, assetName);
 
                 // TODO: if (layer.clipDepth > -1)...
             }

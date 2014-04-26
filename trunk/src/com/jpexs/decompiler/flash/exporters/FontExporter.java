@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.helpers.Helper;
 import fontastic.FGlyph;
 import fontastic.FPoint;
 import fontastic.Fontastic;
@@ -35,6 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -76,6 +79,17 @@ public class FontExporter {
         return ret;
     }
 
+    public byte[] exportFont(final FontTag t, FontExportMode mode) {
+        try {
+            File f = File.createTempFile("temp", ".ttf");
+            exportFont(t, mode, f);
+            return Helper.readFile(f.getPath());
+        } catch (IOException ex) {
+            Logger.getLogger(FontExporter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return new byte[0];
+    }
+    
     public void exportFont(final FontTag t, FontExportMode mode, File file) throws IOException {
         List<SHAPE> shapes = t.getGlyphShapeTable();
         Fontastic f = new Fontastic(t.getFontName(), file);
@@ -86,7 +100,6 @@ public class FontExporter {
         f.setVersion("1.0");
         f.setAscender(t.getAscent() / t.getDivider());
         f.setDescender(t.getDescent() / t.getDivider());
-        //f.set
 
         for (int i = 0; i < shapes.size(); i++) {
             SHAPE s = shapes.get(i);
@@ -102,8 +115,6 @@ public class FontExporter {
                 }
 
                 List<FPoint> path = new ArrayList<>();
-                private double lastX = 0;
-                private double lastY = 0;
 
                 @Override
                 protected void finalizePath() {
@@ -117,22 +128,16 @@ public class FontExporter {
                 @Override
                 public void moveTo(double x, double y) {
                     finalizePath();
-                    lastX = x;
-                    lastY = y;
                     path.add(new FPoint(new PVector(transformX(x), transformY(y))));
                 }
 
                 @Override
                 public void lineTo(double x, double y) {
-                    lastX = x;
-                    lastY = y;
                     path.add(new FPoint(new PVector(transformX(x), transformY(y))));
                 }
 
                 @Override
                 public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
-                    lastX = anchorX;
-                    lastY = anchorY;
                     path.add(new FPoint(
                             new PVector(transformX(anchorX), transformY(anchorY)),
                             new PVector(transformX(controlX), transformY(controlY))

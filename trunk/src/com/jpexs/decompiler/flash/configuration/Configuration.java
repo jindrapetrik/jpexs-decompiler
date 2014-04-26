@@ -274,6 +274,9 @@ public class Configuration {
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> packJavaScripts = null;
 
+    @ConfigurationDefaultBoolean(false)
+    public static final ConfigurationItem<Boolean> textExportExportFontFace = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
