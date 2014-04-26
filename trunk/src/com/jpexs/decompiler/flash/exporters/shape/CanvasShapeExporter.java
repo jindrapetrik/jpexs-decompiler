@@ -69,6 +69,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     public static String getHtmlPrefix(int width,int height) {
         return "<!DOCTYPE html>\r\n"
                 + "<html>\r\n"
+                + "<head>"
+                + "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"
+                + "</head>"
                 + "<body>\r\n"
                 + "\r\n"
                 + "<canvas id=\"myCanvas\" width=\"" + width + "\" height=\"" + height + "\" style=\"border:1px solid #c3c3c3;\">\r\n"
@@ -140,7 +143,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         if(color == null){
             color  = basicFill;
         }
-        fillData += "ctx.fillStyle=\"" + color(color) + "\";\r\n";        
+        fillData += "\tctx.fillStyle=\"" + color(color) + "\";\r\n";        
     }
 
     @Override
@@ -159,7 +162,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             start.y += deltaY;
             end.x += deltaX;
             end.y += deltaY;
-            fillData += "var grd=ctx.createLinearGradient(" + Double.toString(start.x / unitDivisor) + "," + Double.toString(start.y / unitDivisor) + "," + Double.toString(end.x / unitDivisor) + "," + Double.toString(end.y / unitDivisor) + ");\r\n";
+            fillData += "\tvar grd=ctx.createLinearGradient(" + Double.toString(start.x / unitDivisor) + "," + Double.toString(start.y / unitDivisor) + "," + Double.toString(end.x / unitDivisor) + "," + Double.toString(end.y / unitDivisor) + ");\r\n";
         } else {
             matrix.translateX /= unitDivisor;
             matrix.translateY /= unitDivisor;
@@ -172,7 +175,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             matrix.translateX += deltaX / unitDivisor;
             matrix.translateY += deltaY / unitDivisor;
                         
-            fillData += "var grd=ctx.createRadialGradient("+focalPointRatio*16384+",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
+            fillData += "\tvar grd=ctx.createRadialGradient("+focalPointRatio*16384+",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
         }
         int repeatTotal = repeatCnt * 2 + 1;
         double oneHeight = 1.0 / repeatTotal;
@@ -186,12 +189,12 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 revert = !revert;
             }
             for (GRADRECORD r : gradientRecords) {
-                fillData += "grd.addColorStop(" + Double.toString(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0)) + ",\"" + color(r.color) + "\");\r\n";
+                fillData += "\tgrd.addColorStop(" + Double.toString(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0)) + ",\"" + color(r.color) + "\");\r\n";
                 lastRadColor = color(r.color);
             }
             pos += oneHeight;
         }
-        fillData += "ctx.fillStyle = grd;\r\n";
+        fillData += "\tctx.fillStyle = grd;\r\n";
     }
 
     public static String color(Color color) {
@@ -224,21 +227,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         if (image != null) {
             SerializableImage img = image.getImage();
             if (img != null) {
-                colorTransform.apply(img);
-                String format = image.getImageFormat();
-                InputStream imageStream = image.getImageData();
-                byte[] imageData;
-                if (imageStream != null) {
-                    imageData = Helper.readStream(image.getImageData());
-                } else {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    try {
-                        ImageIO.write(img.getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
-                    } catch (IOException ex) {
-                    }
-                    imageData = baos.toByteArray();
-                }
-                String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
+                colorTransform.apply(img);                                
                 if (matrix != null) {
                     matrix.translateX /= unitDivisor;
                     matrix.translateY /= unitDivisor;
@@ -249,9 +238,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                     fillMatrix = matrix;
                 }
 
-                fillData += "var img = document.createElement(\"img\"); img.src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n";
-                fillData += "var pat=ctx.createPattern(img,\"repeat\");\r\n";
-                fillData += "ctx.fillStyle = pat;\r\n";
+                
+                fillData += "\tvar pat=ctx.createPattern(image"+bitmapId+",\"repeat\");\r\n";
+                fillData += "\tctx.fillStyle = pat;\r\n";
             }
         }
     }
@@ -266,29 +255,29 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         finalizePath();
         thickness /= unitDivisor;
 
-        strokeData += "ctx.strokeStyle=\"" + color(color) + "\";\r\n";
-        strokeData += "ctx.lineWidth=" + Double.toString(thickness == 0 ? 1 : thickness) + ";\r\n";
+        strokeData += "\tctx.strokeStyle=\"" + color(color) + "\";\r\n";
+        strokeData += "\tctx.lineWidth=" + Double.toString(thickness == 0 ? 1 : thickness) + ";\r\n";
         switch (startCaps) {
             case LINESTYLE2.NO_CAP:
-                strokeData += "ctx.lineCap=\"butt\";\r\n";
+                strokeData += "\tctx.lineCap=\"butt\";\r\n";
                 break;
             case LINESTYLE2.SQUARE_CAP:
-                strokeData += "ctx.lineCap=\"square\";\r\n";
+                strokeData += "\tctx.lineCap=\"square\";\r\n";
                 break;
             default:
-                strokeData += "ctx.lineCap=\"round\";\r\n";
+                strokeData += "\tctx.lineCap=\"round\";\r\n";
                 break;
         }
         switch (joints) {
             case LINESTYLE2.BEVEL_JOIN:
-                strokeData += "ctx.lineJoin=\"bevel\";\r\n";
+                strokeData += "\tctx.lineJoin=\"bevel\";\r\n";
                 break;
             case LINESTYLE2.ROUND_JOIN:
-                strokeData += "ctx.lineJoin=\"round\";\r\n";
+                strokeData += "\tctx.lineJoin=\"round\";\r\n";
                 break;
             default:
-                strokeData += "ctx.lineJoin=\"miter\";\r\n";
-                strokeData += "ctx.miterLimit=" + Integer.toString(miterLimit) + ";\r\n";
+                strokeData += "\tctx.lineJoin=\"miter\";\r\n";
+                strokeData += "\tctx.miterLimit=" + Integer.toString(miterLimit) + ";\r\n";
                 break;
         }
     }
@@ -302,7 +291,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     public void moveTo(double x, double y) {
         x += deltaX;
         y += deltaY;
-        pathData += "ctx.moveTo("
+        pathData += "\tctx.moveTo("
                 + (x / unitDivisor) + ","
                 + (y / unitDivisor) + ");\r\n";
     }
@@ -311,7 +300,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     public void lineTo(double x, double y) {
         x += deltaX;
         y += deltaY;
-        pathData += "ctx.lineTo(" + (x / unitDivisor) + ","
+        pathData += "\tctx.lineTo(" + (x / unitDivisor) + ","
                 + (y / unitDivisor) + ");\r\n";
     }
 
@@ -321,7 +310,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         anchorX += deltaX;
         controlY += deltaY;
         anchorY += deltaY;
-        pathData += "ctx.quadraticCurveTo(" + (controlX / unitDivisor) + ","
+        pathData += "\tctx.quadraticCurveTo(" + (controlX / unitDivisor) + ","
                 + (controlY / unitDivisor) + ","
                 + (anchorX / unitDivisor) + ","
                 + (anchorY / unitDivisor) + ");\r\n";
@@ -329,27 +318,27 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
-            pathData = "ctx.beginPath();\r\n" + pathData + "ctx.closePath();\r\n" + strokeData;
+            pathData = "\tctx.beginPath();\r\n" + pathData + "\tctx.closePath();\r\n" + strokeData;
             
             if (fillMatrix != null) {
                 if (lastRadColor != null) {
-                    pathData += "ctx.fillStyle=\"" + lastRadColor + "\";\r\n ctx.fill(\"evenodd\");\r\n";
+                    pathData += "\tctx.fillStyle=\"" + lastRadColor + "\";\r\n ctx.fill(\"evenodd\");\r\n";
                 }
-                pathData += "ctx.save();\r\n";
-                pathData += "ctx.clip();\r\n";
-                pathData += "ctx.transform(" + fillMatrix.scaleX + "," + fillMatrix.rotateSkew0 + "," + fillMatrix.rotateSkew1 + "," + fillMatrix.scaleY + "," + fillMatrix.translateX + "," + fillMatrix.translateY + ");\r\n";                
+                pathData += "\tctx.save();\r\n";
+                pathData += "\tctx.clip();\r\n";
+                pathData += "\tctx.transform(" + fillMatrix.scaleX + "," + fillMatrix.rotateSkew0 + "," + fillMatrix.rotateSkew1 + "," + fillMatrix.scaleY + "," + fillMatrix.translateX + "," + fillMatrix.translateY + ");\r\n";                
                 pathData += fillData;
-                pathData += "ctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
-                pathData += "ctx.restore();\r\n";
+                pathData += "\tctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
+                pathData += "\tctx.restore();\r\n";
                 shapeData += pathData;
             } else {
                 if (!"".equals(fillData)) {
-                    pathData += "ctx.fill(\"evenodd\");\r\n";
+                    pathData += "\tctx.fill(\"evenodd\");\r\n";
                 }
                 shapeData += fillData + pathData;
             }
             if (!"".equals(strokeData)) {
-                shapeData += "ctx.stroke();\r\n";
+                shapeData += "\tctx.stroke();\r\n";
             }
         }
 

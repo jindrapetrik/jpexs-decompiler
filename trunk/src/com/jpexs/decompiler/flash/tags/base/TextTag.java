@@ -349,14 +349,14 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 Matrix mat = (new Matrix(textMatrix).concatenate(Matrix.getTranslateInstance(x - bounds.Xmin, y - bounds.Ymin))).concatenate(Matrix.getScaleInstance(rat));
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
-                    ret += "ctx.save();\r\n";
-                    ret += "ctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
+                    ret += "\tctx.save();\r\n";
+                    ret += "\tctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
                 
                     SHAPE shape = glyphs.get(entry.glyphIndex);
                     CanvasShapeExporter exporter = new CanvasShapeExporter(new RGBA(textColor),unitDivisor, swf, shape, colorTransform,0,0);
                     exporter.export();
                     ret += exporter.getShapeData();
-                    ret += "ctx.restore();\r\n";
+                    ret += "\tctx.restore();\r\n";
                     x += entry.glyphAdvance;
                 }
             }

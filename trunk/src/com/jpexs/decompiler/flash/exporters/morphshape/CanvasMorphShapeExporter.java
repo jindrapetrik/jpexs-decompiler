@@ -135,7 +135,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     @Override
     public void beginFill(RGB color, RGB colorEnd) {
         finalizePath();
-        fillData += "ctx.fillStyle="+useRatioColor(color,colorEnd)+";\r\n";   
+        fillData += "\tctx.fillStyle="+useRatioColor(color,colorEnd)+";\r\n";   
     }
 
     @Override
@@ -163,7 +163,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             end2.x += deltaX;
             end2.y += deltaY;
                         
-            fillData += "var grd=ctx.createLinearGradient(" + useRatioPos(start.x, start2.x) + "," + useRatioPos(start.y, start2.y) + "," + useRatioPos(end.x, end2.x) + "," + useRatioPos(end.y, end2.y) + ");\r\n";
+            fillData += "\tvar grd=ctx.createLinearGradient(" + useRatioPos(start.x, start2.x) + "," + useRatioPos(start.y, start2.y) + "," + useRatioPos(end.x, end2.x) + "," + useRatioPos(end.y, end2.y) + ");\r\n";
         } else {
             matrix.translateX /= unitDivisor;
             matrix.translateY /= unitDivisor;
@@ -189,7 +189,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             fillMatrixEnd = matrixEnd;
 
             
-            fillData += "var grd=ctx.createRadialGradient("+focalPointRatio*16384+",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
+            fillData += "\tvar grd=ctx.createRadialGradient("+focalPointRatio*16384+",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
         }
         int repeatTotal = repeatCnt * 2 + 1;
         double oneHeight = 1.0 / repeatTotal;
@@ -205,16 +205,16 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             for(int j=0;j<gradientRecords.length;j++){
                 GRADRECORD r = gradientRecords[j];
                 GRADRECORD r2 = gradientRecordsEnd[j];
-                fillData += "var s = "+useRatioDouble(
+                fillData += "\tvar s = "+useRatioDouble(
                         pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0),
                         pos + (oneHeight * (revert ? 255 - r2.ratio : r2.ratio) / 255.0)
-                )+";\r\nif(s<0) s = 0;\r\nif(s>1) s = 1;\r\n";
-                fillData += "grd.addColorStop(s," + useRatioColor(r.color,r2.color) + ");\r\n";
+                )+";\r\n\tif(s<0) s = 0;\r\n\tif(s>1) s = 1;\r\n";
+                fillData += "\tgrd.addColorStop(s," + useRatioColor(r.color,r2.color) + ");\r\n";
                 lastRadColor = useRatioColor(r.color,r2.color);
             }
             pos += oneHeight;
         }
-        fillData += "ctx.fillStyle = grd;\r\n";
+        fillData += "\tctx.fillStyle = grd;\r\n";
     }
 
     @Override
@@ -247,7 +247,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                     }
                     imageData = baos.toByteArray();
                 }
-                String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
+                //String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
                 if (matrix != null) {                    
                     fillMatrix = matrix.clone();
                     fillMatrix.translateX /= unitDivisor;
@@ -272,9 +272,9 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
                 }
 
-                fillData += "var img = document.createElement(\"img\");\r\nimg.src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n";
-                fillData += "var pat=ctx.createPattern(img,\"repeat\");\r\n";
-                fillData += "ctx.fillStyle = pat;\r\n";
+                //fillData += "\tvar img = document.createElement(\"img\");\r\nimg.src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n";
+                fillData += "\tvar pat=ctx.createPattern(image"+bitmapId+",\"repeat\");\r\n";
+                fillData += "\tctx.fillStyle = pat;\r\n";
             }
         }
     }
@@ -290,29 +290,29 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         thickness /= unitDivisor;
         thicknessEnd /= unitDivisor;
         
-        strokeData += "ctx.strokeStyle=" + useRatioColor(color,colorEnd) + ";\r\n";
-        strokeData += "ctx.lineWidth="+useRatioDouble(thickness,thicknessEnd)+";\r\n";
+        strokeData += "\tctx.strokeStyle=" + useRatioColor(color,colorEnd) + ";\r\n";
+        strokeData += "\tctx.lineWidth="+useRatioDouble(thickness,thicknessEnd)+";\r\n";
         switch (startCaps) {
             case LINESTYLE2.NO_CAP:
-                strokeData += "ctx.lineCap=\"butt\";\r\n";
+                strokeData += "\tctx.lineCap=\"butt\";\r\n";
                 break;
             case LINESTYLE2.SQUARE_CAP:
-                strokeData += "ctx.lineCap=\"square\";\r\n";
+                strokeData += "\tctx.lineCap=\"square\";\r\n";
                 break;
             default:
-                strokeData += "ctx.lineCap=\"round\";\r\n";
+                strokeData += "\tctx.lineCap=\"round\";\r\n";
                 break;
         }
         switch (joints) {
             case LINESTYLE2.BEVEL_JOIN:
-                strokeData += "ctx.lineJoin=\"bevel\";\r\n";
+                strokeData += "\tctx.lineJoin=\"bevel\";\r\n";
                 break;
             case LINESTYLE2.ROUND_JOIN:
-                strokeData += "ctx.lineJoin=\"round\";\r\n";
+                strokeData += "\tctx.lineJoin=\"round\";\r\n";
                 break;
             default:
-                strokeData += "ctx.lineJoin=\"miter\";\r\n";
-                strokeData += "ctx.miterLimit=" + Integer.toString(miterLimit) + ";\r\n";
+                strokeData += "\tctx.lineJoin=\"miter\";\r\n";
+                strokeData += "\tctx.miterLimit=" + Integer.toString(miterLimit) + ";\r\n";
                 break;
         }
     }
@@ -328,7 +328,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         y += deltaY;
         x2 += deltaX;
         y2 += deltaY;
-        pathData += "ctx.moveTo("
+        pathData += "\tctx.moveTo("
                 + useRatioPos(x,x2) + ","
                 + useRatioPos(y,y2) + ");\r\n";
     }
@@ -339,7 +339,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         y += deltaY;
         x2 += deltaX;
         y2 += deltaY;
-        pathData += "ctx.lineTo("
+        pathData += "\tctx.lineTo("
                 + useRatioPos(x,x2) + ","
                 + useRatioPos(y,y2) + ");\r\n";
     }
@@ -357,7 +357,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         anchorY2 += deltaY;
         
         
-        pathData += "ctx.quadraticCurveTo(" + useRatioPos(controlX,controlX2) + ","
+        pathData += "\tctx.quadraticCurveTo(" + useRatioPos(controlX,controlX2) + ","
                 + useRatioPos(controlY,controlY2) + ","
                 + useRatioPos(anchorX,anchorX2) + ","
                 + useRatioPos(anchorY,anchorY2) + ");\r\n";
@@ -365,28 +365,27 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
-            pathData = "ctx.beginPath();\r\n" + pathData + "ctx.closePath();\r\n" + strokeData;
+            pathData = "\tctx.beginPath();\r\n" + pathData + "\tctx.closePath();\r\n" + strokeData;
             
             if (fillMatrix != null) {
                 if (lastRadColor != null) {
-                    pathData += "ctx.fillStyle=" + lastRadColor + ";\r\n ctx.fill(\"evenodd\");\r\n";
+                    pathData += "\tctx.fillStyle=" + lastRadColor + ";\r\n\tctx.fill(\"evenodd\");\r\n";
                 }
-                pathData += "ctx.save();\r\n";
-                pathData += "ctx.clip();\r\n";
-                pathData += "ctx.transform(" + useRatioDouble(fillMatrix.scaleX,fillMatrixEnd.scaleX) + "," + useRatioDouble(fillMatrix.rotateSkew0,fillMatrixEnd.rotateSkew0) + "," + useRatioDouble(fillMatrix.rotateSkew1,fillMatrixEnd.rotateSkew1) + "," + useRatioDouble(fillMatrix.scaleY,fillMatrixEnd.scaleY) + "," + useRatioDouble(fillMatrix.translateX,fillMatrixEnd.translateX) + "," + useRatioDouble(fillMatrix.translateY,fillMatrixEnd.translateY) + ");\r\n";
-                pathData += "console.log('m:'+("+useRatioDouble(fillMatrix.scaleX,fillMatrixEnd.scaleX)+")+','+("+useRatioDouble(fillMatrix.scaleY,fillMatrixEnd.scaleY)+")+','+("+useRatioDouble(fillMatrix.rotateSkew0,fillMatrixEnd.rotateSkew0)+")+','+("+useRatioDouble(fillMatrix.rotateSkew1,fillMatrixEnd.rotateSkew1)+"));";
+                pathData += "\tctx.save();\r\n";
+                pathData += "\tctx.clip();\r\n";
+                pathData += "\tctx.transform(" + useRatioDouble(fillMatrix.scaleX,fillMatrixEnd.scaleX) + "," + useRatioDouble(fillMatrix.rotateSkew0,fillMatrixEnd.rotateSkew0) + "," + useRatioDouble(fillMatrix.rotateSkew1,fillMatrixEnd.rotateSkew1) + "," + useRatioDouble(fillMatrix.scaleY,fillMatrixEnd.scaleY) + "," + useRatioDouble(fillMatrix.translateX,fillMatrixEnd.translateX) + "," + useRatioDouble(fillMatrix.translateY,fillMatrixEnd.translateY) + ");\r\n";
                 pathData += fillData;
-                pathData += "ctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
-                pathData += "ctx.restore();\r\n";
+                pathData += "\tctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
+                pathData += "\tctx.restore();\r\n";
                 shapeData += pathData;
             } else {
                 if (!"".equals(fillData)) {
-                    pathData += "ctx.fill(\"evenodd\");\r\n";
+                    pathData += "\tctx.fill(\"evenodd\");\r\n";
                 }
                 shapeData += fillData + pathData;
             }
             if (!"".equals(strokeData)) {
-                shapeData += "ctx.stroke();\r\n";
+                shapeData += "\tctx.stroke();\r\n";
             }
         }
 

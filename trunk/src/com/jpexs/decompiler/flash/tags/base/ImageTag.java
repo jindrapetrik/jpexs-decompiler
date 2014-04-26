@@ -80,5 +80,5 @@ public abstract class ImageTag extends CharacterTag {
     protected static Color multiplyAlpha(Color c) {
         float multiplier = c.getAlpha() == 0 ? 0 : 255.0f / c.getAlpha();
         return new Color(max255(c.getRed() * multiplier), max255(c.getGreen() * multiplier), max255(c.getBlue() * multiplier), c.getAlpha());
-    }
+    }        
 }

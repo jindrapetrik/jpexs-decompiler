@@ -172,8 +172,7 @@ public class Timeline {
     
     
     public String toHtmlCanvas(double unitDivisor,List<Integer> frames){
-       // SWF.framesToHtmlCanvas(unitDivisor, null, null, this, frames, id, null, frameRate, displayRect, null, Color.darkGray, id)r
-       return null;
+       return SWF.framesToHtmlCanvas(unitDivisor, this, frames, 0, null, 0, displayRect, new ColorTransform(),null);     
     }
 
     public void getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton, List<Integer> sounds, List<String> soundClasses) {
