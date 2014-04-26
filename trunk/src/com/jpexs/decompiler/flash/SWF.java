@@ -1482,7 +1482,7 @@ public final class SWF implements TreeItem, Timelined {
                         fos.write(Utf8Helper.getBytes("}\r\n"));
                         
 
-                        fos.write(Utf8Helper.getBytes("var frame = 0;\r\n"));
+                        fos.write(Utf8Helper.getBytes("var frame = -1;\r\n"));
                         fos.write(Utf8Helper.getBytes("var frames = [];\r\n"));
                         for (int i : fframes) {
                             fos.write(Utf8Helper.getBytes("frames.push(" + i + ");\r\n"));
@@ -1493,7 +1493,7 @@ public final class SWF implements TreeItem, Timelined {
                         fos.write(Utf8Helper.getBytes("\t"+currentName + "(ctx,frames[frame],0);\r\n"));
                         fos.write(Utf8Helper.getBytes("}\r\n"));
 
-                        fos.write(Utf8Helper.getBytes("window.setInterval(function(){nextFrame(ctx)}," + (int) (1000.0 / timeline.swf.frameRate) + ");\r\n"));
+                        fos.write(Utf8Helper.getBytes("if(frames.length==1){nextFrame(ctx);}else{window.setInterval(function(){nextFrame(ctx);}," + (int) (1000.0 / timeline.swf.frameRate) + ");};\r\n"));
                     }
 
                     if (Configuration.packJavaScripts.get()) {
