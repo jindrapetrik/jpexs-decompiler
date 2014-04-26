@@ -1355,6 +1355,9 @@ public final class SWF implements TreeItem, Timelined {
         if(c instanceof TextTag){
             return "text";
         }
+        if(c instanceof ButtonTag){
+            return "button";
+        }
         if(c instanceof FontTag){
             return "font";
         }
@@ -2310,6 +2313,9 @@ public final class SWF implements TreeItem, Timelined {
         }
         if (tag instanceof TextTag) {
             return exporter.getUniqueId("text");
+        }
+        if (tag instanceof ButtonTag) {
+            return exporter.getUniqueId("button");
         }
         return exporter.getUniqueId("tag");
     }

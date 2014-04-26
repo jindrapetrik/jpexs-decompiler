@@ -20,10 +20,13 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.File;
@@ -56,6 +59,28 @@ public class TextExporter {
             }
         }
 
+        if (settings.mode == TextExportMode.SVG) {
+            for (Tag t : tags) {
+                if (t instanceof TextTag) {
+                    final TextTag textTag = (TextTag) t;
+                    final File file = new File(outdir + File.separator + textTag.getCharacterId() + ".svg");
+                    new RetryTask(new RunnableIOEx() {
+                        @Override
+                        public void run() throws IOException {
+                            try (FileOutputStream fos = new FileOutputStream(file)) {
+                                ExportRectangle rect = new ExportRectangle(textTag.getRect());
+                                SVGExporter exporter = new SVGExporter(rect);
+                                textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                fos.write(Utf8Helper.getBytes(exporter.getSVG()));
+                            }
+                        }
+                    }, handler).run();
+                    ret.add(file);
+                }
+            }
+            return ret;
+        }
+        
         if (settings.singleFile) {
             final File file = new File(outdir + File.separator
                     + (settings.mode == TextExportMode.FORMATTED ? TEXT_EXPORT_FILENAME_FORMATTED : TEXT_EXPORT_FILENAME_PLAIN));

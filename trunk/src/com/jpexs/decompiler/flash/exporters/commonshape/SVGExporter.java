@@ -107,7 +107,7 @@ public class SVGExporter {
             Element style = _svg.createElement("style");
             _svgStyle = _svg.createCDATASection("");
             style.appendChild(_svgStyle);
-            _svgDefs.appendChild(style);
+            getDefs().appendChild(style);
         }
         return _svgStyle;
     }
@@ -215,10 +215,10 @@ public class SVGExporter {
             value += "        font-family: \"" + fontFace + "\";" + Helper.newLine;
             switch (mode) {
                 case TTF:
-                    value += "        src: url('data:font/truetype;base64,[" + base64Data + "]') format(\"truetype\");" + Helper.newLine;
+                    value += "        src: url('data:font/truetype;base64," + base64Data + "') format(\"truetype\");" + Helper.newLine;
                     break;
                 case WOFF:
-                    value += "        src: url('data:font/woff;base64,[" + base64Data + "]') format(\"woff\");" + Helper.newLine;
+                    value += "        src: url('data:font/woff;base64," + base64Data + "') format(\"woff\");" + Helper.newLine;
                     break;
             }
             value += "      }" + Helper.newLine;
