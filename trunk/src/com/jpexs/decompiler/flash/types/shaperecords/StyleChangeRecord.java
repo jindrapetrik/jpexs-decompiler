@@ -20,8 +20,11 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.util.Set;
 import java.util.logging.Level;
@@ -67,7 +70,7 @@ public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
 
     @Conditional("stateNewStyles")
     public FILLSTYLEARRAY fillStyles;
-
+    
     @Conditional("stateNewStyles")
     public LINESTYLEARRAY lineStyles;
 

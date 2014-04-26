@@ -78,7 +78,7 @@ public class DefineShape4Tag extends ShapeTag {
         usesFillWindingRule = sis.readUB(1) == 1;
         usesNonScalingStrokes = sis.readUB(1) == 1;
         usesScalingStrokes = sis.readUB(1) == 1;
-        shapes = sis.readSHAPEWITHSTYLE(4);
+        shapes = sis.readSHAPEWITHSTYLE(4,false);
     }
 
     @Override

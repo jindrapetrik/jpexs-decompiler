@@ -321,7 +321,8 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                                         matrixEnd,
                                         fillStyle.gradient.spreadMode,
                                         fillStyle.gradient.interpolationMode,
-                                        (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0
+                                        (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0,
+                                        (fillStyleEnd.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyleEnd.gradient).focalPoint : 0
                                 );
                                 break;
                             case FILLSTYLE.REPEATING_BITMAP:
@@ -430,7 +431,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                                 case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
                                     // Gradient fill
                                     Matrix matrix = new Matrix(fillStyle.gradientMatrix);
-                                    Matrix matrixEnd = new Matrix(fillStyleEnd.gradientMatrix);
+                                    Matrix matrixEnd = new Matrix(fillStyleEnd.gradientMatrix);                                    
                                     lineGradientStyle(
                                             fillStyle.fillStyleType,
                                             fillStyle.gradient.gradientRecords,
@@ -439,7 +440,8 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                                             matrixEnd,
                                             fillStyle.gradient.spreadMode,
                                             fillStyle.gradient.interpolationMode,
-                                            (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0
+                                            (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0,
+                                            (fillStyleEnd.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyleEnd.gradient).focalPoint : 0
                                     );
                                     break;
                             }

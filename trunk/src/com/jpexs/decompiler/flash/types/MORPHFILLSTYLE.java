@@ -34,7 +34,8 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
 
     public static final int SOLID = 0x0;
     public static final int LINEAR_GRADIENT = 0x10;
-    public static final int RADIAL_GRADIENT = 0x12;
+    public static final int RADIAL_GRADIENT = 0x12;    
+    public static final int FOCAL_RADIAL_GRADIENT = 0x13;
     public static final int REPEATING_BITMAP = 0x40;
     public static final int CLIPPED_BITMAP = 0x41;
     public static final int NON_SMOOTHED_REPEATING_BITMAP = 0x42;
@@ -54,7 +55,7 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
 
     @Conditional(value = "fillStyleType", options = {LINEAR_GRADIENT, RADIAL_GRADIENT})
     public MORPHGRADIENT gradient;
-
+        
     @Conditional(value = "fillStyleType", options = {CLIPPED_BITMAP, NON_SMOOTHED_REPEATING_BITMAP, NON_SMOOTHED_CLIPPED_BITMAP})
     public int bitmapId;
 

@@ -127,11 +127,11 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
             SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
             sos2.writeMORPHFILLSTYLEARRAY(morphFillStyles, 2);
             sos2.writeMORPHLINESTYLEARRAY(morphLineStyles, 2);
-            sos2.writeSHAPE(startEdges, 1);
+            sos2.writeSHAPE(startEdges, 2);
             byte[] ba2 = baos2.toByteArray();
             sos.writeUI32(ba2.length);
             sos.write(ba2);
-            sos.writeSHAPE(endEdges, 1);
+            sos.writeSHAPE(endEdges, 2);
         } catch (IOException e) {
         }
         return baos.toByteArray();
@@ -160,8 +160,8 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
         long offset = sis.readUI32();
         morphFillStyles = sis.readMORPHFILLSTYLEARRAY();
         morphLineStyles = sis.readMORPHLINESTYLEARRAY(2);
-        startEdges = sis.readSHAPE(1);
-        endEdges = sis.readSHAPE(1);
+        startEdges = sis.readSHAPE(2,true);
+        endEdges = sis.readSHAPE(2,true);
     }
 
     @Override

@@ -155,7 +155,7 @@ public class DefineFontTag extends FontTag {
             sis.readUI16(); //offset
         }
         for (int i = 0; i < nGlyphs; i++) {
-            glyphShapeTable.add(sis.readSHAPE(1));
+            glyphShapeTable.add(sis.readSHAPE(1, false));
         }
     }
 

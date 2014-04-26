@@ -228,6 +228,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHFOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.MORPHGRADIENT;
 import com.jpexs.decompiler.flash.types.MORPHGRADRECORD;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
@@ -2269,7 +2270,7 @@ public class SWFInputStream extends InputStream {
      * @return SHAPERECORD value
      * @throws IOException
      */
-    private SHAPERECORD readSHAPERECORD(int fillBits, int lineBits, int shapeNum) throws IOException {
+    private SHAPERECORD readSHAPERECORD(int fillBits, int lineBits, int shapeNum, boolean morphShape) throws IOException {
         SHAPERECORD ret;
         int typeFlag = (int) readUB(1);
         if (typeFlag == 0) {
@@ -2302,8 +2303,12 @@ public class SWFInputStream extends InputStream {
                     scr.lineStyle = (int) readUB(lineBits);
                 }
                 if (stateNewStyles) {
-                    scr.fillStyles = readFILLSTYLEARRAY(shapeNum);
-                    scr.lineStyles = readLINESTYLEARRAY(shapeNum);
+                    if(morphShape){
+                        //This should never happen
+                    }else{
+                        scr.fillStyles = readFILLSTYLEARRAY(shapeNum);
+                        scr.lineStyles = readLINESTYLEARRAY(shapeNum);
+                    }
                     scr.numFillBits = (int) readUB(4);
                     scr.numLineBits = (int) readUB(4);
                 }
@@ -2345,11 +2350,11 @@ public class SWFInputStream extends InputStream {
      * @return SHAPE value
      * @throws IOException
      */
-    public SHAPE readSHAPE(int shapeNum) throws IOException {
+    public SHAPE readSHAPE(int shapeNum, boolean morphShape) throws IOException {
         SHAPE ret = new SHAPE();
         ret.numFillBits = (int) readUB(4);
         ret.numLineBits = (int) readUB(4);
-        ret.shapeRecords = readSHAPERECORDS(shapeNum, ret.numFillBits, ret.numLineBits);
+        ret.shapeRecords = readSHAPERECORDS(shapeNum, ret.numFillBits, ret.numLineBits, morphShape);
         return ret;
     }
 
@@ -2360,13 +2365,13 @@ public class SWFInputStream extends InputStream {
      * @return SHAPEWITHSTYLE value
      * @throws IOException
      */
-    public SHAPEWITHSTYLE readSHAPEWITHSTYLE(int shapeNum) throws IOException {
+    public SHAPEWITHSTYLE readSHAPEWITHSTYLE(int shapeNum, boolean morphShape) throws IOException {
         SHAPEWITHSTYLE ret = new SHAPEWITHSTYLE();
         ret.fillStyles = readFILLSTYLEARRAY(shapeNum);
         ret.lineStyles = readLINESTYLEARRAY(shapeNum);
         ret.numFillBits = (int) readUB(4);
         ret.numLineBits = (int) readUB(4);
-        ret.shapeRecords = readSHAPERECORDS(shapeNum, ret.numFillBits, ret.numLineBits);
+        ret.shapeRecords = readSHAPERECORDS(shapeNum, ret.numFillBits, ret.numLineBits, morphShape);
         return ret;
     }
 
@@ -2379,11 +2384,11 @@ public class SWFInputStream extends InputStream {
      * @return SHAPERECORDs array
      * @throws IOException
      */
-    private List<SHAPERECORD> readSHAPERECORDS(int shapeNum, int fillBits, int lineBits) throws IOException {
+    private List<SHAPERECORD> readSHAPERECORDS(int shapeNum, int fillBits, int lineBits, boolean morphShape) throws IOException {
         List<SHAPERECORD> ret = new ArrayList<>();
         SHAPERECORD rec;
         do {
-            rec = readSHAPERECORD(fillBits, lineBits, shapeNum);
+            rec = readSHAPERECORD(fillBits, lineBits, shapeNum, morphShape);
             if (rec instanceof StyleChangeRecord) {
                 StyleChangeRecord scRec = (StyleChangeRecord) rec;
                 if (scRec.stateNewStyles) {
@@ -2542,6 +2547,29 @@ public class SWFInputStream extends InputStream {
         }
         return ret;
     }
+    
+    /**
+     * Reads one MORPHFOCALGRADIENT value from the stream
+     *
+     * This is undocumented feature
+     * 
+     * @return MORPHGRADIENT value
+     * @throws IOException
+     */
+    public MORPHFOCALGRADIENT readMORPHFOCALGRADIENT() throws IOException {
+        MORPHFOCALGRADIENT ret = new MORPHFOCALGRADIENT();
+        ret.spreadMode = (int) readUB(2);
+        ret.interPolationMode = (int) readUB(2);
+        int numGradients = (int) readUB(4);
+        ret.gradientRecords = new MORPHGRADRECORD[numGradients];
+        for (int i = 0; i < numGradients; i++) {
+            ret.gradientRecords[i] = readMORPHGRADRECORD();
+        }
+        ret.startFocalPoint = readFIXED8();
+        ret.endFocalPoint = readFIXED8();
+        return ret;
+    }
+    
 
     /**
      * Reads one MORPHFILLSTYLE value from the stream
@@ -2557,13 +2585,17 @@ public class SWFInputStream extends InputStream {
             ret.endColor = readRGBA();
         }
         if ((ret.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT)
-                || (ret.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)) {
+                || (ret.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)
+                || (ret.fillStyleType == MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT)) {
             ret.startGradientMatrix = readMatrix();
             ret.endGradientMatrix = readMatrix();
         }
         if ((ret.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT)
                 || (ret.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)) {
             ret.gradient = readMORPHGRADIENT();
+        }
+        if(ret.fillStyleType == MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT){
+            ret.gradient = readMORPHFOCALGRADIENT();
         }
 
         if ((ret.fillStyleType == MORPHFILLSTYLE.REPEATING_BITMAP)

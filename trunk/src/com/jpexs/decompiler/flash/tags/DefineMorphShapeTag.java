@@ -133,8 +133,8 @@ public class DefineMorphShapeTag extends CharacterTag implements MorphShapeTag {
         long offset = sis.readUI32(); //ignore
         morphFillStyles = sis.readMORPHFILLSTYLEARRAY();
         morphLineStyles = sis.readMORPHLINESTYLEARRAY(1);
-        startEdges = sis.readSHAPE(1);
-        endEdges = sis.readSHAPE(1);
+        startEdges = sis.readSHAPE(1,true);
+        endEdges = sis.readSHAPE(1,true);
     }
 
     @Override

@@ -146,7 +146,7 @@ public class DefineFont3Tag extends FontTag {
         }
         glyphShapeTable = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
-            glyphShapeTable.add(sis.readSHAPE(1));
+            glyphShapeTable.add(sis.readSHAPE(1, false));
         }
         codeTable = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {

@@ -78,10 +78,11 @@ public class MORPHLINESTYLE2 implements Serializable {
         ret.pixelHintingFlag = pixelHintingFlag;
         ret.noClose = noClose;
         ret.endCapStyle = endCapStyle;
-        ret.miterLimitFactor = miterLimitFactor;
-        ret.color = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
+        ret.miterLimitFactor = miterLimitFactor;        
         if (hasFillFlag) {
             ret.fillType = fillType.getFillStyleAt(ratio);
+        }else{
+            ret.color = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
         }
         return ret;
     }

@@ -506,12 +506,14 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         }
 
         repeatCnt = 0;
-        lineRepeatCnt = 0;
+        
         pathData = "";
         fillData = "";
         strokeData = "";
         fillMatrix = null;
         lastRadColor = null;
+        
+        lineRepeatCnt = 0;
         lineFillData = null;
         lineLastRadColor = null;
         lineFillMatrix = null;

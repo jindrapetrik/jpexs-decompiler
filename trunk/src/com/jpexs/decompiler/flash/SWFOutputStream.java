@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHFOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.MORPHGRADIENT;
 import com.jpexs.decompiler.flash.types.MORPHGRADRECORD;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
@@ -1501,6 +1502,26 @@ public class SWFOutputStream extends OutputStream {
         for (int i = 0; i < value.gradientRecords.length; i++) {
             writeMORPHGRADRECORD(value.gradientRecords[i]);
         }
+    }
+    
+    /**
+     * Writes MORPHFOCALGRADIENT value to the stream
+     *
+     * Undocumented feature
+     * 
+     * @param value MORPHGRADIENT value
+     * @param shapeNum 1 in DefineMorphShape, 2 in DefineMorphShape2,...
+     * @throws IOException
+     */
+    public void writeMORPHFOCALGRADIENT(MORPHFOCALGRADIENT value, int shapeNum) throws IOException {
+        writeUB(2, value.spreadMode);
+        writeUB(2, value.interPolationMode);
+        writeUB(4, value.gradientRecords.length);
+        for (int i = 0; i < value.gradientRecords.length; i++) {
+            writeMORPHGRADRECORD(value.gradientRecords[i]);
+        }
+        writeFIXED8(value.startFocalPoint);
+        writeFIXED8(value.endFocalPoint);
     }
 
     /**
