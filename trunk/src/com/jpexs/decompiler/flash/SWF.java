@@ -1447,6 +1447,7 @@ public final class SWF implements TreeItem, Timelined {
                     int height = (int) (ftim.displayRect.getHeight() / SWF.unitDivisor);
                     try (FileOutputStream fos = new FileOutputStream(f)) {
                         fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
+                        fos.write(Utf8Helper.getBytes("\r\n"));
                         Set<Integer> library = new HashSet<>();
                         getNeededCharacters(timeline, fframes, library);
 
@@ -1474,7 +1475,7 @@ public final class SWF implements TreeItem, Timelined {
                                 if(ch instanceof DrawableTag){
                                     fos.write(Utf8Helper.getBytes(((DrawableTag)ch).toHtmlCanvas(1)));
                                 }
-                                fos.write(Utf8Helper.getBytes("}\r\n"));
+                                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
                             }
                         }
                         
@@ -1482,7 +1483,7 @@ public final class SWF implements TreeItem, Timelined {
                         
                         fos.write(Utf8Helper.getBytes("function "+currentName + "(ctx,frame,ratio){\r\n"));
                         fos.write(Utf8Helper.getBytes(framesToHtmlCanvas(unitDivisor, ftim, fframes, 0, null, 0, displayRect, new ColorTransform(), fbackgroundColor)));
-                        fos.write(Utf8Helper.getBytes("}\r\n"));
+                        fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
                         
 
                         fos.write(Utf8Helper.getBytes("var frame = -1;\r\n"));
@@ -1490,11 +1491,12 @@ public final class SWF implements TreeItem, Timelined {
                         for (int i : fframes) {
                             fos.write(Utf8Helper.getBytes("frames.push(" + i + ");\r\n"));
                         }
+                        fos.write(Utf8Helper.getBytes("\r\n"));
                         fos.write(Utf8Helper.getBytes("function nextFrame(ctx){\r\n"));
                         fos.write(Utf8Helper.getBytes("\tctx.clearRect(0,0," + width + "," + height + ");\r\n"));
                         fos.write(Utf8Helper.getBytes("\tframe = (frame+1)%frames.length;\r\n"));
                         fos.write(Utf8Helper.getBytes("\t"+currentName + "(ctx,frames[frame],0);\r\n"));
-                        fos.write(Utf8Helper.getBytes("}\r\n"));
+                        fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
 
                         fos.write(Utf8Helper.getBytes("if(frames.length==1){nextFrame(ctx);}else{window.setInterval(function(){nextFrame(ctx);}," + (int) (1000.0 / timeline.swf.frameRate) + ");};\r\n"));
                     }
@@ -2220,15 +2222,15 @@ public final class SWF implements TreeItem, Timelined {
                     f = layer.time % tim.getFrameCount();
                 }           
                 sb.append("\t\t\tctx.save();\r\n");
-                    sb.append("\t\t\tctx.transform(").append(placeMatrix.scaleX).append(",");
-                    sb.append(placeMatrix.rotateSkew0).append(",");
-                    sb.append(placeMatrix.rotateSkew1).append(",");
-                    sb.append(placeMatrix.scaleY).append(",");
-                    sb.append(placeMatrix.translateX).append(",");
-                    sb.append(placeMatrix.translateY);
-                    sb.append(");\r\n");
-                    sb.append("\t\t\t").append(getTypePrefix(character)).append(layer.characterId).append("(ctx,").append(f).append(",").append(layer.ratio).append(");\r\n");
-                    sb.append("\t\t\tctx.restore();\r\n");
+                sb.append("\t\t\tctx.transform(").append(placeMatrix.scaleX).append(",");
+                sb.append(placeMatrix.rotateSkew0).append(",");
+                sb.append(placeMatrix.rotateSkew1).append(",");
+                sb.append(placeMatrix.scaleY).append(",");
+                sb.append(placeMatrix.translateX).append(",");
+                sb.append(placeMatrix.translateY);
+                sb.append(");\r\n");
+                sb.append("\t\t\t").append(getTypePrefix(character)).append(layer.characterId).append("(ctx,").append(f).append(",").append(layer.ratio<0?0:layer.ratio).append(");\r\n");
+                sb.append("\t\t\tctx.restore();\r\n");
             }
             sb.append("\t\t\tbreak;\r\n");
         }
