@@ -330,7 +330,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                             case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
                             case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
                                 // Bitmap fill
-                                matrix = new Matrix(fillStyle.bitmapMatrix);                                
+                                matrix = new Matrix(fillStyle.bitmapMatrix);
                                 matrixEnd = new Matrix(fillStyleEnd.bitmapMatrix);
                                 beginBitmapFill(
                                         fillStyle.bitmapId,

@@ -85,7 +85,7 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
             return null;
         }
         MATRIX ret = new MATRIX();
-        double ratio_d = ratio / 65535;
+        double ratio_d = ratio / 65535.0;
         ret.scaleX = (int)Math.round(a.getScaleX() + (b.getScaleX() - a.getScaleX()) * ratio_d);
         ret.scaleY = (int)Math.round(a.getScaleY() + (b.getScaleY() - a.getScaleY()) * ratio_d);
         ret.rotateSkew0 = (int)Math.round(a.getRotateSkew0() + (b.getRotateSkew0() - a.getRotateSkew0()) * ratio_d);
