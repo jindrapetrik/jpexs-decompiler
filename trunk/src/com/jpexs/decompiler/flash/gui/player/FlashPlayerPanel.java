@@ -77,30 +77,24 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     public boolean specialPlayback = false;
     private boolean specialPlaying = false;
 
-    public synchronized String getVariable(String name) {
+    public synchronized String getVariable(String name) throws IOException {
         if (pipe != null) {
             writeToPipe(new byte[]{CMD_GETVARIABLE});
             int nameLen = name.getBytes().length;
             writeToPipe(new byte[]{(byte) ((nameLen >> 8) & 0xff), (byte) (nameLen & 0xff)});
             writeToPipe(name.getBytes());
             byte res[] = new byte[2];
-            if (readFromPipe(res)) {
-                int retLen = ((res[0] & 0xff) << 8) + (res[1] & 0xff);
-                res = new byte[retLen];
-                if (readFromPipe(res)) {
-                    String ret = new String(res, 0, retLen);
-                    return ret;
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
+            readFromPipe(res);
+            int retLen = ((res[0] & 0xff) << 8) + (res[1] & 0xff);
+            res = new byte[retLen];
+            readFromPipe(res);
+            String ret = new String(res, 0, retLen);
+            return ret;
         }
         return null;
     }
 
-    public synchronized void setVariable(String name, String value) {
+    public synchronized void setVariable(String name, String value) throws IOException {
         if (pipe != null) {
             writeToPipe(new byte[]{CMD_SETVARIABLE});
             int nameLen = name.getBytes().length;
@@ -113,7 +107,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         }
     }
 
-    public synchronized String call(String callString) {
+    public synchronized String call(String callString) throws IOException {
         if (pipe != null) {
             writeToPipe(new byte[]{CMD_CALL});
             int callLen = callString.getBytes().length;
@@ -121,23 +115,17 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
             writeToPipe(callString.getBytes());
 
             byte res[] = new byte[2];
-            if (readFromPipe(res)) {
-                int retLen = ((res[0] & 0xff) << 8) + (res[1] & 0xff);
-                res = new byte[retLen];
-                if (readFromPipe(res)) {
-                    String ret = new String(res, 0, retLen);
-                    return ret;
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
+            readFromPipe(res);
+            int retLen = ((res[0] & 0xff) << 8) + (res[1] & 0xff);
+            res = new byte[retLen];
+            readFromPipe(res);
+            String ret = new String(res, 0, retLen);
+            return ret;
         }
         return null;
     }
 
-    private synchronized void resize() {
+    private synchronized void resize() throws IOException {
         if (pipe != null) {
             writeToPipe(new byte[]{CMD_RESIZE});
             writeToPipe(new byte[]{
@@ -146,51 +134,56 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         }
     }
 
-    private int __getCurrentFrame() {
+    private int __getCurrentFrame() throws IOException {
         byte[] res = new byte[2];
         writeToPipe(new byte[]{CMD_CURRENT_FRAME});
-        if (readFromPipe(res)) {
-            return ((res[0] & 0xff) << 8) + (res[1] & 0xff);
-        } else {
+        readFromPipe(res);
+        return ((res[0] & 0xff) << 8) + (res[1] & 0xff);
+    }
+
+    @Override
+    public synchronized int getCurrentFrame() {
+        try {
+            if (specialPlayback) {
+                if (!specialPlaying) {
+                    return specialPosition;
+                }
+                String posStr = getVariable("_root.my_sound.position");
+                if (posStr != null) {
+                    return Integer.parseInt(posStr);
+                }
+            }
+            return __getCurrentFrame();
+        } catch (IOException ex) {
             return 0;
         }
     }
 
     @Override
-    public synchronized int getCurrentFrame() {
-        if (specialPlayback) {
-            if (!specialPlaying) {
-                return specialPosition;
-            }
-            String posStr = getVariable("_root.my_sound.position");
-            if (posStr != null) {
-                return Integer.parseInt(posStr);
-            }
-        }
-        return __getCurrentFrame();
-    }
-
-    @Override
     public synchronized int getTotalFrames() {
-        if (specialPlayback) {
-            String durStr = getVariable("_root.my_sound.duration");
-            if (durStr != null) {
-                return Integer.parseInt(durStr);
+        try {
+            if (specialPlayback) {
+                String durStr = getVariable("_root.my_sound.duration");
+                if (durStr != null) {
+                    return Integer.parseInt(durStr);
+                }
             }
-        }
-        byte[] res = new byte[2];
-        writeToPipe(new byte[]{CMD_TOTAL_FRAMES});
-        if (readFromPipe(res)) {
+            byte[] res = new byte[2];
+            writeToPipe(new byte[]{CMD_TOTAL_FRAMES});
+            readFromPipe(res);
             return ((res[0] & 0xff) << 8) + (res[1] & 0xff);
-        } else {
+        } catch (IOException ex) {
             return 0;
         }
     }
 
     @Override
     public synchronized void setBackground(Color color) {
-        writeToPipe(new byte[]{CMD_BGCOLOR});
-        writeToPipe(new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()});
+        try {
+            writeToPipe(new byte[]{CMD_BGCOLOR});
+            writeToPipe(new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()});
+        } catch (IOException ex) {
+        }
     }
 
     public FlashPlayerPanel(Component frame) {
@@ -201,7 +194,10 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-                resize();
+                try {
+                    resize();
+                } catch (IOException ex) {
+                }
             }
 
             @Override
@@ -253,7 +249,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         }
 
         String pipeName = "\\\\.\\pipe\\ffdec_flashplayer_" + hwnd.getPointer().hashCode();
-        pipe = Kernel32.INSTANCE.CreateNamedPipe(pipeName, Kernel32.PIPE_ACCESS_DUPLEX, Kernel32.PIPE_TYPE_BYTE, 1, 0, 0, 0, null);
+        pipe = Kernel32.INSTANCE.CreateNamedPipe(pipeName, Kernel32.PIPE_ACCESS_DUPLEX, Kernel32.PIPE_TYPE_BYTE, 1, 4096, 4096, 0, null);
 
         SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
         sei.fMask = 0x00000040;
@@ -276,24 +272,27 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     }
 
     public synchronized void displaySWF(String flash, Color bgColor, int frameRate) {
-        this.flash = flash;
-        repaint();
-        this.frameRate = frameRate;
-        execute();
-        if (bgColor != null) {
-            setBackground(bgColor);
-        }
-        resize();
-        if (pipe != null) {
-            writeToPipe(new byte[]{CMD_PLAY});
-            writeToPipe(new byte[]{(byte) flash.getBytes().length});
-            writeToPipe(flash.getBytes());
-        }
-        stopped = false;
-        specialPlaying = false;
-        specialPosition = 0;
-        if (specialPlayback) {
-            play();
+        try {
+            this.flash = flash;
+            repaint();
+            this.frameRate = frameRate;
+            execute();
+            if (bgColor != null) {
+                setBackground(bgColor);
+            }
+            resize();
+            if (pipe != null) {
+                writeToPipe(new byte[]{CMD_PLAY});
+                writeToPipe(new byte[]{(byte) flash.getBytes().length});
+                writeToPipe(flash.getBytes());
+            }
+            stopped = false;
+            specialPlaying = false;
+            specialPosition = 0;
+            if (specialPlayback) {
+                play();
+            }
+        } catch (IOException ex) {
         }
     }
 
@@ -312,86 +311,99 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
     }
     private int specialPosition = 0;
 
-    private synchronized void __pause() {
+    private synchronized void __pause() throws IOException {
         writeToPipe(new byte[]{CMD_PAUSE});
     }
 
     @Override
     public void pause() {
-        if (specialPlayback) {
-            specialPosition = getCurrentFrame();
-            __gotoFrame(3);
-            __play();
-            specialPlaying = false;
-            return;
+        try {
+            if (specialPlayback) {
+                specialPosition = getCurrentFrame();
+                __gotoFrame(3);
+                __play();
+                specialPlaying = false;
+                return;
+            }
+            __pause();
+        } catch (IOException ex) {
         }
-        __pause();
     }
 
     @Override
     public void rewind() {
-        if (specialPlayback) {
-            boolean plays = specialPlaying;
-            pause();
-            specialPosition = 0;
-            if (plays) {
-                play();
+        try {
+            if (specialPlayback) {
+                boolean plays = specialPlaying;
+                pause();
+                specialPosition = 0;
+                if (plays) {
+                    play();
+                }
+                
+                return;
             }
-
-            return;
+            writeToPipe(new byte[]{CMD_REWIND});
+        } catch (IOException ex) {
         }
-        writeToPipe(new byte[]{CMD_REWIND});
     }
 
-    private synchronized void __play() {
+    private synchronized void __play() throws IOException {
         writeToPipe(new byte[]{CMD_RESUME});
     }
 
     @Override
     public void play() {
-        if (specialPlayback) {
-            double p = (((double) specialPosition) / 1000.0);
-            setVariable("_root.execParam", "" + p);
-            __gotoFrame(1);
+        try {
+            if (specialPlayback) {
+                double p = (((double) specialPosition) / 1000.0);
+                setVariable("_root.execParam", "" + p);
+                __gotoFrame(1);
+                __play();
+                specialPlaying = true;
+                return;
+            }
             __play();
-            specialPlaying = true;
-            return;
+        } catch (IOException ex) {
         }
-        __play();
     }
 
     @Override
     public boolean isPlaying() {
-        if (specialPlayback) {
-            return specialPlaying;
-        }
-        writeToPipe(new byte[]{CMD_PLAYING});
-        byte[] res = new byte[1];
-        if (readFromPipe(res)) {
+        try {
+            if (specialPlayback) {
+                return specialPlaying;
+            }
+            writeToPipe(new byte[]{CMD_PLAYING});
+            byte[] res = new byte[1];
+            readFromPipe(res);
             return res[0] == 1;
-        } else {
+        } catch (IOException ex) {
             return false;
         }
     }
 
-    private synchronized void __gotoFrame(int frame) {
+    private synchronized void __gotoFrame(int frame) throws IOException {
         writeToPipe(new byte[]{CMD_GOTO});
         writeToPipe(new byte[]{(byte) ((frame >> 8) & 0xff), (byte) (frame & 0xff)});
     }
 
     @Override
     public void gotoFrame(int frame) {
-        if (specialPlayback) {
-            if (specialPlaying) {
-                pause();
-                specialPosition = frame;
-                play();
-            } else {
-                specialPosition = frame;
+        try {
+            if (specialPlayback) {
+                if (specialPlaying) {
+                    pause();
+                    specialPosition = frame;
+                    play();
+                } else {
+                    specialPosition = frame;
+                }
+                return;
             }
-            return;
+            __gotoFrame(frame);
+        } catch (IOException ex) {
         }
-        __gotoFrame(frame);
     }
 
     @Override
@@ -407,7 +419,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         return !isStopped();
     }
 
-    private synchronized boolean writeToPipe(final byte[] data) {
+    private synchronized boolean writeToPipe(final byte[] data) throws IOException {
         final IntByReference ibr = new IntByReference();
         int result = -1;
         try {
@@ -430,6 +442,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         if (result != 0) {
             if (result == Kernel32.ERROR_NO_DATA || result == -1) {
                 restartFlashPlayer();
+                throw new IOException("Pipe write error.");
             } else {
                 // System.out.println("pipe write failed. datalength: " + data.length + " error:" + result);
             }
@@ -437,19 +450,23 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
         return result == 0;
     }
 
-    private synchronized boolean readFromPipe(final byte[] res) {
+    private synchronized boolean readFromPipe(final byte[] res) throws IOException {
         final IntByReference ibr = new IntByReference();
         int result = -1;
         try {
             result = CancellableWorker.call(new Callable<Integer>() {
                 @Override
                 public Integer call() throws Exception {
-                    boolean result = Kernel32.INSTANCE.ReadFile(pipe, res, res.length, ibr, null);
-                    if (!result) {
-                        return Kernel32.INSTANCE.GetLastError();
-                    }
-                    if (ibr.getValue() != res.length) {
-                        return -1;
+                    int read = 0;
+                    while (read < res.length) {
+                        byte[] data = new byte[res.length - read];
+                        boolean result = Kernel32.INSTANCE.ReadFile(pipe, data, data.length, ibr, null);
+                        if (!result) {
+                            return Kernel32.INSTANCE.GetLastError();
+                        }
+                        int readNow = ibr.getValue();
+                        System.arraycopy(data, readNow, res, read, readNow);
+                        read += readNow;
                     }
                     return 0;
                 }
@@ -458,8 +475,9 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
             // ignore
         }
         if (result != 0) {
-            if (result == Kernel32.ERROR_BROKEN_PIPE || result == -1) {
+            if (result == Kernel32.ERROR_BROKEN_PIPE) {
                 restartFlashPlayer();
+                throw new IOException("Pipe read error.");
             } else {
                 // System.out.println("pipe read failed. result: " + result + " datalength: " + res.length + " received: " + ibr.getValue() + " error: " + result);
             }

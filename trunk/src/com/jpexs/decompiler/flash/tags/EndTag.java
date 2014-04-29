@@ -52,6 +52,6 @@ public class EndTag extends Tag {
     }
 
     public EndTag(SWF swf) {
-        super(swf, ID, "End", new byte[0], new byte[0], 0);
+        super(swf, ID, "End", new byte[2], new byte[0], 0);
     }
 }
