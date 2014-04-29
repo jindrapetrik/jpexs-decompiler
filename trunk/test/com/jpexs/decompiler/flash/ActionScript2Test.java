@@ -38,6 +38,8 @@ import org.testng.annotations.Test;
  */
 public class ActionScript2Test extends ActionStript2TestBase {
 
+    private final int frameIdxDiff = 23;
+    
     @BeforeClass
     public void init() throws IOException, InterruptedException {
         Configuration.autoDeobfuscate.set(false);
@@ -81,8 +83,8 @@ public class ActionScript2Test extends ActionStript2TestBase {
     }
 
     @Test
-    public void frame1_unicodeTest() {
-        compareSrc(1, "trace(\"unicodeTest\");\r\n"
+    public void frame24_unicodeTest() {
+        compareSrc(frameIdxDiff + 1, "trace(\"unicodeTest\");\r\n"
                 + "var k = \"היפופוטמי, או א\";\r\n"
                 + "trace(k);\r\n"
         );
@@ -90,7 +92,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame2_ifWithElseTest() {
-        compareSrc(2, "trace(\"ifWithElseTest\");\r\n"
+        compareSrc(frameIdxDiff + 2, "trace(\"ifWithElseTest\");\r\n"
                 + "var i = 5;\r\n"
                 + "if(i == 258)\r\n"
                 + "{\r\n"
@@ -105,7 +107,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame3_forTest() {
-        compareSrc(3, "trace(\"forTest\");\r\n"
+        compareSrc(frameIdxDiff + 3, "trace(\"forTest\");\r\n"
                 + "var i = 0;\r\n"
                 + "while(i < 10)\r\n"
                 + "{\r\n"
@@ -117,7 +119,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame4_whileTest() {
-        compareSrc(4, "trace(\"whileTest\");\r\n"
+        compareSrc(frameIdxDiff + 4, "trace(\"whileTest\");\r\n"
                 + "var i = 0;\r\n"
                 + "while(i < 10)\r\n"
                 + "{\r\n"
@@ -129,7 +131,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame5_forWithContinueTest() {
-        compareSrc(5, "trace(\"forWithContinueTest\");\r\n"
+        compareSrc(frameIdxDiff + 5, "trace(\"forWithContinueTest\");\r\n"
                 + "var i = 0;\r\n"
                 + "for(;i < 10;i++)\r\n"
                 + "{\r\n"
@@ -150,7 +152,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame6_doWhileTest() {
-        compareSrc(6, "trace(\"doWhileTest\");\r\n"
+        compareSrc(frameIdxDiff + 6, "trace(\"doWhileTest\");\r\n"
                 + "var i = 0;\r\n"
                 + "do\r\n"
                 + "{\r\n"
@@ -164,7 +166,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame7_switchTest() {
-        compareSrc(7, "trace(\"switchTest\");\r\n"
+        compareSrc(frameIdxDiff + 7, "trace(\"switchTest\");\r\n"
                 + "var i = 5;\r\n"
                 + "switch(i)\r\n"
                 + "{\r\n"
@@ -189,7 +191,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame8_strictEqualsTest() {
-        compareSrc(8, "trace(\"strictEqualsTest\");\r\n"
+        compareSrc(frameIdxDiff + 8, "trace(\"strictEqualsTest\");\r\n"
                 + "var i = 5;\r\n"
                 + "if(i === 5)\r\n"
                 + "{\r\n"
@@ -204,7 +206,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame9_switchForTest() {
-        compareSrc(9, "trace(\"switchForTest\");\r\n"
+        compareSrc(frameIdxDiff + 9, "trace(\"switchForTest\");\r\n"
                 + "var i = 0;\r\n"
                 + "for(;i < 10;i++)\r\n"
                 + "{\r\n"
@@ -235,7 +237,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame10_functionTest() {
-        compareSrc(10, "function hello(what, second)\r\n"
+        compareSrc(frameIdxDiff + 10, "function hello(what, second)\r\n"
                 + "{\r\n"
                 + "trace(\"hello \" + what + \"! \" + second);\r\n"
                 + "}\r\n"
@@ -246,7 +248,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame11_multipleConditionsTest() {
-        compareSrc(11, "trace(\"multipleConditionsTest\");\r\n"
+        compareSrc(frameIdxDiff + 11, "trace(\"multipleConditionsTest\");\r\n"
                 + "var k = 5;\r\n"
                 + "if(k == 7 && k == 8)\r\n"
                 + "{\r\n"
@@ -262,7 +264,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame12_multipleConditions2Test() {
-        compareSrc(12, "trace(\"multipleConditions2Test\");\r\n"
+        compareSrc(frameIdxDiff + 12, "trace(\"multipleConditions2Test\");\r\n"
                 + "var k = 5;\r\n"
                 + "if(k == 7 && k == 8)\r\n"
                 + "{\r\n"
@@ -278,7 +280,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame13_chainedAssignmentsTest() {
-        compareSrc(13, "trace(\"chainedAssignmentsTest\");\r\n"
+        compareSrc(frameIdxDiff + 13, "trace(\"chainedAssignmentsTest\");\r\n"
                 + "var a = 7;\r\n"
                 + "var b = 8;\r\n"
                 + "var c = 9;\r\n"
@@ -289,7 +291,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame14_objectsTest() {
-        compareSrc(14, "trace(\"objectsTest\");\r\n"
+        compareSrc(frameIdxDiff + 14, "trace(\"objectsTest\");\r\n"
                 + "var flashBox = new Box(box1);\r\n"
                 + "_root.onEnterFrame = function()\r\n"
                 + "{\r\n"
@@ -309,7 +311,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame15_doWhile2Test() {
-        compareSrc(15, "trace(\"doWhile2Test\");\r\n"
+        compareSrc(frameIdxDiff + 15, "trace(\"doWhile2Test\");\r\n"
                 + "var k = 5;\r\n"
                 + "do\r\n"
                 + "{\r\n"
@@ -329,7 +331,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame16_whileAndTest() {
-        compareSrc(16, "trace(\"whileAndTest\");\r\n"
+        compareSrc(frameIdxDiff + 16, "trace(\"whileAndTest\");\r\n"
                 + "var a = 5;\r\n"
                 + "var b = 10;\r\n"
                 + "while(a < 10 && b > 1)\r\n"
@@ -344,7 +346,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame17_forInTest() {
-        compareSrc(17, "function testForIn()\r\n"
+        compareSrc(frameIdxDiff + 17, "function testForIn()\r\n"
                 + "{\r\n"
                 + "var _loc1_ = [];\r\n"
                 + "for(var _loc2_ in _loc1_)\r\n"
@@ -371,7 +373,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame18_tryTest() {
-        compareSrc(18, "trace(\"tryTest\");\r\n"
+        compareSrc(frameIdxDiff + 18, "trace(\"tryTest\");\r\n"
                 + "var k = 5;\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -410,7 +412,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame19_indicesTest() {
-        compareSrc(19, "trace(\"indicesTest\");\r\n"
+        compareSrc(frameIdxDiff + 19, "trace(\"indicesTest\");\r\n"
                 + "var k = [1,2,3];\r\n"
                 + "var b = k[1];\r\n"
                 + "trace(b);\r\n"
@@ -419,7 +421,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame20_incDecTest() {
-        compareSrc(20, "function tst()\r\n"
+        compareSrc(frameIdxDiff + 20, "function tst()\r\n"
                 + "{\r\n"
                 + "return 1;\r\n"
                 + "}\r\n"
@@ -437,7 +439,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame21_chainedAssignments2Test() {
-        compareSrc(21, "trace(\"chainedAssignments2Test\");\r\n"
+        compareSrc(frameIdxDiff + 21, "trace(\"chainedAssignments2Test\");\r\n"
                 + "var a = 5;\r\n"
                 + "var b = 6;\r\n"
                 + "var c = 7;\r\n"
@@ -460,7 +462,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame22_function2Test() {
-        compareSrc(22, "function a()\r\n"
+        compareSrc(frameIdxDiff + 22, "function a()\r\n"
                 + "{\r\n"
                 + "trace(\"hi\");\r\n"
                 + "var _loc1_ = 5;\r\n"
@@ -477,7 +479,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame23_tryFunctionTest() {
-        compareSrc(23, "function testtry()\r\n"
+        compareSrc(frameIdxDiff + 23, "function testtry()\r\n"
                 + "{\r\n"
                 + "var _loc1_ = 5;\r\n"
                 + "try\r\n"
@@ -510,7 +512,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame24_ternarTest() {
-        compareSrc(24, "trace(\"ternarTest\");\r\n"
+        compareSrc(frameIdxDiff + 24, "trace(\"ternarTest\");\r\n"
                 + "var a = 5;\r\n"
                 + "var b = a != 4?3:2;\r\n"
                 + "trace(b);\r\n"
@@ -519,7 +521,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame25_forInInTest() {
-        compareSrc(25, "function tst()\r\n"
+        compareSrc(frameIdxDiff + 25, "function tst()\r\n"
                 + "{\r\n"
                 + "var _loc2_ = [];\r\n"
                 + "_loc2_[0] = [];\r\n"
@@ -546,7 +548,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame26_registersFuncTest() {
-        compareSrc(26, "function tst(px)\r\n"
+        compareSrc(frameIdxDiff + 26, "function tst(px)\r\n"
                 + "{\r\n"
                 + "var _loc1_ = 57;\r\n"
                 + "_loc1_ = _loc1_ * 27;\r\n"
@@ -559,7 +561,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame27_ifFrameLoadedTest() {
-        compareSrc(27, "trace(\"ifFrameLoadedTest\");\r\n"
+        compareSrc(frameIdxDiff + 27, "trace(\"ifFrameLoadedTest\");\r\n"
                 + "ifFrameLoaded(9)\r\n"
                 + "{\r\n"
                 + "trace(\"loaded\");\r\n"
@@ -569,7 +571,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame28_function3Test() {
-        compareSrc(28, "function tst()\r\n"
+        compareSrc(frameIdxDiff + 28, "function tst()\r\n"
                 + "{\r\n"
                 + "var _loc1_ = 5;\r\n"
                 + "c = _loc1_ = 8;\r\n"
@@ -590,7 +592,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame29_commaOperatorTest() {
-        compareSrc(29, "trace(\"commaOperatorTest\");\r\n"
+        compareSrc(frameIdxDiff + 29, "trace(\"commaOperatorTest\");\r\n"
                 + "var a = 0;\r\n"
                 + "var b = 0;\r\n"
                 + "var c = 0;\r\n"
@@ -612,7 +614,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame30_commaOperator2Test() {
-        compareSrc(30, "trace(\"commaOperator2Test\");\r\n"
+        compareSrc(frameIdxDiff + 30, "trace(\"commaOperator2Test\");\r\n"
                 + "var k = 8;\r\n"
                 + "do\r\n"
                 + "{\r\n"
@@ -635,7 +637,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame31_function4Test() {
-        compareSrc(31, "function tst()\r\n"
+        compareSrc(frameIdxDiff + 31, "function tst()\r\n"
                 + "{\r\n"
                 + "var _loc1_ = 5;\r\n"
                 + "while(_loc1_ < 10)\r\n"
@@ -659,13 +661,13 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame32_pushTest() {
-        compareSrc(32, "trace(\"pushTest\");\r\n"
+        compareSrc(frameIdxDiff + 32, "trace(\"pushTest\");\r\n"
         );
     }
 
     @Test
     public void frame33_commaOperator3Test() {
-        compareSrc(33, "trace(\"commaOperator3Test\");\r\n"
+        compareSrc(frameIdxDiff + 33, "trace(\"commaOperator3Test\");\r\n"
                 + "var k = 1;\r\n"
                 + "while(true)\r\n"
                 + "{\r\n"
@@ -684,7 +686,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame34_commaOperator4Test() {
-        compareSrc(34, "trace(\"commaOperator4Test\");\r\n"
+        compareSrc(frameIdxDiff + 34, "trace(\"commaOperator4Test\");\r\n"
                 + "var k = 0;\r\n"
                 + "do\r\n"
                 + "{\r\n"
@@ -708,7 +710,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
 
     @Test
     public void frame35_globalFunctionsTest() {
-        compareSrc(35, "function tst(p1)\r\n"
+        compareSrc(frameIdxDiff + 35, "function tst(p1)\r\n"
                 + "{\r\n"
                 + "trace(\"test\");\r\n"
                 + "}\r\n"
