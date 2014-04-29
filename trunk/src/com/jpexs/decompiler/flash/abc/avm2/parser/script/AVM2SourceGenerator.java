@@ -167,7 +167,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
-        if(!(""+item.leftSide.returnType()).equals("Boolean")){
+        if (!("" + item.leftSide.returnType()).equals("Boolean")) {
             ret.add(ins(new ConvertBIns()));
         }
         ret.add(ins(new DupIns()));
@@ -199,7 +199,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
-        if(!(""+item.leftSide.returnType()).equals("Boolean")){
+        if (!("" + item.leftSide.returnType()).equals("Boolean")) {
             ret.add(ins(new ConvertBIns()));
         }
         ret.add(ins(new DupIns()));
@@ -1189,7 +1189,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         //Class initializer
-        int staticMi = method(false, new ArrayList<MethodBody>(), pkg.packageName, staticNeedsActivation, sinitVariables, initScope + 1 + (implementsStr.isEmpty()?0:1), false, 0, isInterface ? null : name, superName, false, localData, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), new ArrayList<GraphTargetItem>(), staticInit, TypeItem.UNBOUNDED);
+        int staticMi = method(false, new ArrayList<MethodBody>(), pkg.packageName, staticNeedsActivation, sinitVariables, initScope + 1 + (implementsStr.isEmpty() ? 0 : 1), false, 0, isInterface ? null : name, superName, false, localData, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), new ArrayList<GraphTargetItem>(), staticInit, TypeItem.UNBOUNDED);
         MethodBody sinitBody = abc.findBody(staticMi);
 
         List<AVM2Instruction> sinitcode = new ArrayList<>();
@@ -1239,7 +1239,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
         sinitBody.markOffsets();
-        sinitBody.autoFillStats(abc, initScope + 1 + (implementsStr.isEmpty()?0:1), true);
+        sinitBody.autoFillStats(abc, initScope + 1 + (implementsStr.isEmpty() ? 0 : 1), true);
 
         classInfo.cinit_index = staticMi;
         if (!isInterface) {

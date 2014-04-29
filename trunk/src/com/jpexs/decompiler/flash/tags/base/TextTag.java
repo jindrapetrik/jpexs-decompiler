@@ -216,7 +216,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         return att;
     }
 
-    public static SHAPE getBorderShape(RGB borderColor, RGB fillColor, RECT rect){        
+    public static SHAPE getBorderShape(RGB borderColor, RGB fillColor, RECT rect) {
         SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
         shape.fillStyles = new FILLSTYLEARRAY();
         if (fillColor != null) {
@@ -263,9 +263,9 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         shape.shapeRecords.add(new EndShapeRecord());
         return shape;
     }
-    
+
     public static void drawBorder(SWF swf, SerializableImage image, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
-        Graphics2D g = (Graphics2D) image.getGraphics();        
+        Graphics2D g = (Graphics2D) image.getGraphics();
         Matrix mat = transformation.clone();
         mat = mat.concatenate(new Matrix(textMatrix));
         BitmapExporter.export(swf, getBorderShape(borderColor, fillColor, rect), null, image, mat, colorTransform);
@@ -316,7 +316,6 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         }
     }
 
-    
     public static String staticTextToHtmlCanvas(double unitDivisor, SWF swf, List<TEXTRECORD> textRecords, int numText, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
         Color textColor = new Color(0, 0, 0);
         String ret = "";
@@ -353,9 +352,9 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                     // shapeNum: 1
                     ret += "\tctx.save();\r\n";
                     ret += "\tctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
-                
+
                     SHAPE shape = glyphs.get(entry.glyphIndex);
-                    CanvasShapeExporter exporter = new CanvasShapeExporter(new RGBA(textColor),unitDivisor, swf, shape, colorTransform,0,0);
+                    CanvasShapeExporter exporter = new CanvasShapeExporter(new RGBA(textColor), unitDivisor, swf, shape, colorTransform, 0, 0);
                     exporter.export();
                     ret += exporter.getShapeData();
                     ret += "\tctx.restore();\r\n";
@@ -365,7 +364,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         }
         return ret;
     }
-    
+
     public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
@@ -415,7 +414,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 if (hasOffset) {
                     exporter.createSubGroup(Matrix.getTranslateInstance(offsetX, offsetY), null);
                 }
-                
+
                 Element textElement = exporter.createElement("text");
                 textElement.setAttribute("font-size", Double.toString(rat * 1024));
                 textElement.setAttribute("font-family", font.getFontName());
@@ -430,11 +429,11 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                         textElement.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
                     }
                 }
-                
+
                 exporter.addToGroup(textElement);
                 FontExportMode fontExportMode = FontExportMode.TTF; // todo: change this to WOFF
                 exporter.addStyle(font.getFontName(), new FontExporter().exportFont(font, fontExportMode), fontExportMode);
-                
+
                 if (hasOffset) {
                     exporter.endGroup();
                 }

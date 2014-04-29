@@ -236,7 +236,7 @@ public class DefineFont2Tag extends FontTag {
 
         glyphShapeTable = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
-            glyphShapeTable.add(sis.readSHAPE(1,false));
+            glyphShapeTable.add(sis.readSHAPE(1, false));
         }
 
         codeTable = new ArrayList<>(); //[numGlyphs];

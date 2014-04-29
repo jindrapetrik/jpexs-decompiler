@@ -125,7 +125,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
         this.definition = definition;
     }
 
-
     public void setNsKind(int nsKind) {
         this.nsKind = nsKind;
     }
@@ -239,7 +238,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
         Reference<Integer> ns_temp = new Reference<>(-1);
         Reference<Integer> index_temp = new Reference<>(-1);
         Reference<Integer> ret_temp = new Reference<>(-1);
-        
 
         if (assignedValue != null) {
             List<String> basicTypes = Arrays.asList("int", "Number");

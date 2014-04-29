@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 JPEXS
+ * Copyright (C) 2010-2014 JPEXS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,15 +16,17 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
-
 /**
  *
  * @author JPEXS
  */
-public interface Timelined extends BoundedTag {
+public class SvgClip {
 
-    public Timeline getTimeline();
+    public String shape;
+    public int depth;
 
-    public void resetTimeline();
+    public SvgClip(String shape, int depth) {
+        this.shape = shape;
+        this.depth = depth;
+    }
 }

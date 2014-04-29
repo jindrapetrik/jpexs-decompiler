@@ -1700,7 +1700,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-    
+
     private void importTextsSingleFileFormatted(File textsFile, SWF swf) {
         String texts = Helper.readTextFile(textsFile.getPath());
         Map<Integer, String[]> records = splitTextRecords(texts);
@@ -1723,7 +1723,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-    
+
     private void importTextsMultipleFiles(String folder, SWF swf) {
         File textsFolder = new File(Path.combine(folder, TextExporter.TEXT_EXPORT_FOLDER));
         String[] files = textsFolder.list(new FilenameFilter() {
@@ -1775,7 +1775,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-    
+
     public void importText(final SWF swf) {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));

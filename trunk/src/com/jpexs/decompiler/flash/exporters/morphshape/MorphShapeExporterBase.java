@@ -431,7 +431,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                                 case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
                                     // Gradient fill
                                     Matrix matrix = new Matrix(fillStyle.gradientMatrix);
-                                    Matrix matrixEnd = new Matrix(fillStyleEnd.gradientMatrix);                                    
+                                    Matrix matrixEnd = new Matrix(fillStyleEnd.gradientMatrix);
                                     lineGradientStyle(
                                             fillStyle.fillStyleType,
                                             fillStyle.gradient.gradientRecords,

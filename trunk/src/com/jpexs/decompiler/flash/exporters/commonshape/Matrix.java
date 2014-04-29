@@ -210,6 +210,21 @@ public class Matrix {
         return transform;
     }
 
+    public String getTransformationString(double translateDivisor, double unitDivisor) {
+        double translateX = roundPixels400(this.translateX / translateDivisor);
+        double translateY = roundPixels400(this.translateY / translateDivisor);
+        double rotateSkew0 = roundPixels400(this.rotateSkew0 / unitDivisor);
+        double rotateSkew1 = roundPixels400(this.rotateSkew1 / unitDivisor);
+        double scaleX = roundPixels400(this.scaleX / unitDivisor);
+        double scaleY = roundPixels400(this.scaleY / unitDivisor);
+        return "matrix(" + scaleX + ", " + rotateSkew0 + ", "
+                + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")";
+    }
+
+    private double roundPixels400(double pixels) {
+        return Math.round(pixels * 10000) / 10000.0;
+    }
+
     @Override
     public String toString() {
         return "[Matrix scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";

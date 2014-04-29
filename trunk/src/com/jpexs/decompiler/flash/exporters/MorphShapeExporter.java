@@ -64,7 +64,7 @@ public class MorphShapeExporter {
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterId();
                 }
-                String ext = settings.mode==MorphShapeExportMode.CANVAS?"html":"svg";
+                String ext = settings.mode == MorphShapeExportMode.CANVAS ? "html" : "svg";
 
                 final File file = new File(outdir + File.separator + characterID + "." + ext);
                 final int fcharacterID = characterID;
@@ -82,14 +82,14 @@ public class MorphShapeExporter {
                                 }
                                 break;
                             case CANVAS:
-                                try (FileOutputStream fos = new FileOutputStream(file)) {                                    
-                                    int deltaX = -Math.min(mst.getStartBounds().Xmin,mst.getEndBounds().Xmin);
-                                    int deltaY = -Math.min(mst.getStartBounds().Ymin,mst.getEndBounds().Ymin);
-                                    CanvasMorphShapeExporter cse = new CanvasMorphShapeExporter(((Tag)mst).getSwf(),mst.getShapeAtRatio(0),mst.getShapeAtRatio(DefineMorphShapeTag.MAX_RATIO), new CXFORMWITHALPHA(),SWF.unitDivisor,deltaX,deltaY);
-                                    cse.export();                                                                        
+                                try (FileOutputStream fos = new FileOutputStream(file)) {
+                                    int deltaX = -Math.min(mst.getStartBounds().Xmin, mst.getEndBounds().Xmin);
+                                    int deltaY = -Math.min(mst.getStartBounds().Ymin, mst.getEndBounds().Ymin);
+                                    CanvasMorphShapeExporter cse = new CanvasMorphShapeExporter(((Tag) mst).getSwf(), mst.getShapeAtRatio(0), mst.getShapeAtRatio(DefineMorphShapeTag.MAX_RATIO), new CXFORMWITHALPHA(), SWF.unitDivisor, deltaX, deltaY);
+                                    cse.export();
                                     fos.write(Utf8Helper.getBytes(cse.getHtml()));
                                 }
-                                break;                                
+                                break;
                         }
 
                     }

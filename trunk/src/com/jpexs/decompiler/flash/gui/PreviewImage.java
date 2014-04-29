@@ -185,7 +185,7 @@ public class PreviewImage extends JPanel {
         int h2 = PREVIEW_SIZE;
 
         int w;
-            int h = h1 * w2 / w1;
+        int h = h1 * w2 / w1;
         if (h > h2) {
             w = w1 * h2 / h1;
             h = h2;

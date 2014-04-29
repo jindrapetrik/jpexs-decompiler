@@ -511,7 +511,7 @@ public class ActionScriptParser {
                         throw new ParseException("Only one final keyword allowed", lexer.yyline());
                     }
                     isFinal = true;
-                } else if (s.type == SymbolType.DYNAMIC) {                    
+                } else if (s.type == SymbolType.DYNAMIC) {
                     if (isDynamic) {
                         throw new ParseException("Only one dynamic keyword allowed", lexer.yyline());
                     }

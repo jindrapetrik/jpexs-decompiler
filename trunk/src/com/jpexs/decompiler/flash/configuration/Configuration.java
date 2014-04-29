@@ -269,8 +269,7 @@ public class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as3edit")
     public static final ConfigurationItem<Boolean> warningExperimentalAS3Edit = null;
-    
-    
+
     @ConfigurationDefaultBoolean(true)
     public static final ConfigurationItem<Boolean> packJavaScripts = null;
 

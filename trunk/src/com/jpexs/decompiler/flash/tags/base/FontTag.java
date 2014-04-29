@@ -311,7 +311,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         }
         return dfn.fontCopyright;
     }
-    
+
     @Override
     public String toHtmlCanvas(double unitDivisor) {
         return ""; //TODO

@@ -21,16 +21,17 @@ import java.io.Serializable;
 
 /**
  * Well, this structure is undocumented, but exists
+ *
  * @author JPEXS
  */
 public class MORPHFOCALGRADIENT extends MORPHGRADIENT implements Serializable {
 
     @SWFType(BasicType.FIXED8)
     public float startFocalPoint;
-    
+
     @SWFType(BasicType.FIXED8)
     public float endFocalPoint;
-    
+
     @Override
     public GRADIENT getGradientAt(int ratio) {
         FOCALGRADIENT ret = new FOCALGRADIENT();

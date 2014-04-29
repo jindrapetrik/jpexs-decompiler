@@ -57,16 +57,14 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     protected String lastRadColor = null;
     protected int repeatCnt = 0;
     protected SWF swf;
-    
+
     protected String lineFillData = null;
     protected String lineLastRadColor = null;
     protected Matrix lineFillMatrix = null;
     protected Matrix lineFillMatrixEnd = null;
     protected int lineRepeatCnt = 0;
-   
-    
-    
-    public CanvasMorphShapeExporter(SWF swf,SHAPE shape, SHAPE endShape, ColorTransform colorTransform, double unitDivisor,int deltaX, int deltaY) {
+
+    public CanvasMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, ColorTransform colorTransform, double unitDivisor, int deltaX, int deltaY) {
         super(shape, endShape, colorTransform);
         this.deltaX = deltaX;
         this.deltaY = deltaY;
@@ -74,38 +72,36 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         this.swf = swf;
     }
 
-    
-    public String getHtml() {        
-        int width = (int) (Math.max(shape.getBounds().getWidth(),shapeEnd.getBounds().getWidth())/unitDivisor);
-        int height = (int) (Math.max(shape.getBounds().getHeight(),shapeEnd.getBounds().getHeight())/unitDivisor);
-        
-        return CanvasShapeExporter.getHtmlPrefix(width, height)+getJsPrefix()+shapeData+getJsSuffix(width,height)+CanvasShapeExporter.getHtmlSuffix();
+    public String getHtml() {
+        int width = (int) (Math.max(shape.getBounds().getWidth(), shapeEnd.getBounds().getWidth()) / unitDivisor);
+        int height = (int) (Math.max(shape.getBounds().getHeight(), shapeEnd.getBounds().getHeight()) / unitDivisor);
+
+        return CanvasShapeExporter.getHtmlPrefix(width, height) + getJsPrefix() + shapeData + getJsSuffix(width, height) + CanvasShapeExporter.getHtmlSuffix();
     }
-    
-    
-    public static String getJsSuffix(int width,int height){
+
+    public static String getJsSuffix(int width, int height) {
         String ret = "";
         ret += "}\r\n";
         int step = Math.round(65535 / 100);
         int rate = 10;
-        ret += "var step = "+step+";\r\n";
+        ret += "var step = " + step + ";\r\n";
         ret += "var ratio = -1;\r\n";
         ret += "function nextFrame(ctx){\r\n";
-        ret +="\tctx.clearRect(0,0," + width + "," + height + ");\r\n";
-        ret +="\tratio = (ratio+step)%65535;\r\n";
-        ret +="\tmorphshape(ctx,ratio);\r\n";
-        ret +="}\r\n";
+        ret += "\tctx.clearRect(0,0," + width + "," + height + ");\r\n";
+        ret += "\tratio = (ratio+step)%65535;\r\n";
+        ret += "\tmorphshape(ctx,ratio);\r\n";
+        ret += "}\r\n";
 
-        ret +="window.setInterval(function(){nextFrame(ctx)},"+rate+");\r\n";
-        return ret;          
-    }
-    
-    public static String getJsPrefix(){
-        String ret = CanvasShapeExporter.getJsPrefix();
-        ret+="function morphshape(ctx,ratio){\r\n";
+        ret += "window.setInterval(function(){nextFrame(ctx)}," + rate + ");\r\n";
         return ret;
     }
-    
+
+    public static String getJsPrefix() {
+        String ret = CanvasShapeExporter.getJsPrefix();
+        ret += "function morphshape(ctx,ratio){\r\n";
+        return ret;
+    }
+
     @Override
     public void beginShape() {
     }
@@ -134,7 +130,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     @Override
     public void beginFill(RGB color, RGB colorEnd) {
         finalizePath();
-        fillData += "\tctx.fillStyle="+useRatioColor(color,colorEnd)+";\r\n";   
+        fillData += "\tctx.fillStyle=" + useRatioColor(color, colorEnd) + ";\r\n";
     }
 
     @Override
@@ -153,15 +149,14 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             start.y += deltaY;
             end.x += deltaX;
             end.y += deltaY;
-            
-            
+
             Point start2 = matrixEnd.transform(new Point(-16384 - 32768 * repeatCnt, 0));
             Point end2 = matrixEnd.transform(new Point(16384 + 32768 * repeatCnt, 0));
             start2.x += deltaX;
             start2.y += deltaY;
             end2.x += deltaX;
             end2.y += deltaY;
-                        
+
             fillData += "\tvar grd=ctx.createLinearGradient(" + useRatioPos(start.x, start2.x) + "," + useRatioPos(start.y, start2.y) + "," + useRatioPos(end.x, end2.x) + "," + useRatioPos(end.y, end2.y) + ");\r\n";
         } else {
             matrix.translateX /= unitDivisor;
@@ -174,9 +169,6 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             matrix.translateY += deltaY / unitDivisor;
             fillMatrix = matrix;
 
-            
-            
-            
             matrixEnd.translateX /= unitDivisor;
             matrixEnd.translateY /= unitDivisor;
             matrixEnd.scaleX /= unitDivisor;
@@ -187,8 +179,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             matrixEnd.translateY += deltaY / unitDivisor;
             fillMatrixEnd = matrixEnd;
 
-            
-            fillData += "\tvar grd=ctx.createRadialGradient("+useRatioDouble(focalPointRatio*16384,focalPointRatioEnd*16384)+",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
+            fillData += "\tvar grd=ctx.createRadialGradient(" + useRatioDouble(focalPointRatio * 16384, focalPointRatioEnd * 16384) + ",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
         }
         int repeatTotal = repeatCnt * 2 + 1;
         double oneHeight = 1.0 / repeatTotal;
@@ -200,16 +191,16 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         for (int i = 0; i < repeatTotal; i++) {
             if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
                 revert = !revert;
-            }            
-            for(int j=0;j<gradientRecords.length;j++){
+            }
+            for (int j = 0; j < gradientRecords.length; j++) {
                 GRADRECORD r = gradientRecords[j];
                 GRADRECORD r2 = gradientRecordsEnd[j];
-                fillData += "\tvar s = "+useRatioDouble(
+                fillData += "\tvar s = " + useRatioDouble(
                         pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0),
                         pos + (oneHeight * (revert ? 255 - r2.ratio : r2.ratio) / 255.0)
-                )+";\r\n\tif(s<0) s = 0;\r\n\tif(s>1) s = 1;\r\n";
-                fillData += "\tgrd.addColorStop(s," + useRatioColor(r.color,r2.color) + ");\r\n";
-                lastRadColor = useRatioColor(r.color,r2.color);
+                ) + ";\r\n\tif(s<0) s = 0;\r\n\tif(s>1) s = 1;\r\n";
+                fillData += "\tgrd.addColorStop(s," + useRatioColor(r.color, r2.color) + ");\r\n";
+                lastRadColor = useRatioColor(r.color, r2.color);
             }
             pos += oneHeight;
         }
@@ -247,7 +238,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                     imageData = baos.toByteArray();
                 }
                 //String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
-                if (matrix != null) {                    
+                if (matrix != null) {
                     fillMatrix = matrix.clone();
                     fillMatrix.translateX /= unitDivisor;
                     fillMatrix.translateY /= unitDivisor;
@@ -257,8 +248,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                     fillMatrix.rotateSkew1 /= unitDivisor;
                     fillMatrix.translateX += deltaX / unitDivisor;
                     fillMatrix.translateY += deltaY / unitDivisor;
-                    
-                    
+
                     fillMatrixEnd = matrixEnd.clone();
                     fillMatrixEnd.translateX /= unitDivisor;
                     fillMatrixEnd.translateY /= unitDivisor;
@@ -272,7 +262,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 }
 
                 //fillData += "\tvar img = document.createElement(\"img\");\r\nimg.src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n";
-                fillData += "\tvar pat=ctx.createPattern(image"+bitmapId+",\"repeat\");\r\n";
+                fillData += "\tvar pat=ctx.createPattern(image" + bitmapId + ",\"repeat\");\r\n";
                 fillData += "\tctx.fillStyle = pat;\r\n";
             }
         }
@@ -288,10 +278,10 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         finalizePath();
         thickness /= unitDivisor;
         thicknessEnd /= unitDivisor;
-        if(color!=null){ //for gradient line fill
-            strokeData += "\tctx.strokeStyle=" + useRatioColor(color,colorEnd) + ";\r\n";
+        if (color != null) { //for gradient line fill
+            strokeData += "\tctx.strokeStyle=" + useRatioColor(color, colorEnd) + ";\r\n";
         }
-        strokeData += "\tctx.lineWidth="+useRatioDouble(thickness,thicknessEnd)+";\r\n";
+        strokeData += "\tctx.lineWidth=" + useRatioDouble(thickness, thicknessEnd) + ";\r\n";
         switch (startCaps) {
             case LINESTYLE2.NO_CAP:
                 strokeData += "\tctx.lineCap=\"butt\";\r\n";
@@ -320,7 +310,6 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     @Override
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, GRADRECORD[] gradientRecordsEnd, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio, float focalPointRatioEnd) {
         lineFillData = "";
-        
 
         //TODO: How many repeats is ideal?        
         final int REPEAT_CNT = 5;
@@ -334,14 +323,13 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             start.y += deltaY;
             end.x += deltaX;
             end.y += deltaY;
-            
-            
+
             Point start2 = matrixEnd.transform(new Point(-16384 - 32768 * repeatCnt, 0));
             Point end2 = matrixEnd.transform(new Point(16384 + 32768 * repeatCnt, 0));
             start2.x += deltaX;
             start2.y += deltaY;
             end2.x += deltaX;
-            end2.y += deltaY;                        
+            end2.y += deltaY;
             lineFillData += "\tvar grd=ctx.createLinearGradient(" + useRatioPos(start.x, start2.x) + "," + useRatioPos(start.y, start2.y) + "," + useRatioPos(end.x, end2.x) + "," + useRatioPos(end.y, end2.y) + ");\r\n";
         } else {
             matrix.translateX /= unitDivisor;
@@ -354,9 +342,6 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             matrix.translateY += deltaY / unitDivisor;
             lineFillMatrix = matrix;
 
-            
-            
-            
             matrixEnd.translateX /= unitDivisor;
             matrixEnd.translateY /= unitDivisor;
             matrixEnd.scaleX /= unitDivisor;
@@ -367,8 +352,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             matrixEnd.translateY += deltaY / unitDivisor;
             lineFillMatrixEnd = matrixEnd;
 
-            
-            lineFillData += "\tvar grd=ctx.createRadialGradient("+useRatioDouble(focalPointRatio*16384,focalPointRatioEnd*16384)+",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
+            lineFillData += "\tvar grd=ctx.createRadialGradient(" + useRatioDouble(focalPointRatio * 16384, focalPointRatioEnd * 16384) + ",0,0,0,0," + (16384 + 32768 * repeatCnt) + ");\r\n";
         }
         int repeatTotal = lineRepeatCnt * 2 + 1;
         double oneHeight = 1.0 / repeatTotal;
@@ -381,27 +365,27 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
                 revert = !revert;
             }
-            for (int j=0;j<gradientRecords.length;j++) {
+            for (int j = 0; j < gradientRecords.length; j++) {
                 GRADRECORD r = gradientRecords[j];
                 GRADRECORD r2 = gradientRecordsEnd[j];
-                lineFillData += "\tvar s="+useRatioDouble(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0), pos + (oneHeight * (revert ? 255 - r2.ratio : r2.ratio) / 255.0))+";\r\n";
+                lineFillData += "\tvar s=" + useRatioDouble(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0), pos + (oneHeight * (revert ? 255 - r2.ratio : r2.ratio) / 255.0)) + ";\r\n";
                 lineFillData += "\tif(s<0) s = 0;\r\n\tif(s>1) s = 1;\r\n";
-                lineFillData += "\tgrd.addColorStop(s," + useRatioColor(r.color,r2.color) + ");\r\n";
-                lineLastRadColor = useRatioColor(r.color,r2.color);
+                lineFillData += "\tgrd.addColorStop(s," + useRatioColor(r.color, r2.color) + ");\r\n";
+                lineLastRadColor = useRatioColor(r.color, r2.color);
             }
             pos += oneHeight;
         }
         lineFillData += "\tctx.fillStyle = grd;\r\n";
-        
+
         String preStrokeData = "";
-        
+
         preStrokeData += "\tvar lcanvas = document.createElement(\"canvas\");\r\n";
         preStrokeData += "\tlcanvas.width = canvas.width;\r\n";
         preStrokeData += "\tlcanvas.height=canvas.height;\r\n";
         preStrokeData += "\tvar lctx = lcanvas.getContext(\"2d\");\r\n";
         preStrokeData += "\tenhanceContext(lctx);\r\n";
         preStrokeData += "\tlctx.applyTransforms(ctx._matrices);\r\n";
-        preStrokeData += "\tctx = lctx;\r\n";        
+        preStrokeData += "\tctx = lctx;\r\n";
         strokeData = preStrokeData + strokeData;
     }
 
@@ -412,8 +396,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         x2 += deltaX;
         y2 += deltaY;
         pathData += "\tctx.moveTo("
-                + useRatioPos(x,x2) + ","
-                + useRatioPos(y,y2) + ");\r\n";
+                + useRatioPos(x, x2) + ","
+                + useRatioPos(y, y2) + ");\r\n";
     }
 
     @Override
@@ -423,8 +407,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         x2 += deltaX;
         y2 += deltaY;
         pathData += "\tctx.lineTo("
-                + useRatioPos(x,x2) + ","
-                + useRatioPos(y,y2) + ");\r\n";
+                + useRatioPos(x, x2) + ","
+                + useRatioPos(y, y2) + ");\r\n";
     }
 
     @Override
@@ -433,23 +417,22 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         anchorX += deltaX;
         controlY += deltaY;
         anchorY += deltaY;
-        
+
         controlX2 += deltaX;
         anchorX2 += deltaX;
         controlY2 += deltaY;
         anchorY2 += deltaY;
-        
-        
-        pathData += "\tctx.quadraticCurveTo(" + useRatioPos(controlX,controlX2) + ","
-                + useRatioPos(controlY,controlY2) + ","
-                + useRatioPos(anchorX,anchorX2) + ","
-                + useRatioPos(anchorY,anchorY2) + ");\r\n";
+
+        pathData += "\tctx.quadraticCurveTo(" + useRatioPos(controlX, controlX2) + ","
+                + useRatioPos(controlY, controlY2) + ","
+                + useRatioPos(anchorX, anchorX2) + ","
+                + useRatioPos(anchorY, anchorY2) + ");\r\n";
     }
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
             pathData = "\tctx.beginPath();\r\n" + pathData + "\tctx.closePath();\r\n";
-            if(lineFillData!=null){                                                 
+            if (lineFillData != null) {
                 String preLineFillData = "";
                 preLineFillData += "\tvar oldctx = ctx;\r\n";
                 preLineFillData += "\tctx.save();\r\n";
@@ -466,28 +449,26 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 if (lineLastRadColor != null) {
                     preLineFillData += "\tctx.fillStyle=" + lineLastRadColor + ";\r\n ctx.fill(\"evenodd\");\r\n";
                 }
-                preLineFillData += "\tctx.transform(" + useRatioDouble(lineFillMatrix.scaleX,lineFillMatrixEnd.scaleX) + "," + useRatioDouble(lineFillMatrix.rotateSkew0,lineFillMatrixEnd.rotateSkew0) + "," + useRatioDouble(lineFillMatrix.rotateSkew1,lineFillMatrixEnd.rotateSkew1) + "," + useRatioDouble(lineFillMatrix.scaleY,lineFillMatrixEnd.scaleY) + "," + useRatioDouble(lineFillMatrix.translateX,lineFillMatrixEnd.translateX) + "," + useRatioDouble(lineFillMatrix.translateY,lineFillMatrixEnd.translateY) + ");\r\n";
+                preLineFillData += "\tctx.transform(" + useRatioDouble(lineFillMatrix.scaleX, lineFillMatrixEnd.scaleX) + "," + useRatioDouble(lineFillMatrix.rotateSkew0, lineFillMatrixEnd.rotateSkew0) + "," + useRatioDouble(lineFillMatrix.rotateSkew1, lineFillMatrixEnd.rotateSkew1) + "," + useRatioDouble(lineFillMatrix.scaleY, lineFillMatrixEnd.scaleY) + "," + useRatioDouble(lineFillMatrix.translateX, lineFillMatrixEnd.translateX) + "," + useRatioDouble(lineFillMatrix.translateY, lineFillMatrixEnd.translateY) + ");\r\n";
                 lineFillData = preLineFillData + lineFillData;
                 lineFillData += "\tctx.fillRect(" + (-16384 - 32768 * lineRepeatCnt) + "," + (-16384 - 32768 * lineRepeatCnt) + "," + (2 * 16384 + 32768 * 2 * lineRepeatCnt) + "," + (2 * 16384 + 32768 * 2 * lineRepeatCnt) + ");\r\n";
-                lineFillData += "\tctx = oldctx;\r\n";                 
-                
-                
+                lineFillData += "\tctx = oldctx;\r\n";
+
                 //lcanvas - stroke
                 //lfcanvas - stroke background
-                
                 lineFillData += "\tvar limgd = lctx.getImageData(0, 0, lcanvas.width, lcanvas.height);\r\n"
                         + "\tvar lpix = limgd.data;\r\n"
                         + "\tvar lfimgd = lfctx.getImageData(0, 0, lfcanvas.width, lfcanvas.height);\r\n"
                         + "\tvar lfpix = lfimgd.data;\r\n"
                         + "\tvar imgd = ctx.getImageData(0, 0, canvas.width, canvas.height);\r\n"
                         + "\tvar pix = imgd.data;\r\n"
-                        + "\tfor (var i = 0; i < lpix.length; i += 4) {\r\n" +
-                            "\t\tif(lpix[i+3]>0){ pix[i] = lfpix[i]; pix[i+1] = lfpix[i+1]; pix[i+2] = lfpix[i+2]; pix[i+3] = lfpix[i+3];}\r\n" +
-                            "\t}\r\n"
+                        + "\tfor (var i = 0; i < lpix.length; i += 4) {\r\n"
+                        + "\t\tif(lpix[i+3]>0){ pix[i] = lfpix[i]; pix[i+1] = lfpix[i+1]; pix[i+2] = lfpix[i+2]; pix[i+3] = lfpix[i+3];}\r\n"
+                        + "\t}\r\n"
                         + "\tctx.putImageData(imgd, 0, 0);\r\n";
-                lineFillData += "\tctx.restore();\r\n";            
+                lineFillData += "\tctx.restore();\r\n";
                 strokeData = "";
-            }else{
+            } else {
                 pathData += strokeData;
             }
             if (fillMatrix != null) {
@@ -496,7 +477,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 }
                 pathData += "\tctx.save();\r\n";
                 pathData += "\tctx.clip();\r\n";
-                pathData += "\tctx.transform(" + useRatioDouble(fillMatrix.scaleX,fillMatrixEnd.scaleX) + "," + useRatioDouble(fillMatrix.rotateSkew0,fillMatrixEnd.rotateSkew0) + "," + useRatioDouble(fillMatrix.rotateSkew1,fillMatrixEnd.rotateSkew1) + "," + useRatioDouble(fillMatrix.scaleY,fillMatrixEnd.scaleY) + "," + useRatioDouble(fillMatrix.translateX,fillMatrixEnd.translateX) + "," + useRatioDouble(fillMatrix.translateY,fillMatrixEnd.translateY) + ");\r\n";
+                pathData += "\tctx.transform(" + useRatioDouble(fillMatrix.scaleX, fillMatrixEnd.scaleX) + "," + useRatioDouble(fillMatrix.rotateSkew0, fillMatrixEnd.rotateSkew0) + "," + useRatioDouble(fillMatrix.rotateSkew1, fillMatrixEnd.rotateSkew1) + "," + useRatioDouble(fillMatrix.scaleY, fillMatrixEnd.scaleY) + "," + useRatioDouble(fillMatrix.translateX, fillMatrixEnd.translateX) + "," + useRatioDouble(fillMatrix.translateY, fillMatrixEnd.translateY) + ");\r\n";
                 pathData += fillData;
                 pathData += "\tctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
                 pathData += "\tctx.restore();\r\n";
@@ -509,7 +490,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             }
             if (!"".equals(strokeData)) {
                 shapeData += "\tctx.stroke();\r\n";
-            }else if(lineFillData!=null){
+            } else if (lineFillData != null) {
                 shapeData += lineFillData;
             }
         }
@@ -521,7 +502,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         fillMatrix = null;
         fillMatrixEnd = null;
         lastRadColor = null;
-        
+
         lineRepeatCnt = 0;
         lineFillData = null;
         lineLastRadColor = null;
@@ -529,23 +510,23 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         lineFillMatrixEnd = null;
     }
 
-    private String useRatioPos(double a, double b){
-        return (a / unitDivisor) + "+ratio*(" +((b-a)/unitDivisor)+")/"+DefineMorphShapeTag.MAX_RATIO;
+    private String useRatioPos(double a, double b) {
+        return (a / unitDivisor) + "+ratio*(" + ((b - a) / unitDivisor) + ")/" + DefineMorphShapeTag.MAX_RATIO;
     }
-    
-    private String useRatioInt(int a, int b){
-        return "Math.round("+ a + "+ratio*(" +((b-a))+")/"+DefineMorphShapeTag.MAX_RATIO+")";
+
+    private String useRatioInt(int a, int b) {
+        return "Math.round(" + a + "+ratio*(" + ((b - a)) + ")/" + DefineMorphShapeTag.MAX_RATIO + ")";
     }
-    
-     private String useRatioDouble(double a, double b){
-        return "" + a + "+ratio*(" +((b-a))+")/"+DefineMorphShapeTag.MAX_RATIO;
+
+    private String useRatioDouble(double a, double b) {
+        return "" + a + "+ratio*(" + ((b - a)) + ")/" + DefineMorphShapeTag.MAX_RATIO;
     }
 
     public String getShapeData() {
         return shapeData;
     }
-    
-    private String useRatioColor(RGB color, RGB colorEnd){
-        return "\"rgba(\"+" + useRatioInt(color.red,colorEnd.red)+"+\",\"+"+useRatioInt(color.green,colorEnd.green)+"+\",\"+"+useRatioInt(color.blue,colorEnd.blue)+"+\",\"+(("+useRatioInt((color instanceof RGBA)?((RGBA)color).alpha:255,(colorEnd instanceof RGBA)?((RGBA)colorEnd).alpha:255)   + ")/255)+\")\"";
-    }       
+
+    private String useRatioColor(RGB color, RGB colorEnd) {
+        return "\"rgba(\"+" + useRatioInt(color.red, colorEnd.red) + "+\",\"+" + useRatioInt(color.green, colorEnd.green) + "+\",\"+" + useRatioInt(color.blue, colorEnd.blue) + "+\",\"+((" + useRatioInt((color instanceof RGBA) ? ((RGBA) color).alpha : 255, (colorEnd instanceof RGBA) ? ((RGBA) colorEnd).alpha : 255) + ")/255)+\")\"";
+    }
 }

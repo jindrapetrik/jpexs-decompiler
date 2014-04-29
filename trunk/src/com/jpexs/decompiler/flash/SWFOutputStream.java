@@ -1503,12 +1503,12 @@ public class SWFOutputStream extends OutputStream {
             writeMORPHGRADRECORD(value.gradientRecords[i]);
         }
     }
-    
+
     /**
      * Writes MORPHFOCALGRADIENT value to the stream
      *
      * Undocumented feature
-     * 
+     *
      * @param value MORPHGRADIENT value
      * @param shapeNum 1 in DefineMorphShape, 2 in DefineMorphShape2,...
      * @throws IOException

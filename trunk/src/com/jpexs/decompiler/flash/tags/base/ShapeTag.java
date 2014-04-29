@@ -54,17 +54,16 @@ public abstract class ShapeTag extends CharacterTag implements BoundedTag, Drawa
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException{
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
         SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShapes(), exporter, null, colorTransform);
         shapeExporter.export();
     }
 
     @Override
     public String toHtmlCanvas(double unitDivisor) {
-        CanvasShapeExporter cse = new CanvasShapeExporter(null,unitDivisor, swf, getShapes(), new ColorTransform(), 0, 0);
+        CanvasShapeExporter cse = new CanvasShapeExporter(null, unitDivisor, swf, getShapes(), new ColorTransform(), 0, 0);
         cse.export();
         return cse.getShapeData();
     }
-    
-    
+
 }

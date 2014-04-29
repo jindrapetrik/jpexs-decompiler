@@ -2303,9 +2303,9 @@ public class SWFInputStream extends InputStream {
                     scr.lineStyle = (int) readUB(lineBits);
                 }
                 if (stateNewStyles) {
-                    if(morphShape){
+                    if (morphShape) {
                         //This should never happen
-                    }else{
+                    } else {
                         scr.fillStyles = readFILLSTYLEARRAY(shapeNum);
                         scr.lineStyles = readLINESTYLEARRAY(shapeNum);
                     }
@@ -2347,6 +2347,7 @@ public class SWFInputStream extends InputStream {
      * Reads one SHAPE value from the stream
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
+     * @param morphShape
      * @return SHAPE value
      * @throws IOException
      */
@@ -2362,6 +2363,7 @@ public class SWFInputStream extends InputStream {
      * Reads one SHAPEWITHSTYLE value from the stream
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
+     * @param morphShape
      * @return SHAPEWITHSTYLE value
      * @throws IOException
      */
@@ -2547,12 +2549,12 @@ public class SWFInputStream extends InputStream {
         }
         return ret;
     }
-    
+
     /**
      * Reads one MORPHFOCALGRADIENT value from the stream
      *
      * This is undocumented feature
-     * 
+     *
      * @return MORPHGRADIENT value
      * @throws IOException
      */
@@ -2569,7 +2571,6 @@ public class SWFInputStream extends InputStream {
         ret.endFocalPoint = readFIXED8();
         return ret;
     }
-    
 
     /**
      * Reads one MORPHFILLSTYLE value from the stream
@@ -2594,7 +2595,7 @@ public class SWFInputStream extends InputStream {
                 || (ret.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)) {
             ret.gradient = readMORPHGRADIENT();
         }
-        if(ret.fillStyleType == MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT){
+        if (ret.fillStyleType == MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT) {
             ret.gradient = readMORPHFOCALGRADIENT();
         }
 

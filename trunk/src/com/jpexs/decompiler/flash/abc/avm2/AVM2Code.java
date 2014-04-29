@@ -1868,7 +1868,7 @@ public class AVM2Code implements Serializable {
 
             if (ins.definition instanceof NewFunctionIns) {
                 MethodBody innerBody = abc.findBody(ins.operands[0]);
-                innerBody.autoFillStats(abc, stats.initscope + (stats.has_activation ? 1 : 0),false);
+                innerBody.autoFillStats(abc, stats.initscope + (stats.has_activation ? 1 : 0), false);
             }
 
             stats.instructionStats[pos].seen = true;

@@ -144,14 +144,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
                 if (matrix != null) {
-                    double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
-                    double translateY = roundPixels400(matrix.translateY / SWF.unitDivisor);
-                    double rotateSkew0 = roundPixels400(matrix.rotateSkew0 / SWF.unitDivisor);
-                    double rotateSkew1 = roundPixels400(matrix.rotateSkew1 / SWF.unitDivisor);
-                    double scaleX = roundPixels400(matrix.scaleX / SWF.unitDivisor);
-                    double scaleY = roundPixels400(matrix.scaleY / SWF.unitDivisor);
-                    pattern.setAttribute("patternTransform", "matrix(" + scaleX + ", " + rotateSkew0
-                            + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
+                    pattern.setAttribute("patternTransform", matrix.getTransformationString(SWF.unitDivisor, SWF.unitDivisor));
                 }
                 Element imageElement = exporter.createElement("image");
                 imageElement.setAttribute("width", "" + width);
@@ -261,14 +254,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             gradient.setAttribute("color-interpolation", "linearRGB");
         }
         if (matrix != null) {
-            double translateX = roundPixels400(matrix.translateX / SWF.unitDivisor);
-            double translateY = roundPixels400(matrix.translateY / SWF.unitDivisor);
-            double rotateSkew0 = roundPixels400(matrix.rotateSkew0);
-            double rotateSkew1 = roundPixels400(matrix.rotateSkew1);
-            double scaleX = roundPixels400(matrix.scaleX);
-            double scaleY = roundPixels400(matrix.scaleY);
-            gradient.setAttribute("gradientTransform", "matrix(" + scaleX + ", " + rotateSkew0
-                    + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
+            gradient.setAttribute("gradientTransform", matrix.getTransformationString(SWF.unitDivisor, 1));
         }
         for (int i = 0; i < gradientRecords.length; i++) {
             GRADRECORD record = gradientRecords[i];

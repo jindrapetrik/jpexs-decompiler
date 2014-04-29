@@ -109,6 +109,7 @@ import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Clip;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.SvgClip;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.AS2PackageNodeItem;
@@ -1341,27 +1342,27 @@ public final class SWF implements TreeItem, Timelined {
             writer.close();
         }
     }
-    
-    private static String getTypePrefix(CharacterTag c){
-        if(c instanceof ShapeTag){
+
+    private static String getTypePrefix(CharacterTag c) {
+        if (c instanceof ShapeTag) {
             return "shape";
         }
-        if(c instanceof MorphShapeTag){
+        if (c instanceof MorphShapeTag) {
             return "morphshape";
         }
-        if(c instanceof DefineSpriteTag){
+        if (c instanceof DefineSpriteTag) {
             return "sprite";
         }
-        if(c instanceof TextTag){
+        if (c instanceof TextTag) {
             return "text";
         }
-        if(c instanceof ButtonTag){
+        if (c instanceof ButtonTag) {
             return "button";
         }
-        if(c instanceof FontTag){
+        if (c instanceof FontTag) {
             return "font";
         }
-        if(c instanceof ImageTag){
+        if (c instanceof ImageTag) {
             return "image";
         }
         return "character";
@@ -1452,9 +1453,9 @@ public final class SWF implements TreeItem, Timelined {
                         getNeededCharacters(timeline, fframes, library);
 
                         for (int c : library) {
-                            CharacterTag  ch = fswf.characters.get(c);                            
-                            if(ch instanceof ImageTag){
-                                ImageTag image=(ImageTag)ch;
+                            CharacterTag ch = fswf.characters.get(c);
+                            if (ch instanceof ImageTag) {
+                                ImageTag image = (ImageTag) ch;
                                 String format = image.getImageFormat();
                                 InputStream imageStream = image.getImageData();
                                 byte[] imageData;
@@ -1469,22 +1470,21 @@ public final class SWF implements TreeItem, Timelined {
                                     imageData = baos.toByteArray();
                                 }
                                 String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
-                                fos.write(Utf8Helper.getBytes("var image"+c+" = document.createElement(\"img\");\r\nimage"+c+".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
-                            }else{
-                                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch)+c + "(ctx,frame,ratio){\r\n"));                            
-                                if(ch instanceof DrawableTag){
-                                    fos.write(Utf8Helper.getBytes(((DrawableTag)ch).toHtmlCanvas(1)));
+                                fos.write(Utf8Helper.getBytes("var image" + c + " = document.createElement(\"img\");\r\nimage" + c + ".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
+                            } else {
+                                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,frame,ratio){\r\n"));
+                                if (ch instanceof DrawableTag) {
+                                    fos.write(Utf8Helper.getBytes(((DrawableTag) ch).toHtmlCanvas(1)));
                                 }
                                 fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
                             }
                         }
-                        
-                        String currentName = timeline.id == 0?"main":getTypePrefix(fswf.characters.get(timeline.id))+timeline.id;
-                        
-                        fos.write(Utf8Helper.getBytes("function "+currentName + "(ctx,frame,ratio){\r\n"));
+
+                        String currentName = timeline.id == 0 ? "main" : getTypePrefix(fswf.characters.get(timeline.id)) + timeline.id;
+
+                        fos.write(Utf8Helper.getBytes("function " + currentName + "(ctx,frame,ratio){\r\n"));
                         fos.write(Utf8Helper.getBytes(framesToHtmlCanvas(unitDivisor, ftim, fframes, 0, null, 0, displayRect, new ColorTransform(), fbackgroundColor)));
                         fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
-                        
 
                         fos.write(Utf8Helper.getBytes("var frame = -1;\r\n"));
                         fos.write(Utf8Helper.getBytes("var frames = [];\r\n"));
@@ -1495,7 +1495,7 @@ public final class SWF implements TreeItem, Timelined {
                         fos.write(Utf8Helper.getBytes("function nextFrame(ctx){\r\n"));
                         fos.write(Utf8Helper.getBytes("\tctx.clearRect(0,0," + width + "," + height + ");\r\n"));
                         fos.write(Utf8Helper.getBytes("\tframe = (frame+1)%frames.length;\r\n"));
-                        fos.write(Utf8Helper.getBytes("\t"+currentName + "(ctx,frames[frame],0);\r\n"));
+                        fos.write(Utf8Helper.getBytes("\t" + currentName + "(ctx,frames[frame],0);\r\n"));
                         fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
 
                         fos.write(Utf8Helper.getBytes("if(frames.length==1){nextFrame(ctx);}else{window.setInterval(function(){nextFrame(ctx);}," + (int) (1000.0 / timeline.swf.frameRate) + ");};\r\n"));
@@ -1516,7 +1516,7 @@ public final class SWF implements TreeItem, Timelined {
                         while ((cnt = fis.read(buf)) > 0) {
                             fos.write(buf, 0, cnt);
                         }
-                        if(Configuration.packJavaScripts.get()){
+                        if (Configuration.packJavaScripts.get()) {
                             fos.write(Utf8Helper.getBytes(";"));
                         }
                         fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlSuffix()));
@@ -2165,7 +2165,7 @@ public final class SWF implements TreeItem, Timelined {
                 DepthState layer = frameObj.layers.get(depth);
                 if (!timeline.swf.characters.containsKey(layer.characterId)) {
                     continue;
-                }                
+                }
                 usedCharacters.add(layer.characterId);
                 CharacterTag character = timeline.swf.characters.get(layer.characterId);
                 usedCharacters.add(layer.characterId);
@@ -2220,7 +2220,7 @@ public final class SWF implements TreeItem, Timelined {
                     DefineSpriteTag sp = (DefineSpriteTag) character;
                     Timeline tim = sp.getTimeline();
                     f = layer.time % tim.getFrameCount();
-                }           
+                }
                 sb.append("\t\t\tctx.save();\r\n");
                 sb.append("\t\t\tctx.transform(").append(placeMatrix.scaleX).append(",");
                 sb.append(placeMatrix.rotateSkew0).append(",");
@@ -2229,7 +2229,7 @@ public final class SWF implements TreeItem, Timelined {
                 sb.append(placeMatrix.translateX).append(",");
                 sb.append(placeMatrix.translateY);
                 sb.append(");\r\n");
-                sb.append("\t\t\t").append(getTypePrefix(character)).append(layer.characterId).append("(ctx,").append(f).append(",").append(layer.ratio<0?0:layer.ratio).append(");\r\n");
+                sb.append("\t\t\t").append(getTypePrefix(character)).append(layer.characterId).append("(ctx,").append(f).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(");\r\n");
                 sb.append("\t\t\tctx.restore();\r\n");
             }
             sb.append("\t\t\tbreak;\r\n");
@@ -2243,14 +2243,13 @@ public final class SWF implements TreeItem, Timelined {
             return;
         }
         Frame frameObj = timeline.frames.get(frame);
-        // TODO g.setTransform(transformation.toTransform());
-        List<Clip> clips = new ArrayList<>();
-        List<Shape> prevClips = new ArrayList<>();
+        List<SvgClip> clips = new ArrayList<>();
+        List<String> prevClips = new ArrayList<>();
 
         for (int i = 1; i <= timeline.getMaxDepth(); i++) {
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth == i) {
-                    // TODO exporter.setClip(prevClips.get(c));
+                    exporter.setClip(prevClips.get(c));
                     prevClips.remove(c);
                     clips.remove(c);
                 }
@@ -2295,10 +2294,20 @@ public final class SWF implements TreeItem, Timelined {
 
                 // TODO: if (layer.filters != null)
                 // TODO: if (layer.blendMode > 1)
-                Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                exporter.addUse(mat, boundRect, assetName);
-
-                // TODO: if (layer.clipDepth > -1)...
+                if (layer.clipDepth > -1) {
+                    String clipName = exporter.getUniqueId("clipPath");
+                    exporter.createClipPath(new Matrix(), clipName);
+                    SvgClip clip = new SvgClip(clipName, layer.clipDepth);
+                    clips.add(clip);
+                    prevClips.add(exporter.getClip());
+                    Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
+                    exporter.addUse(mat, boundRect, assetName);
+                    exporter.setClip(clip.shape);
+                    exporter.endGroup();
+                } else {
+                    Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
+                    exporter.addUse(mat, boundRect, assetName);
+                }
             }
         }
     }
@@ -2321,7 +2330,7 @@ public final class SWF implements TreeItem, Timelined {
         }
         return exporter.getUniqueId("tag");
     }
-    
+
     public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor) {
         String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode();
         SerializableImage image = getFromCache(key);
@@ -2555,7 +2564,7 @@ public final class SWF implements TreeItem, Timelined {
                     gm.fillRect(0, 0, image.getWidth(), image.getHeight());
                     gm.setTransform(trans);
                     gm.drawImage(img.getBufferedImage(), 0, 0, null);
-                    Clip clip = new Clip(Helper.imageToShape(mask), layer.clipDepth); //Maybe we can get corrent outline instead converting from image (?)
+                    Clip clip = new Clip(Helper.imageToShape(mask), layer.clipDepth); //Maybe we can get current outline instead converting from image (?)
                     clips.add(clip);
                     prevClips.add(g.getClip());
                     g.setTransform(AffineTransform.getTranslateInstance(0, 0));

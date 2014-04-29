@@ -56,7 +56,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected String lineLastRadColor = null;
     protected Matrix lineFillMatrix = null;
     protected int lineRepeatCnt = 0;
-    
+
     public static String getJsPrefix() {
         return "var canvas=document.getElementById(\"myCanvas\");\r\n"
                 + "var ctx=canvas.getContext(\"2d\");\r\n"
@@ -344,7 +344,6 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     @Override
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
         lineFillData = "";
-        
 
         //TODO: How many repeats is ideal?        
         final int REPEAT_CNT = 5;
@@ -391,16 +390,16 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             pos += oneHeight;
         }
         lineFillData += "\tctx.fillStyle = grd;\r\n";
-        
+
         String preStrokeData = "";
-        
+
         preStrokeData += "\tvar lcanvas = document.createElement(\"canvas\");\r\n";
         preStrokeData += "\tlcanvas.width = canvas.width;\r\n";
         preStrokeData += "\tlcanvas.height=canvas.height;\r\n";
         preStrokeData += "\tvar lctx = lcanvas.getContext(\"2d\");\r\n";
         preStrokeData += "\tenhanceContext(lctx);\r\n";
         preStrokeData += "\tlctx.applyTransforms(ctx._matrices);\r\n";
-        preStrokeData += "\tctx = lctx;\r\n";        
+        preStrokeData += "\tctx = lctx;\r\n";
         strokeData = preStrokeData + strokeData;
     }
 
@@ -436,8 +435,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected void finalizePath() {
         if (!"".equals(pathData)) {
             pathData = "\tctx.beginPath();\r\n" + pathData + "\tctx.closePath();\r\n";
-            
-            if(lineFillData!=null){                                                 
+
+            if (lineFillData != null) {
                 String preLineFillData = "";
                 preLineFillData += "\tvar oldctx = ctx;\r\n";
                 preLineFillData += "\tctx.save();\r\n";
@@ -458,26 +457,24 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 preLineFillData += "\tctx.transform(" + lineFillMatrix.scaleX + "," + lineFillMatrix.rotateSkew0 + "," + lineFillMatrix.rotateSkew1 + "," + lineFillMatrix.scaleY + "," + lineFillMatrix.translateX + "," + lineFillMatrix.translateY + ");\r\n";
                 lineFillData = preLineFillData + lineFillData;
                 lineFillData += "\tctx.fillRect(" + (-16384 - 32768 * lineRepeatCnt) + "," + (-16384 - 32768 * lineRepeatCnt) + "," + (2 * 16384 + 32768 * 2 * lineRepeatCnt) + "," + (2 * 16384 + 32768 * 2 * lineRepeatCnt) + ");\r\n";
-                
-                lineFillData += "\tctx = oldctx;\r\n";                 
-                
-                
+
+                lineFillData += "\tctx = oldctx;\r\n";
+
                 //lcanvas - stroke
                 //lfcanvas - stroke background
-                
                 lineFillData += "\tvar limgd = lctx.getImageData(0, 0, lcanvas.width, lcanvas.height);\r\n"
                         + "\tvar lpix = limgd.data;\r\n"
                         + "\tvar lfimgd = lfctx.getImageData(0, 0, lfcanvas.width, lfcanvas.height);\r\n"
                         + "\tvar lfpix = lfimgd.data;\r\n"
                         + "\tvar imgd = ctx.getImageData(0, 0, canvas.width, canvas.height);\r\n"
                         + "\tvar pix = imgd.data;\r\n"
-                        + "\tfor (var i = 0; i < lpix.length; i += 4) {\r\n" +
-                            "\t\tif(lpix[i+3]>0){ pix[i] = lfpix[i]; pix[i+1] = lfpix[i+1]; pix[i+2] = lfpix[i+2]; pix[i+3] = lfpix[i+3];}\r\n" +
-                            "\t}\r\n"
+                        + "\tfor (var i = 0; i < lpix.length; i += 4) {\r\n"
+                        + "\t\tif(lpix[i+3]>0){ pix[i] = lfpix[i]; pix[i+1] = lfpix[i+1]; pix[i+2] = lfpix[i+2]; pix[i+3] = lfpix[i+3];}\r\n"
+                        + "\t}\r\n"
                         + "\tctx.putImageData(imgd, 0, 0);\r\n";
-                lineFillData += "\tctx.restore();\r\n";            
+                lineFillData += "\tctx.restore();\r\n";
                 strokeData = "";
-            }else{
+            } else {
                 pathData += strokeData;
             }
             if (fillMatrix != null) {
@@ -499,19 +496,19 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             }
             if (!"".equals(strokeData)) {
                 shapeData += "\tctx.stroke();\r\n";
-            }else if(lineFillData!=null){
+            } else if (lineFillData != null) {
                 shapeData += lineFillData;
             }
         }
 
         repeatCnt = 0;
-        
+
         pathData = "";
         fillData = "";
         strokeData = "";
         fillMatrix = null;
         lastRadColor = null;
-        
+
         lineRepeatCnt = 0;
         lineFillData = null;
         lineLastRadColor = null;

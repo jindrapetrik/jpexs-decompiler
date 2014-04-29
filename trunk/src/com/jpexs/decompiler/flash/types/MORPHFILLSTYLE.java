@@ -34,7 +34,7 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
 
     public static final int SOLID = 0x0;
     public static final int LINEAR_GRADIENT = 0x10;
-    public static final int RADIAL_GRADIENT = 0x12;    
+    public static final int RADIAL_GRADIENT = 0x12;
     public static final int FOCAL_RADIAL_GRADIENT = 0x13;
     public static final int REPEATING_BITMAP = 0x40;
     public static final int CLIPPED_BITMAP = 0x41;
@@ -55,7 +55,7 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
 
     @Conditional(value = "fillStyleType", options = {LINEAR_GRADIENT, RADIAL_GRADIENT})
     public MORPHGRADIENT gradient;
-        
+
     @Conditional(value = "fillStyleType", options = {CLIPPED_BITMAP, NON_SMOOTHED_REPEATING_BITMAP, NON_SMOOTHED_CLIPPED_BITMAP})
     public int bitmapId;
 
@@ -86,12 +86,12 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
         }
         MATRIX ret = new MATRIX();
         double ratio_d = ratio / 65535.0;
-        ret.scaleX = (int)Math.round(a.getScaleX() + (b.getScaleX() - a.getScaleX()) * ratio_d);
-        ret.scaleY = (int)Math.round(a.getScaleY() + (b.getScaleY() - a.getScaleY()) * ratio_d);
-        ret.rotateSkew0 = (int)Math.round(a.getRotateSkew0() + (b.getRotateSkew0() - a.getRotateSkew0()) * ratio_d);
-        ret.rotateSkew1 = (int)Math.round(a.getRotateSkew1() + (b.getRotateSkew1() - a.getRotateSkew1()) * ratio_d);
-        ret.translateX = (int)Math.round(a.translateX + (b.translateX - a.translateX) * ratio_d);
-        ret.translateY = (int)Math.round(a.translateY + (b.translateY - a.translateY) * ratio_d);
+        ret.scaleX = (int) Math.round(a.getScaleX() + (b.getScaleX() - a.getScaleX()) * ratio_d);
+        ret.scaleY = (int) Math.round(a.getScaleY() + (b.getScaleY() - a.getScaleY()) * ratio_d);
+        ret.rotateSkew0 = (int) Math.round(a.getRotateSkew0() + (b.getRotateSkew0() - a.getRotateSkew0()) * ratio_d);
+        ret.rotateSkew1 = (int) Math.round(a.getRotateSkew1() + (b.getRotateSkew1() - a.getRotateSkew1()) * ratio_d);
+        ret.translateX = (int) Math.round(a.translateX + (b.translateX - a.translateX) * ratio_d);
+        ret.translateY = (int) Math.round(a.translateY + (b.translateY - a.translateY) * ratio_d);
         ret.hasRotate = true;
         ret.hasScale = true;
         return ret;

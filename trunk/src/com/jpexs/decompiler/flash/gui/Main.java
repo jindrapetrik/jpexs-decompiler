@@ -1014,14 +1014,14 @@ public class Main {
     public static void exit() {
         Configuration.saveConfig();
         /*if (proxyFrame != null && Main.proxyFrame.isVisible()) {
-            return;
-        }
-        if (loadFromMemoryFrame != null && Main.loadFromMemoryFrame.isVisible()) {
-            return;
-        }
-        if (loadFromCacheFrame != null && loadFromCacheFrame.isVisible()) {
-            return;
-        }*/
+         return;
+         }
+         if (loadFromMemoryFrame != null && Main.loadFromMemoryFrame.isVisible()) {
+         return;
+         }
+         if (loadFromCacheFrame != null && loadFromCacheFrame.isVisible()) {
+         return;
+         }*/
         if (mainFrame != null && mainFrame.getPanel() != null) {
             mainFrame.getPanel().unloadFlashPlayer();
         }

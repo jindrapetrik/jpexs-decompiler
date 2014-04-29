@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.player;
 
-import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.utf8.Utf8Helper;

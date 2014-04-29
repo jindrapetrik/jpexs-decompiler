@@ -70,6 +70,7 @@ public class SVGExporter {
     public Map<Tag, Map<Character, String>> exportedChars = new HashMap<>();
     private final Map<String, Integer> lastIds = new HashMap<>();
     private final HashSet<String> fontFaces = new HashSet<>();
+    private String clip;
     public boolean useTextTag = Configuration.textExportExportFontFace.get();
 
     public SVGExporter(ExportRectangle bounds) {
@@ -101,7 +102,7 @@ public class SVGExporter {
         }
         return _svgDefs;
     }
-    
+
     private CDATASection getStyle() {
         if (_svgStyle == null) {
             Element style = _svg.createElement("style");
@@ -111,7 +112,7 @@ public class SVGExporter {
         }
         return _svgStyle;
     }
-    
+
     public final void createDefGroup(ExportRectangle bounds, String id) {
         Element g = _svg.createElement("g");
         if (bounds != null) {
@@ -122,13 +123,13 @@ public class SVGExporter {
             g.setAttribute("id", id);
         }
         if (_svgGs.size() == 0) {
-           _svg.getDocumentElement().appendChild(g);
+            _svg.getDocumentElement().appendChild(g);
         } else {
             getDefs().appendChild(g);
         }
         _svgGs.add(g);
     }
-    
+
     public void endGroup() {
         Element g = _svgGs.pop();
         if (g.getChildNodes().getLength() == 0) {
@@ -136,21 +137,30 @@ public class SVGExporter {
         }
     }
 
-    public final void createSubGroup(Matrix transform, String id) {
-        Element g  = _svg.createElement("g");
-        double translateX = roundPixels400(transform.translateX / SWF.unitDivisor);
-        double translateY = roundPixels400(transform.translateY / SWF.unitDivisor);
-        double rotateSkew0 = roundPixels400(transform.rotateSkew0);
-        double rotateSkew1 = roundPixels400(transform.rotateSkew1);
-        double scaleX = roundPixels400(transform.scaleX);
-        double scaleY = roundPixels400(transform.scaleY);
-        g.setAttribute("transform", "matrix(" + scaleX + ", " + rotateSkew0
-                + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
-        if (id != null) {
-            g.setAttribute("id", id);
+    public final Element createSubGroup(Matrix transform, String id) {
+        Element group = createSubGroup(transform, id, "g");
+        group.setAttribute("transform", transform.getTransformationString(SWF.unitDivisor, 1));
+        return group;
+    }
+
+    public final Element createClipPath(Matrix transform, String id) {
+        Element group = createSubGroup(transform, id, "clipPath");
+        Node parent = group.getParentNode();
+        if (parent instanceof Element) {
+            Element parentElement = (Element) parent;
+            group.setAttribute("transform", parentElement.getAttribute("transform"));
         }
-        _svgGs.peek().appendChild(g);
-        _svgGs.add(g);
+        return group;
+    }
+
+    private Element createSubGroup(Matrix transform, String id, String tagName) {
+        Element group = _svg.createElement(tagName);
+        if (id != null) {
+            group.setAttribute("id", id);
+        }
+        _svgGs.peek().appendChild(group);
+        _svgGs.add(group);
+        return group;
     }
 
     public void addToGroup(Node newChild) {
@@ -189,24 +199,20 @@ public class SVGExporter {
     public Element addUse(Matrix transform, RECT boundRect, String href) {
         Element image = _svg.createElement("use");
         if (transform != null) {
-            double translateX = roundPixels400(transform.translateX / SWF.unitDivisor);
-            double translateY = roundPixels400(transform.translateY / SWF.unitDivisor);
-            double rotateSkew0 = roundPixels400(transform.rotateSkew0);
-            double rotateSkew1 = roundPixels400(transform.rotateSkew1);
-            double scaleX = roundPixels400(transform.scaleX);
-            double scaleY = roundPixels400(transform.scaleY);
-            image.setAttribute("transform", "matrix(" + scaleX + ", " + rotateSkew0
-                    + ", " + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")");
+            image.setAttribute("transform", transform.getTransformationString(SWF.unitDivisor, 1));
             image.setAttribute("width", Double.toString(boundRect.getWidth() / (double) SWF.unitDivisor));
             image.setAttribute("height", Double.toString(boundRect.getHeight() / (double) SWF.unitDivisor));
         }
         image.setAttribute("xlink:href", "#" + href);
+        if (clip != null) {
+            image.setAttribute("clip-path", "url(#" + clip + ")");
+        }
         _svgGs.peek().appendChild(image);
         return image;
     }
 
     public void addStyle(String fontFace, byte[] data, FontExportMode mode) {
-        if (!fontFaces.contains(fontFace)){
+        if (!fontFaces.contains(fontFace)) {
             fontFaces.add(fontFace);
             String base64Data = DatatypeConverter.printBase64Binary(data);
             String value = getStyle().getTextContent();
@@ -225,7 +231,7 @@ public class SVGExporter {
             getStyle().setTextContent(value);
         }
     }
-    
+
     public String getUniqueId(String prefix) {
         Integer lastId = lastIds.get(prefix);
         if (lastId == null) {
@@ -236,12 +242,16 @@ public class SVGExporter {
         lastIds.put(prefix, lastId);
         return prefix + lastId;
     }
-    
-    protected static double roundPixels20(double pixels) {
-        return Math.round(pixels * 100) / 100.0;
+
+    public void setClip(String clip) {
+        this.clip = clip;
     }
 
-    protected static double roundPixels400(double pixels) {
-        return Math.round(pixels * 10000) / 10000.0;
+    public String getClip() {
+        return clip;
+    }
+
+    protected static double roundPixels20(double pixels) {
+        return Math.round(pixels * 100) / 100.0;
     }
 }

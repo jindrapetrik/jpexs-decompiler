@@ -169,10 +169,9 @@ public class Timeline {
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         SWF.frameToImage(this, frame, time, stateUnderCursor, mouseButton, image, transformation, colorTransform);
     }
-    
-    
-    public String toHtmlCanvas(double unitDivisor,List<Integer> frames){
-       return SWF.framesToHtmlCanvas(unitDivisor, this, frames, 0, null, 0, displayRect, new ColorTransform(),null);     
+
+    public String toHtmlCanvas(double unitDivisor, List<Integer> frames) {
+        return SWF.framesToHtmlCanvas(unitDivisor, this, frames, 0, null, 0, displayRect, new ColorTransform(), null);
     }
 
     public void getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton, List<Integer> sounds, List<String> soundClasses) {

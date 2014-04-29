@@ -693,7 +693,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     decompiledTextArea.setClassIndex(-1);
                     navigator.setClassIndex(-1, oldIndex);
                     setDecompiledEditMode(false);
-                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));                    
+                    View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
                     reload();
                 } catch (ParseException ex) {
                     ex.printStackTrace();

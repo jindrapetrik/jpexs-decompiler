@@ -97,7 +97,7 @@ public class FontExporter {
         }
         return new byte[0];
     }
-    
+
     public void exportFont(final FontTag t, FontExportMode mode, File file) throws IOException {
         List<SHAPE> shapes = t.getGlyphShapeTable();
         Fontastic f = new Fontastic(t.getFontName(), file);

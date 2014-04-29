@@ -80,7 +80,7 @@ public class TextExporter {
             }
             return ret;
         }
-        
+
         if (settings.singleFile) {
             final File file = new File(outdir + File.separator
                     + (settings.mode == TextExportMode.FORMATTED ? TEXT_EXPORT_FILENAME_FORMATTED : TEXT_EXPORT_FILENAME_PLAIN));

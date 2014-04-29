@@ -160,8 +160,8 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
         long offset = sis.readUI32();
         morphFillStyles = sis.readMORPHFILLSTYLEARRAY();
         morphLineStyles = sis.readMORPHLINESTYLEARRAY(2);
-        startEdges = sis.readSHAPE(2,true);
-        endEdges = sis.readSHAPE(2,true);
+        startEdges = sis.readSHAPE(2, true);
+        endEdges = sis.readSHAPE(2, true);
     }
 
     @Override
@@ -357,12 +357,12 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
     public Shape getOutline(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation) {
         return transformation.toTransform().createTransformedShape(getShapeAtRatio(ratio).getOutline());
     }
-    
+
     @Override
     public String toHtmlCanvas(double unitDivisor) {
         CanvasMorphShapeExporter cmse = new CanvasMorphShapeExporter(swf, getShapeAtRatio(0), getShapeAtRatio(MAX_RATIO), new ColorTransform(), unitDivisor, 0, 0);
         cmse.export();
-        
+
         return cmse.getShapeData();
     }
 }

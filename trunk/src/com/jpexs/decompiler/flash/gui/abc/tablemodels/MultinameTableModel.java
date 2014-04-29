@@ -131,7 +131,7 @@ public class MultinameTableModel implements TableModel {
                 if (rowIndex == 0) {
                     return "";
                 }
-                if (abc.constants.getMultiname(rowIndex).namespace_index <= 0 ) {
+                if (abc.constants.getMultiname(rowIndex).namespace_index <= 0) {
                     return "-";
                 }
                 return abc.constants.getMultiname(rowIndex).getNamespace(abc.constants).getNameWithKind(abc.constants);

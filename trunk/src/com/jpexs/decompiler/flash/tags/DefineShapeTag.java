@@ -62,7 +62,7 @@ public class DefineShapeTag extends ShapeTag {
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();
-        shapes = sis.readSHAPEWITHSTYLE(1,false);
+        shapes = sis.readSHAPEWITHSTYLE(1, false);
     }
 
     /**

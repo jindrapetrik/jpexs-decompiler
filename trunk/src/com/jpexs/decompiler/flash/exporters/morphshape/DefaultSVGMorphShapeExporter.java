@@ -144,8 +144,4 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
     protected double roundPixels20(double pixels) {
         return Math.round(pixels * 100) / 100.0;
     }
-
-    protected double roundPixels400(double pixels) {
-        return Math.round(pixels * 10000) / 10000.0;
-    }
 }
