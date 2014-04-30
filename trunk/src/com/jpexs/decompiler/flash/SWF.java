@@ -2186,10 +2186,10 @@ public final class SWF implements TreeItem, Timelined {
         sb.append("\tvar frame_cnt = ").append(timeline.getFrameCount()).append(";\r\n");
         sb.append("\tframe = frame % frame_cnt;\r\n");
         sb.append("\tswitch(frame){\r\n");
+        int maxDepth = timeline.getMaxDepth();
         for (int frame = 0; frame < frames.size(); frame++) {
             sb.append("\t\tcase ").append(frame).append(":\r\n");
             Frame frameObj = timeline.frames.get(frame);
-            int maxDepth = timeline.getMaxDepth();
             for (int i = 1; i <= maxDepth; i++) {
                 if (!frameObj.layers.containsKey(i)) {
                     continue;
@@ -2246,7 +2246,8 @@ public final class SWF implements TreeItem, Timelined {
         List<SvgClip> clips = new ArrayList<>();
         List<String> prevClips = new ArrayList<>();
 
-        for (int i = 1; i <= timeline.getMaxDepth(); i++) {
+        int maxDepth = timeline.getMaxDepth();
+        for (int i = 1; i <= maxDepth; i++) {
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth == i) {
                     exporter.setClip(prevClips.get(c));
@@ -2386,7 +2387,8 @@ public final class SWF implements TreeItem, Timelined {
         List<Clip> clips = new ArrayList<>();
         List<Shape> prevClips = new ArrayList<>();
 
-        for (int i = 1; i <= timeline.getMaxDepth(); i++) {
+        int maxDepth = timeline.getMaxDepth();
+        for (int i = 1; i <= maxDepth; i++) {
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth == i) {
                     g.setClip(prevClips.get(c));
@@ -2424,7 +2426,7 @@ public final class SWF implements TreeItem, Timelined {
                 Matrix drawMatrix = new Matrix();
                 int drawableFrameCount = drawable.getNumFrames();
                 if (drawableFrameCount == 0) {
-                    continue;
+                    drawableFrameCount = 1;
                 }
                 int dframe = (time + layer.time) % drawableFrameCount;
                 if (character instanceof ButtonTag) {

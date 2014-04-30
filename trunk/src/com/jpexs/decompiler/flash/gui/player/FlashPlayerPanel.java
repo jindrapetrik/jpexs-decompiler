@@ -465,7 +465,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
                             return Kernel32.INSTANCE.GetLastError();
                         }
                         int readNow = ibr.getValue();
-                        System.arraycopy(data, readNow, res, read, readNow);
+                        System.arraycopy(data, 0, res, read, readNow);
                         read += readNow;
                     }
                     return 0;
@@ -475,7 +475,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
             // ignore
         }
         if (result != 0) {
-            if (result == Kernel32.ERROR_BROKEN_PIPE) {
+            if (result == Kernel32.ERROR_BROKEN_PIPE || result == -1) {
                 restartFlashPlayer();
                 throw new IOException("Pipe read error.");
             } else {

@@ -178,7 +178,8 @@ public class Timeline {
         Frame fr = this.frames.get(frame);
         sounds.addAll(fr.sounds);
         soundClasses.addAll(fr.soundClasses);
-        for (int d = this.getMaxDepth(); d >= 0; d--) {
+        int maxDepth = this.getMaxDepth();
+        for (int d = maxDepth; d >= 0; d--) {
             DepthState ds = fr.layers.get(d);
             if (ds != null) {
                 CharacterTag c = swf.characters.get(ds.characterId);
@@ -208,7 +209,8 @@ public class Timeline {
     public void getObjectsOutlines(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, Matrix transformation, List<DepthState> objs, List<Shape> outlines) {
         Frame fr = this.frames.get(frame);
         Stack<Clip> clips = new Stack<>();
-        for (int d = this.getMaxDepth(); d >= 0; d--) {
+        int maxDepth = this.getMaxDepth();
+        for (int d = maxDepth; d >= 0; d--) {
             Clip currentClip = null;
             for (int i = clips.size() - 1; i >= 0; i--) {
                 Clip cl = clips.get(i);
@@ -277,7 +279,8 @@ public class Timeline {
         Frame fr = this.frames.get(frame);
         Area area = new Area();
         Stack<Clip> clips = new Stack<>();
-        for (int d = this.getMaxDepth(); d >= 0; d--) {
+        int maxDepth = this.getMaxDepth();
+        for (int d = maxDepth; d >= 0; d--) {
             Clip currentClip = null;
             for (int i = clips.size() - 1; i >= 0; i--) {
                 Clip cl = clips.get(i);
@@ -345,7 +348,8 @@ public class Timeline {
 
     private boolean isSingleFrame(int frame) {
         Frame frameObj = frames.get(frame);
-        for (int i = 1; i <= getMaxDepth(); i++) {
+        int maxDepth = this.getMaxDepth();
+        for (int i = 1; i <= maxDepth; i++) {
             if (!frameObj.layers.containsKey(i)) {
                 continue;
             }

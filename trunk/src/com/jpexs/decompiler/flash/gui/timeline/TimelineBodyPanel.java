@@ -248,8 +248,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener {
         if (p.x >= timeLine.getFrameCount()) {
             p.x = timeLine.getFrameCount() - 1;
         }
-        if (p.y > timeLine.getMaxDepth()) {
-            p.y = timeLine.getMaxDepth();
+        int maxDepth = timeLine.getMaxDepth();
+        if (p.y > maxDepth) {
+            p.y = maxDepth;
         }
         frameSelect(p.x, p.y);
     }
