@@ -121,12 +121,12 @@ public class GRADIENTGLOWFILTER extends FILTER {
     }
 
     @Override
-    public double getDeltaX() {
-        return blurX;
+    public double getDeltaX() {       
+        return blurX + (distance * Math.cos(angle));
     }
 
     @Override
     public double getDeltaY() {
-        return blurY;
+        return blurY +(distance * Math.sin(angle));
     }
 }

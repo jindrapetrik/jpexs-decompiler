@@ -78,7 +78,7 @@ public class GLOWFILTER extends FILTER {
     }
 
     @Override
-    public double getDeltaX() {
+    public double getDeltaX() {       
         return blurX;
     }
 

@@ -125,8 +125,17 @@ import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
+import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
+import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
+import com.jpexs.decompiler.flash.types.filters.DROPSHADOWFILTER;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
+import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
+import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import com.jpexs.decompiler.graph.Graph;
@@ -1442,12 +1451,15 @@ public final class SWF implements TreeItem, Timelined {
             new RetryTask(new RunnableIOEx() {
                 @Override
                 public void run() throws IOException {
+                    File ff = new File(foutdir + File.separator + "filters.js");
+                    Helper.saveStream(SWF.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/filters.js"), ff);
+                    ret.add(ff);
+                    
                     File f = new File(foutdir + File.separator + "frames.js");
                     File fmin = new File(foutdir + File.separator + "frames.min.js");
                     int width = (int) (ftim.displayRect.getWidth() / SWF.unitDivisor);
                     int height = (int) (ftim.displayRect.getHeight() / SWF.unitDivisor);
                     try (FileOutputStream fos = new FileOutputStream(f)) {
-                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
                         fos.write(Utf8Helper.getBytes("\r\n"));
                         Set<Integer> library = new HashSet<>();
                         getNeededCharacters(timeline, fframes, library);
@@ -1511,6 +1523,8 @@ public final class SWF implements TreeItem, Timelined {
                     File fh = new File(foutdir + File.separator + "frames.html");
                     try (FileOutputStream fos = new FileOutputStream(fh); FileInputStream fis = new FileInputStream(fmin)) {
                         fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlPrefix(width, height)));
+                        fos.write(Utf8Helper.getBytes("<script type=\"text/javascript\" src=\"filters.js\"></script>"));
+                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
                         byte buf[] = new byte[1000];
                         int cnt;
                         while ((cnt = fis.read(buf)) > 0) {
@@ -1519,6 +1533,7 @@ public final class SWF implements TreeItem, Timelined {
                         if (Configuration.packJavaScripts.get()) {
                             fos.write(Utf8Helper.getBytes(";"));
                         }
+                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsSuffix()));
                         fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlSuffix()));
                     }
                     fmin.delete();
@@ -2175,6 +2190,10 @@ public final class SWF implements TreeItem, Timelined {
 
     }
 
+    private static String jsArrColor(RGB rgb){
+        return "["+rgb.red+","+rgb.green+","+rgb.blue+","+((rgb instanceof RGBA)?((RGBA)rgb).getAlphaFloat():1)+"]";
+    }
+    
     public static String framesToHtmlCanvas(double unitDivisor, Timeline timeline, List<Integer> frames, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, ColorTransform colorTransform, Color backGroundColor) {
         StringBuilder sb = new StringBuilder();
         if (frames == null) {
@@ -2214,12 +2233,24 @@ public final class SWF implements TreeItem, Timelined {
                 placeMatrix.translateX /= unitDivisor;
                 placeMatrix.translateY /= unitDivisor;
 
-                String charStr = null;
                 int f = 0;
                 if (character instanceof DefineSpriteTag) {
                     DefineSpriteTag sp = (DefineSpriteTag) character;
                     Timeline tim = sp.getTimeline();
-                    f = layer.time % tim.getFrameCount();
+                    if(tim.getFrameCount()>0){
+                        f = layer.time % tim.getFrameCount();
+                    }
+                }           
+                                
+                if(layer.filters!=null){
+                    sb.append("\t\t\tvar oldctx = ctx;\r\n");
+                    sb.append("var fcanvas = document.createElement(\"canvas\");");
+                    sb.append("\tfcanvas.width = canvas.width;\r\n");
+                    sb.append("\tfcanvas.height = canvas.height;\r\n");
+                    sb.append("\tvar fctx = fcanvas.getContext(\"2d\");\r\n");
+                    sb.append("\tenhanceContext(fctx);\r\n");
+                    sb.append("\tfctx.applyTransforms(ctx._matrices);\r\n");
+                    sb.append("\tctx = fctx;\r\n");                    
                 }
                 sb.append("\t\t\tctx.save();\r\n");
                 sb.append("\t\t\tctx.transform(").append(placeMatrix.scaleX).append(",");
@@ -2231,6 +2262,115 @@ public final class SWF implements TreeItem, Timelined {
                 sb.append(");\r\n");
                 sb.append("\t\t\t").append(getTypePrefix(character)).append(layer.characterId).append("(ctx,").append(f).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(");\r\n");
                 sb.append("\t\t\tctx.restore();\r\n");
+                if(layer.filters!=null){
+                    for(FILTER filter:layer.filters){
+                        if(filter instanceof COLORMATRIXFILTER){
+                            COLORMATRIXFILTER cmf = (COLORMATRIXFILTER)filter;
+                            String mat = "[";
+                            for(int k=0;k<cmf.matrix.length;k++){
+                                if(k>0){
+                                    mat+=",";
+                                }
+                                mat += cmf.matrix[k];
+                            }
+                            mat+="]";
+                            sb.append("fcanvas = Filters.colorMatrix(fcanvas,fcanvas.getContext(\"2d\"),"+mat+");\r\n");
+                        }
+                        
+                        if(filter instanceof CONVOLUTIONFILTER){
+                            CONVOLUTIONFILTER cf=(CONVOLUTIONFILTER)filter;
+                            int height = cf.matrix.length;
+                            int width = cf.matrix[0].length;
+                            float[] matrix2 = new float[width * height];
+                            for (int y = 0; y < height; y++) {
+                                for (int x = 0; x < width; x++) {
+                                    matrix2[y * width + x] = cf.matrix[x][y] * cf.divisor + cf.bias;
+                                }
+                            }
+                            String mat = "[";
+                            for(int k=0;k<matrix2.length;k++){
+                                if(k>0){
+                                    mat+=",";
+                                }
+                                mat += matrix2[k];
+                            }
+                            mat+="]";
+                            sb.append("fcanvas = Filters.convolution(fcanvas,fcanvas.getContext(\"2d\"),"+mat+",false);\r\n");
+                        }
+                        
+                        if(filter instanceof GLOWFILTER){
+                            GLOWFILTER gf = (GLOWFILTER)filter;
+                            sb.append("fcanvas = Filters.glow(fcanvas,fcanvas.getContext(\"2d\"),"+gf.blurX+","+gf.blurY+","+gf.strength+","+jsArrColor(gf.glowColor)+","+(gf.innerGlow?"true":"false")+","+(gf.knockout?"true":"false")+","+gf.passes+");\r\n");
+                        }
+                        
+                        if(filter instanceof DROPSHADOWFILTER){
+                            DROPSHADOWFILTER ds=(DROPSHADOWFILTER)filter;
+                            sb.append("fcanvas = Filters.dropShadow(fcanvas,fcanvas.getContext(\"2d\"),"+ds.blurX+","+ds.blurY+","+(int) (ds.angle * 180 / Math.PI)+","+ds.distance+","+jsArrColor(ds.dropShadowColor)+","+(ds.innerShadow?"true":"false")+","+ds.passes+","+ds.strength+","+(ds.knockout?"true":"false")+");\r\n");                        
+                        }
+                        if(filter instanceof BEVELFILTER){
+                            BEVELFILTER bv=(BEVELFILTER)filter;                           
+                            String type = "Filters.INNER";
+                            if (bv.onTop && !bv.innerShadow) {
+                                type = "Filters.FULL";
+                            } else if (!bv.innerShadow) {
+                                type = "Filters.OUTER";
+                            }
+                            sb.append("fcanvas = Filters.bevel(fcanvas,fcanvas.getContext(\"2d\"),"+bv.blurX+","+bv.blurY+","+bv.strength+","+type+","+jsArrColor(bv.highlightColor)+","+jsArrColor(bv.shadowColor)+","+(int) (bv.angle * 180 / Math.PI)+","+bv.distance+","+(bv.knockout?"true":"false")+","+bv.passes+");\r\n");
+                        }
+                        
+                        if(filter instanceof GRADIENTBEVELFILTER){
+                            GRADIENTBEVELFILTER gbf = (GRADIENTBEVELFILTER)filter;
+                            String colArr = "[";
+                            String ratArr = "[";
+                            for(int k=0;k<gbf.gradientColors.length;k++){
+                                if(k>0){
+                                    colArr+=",";
+                                    ratArr+=",";
+                                }
+                                colArr+=jsArrColor(gbf.gradientColors[k]);
+                                ratArr+=gbf.gradientRatio[k] / 255f;
+                            }
+                            colArr+="]";
+                            ratArr+="]";                
+                            String type = "Filters.INNER";
+                            if (gbf.onTop && !gbf.innerShadow) {
+                                type = "Filters.FULL";
+                            } else if (!gbf.innerShadow) {
+                                type = "Filters.OUTER";
+                            }
+                            
+                            sb.append("fcanvas = Filters.gradientBevel(fcanvas,fcanvas.getContext(\"2d\"),"+colArr+","+ratArr+","+gbf.blurX+","+gbf.blurY+","+gbf.strength+","+type+","+(int) (gbf.angle * 180 / Math.PI)+","+gbf.distance+","+(gbf.knockout?"true":"false")+","+gbf.passes+");\r\n");
+                        }
+                        
+                        if(filter instanceof GRADIENTGLOWFILTER){
+                            GRADIENTGLOWFILTER ggf = (GRADIENTGLOWFILTER)filter;
+                            String colArr = "[";
+                            String ratArr = "[";
+                            for(int k=0;k<ggf.gradientColors.length;k++){
+                                if(k>0){
+                                    colArr+=",";
+                                    ratArr+=",";
+                                }
+                                colArr+=jsArrColor(ggf.gradientColors[k]);
+                                ratArr+=ggf.gradientRatio[k] / 255f;
+                            }
+                            colArr+="]";
+                            ratArr+="]";                
+                            String type = "Filters.INNER";
+                            if (ggf.onTop && !ggf.innerShadow) {
+                                type = "Filters.FULL";
+                            } else if (!ggf.innerShadow) {
+                                type = "Filters.OUTER";
+                            }
+                                                             
+                            //function(srcCanvas,src, blurX, blurY, angle, distance, colors, ratios, type, iterations, strength, knockout)
+                            sb.append("fcanvas = Filters.gradientGlow(fcanvas,fcanvas.getContext(\"2d\"),"+ggf.blurX+","+ggf.blurY+","+(int) (ggf.angle * 180 / Math.PI)+","+ggf.distance+","+colArr+","+ratArr+","+type+","+ggf.passes+","+ggf.strength+","+(ggf.knockout?"true":"false")+");\r\n");
+                        }
+                    }
+                    sb.append("\tctx = oldctx;\r\n");  
+                    sb.append("\tctx.drawImage(fcanvas,0,0);\r\n");
+                    
+                }
             }
             sb.append("\t\t\tbreak;\r\n");
         }

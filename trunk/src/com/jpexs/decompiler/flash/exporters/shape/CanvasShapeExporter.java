@@ -58,7 +58,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected int lineRepeatCnt = 0;
 
     public static String getJsPrefix() {
-        return "var canvas=document.getElementById(\"myCanvas\");\r\n"
+        return "<script>var canvas=document.getElementById(\"myCanvas\");\r\n"
                 + "var ctx=canvas.getContext(\"2d\");\r\n"
                 + "var enhanceContext = function(context) {\r\n"
                 + "  var m = [1,0,0,1,0,0];\r\n"
@@ -136,15 +136,16 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 + "<canvas id=\"myCanvas\" width=\"" + width + "\" height=\"" + height + "\" style=\"border:1px solid #c3c3c3;\">\r\n"
                 + "Your browser does not support the HTML5 canvas tag.\r\n"
                 + "</canvas>\r\n"
-                + "\r\n"
-                + "<script>\r\n";
+                + "\r\n";
 
     }
 
+    public static String getJsSuffix(){
+        return "</script>\r\n";
+    }
+    
     public static String getHtmlSuffix() {
-        return "\r\n"
-                + "</script>\r\n"
-                + "</body>\r\n"
+        return "</body>\r\n"
                 + "</html>";
     }
 
@@ -153,7 +154,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         int width = (int) (r.getWidth() / unitDivisor);
         int height = (int) (r.getHeight() / unitDivisor);
 
-        return getHtmlPrefix(width, height) + getJsPrefix() + shapeData + getHtmlSuffix();
+        return getHtmlPrefix(width, height) + getJsPrefix() + shapeData + getJsSuffix() + getHtmlSuffix();
     }
 
     public String getShapeData() {

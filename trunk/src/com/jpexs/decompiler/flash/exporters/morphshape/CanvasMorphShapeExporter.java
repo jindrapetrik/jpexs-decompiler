@@ -91,14 +91,14 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         ret += "\tratio = (ratio+step)%65535;\r\n";
         ret += "\tmorphshape(ctx,ratio);\r\n";
         ret += "}\r\n";
-
-        ret += "window.setInterval(function(){nextFrame(ctx)}," + rate + ");\r\n";
-        return ret;
+        ret +="window.setInterval(function(){nextFrame(ctx)},"+rate+");\r\n";
+        ret += "</script>\r\n";
+        return ret;          
     }
-
-    public static String getJsPrefix() {
-        String ret = CanvasShapeExporter.getJsPrefix();
-        ret += "function morphshape(ctx,ratio){\r\n";
+    
+    public static String getJsPrefix(){
+        String ret = "<script>\r\n" +CanvasShapeExporter.getJsPrefix();
+        ret+="function morphshape(ctx,ratio){\r\n";
         return ret;
     }
 
