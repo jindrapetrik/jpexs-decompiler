@@ -457,13 +457,11 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
-        // todo: find icon
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
         hexOnlyButton.setActionCommand(ACTION_HEX_ONLY);
         hexOnlyButton.addActionListener(this);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
-        hexOnlyButton.setVisible(false);
 
         topButtonsPan = new JPanel();
         topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));

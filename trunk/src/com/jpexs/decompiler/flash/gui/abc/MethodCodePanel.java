@@ -113,13 +113,11 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         hexButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexButton.setMargin(new Insets(3, 3, 3, 3));
 
-        // todo: find icon
         hexOnlyButton = new JToggleButton(View.getIcon("hex16"));
         hexOnlyButton.setActionCommand(ACTION_HEX_ONLY);
         hexOnlyButton.addActionListener(this);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
-        hexOnlyButton.setVisible(false);
 
         buttonsPanel.add(graphButton);
         buttonsPanel.add(hexButton);
