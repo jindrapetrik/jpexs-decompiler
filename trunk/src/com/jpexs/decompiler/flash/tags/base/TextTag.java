@@ -431,7 +431,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 }
 
                 exporter.addToGroup(textElement);
-                FontExportMode fontExportMode = FontExportMode.TTF; // todo: change this to WOFF
+                FontExportMode fontExportMode = FontExportMode.WOFF;
                 exporter.addStyle(font.getFontName(), new FontExporter().exportFont(font, fontExportMode), fontExportMode);
 
                 if (hasOffset) {
