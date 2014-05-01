@@ -851,4 +851,17 @@ public class Helper {
         }
         return area;
     }
+    
+    /**
+     * Formats double value (removes .0 from end)
+     * @param d
+     * @return String
+     */
+    public static String doubleStr(double d){
+        String ret= ""+d;
+        if(ret.endsWith(".0")){
+            ret = ret.substring(0,ret.length()-2);
+        }
+        return ret;
+    }
 }

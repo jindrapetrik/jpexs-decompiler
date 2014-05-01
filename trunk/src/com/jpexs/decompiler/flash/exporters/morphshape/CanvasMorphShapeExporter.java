@@ -511,7 +511,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     }
 
     private String useRatioPos(double a, double b) {
-        return (a / unitDivisor) + "+ratio*(" + ((b - a) / unitDivisor) + ")/" + DefineMorphShapeTag.MAX_RATIO;
+        return Helper.doubleStr(a / unitDivisor) + "+ratio*(" + Helper.doubleStr((b - a) / unitDivisor) + ")/" + DefineMorphShapeTag.MAX_RATIO;
     }
 
     private String useRatioInt(int a, int b) {
@@ -519,7 +519,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     }
 
     private String useRatioDouble(double a, double b) {
-        return "" + a + "+ratio*(" + ((b - a)) + ")/" + DefineMorphShapeTag.MAX_RATIO;
+        return "" + a + "+ratio*(" + (Helper.doubleStr(b - a)) + ")/" + DefineMorphShapeTag.MAX_RATIO;
     }
 
     public String getShapeData() {
@@ -529,4 +529,5 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     private String useRatioColor(RGB color, RGB colorEnd) {
         return "\"rgba(\"+" + useRatioInt(color.red, colorEnd.red) + "+\",\"+" + useRatioInt(color.green, colorEnd.green) + "+\",\"+" + useRatioInt(color.blue, colorEnd.blue) + "+\",\"+((" + useRatioInt((color instanceof RGBA) ? ((RGBA) color).alpha : 255, (colorEnd instanceof RGBA) ? ((RGBA) colorEnd).alpha : 255) + ")/255)+\")\"";
     }
+    
 }

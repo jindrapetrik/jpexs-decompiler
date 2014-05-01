@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 
@@ -409,16 +410,16 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         x += deltaX;
         y += deltaY;
         pathData += "\tctx.moveTo("
-                + (x / unitDivisor) + ","
-                + (y / unitDivisor) + ");\r\n";
+                + Helper.doubleStr(x / unitDivisor) + ","
+                + Helper.doubleStr(y / unitDivisor) + ");\r\n";
     }
 
     @Override
     public void lineTo(double x, double y) {
         x += deltaX;
         y += deltaY;
-        pathData += "\tctx.lineTo(" + (x / unitDivisor) + ","
-                + (y / unitDivisor) + ");\r\n";
+        pathData += "\tctx.lineTo(" + Helper.doubleStr(x / unitDivisor) + ","
+                + Helper.doubleStr(y / unitDivisor) + ");\r\n";
     }
 
     @Override
@@ -427,10 +428,10 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         anchorX += deltaX;
         controlY += deltaY;
         anchorY += deltaY;
-        pathData += "\tctx.quadraticCurveTo(" + (controlX / unitDivisor) + ","
-                + (controlY / unitDivisor) + ","
-                + (anchorX / unitDivisor) + ","
-                + (anchorY / unitDivisor) + ");\r\n";
+        pathData += "\tctx.quadraticCurveTo(" + Helper.doubleStr(controlX / unitDivisor) + ","
+                + Helper.doubleStr(controlY / unitDivisor) + ","
+                + Helper.doubleStr(anchorX / unitDivisor) + ","
+                + Helper.doubleStr(anchorY / unitDivisor) + ");\r\n";
     }
 
     protected void finalizePath() {
@@ -455,7 +456,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                     preLineFillData += "\tctx.fillStyle=\"" + lineLastRadColor + "\";\r\n ctx.fill(\"evenodd\");\r\n";
                 }
 
-                preLineFillData += "\tctx.transform(" + lineFillMatrix.scaleX + "," + lineFillMatrix.rotateSkew0 + "," + lineFillMatrix.rotateSkew1 + "," + lineFillMatrix.scaleY + "," + lineFillMatrix.translateX + "," + lineFillMatrix.translateY + ");\r\n";
+                preLineFillData += "\tctx.transform(" + Helper.doubleStr(lineFillMatrix.scaleX) + "," + Helper.doubleStr(lineFillMatrix.rotateSkew0) + "," + Helper.doubleStr(lineFillMatrix.rotateSkew1) + "," + Helper.doubleStr(lineFillMatrix.scaleY) + "," + Helper.doubleStr(lineFillMatrix.translateX) + "," + Helper.doubleStr(lineFillMatrix.translateY) + ");\r\n";
                 lineFillData = preLineFillData + lineFillData;
                 lineFillData += "\tctx.fillRect(" + (-16384 - 32768 * lineRepeatCnt) + "," + (-16384 - 32768 * lineRepeatCnt) + "," + (2 * 16384 + 32768 * 2 * lineRepeatCnt) + "," + (2 * 16384 + 32768 * 2 * lineRepeatCnt) + ");\r\n";
 
@@ -484,7 +485,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 }
                 pathData += "\tctx.save();\r\n";
                 pathData += "\tctx.clip();\r\n";
-                pathData += "\tctx.transform(" + fillMatrix.scaleX + "," + fillMatrix.rotateSkew0 + "," + fillMatrix.rotateSkew1 + "," + fillMatrix.scaleY + "," + fillMatrix.translateX + "," + fillMatrix.translateY + ");\r\n";
+                pathData += "\tctx.transform(" + Helper.doubleStr(fillMatrix.scaleX) + "," + Helper.doubleStr(fillMatrix.rotateSkew0) + "," + Helper.doubleStr(fillMatrix.rotateSkew1) + "," + Helper.doubleStr(fillMatrix.scaleY) + "," + Helper.doubleStr(fillMatrix.translateX) + "," + Helper.doubleStr(fillMatrix.translateY) + ");\r\n";
                 pathData += fillData;
                 pathData += "\tctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
                 pathData += "\tctx.restore();\r\n";
@@ -515,4 +516,6 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         lineLastRadColor = null;
         lineFillMatrix = null;
     }
+    
+  
 }

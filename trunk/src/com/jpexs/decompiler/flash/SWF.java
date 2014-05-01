@@ -2276,12 +2276,12 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append("\t\t\tctx = fctx;\r\n");                    
                 }
                 sb.append("\t\t\tctx.save();\r\n");
-                sb.append("\t\t\tctx.transform(").append(placeMatrix.scaleX).append(",");
-                sb.append(placeMatrix.rotateSkew0).append(",");
-                sb.append(placeMatrix.rotateSkew1).append(",");
-                sb.append(placeMatrix.scaleY).append(",");
-                sb.append(placeMatrix.translateX).append(",");
-                sb.append(placeMatrix.translateY);
+                sb.append("\t\t\tctx.transform(").append(Helper.doubleStr(placeMatrix.scaleX)).append(",");
+                sb.append(Helper.doubleStr(placeMatrix.rotateSkew0)).append(",");
+                sb.append(Helper.doubleStr(placeMatrix.rotateSkew1)).append(",");
+                sb.append(Helper.doubleStr(placeMatrix.scaleY)).append(",");
+                sb.append(Helper.doubleStr(placeMatrix.translateX)).append(",");
+                sb.append(Helper.doubleStr(placeMatrix.translateY));
                 sb.append(");\r\n");
                 sb.append("\t\t\t").append(getTypePrefix(character)).append(layer.characterId).append("(ctx,").append(f).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(");\r\n");
                 sb.append("\t\t\tctx.restore();\r\n");
