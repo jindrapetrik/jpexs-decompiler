@@ -2202,10 +2202,12 @@ public final class SWF implements TreeItem, Timelined {
                 frames.add(i);
             }
         }
+        sb.append("\tvar clips = [];\r\n");
         sb.append("\tvar frame_cnt = ").append(timeline.getFrameCount()).append(";\r\n");
         sb.append("\tframe = frame % frame_cnt;\r\n");
         sb.append("\tswitch(frame){\r\n");
         int maxDepth = timeline.getMaxDepth();
+        Stack<Integer> clipDepths=new Stack<>();
         for (int frame = 0; frame < frames.size(); frame++) {
             sb.append("\t\tcase ").append(frame).append(":\r\n");
             Frame frameObj = timeline.frames.get(frame);
@@ -2232,6 +2234,7 @@ public final class SWF implements TreeItem, Timelined {
                 placeMatrix.rotateSkew1 /= unitDivisor;
                 placeMatrix.translateX /= unitDivisor;
                 placeMatrix.translateY /= unitDivisor;
+                
 
                 int f = 0;
                 if (character instanceof DefineSpriteTag) {
@@ -2241,16 +2244,36 @@ public final class SWF implements TreeItem, Timelined {
                         f = layer.time % tim.getFrameCount();
                     }
                 }           
-                                
+                              
+                while(!clipDepths.isEmpty() && clipDepths.peek()<=i){
+                    clipDepths.pop();
+                    sb.append("\t\t\tvar o = clips.pop();\r\n");
+                    sb.append("\t\t\tctx.globalCompositeOperation = \"destination-in\";\r\n");
+                    sb.append("\t\t\tctx.drawImage(o.clipCanvas,0,0);\r\n");
+                    sb.append("\t\t\to.ctx.globalCompositeOperation = \"source-over\";\r\n");
+                    sb.append("\t\t\to.ctx.drawImage(canvas,0,0);\r\n");
+                    sb.append("\t\t\tctx = o.ctx;\r\n");
+                    sb.append("\t\t\tcanvas = o.canvas;\r\n");
+                }
+                
+                if(layer.clipDepth!=-1){
+                    clipDepths.push(layer.clipDepth);                   
+                    sb.append("\t\t\tclips.push({ctx:ctx,canvas:canvas});\r\n");                    
+                    sb.append("\t\t\tvar ccanvas = Filters.createCanvas(canvas.width,canvas.height);\r\n");                    
+                    sb.append("\t\t\tvar cctx = ccanvas.getContext(\"2d\");\r\n");
+                    sb.append("\t\t\tenhanceContext(cctx);\r\n");
+                    sb.append("\t\t\tcctx.applyTransforms(ctx._matrices);\r\n");
+                    sb.append("\t\t\tcanvas = ccanvas;\r\n");
+                    sb.append("\t\t\tctx = cctx;\r\n");
+                }
+                
                 if(layer.filters!=null){
                     sb.append("\t\t\tvar oldctx = ctx;\r\n");
-                    sb.append("var fcanvas = document.createElement(\"canvas\");");
-                    sb.append("\tfcanvas.width = canvas.width;\r\n");
-                    sb.append("\tfcanvas.height = canvas.height;\r\n");
-                    sb.append("\tvar fctx = fcanvas.getContext(\"2d\");\r\n");
-                    sb.append("\tenhanceContext(fctx);\r\n");
-                    sb.append("\tfctx.applyTransforms(ctx._matrices);\r\n");
-                    sb.append("\tctx = fctx;\r\n");                    
+                    sb.append("\t\t\tvar fcanvas = Filters.createCanvas(canvas.width,canvas.height);");
+                    sb.append("\t\t\tvar fctx = fcanvas.getContext(\"2d\");\r\n");
+                    sb.append("\t\t\tenhanceContext(fctx);\r\n");
+                    sb.append("\t\t\tfctx.applyTransforms(ctx._matrices);\r\n");
+                    sb.append("\t\t\tctx = fctx;\r\n");                    
                 }
                 sb.append("\t\t\tctx.save();\r\n");
                 sb.append("\t\t\tctx.transform(").append(placeMatrix.scaleX).append(",");
@@ -2370,6 +2393,14 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append("\tctx = oldctx;\r\n");  
                     sb.append("\tctx.drawImage(fcanvas,0,0);\r\n");
                     
+                }
+                if(layer.clipDepth!=-1){
+                    sb.append("\t\t\tclips[clips.length-1].clipCanvas = canvas;\r\n");                    
+                    sb.append("\t\t\tcanvas = Filters.createCanvas(canvas.width,canvas.height);\r\n");   
+                    sb.append("\t\t\tvar nctx = canvas.getContext(\"2d\");\r\n");  
+                    sb.append("\t\t\tenhanceContext(nctx);\r\n");
+                    sb.append("\t\t\tnctx.applyTransforms(ctx._matrices);\r\n");
+                    sb.append("\t\t\tctx = nctx;\r\n");
                 }
             }
             sb.append("\t\t\tbreak;\r\n");
