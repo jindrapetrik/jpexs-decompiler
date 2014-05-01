@@ -18,23 +18,38 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationCategory;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -44,6 +59,8 @@ import javax.swing.table.TableModel;
  */
 public class AdvancedSettingsDialog extends AppDialog implements ActionListener {
 
+    private Map<String, Component> componentsMap = new HashMap<>();
+
     /**
      * Creates new form AdvancedSettingsDialog
      */
@@ -51,34 +68,9 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
         initComponents();
         View.centerScreen(this);
         View.setWindowIcon(this);
+
+        //configurationTable.setCellEditor(configurationTable.getDefaultEditor(null));
         pack();
-
-        configurationTable.setCellEditor(configurationTable.getDefaultEditor(null));
-
-        Map<String, Field> fields = Configuration.getConfigurationFields();
-        String[] keys = new String[fields.size()];
-        keys = fields.keySet().toArray(keys);
-        Arrays.sort(keys);
-
-        for (String name : keys) {
-            Field field = fields.get(name);
-            DefaultTableModel model = (DefaultTableModel) configurationTable.getModel();
-            try {
-                ConfigurationItem item = (ConfigurationItem) field.get(null);
-                String description = Configuration.getDescription(field);
-                if (description == null) {
-                    description = "";
-                }
-                Object defaultValue = Configuration.getDefaultValue(field);
-                if (defaultValue != null) {
-                    description += " (" + translate("default") + ": " + defaultValue + ")";
-                }
-                model.addRow(new Object[]{name, item.get(), description});
-            } catch (IllegalArgumentException | IllegalAccessException ex) {
-                // Reflection exceptions. This should never happen
-                throw new Error(ex.getMessage());
-            }
-        }
     }
 
     private DefaultTableModel getModel() {
@@ -110,7 +102,6 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
     }
 
     private void initComponents() {
-        configurationTable = new EachRowRendererEditor();      
         okButton = new JButton();
         cancelButton = new JButton();
         resetButton = new JButton();
@@ -120,12 +111,6 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
         setModal(true);
         setPreferredSize(new java.awt.Dimension(800, 500));
 
-        configurationTable.setModel(getModel());
-              
-        configurationTable.getColumnModel().getColumn(0).setPreferredWidth(200);
-        configurationTable.getColumnModel().getColumn(1).setPreferredWidth(100);
-        configurationTable.getColumnModel().getColumn(2).setPreferredWidth(600);
-        
         okButton.setText(AppStrings.translate("button.ok"));
         okButton.addActionListener(this);
         okButton.setActionCommand("OK");
@@ -138,25 +123,124 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
         resetButton.addActionListener(this);
         resetButton.setActionCommand("RESET");
 
-        Container cnt=getContentPane();
+        Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        cnt.add(new JScrollPane(configurationTable),BorderLayout.CENTER);
-        
-        
+        //cnt.add(new JScrollPane(configurationTable),BorderLayout.CENTER);
+
         JPanel buttonsPanel = new JPanel(new BorderLayout());
-        
-        
+
         JPanel buttonsLeftPanel = new JPanel(new FlowLayout());
-        buttonsLeftPanel.add(resetButton,BorderLayout.WEST);
-        
-        buttonsPanel.add(buttonsLeftPanel,BorderLayout.WEST);
-        
+        buttonsLeftPanel.add(resetButton, BorderLayout.WEST);
+
+        buttonsPanel.add(buttonsLeftPanel, BorderLayout.WEST);
+
         JPanel buttonsRightPanel = new JPanel(new FlowLayout());
-        buttonsRightPanel.add(cancelButton); 
-        buttonsRightPanel.add(okButton);                       
-        buttonsPanel.add(buttonsRightPanel,BorderLayout.EAST);
+        buttonsRightPanel.add(cancelButton);
+        buttonsRightPanel.add(okButton);
+        buttonsPanel.add(buttonsRightPanel, BorderLayout.EAST);
+
+        cnt.add(buttonsPanel, BorderLayout.SOUTH);
+
+        Map<String, Field> fields = Configuration.getConfigurationFields();
+        String[] keys = new String[fields.size()];
+        keys = fields.keySet().toArray(keys);
+        Arrays.sort(keys);
+
+        Map<String, Map<String, Field>> categorized = new HashMap<>();
+
+        for (String name : keys) {
+            Field field = fields.get(name);
+            ConfigurationCategory cat = field.getAnnotation(ConfigurationCategory.class);
+            String scat = cat == null?"other":cat.value();
+            if (!categorized.containsKey(scat)) {
+                categorized.put(scat, new HashMap<String, Field>());
+            }
+            categorized.get(scat).put(name, field);
+        }
+
+        JTabbedPane tabPane = new JTabbedPane();
+        Map<String,Component> tabs=new HashMap<>();
+        for (String cat : categorized.keySet()) {
+            JPanel configPanel = new JPanel(new SpringLayout());
+            for (String name : categorized.get(cat).keySet()) {
+                Field field = categorized.get(cat).get(name);
+
+                String locName = translate("config.name." + name);
+
+                try {
+
+                    ConfigurationItem item = (ConfigurationItem) field.get(null);
+
+                    ParameterizedType listType = (ParameterizedType) field.getGenericType();
+                    Class itemType = (Class<?>) listType.getActualTypeArguments()[0];
+                    /*String description = Configuration.getDescription(field);
+                     if (description == null) {
+                     description = "";
+                     }*/
+                    String description = translate("config.description." + name);
+
+                    Object defaultValue = Configuration.getDefaultValue(field);
+                    if (defaultValue != null) {
+                        description += " (" + translate("default") + ": " + defaultValue + ")";
+                    }
+                //model.addRow(new Object[]{locName, item.get(), description});
+
+                    JLabel l = new JLabel(locName, JLabel.TRAILING);
+                    l.setToolTipText(description);
+                    configPanel.add(l);
+                    Component c = null;
+                    if ((itemType == String.class) || (itemType == Integer.class) || (itemType == Long.class) || (itemType == Double.class) || (itemType == Float.class) || (itemType == Calendar.class)) {
+                        JTextField tf = new JTextField();
+                        Object val = item.get();
+                        if (val == null) {
+                            val = "";
+                        }
+                        if (itemType == Calendar.class) {
+
+                            tf.setText(new SimpleDateFormat().format(((Calendar) item.get()).getTime()));
+                        } else {
+                            tf.setText(val.toString());
+                        }
+                        tf.setToolTipText(description);
+                        tf.setMaximumSize(new Dimension(Integer.MAX_VALUE,tf.getPreferredSize().height));
+                        c = tf;
+                    }
+                    if (itemType == Boolean.class) {
+                        JCheckBox cb = new JCheckBox();
+                        cb.setSelected((Boolean) item.get());
+                        cb.setToolTipText(description);
+                        c = cb;
+                    }
+                    componentsMap.put(name, c);
+                    l.setLabelFor(c);
+                    configPanel.add(c);
+
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    // Reflection exceptions. This should never happen
+                    throw new Error(ex.getMessage());
+                }
+            }
+            SpringUtilities.makeCompactGrid(configPanel,
+                    categorized.get(cat).size(), 2, //rows, cols
+                    6, 6, //initX, initY
+                    6, 6);       //xPad, yPad
+            tabs.put(cat,new JScrollPane(configPanel));            
+        }
+
         
-        cnt.add(buttonsPanel,BorderLayout.SOUTH);        
+        String catOrder[] = new String[]{"ui","display","decompilation","script","format","export","limit","update","debug","other"};
+        
+        for(String cat:catOrder){
+            if(!tabs.containsKey(cat)){
+                continue;
+            }
+            tabPane.add(translate("config.group.name."+cat),tabs.get(cat));
+            tabPane.setToolTipTextAt(tabPane.getTabCount()-1, translate("config.group.description."+cat));
+        }
+        
+        
+        
+        cnt.add(tabPane, BorderLayout.CENTER);
         pack();
     }
 
@@ -174,27 +258,73 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                     SelectLanguageDialog.reloadUi();
                 }
             });
-            
+
         }
     }
 
     private JButton cancelButton;
     private JButton okButton;
     private JButton resetButton;
-    private EachRowRendererEditor configurationTable;
+    //private EachRowRendererEditor configurationTable;
 
     @Override
     @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "OK":
-                TableModel model = configurationTable.getModel();
-                int count = model.getRowCount();
                 boolean modified = false;
-                for (int i = 0; i < count; i++) {
-                    String name = (String) model.getValueAt(i, 0);
-                    Object value = model.getValueAt(i, 1);
-                    Map<String, Field> fields = Configuration.getConfigurationFields();
+                Map<String, Field> fields = Configuration.getConfigurationFields();
+                Map<String, Object> values = new HashMap<>();
+                for (String name : fields.keySet()) {
+                    Component c = componentsMap.get(name);
+                    Object value = null;
+
+                    ParameterizedType listType = (ParameterizedType) fields.get(name).getGenericType();
+                    Class itemType = (Class<?>) listType.getActualTypeArguments()[0];
+                    if (itemType == String.class) {
+                        value = ((JTextField) c).getText();
+                    }
+                    if (itemType == Boolean.class) {
+                        value = ((JCheckBox) c).isSelected();
+                    }
+
+                    if (itemType == Calendar.class) {
+                        Calendar cal = Calendar.getInstance();
+                        try {
+                            cal.setTime(new SimpleDateFormat().parse(((JTextField) c).getText()));
+                        } catch (ParseException ex) {
+                            c.requestFocusInWindow();
+                            return;
+                        }
+                        value = cal;
+                    }
+
+                    try {
+                        if (itemType == Integer.class) {
+                            value = Integer.parseInt(((JTextField) c).getText());
+                        }
+                        if (itemType == Long.class) {
+                            value = Long.parseLong(((JTextField) c).getText());
+                        }
+                        if (itemType == Double.class) {
+                            value = Double.parseDouble(((JTextField) c).getText());
+                        }
+                        if (itemType == Float.class) {
+                            value = Float.parseFloat(((JTextField) c).getText());
+                        }
+                    } catch (NumberFormatException nfe) {
+                        if (!((JTextField) c).getText().equals("")) {
+                            c.requestFocusInWindow();
+                            return;
+                        }//else null
+                    }
+                    values.put(name, value);
+                }
+
+                for (String name : fields.keySet()) {
+                    Component c = componentsMap.get(name);
+                    Object value = values.get(name);
+
                     Field field = fields.get(name);
                     ConfigurationItem item = null;
                     try {
@@ -218,9 +348,9 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                 setVisible(false);
                 break;
             case "RESET":
-                
-                Map<String, Field> fields = Configuration.getConfigurationFields();
-                for (Entry<String, Field> entry : fields.entrySet()) {
+
+                Map<String, Field> rfields = Configuration.getConfigurationFields();
+                for (Entry<String, Field> entry : rfields.entrySet()) {
                     String name = entry.getKey();
                     Field field = entry.getValue();
                     try {

@@ -22,10 +22,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentUI;
+import org.pushingpixels.flamingo.api.common.JCommandButton;
 import org.pushingpixels.flamingo.api.common.popup.JCommandPopupMenu;
 import org.pushingpixels.flamingo.api.common.popup.JPopupPanel;
 import org.pushingpixels.flamingo.api.common.popup.PopupPanelManager;
 import org.pushingpixels.flamingo.internal.ui.common.BasicCommandButtonUI;
+import org.pushingpixels.substance.flamingo.common.ui.SubstanceCommandButtonUI;
 import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
 
 /**
@@ -34,10 +36,13 @@ import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
  * 
  * @author JPEXS
  */
-public class MyCommandButtonUI extends BasicCommandButtonUI{
+public class MyCommandButtonUI extends SubstanceCommandButtonUI{
     public static ComponentUI createUI(JComponent comp) {
-        SubstanceCoreUtilities.testComponentCreationThreadingViolation(comp);
-        return new MyCommandButtonUI();
+        return new MyCommandButtonUI((JCommandButton)comp);
+    }
+
+    public MyCommandButtonUI(JCommandButton jcb) {
+        super(jcb);
     }
 
     @Override

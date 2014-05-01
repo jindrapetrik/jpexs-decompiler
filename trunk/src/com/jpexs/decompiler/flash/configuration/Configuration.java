@@ -64,45 +64,70 @@ public class Configuration {
     public static final Level logLevel;
 
     @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> openMultipleFiles = null;
+    
     @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> decompile = null;
+    
     @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("decompilation")
     public static final ConfigurationItem<Boolean> parallelSpeedUp = null;
+    
     @ConfigurationDefaultInt(20)
+    @ConfigurationCategory("decompilation")
     public static final ConfigurationItem<Integer> parallelThreadCount = null;
+    
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> autoDeobfuscate = null;
+    
     @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("decompilation")
     public static final ConfigurationItem<Boolean> cacheOnDisk = null;
+    
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
     public static final ConfigurationItem<Boolean> internalFlashViewer = null;
+    
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> gotoMainClassOnStartup = null;
+    
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> autoRenameIdentifiers = null;
-    @ConfigurationDefaultBoolean(true)
-    public static final ConfigurationItem<Boolean> deobfuscateUsePrevTagOnly = null;
+    
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> offeredAssociation = null;
-    @ConfigurationDefaultBoolean(true)
-    public static final ConfigurationItem<Boolean> removeNops = null;
-    @ConfigurationDefaultBoolean(true)
-    public static final ConfigurationItem<Boolean> showHexOnlyButton = null;
+    
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> decimalAddress = null;
+    
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> showAllAddresses = null;
+    
     @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
     public static final ConfigurationItem<Boolean> useFrameCache = null;
+    
     @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> useRibbonInterface = null;
+    
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> openFolderAfterFlaExport = null;
+    
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> useDetailedLogging = null;
 
     @ConfigurationDefaultInt(65536)
+    @ConfigurationCategory("display")
     public static final ConfigurationItem<Integer> binaryDataDisplayLimit = null;
 
     /**
@@ -110,72 +135,78 @@ public class Configuration {
      * recompiled
      */
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationDescription("Debug mode = throwing an error when comparing original file and recompiled")
+    @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> debugMode = null;
-    /**
-     * Turn off reading unsafe tags (tags which can cause problems with
-     * recompiling)
-     */
-    @ConfigurationDefaultBoolean(false)
-    @ConfigurationDescription("Turn off reading unsafe tags (tags which can cause problems with recompiling)")
-    public static final ConfigurationItem<Boolean> disableDangerous = null;
     /**
      * Turn off resolving constants in ActionScript 2
      */
     @ConfigurationDefaultBoolean(true)
-    @ConfigurationDescription("Turn off resolving constants in ActionScript 2")
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> resolveConstants = null;
     /**
      * Limit of code subs (for obfuscated code)
      */
     @ConfigurationDefaultInt(500)
-    @ConfigurationDescription("Limit of code subs (for obfuscated code)")
+    @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> sublimiter = null;
     /**
      * Total export timeout in seconds
      */
     @ConfigurationDefaultInt(30 * 60)
-    @ConfigurationDescription("Total export timeout in seconds")
+    @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> exportTimeout = null;
     /**
      * Decompilation timeout in seconds for a single file
      */
     @ConfigurationDefaultInt(5 * 60)
-    @ConfigurationDescription("Decompilation timeout in seconds for a single file")
+    @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> decompilationTimeoutFile = null;
     /**
      * Using parameter names in decompiling may cause problems because official
      * programs like Flash CS 5.5 inserts wrong parameter names indices
      */
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationDescription("Using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices")
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> paramNamesEnable = null;
 
     @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> displayFileName = null;
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> debugCopy = null;
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> dumpTags = null;
 
     @ConfigurationDefaultInt(60)
+    @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> decompilationTimeoutSingleMethod = null;
     @ConfigurationDefaultInt(1)
     public static final ConfigurationItem<Integer> lastRenameType = null;
 
     @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastSaveDir = null;
+    
     @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastOpenDir = null;
+    
     @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastExportDir = null;
+    
     @ConfigurationDefaultString("en")
+    @ConfigurationCategory("ui")
     public static final ConfigurationItem<String> locale = null;
+    
     @ConfigurationDefaultString("_loc%d_")
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<String> registerNameFormat = null;
+    
     @ConfigurationDefaultInt(10)
     public static final ConfigurationItem<Integer> maxRecentFileCount = null;
+    
     public static final ConfigurationItem<String> recentFiles = null;
+    
     public static final ConfigurationItem<String> fontPairing = null;
 
     public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
@@ -203,8 +234,11 @@ public class Configuration {
     @ConfigurationName("gui.splitPane2.dividerLocation")
     public static final ConfigurationItem<Integer> guiSplitPane2DividerLocation = null;
     @ConfigurationDefaultInt(3)
+    @ConfigurationCategory("export")
     public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
+    
     @ConfigurationDefaultInt(1024 * 100/*100KB*/)
+    @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> syntaxHighlightLimit = null;
     public static final ConfigurationItem<Integer> guiFontPreviewSampleText = null;
     @ConfigurationName("gui.fontPreviewWindow.width")
@@ -218,34 +252,35 @@ public class Configuration {
 
     @ConfigurationDefaultInt(3)
     @ConfigurationName("formatting.indent.size")
-    @ConfigurationDescription("Number or spaces(or tabs) for one indentation")
+    @ConfigurationCategory("format")
     public static final ConfigurationItem<Integer> indentSize = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationName("formatting.indent.useTabs")
-    @ConfigurationDescription("Use tabs instead of spaces for indentation")
+    @ConfigurationCategory("format")
     public static final ConfigurationItem<Boolean> indentUseTabs = null;
 
     @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("format")
     public static final ConfigurationItem<Boolean> beginBlockOnNewLine = null;
 
     @ConfigurationDefaultInt(1000 * 60 * 60 * 24)
-    @ConfigurationDescription("Minimum time between automatic checks for updates on application start")
+    @ConfigurationCategory("update")
     @ConfigurationName("check.updates.delay")
     public static final ConfigurationItem<Integer> checkForUpdatesDelay = null;
 
     @ConfigurationDefaultBoolean(true)
-    @ConfigurationDescription("Checking for stable version updates")
+    @ConfigurationCategory("update")
     @ConfigurationName("check.updates.stable")
     public static final ConfigurationItem<Boolean> checkForUpdatesStable = null;
 
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationDescription("Checking for nightly version updates")
+    @ConfigurationCategory("update")
     @ConfigurationName("check.updates.nightly")
     public static final ConfigurationItem<Boolean> checkForUpdatesNightly = null;
 
     @ConfigurationDefaultBoolean(true)
-    @ConfigurationDescription("Automatic checking for updates on application start")
+    @ConfigurationCategory("update")
     @ConfigurationName("check.updates.enabled")
     public static final ConfigurationItem<Boolean> checkForUpdatesAuto = null;
 
@@ -254,26 +289,33 @@ public class Configuration {
     public static final ConfigurationItem<String> lastSelectedExportFormats = null;
 
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> textExportSingleFile = null;
 
     @ConfigurationDefaultString("--- SEPARATOR ---")
+    @ConfigurationCategory("export")
     public static final ConfigurationItem<String> textExportSingleFileSeparator = null;
 
     @ConfigurationDefaultString("--- RECORDSEPARATOR ---")
+    @ConfigurationCategory("export")
     public static final ConfigurationItem<String> textExportSingleFileRecordSeparator = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as12edit")
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> warningExperimentalAS12Edit = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as3edit")
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> warningExperimentalAS3Edit = null;
 
     @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> packJavaScripts = null;
 
     @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> textExportExportFontFace = null;
 
     private enum OSId {
@@ -584,14 +626,6 @@ public class Configuration {
             defaultValue = aString.value();
         }
         return defaultValue;
-    }
-
-    public static String getDescription(Field field) {
-        ConfigurationDescription a = field.getAnnotation(ConfigurationDescription.class);
-        if (a != null) {
-            return a.value();
-        }
-        return null;
     }
 
     public static Map<String, Field> getConfigurationFields() {

@@ -221,9 +221,6 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
      */
     @Override
     public byte[] getData() {
-        if (Configuration.disableDangerous.get()) {
-            return super.getData();
-        }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {

@@ -289,9 +289,7 @@ public class ActionListReader {
             }
         }
 
-        if (Configuration.removeNops.get()) {
-            ret = Action.removeNops(0, ret, version, 0, path);
-        }
+        ret = Action.removeNops(0, ret, version, 0, path);
         List<Action> reta = new ArrayList<>();
         for (Object o : ret) {
             if (o instanceof Action) {

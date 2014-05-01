@@ -124,10 +124,6 @@ public class DefineButton2Tag extends ButtonTag implements Container {
      */
     @Override
     public byte[] getData() {
-        if (Configuration.disableDangerous.get()) {
-            return super.getData();
-        }
-
         ByteArrayInputStream bais = new ByteArrayInputStream(super.data);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

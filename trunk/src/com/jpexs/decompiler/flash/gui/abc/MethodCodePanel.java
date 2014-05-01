@@ -119,9 +119,7 @@ public class MethodCodePanel extends JPanel implements ActionListener {
         hexOnlyButton.addActionListener(this);
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
-        if (!Configuration.showHexOnlyButton.get()) {
-            hexOnlyButton.setVisible(false);
-        }
+        hexOnlyButton.setVisible(false);
 
         buttonsPanel.add(graphButton);
         buttonsPanel.add(hexButton);

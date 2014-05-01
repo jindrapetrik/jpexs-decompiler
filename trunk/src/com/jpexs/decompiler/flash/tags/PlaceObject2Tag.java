@@ -148,9 +148,6 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
      */
     @Override
     public byte[] getData() {
-        if (Configuration.disableDangerous.get()) {
-            return super.getData();
-        }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
