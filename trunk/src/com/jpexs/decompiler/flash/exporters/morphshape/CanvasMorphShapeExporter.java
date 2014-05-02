@@ -261,8 +261,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
                 }
 
-                //fillData += "\tvar img = document.createElement(\"img\");\r\nimg.src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n";
-                fillData += "\tvar pat=ctx.createPattern(image" + bitmapId + ",\"repeat\");\r\n";
+                fillData += "\tvar fimg = ctrans.applyToImage(image" + bitmapId + ");";
+                fillData += "\tvar pat=ctx.createPattern(fimg,\"repeat\");\r\n";                
                 fillData += "\tctx.fillStyle = pat;\r\n";
             }
         }
@@ -527,7 +527,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     }
 
     private String useRatioColor(RGB color, RGB colorEnd) {
-        return "\"rgba(\"+" + useRatioInt(color.red, colorEnd.red) + "+\",\"+" + useRatioInt(color.green, colorEnd.green) + "+\",\"+" + useRatioInt(color.blue, colorEnd.blue) + "+\",\"+((" + useRatioInt((color instanceof RGBA) ? ((RGBA) color).alpha : 255, (colorEnd instanceof RGBA) ? ((RGBA) colorEnd).alpha : 255) + ")/255)+\")\"";
+        return "tocolor(ctrans.apply([" + useRatioInt(color.red, colorEnd.red) + "," + useRatioInt(color.green, colorEnd.green) + "," + useRatioInt(color.blue, colorEnd.blue) + ",((" + useRatioInt((color instanceof RGBA) ? ((RGBA) color).alpha : 255, (colorEnd instanceof RGBA) ? ((RGBA) colorEnd).alpha : 255) + ")/255)))";
     }
     
 }

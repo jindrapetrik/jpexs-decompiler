@@ -1484,7 +1484,7 @@ public final class SWF implements TreeItem, Timelined {
                                 String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
                                 fos.write(Utf8Helper.getBytes("var image" + c + " = document.createElement(\"img\");\r\nimage" + c + ".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
                             } else {
-                                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,frame,ratio){\r\n"));
+                                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ctrans,frame,ratio){\r\n"));
                                 if (ch instanceof DrawableTag) {
                                     fos.write(Utf8Helper.getBytes(((DrawableTag) ch).toHtmlCanvas(1)));
                                 }
@@ -1494,7 +1494,7 @@ public final class SWF implements TreeItem, Timelined {
 
                         String currentName = timeline.id == 0 ? "main" : getTypePrefix(fswf.characters.get(timeline.id)) + timeline.id;
 
-                        fos.write(Utf8Helper.getBytes("function " + currentName + "(ctx,frame,ratio){\r\n"));
+                        fos.write(Utf8Helper.getBytes("function " + currentName + "(ctx,ctrans,frame,ratio){\r\n"));
                         fos.write(Utf8Helper.getBytes(framesToHtmlCanvas(unitDivisor, ftim, fframes, 0, null, 0, displayRect, new ColorTransform(), fbackgroundColor)));
                         fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
 
@@ -1504,13 +1504,13 @@ public final class SWF implements TreeItem, Timelined {
                             fos.write(Utf8Helper.getBytes("frames.push(" + i + ");\r\n"));
                         }
                         fos.write(Utf8Helper.getBytes("\r\n"));
-                        fos.write(Utf8Helper.getBytes("function nextFrame(ctx){\r\n"));
+                        fos.write(Utf8Helper.getBytes("function nextFrame(ctx,ctrans){\r\n"));
                         fos.write(Utf8Helper.getBytes("\tctx.clearRect(0,0," + width + "," + height + ");\r\n"));
                         fos.write(Utf8Helper.getBytes("\tframe = (frame+1)%frames.length;\r\n"));
-                        fos.write(Utf8Helper.getBytes("\t" + currentName + "(ctx,frames[frame],0);\r\n"));
+                        fos.write(Utf8Helper.getBytes("\t" + currentName + "(ctx,ctrans,frames[frame],0);\r\n"));
                         fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
 
-                        fos.write(Utf8Helper.getBytes("if(frames.length==1){nextFrame(ctx);}else{window.setInterval(function(){nextFrame(ctx);}," + (int) (1000.0 / timeline.swf.frameRate) + ");};\r\n"));
+                        fos.write(Utf8Helper.getBytes("if(frames.length==1){nextFrame(ctx,ctrans);}else{window.setInterval(function(){nextFrame(ctx,ctrans);}," + (int) (1000.0 / timeline.swf.frameRate) + ");};\r\n"));
                     }
 
                     if (Configuration.packJavaScripts.get()) {
@@ -2167,6 +2167,15 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
+    private static void getNeededCharacters(SWF swf,int id,Set<Integer> usedCharacters){
+        usedCharacters.add(id);
+        CharacterTag character = swf.characters.get(id);
+        Set<Integer> needed = character.getNeededCharacters();
+        for(int n:needed){
+            getNeededCharacters(swf, n, usedCharacters);
+        }
+    }
+    
     private static void getNeededCharacters(Timeline timeline, List<Integer> frames, Set<Integer> usedCharacters) {
         if (frames == null) {
             frames = new ArrayList<>();
@@ -2181,10 +2190,7 @@ public final class SWF implements TreeItem, Timelined {
                 if (!timeline.swf.characters.containsKey(layer.characterId)) {
                     continue;
                 }
-                usedCharacters.add(layer.characterId);
-                CharacterTag character = timeline.swf.characters.get(layer.characterId);
-                usedCharacters.add(layer.characterId);
-                usedCharacters.addAll(character.getNeededCharacters());
+                getNeededCharacters(timeline.swf,layer.characterId,usedCharacters);                
             }
         }
 
@@ -2283,7 +2289,17 @@ public final class SWF implements TreeItem, Timelined {
                 sb.append(Helper.doubleStr(placeMatrix.translateX)).append(",");
                 sb.append(Helper.doubleStr(placeMatrix.translateY));
                 sb.append(");\r\n");
-                sb.append("\t\t\t").append(getTypePrefix(character)).append(layer.characterId).append("(ctx,").append(f).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(");\r\n");
+                ColorTransform ctrans =layer.colorTransForm;
+                if(ctrans==null){
+                    ctrans = new ColorTransform();
+                     sb.append("\t\t\tvar nctrans = ctrans;\r\n");
+                }else{
+                    sb.append("\t\t\tvar nctrans = ctrans.merge(new cxform("+
+                            ctrans.getRedAdd()+","+ctrans.getGreenAdd()+","+ctrans.getBlueAdd()+","+ctrans.getAlphaAdd()+","+
+                            ctrans.getRedMulti()+","+ctrans.getGreenMulti()+","+ctrans.getBlueMulti()+","+ctrans.getAlphaMulti()
+                            +"));\r\n");
+                }
+                sb.append("\t\t\t").append(getTypePrefix(character)).append(layer.characterId).append("(ctx,nctrans,").append(f).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(");\r\n");
                 sb.append("\t\t\tctx.restore();\r\n");
                 if(layer.filters!=null){
                     for(FILTER filter:layer.filters){
@@ -2297,7 +2313,7 @@ public final class SWF implements TreeItem, Timelined {
                                 mat += cmf.matrix[k];
                             }
                             mat+="]";
-                            sb.append("fcanvas = Filters.colorMatrix(fcanvas,fcanvas.getContext(\"2d\"),"+mat+");\r\n");
+                            sb.append("\t\t\tfcanvas = Filters.colorMatrix(fcanvas,fcanvas.getContext(\"2d\"),"+mat+");\r\n");
                         }
                         
                         if(filter instanceof CONVOLUTIONFILTER){
@@ -2318,17 +2334,17 @@ public final class SWF implements TreeItem, Timelined {
                                 mat += matrix2[k];
                             }
                             mat+="]";
-                            sb.append("fcanvas = Filters.convolution(fcanvas,fcanvas.getContext(\"2d\"),"+mat+",false);\r\n");
+                            sb.append("\t\t\tfcanvas = Filters.convolution(fcanvas,fcanvas.getContext(\"2d\"),"+mat+",false);\r\n");
                         }
                         
                         if(filter instanceof GLOWFILTER){
                             GLOWFILTER gf = (GLOWFILTER)filter;
-                            sb.append("fcanvas = Filters.glow(fcanvas,fcanvas.getContext(\"2d\"),"+gf.blurX+","+gf.blurY+","+gf.strength+","+jsArrColor(gf.glowColor)+","+(gf.innerGlow?"true":"false")+","+(gf.knockout?"true":"false")+","+gf.passes+");\r\n");
+                            sb.append("\t\t\tfcanvas = Filters.glow(fcanvas,fcanvas.getContext(\"2d\"),"+gf.blurX+","+gf.blurY+","+gf.strength+","+jsArrColor(gf.glowColor)+","+(gf.innerGlow?"true":"false")+","+(gf.knockout?"true":"false")+","+gf.passes+");\r\n");
                         }
                         
                         if(filter instanceof DROPSHADOWFILTER){
                             DROPSHADOWFILTER ds=(DROPSHADOWFILTER)filter;
-                            sb.append("fcanvas = Filters.dropShadow(fcanvas,fcanvas.getContext(\"2d\"),"+ds.blurX+","+ds.blurY+","+(int) (ds.angle * 180 / Math.PI)+","+ds.distance+","+jsArrColor(ds.dropShadowColor)+","+(ds.innerShadow?"true":"false")+","+ds.passes+","+ds.strength+","+(ds.knockout?"true":"false")+");\r\n");                        
+                            sb.append("\t\t\tfcanvas = Filters.dropShadow(fcanvas,fcanvas.getContext(\"2d\"),"+ds.blurX+","+ds.blurY+","+(int) (ds.angle * 180 / Math.PI)+","+ds.distance+","+jsArrColor(ds.dropShadowColor)+","+(ds.innerShadow?"true":"false")+","+ds.passes+","+ds.strength+","+(ds.knockout?"true":"false")+");\r\n");                        
                         }
                         if(filter instanceof BEVELFILTER){
                             BEVELFILTER bv=(BEVELFILTER)filter;                           
@@ -2338,7 +2354,7 @@ public final class SWF implements TreeItem, Timelined {
                             } else if (!bv.innerShadow) {
                                 type = "Filters.OUTER";
                             }
-                            sb.append("fcanvas = Filters.bevel(fcanvas,fcanvas.getContext(\"2d\"),"+bv.blurX+","+bv.blurY+","+bv.strength+","+type+","+jsArrColor(bv.highlightColor)+","+jsArrColor(bv.shadowColor)+","+(int) (bv.angle * 180 / Math.PI)+","+bv.distance+","+(bv.knockout?"true":"false")+","+bv.passes+");\r\n");
+                            sb.append("\t\t\tfcanvas = Filters.bevel(fcanvas,fcanvas.getContext(\"2d\"),"+bv.blurX+","+bv.blurY+","+bv.strength+","+type+","+jsArrColor(bv.highlightColor)+","+jsArrColor(bv.shadowColor)+","+(int) (bv.angle * 180 / Math.PI)+","+bv.distance+","+(bv.knockout?"true":"false")+","+bv.passes+");\r\n");
                         }
                         
                         if(filter instanceof GRADIENTBEVELFILTER){
@@ -2362,7 +2378,7 @@ public final class SWF implements TreeItem, Timelined {
                                 type = "Filters.OUTER";
                             }
                             
-                            sb.append("fcanvas = Filters.gradientBevel(fcanvas,fcanvas.getContext(\"2d\"),"+colArr+","+ratArr+","+gbf.blurX+","+gbf.blurY+","+gbf.strength+","+type+","+(int) (gbf.angle * 180 / Math.PI)+","+gbf.distance+","+(gbf.knockout?"true":"false")+","+gbf.passes+");\r\n");
+                            sb.append("\t\t\tfcanvas = Filters.gradientBevel(fcanvas,fcanvas.getContext(\"2d\"),"+colArr+","+ratArr+","+gbf.blurX+","+gbf.blurY+","+gbf.strength+","+type+","+(int) (gbf.angle * 180 / Math.PI)+","+gbf.distance+","+(gbf.knockout?"true":"false")+","+gbf.passes+");\r\n");
                         }
                         
                         if(filter instanceof GRADIENTGLOWFILTER){
@@ -2386,12 +2402,11 @@ public final class SWF implements TreeItem, Timelined {
                                 type = "Filters.OUTER";
                             }
                                                              
-                            //function(srcCanvas,src, blurX, blurY, angle, distance, colors, ratios, type, iterations, strength, knockout)
-                            sb.append("fcanvas = Filters.gradientGlow(fcanvas,fcanvas.getContext(\"2d\"),"+ggf.blurX+","+ggf.blurY+","+(int) (ggf.angle * 180 / Math.PI)+","+ggf.distance+","+colArr+","+ratArr+","+type+","+ggf.passes+","+ggf.strength+","+(ggf.knockout?"true":"false")+");\r\n");
+                            sb.append("\t\t\tfcanvas = Filters.gradientGlow(fcanvas,fcanvas.getContext(\"2d\"),"+ggf.blurX+","+ggf.blurY+","+(int) (ggf.angle * 180 / Math.PI)+","+ggf.distance+","+colArr+","+ratArr+","+type+","+ggf.passes+","+ggf.strength+","+(ggf.knockout?"true":"false")+");\r\n");
                         }
                     }
-                    sb.append("\tctx = oldctx;\r\n");  
-                    sb.append("\tctx.drawImage(fcanvas,0,0);\r\n");
+                    sb.append("\t\t\tctx = oldctx;\r\n");  
+                    sb.append("\t\t\tctx.drawImage(fcanvas,0,0);\r\n");
                     
                 }
                 if(layer.clipDepth!=-1){

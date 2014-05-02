@@ -123,7 +123,48 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 + "  return context;  \r\n"
                 + "};\r\n"
                 + "\r\n"
-                + "enhanceContext(ctx);\r\n";
+                + "enhanceContext(ctx);\r\n"
+                + "var cxform = function(r_add,g_add,b_add,a_add,r_mult,g_mult,b_mult,a_mult){\r\n"
+                + "this.r_add = r_add;this.g_add = g_add;this.b_add = b_add;this.a_add = a_add;\r\n"
+                + "this.r_mult = r_mult;this.g_mult = g_mult;this.b_mult = b_mult;this.a_mult = a_mult;\r\n"
+                + "this._cut = function(v,min, max) {if(v<min) v = min; if(v>max) v = max; return v;};\r\n"
+                + "this.apply = function(c){var d=c;\r\n"
+                + "d[0] = this._cut(d[0]*this.r_mult/255+this.r_add,0,255);\r\n"
+                + "d[1] = this._cut(d[1]*this.g_mult/255+this.g_add,0,255);\r\n"
+                + "d[2] = this._cut(d[2]*this.b_mult/255+this.b_add,0,255);\r\n"
+                + "d[3] = this._cut(d[3]*this.a_mult/255+this.a_add/255,0,1);\r\n"
+                + "return d;\r\n"
+                + "};\r\n"
+                + "this.applyToImage=function(fimg){if(this.isEmpty()){return fimg};\r\n"
+                + "\tvar icanvas = Filters.createCanvas(fimg.width,fimg.height);\r\n"
+                + "\tvar ictx = icanvas.getContext(\"2d\");\r\n"
+                + "\tictx.drawImage(fimg,0,0);\r\n"
+                + "\tvar imdata=ictx.getImageData(0,0,icanvas.width,icanvas.height);\r\n"
+                + "\tvar idata=imdata.data;\r\n"
+                + "\tfor(var i=0;i<idata.length;i+=4){\r\n"
+                + "\t\tvar c=this.apply([idata[i],idata[i+1],idata[i+2],idata[i+3]/255]);"
+                + "\t\tidata[i] = c[0];\r\n"
+                + "\t\tidata[i+1] = c[1];\r\n"
+                + "\t\tidata[i+2] = c[2];\r\n"
+                + "\t\tidata[i+3] = Math.round(c[3]*255);\r\n"
+                + "\t}\r\n"
+                + "\tictx.putImageData(imdata,0,0);\r\n"                        
+                + "\treturn icanvas;"                        
+                + "};\r\n"                                
+                + "this.merge = function(cx) {var r = new cxform("
+                + "this.r_add + cx.r_add,"
+                + "this.g_add + cx.g_add,"
+                + "this.b_add + cx.b_add,"
+                + "this.a_add + cx.a_add,"
+                + "this.r_mult * cx.r_mult / 255,"
+                + "this.g_mult * cx.g_mult / 255,"
+                + "this.b_mult * cx.b_mult / 255,"
+                + "this.a_mult * cx.a_mult / 255"
+                + "); return r;};\r\n"   
+                + "this.isEmpty = function(){return this.r_add==0 && this.g_add==0 && this.b_add==0 && this.a_add==0 && this.r_mult==255 && this.g_mult==255 && this.b_mult==255 && this.a_mult==255};"                
+                + "};\r\n"
+                + "var tocolor = function(c){var r= \"rgba(\"+c[0]+\",\"+c[1]+\",\"+c[2]+\",\"+c[3]+\")\"; return r;};\r\n"
+                + "var ctrans = new cxform(0,0,0,0,255,255,255,255);\r\n";
     }
 
     public static String getHtmlPrefix(int width, int height) {
@@ -203,7 +244,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         if (color == null) {
             color = basicFill;
         }
-        fillData += "\tctx.fillStyle=\"" + color(color) + "\";\r\n";
+        fillData += "\tctx.fillStyle=" + color(color) + ";\r\n";
     }
 
     @Override
@@ -249,7 +290,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 revert = !revert;
             }
             for (GRADRECORD r : gradientRecords) {
-                fillData += "\tgrd.addColorStop(" + Double.toString(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0)) + ",\"" + color(r.color) + "\");\r\n";
+                fillData += "\tgrd.addColorStop(" + Double.toString(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0)) + "," + color(r.color) + ");\r\n";
                 lastRadColor = color(r.color);
             }
             pos += oneHeight;
@@ -264,9 +305,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     public static String color(RGB rgb) {
         if ((rgb instanceof RGBA) && (((RGBA) rgb).alpha < 255)) {
             RGBA rgba = (RGBA) rgb;
-            return "rgba(" + rgba.red + "," + rgba.green + "," + rgba.blue + "," + rgba.getAlphaFloat() + ")";
+            return "tocolor(ctrans.apply([" + rgba.red + "," + rgba.green + "," + rgba.blue + "," + rgba.getAlphaFloat() + "]))";
         } else {
-            return rgb.toHexRGB();
+            return "tocolor(ctrans.apply([" + rgb.red + "," + rgb.green + "," + rgb.blue + ",1]))";
         }
 
     }
@@ -298,7 +339,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                     fillMatrix = matrix;
                 }
 
-                fillData += "\tvar pat=ctx.createPattern(image" + bitmapId + ",\"repeat\");\r\n";
+                fillData += "\tvar fimg = ctrans.applyToImage(image" + bitmapId + ");";
+                fillData += "\tvar pat=ctx.createPattern(fimg,\"repeat\");\r\n";
                 fillData += "\tctx.fillStyle = pat;\r\n";
             }
         }
@@ -315,7 +357,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         thickness /= unitDivisor;
 
         if (color != null) { //gradient lines have no color
-            strokeData += "\tctx.strokeStyle=\"" + color(color) + "\";\r\n";
+            strokeData += "\tctx.strokeStyle=" + color(color) + ";\r\n";
         }
         strokeData += "\tctx.lineWidth=" + Double.toString(thickness == 0 ? 1 : thickness) + ";\r\n";
         switch (startCaps) {
@@ -386,7 +428,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 revert = !revert;
             }
             for (GRADRECORD r : gradientRecords) {
-                lineFillData += "\tgrd.addColorStop(" + Double.toString(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0)) + ",\"" + color(r.color) + "\");\r\n";
+                lineFillData += "\tgrd.addColorStop(" + Double.toString(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0)) + "," + color(r.color) + ");\r\n";
                 lineLastRadColor = color(r.color);
             }
             pos += oneHeight;
@@ -453,7 +495,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 preLineFillData += "\tlfctx.applyTransforms(ctx._matrices);\r\n";
                 preLineFillData += "\tctx = lfctx;";
                 if (lineLastRadColor != null) {
-                    preLineFillData += "\tctx.fillStyle=\"" + lineLastRadColor + "\";\r\n ctx.fill(\"evenodd\");\r\n";
+                    preLineFillData += "\tctx.fillStyle=" + lineLastRadColor + ";\r\n\tctx.fill(\"evenodd\");\r\n";
                 }
 
                 preLineFillData += "\tctx.transform(" + Helper.doubleStr(lineFillMatrix.scaleX) + "," + Helper.doubleStr(lineFillMatrix.rotateSkew0) + "," + Helper.doubleStr(lineFillMatrix.rotateSkew1) + "," + Helper.doubleStr(lineFillMatrix.scaleY) + "," + Helper.doubleStr(lineFillMatrix.translateX) + "," + Helper.doubleStr(lineFillMatrix.translateY) + ");\r\n";
@@ -481,7 +523,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             }
             if (fillMatrix != null) {
                 if (lastRadColor != null) {
-                    pathData += "\tctx.fillStyle=\"" + lastRadColor + "\";\r\n ctx.fill(\"evenodd\");\r\n";
+                    pathData += "\tctx.fillStyle=" + lastRadColor + ";\r\n\tctx.fill(\"evenodd\");\r\n";
                 }
                 pathData += "\tctx.save();\r\n";
                 pathData += "\tctx.clip();\r\n";

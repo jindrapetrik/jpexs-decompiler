@@ -347,7 +347,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
             double rat = textHeight / 1024.0 / font.getDivider();
 
             for (GLYPHENTRY entry : rec.glyphEntries) {
-                Matrix mat = (new Matrix(textMatrix).concatenate(Matrix.getTranslateInstance(x - bounds.Xmin, y - bounds.Ymin))).concatenate(Matrix.getScaleInstance(rat));
+                Matrix mat = (new Matrix(textMatrix).concatenate(Matrix.getTranslateInstance(x, y))).concatenate(Matrix.getScaleInstance(rat));
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
                     ret += "\tctx.save();\r\n";
