@@ -223,21 +223,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         if (image != null) {
             SerializableImage img = image.getImage();
             if (img != null) {
-                colorTransform.apply(img);
-                String format = image.getImageFormat();
-                InputStream imageStream = image.getImageData();
-                byte[] imageData;
-                if (imageStream != null) {
-                    imageData = Helper.readStream(image.getImageData());
-                } else {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    try {
-                        ImageIO.write(img.getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
-                    } catch (IOException ex) {
-                    }
-                    imageData = baos.toByteArray();
-                }
-                //String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
+                colorTransform.apply(img);                                                
                 if (matrix != null) {
                     fillMatrix = matrix.clone();
                     fillMatrix.translateX /= unitDivisor;
