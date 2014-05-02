@@ -601,3 +601,162 @@ Filters.colorMatrix = function(canvas,ctx,m){
 Filters.glow = function(canvas,src,blurX,blurY,strength,color, inner,knockout,iterations) {
         return Filters.dropShadow(canvas,src, blurX, blurY, 45, 0, color, inner, iterations, strength, knockout);
 };
+
+
+var BlendModes = {};
+
+BlendModes._cut = function(v) {if(v<0) v = 0; if(v>255) v = 255; return v;};
+
+BlendModes.normal = function(src,dst,result,pos){
+    var am = (255-src[pos + 3])/255;
+    result[pos] = this._cut(src[pos]*src[pos + 3]/255 + dst[pos]*dst[pos+3]/255*am);
+    result[pos + 1] = this._cut(src[pos+1]*src[pos + 3]/255 + dst[pos+1]*dst[pos+3]/255*am);
+    result[pos + 2] = this._cut(src[pos+2]*src[pos + 3]/255 + dst[pos+2]*dst[pos+3]/255*am);
+    result[pos + 3] = this._cut(src[pos + 3] + dst[pos+3]*am);    
+};
+
+BlendModes.layer = function(src,dst,result,pos){
+  BlendModes.normal(src,dst,result,pos);  
+};
+
+BlendModes.multiply = function(src,dst,result,pos){
+    result[pos+0] = (src[pos+0] * dst[pos+0]) >> 8;
+    result[pos+1] = (src[pos+1] * dst[pos+1]) >> 8;
+    result[pos+2] = (src[pos+2] * dst[pos+2]) >> 8;
+    result[pos+3] = Math.min(255, src[pos+3] + dst[pos+3] - (src[pos+3] * dst[pos+3]) / 255);
+};
+
+BlendModes.screen  = function(src,dst,result,pos){
+    result[pos+0] = 255 - ((255 - src[pos+0]) * (255 - dst[pos+0]) >> 8);
+    result[pos+1] = 255 - ((255 - src[pos+1]) * (255 - dst[pos+1]) >> 8);
+    result[pos+2] = 255 - ((255 - src[pos+2]) * (255 - dst[pos+2]) >> 8);
+    result[pos+3] = Math.min(255, src[pos+3] + dst[pos+3] - (src[pos+3] * dst[pos+3]) / 255);
+};
+
+BlendModes.lighten = function(src,dst,result,pos){
+    result[pos+0] = Math.max(src[pos+0], dst[pos+0]);
+    result[pos+1] = Math.max(src[pos+1], dst[pos+1]);
+    result[pos+2] = Math.max(src[pos+2], dst[pos+2]);
+    result[pos+3] = Math.min(255, src[pos+3] + dst[pos+3] - (src[pos+3] * dst[pos+3]) / 255);
+};
+
+BlendModes.darken = function(src,dst,result,pos){   
+    result[pos+0] = Math.min(src[pos+0], dst[pos+0]);
+    result[pos+1] = Math.min(src[pos+1], dst[pos+1]);
+    result[pos+2] = Math.min(src[pos+2], dst[pos+2]);
+    result[pos+3] = Math.min(255, src[pos+3] + dst[pos+3] - (src[pos+3] * dst[pos+3]) / 255);
+};
+
+BlendModes.difference = function(src,dst,result,pos){
+    result[pos+0] = Math.abs(dst[pos+0] - src[pos+0]);
+    result[pos+1] = Math.abs(dst[pos+1] - src[pos+1]);
+    result[pos+2] = Math.abs(dst[pos+2] - src[pos+2]);
+    result[pos+3] = Math.min(255, src[pos+3] + dst[pos+3] - (src[pos+3] * dst[pos+3]) / 255);
+};
+
+BlendModes.add = function(src,dst,result,pos){
+    result[pos+0] = Math.min(255, src[pos+0] + dst[pos+0]);
+    result[pos+1] = Math.min(255, src[pos+1] + dst[pos+1]);
+    result[pos+2] = Math.min(255, src[pos+2] + dst[pos+2]);
+    result[pos+3] = Math.min(255, src[pos+3] + dst[pos+3]);
+};
+
+BlendModes.subtract = function(src,dst,result,pos){
+    result[pos+0] = Math.max(0, src[pos+0] + dst[pos+0] - 256);
+    result[pos+1] = Math.max(0, src[pos+1] + dst[pos+1] - 256);
+    result[pos+2] = Math.max(0, src[pos+2] + dst[pos+2] - 256);
+    result[pos+3] = Math.min(255, src[pos+3] + dst[pos+3] - (src[pos+3] * dst[pos+3]) / 255);
+};
+
+BlendModes.invert = function(src,dst,result,pos){
+    result[pos+0] = 255 - dst[pos+0];
+    result[pos+1] = 255 - dst[pos+1];
+    result[pos+2] = 255 - dst[pos+2];
+    result[pos+3] = src[pos+3];
+};
+
+BlendModes.alpha = function(src,dst,result,pos){
+    result[pos+0] = src[pos+0];
+    result[pos+1] = src[pos+1];
+    result[pos+2] = src[pos+2];
+    result[pos+3] = dst[pos+3]; //?
+};
+
+BlendModes.erase = function(src,dst,result,pos){
+    result[pos+0] = src[pos+0];
+    result[pos+1] = src[pos+1];
+    result[pos+2] = src[pos+2];
+    result[pos+3] = 255 - dst[pos+3]; //?
+};
+
+BlendModes.overlay = function(src,dst,result,pos){
+    result[pos+0] = dst[pos+0] < 128 ? dst[pos+0] * src[pos+0] >> 7
+            : 255 - ((255 - dst[pos+0]) * (255 - src[pos+0]) >> 7);
+    result[pos+1] = dst[pos+1] < 128 ? dst[pos+1] * src[pos+1] >> 7
+            : 255 - ((255 - dst[pos+1]) * (255 - src[pos+1]) >> 7);
+    result[pos+2] = dst[pos+2] < 128 ? dst[pos+2] * src[pos+2] >> 7
+            : 255 - ((255 - dst[pos+2]) * (255 - src[pos+2]) >> 7);
+    result[pos+3] = Math.min(255, src[pos+3] + dst[pos+3] - (src[pos+3] * dst[pos+3]) / 255);
+};
+
+BlendModes.hardlight = function(src,dst,result,pos){
+    result[pos+0] = src[pos+0] < 128 ? dst[pos+0] * src[pos+0] >> 7
+            : 255 - ((255 - src[pos+0]) * (255 - dst[pos+0]) >> 7);
+    result[pos+1] = src[pos+1] < 128 ? dst[pos+1] * src[pos+1] >> 7
+            : 255 - ((255 - src[pos+1]) * (255 - dst[pos+1]) >> 7);
+    result[pos+2] = src[pos+2] < 128 ? dst[pos+2] * src[pos+2] >> 7
+            : 255 - ((255 - src[pos+2]) * (255 - dst[pos+2]) >> 7);
+    result[pos+3] = Math.min(255, src[pos+3] + dst[pos+3] - (src[pos+3] * dst[pos+3]) / 255);
+};
+
+BlendModes._list = [
+                    BlendModes.normal,
+                    BlendModes.normal,
+                    BlendModes.layer,
+                    BlendModes.multiply,
+                    BlendModes.screen,
+                    BlendModes.lighten,
+                    BlendModes.darken,
+                    BlendModes.difference,
+                    BlendModes.add,
+                    BlendModes.subtract,
+                    BlendModes.invert,
+                    BlendModes.alpha,
+                    BlendModes.erase,
+                    BlendModes.overlay,
+                    BlendModes.hardlight                    
+                   ];
+                
+BlendModes.blendData = function(srcPixel,dstPixel,retData,modeIndex){    
+  var result = [];
+  var retPixel = [];
+  var alpha = 1.0;  
+  for(var i=0;i<retData.length;i+=4){      
+      this._list[modeIndex](srcPixel,dstPixel,result,i);      
+      
+      retPixel[i+0] = this._cut(dstPixel[i+0] + (result[i+0] - dstPixel[i+0]) * alpha);
+      retPixel[i+1] = this._cut(dstPixel[i+1] + (result[i+1] - dstPixel[i+1]) * alpha);
+      retPixel[i+2] = this._cut(dstPixel[i+2] + (result[i+2] - dstPixel[i+2]) * alpha);
+      retPixel[i+3] = this._cut(dstPixel[i+3] + (result[i+3] - dstPixel[i+3]) * alpha);
+
+      var af = srcPixel[i+3] / 255;
+      retData[i+0] =  this._cut((1 - af) * dstPixel[i+0] + af * retPixel[i+0]);
+      retData[i+1] =  this._cut((1 - af) * dstPixel[i+1] + af * retPixel[i+1]);
+      retData[i+2] =  this._cut((1 - af) * dstPixel[i+2] + af * retPixel[i+2]);
+      retData[i+3] =  this._cut((1 - af) * dstPixel[i+3] + af * retPixel[i+3]);   
+  }  
+};
+
+BlendModes.blendCanvas = function(src,dst,result,modeIndex){
+    var width = src.width;
+    var height = src.height;
+    var rctx = result.getContext("2d");
+    var sctx = src.getContext("2d");
+    var dctx = dst.getContext("2d");
+    var ridata = rctx.getImageData(0,0,width,height);
+    var sidata = sctx.getImageData(0,0,width,height);
+    var didata = dctx.getImageData(0,0,width,height);
+    
+    this.blendData(sidata.data,didata.data,ridata.data,modeIndex);
+    rctx.putImageData(ridata,0,0);
+};

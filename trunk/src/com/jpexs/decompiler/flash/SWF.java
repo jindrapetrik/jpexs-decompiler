@@ -1509,8 +1509,20 @@ public final class SWF implements TreeItem, Timelined {
                             fos.write(Utf8Helper.getBytes("frames.push(" + i + ");\r\n"));
                         }
                         fos.write(Utf8Helper.getBytes("\r\n"));
+                        RGB backgroundColor = new RGB(255,255,255);
+                        for(Tag t:fswf.tags){
+                            if(t instanceof SetBackgroundColorTag){
+                                SetBackgroundColorTag sb=(SetBackgroundColorTag)t;
+                                backgroundColor = sb.backgroundColor;
+                            }
+                        }
+                        
+                        fos.write(Utf8Helper.getBytes("var backgroundColor = \""+backgroundColor.toHexRGB()+"\";\r\n"));
+                        
                         fos.write(Utf8Helper.getBytes("function nextFrame(ctx,ctrans){\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tctx.clearRect(0,0," + width + "," + height + ");\r\n"));
+                        //fos.write(Utf8Helper.getBytes("\tctx.clearRect(0,0," + width + "," + height + ");\r\n"));
+                        fos.write(Utf8Helper.getBytes("\tctx.fillStyle = backgroundColor;\r\n"));
+                        fos.write(Utf8Helper.getBytes("\tctx.fillRect(0,0," + width + "," + height + ");\r\n"));
                         fos.write(Utf8Helper.getBytes("\tframe = (frame+1)%frames.length;\r\n"));
                         fos.write(Utf8Helper.getBytes("\t" + currentName + "(ctx,ctrans,frames[frame],0);\r\n"));
                         fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
@@ -2297,12 +2309,12 @@ public final class SWF implements TreeItem, Timelined {
                             ctrans.getRedMulti()+","+ctrans.getGreenMulti()+","+ctrans.getBlueMulti()+","+ctrans.getAlphaMulti()
                             +"))";
                 }
-                sb.append("\t\t\t").append("place(\"").append(getTypePrefix(character)).append(layer.characterId).append("\",canvas,ctx,[").append(placeMatrix.scaleX).append(",")
+                sb.append("\t\t\tplace(\"").append(getTypePrefix(character)).append(layer.characterId).append("\",canvas,ctx,[").append(placeMatrix.scaleX).append(",")
                                                                 .append(placeMatrix.rotateSkew0).append(",")
                                                                 .append(placeMatrix.rotateSkew1).append(",")
                                                                 .append(placeMatrix.scaleY).append(",")
                                                                 .append(placeMatrix.translateX).append(",")
-                                                                .append(placeMatrix.translateY).append("],").append(ctrans_str).append(",").append(f).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(");\r\n");                                
+                                                                .append(placeMatrix.translateY).append("],").append(ctrans_str).append(",").append(""+(layer.blendMode<1?1:layer.blendMode)).append(",").append(f).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(");\r\n");                                
                 
                 if(layer.filters!=null){
                     for(FILTER filter:layer.filters){
