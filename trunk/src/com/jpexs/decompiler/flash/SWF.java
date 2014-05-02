@@ -1466,7 +1466,12 @@ public final class SWF implements TreeItem, Timelined {
 
                         for (int c : library) {
                             CharacterTag ch = fswf.characters.get(c);
-                            if (ch instanceof ImageTag) {
+                            if(ch instanceof FontTag){
+                                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ch,textColor){\r\n"));
+                                fos.write(Utf8Helper.getBytes(((FontTag) ch).toHtmlCanvas(1)));
+                                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+                            }
+                            else if (ch instanceof ImageTag) {
                                 ImageTag image = (ImageTag) ch;
                                 String format = image.getImageFormat();
                                 InputStream imageStream = image.getImageData();
@@ -2281,26 +2286,24 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append("\t\t\tfctx.applyTransforms(ctx._matrices);\r\n");
                     sb.append("\t\t\tctx = fctx;\r\n");                    
                 }
-                sb.append("\t\t\tctx.save();\r\n");
-                sb.append("\t\t\tctx.transform(").append(Helper.doubleStr(placeMatrix.scaleX)).append(",");
-                sb.append(Helper.doubleStr(placeMatrix.rotateSkew0)).append(",");
-                sb.append(Helper.doubleStr(placeMatrix.rotateSkew1)).append(",");
-                sb.append(Helper.doubleStr(placeMatrix.scaleY)).append(",");
-                sb.append(Helper.doubleStr(placeMatrix.translateX)).append(",");
-                sb.append(Helper.doubleStr(placeMatrix.translateY));
-                sb.append(");\r\n");
+                
                 ColorTransform ctrans =layer.colorTransForm;
+                String ctrans_str = "ctrans";
                 if(ctrans==null){
                     ctrans = new ColorTransform();
-                     sb.append("\t\t\tvar nctrans = ctrans;\r\n");
                 }else{
-                    sb.append("\t\t\tvar nctrans = ctrans.merge(new cxform("+
+                    ctrans_str = "ctrans.merge(new cxform("+
                             ctrans.getRedAdd()+","+ctrans.getGreenAdd()+","+ctrans.getBlueAdd()+","+ctrans.getAlphaAdd()+","+
                             ctrans.getRedMulti()+","+ctrans.getGreenMulti()+","+ctrans.getBlueMulti()+","+ctrans.getAlphaMulti()
-                            +"));\r\n");
+                            +"))";
                 }
-                sb.append("\t\t\t").append(getTypePrefix(character)).append(layer.characterId).append("(ctx,nctrans,").append(f).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(");\r\n");
-                sb.append("\t\t\tctx.restore();\r\n");
+                sb.append("\t\t\t").append("place(\"").append(getTypePrefix(character)).append(layer.characterId).append("\",canvas,ctx,[").append(placeMatrix.scaleX).append(",")
+                                                                .append(placeMatrix.rotateSkew0).append(",")
+                                                                .append(placeMatrix.rotateSkew1).append(",")
+                                                                .append(placeMatrix.scaleY).append(",")
+                                                                .append(placeMatrix.translateX).append(",")
+                                                                .append(placeMatrix.translateY).append("],").append(ctrans_str).append(",").append(f).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(");\r\n");                                
+                
                 if(layer.filters!=null){
                     for(FILTER filter:layer.filters){
                         if(filter instanceof COLORMATRIXFILTER){

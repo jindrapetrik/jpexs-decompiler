@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
@@ -29,6 +30,7 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -314,6 +316,21 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     @Override
     public String toHtmlCanvas(double unitDivisor) {
-        return ""; //TODO
+        List<SHAPE> shapes = getGlyphShapeTable();
+        StringBuilder sb=new StringBuilder();
+        sb.append("\tdefaultFill = textColor;\r\n");
+        sb.append("\tswitch(ch){\r\n");        
+        for(int i=0;i<shapes.size();i++){
+            char c= glyphToChar(i);
+            String cs = ""+c;
+            cs = cs.replace("\"", "\\\"");
+            sb.append("\t\tcase \"").append(cs).append("\":\r\n");
+            CanvasShapeExporter exporter = new CanvasShapeExporter(null, unitDivisor, swf, shapes.get(i), new ColorTransform(), 0, 0);
+                    exporter.export();
+            sb.append("\t\t").append(exporter.getShapeData().replaceAll("\r\n", "\r\n\t\t"));
+            sb.append("\tbreak;\r\n");
+        }       
+        sb.append("\t}\r\n"); 
+        return sb.toString();
     }
 }

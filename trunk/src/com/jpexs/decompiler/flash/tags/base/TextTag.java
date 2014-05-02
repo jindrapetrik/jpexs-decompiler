@@ -320,9 +320,11 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         Color textColor = new Color(0, 0, 0);
         String ret = "";
         FontTag font = null;
+        int fontId = -1;
         int textHeight = 12;
         int x = 0;
-        int y = 0;
+        int y = 0;        
+        
         List<SHAPE> glyphs = new ArrayList<>();
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
@@ -334,6 +336,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
             }
             if (rec.styleFlagsHasFont) {
                 font = (FontTag) swf.characters.get(rec.fontId);
+                fontId = rec.fontId;
                 glyphs = font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }
@@ -346,17 +349,15 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
 
             double rat = textHeight / 1024.0 / font.getDivider();
 
+            
+            ret += "\tvar textColor = "+CanvasShapeExporter.color(textColor)+";\r\n";
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 Matrix mat = (new Matrix(textMatrix).concatenate(Matrix.getTranslateInstance(x, y))).concatenate(Matrix.getScaleInstance(rat));
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
                     ret += "\tctx.save();\r\n";
                     ret += "\tctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
-
-                    SHAPE shape = glyphs.get(entry.glyphIndex);
-                    CanvasShapeExporter exporter = new CanvasShapeExporter(new RGBA(textColor), unitDivisor, swf, shape, colorTransform, 0, 0);
-                    exporter.export();
-                    ret += exporter.getShapeData();
+                    ret += "\tfont"+fontId+"(ctx,\""+(""+font.glyphToChar(entry.glyphIndex)).replace("\"", "\\\"")+"\",textColor);\r\n";
                     ret += "\tctx.restore();\r\n";
                     x += entry.glyphAdvance;
                 }

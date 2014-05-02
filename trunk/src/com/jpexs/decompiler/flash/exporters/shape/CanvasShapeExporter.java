@@ -142,7 +142,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 + "\tvar imdata=ictx.getImageData(0,0,icanvas.width,icanvas.height);\r\n"
                 + "\tvar idata=imdata.data;\r\n"
                 + "\tfor(var i=0;i<idata.length;i+=4){\r\n"
-                + "\t\tvar c=this.apply([idata[i],idata[i+1],idata[i+2],idata[i+3]/255]);"
+                + "\t\tvar c=this.apply([idata[i],idata[i+1],idata[i+2],idata[i+3]/255]);\r\n"
                 + "\t\tidata[i] = c[0];\r\n"
                 + "\t\tidata[i+1] = c[1];\r\n"
                 + "\t\tidata[i+2] = c[2];\r\n"
@@ -163,6 +163,13 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 + "); return r;};\r\n"   
                 + "this.isEmpty = function(){return this.r_add==0 && this.g_add==0 && this.b_add==0 && this.a_add==0 && this.r_mult==255 && this.g_mult==255 && this.b_mult==255 && this.a_mult==255};"                
                 + "};\r\n"
+                + "\r\n"
+                + "var place = function(obj,canvas,ctx,matrix,ctrans,frame,ratio){\r\n"
+                + "\tctx.save();\r\n"
+                + "\tctx.transform(matrix[0],matrix[1],matrix[2],matrix[3],matrix[4],matrix[5]);\r\n"                
+                + "\teval(obj+\"(ctx,ctrans,frame,ratio);\");\r\n"
+                + "\tctx.restore();\r\n"
+                + "}\r\n"
                 + "var tocolor = function(c){var r= \"rgba(\"+c[0]+\",\"+c[1]+\",\"+c[2]+\",\"+c[3]+\")\"; return r;};\r\n"
                 + "var ctrans = new cxform(0,0,0,0,255,255,255,255);\r\n";
     }
@@ -242,9 +249,10 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     public void beginFill(RGB color) {
         finalizePath();
         if (color == null) {
-            color = basicFill;
+            fillData += "\tctx.fillStyle=defaultFill;\r\n";
+        }else{
+            fillData += "\tctx.fillStyle=" + color(color) + ";\r\n";
         }
-        fillData += "\tctx.fillStyle=" + color(color) + ";\r\n";
     }
 
     @Override
@@ -339,7 +347,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                     fillMatrix = matrix;
                 }
 
-                fillData += "\tvar fimg = ctrans.applyToImage(image" + bitmapId + ");";
+                fillData += "\tvar fimg = ctrans.applyToImage(image" + bitmapId + ");\r\n";
                 fillData += "\tvar pat=ctx.createPattern(fimg,\"repeat\");\r\n";
                 fillData += "\tctx.fillStyle = pat;\r\n";
             }

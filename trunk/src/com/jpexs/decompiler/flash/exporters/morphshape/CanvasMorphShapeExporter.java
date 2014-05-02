@@ -261,7 +261,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
                 }
 
-                fillData += "\tvar fimg = ctrans.applyToImage(image" + bitmapId + ");";
+                fillData += "\tvar fimg = ctrans.applyToImage(image" + bitmapId + ");\r\n";
                 fillData += "\tvar pat=ctx.createPattern(fimg,\"repeat\");\r\n";                
                 fillData += "\tctx.fillStyle = pat;\r\n";
             }
