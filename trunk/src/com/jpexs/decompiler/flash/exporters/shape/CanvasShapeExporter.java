@@ -172,7 +172,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 + "\t\tvar ncanvas = Filters.createCanvas(canvas.width,canvas.height);\r\n"
                 + "\t\tctx = ncanvas.getContext(\"2d\");\r\n"
                 + "\t\tenhanceContext(ctx);\r\n"
-                + "\t\tctx.applyTransforms(oldctx._matrices);"
+                + "\t\tctx.applyTransforms(oldctx._matrices);\r\n"
                 + "\t}\r\n"         
                 + "\tif(blendMode > 1){\r\n"
                 + "\t\teval(obj+\"(ctx,new cxform(0,0,0,0,255,255,255,255),frame,ratio);\");\r\n"
