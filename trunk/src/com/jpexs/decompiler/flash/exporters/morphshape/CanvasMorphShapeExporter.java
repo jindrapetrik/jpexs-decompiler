@@ -63,6 +63,9 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     protected Matrix lineFillMatrix = null;
     protected Matrix lineFillMatrixEnd = null;
     protected int lineRepeatCnt = 0;
+    
+    protected int fillWidth;
+    protected int fillHeight;
 
     public CanvasMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, ColorTransform colorTransform, double unitDivisor, int deltaX, int deltaY) {
         super(shape, endShape, colorTransform);
@@ -72,11 +75,11 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         this.swf = swf;
     }
 
-    public String getHtml() {
+    public String getHtml(String needed) {
         int width = (int) (Math.max(shape.getBounds().getWidth(), shapeEnd.getBounds().getWidth()) / unitDivisor);
         int height = (int) (Math.max(shape.getBounds().getHeight(), shapeEnd.getBounds().getHeight()) / unitDivisor);
 
-        return CanvasShapeExporter.getHtmlPrefix(width, height) + getJsPrefix() + shapeData + getJsSuffix(width, height) + CanvasShapeExporter.getHtmlSuffix();
+        return CanvasShapeExporter.getHtmlPrefix(width, height) + getJsPrefix() + needed + CanvasShapeExporter.getDrawJs(width,height,shapeData) + getJsSuffix(width, height) + CanvasShapeExporter.getHtmlSuffix();
     }
 
     public static String getJsSuffix(int width, int height) {
@@ -216,6 +219,9 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 ImageTag i = (ImageTag) t;
                 if (i.getCharacterId() == bitmapId) {
                     image = i;
+                    SerializableImage img=i.getImage();
+                    fillWidth = img.getWidth();
+                    fillHeight = img.getHeight();
                     break;
                 }
             }
@@ -464,6 +470,15 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 pathData += "\tctx.save();\r\n";
                 pathData += "\tctx.clip();\r\n";
                 pathData += "\tctx.transform(" + useRatioDouble(fillMatrix.scaleX, fillMatrixEnd.scaleX) + "," + useRatioDouble(fillMatrix.rotateSkew0, fillMatrixEnd.rotateSkew0) + "," + useRatioDouble(fillMatrix.rotateSkew1, fillMatrixEnd.rotateSkew1) + "," + useRatioDouble(fillMatrix.scaleY, fillMatrixEnd.scaleY) + "," + useRatioDouble(fillMatrix.translateX, fillMatrixEnd.translateX) + "," + useRatioDouble(fillMatrix.translateY, fillMatrixEnd.translateY) + ");\r\n";
+                
+                if(fillWidth>0){//repeating bitmap glitch fix
+                    //make bitmap 1px wider
+                    double s_w = (fillWidth+1)/(double)fillWidth;
+                    double s_h = (fillHeight+1)/(double)fillHeight;
+                                       
+                    pathData += "\tctx.transform("+s_w+",0,0,"+s_h+",-0.5,-0.5);\r\n";
+                }
+                
                 pathData += fillData;
                 pathData += "\tctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
                 pathData += "\tctx.restore();\r\n";
@@ -494,6 +509,9 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         lineLastRadColor = null;
         lineFillMatrix = null;
         lineFillMatrixEnd = null;
+        
+        fillWidth = 0;
+        fillHeight = 0;
     }
 
     private String useRatioPos(double a, double b) {

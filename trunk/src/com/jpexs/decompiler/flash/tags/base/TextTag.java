@@ -357,7 +357,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                     // shapeNum: 1
                     ret += "\tctx.save();\r\n";
                     ret += "\tctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
-                    ret += "\tfont"+fontId+"(ctx,\""+(""+font.glyphToChar(entry.glyphIndex)).replace("\"", "\\\"")+"\",textColor);\r\n";
+                    ret += "\tfont"+fontId+"(ctx,\""+(""+font.glyphToChar(entry.glyphIndex)).replace("\\", "\\\\").replace("\"", "\\\"")+"\",textColor);\r\n";
                     ret += "\tctx.restore();\r\n";
                     x += entry.glyphAdvance;
                 }

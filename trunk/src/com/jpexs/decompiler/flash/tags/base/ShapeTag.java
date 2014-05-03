@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  *
@@ -65,5 +66,14 @@ public abstract class ShapeTag extends CharacterTag implements BoundedTag, Drawa
         cse.export();
         return cse.getShapeData();
     }
+
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        Set<Integer> ret= super.getNeededCharacters();
+        ret.addAll(getShapes().getNeededCharacters());
+        return ret;
+    }
+    
+    
 
 }

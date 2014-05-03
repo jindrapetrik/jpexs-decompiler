@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -52,4 +54,14 @@ public class LINESTYLE2 extends LINESTYLE implements Serializable {
     @Conditional(value = "joinStyle", options = MITER_JOIN)
     public int miterLimitFactor;
     public FILLSTYLE fillType;
+    
+    
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        HashSet<Integer> ret = new HashSet<>();
+        if(hasFillFlag){
+            ret.addAll(fillType.getNeededCharacters());
+        }
+        return ret;
+    }
 }

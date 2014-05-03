@@ -30,12 +30,16 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -87,7 +91,11 @@ public class MorphShapeExporter {
                                     int deltaY = -Math.min(mst.getStartBounds().Ymin, mst.getEndBounds().Ymin);
                                     CanvasMorphShapeExporter cse = new CanvasMorphShapeExporter(((Tag) mst).getSwf(), mst.getShapeAtRatio(0), mst.getShapeAtRatio(DefineMorphShapeTag.MAX_RATIO), new CXFORMWITHALPHA(), SWF.unitDivisor, deltaX, deltaY);
                                     cse.export();
-                                    fos.write(Utf8Helper.getBytes(cse.getHtml()));
+                                    Set<Integer> needed=new HashSet<>();
+                                    SWF.getNeededCharacters(((Tag)mst).getSwf(), ((CharacterTag)mst).getCharacterId(), needed);
+                                    ByteArrayOutputStream baos=new ByteArrayOutputStream();
+                                    SWF.writeLibrary(((Tag)mst).getSwf(), needed, baos);
+                                    fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(),"UTF-8"))));
                                 }
                                 break;
                         }
@@ -96,6 +104,12 @@ public class MorphShapeExporter {
                 }, handler).run();
                 ret.add(file);
             }
+        }
+        
+        if(settings.mode == MorphShapeExportMode.CANVAS){
+            File fcanvas = new File(foutdir + File.separator + "canvas.js");
+            Helper.saveStream(SWF.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/canvas.js"), fcanvas);
+            ret.add(fcanvas);
         }
         return ret;
     }

@@ -61,6 +61,9 @@ public class Timeline {
                 if (depth > max_depth) {
                     max_depth = depth;
                 }
+                if(f.layers.get(depth).clipDepth > max_depth){
+                    max_depth = f.layers.get(depth).clipDepth;
+                }
             }
         }
         return max_depth;

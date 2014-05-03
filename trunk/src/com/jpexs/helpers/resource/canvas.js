@@ -760,3 +760,194 @@ BlendModes.blendCanvas = function(src,dst,result,modeIndex){
     this.blendData(sidata.data,didata.data,ridata.data,modeIndex);
     rctx.putImageData(ridata,0,0);
 };
+
+
+var enhanceContext = function(context) {
+  var m = [1,0,0,1,0,0];
+  context._matrices = [m];
+
+  //the stack of saved matrices
+  context._savedMatrices = [[m]];
+
+  var super_ = context.__proto__;
+  context.__proto__ = ({
+
+    save: function() {
+      this._savedMatrices.push(this._matrices.slice());
+      super_.save.call(this);
+    },
+
+    //if the stack of matrices we're managing doesn't have a saved matrix,
+    //we won't even call the context's original `restore` method.
+    restore: function() {
+      if(this._savedMatrices.length == 0)
+        return;
+      super_.restore.call(this);
+      this._matrices = this._savedMatrices.pop();
+    },
+
+    scale: function(x, y) {
+      super_.scale.call(this, x, y);
+    },
+
+    rotate: function(theta) {
+      super_.rotate.call(this, theta);
+    },
+
+    translate: function(x, y) {
+      super_.translate.call(this, x, y);
+    },
+
+    transform: function(a, b, c, d, e, f) {
+      this._matrices.push([a,b,c,d,e,f]);
+      super_.transform.call(this, a, b, c, d, e, f);
+    },
+
+    setTransform: function(a, b, c, d, e, f) {
+      this._matrices=[];
+      this._matrices.push([a,b,c,d,e,f]);
+      super_.setTransform.call(this, a, b, c, d, e, f);
+    },
+
+    resetTransform: function() {
+      super_.resetTransform.call(this);
+    },
+
+    applyTransforms: function(m) {
+      this.setTransform(1,0,0,1,0,0);      for(var i=0;i<m.length;i++){this.transform(m[i][0],m[i][1],m[i][2],m[i][3],m[i][4],m[i][5]);}
+    },
+
+    __proto__: super_
+  });
+
+  return context;  
+};
+var cxform = function(r_add,g_add,b_add,a_add,r_mult,g_mult,b_mult,a_mult){
+        this.r_add = r_add;
+        this.g_add = g_add;
+        this.b_add = b_add;
+        this.a_add = a_add;
+        this.r_mult = r_mult;
+        this.g_mult = g_mult;
+        this.b_mult = b_mult;
+        this.a_mult = a_mult;
+        this._cut = function(v,min, max) {
+            if(v<min) v = min;
+            if(v>max) v = max;
+            return v;
+        };
+        this.apply = function(c){
+            var d=c;
+            d[0] = this._cut(d[0]*this.r_mult/255+this.r_add,0,255);
+            d[1] = this._cut(d[1]*this.g_mult/255+this.g_add,0,255);
+            d[2] = this._cut(d[2]*this.b_mult/255+this.b_add,0,255);
+            d[3] = this._cut(d[3]*this.a_mult/255+this.a_add/255,0,1);
+            return d;
+        };
+        this.applyToImage=function(fimg){
+                if(this.isEmpty()){
+                    return fimg
+                };
+                var icanvas = Filters.createCanvas(fimg.width,fimg.height);
+                var ictx = icanvas.getContext("2d");
+                ictx.drawImage(fimg,0,0);
+                var imdata=ictx.getImageData(0,0,icanvas.width,icanvas.height);
+                var idata=imdata.data;
+                for(var i=0;i<idata.length;i+=4){
+                        var c=this.apply([idata[i],idata[i+1],idata[i+2],idata[i+3]/255]);
+                        idata[i] = c[0];
+                        idata[i+1] = c[1];
+                        idata[i+2] = c[2];
+                        idata[i+3] = Math.round(c[3]*255);
+                }
+                ictx.putImageData(imdata,0,0);
+                return icanvas;};
+        this.merge = function(cx) {
+            return new cxform(this.r_add + cx.r_add,this.g_add + cx.g_add,this.b_add + cx.b_add,this.a_add + cx.a_add,this.r_mult * cx.r_mult / 255,this.g_mult * cx.g_mult / 255,this.b_mult * cx.b_mult / 255,this.a_mult * cx.a_mult / 255);
+        };
+        this.isEmpty = function(){
+            return this.r_add==0 && this.g_add==0 && this.b_add==0 && this.a_add==0 && this.r_mult==255 && this.g_mult==255 && this.b_mult==255 && this.a_mult==255;
+        };
+};
+
+var place = function(obj,canvas,ctx,matrix,ctrans,blendMode,frame,ratio,time){
+	ctx.save();
+	ctx.transform(matrix[0],matrix[1],matrix[2],matrix[3],matrix[4],matrix[5]);
+	if(blendMode>1){
+		var oldctx = ctx;
+		var ncanvas = Filters.createCanvas(canvas.width,canvas.height);
+		ctx = ncanvas.getContext("2d");
+		enhanceContext(ctx);
+		ctx.applyTransforms(oldctx._matrices);
+	}
+	if(blendMode > 1){
+		eval(obj+"(ctx,new cxform(0,0,0,0,255,255,255,255),frame,ratio,time);");
+	}else{
+		eval(obj+"(ctx,ctrans,frame,ratio,time);");
+	}
+	if(blendMode > 1){
+		BlendModes.blendCanvas(ctrans.applyToImage(ncanvas),canvas,canvas,blendMode);
+		ctx = oldctx;
+	}
+	ctx.restore();
+}
+var tocolor = function(c){var r= "rgba("+c[0]+","+c[1]+","+c[2]+","+c[3]+")"; return r;};
+
+
+
+window.addEventListener('load',function(){
+   
+   var wsize = document.getElementById("width_size");
+   var hsize = document.getElementById("height_size");
+   var bsize = document.getElementById("both_size");
+   bsize.addEventListener('mousedown', initDragBoth, false);
+   wsize.addEventListener('mousedown', initDragWidth, false);
+   hsize.addEventListener('mousedown', initDragHeight, false);
+});
+
+var startWidth = 0;
+var startHeight = 0;
+var dragWidth = false;
+var dragHeight = false;
+
+function initDragWidth(e) {
+    dragWidth = true;
+    dragHeight = false;
+    initDrag(e);
+}
+
+function initDragHeight(e) {
+    dragWidth = false;
+    dragHeight = true;
+    initDrag(e);
+}
+
+function initDragBoth(e) {
+    dragWidth = true;
+    dragHeight = true;
+    initDrag(e);
+}
+
+function initDrag(e) {
+   startX = e.clientX;
+   startY = e.clientY;
+   startWidth = canvas.width;
+   startHeight = canvas.height;
+   document.documentElement.addEventListener('mousemove', doDrag, false);
+   document.documentElement.addEventListener('mouseup', stopDrag, false);
+}
+
+function doDrag(e) {
+   if(dragWidth){
+        canvas.width = (startWidth + e.clientX - startX);
+   }
+   if(dragHeight){
+        canvas.height = (startHeight + e.clientY - startY);
+   }
+   drawFrame();
+}
+
+function stopDrag(e) {
+    document.documentElement.removeEventListener('mousemove', doDrag, false);
+    document.documentElement.removeEventListener('mouseup', stopDrag, false);
+}

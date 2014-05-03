@@ -35,6 +35,7 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
     public Set<Integer> getNeededCharacters() {
         Set<Integer> ret = new HashSet<>();
         ret.addAll(fillStyles.getNeededCharacters());
+        ret.addAll(lineStyles.getNeededCharacters());
         for (SHAPERECORD r : shapeRecords) {
             ret.addAll(r.getNeededCharacters());
         }

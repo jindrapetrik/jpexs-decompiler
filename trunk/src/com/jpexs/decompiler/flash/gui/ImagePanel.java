@@ -402,7 +402,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         }
     }
 
-    public void setTimelined(final Timelined drawable, final SWF swf, int frame) {
+    public synchronized void setTimelined(final Timelined drawable, final SWF swf, int frame) {
         pause();
         if (drawable instanceof ButtonTag) {
             frame = ButtonTag.FRAME_UP;
@@ -433,7 +433,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             timer.cancel();
         }
         timelined = null;
-        loaded = true;
+        loaded = true;        
         stillFrame = true;
         iconPanel.setImg(image);
         iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
@@ -474,7 +474,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
 
     private void nextFrame() {
         drawFrame();
-        int newframe = frame == timelined.getTimeline().frames.size() - 1 ? 0 : frame + 1;
+        int newframe = (frame + 1) % timelined.getTimeline().frames.size();
         if (stillFrame) {
             newframe = frame;
         }
@@ -530,12 +530,12 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
         return img;
     }
 
-    private void drawFrame() {
+    private synchronized void drawFrame() {
         if (timelined == null) {
             return;
         }
         Timeline timeline = timelined.getTimeline();
-        if (timeline.getFrameCount() <= frame) {
+        if (frame>=timeline.frames.size()) {
             return;
         }
 

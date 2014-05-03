@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -33,4 +35,8 @@ public class LINESTYLE implements Serializable {
 
     @ConditionalType(tags = {DefineShape3Tag.ID, DefineShape4Tag.ID}, type = RGBA.class)
     public RGB color;
+    
+    public Set<Integer> getNeededCharacters() {
+        return new HashSet<>();
+    }
 }

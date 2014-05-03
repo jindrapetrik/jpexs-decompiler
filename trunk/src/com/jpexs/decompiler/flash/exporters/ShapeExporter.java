@@ -32,13 +32,17 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.imageio.ImageIO;
 
 /**
@@ -108,7 +112,11 @@ public class ShapeExporter {
                                     int deltaY = -shp.getBounds().Ymin;
                                     CanvasShapeExporter cse = new CanvasShapeExporter(null, SWF.unitDivisor, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
                                     cse.export();
-                                    fos.write(Utf8Helper.getBytes(cse.getHtml()));
+                                    Set<Integer> needed=new HashSet<>();
+                                    SWF.getNeededCharacters(st.getSwf(), st.getCharacterId(), needed);
+                                    ByteArrayOutputStream baos=new ByteArrayOutputStream();
+                                    SWF.writeLibrary(st.getSwf(), needed, baos);
+                                    fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(),"UTF-8"))));
                                 }
                                 break;
                         }
@@ -117,6 +125,11 @@ public class ShapeExporter {
                 }, handler).run();
                 ret.add(file);
             }
+        }
+        if(settings.mode == ShapeExportMode.CANVAS){
+            File fcanvas = new File(foutdir + File.separator + "canvas.js");
+            Helper.saveStream(SWF.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/canvas.js"), fcanvas);
+            ret.add(fcanvas);
         }
         return ret;
     }

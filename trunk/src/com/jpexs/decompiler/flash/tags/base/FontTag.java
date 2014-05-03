@@ -323,7 +323,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         for(int i=0;i<shapes.size();i++){
             char c= glyphToChar(i);
             String cs = ""+c;
-            cs = cs.replace("\"", "\\\"");
+            cs = cs.replace("\\", "\\\\").replace("\"", "\\\"");
             sb.append("\t\tcase \"").append(cs).append("\":\r\n");
             CanvasShapeExporter exporter = new CanvasShapeExporter(null, unitDivisor, swf, shapes.get(i), new ColorTransform(), 0, 0);
                     exporter.export();

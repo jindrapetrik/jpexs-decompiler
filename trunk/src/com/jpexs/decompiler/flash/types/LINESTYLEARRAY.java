@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.types;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -25,4 +27,12 @@ import java.io.Serializable;
 public class LINESTYLEARRAY implements Serializable {
 
     public LINESTYLE[] lineStyles = new LINESTYLE[0];
+    
+    public Set<Integer> getNeededCharacters() {
+        HashSet<Integer> ret = new HashSet<>();
+        for (LINESTYLE ls : lineStyles) {
+            ret.addAll(ls.getNeededCharacters());
+        }
+        return ret;
+    }
 }

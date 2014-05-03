@@ -57,135 +57,13 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected String lineLastRadColor = null;
     protected Matrix lineFillMatrix = null;
     protected int lineRepeatCnt = 0;
+    protected int fillWidth=0;
+    protected int fillHeight=0;
 
     public static String getJsPrefix() {
         return "<script>var canvas=document.getElementById(\"myCanvas\");\r\n"
                 + "var ctx=canvas.getContext(\"2d\");\r\n"
-                + "var enhanceContext = function(context) {\r\n"
-                + "  var m = [1,0,0,1,0,0];\r\n"
-                + "  context._matrices = [m];\r\n"
-                + "\r\n"
-                + "  //the stack of saved matrices\r\n"
-                + "  context._savedMatrices = [[m]];\r\n"
-                + "\r\n"
-                + "  var super_ = context.__proto__;\r\n"
-                + "  context.__proto__ = ({\r\n"
-                + "\r\n"
-                + "    save: function() {\r\n"
-                + "      this._savedMatrices.push(this._matrices.slice());\r\n"
-                + "      super_.save.call(this);\r\n"
-                + "    },\r\n"
-                + "\r\n"
-                + "    //if the stack of matrices we're managing doesn't have a saved matrix,\r\n"
-                + "    //we won't even call the context's original `restore` method.\r\n"
-                + "    restore: function() {\r\n"
-                + "      if(this._savedMatrices.length == 0)\r\n"
-                + "        return;\r\n"
-                + "      super_.restore.call(this);\r\n"
-                + "      this._matrices = this._savedMatrices.pop();\r\n"
-                + "    },\r\n"
-                + "\r\n"
-                + "    scale: function(x, y) {\r\n"
-                + "      super_.scale.call(this, x, y);\r\n"
-                + "    },\r\n"
-                + "\r\n"
-                + "    rotate: function(theta) {\r\n"
-                + "      super_.rotate.call(this, theta);\r\n"
-                + "    },\r\n"
-                + "\r\n"
-                + "    translate: function(x, y) {\r\n"
-                + "      super_.translate.call(this, x, y);\r\n"
-                + "    },\r\n"
-                + "\r\n"
-                + "    transform: function(a, b, c, d, e, f) {\r\n"
-                + "      this._matrices.push([a,b,c,d,e,f]);\r\n"
-                + "      super_.transform.call(this, a, b, c, d, e, f);\r\n"
-                + "    },\r\n"
-                + "\r\n"
-                + "    setTransform: function(a, b, c, d, e, f) {\r\n"
-                + "      this._matrices=[];\r\n"
-                + "      this._matrices.push([a,b,c,d,e,f]);\r\n"
-                + "      super_.setTransform.call(this, a, b, c, d, e, f);\r\n"
-                + "    },\r\n"
-                + "\r\n"
-                + "    resetTransform: function() {\r\n"
-                + "      super_.resetTransform.call(this);\r\n"
-                + "    },\r\n"
-                + "\r\n"
-                + "    applyTransforms: function(m) {\r\n"
-                + "      this.setTransform(1,0,0,1,0,0);"
-                + "      for(var i=0;i<m.length;i++){this.transform(m[i][0],m[i][1],m[i][2],m[i][3],m[i][4],m[i][5]);}\r\n"
-                + "    },\r\n"
-                + "\r\n"
-                + "    __proto__: super_\r\n"
-                + "  });\r\n"
-                + "\r\n"
-                + "  return context;  \r\n"
-                + "};\r\n"
-                + "\r\n"
-                + "enhanceContext(ctx);\r\n"
-                + "var cxform = function(r_add,g_add,b_add,a_add,r_mult,g_mult,b_mult,a_mult){\r\n"
-                + "this.r_add = r_add;this.g_add = g_add;this.b_add = b_add;this.a_add = a_add;\r\n"
-                + "this.r_mult = r_mult;this.g_mult = g_mult;this.b_mult = b_mult;this.a_mult = a_mult;\r\n"
-                + "this._cut = function(v,min, max) {if(v<min) v = min; if(v>max) v = max; return v;};\r\n"
-                + "this.apply = function(c){var d=c;\r\n"
-                + "d[0] = this._cut(d[0]*this.r_mult/255+this.r_add,0,255);\r\n"
-                + "d[1] = this._cut(d[1]*this.g_mult/255+this.g_add,0,255);\r\n"
-                + "d[2] = this._cut(d[2]*this.b_mult/255+this.b_add,0,255);\r\n"
-                + "d[3] = this._cut(d[3]*this.a_mult/255+this.a_add/255,0,1);\r\n"
-                + "return d;\r\n"
-                + "};\r\n"
-                + "this.applyToImage=function(fimg){if(this.isEmpty()){return fimg};\r\n"
-                + "\tvar icanvas = Filters.createCanvas(fimg.width,fimg.height);\r\n"
-                + "\tvar ictx = icanvas.getContext(\"2d\");\r\n"
-                + "\tictx.drawImage(fimg,0,0);\r\n"
-                + "\tvar imdata=ictx.getImageData(0,0,icanvas.width,icanvas.height);\r\n"
-                + "\tvar idata=imdata.data;\r\n"
-                + "\tfor(var i=0;i<idata.length;i+=4){\r\n"
-                + "\t\tvar c=this.apply([idata[i],idata[i+1],idata[i+2],idata[i+3]/255]);\r\n"
-                + "\t\tidata[i] = c[0];\r\n"
-                + "\t\tidata[i+1] = c[1];\r\n"
-                + "\t\tidata[i+2] = c[2];\r\n"
-                + "\t\tidata[i+3] = Math.round(c[3]*255);\r\n"
-                + "\t}\r\n"
-                + "\tictx.putImageData(imdata,0,0);\r\n"                        
-                + "\treturn icanvas;"                        
-                + "};\r\n"                                
-                + "this.merge = function(cx) {var r = new cxform("
-                + "this.r_add + cx.r_add,"
-                + "this.g_add + cx.g_add,"
-                + "this.b_add + cx.b_add,"
-                + "this.a_add + cx.a_add,"
-                + "this.r_mult * cx.r_mult / 255,"
-                + "this.g_mult * cx.g_mult / 255,"
-                + "this.b_mult * cx.b_mult / 255,"
-                + "this.a_mult * cx.a_mult / 255"
-                + "); return r;};\r\n"   
-                + "this.isEmpty = function(){return this.r_add==0 && this.g_add==0 && this.b_add==0 && this.a_add==0 && this.r_mult==255 && this.g_mult==255 && this.b_mult==255 && this.a_mult==255};"                
-                + "};\r\n"
-                + "\r\n"
-                + "var place = function(obj,canvas,ctx,matrix,ctrans,blendMode,frame,ratio){\r\n"
-                + "\tctx.save();\r\n"                
-                + "\tctx.transform(matrix[0],matrix[1],matrix[2],matrix[3],matrix[4],matrix[5]);\r\n"
-                + "\tif(blendMode>1){\r\n"
-                + "\t\tvar oldctx = ctx;\r\n"                
-                + "\t\tvar ncanvas = Filters.createCanvas(canvas.width,canvas.height);\r\n"
-                + "\t\tctx = ncanvas.getContext(\"2d\");\r\n"
-                + "\t\tenhanceContext(ctx);\r\n"
-                + "\t\tctx.applyTransforms(oldctx._matrices);\r\n"
-                + "\t}\r\n"         
-                + "\tif(blendMode > 1){\r\n"
-                + "\t\teval(obj+\"(ctx,new cxform(0,0,0,0,255,255,255,255),frame,ratio);\");\r\n"
-                + "\t}else{\r\n"                
-                + "\t\teval(obj+\"(ctx,ctrans,frame,ratio);\");\r\n"
-                + "\t}\r\n"
-                + "\tif(blendMode > 1){\r\n"                
-                + "\t\tBlendModes.blendCanvas(ctrans.applyToImage(ncanvas),canvas,canvas,blendMode);\r\n"                
-                + "\t\tctx = oldctx;\r\n"                  
-                + "\t}\r\n"                                
-                + "\tctx.restore();\r\n"
-                + "}\r\n"
-                + "var tocolor = function(c){var r= \"rgba(\"+c[0]+\",\"+c[1]+\",\"+c[2]+\",\"+c[3]+\")\"; return r;};\r\n"
+                + "enhanceContext(ctx);\r\n"                            
                 + "var ctrans = new cxform(0,0,0,0,255,255,255,255);\r\n";
     }
 
@@ -194,12 +72,26 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 + "<html>\r\n"
                 + "<head>"
                 + "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"
+                + "<script type=\"text/javascript\" src=\"canvas.js\"></script>"
+                + "<style type=\"text/css\">"
+                + "#resizable {position:relative; display:inline-block; margin:0; padding:0;font-size:0px;} "
+                + "#width_size {width:10px; position:absolute; right:-5px; top:0px; bottom:0px; cursor:e-resize;"
+                + "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"+
+                "} "
+                + "#height_size {height:10px; position:absolute; bottom:-5px; left:0px; right:0px; cursor:n-resize;"+
+                "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"
+                +"} "
+                + "#both_size {height:10px; width:10px; position:absolute; bottom:-5px; right:-5px; cursor:nw-resize;"+
+                "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"
+                +"} "
+                + "#myCanvas {margin:0; padding:0;} "
+                + "</style>"
                 + "</head>"
                 + "<body>\r\n"
                 + "\r\n"
-                + "<canvas id=\"myCanvas\" width=\"" + width + "\" height=\"" + height + "\" style=\"border:1px solid #c3c3c3;\">\r\n"
+                + "<div id=\"resizable\"><canvas id=\"myCanvas\" width=\"" + width + "\" height=\"" + height + "\" style=\"border:1px solid #c3c3c3;\">\r\n"
                 + "Your browser does not support the HTML5 canvas tag.\r\n"
-                + "</canvas>\r\n"
+                + "</canvas><div id=\"width_size\">&nbsp;</div><div id=\"height_size\">&nbsp;</div><div id=\"both_size\">&nbsp;</div></div>\r\n"
                 + "\r\n";
 
     }
@@ -212,13 +104,18 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         return "</body>\r\n"
                 + "</html>";
     }
+    
+    public static String getDrawJs(int width,int height,String data){
+        return "var originalWidth="+width+";\r\nvar originalHeight="+height+";\r\n function drawFrame(){\r\n"
+                + "\tctx.save();\r\n\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n"+data +"\tctx.restore();\r\n}\r\n\tdrawFrame();\r\n";
+    }
 
-    public String getHtml() {
+    public String getHtml(String needed) {
         RECT r = shape.getBounds();
         int width = (int) (r.getWidth() / unitDivisor);
         int height = (int) (r.getHeight() / unitDivisor);
-
-        return getHtmlPrefix(width, height) + getJsPrefix() + shapeData + getJsSuffix() + getHtmlSuffix();
+                
+        return getHtmlPrefix(width, height) + getJsPrefix() + needed +getDrawJs(width,height,shapeData) + getJsSuffix() + getHtmlSuffix();
     }
 
     public String getShapeData() {
@@ -344,6 +241,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 ImageTag i = (ImageTag) t;
                 if (i.getCharacterId() == bitmapId) {
                     image = i;
+                    SerializableImage im=i.getImage();
+                    fillWidth = im.getWidth();
+                    fillHeight = im.getHeight();
                     break;
                 }
             }
@@ -359,6 +259,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                     matrix.scaleY /= unitDivisor;
                     matrix.rotateSkew0 /= unitDivisor;
                     matrix.rotateSkew1 /= unitDivisor;
+                    matrix.translateX += deltaX / unitDivisor;
+                    matrix.translateY += deltaY / unitDivisor;
                     fillMatrix = matrix;
                 }
 
@@ -551,6 +453,13 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 pathData += "\tctx.save();\r\n";
                 pathData += "\tctx.clip();\r\n";
                 pathData += "\tctx.transform(" + Helper.doubleStr(fillMatrix.scaleX) + "," + Helper.doubleStr(fillMatrix.rotateSkew0) + "," + Helper.doubleStr(fillMatrix.rotateSkew1) + "," + Helper.doubleStr(fillMatrix.scaleY) + "," + Helper.doubleStr(fillMatrix.translateX) + "," + Helper.doubleStr(fillMatrix.translateY) + ");\r\n";
+                if(fillWidth>0){//repeating bitmap glitch fix
+                    //make bitmap 1px wider
+                    double s_w = (fillWidth+1)/(double)fillWidth;
+                    double s_h = (fillHeight+1)/(double)fillHeight;
+                    
+                    pathData += "\tctx.transform("+(s_w)+",0,0,"+s_h+",-0.5,-0.5);\r\n";
+                }
                 pathData += fillData;
                 pathData += "\tctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
                 pathData += "\tctx.restore();\r\n";
@@ -580,6 +489,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         lineFillData = null;
         lineLastRadColor = null;
         lineFillMatrix = null;
+        
+        fillWidth = 0;
+        fillHeight = 0;
     }
     
   
