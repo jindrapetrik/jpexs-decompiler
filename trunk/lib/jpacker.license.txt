@@ -1,0 +1,10 @@
+Packer version 3.0 (final)
+Copyright 2004-2007, Dean Edwards
+Web: http://dean.edwards.name/
+
+This software is licensed under the MIT license
+Web: http://www.opensource.org/licenses/mit-license
+
+Ported to Java by Pablo Santiago based on C# version by Jesse Hansen, <twindagger2k @ msn.com>
+Web: http://jpacker.googlecode.com/
+Email: pablo.santiago@gmail.com

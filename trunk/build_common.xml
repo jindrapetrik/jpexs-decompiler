@@ -304,6 +304,7 @@
         <copy todir="${DISTLIBRARIESFULLDIR}">
             <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
             <fileset dir="${LIBRARIESDIR}" includes="**/*.exe"/>
+            <fileset dir="${LIBRARIESDIR}" includes="**/*.txt"/>            
         </copy>
         
         
