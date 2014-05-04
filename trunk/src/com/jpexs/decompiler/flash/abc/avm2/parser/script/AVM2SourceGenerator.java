@@ -1664,6 +1664,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     if (ci > -1) {
                         MethodInfo pmi = a.method_info.get(a.instance_info.get(ci).iinit_index);
                         parentConsAC = pmi.param_types.length;
+                        if(pmi.flagHas_optional()){
+                            parentConsAC -= pmi.optional.length;
+                        }
 
                     }
                 }
