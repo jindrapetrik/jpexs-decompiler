@@ -689,12 +689,17 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
                     abc.script_info.remove(newIndex);
                     ((Tag) abc.parentTag).setModified(true);
-                    lastDecompiled = decompiledTextArea.getText();
-                    decompiledTextArea.setClassIndex(-1);
-                    navigator.setClassIndex(-1, oldIndex);
+                    lastDecompiled = decompiledTextArea.getText();                   
+                    mainPanel.updateClassesList();
+                    List<MyEntry<ClassPath,ScriptPack>> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
+                    if(!packs.isEmpty()){
+                        hilightScript(swf,packs.get(0).key.toString());
+                    }
+                    //decompiledTextArea.setClassIndex(-1);
+                    //navigator.setClassIndex(-1, oldIndex);
                     setDecompiledEditMode(false);
                     View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
-                    reload();
+                    //reload();
                 } catch (ParseException ex) {
                     ex.printStackTrace();
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
