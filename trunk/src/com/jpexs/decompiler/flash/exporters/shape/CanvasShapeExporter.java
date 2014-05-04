@@ -40,6 +40,11 @@ import java.awt.Color;
  */
 public class CanvasShapeExporter extends ShapeExporterBase {
 
+    protected static final String DRAW_COMMAND_M = "M";
+    protected static final String DRAW_COMMAND_L = "L";
+    protected static final String DRAW_COMMAND_Q = "Q";
+    protected String currentDrawCommand = "";
+    
     protected String pathData = "";
     protected String shapeData = "";
     protected String html = "";
@@ -81,9 +86,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 + "#height_size {height:10px; position:absolute; bottom:-5px; left:0px; right:0px; cursor:n-resize;"+
                 "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"
                 +"} "
-                + "#both_size {height:10px; width:10px; position:absolute; bottom:-5px; right:-5px; cursor:nw-resize;"+
+                /*+ "#both_size {height:10px; width:10px; position:absolute; bottom:-5px; right:-5px; cursor:nw-resize;"+
                 "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"
-                +"} "
+                +"} "*/
                 + "#myCanvas {margin:0; padding:0;} "
                 + "</style>"
                 + "</head>"
@@ -91,7 +96,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 + "\r\n"
                 + "<div id=\"resizable\"><canvas id=\"myCanvas\" width=\"" + width + "\" height=\"" + height + "\" style=\"border:1px solid #c3c3c3;\">\r\n"
                 + "Your browser does not support the HTML5 canvas tag.\r\n"
-                + "</canvas><div id=\"width_size\">&nbsp;</div><div id=\"height_size\">&nbsp;</div><div id=\"both_size\">&nbsp;</div></div>\r\n"
+                + "</canvas><div id=\"width_size\">&nbsp;</div><div id=\"height_size\">&nbsp;</div>"
+                //+ "<div id=\"both_size\">&nbsp;</div>"
+                + "</div>\r\n"
                 + "\r\n";
 
     }
@@ -374,36 +381,45 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
     @Override
     public void moveTo(double x, double y) {
+        currentDrawCommand = DRAW_COMMAND_M;
+        pathData += currentDrawCommand + " ";
         x += deltaX;
         y += deltaY;
-        pathData += "\tctx.moveTo("
-                + Helper.doubleStr(x / unitDivisor) + ","
-                + Helper.doubleStr(y / unitDivisor) + ");\r\n";
+        pathData += Helper.doubleStr(x / unitDivisor) + " "
+                + Helper.doubleStr(y / unitDivisor) + " ";
     }
 
     @Override
     public void lineTo(double x, double y) {
+        if (!currentDrawCommand.equals(DRAW_COMMAND_L)) {
+            currentDrawCommand = DRAW_COMMAND_L;
+            pathData += currentDrawCommand + " ";
+        }
         x += deltaX;
         y += deltaY;
-        pathData += "\tctx.lineTo(" + Helper.doubleStr(x / unitDivisor) + ","
-                + Helper.doubleStr(y / unitDivisor) + ");\r\n";
+        pathData += Helper.doubleStr(x / unitDivisor) + " "
+                + Helper.doubleStr(y / unitDivisor) + " ";
     }
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
+        if (!currentDrawCommand.equals(DRAW_COMMAND_Q)) {
+            currentDrawCommand = DRAW_COMMAND_Q;
+            pathData += currentDrawCommand + " ";
+        }
         controlX += deltaX;
         anchorX += deltaX;
         controlY += deltaY;
         anchorY += deltaY;
-        pathData += "\tctx.quadraticCurveTo(" + Helper.doubleStr(controlX / unitDivisor) + ","
-                + Helper.doubleStr(controlY / unitDivisor) + ","
-                + Helper.doubleStr(anchorX / unitDivisor) + ","
-                + Helper.doubleStr(anchorY / unitDivisor) + ");\r\n";
+        pathData += Helper.doubleStr(controlX / unitDivisor) + " "
+                + Helper.doubleStr(controlY / unitDivisor) + " "
+                + Helper.doubleStr(anchorX / unitDivisor) + " "
+                + Helper.doubleStr(anchorY / unitDivisor) + " ";
     }
 
     protected void finalizePath() {
         if (!"".equals(pathData)) {
-            pathData = "\tctx.beginPath();\r\n" + pathData + "\tctx.closePath();\r\n";
+            pathData = "\tdrawPath(ctx,\"" + pathData + "\");\r\n";
 
             if (lineFillData != null) {
                 String preLineFillData = "";

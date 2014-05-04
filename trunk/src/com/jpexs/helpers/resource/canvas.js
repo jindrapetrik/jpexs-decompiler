@@ -4,7 +4,7 @@
         
 Filters = {};        
         
-Filters.createCanvas = function(width,height){
+var createCanvas = function(width,height){
    var c = document.createElement("canvas");
    c.width = width;
    c.height = height;
@@ -202,19 +202,19 @@ Filters.blur = function(canvas,ctx, hRadius, vRadius, iterations, mask){
   
   var width = canvas.width;
   var height = canvas.height;
-  var retCanvas = Filters.createCanvas(width,height);
+  var retCanvas = createCanvas(width,height);
   var retImg = retCanvas.getContext("2d");
   retImg.putImageData(imgData,0,0);  
   return retCanvas;
 }
 
 Filters._moveRGB = function(width, height, rgb, deltaX, deltaY, fill) {
-        var img = Filters.createCanvas(width,height);
+        var img = createCanvas(width,height);
 
         var ig=img.getContext("2d");                        
         
         Filters._setRGB(ig,0,0,width,height,rgb);
-        var retImg = Filters.createCanvas(width,height);
+        var retImg = createCanvas(width,height);
         retImg.width = width;
         retImg.heigth = height;
         var g = retImg.getContext("2d");               
@@ -241,10 +241,10 @@ Filters._setRGB = function(ctx, x, y, width, height, data){
 Filters.gradientGlow = function(srcCanvas,src, blurX, blurY, angle, distance, colors, ratios, type, iterations, strength, knockout) {
    var width = canvas.width;
    var height = canvas.height;
-   var retCanvas = Filters.createCanvas(width,height);
+   var retCanvas = createCanvas(width,height);
    var retImg = retCanvas.getContext("2d");
 
-   var gradCanvas = Filters.createCanvas(256,1);
+   var gradCanvas = createCanvas(256,1);
 
    var gradient = gradCanvas.getContext("2d");
    var grd=ctx.createLinearGradient(0,0,255,0);
@@ -354,7 +354,7 @@ Filters.dropShadow = function(canvas,src, blurX, blurY, angle, distance, color,i
     shadow = Filters._moveRGB(width, height, shadow, moveX, moveY, inner ? colorFirst : colorAlpha);
     
     
-    var retCanvas = Filters.createCanvas(canvas.width,canvas.height);
+    var retCanvas = createCanvas(canvas.width,canvas.height);
     Filters._setRGB(retCanvas.getContext("2d"),0,0,width,height,shadow);
     if(blurX>0 || blurY > 0){
         retCanvas = Filters.blur(retCanvas,retCanvas.getContext("2d"), blurX, blurY, iterations,null);       
@@ -389,7 +389,7 @@ Filters._cut = function(a,min,max){
 Filters.gradientBevel = function(canvas, src, colors, ratios, blurX, blurY, strength, type, angle, distance, knockout, iterations) {
         var width = canvas.width;
         var height = canvas.height;
-        var retImg = Filters.createCanvas(width,height);
+        var retImg = createCanvas(width,height);
         var srcPixels = src.getImageData(0, 0, width, height).data;
 
         var revPixels = [];
@@ -400,7 +400,7 @@ Filters.gradientBevel = function(canvas, src, colors, ratios, blurX, blurY, stre
             revPixels[i+3] = 255-srcPixels[i+3];
         }    
 
-        var gradient = Filters.createCanvas(512, 1);            
+        var gradient = createCanvas(512, 1);            
         var gg = gradient.getContext("2d");
 
         var grd=ctx.createLinearGradient(0,0,511,0);
@@ -417,8 +417,8 @@ Filters.gradientBevel = function(canvas, src, colors, ratios, blurX, blurY, stre
         if(type!=Filters.OUTER){
             var hilightIm = Filters.dropShadow(canvas,src,0, 0, angle, distance, [255,0,0,1], true, iterations, strength, true);
             var shadowIm = Filters.dropShadow(canvas,src, 0, 0, angle + 180, distance, [0,0,255,1], true, iterations, strength, true);
-            var h2 = Filters.createCanvas(width,height);
-            var s2 = Filters.createCanvas(width,height);
+            var h2 = createCanvas(width,height);
+            var s2 = createCanvas(width,height);
             var hc=h2.getContext("2d");
             var sc=s2.getContext("2d");
             hc.drawImage(hilightIm,0,0);
@@ -434,8 +434,8 @@ Filters.gradientBevel = function(canvas, src, colors, ratios, blurX, blurY, stre
         if(type!=Filters.INNER){
             var hilightIm = Filters.dropShadow(canvas,src,0, 0, angle + 180, distance, [255,0,0,1], false, iterations, strength, true);
             var shadowIm = Filters.dropShadow(canvas,src, 0, 0, angle, distance, [0,0,255,1], false, iterations, strength, true);
-            var h2 = Filters.createCanvas(width,height);
-            var s2 = Filters.createCanvas(width,height);
+            var h2 = createCanvas(width,height);
+            var s2 = createCanvas(width,height);
             var hc=h2.getContext("2d");
             var sc=s2.getContext("2d");
             hc.drawImage(hilightIm,0,0);
@@ -532,7 +532,7 @@ Filters.convolution = function(canvas,ctx, weights, opaque) {
   // pad output by the convolution matrix
   var w = sw;
   var h = sh;
-  var outCanvas = Filters.createCanvas(w,h);
+  var outCanvas = createCanvas(w,h);
   var outCtx = outCanvas.getContext("2d");
   var output = outCtx.getImageData(0,0,w,h);
   var dst = output.data;
@@ -591,7 +591,7 @@ Filters.colorMatrix = function(canvas,ctx,m){
             data[b] = (m[10] * oR) + (m[11] * oG) + (m[12] * oB) + (m[13] * oA) + m[14];
             data[a] = (m[15] * oR) + (m[16] * oG) + (m[17] * oB) + (m[18] * oA) + m[19];
     }
-    var outCanvas = Filters.createCanvas(canvas.width,canvas.height);
+    var outCanvas = createCanvas(canvas.width,canvas.height);
     var outCtx = outCanvas.getContext("2d");
     outCtx.putImageData(pixels,0,0);
     return outCanvas;
@@ -848,7 +848,7 @@ var cxform = function(r_add,g_add,b_add,a_add,r_mult,g_mult,b_mult,a_mult){
                 if(this.isEmpty()){
                     return fimg
                 };
-                var icanvas = Filters.createCanvas(fimg.width,fimg.height);
+                var icanvas = createCanvas(fimg.width,fimg.height);
                 var ictx = icanvas.getContext("2d");
                 ictx.drawImage(fimg,0,0);
                 var imdata=ictx.getImageData(0,0,icanvas.width,icanvas.height);
@@ -875,7 +875,7 @@ var place = function(obj,canvas,ctx,matrix,ctrans,blendMode,frame,ratio,time){
 	ctx.transform(matrix[0],matrix[1],matrix[2],matrix[3],matrix[4],matrix[5]);
 	if(blendMode>1){
 		var oldctx = ctx;
-		var ncanvas = Filters.createCanvas(canvas.width,canvas.height);
+		var ncanvas = createCanvas(canvas.width,canvas.height);
 		ctx = ncanvas.getContext("2d");
 		enhanceContext(ctx);
 		ctx.applyTransforms(oldctx._matrices);
@@ -899,8 +899,8 @@ window.addEventListener('load',function(){
    
    var wsize = document.getElementById("width_size");
    var hsize = document.getElementById("height_size");
-   var bsize = document.getElementById("both_size");
-   bsize.addEventListener('mousedown', initDragBoth, false);
+   //var bsize = document.getElementById("both_size");
+   //bsize.addEventListener('mousedown', initDragBoth, false);
    wsize.addEventListener('mousedown', initDragWidth, false);
    hsize.addEventListener('mousedown', initDragHeight, false);
 });
@@ -937,12 +937,14 @@ function initDrag(e) {
    document.documentElement.addEventListener('mouseup', stopDrag, false);
 }
 
-function doDrag(e) {
+function doDrag(e) {   
    if(dragWidth){
         canvas.width = (startWidth + e.clientX - startX);
+        canvas.height = canvas.width*originalHeight/originalWidth;
    }
-   if(dragHeight){
+   else if(dragHeight){
         canvas.height = (startHeight + e.clientY - startY);
+        canvas.width = canvas.height*originalWidth/originalHeight;
    }
    drawFrame();
 }
@@ -950,4 +952,38 @@ function doDrag(e) {
 function stopDrag(e) {
     document.documentElement.removeEventListener('mousemove', doDrag, false);
     document.documentElement.removeEventListener('mouseup', stopDrag, false);
+}
+
+
+function drawPath(ctx,p){
+    ctx.beginPath();
+    var parts = p.split(" ");
+    var len = parts.length;
+    var drawCommand = "";
+    for(var i=0;i<len;i++){
+        switch(parts[i]){
+            case 'L':
+            case 'M':               
+            case 'Q':
+                drawCommand = parts[i];
+                break;
+            default:
+                switch(drawCommand){
+                    case 'L':
+                        ctx.lineTo(parts[i],parts[i+1]);
+                        i++;
+                        break;
+                    case 'M':
+                        ctx.moveTo(parts[i],parts[i+1]);
+                        i++;
+                        break;
+                    case 'Q':
+                        ctx.quadraticCurveTo(parts[i],parts[i+1],parts[i+2],parts[i+3]);
+                        i+=3;
+                        break;
+                }
+                break;
+        }
+    }
+    ctx.closePath();
 }

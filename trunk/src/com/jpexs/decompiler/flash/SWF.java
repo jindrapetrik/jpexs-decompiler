@@ -1548,8 +1548,13 @@ public final class SWF implements TreeItem, Timelined {
                     }
 
                     if (Configuration.packJavaScripts.get()) {
-                        JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
-                        f.delete();
+                        try{
+                            JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
+                            f.delete();
+                        }catch(Exception|Error e){ //Something wrong in the packer
+                            Logger.getLogger(SWF.class.getName()).log(Level.WARNING, "JPacker: Cannot minimize script");
+                            f.renameTo(fmin);
+                        }                                                
                     } else {
                         f.renameTo(fmin);
                     }
@@ -2306,7 +2311,7 @@ public final class SWF implements TreeItem, Timelined {
                 if(layer.clipDepth!=-1){
                     clipDepths.push(layer.clipDepth);                   
                     sb.append("\t\t\tclips.push({ctx:ctx,canvas:canvas});\r\n");                    
-                    sb.append("\t\t\tvar ccanvas = Filters.createCanvas(canvas.width,canvas.height);\r\n");                    
+                    sb.append("\t\t\tvar ccanvas = createCanvas(canvas.width,canvas.height);\r\n");                    
                     sb.append("\t\t\tvar cctx = ccanvas.getContext(\"2d\");\r\n");
                     sb.append("\t\t\tenhanceContext(cctx);\r\n");
                     sb.append("\t\t\tcctx.applyTransforms(ctx._matrices);\r\n");
@@ -2316,7 +2321,7 @@ public final class SWF implements TreeItem, Timelined {
                 
                 if(layer.filters!=null){
                     sb.append("\t\t\tvar oldctx = ctx;\r\n");
-                    sb.append("\t\t\tvar fcanvas = Filters.createCanvas(canvas.width,canvas.height);");
+                    sb.append("\t\t\tvar fcanvas = createCanvas(canvas.width,canvas.height);");
                     sb.append("\t\t\tvar fctx = fcanvas.getContext(\"2d\");\r\n");
                     sb.append("\t\t\tenhanceContext(fctx);\r\n");
                     sb.append("\t\t\tfctx.applyTransforms(ctx._matrices);\r\n");
@@ -2453,7 +2458,7 @@ public final class SWF implements TreeItem, Timelined {
                 }
                 if(layer.clipDepth!=-1){
                     sb.append("\t\t\tclips[clips.length-1].clipCanvas = canvas;\r\n");                    
-                    sb.append("\t\t\tcanvas = Filters.createCanvas(canvas.width,canvas.height);\r\n");   
+                    sb.append("\t\t\tcanvas = createCanvas(canvas.width,canvas.height);\r\n");   
                     sb.append("\t\t\tvar nctx = canvas.getContext(\"2d\");\r\n");  
                     sb.append("\t\t\tenhanceContext(nctx);\r\n");
                     sb.append("\t\t\tnctx.applyTransforms(ctx._matrices);\r\n");
