@@ -681,37 +681,37 @@ public class ActionScriptParser {
                         }
                         constr = (method(false, customAccess, new Reference<Boolean>(false), importedClasses, false, false, thisType, openedNamespaces, false, namespace, "", true, constrVariables));
                     } else {
-                        if (isStatic) {
+                        MethodAVM2Item ft = method(false, customAccess, new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, fname, true, new ArrayList<AssignableAVM2Item>());
+                                                
+                        if(isGetter){
+                            if (!ft.paramTypes.isEmpty()) {
+                                throw new ParseException("Getter can't have any parameters", lexer.yyline());
+                            }
+                        }
+                        
+                        if(isSetter){
+                            if (ft.paramTypes.size() != 1) {
+                                throw new ParseException("Getter must have exactly one parameter", lexer.yyline());
+                            }
+                        }
+                        
+                        if (isStatic && isInterface) {
                             if (isInterface) {
                                 throw new ParseException("Interface cannot have static fields", lexer.yyline());
                             }
-                            GraphTargetItem t;
-                            MethodAVM2Item ft = method(false, customAccess, new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, fname, true, new ArrayList<AssignableAVM2Item>());
-                            traits.add(ft);
-                            if (isGetter || isSetter) {
-                                throw new ParseException("Getter or Setter cannot be static", lexer.yyline());
-                            }
-                        } else {
-                            MethodAVM2Item ft = method(isInterface, customAccess, new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, fname, true, new ArrayList<AssignableAVM2Item>());
-                            GraphTargetItem t;
-                            if (isGetter) {
-                                if (!ft.paramTypes.isEmpty()) {
-                                    throw new ParseException("Getter can't have any parameters", lexer.yyline());
-                                }
-                                GetterAVM2Item g = new GetterAVM2Item(isInterface, customAccess, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
-                                t = g;
-                            } else if (isSetter) {
-                                if (ft.paramTypes.size() != 1) {
-                                    throw new ParseException("Getter must have exactly one parameter", lexer.yyline());
-                                }
-                                SetterAVM2Item st = new SetterAVM2Item(isInterface, customAccess, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
-                                t = st;
-                            } else {
-                                t = ft;
-                            }
-
-                            traits.add(ft);
                         }
+                        GraphTargetItem t;
+                        if (isGetter) {                                
+                            GetterAVM2Item g = new GetterAVM2Item(isInterface, customAccess, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                            t = g;
+                        } else if (isSetter) {                                
+                            SetterAVM2Item st = new SetterAVM2Item(isInterface, customAccess, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                            t = st;
+                        } else {
+                            t = ft;
+                        }
+
+                        traits.add(t);
                     }
                     //}
                     break;
