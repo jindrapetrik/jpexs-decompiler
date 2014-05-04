@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.gui.Main;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -36,6 +37,11 @@ import org.testng.annotations.Test;
  */
 public class ExportTest {
 
+    @BeforeClass
+    public void init(){
+        Main.initLogging(false);
+    }
+    
     public static final String TESTDATADIR = "testdata/decompile";
 
     @BeforeClass

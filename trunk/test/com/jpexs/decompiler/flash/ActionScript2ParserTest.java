@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.graph.CompilationException;
 import java.io.BufferedInputStream;
@@ -36,6 +37,7 @@ public class ActionScript2ParserTest extends ActionStript2TestBase {
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
+        Main.initLogging(false);
         Configuration.autoDeobfuscate.set(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }

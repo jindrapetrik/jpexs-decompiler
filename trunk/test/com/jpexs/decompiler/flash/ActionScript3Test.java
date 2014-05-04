@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -49,6 +50,7 @@ public class ActionScript3Test {
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
+        Main.initLogging(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
         DoABCDefineTag tag = null;
         for (Tag t : swf.tags) {

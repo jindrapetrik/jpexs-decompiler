@@ -16,12 +16,14 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -30,6 +32,11 @@ import org.testng.annotations.Test;
  */
 public class SWFStreamTest {
 
+    @BeforeClass
+    public void init(){
+        Main.initLogging(false);
+    }
+    
     @Test
     public void testNeededBits() {
         assertEquals(SWFOutputStream.getNeededBitsU(3), 2);

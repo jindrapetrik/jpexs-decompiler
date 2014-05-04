@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -40,6 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import static org.testng.Assert.fail;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -48,6 +50,11 @@ import org.testng.annotations.Test;
  */
 public class RecompileTest {
 
+    @BeforeClass
+    public void init(){
+        Main.initLogging(false);
+    }
+    
     public static final String TESTDATADIR = "testdata/recompile";
 
     private void testRecompileOne(String filename) {

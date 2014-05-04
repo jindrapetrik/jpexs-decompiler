@@ -18,11 +18,13 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.ABCOutputStream;
+import com.jpexs.decompiler.flash.gui.Main;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -30,6 +32,10 @@ import org.testng.annotations.Test;
  * @author JPEXS
  */
 public class ABCStreamTest {
+    @BeforeClass
+    public void init(){
+        Main.initLogging(false);
+    }
 
     @Test
     public void testU30() {
