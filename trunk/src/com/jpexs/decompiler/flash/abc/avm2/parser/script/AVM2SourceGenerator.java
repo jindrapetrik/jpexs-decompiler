@@ -1657,16 +1657,16 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 abcs.add(abc);
                 abcs.addAll(allABCs);
 
-                int parentConsAC = 0;
+                int parentConstMinAC = 0;                
 
                 for (ABC a : abcs) {
                     int ci = a.findClassByName(superType);
                     if (ci > -1) {
                         MethodInfo pmi = a.method_info.get(a.instance_info.get(ci).iinit_index);
-                        parentConsAC = pmi.param_types.length;
+                        parentConstMinAC = pmi.param_types.length;
                         if(pmi.flagHas_optional()){
-                            parentConsAC -= pmi.optional.length;
-                        }
+                            parentConstMinAC -= pmi.optional.length;
+                        }                        
 
                     }
                 }
@@ -1674,14 +1674,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 for (AVM2Instruction ins : mbody.code.code) {
                     if (ins.definition instanceof ConstructSuperIns) {
                         ac = ins.operands[0];
-                        if (parentConsAC != ac) {
+                        if (parentConstMinAC > ac) {
                             throw new CompilationException("Parent constructor call requires different number of arguments", line);
                         }
 
                     }
                 }
                 if (ac == -1) {
-                    if (parentConsAC == 0) {
+                    if (parentConstMinAC == 0) {
                         mbody.code.code.add(0, new AVM2Instruction(0, new GetLocal0Ins(), new int[]{}, new byte[0]));
                         mbody.code.code.add(1, new AVM2Instruction(0, new ConstructSuperIns(), new int[]{0}, new byte[0]));
 
