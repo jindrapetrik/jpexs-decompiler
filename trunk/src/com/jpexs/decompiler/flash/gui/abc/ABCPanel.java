@@ -684,7 +684,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 boolean isDocumentClass = documentClass.equals(pack.getPath().toString());
 
                 try {
-                    ActionScriptParser.compile(decompiledTextArea.getText(), abc, isDocumentClass, scriptName);
+                    ActionScriptParser.compile(decompiledTextArea.getText(), abc,new ArrayList<ABC>(), isDocumentClass, scriptName);
                     //Move newly added script to its position
                     abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
                     abc.script_info.remove(newIndex);

@@ -28,6 +28,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -119,8 +120,19 @@ public abstract class AVM2Item extends GraphTargetItem {
         return ret;
     }
 
-    public static AVM2Instruction ins(InstructionDefinition def, int... operands) {
-        return new AVM2Instruction(0, def, operands, new byte[0]);
+    public static AVM2Instruction ins(InstructionDefinition def, Integer... operands) {
+        List<Integer> ops=new ArrayList<>();
+        for(Integer o:operands){
+            if(o!=null){
+                ops.add(o);
+            }
+        }
+        int opArr[]=new int[ops.size()];
+        for(int i=0;i<ops.size();i++){
+            opArr[i] = ops.get(i);
+        }
+        
+        return new AVM2Instruction(0, def, opArr, new byte[0]);
     }
 
     public static int getFreeRegister(SourceGeneratorLocalData localData, SourceGenerator generator) {

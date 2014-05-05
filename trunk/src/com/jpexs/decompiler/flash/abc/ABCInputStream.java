@@ -214,26 +214,25 @@ public class ABCInputStream extends InputStream {
 
     public Multiname readMultiname() throws IOException {
         int kind = readU8();
-        int namespace_index = -1;
-        int name_index = -1;
-        int namespace_set_index = -1;
-        int qname_index = -1;
+        int namespace_index = 0;
+        int name_index = 0;
+        int namespace_set_index = 0;
+        int qname_index = 0;
         List<Integer> params = new ArrayList<>();
 
-        if ((kind == 7) || (kind == 0xd)) { // CONSTANT_QName and CONSTANT_QNameA.
+        if ((kind == Multiname.QNAME) || (kind == Multiname.QNAMEA)) {
             namespace_index = readU30();
             name_index = readU30();
-        } else if ((kind == 0xf) || (kind == 0x10)) { //CONSTANT_RTQName and CONSTANT_RTQNameA
+        } else if ((kind == Multiname.RTQNAME) || (kind == Multiname.RTQNAMEA)) {
             name_index = readU30();
-        } else if ((kind == 0x11) || (kind == 0x12))//kind==0x11,0x12 nothing CONSTANT_RTQNameL and CONSTANT_RTQNameLA.
-        {
-        } else if ((kind == 9) || (kind == 0xe)) { // CONSTANT_Multiname and CONSTANT_MultinameA.
+        } else if ((kind == Multiname.RTQNAMEL) || (kind == Multiname.RTQNAMELA)) {
+        
+        } else if ((kind == Multiname.MULTINAME) || (kind == Multiname.MULTINAMEA)) {
             name_index = readU30();
             namespace_set_index = readU30();
-        } else if ((kind == 0x1B) || (kind == 0x1C)) { //CONSTANT_MultinameL and CONSTANT_MultinameLA
+        } else if ((kind == Multiname.MULTINAMEL) || (kind == Multiname.MULTINAMELA)) {
             namespace_set_index = readU30();
-        } else if (kind == 0x1D) {
-            //Constant_TypeName
+        } else if (kind == Multiname.TYPENAME) {           
             qname_index = readU30(); //Multiname index!!!
             int paramsLength = readU30();
             for (int i = 0; i < paramsLength; i++) {

@@ -26,9 +26,7 @@ import org.pushingpixels.flamingo.api.common.JCommandButton;
 import org.pushingpixels.flamingo.api.common.popup.JCommandPopupMenu;
 import org.pushingpixels.flamingo.api.common.popup.JPopupPanel;
 import org.pushingpixels.flamingo.api.common.popup.PopupPanelManager;
-import org.pushingpixels.flamingo.internal.ui.common.BasicCommandButtonUI;
 import org.pushingpixels.substance.flamingo.common.ui.SubstanceCommandButtonUI;
-import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
 
 /**
  *

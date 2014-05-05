@@ -307,16 +307,24 @@ public class ASM3Parser {
                 namespace_index = parseNamespace(constants, lexer);
                 expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
                 ParsedSymbol name = lexer.lex();
-                expected(name, ParsedSymbol.TYPE_STRING, "String");
-                name_index = constants.getStringId((String) name.value, true);
+                if(name.type == ParsedSymbol.TYPE_KEYWORD_NULL){
+                    name_index = 0;
+                }else{
+                    expected(name, ParsedSymbol.TYPE_STRING, "String");
+                    name_index = constants.getStringId((String) name.value, true);
+                }
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
                 break;
             case ParsedSymbol.TYPE_KEYWORD_RTQNAME:
             case ParsedSymbol.TYPE_KEYWORD_RTQNAMEA:
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 ParsedSymbol rtqName = lexer.lex();
-                expected(rtqName, ParsedSymbol.TYPE_STRING, "String");
-                name_index = constants.getStringId((String) rtqName.value, true);
+                if(rtqName.type == ParsedSymbol.TYPE_KEYWORD_NULL){
+                    name_index = 0;
+                }else{
+                    expected(rtqName, ParsedSymbol.TYPE_STRING, "String");
+                    name_index = constants.getStringId((String) rtqName.value, true);
+                }
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
                 break;
             case ParsedSymbol.TYPE_KEYWORD_RTQNAMEL:
@@ -328,8 +336,12 @@ public class ASM3Parser {
             case ParsedSymbol.TYPE_KEYWORD_MULTINAMEA:
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 ParsedSymbol mName = lexer.lex();
-                expected(mName, ParsedSymbol.TYPE_STRING, "String");
-                name_index = constants.getStringId((String) mName.value, true);
+                if(mName.type == ParsedSymbol.TYPE_KEYWORD_NULL){
+                    name_index = 0;
+                }else{
+                    expected(mName, ParsedSymbol.TYPE_STRING, "String");
+                    name_index = constants.getStringId((String) mName.value, true);
+                }
                 expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
                 namespace_set_index = parseNamespaceSet(constants, lexer);
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);

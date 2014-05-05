@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
@@ -214,6 +215,21 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             }
                                             break loopobjType;
                                         }
+                                    }                                                                        
+                                }
+                                
+                                for(ScriptInfo si:abc.script_info){
+                                for (Trait t :si.traits.traits) {
+                                        if (t.name_index == name_index) {
+                                            objType = "Object";
+                                            propType = AVM2SourceGenerator.getTraitReturnType(abc, t).toString();
+                                            propIndex = t.name_index;
+                                            if (t instanceof TraitSlotConst) {
+                                                TraitSlotConst tsc = (TraitSlotConst) t;
+                                                propValue = new ValueKind(tsc.value_index, tsc.value_kind);
+                                            }
+                                            break loopobjType;
+                                        }
                                     }
                                 }
                             }
@@ -233,7 +249,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             Reference<Integer> outPropNsKind = new Reference<>(1);
                                             Reference<String> outPropType = new Reference<>("");
                                             Reference<ValueKind> outPropValue = new Reference<>(null);
-                                            if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, n.getName(a.constants, new ArrayList<String>()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
+                                            if (propertyName!=null && AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, n.getName(a.constants, new ArrayList<String>()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
                                                 objType = "".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal();
                                                 propType = outPropType.getVal();
                                                 propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
@@ -300,7 +316,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 pname = pname.substring(1);
             }
             propIndex = abc.constants.getMultinameId(new Multiname(attr ? (pname.isEmpty() ? Multiname.MULTINAMELA : Multiname.MULTINAMEA) : Multiname.MULTINAME,
-                    abc.constants.getStringId(pname, true), 0,
+                    abc.constants.getStringId("*".equals(pname)?null:pname, true), 0, //Note: name = * is for .@* attribute
                     attr && pname.isEmpty() ? abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abc.constants.getStringId(localData.pkg, true)), 0, true)}), true) : allNsSet(), 0, new ArrayList<Integer>()), true);
             propType = "*";
             objType = "*";

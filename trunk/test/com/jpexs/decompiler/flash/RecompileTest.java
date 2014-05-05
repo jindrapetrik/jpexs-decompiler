@@ -16,15 +16,20 @@
  */
 package com.jpexs.decompiler.flash;
 
-import static com.jpexs.decompiler.flash.SWF.createASTagList;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.NotSameException;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HilightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -42,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -51,13 +57,14 @@ import org.testng.annotations.Test;
 public class RecompileTest {
 
     @BeforeClass
-    public void init(){
+    public void init() {
         Main.initLogging(false);
     }
-    
+
     public static final String TESTDATADIR = "testdata/recompile";
 
-    private void testRecompileOne(String filename) {
+    @Test(dataProvider = "provideFiles")
+    public void testRecompile(String filename) {
         try {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
             Configuration.debugCopy.set(true);
@@ -66,23 +73,6 @@ public class RecompileTest {
             fail();
         } catch (NotSameException ex) {
             fail("File is different after recompiling: " + filename);
-        }
-    }
-
-    @Test
-    public void testRecompile() {
-        File dir = new File(TESTDATADIR);
-        if (!dir.exists()) {
-            return;
-        }
-        File[] files = dir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".swf");
-            }
-        });
-        for (File f : files) {
-            testRecompileOne(f.getName());
         }
     }
 
@@ -117,7 +107,7 @@ public class RecompileTest {
                         String as3 = writer.toString();
                         as3 = asm.removePrefixAndSuffix(as3);
                         if (!as3.equals(as2)) {
-                            fail("ActionScript is diffrent: " + item.getSwf().getShortFileName() + "/" + item.toString());
+                            fail("ActionScript is different: " + item.getSwf().getShortFileName() + "/" + item.toString());
                         }
                     } catch (InterruptedException | IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
                     }
@@ -128,25 +118,45 @@ public class RecompileTest {
         }
     }
 
-    private void testAS2DirectEditingOne(String filename) {
-        try {
-            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
+    @Test(dataProvider = "provideFiles")
+    public void testDirectEditing(String filename) throws IOException, InterruptedException, com.jpexs.decompiler.flash.abc.avm2.parser.ParseException, CompilationException {
+        try{SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
+        if (swf.fileAttributes.actionScript3) {
+            List<ABC> allAbcs = new ArrayList<>();
+            for (ABCContainerTag ct : swf.abcList) {
+                allAbcs.add(ct.getABC());
+            }
+            for (ABC abc : allAbcs) {
+                for (int s = 0; s < abc.script_info.size(); s++) {
+                    HilightedTextWriter htw = new HilightedTextWriter(new CodeFormatting(), false);
+                    MyEntry<ClassPath, ScriptPack> en = abc.script_info.get(s).getPacks(abc, s).get(0);
+                    System.out.print("Recompiling:"+en.key.toString()+"...");
+                    en.value.toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
+                    String original = htw.toString();
+                    ABC nabc = new ABC(swf);
+                    com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc,allAbcs, false, en.key.className + ".as");                                        
+                    System.out.println("OK");
+                }
+            }
+        } else {
             List<ContainerItem> list2 = new ArrayList<>();
             list2.addAll(swf.tags);
-            List<TreeNode> list = createASTagList(list2, null);
+            List<TreeNode> list = SWF.createASTagList(list2, null);
 
             TagNode.setExport(list, true);
             testAS2DirectEditingOneRecursive(list);
-        } catch (IOException | InterruptedException ex) {
-            fail();
+        }
+        }catch(Exception ex){
+            System.out.println("FAIL");
+            throw ex;
         }
     }
 
-    @Test
-    public void testAS2DirectEditing() {
+    @DataProvider(name = "provideFiles")
+    public Object[][] provideFiles() {
         File dir = new File(TESTDATADIR);
         if (!dir.exists()) {
-            return;
+            return new Object[0][];
         }
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
@@ -154,8 +164,10 @@ public class RecompileTest {
                 return name.toLowerCase().endsWith(".swf");
             }
         });
-        for (File f : files) {
-            testAS2DirectEditingOne(f.getName());
+        Object[][] ret = new Object[files.length][1];
+        for (int f = 0; f < files.length; f++) {
+            ret[f][0] = files[f].getName();
         }
+        return ret;
     }
 }

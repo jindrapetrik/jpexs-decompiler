@@ -209,14 +209,13 @@ public class ActionScript3Test {
                 + "trace(\"new line \\r\\n hello!\");\r\n", false);
     }
 
-    @Test
     public void testContinueLevels() {
         decompileMethod("testContinueLevels", "var b:* = undefined;\r\n"
                 + "var c:* = undefined;\r\n"
                 + "var d:* = undefined;\r\n"
                 + "var e:* = undefined;\r\n"
                 + "var a:* = 5;\r\n"
-                + "loopswitch3:\r\n"
+                + "loop3:\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
                 + "case 57 * a:\r\n"

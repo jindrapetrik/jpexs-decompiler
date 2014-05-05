@@ -58,8 +58,8 @@ public class CallAVM2Item extends AVM2Item {
         return writer;
     }
 
-    @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+   
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
 
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
 
@@ -75,7 +75,7 @@ public class CallAVM2Item extends AVM2Item {
             String cname;
             String pkgName = "";
             cname = localData.currentClass;
-            if (cname.contains(".")) {
+            if (cname!=null && cname.contains(".")) {
                 pkgName = cname.substring(0, cname.lastIndexOf('.'));
                 cname = cname.substring(cname.lastIndexOf('.') + 1);
             }
@@ -86,7 +86,7 @@ public class CallAVM2Item extends AVM2Item {
             Reference<Integer> outPropNsKind = new Reference<>(1);
             Reference<String> outPropType = new Reference<>("");
             Reference<ValueKind> outPropValue = new Reference<>(null);
-            if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
+            if (cname!=null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), n.line, "this", null, false, n.openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;
@@ -114,7 +114,7 @@ public class CallAVM2Item extends AVM2Item {
                 String cname;
                 String pkgName = "";
                 cname = localData.currentClass;
-                if (cname.contains(".")) {
+                if (cname!=null && cname.contains(".")) {
                     pkgName = cname.substring(0, cname.lastIndexOf('.'));
                     cname = cname.substring(cname.lastIndexOf('.') + 1);
                 }
@@ -124,7 +124,7 @@ public class CallAVM2Item extends AVM2Item {
                 Reference<Integer> outPropNsKind = new Reference<>(1);
                 Reference<String> outPropType = new Reference<>("");
                 Reference<ValueKind> outPropValue = new Reference<>(null);
-                if (AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
+                if (cname!=null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, new ArrayList<Integer>());
                     nobj.setRegNumber(0);
                     obj = nobj;
@@ -138,42 +138,30 @@ public class CallAVM2Item extends AVM2Item {
                 obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propIndex}, new byte[0]);
             }
             return toSourceMerge(localData, generator, obj, arguments,
-                    ins(new CallPropertyIns(), propIndex, arguments.size())
+                    ins(needsReturn?new CallPropertyIns():new CallPropVoidIns(), propIndex, arguments.size())
             );
         }
 
+        if(callable instanceof IndexAVM2Item){
+            return ((IndexAVM2Item)callable).toSource(localData, generator, needsReturn, true, arguments);
+        }
+        if(callable instanceof NamespacedAVM2Item){
+            return ((NamespacedAVM2Item)callable).toSource(localData, generator, needsReturn, true, arguments);
+        }
+        
         throw new CompilationException("Not a callable", line);
     }
 
     @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, true);
+    }
+
+    
+    
+    @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-
-        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
-
-        GraphTargetItem callable = name;
-        if (callable instanceof UnresolvedAVM2Item) {
-            callable = ((UnresolvedAVM2Item) callable).resolved;
-        }
-
-        if (callable instanceof NameAVM2Item) {
-            NameAVM2Item n = (NameAVM2Item) callable;
-            PropertyAVM2Item p = new PropertyAVM2Item(null, n.getVariableName(), g.abc, g.allABCs, n.openedNamespaces, new ArrayList<MethodBody>());
-            p.setAssignedValue(n.getAssignedValue());
-            callable = p;
-        }
-
-        if (callable instanceof PropertyAVM2Item) {
-            PropertyAVM2Item prop = (PropertyAVM2Item) callable;
-            Object obj = prop.object;
-            if (obj == null) {
-                obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{prop.resolveProperty(localData)}, new byte[0]);
-            }
-            return toSourceMerge(localData, generator, obj, arguments,
-                    new AVM2Instruction(0, new CallPropVoidIns(), new int[]{prop.resolveProperty(localData), arguments.size()}, new byte[0])
-            );
-        }
-
-        return new ArrayList<>();
+        return toSource(localData, generator, false);
     }
 
     @Override

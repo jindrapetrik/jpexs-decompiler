@@ -57,6 +57,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem type;
     //private GraphTargetItem ns = null;
     public GraphTargetItem resolved;
+    public GraphTargetItem resolvedRoot;
     private boolean mustBeType;
     public List<String> importedClasses;
     public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
@@ -311,7 +312,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                             ret.setAssignedValue(assignedValue);
                         }
                         ret.setNs(n.getNs());
-                        return ret;
+                        return resolvedRoot=ret;
                     }
                 }
             }
@@ -348,7 +349,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 if (parts.size() == 1 && assignedValue != null) {
                     throw new CompilationException("Cannot assign type", line);
                 }
-                return ret;
+                return resolvedRoot=ret;
             }
         }
 
@@ -385,7 +386,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                             throw new CompilationException("Cannot assign type", line);
                         }
 
-                        return ret;
+                        return resolvedRoot=ret;
                     }
                 }
             }
@@ -423,7 +424,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                                 throw new CompilationException("Cannot assign type", line);
                             }
 
-                            return ret;
+                            return resolvedRoot=ret;
                         }
                     }
                 }
@@ -445,13 +446,19 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             if (parts.size() == 1) {
                 ((NameAVM2Item) ret).setAssignedValue(assignedValue);
             }
-            return ret;
+            return resolvedRoot=ret;
         }
 
         if (paramNames.contains(parts.get(0)) || parts.get(0).equals("arguments")) {
             int ind = paramNames.indexOf(parts.get(0));
+            GraphTargetItem t = TypeItem.UNBOUNDED;
+            if(ind == -1){
+                
+            }else if(ind < paramTypes.size()){                          
+                t = paramTypes.get(ind);
+            } //else rest parameter
 
-            GraphTargetItem ret = new NameAVM2Item(ind == -1 ? TypeItem.UNBOUNDED : paramTypes.get(ind), line, parts.get(0), null, false, openedNamespaces);
+            GraphTargetItem ret = new NameAVM2Item(t, line, parts.get(0), null, false, openedNamespaces);
             resolved = ret;
             for (int i = 1; i < parts.size(); i++) {
                 resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
@@ -462,7 +469,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             if (parts.size() == 1) {
                 ((NameAVM2Item) ret).setAssignedValue(assignedValue);
             }
-            return ret;
+            return resolvedRoot=ret;
         }
 
         if (!subtypes.isEmpty() && parts.size() == 1 && parts.get(0).equals("Vector")) {
@@ -477,10 +484,10 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 ret.subtypes.add(st.fullTypeName);
             }
             resolved = ret;
-            return ret;
+            return resolvedRoot=ret;
         }
 
-        if (mustBeType) {
+        if (mustBeType) {         
             throw new CompilationException("Not a type", line);
         }
         resolved = null;
@@ -495,7 +502,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 ((PropertyAVM2Item) resolved).setAssignedValue(assignedValue);
             }
         }
-        return ret;
+        return resolvedRoot=ret;
     }
 
 }

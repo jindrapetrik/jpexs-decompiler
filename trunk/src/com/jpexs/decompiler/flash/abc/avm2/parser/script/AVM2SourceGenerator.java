@@ -780,7 +780,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             for (AssignableAVM2Item a : item.catchVariables.get(c)) {
                 GraphTargetItem r = a;
                 if (r instanceof UnresolvedAVM2Item) {
-                    r = ((UnresolvedAVM2Item) r).resolved;
+                    r = ((UnresolvedAVM2Item) r).resolvedRoot;
                 }
                 if (r instanceof NameAVM2Item) {
                     NameAVM2Item n = (NameAVM2Item) r;
@@ -1780,7 +1780,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             return new ValueKind(abc.constants.getIntId(((IntegerValueAVM2Item) val).value, true), ValueKind.CONSTANT_Int);
         }
         if (val instanceof FloatValueAVM2Item) {
-            return new ValueKind(abc.constants.getIntId(((IntegerValueAVM2Item) val).value, true), ValueKind.CONSTANT_Double);
+            return new ValueKind(abc.constants.getDoubleId(((FloatValueAVM2Item) val).value, true), ValueKind.CONSTANT_Double);
         }
         if (val instanceof NullAVM2Item) {
             return new ValueKind(0, ValueKind.CONSTANT_Null);
@@ -1791,11 +1791,19 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return null;
     }
 
-    private int genNs(String custom, int namespace, List<Integer> openedNamespaces, SourceGeneratorLocalData localData) {
+    private int genNs(String pkg,String custom, int namespace, List<Integer> openedNamespaces, SourceGeneratorLocalData localData,int line) throws CompilationException {
         if (custom != null) {
             PropertyAVM2Item prop = new PropertyAVM2Item(null, custom, abc, allABCs, openedNamespaces, new ArrayList<MethodBody>());
             Reference<ValueKind> value = new Reference<>(null);
             prop.resolve(localData, new Reference<String>(""), new Reference<String>(""), new Reference<Integer>(0), value);
+            boolean resolved = true;
+            if(value.getVal() == null){
+                resolved = false;
+                
+            }
+            if(!resolved){
+                throw new CompilationException("Namespace not defined", line);
+            }
             namespace = value.getVal().value_index;
         }
         return namespace;
@@ -1811,13 +1819,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
             } else if (item instanceof ClassAVM2Item) {
                 traits[k].name_index = traitName(((ClassAVM2Item) item).namespace, ((ClassAVM2Item) item).className);
             } else if ((item instanceof MethodAVM2Item) || (item instanceof GetterAVM2Item) || (item instanceof SetterAVM2Item)) {
-                traits[k].name_index = traitName(genNs(((MethodAVM2Item) item).customNamespace, ((MethodAVM2Item) item).namespace, openedNamespaces, localData), ((MethodAVM2Item) item).functionName);
+                traits[k].name_index = traitName(genNs(pkg,((MethodAVM2Item) item).customNamespace, ((MethodAVM2Item) item).namespace, openedNamespaces, localData,((MethodAVM2Item)item).line), ((MethodAVM2Item) item).functionName);
             } else if (item instanceof FunctionAVM2Item) {
                 traits[k].name_index = traitName(((FunctionAVM2Item) item).namespace, ((FunctionAVM2Item) item).functionName);
             } else if (item instanceof ConstAVM2Item) {
-                traits[k].name_index = traitName(genNs(((ConstAVM2Item) item).customNamespace, ((ConstAVM2Item) item).getNamespace(), openedNamespaces, localData), ((ConstAVM2Item) item).var);
+                traits[k].name_index = traitName(genNs(pkg,((ConstAVM2Item) item).customNamespace, ((ConstAVM2Item) item).getNamespace(), openedNamespaces, localData,((ConstAVM2Item)item).line), ((ConstAVM2Item) item).var);
             } else if (item instanceof SlotAVM2Item) {
-                traits[k].name_index = traitName(genNs(((SlotAVM2Item) item).customNamespace, ((SlotAVM2Item) item).getNamespace(), openedNamespaces, localData), ((SlotAVM2Item) item).var);
+                traits[k].name_index = traitName(genNs(pkg,((SlotAVM2Item) item).customNamespace, ((SlotAVM2Item) item).getNamespace(), openedNamespaces, localData,((SlotAVM2Item)item).line), ((SlotAVM2Item) item).var);
             }
         }
 
@@ -2152,7 +2160,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     if (pkg.equals(clsName.getNamespace(abc.constants).getName(abc.constants))) {
                         //class found
 
-                        for (Trait t : ii.instance_traits.traits) {
+                        for (Trait t : ii.instance_traits.traits) {       
+                            if(t.getName(abc) == null){ //in traits phase 2
+                                continue;
+                            }
                             if (propertyName.equals(t.getName(abc).getName(abc.constants, new ArrayList<String>()))) {
                                 outName.setVal(obj);
                                 outNs.setVal(pkg);
@@ -2169,6 +2180,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
                         if (!instanceOnly) {
                             for (Trait t : abc.class_info.get(i).static_traits.traits) {
+                                if(t.getName(abc) == null){ //in traits phase 2
+                                    continue;
+                                }
                                 if (propertyName.equals(t.getName(abc).getName(abc.constants, new ArrayList<String>()))) {
                                     outName.setVal(obj);
                                     outNs.setVal(pkg);
@@ -2294,7 +2308,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         for (int i = 1; i < abc.constants.constant_multiname.size(); i++) {
             Multiname mname = abc.constants.constant_multiname.get(i);
             if (name.equals(mname.getName(abc.constants, new ArrayList<String>()))) {
-                if (pkg.equals(mname.getNamespace(abc.constants).getName(abc.constants))) {
+                if (mname.getNamespace(abc.constants)!=null && pkg.equals(mname.getNamespace(abc.constants).getName(abc.constants))) {
                     name_index = i;
                     break;
                 }

@@ -175,9 +175,25 @@ public class ActionScriptParser {
                 case PARENT_OPEN:
                     ret = new CallAVM2Item(lexer.yyline(), ret, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                     break;
+
             }
             s = lex();
         }
+        if (s.type == SymbolType.INCREMENT) {
+            if (!isNameOrProp(ret)) {
+                throw new ParseException("Invalid assignment", lexer.yyline());
+            }
+            ret = new PostIncrementAVM2Item(null, ret);
+            s = lex();
+
+        } else if (s.type == SymbolType.DECREMENT) {
+            if (!isNameOrProp(ret)) {
+                throw new ParseException("Invalid assignment", lexer.yyline());
+            }
+            ret = new PostDecrementAVM2Item(null, ret);
+            s = lex();
+        }
+
         lexer.pushback(s);
         return ret;
     }
@@ -208,19 +224,27 @@ public class ActionScriptParser {
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
                 String propName = s.value.toString();
+                GraphTargetItem propItem = null;
                 s = lex();
                 GraphTargetItem ns = null;
                 if (s.type == SymbolType.NAMESPACE_OP) {
-                    s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
                     ns = new UnresolvedAVM2Item(new ArrayList<String>(), importedClasses, false, null, lexer.yyline(), propName, null, openedNamespaces);
                     variables.add((UnresolvedAVM2Item) ns);
-                    propName = s.value.toString();
+                    s = lex();
+                    if(s.type == SymbolType.BRACKET_OPEN){
+                        propItem = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                        expectedType(SymbolType.BRACKET_CLOSE);
+                        propName = null;
+                    }else{
+                        expected(s, lexer.yyline(), SymbolType.IDENTIFIER);                        
+                        propName = s.value.toString();
+                        propItem = null;
+                    }                                       
                 } else {
                     lexer.pushback(s);
                 }
                 if (ns != null) {
-                    ret = new NamespacedAVM2Item(ns, propName, ret, attr, openedNamespaces, null);
+                    ret = new NamespacedAVM2Item(ns, propName,propItem, ret, attr, openedNamespaces, null);
                 } else {
                     ret = new PropertyAVM2Item(ret, (attr ? "@" : "") + propName, abc, otherABCs, openedNamespaces, new ArrayList<MethodBody>());
                 }
@@ -249,7 +273,9 @@ public class ActionScriptParser {
             if (s.type == SymbolType.ATTRIBUTE) {
                 name += "@";
                 s = lex();
-                if (s.type == SymbolType.IDENTIFIER) {
+                if(s.type == SymbolType.MULTIPLY){
+                    name += s.value.toString();  
+                } else if (s.type == SymbolType.IDENTIFIER) {
                     name += s.value.toString();
                 } else {
                     if (s.type != SymbolType.BRACKET_OPEN) {
@@ -266,6 +292,7 @@ public class ActionScriptParser {
         }
         String nsname = null;
         String nsprop = null;
+        GraphTargetItem nspropItem = null;
         if (s.type == SymbolType.NAMESPACE_OP) {
             if (name.contains(".")) {
                 nsname = name.substring(name.lastIndexOf('.') + 1);
@@ -275,9 +302,9 @@ public class ActionScriptParser {
             s = lex();
             if (s.type == SymbolType.IDENTIFIER) {
                 nsprop = s.value.toString();
-            } else {
-                nsprop = null;
-                lexer.pushback(s);
+            } else if(s.type == SymbolType.BRACKET_OPEN){
+                nspropItem = expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                expectedType(SymbolType.BRACKET_CLOSE);
             }
             if (name.contains(".")) {
                 name = name.substring(0, name.lastIndexOf('.'));
@@ -332,7 +359,7 @@ public class ActionScriptParser {
             }
             UnresolvedAVM2Item ns = new UnresolvedAVM2Item(params, importedClasses, typeOnly, null, lexer.yyline(), nsname, null, openedNamespaces);
             variables.add(ns);
-            ret = new NamespacedAVM2Item(ns, nsprop, ret, attr, openedNamespaces, null);
+            ret = new NamespacedAVM2Item(ns, nsprop, nspropItem, ret, attr, openedNamespaces, null);
         }
         if (s.type == SymbolType.BRACKET_OPEN) {
             lexer.pushback(s);
@@ -463,8 +490,11 @@ public class ActionScriptParser {
         List<GraphTargetItem> body = null;
         List<AssignableAVM2Item> subvariables = new ArrayList<>();
         subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), "this", null, true, openedNamespaces));
-        for (int i = 0; i < paramNames.size(); i++) {
+        for (int i = 0; i < paramNames.size() - (hasRest ? 1 : 0); i++) {
             subvariables.add(new NameAVM2Item(paramTypes.get(i), lexer.yyline(), paramNames.get(i), null, true, openedNamespaces));
+        }
+        if (hasRest) {
+            subvariables.add(new NameAVM2Item(TypeItem.UNBOUNDED, lexer.yyline(), paramNames.get(paramNames.size() - 1), null, true, openedNamespaces));
         }
         subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), "arguments", null, true, openedNamespaces));
         int parCnt = subvariables.size();
@@ -682,29 +712,29 @@ public class ActionScriptParser {
                         constr = (method(false, customAccess, new Reference<Boolean>(false), importedClasses, false, false, thisType, openedNamespaces, false, namespace, "", true, constrVariables));
                     } else {
                         MethodAVM2Item ft = method(false, customAccess, new Reference<Boolean>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, fname, true, new ArrayList<AssignableAVM2Item>());
-                                                
-                        if(isGetter){
+
+                        if (isGetter) {
                             if (!ft.paramTypes.isEmpty()) {
                                 throw new ParseException("Getter can't have any parameters", lexer.yyline());
                             }
                         }
-                        
-                        if(isSetter){
+
+                        if (isSetter) {
                             if (ft.paramTypes.size() != 1) {
                                 throw new ParseException("Getter must have exactly one parameter", lexer.yyline());
                             }
                         }
-                        
+
                         if (isStatic && isInterface) {
                             if (isInterface) {
                                 throw new ParseException("Interface cannot have static fields", lexer.yyline());
                             }
                         }
                         GraphTargetItem t;
-                        if (isGetter) {                                
+                        if (isGetter) {
                             GetterAVM2Item g = new GetterAVM2Item(isInterface, customAccess, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                             t = g;
-                        } else if (isSetter) {                                
+                        } else if (isSetter) {
                             SetterAVM2Item st = new SetterAVM2Item(isInterface, customAccess, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.namespace, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                             t = st;
                         } else {
@@ -737,7 +767,7 @@ public class ActionScriptParser {
                         lexer.pushback(s);
                     }
 
-                    ConstAVM2Item ns = new ConstAVM2Item(customAccess, true, namespace, nname, new TypeItem("Namespace"), new StringAVM2Item(null, nval));
+                    ConstAVM2Item ns = new ConstAVM2Item(customAccess, true, namespace, nname, new TypeItem("Namespace"), new StringAVM2Item(null, nval),lexer.yyline());
                     traits.add(ns);
                     break;
                 case CONST:
@@ -776,9 +806,9 @@ public class ActionScriptParser {
                     }
                     GraphTargetItem tar;
                     if (isConst) {
-                        tar = new ConstAVM2Item(customAccess, isStatic, namespace, vcname, type, value);
+                        tar = new ConstAVM2Item(customAccess, isStatic, namespace, vcname, type, value,lexer.yyline());
                     } else {
-                        tar = new SlotAVM2Item(customAccess, isStatic, namespace, vcname, type, value);
+                        tar = new SlotAVM2Item(customAccess, isStatic, namespace, vcname, type, value,lexer.yyline());
                     }
                     traits.add(tar);
                     if (s.type != SymbolType.SEMICOLON) {
@@ -1772,18 +1802,6 @@ public class ActionScriptParser {
                     }
                     ret = as;
                     break;
-                case INCREMENT: //postincrement
-                    if (!(expr instanceof AssignableAVM2Item)) {
-                        throw new ParseException("Invalid assignment", lexer.yyline());
-                    }
-                    ret = new PostIncrementAVM2Item(null, expr);
-                    break;
-                case DECREMENT: //postdecrement
-                    if (!(expr instanceof AssignableAVM2Item)) {
-                        throw new ParseException("Invalid assignment", lexer.yyline());
-                    }
-                    ret = new PostDecrementAVM2Item(null, expr);
-                    break;
                 case DOT: //member
                 case BRACKET_OPEN: //member
                 case PARENT_OPEN: //function call
@@ -1815,6 +1833,9 @@ public class ActionScriptParser {
             return true;
         }
         if (item instanceof PropertyAVM2Item) {
+            return true;
+        }
+        if (item instanceof IndexAVM2Item) {
             return true;
         }
         return false;
@@ -2035,9 +2056,23 @@ public class ActionScriptParser {
                 existsRemainder = true;
                 break;
             case NEW:
-                GraphTargetItem newvar = name(needsActivation, true, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
-                expectedType(SymbolType.PARENT_OPEN);
-                ret = new ConstructSomethingAVM2Item(lexer.yyline(), openedNamespaces, newvar, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                s = lex();
+                if(s.type == SymbolType.FUNCTION){
+                    s = lexer.lex();
+                    String ffname = "";
+                    if (s.isType(SymbolType.IDENTIFIER)) {
+                        ffname = s.value.toString();
+                    } else {
+                        lexer.pushback(s);
+                    }
+                    needsActivation.setVal(true);
+                    ret = function(false, needsActivation, importedClasses, 0/*?*/, TypeItem.UNBOUNDED, openedNamespaces, ffname, false, variables);
+                }else{
+                    lexer.pushback(s);
+                    GraphTargetItem newvar = name(needsActivation, true, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
+                    expectedType(SymbolType.PARENT_OPEN);
+                    ret = new ConstructSomethingAVM2Item(lexer.yyline(), openedNamespaces, newvar, call(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                }
                 existsRemainder = true;
                 break;
             case IDENTIFIER:
@@ -2201,7 +2236,7 @@ public class ActionScriptParser {
         this.otherABCs = otherABCs;
     }
 
-    public static void compile(String src, ABC abc, boolean documentClass, String fileName) throws ParseException, IOException, InterruptedException, CompilationException {
+    public static void compile(String src, ABC abc, List<ABC> otherABCs,boolean documentClass, String fileName) throws ParseException, IOException, InterruptedException, CompilationException {
         SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
         SWF swf = new SWF(swc.getSWF("library.swf"), true);
         List<ABC> playerABCs = new ArrayList<>();
@@ -2210,7 +2245,10 @@ public class ActionScriptParser {
                 playerABCs.add(((ABCContainerTag) t).getABC());
             }
         }
-        ActionScriptParser parser = new ActionScriptParser(abc, playerABCs);
+        List<ABC> parABCs=new ArrayList<>();
+        parABCs.addAll(playerABCs);
+        parABCs.addAll(otherABCs);
+        ActionScriptParser parser = new ActionScriptParser(abc, parABCs);
         parser.addScript(src, documentClass, fileName);
     }
 

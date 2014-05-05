@@ -1990,18 +1990,20 @@ public class AVM2Code implements Serializable {
                 if (code.get(maxIp).definition instanceof JumpIns) {
                     nextIp = adr2pos(pos2adr(nextIp) + code.get(maxIp).operands[0]);
                 }
-                int origScopePos = stats.instructionStats[nextIp].scopepos;
-                int origStackPos = stats.instructionStats[nextIp].stackpos;
+                if(nextIp<stats.instructionStats.length){
+                    int origScopePos = stats.instructionStats[nextIp].scopepos;
+                    int origStackPos = stats.instructionStats[nextIp].stackpos;
 
-                if (prevStart == ex.start && ex.isFinally() && !code.get(nextIp).isExit() && stats.instructionStats[nextIp].seen) {
-                    for (int i = 0; i < stats.instructionStats.length; i++) {
-                        stats.instructionStats[i].seen = false;
+                    if (prevStart == ex.start && ex.isFinally() && !code.get(nextIp).isExit() && stats.instructionStats[nextIp].seen) {
+                        for (int i = 0; i < stats.instructionStats.length; i++) {
+                            stats.instructionStats[i].seen = false;
+                        }
+                        //Rerun rest with new scopePos, stackPos
+                        if (!walkCode(stats, nextIp, origStackPos + 1/*magic!*/, scopePos - 1 /*magic!*/, abc)) {
+                            return null;
+                        }
+                        scopePos--;
                     }
-                    //Rerun rest with new scopePos, stackPos
-                    if (!walkCode(stats, nextIp, origStackPos + 1/*magic!*/, scopePos - 1 /*magic!*/, abc)) {
-                        return null;
-                    }
-                    scopePos--;
                 }
                 prevStart = ex.start;
             } catch (ConvertException ex1) {

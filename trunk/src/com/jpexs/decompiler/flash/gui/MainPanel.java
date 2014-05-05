@@ -684,15 +684,9 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         swfs.add(newSwfs);
 
         for (SWF swf : newSwfs) {
-            List<ContainerItem> objs = new ArrayList<>();
-            objs.addAll(swf.tags);
+           
 
-            ArrayList<ABCContainerTag> abcList = new ArrayList<>();
-            getActionScript3(objs, abcList);
-
-            swf.abcList = abcList;
-
-            boolean hasAbc = !abcList.isEmpty();
+            boolean hasAbc = !swf.abcList.isEmpty();
             swf.isAS3 = hasAbc;
 
             tagTree.setModel(new TagTreeModel(mainFrame, swfs));
@@ -933,16 +927,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
-    public static void getActionScript3(List<ContainerItem> list, List<ABCContainerTag> actionScripts) {
-        for (ContainerItem t : list) {
-            if (t instanceof Container) {
-                getActionScript3(((Container) t).getSubItems(), actionScripts);
-            }
-            if (t instanceof ABCContainerTag) {
-                actionScripts.add((ABCContainerTag) t);
-            }
-        }
-    }
+    
 
     public static void getMorphShapes(List<ContainerItem> list, List<Tag> morphShapes) {
         for (ContainerItem t : list) {

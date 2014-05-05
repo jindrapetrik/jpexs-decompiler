@@ -601,6 +601,7 @@ public final class SWF implements TreeItem, Timelined {
             assignExportNamesToSymbols();
             assignClassesToSymbols();
             findFileAttributes();
+            findABCTags();
         } else {
             boolean hasNonUnknownTag = false;
             for (Tag tag : tags) {
@@ -682,6 +683,27 @@ public final class SWF implements TreeItem, Timelined {
         return new File(title).getName();
     }
 
+    private void findABCTags(){
+         List<ContainerItem> objs = new ArrayList<>();
+            objs.addAll(tags);
+
+            ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();
+            getABCTags(objs, newAbcList);
+            this.abcList = newAbcList;
+    }
+    
+    
+    private static void getABCTags(List<ContainerItem> list, List<ABCContainerTag> actionScripts) {
+        for (ContainerItem t : list) {
+            if (t instanceof Container) {
+                getABCTags(((Container) t).getSubItems(), actionScripts);
+            }
+            if (t instanceof ABCContainerTag) {
+                actionScripts.add((ABCContainerTag) t);
+            }
+        }
+    }
+    
     private void findFileAttributes() {
         for (Tag t : tags) {
             if (t instanceof FileAttributesTag) {
