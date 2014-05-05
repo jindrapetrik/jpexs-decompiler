@@ -44,7 +44,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
 
     JComboBox<Language> languageCombobox = new JComboBox<>();
     public String languageCode = null;
-    private static final String[] languages = new String[]{"en", "cs", "zh", "de", "es", "fr", "hu", "nl", "pt", "ru", "sv", "uk"};
+    private static final String[] languages = new String[]{"en", "cs", "zh", "de", "es", "fr", "hu", "nl", "pt", "pt-BR", "ru", "sv", "uk"};
 
     public SelectLanguageDialog() {
         setSize(350, 130);
