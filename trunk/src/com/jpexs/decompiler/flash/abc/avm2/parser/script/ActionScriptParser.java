@@ -1975,10 +1975,8 @@ public class ActionScriptParser {
                     }
                 }
                 break;
-            case TYPEOF:
-                expectedType(SymbolType.PARENT_OPEN);
-                ret = new TypeOfAVM2Item(null, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
-                expectedType(SymbolType.PARENT_CLOSE);
+            case TYPEOF:                
+                ret = new TypeOfAVM2Item(null, expression(needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
                 existsRemainder = true;
                 break;
             case TRUE:
