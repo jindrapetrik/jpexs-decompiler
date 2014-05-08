@@ -279,7 +279,7 @@ public class FunctionActionItem extends ActionItem {
                     suppressThisFlag,
                     preloadThisFlag,
                     preloadGlobalFlag,
-                    registerNames.size() - 1, len, SWF.DEFAULT_VERSION, paramNames, paramRegs));
+                    registerNames.size(), len, SWF.DEFAULT_VERSION, paramNames, paramRegs));
         }
 
         return ret;

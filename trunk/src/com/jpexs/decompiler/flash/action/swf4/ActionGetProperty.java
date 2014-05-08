@@ -43,6 +43,10 @@ public class ActionGetProperty extends Action {
         if (index instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) index).value instanceof Long) {
                 indexInt = (int) (long) (Long) ((DirectValueActionItem) index).value;
+            } else if (((DirectValueActionItem) index).value instanceof Double) {
+                indexInt = (int) Math.round((Double) ((DirectValueActionItem) index).value);
+            } else if (((DirectValueActionItem) index).value instanceof Float) {
+                indexInt = (int) Math.round((Float) ((DirectValueActionItem) index).value);
             }
         }
         stack.push(new GetPropertyActionItem(this, target, indexInt));
