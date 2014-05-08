@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -53,7 +54,7 @@ public class ConvertSIns extends InstructionDefinition implements CoerceOrConver
     }
 
     @Override
-    public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
-        return "String";
+    public GraphTargetItem getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
+        return new TypeItem("String");
     }
 }

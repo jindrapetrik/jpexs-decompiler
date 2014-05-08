@@ -19,9 +19,11 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
@@ -84,7 +86,7 @@ public class CallAVM2Item extends AVM2Item {
             Reference<String> outNs = new Reference<>("");
             Reference<String> outPropNs = new Reference<>("");
             Reference<Integer> outPropNsKind = new Reference<>(1);
-            Reference<String> outPropType = new Reference<>("");
+            Reference<GraphTargetItem> outPropType = new Reference<>(null);
             Reference<ValueKind> outPropValue = new Reference<>(null);
             if (cname!=null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), n.line, "this", null, false, n.openedNamespaces);
@@ -99,7 +101,7 @@ public class CallAVM2Item extends AVM2Item {
         int propIndex = -1;
         if (callable instanceof TypeItem) {
             TypeItem t = (TypeItem) callable;
-            propIndex = AVM2SourceGenerator.resolveType(t, ((AVM2SourceGenerator) generator).abc);
+            propIndex = AVM2SourceGenerator.resolveType(localData,t, ((AVM2SourceGenerator) generator).abc,((AVM2SourceGenerator) generator).allABCs);
         }
         Object obj = null;
 
@@ -122,7 +124,7 @@ public class CallAVM2Item extends AVM2Item {
                 Reference<String> outNs = new Reference<>("");
                 Reference<String> outPropNs = new Reference<>("");
                 Reference<Integer> outPropNsKind = new Reference<>(1);
-                Reference<String> outPropType = new Reference<>("");
+                Reference<GraphTargetItem> outPropType = new Reference<>(null);
                 Reference<ValueKind> outPropValue = new Reference<>(null);
                 if (cname!=null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, new ArrayList<Integer>());
@@ -143,13 +145,13 @@ public class CallAVM2Item extends AVM2Item {
         }
 
         if(callable instanceof IndexAVM2Item){
-            return ((IndexAVM2Item)callable).toSource(localData, generator, needsReturn, true, arguments);
+            return ((IndexAVM2Item)callable).toSource(localData, generator, needsReturn, true, arguments,false,false);
         }
         if(callable instanceof NamespacedAVM2Item){
-            return ((NamespacedAVM2Item)callable).toSource(localData, generator, needsReturn, true, arguments);
+            return ((NamespacedAVM2Item)callable).toSource(localData, generator, needsReturn, true, arguments,false,false);
         }
         
-        throw new CompilationException("Not a callable", line);
+        return toSourceMerge(localData, generator, callable, ins(new GetGlobalScopeIns()),arguments,ins(new CallIns(),arguments.size()));
     }
 
     @Override

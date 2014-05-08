@@ -20,7 +20,9 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.DeletePropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
@@ -116,8 +118,10 @@ public class IndexAVM2Item extends AssignableAVM2Item {
         );
 
     }
+    
+   
 
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn, boolean call, List<GraphTargetItem> callargs) throws CompilationException {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn, boolean call, List<GraphTargetItem> callargs, boolean delete, boolean construct) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         int indexPropIndex = g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.MULTINAMELA : Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true);
         Reference<Integer> ret_temp = new Reference<>(-1);
@@ -136,9 +140,10 @@ public class IndexAVM2Item extends AssignableAVM2Item {
                     object,
                     call?ins(new DupIns()):null,
                     index,
-                    ins(new GetPropertyIns(), indexPropIndex),
+                    construct?callargs:null,
+                    ins(construct?new ConstructPropIns():delete?new DeletePropertyIns():new GetPropertyIns(), indexPropIndex, construct?callargs.size():null),
                     call?callargs:null,
-                    call?ins(new CallIns(),callargs.size()):null,
+                    call?ins(new CallIns(),callargs.size()):null,                    
                     needsReturn ? null : ins(new PopIns()));
         }
 
@@ -146,12 +151,12 @@ public class IndexAVM2Item extends AssignableAVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>());
+        return toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(),false,false);
     }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSource(localData, generator, false, false, new ArrayList<GraphTargetItem>());
+        return toSource(localData, generator, false, false, new ArrayList<GraphTargetItem>(),false,false);
     }
 
 }

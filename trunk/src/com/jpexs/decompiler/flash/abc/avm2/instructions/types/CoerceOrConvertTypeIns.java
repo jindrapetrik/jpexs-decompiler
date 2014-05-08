@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
 
 /**
@@ -26,5 +27,5 @@ import java.util.List;
  */
 public interface CoerceOrConvertTypeIns {
 
-    public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames);
+    public GraphTargetItem getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames);
 }

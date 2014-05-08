@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -45,13 +46,13 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         int multinameIndex = ins.operands[0];
-        stack.push(new CoerceAVM2Item(ins, (GraphTargetItem) stack.pop(), constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames)));
+        stack.push(new CoerceAVM2Item(ins, (GraphTargetItem) stack.pop(),PropertyAVM2Item.multinameToType(multinameIndex,constants)));
     }
 
     @Override
-    public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
+    public GraphTargetItem getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
         int multinameIndex = ins.operands[0];
-        return constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames);
+        return PropertyAVM2Item.multinameToType(multinameIndex, constants);
     }
 
     @Override

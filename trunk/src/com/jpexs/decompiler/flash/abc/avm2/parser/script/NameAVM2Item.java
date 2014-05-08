@@ -181,7 +181,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
     }
 
-    public static AVM2Instruction generateCoerce(SourceGenerator generator, GraphTargetItem ttype) {
+    public static AVM2Instruction generateCoerce(SourceGeneratorLocalData localData, SourceGenerator generator, GraphTargetItem ttype) throws CompilationException {
         if (ttype instanceof UnresolvedAVM2Item) {
             ttype = ((UnresolvedAVM2Item) ttype).resolved;
         }
@@ -189,33 +189,26 @@ public class NameAVM2Item extends AssignableAVM2Item {
         if (ttype instanceof UnboundedTypeItem) {
             ins = ins(new CoerceAIns());
         } else {
-            TypeItem type = (TypeItem) ttype;
-
-            if (type.subtypes.isEmpty()) {
-                switch (type.fullTypeName) {
-                    case "int":
-                        ins = ins(new ConvertIIns());
-                        break;
-                    case "*":
-                        ins = ins(new CoerceAIns());
-                        break;
-                    case "String":
-                        ins = ins(new CoerceSIns());
-                        break;
-                    case "Boolean":
-                        ins = ins(new ConvertBIns());
-                        break;
-                    case "uint":
-                        ins = ins(new ConvertUIns());
-                        break;
-                    default:
-                        int type_index = AVM2SourceGenerator.resolveType(type, ((AVM2SourceGenerator) generator).abc);
-                        ins = ins(new CoerceIns(), type_index);
-                        break;
-                }
-            } else {
-                int type_index = AVM2SourceGenerator.resolveType(type, ((AVM2SourceGenerator) generator).abc);
-                ins = ins(new CoerceIns(), type_index);
+            switch (ttype.toString()) {
+                case "int":
+                    ins = ins(new ConvertIIns());
+                    break;
+                case "*":
+                    ins = ins(new CoerceAIns());
+                    break;
+                case "String":
+                    ins = ins(new CoerceSIns());
+                    break;
+                case "Boolean":
+                    ins = ins(new ConvertBIns());
+                    break;
+                case "uint":
+                    ins = ins(new ConvertUIns());
+                    break;
+                default:
+                    int type_index = AVM2SourceGenerator.resolveType(localData,ttype, ((AVM2SourceGenerator) generator).abc,((AVM2SourceGenerator) generator).allABCs);
+                    ins = ins(new CoerceIns(), type_index);
+                    break;
             }
         }
         return ins;
@@ -223,7 +216,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
     private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         if (variableName != null && regNumber == -1 && slotNumber == -1 && ns == null) {
-            throw new RuntimeException("No register or slot set for " + variableName);
+            throw new CompilationException("No register or slot set for " + variableName, line);
         }
         if (definition && assignedValue == null) {
             return new ArrayList<>();
@@ -244,7 +237,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
             if (slotNumber > -1) {
                 return toSourceMerge(localData, generator,
                         ins(new GetScopeObjectIns(), slotScope),
-                        assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(generator, type) : null, needsReturn
+                        assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData,generator, type) : null, needsReturn
                         ? dupSetTemp(localData, generator, ret_temp) : null, generateSetLoc(regNumber), slotNumber > -1
                         ? ins(new SetSlotIns(), slotNumber)
                         : null,
@@ -252,7 +245,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
                         killTemp(localData, generator, Arrays.asList(ret_temp)));
             } else {
 
-                return toSourceMerge(localData, generator, assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(generator, type) : null, needsReturn
+                return toSourceMerge(localData, generator, assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData,generator, type) : null, needsReturn
                         ? ins(new DupIns()) : null, generateSetLoc(regNumber));
             }
         } else {

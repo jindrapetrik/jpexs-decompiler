@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -57,7 +58,7 @@ public class CoerceAIns extends InstructionDefinition implements CoerceOrConvert
     }
 
     @Override
-    public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
-        return "*";
+    public GraphTargetItem getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
+        return TypeItem.UNBOUNDED;
     }
 }

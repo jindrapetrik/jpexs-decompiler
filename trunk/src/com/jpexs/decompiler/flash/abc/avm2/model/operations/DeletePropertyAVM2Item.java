@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.DeletePropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.IndexAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.NamespacedAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.UnresolvedAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -29,6 +31,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DeletePropertyAVM2Item extends AVM2Item {
@@ -53,10 +56,8 @@ public class DeletePropertyAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("delete ");
-        object.toString(writer, localData);
-        writer.append("[");
-        propertyName.toString(writer, localData);
-        return writer.append("]");
+        formatProperty(writer, object, propertyName, localData);
+        return writer;
     }
 
     @Override
@@ -65,15 +66,22 @@ public class DeletePropertyAVM2Item extends AVM2Item {
         if (p instanceof UnresolvedAVM2Item) {
             p = ((UnresolvedAVM2Item) p).resolved;
         }
-        if (!(p instanceof PropertyAVM2Item)) {
-            throw new CompilationException("Not a property", line); //TODO: handle line better way
-        }
-
-        PropertyAVM2Item prop = (PropertyAVM2Item) p;
-
-        return toSourceMerge(localData, generator, prop.object,
+        if (p instanceof PropertyAVM2Item) {
+            PropertyAVM2Item prop=(PropertyAVM2Item)p;            
+            return toSourceMerge(localData, generator, prop.resolveObject(localData, generator),
                 ins(new DeletePropertyIns(), prop.resolveProperty(localData))
-        );
+            );
+        }
+        if(p instanceof IndexAVM2Item){
+            IndexAVM2Item ind=(IndexAVM2Item)p;
+            return ind.toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(), true,false);
+        }
+        if(p instanceof NamespacedAVM2Item){
+            NamespacedAVM2Item n=(NamespacedAVM2Item)p;
+            return n.toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(), true,false);
+        }
+        
+        throw new CompilationException("Not a property", line); //TODO: handle line better way        
     }
 
     @Override

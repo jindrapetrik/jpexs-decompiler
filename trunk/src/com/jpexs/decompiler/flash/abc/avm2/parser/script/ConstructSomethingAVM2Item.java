@@ -69,41 +69,36 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
         GraphTargetItem resname = name;
         if (resname instanceof UnresolvedAVM2Item) {
             resname = ((UnresolvedAVM2Item) resname).resolved;
-        }
+        }        
+        
         if (resname instanceof TypeItem) {
-            TypeItem prop = (TypeItem) resname;
-            if (!prop.subtypes.isEmpty()) { //It's Vector - TypeName
-                //int qname = ((AVM2SourceGenerator) generator).resolveType(prop.fullTypeName);
-                String name = prop.fullTypeName.substring(prop.fullTypeName.lastIndexOf('.') + 1);
-                ABC abc = ((AVM2SourceGenerator) generator).abc;
-                int qname = abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, abc.constants.getStringId(name, true), 0, allNsSetWithVec(abc), 0, new ArrayList<Integer>()), true);
-                List<Integer> params = new ArrayList<>();
-                for (String p : prop.subtypes) {
-                    params.add(((AVM2SourceGenerator) generator).resolveType(p));
-                }
-                List<GraphSourceItem> ret = new ArrayList<>();
-                ret.add(ins(new GetLexIns(), qname));
-                for (int p : params) {
-                    ret.add(ins(new GetLexIns(), p));
-                }
-                ret.add(ins(new ApplyTypeIns(), params.size()));
-                ret.addAll(toSourceMerge(localData, generator, arguments,
-                        ins(new ConstructIns(), arguments.size())
-                ));
-                return ret;
-
-            } else {
-                int type_index = ((AVM2SourceGenerator) generator).resolveType(resname.toString());
-                return toSourceMerge(localData, generator,
-                        new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index, arguments.size()}, new byte[0]), arguments,
-                        new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index, arguments.size()}, new byte[0])
-                );
-            }
+            TypeItem prop = (TypeItem) resname;            
+            int type_index = AVM2SourceGenerator.resolveType(localData,resname,((AVM2SourceGenerator)generator).abc,((AVM2SourceGenerator)generator).allABCs);
+            return toSourceMerge(localData, generator,
+                    new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index, arguments.size()}, new byte[0]), arguments,
+                    new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index, arguments.size()}, new byte[0])
+            );            
         }
+                        
+        if (resname instanceof PropertyAVM2Item) {
+            PropertyAVM2Item prop=(PropertyAVM2Item)resname;            
+            return toSourceMerge(localData, generator, prop.resolveObject(localData, generator),arguments,
+                ins(new ConstructPropIns(), prop.resolveProperty(localData),arguments.size())
+            );
+        }
+        
         if (resname instanceof NameAVM2Item) {
-            //TODO
+            return toSourceMerge(localData, generator, resname,arguments,ins(new ConstructIns(),arguments.size()));
         }
-        return new ArrayList<>();
+        
+        if(resname instanceof IndexAVM2Item){
+            return ((IndexAVM2Item)resname).toSource(localData, generator, true, false, arguments, false, true);
+        }
+        
+        if(resname instanceof NamespacedAVM2Item){
+            return ((NamespacedAVM2Item)resname).toSource(localData, generator, true, false, arguments, false, true);
+        }
+        return toSourceMerge(localData, generator, resname, arguments, ins(new ConstructIns(),arguments.size()));
     }
 
 }

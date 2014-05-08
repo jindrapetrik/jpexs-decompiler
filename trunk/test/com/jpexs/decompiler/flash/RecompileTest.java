@@ -120,6 +120,7 @@ public class RecompileTest {
 
     @Test(dataProvider = "provideFiles")
     public void testDirectEditing(String filename) throws IOException, InterruptedException, com.jpexs.decompiler.flash.abc.avm2.parser.ParseException, CompilationException {
+        Configuration.autoDeobfuscate.set(false);
         try{SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
         if (swf.fileAttributes.actionScript3) {
             List<ABC> allAbcs = new ArrayList<>();

@@ -23,10 +23,13 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
@@ -36,6 +39,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -115,7 +119,28 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 }
             }
         }
+        
+        if(obj.getThroughDuplicate() instanceof ConstructAVM2Item){
+            ConstructAVM2Item c = (ConstructAVM2Item)obj.getThroughDuplicate();
+            if(c.object instanceof ApplyTypeAVM2Item){
+                ApplyTypeAVM2Item at = (ApplyTypeAVM2Item)c.object;
+                c.args.clear();
+                List<GraphTargetItem> vals=new ArrayList<>();
+                vals.add(value);
+                c.object = new InitVectorAVM2Item(c.instruction,at.params.get(0),vals);
+                return;
+            }
+            else
+            if(c.object instanceof InitVectorAVM2Item){
+                InitVectorAVM2Item iv = (InitVectorAVM2Item)c.object;
+                iv.arguments.add(value);
+                return;
+            }
+        }
+        
         output.add(new SetPropertyAVM2Item(ins, obj, multiname, value));
+        
+        
     }
 
     @Override

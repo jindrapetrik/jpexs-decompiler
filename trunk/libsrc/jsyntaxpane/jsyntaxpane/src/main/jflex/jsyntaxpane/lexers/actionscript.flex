@@ -97,6 +97,8 @@ FLit2    = \. [0-9]+
 FLit3    = [0-9]+ 
 Exponent = [eE] [+-]? [0-9]+
 
+NewVector = "new" {WhiteSpace}* "<"
+
 /* string and character literals */
 StringCharacter = [^\r\n\"\\]
 SingleCharacter = [^\r\n\'\\]
@@ -215,6 +217,7 @@ SingleCharacter = [^\r\n\'\\]
   "new"                          | 
   "typeof"                       | 
   "void"                         | 
+ {NewVector}                     |
   "@"                            { return token(TokenType.OPERATOR); } 
   
   /* string literal */

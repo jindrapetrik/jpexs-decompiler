@@ -41,14 +41,14 @@ import java.util.Set;
 public class CoerceAVM2Item extends AVM2Item {
 
     //public GraphTargetItem value;
-    public String type;
+    //public GraphTargetItem type;
     public GraphTargetItem typeObj;
 
-    public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, String type) {
+    /*public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, String type) {
         super(instruction, value.getPrecedence());
         this.value = value;
         this.type = type;
-    }
+    }*/
 
     public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem typeObj) {
         super(instruction, value.getPrecedence());
@@ -79,7 +79,7 @@ public class CoerceAVM2Item extends AVM2Item {
     @Override
     public Object getResult() {
         Object ret = value.getResult();
-        switch (type) {
+        switch (typeObj.toString()) {
             case "String":
                 if (ret instanceof Null) {
                     return ret;
@@ -97,7 +97,7 @@ public class CoerceAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(type);
+        return new TypeItem(typeObj.toString());
     }
 
     @Override
@@ -112,7 +112,7 @@ public class CoerceAVM2Item extends AVM2Item {
          return toSourceMerge(localData, generator, value);
          }*/
         AVM2Instruction ins;
-        switch (type) {
+        switch (typeObj.toString()) {
             case "*":
                 ins = new AVM2Instruction(0, new CoerceAIns(), new int[]{}, new byte[0]);
                 break;
@@ -132,7 +132,7 @@ public class CoerceAVM2Item extends AVM2Item {
                 ins = new AVM2Instruction(0, new ConvertDIns(), new int[]{}, new byte[0]);
                 break;
             default:
-                int type_index = AVM2SourceGenerator.resolveType(new TypeItem(type), (((AVM2SourceGenerator) generator).abc));
+                int type_index = AVM2SourceGenerator.resolveType(localData, typeObj, ((AVM2SourceGenerator) generator).abc,(((AVM2SourceGenerator) generator).allABCs));
                 ins = new AVM2Instruction(0, new CoerceIns(), new int[]{type_index}, new byte[0]);
                 break;
         }

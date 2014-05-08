@@ -27,9 +27,9 @@ import java.util.Set;
 public class ConvertAVM2Item extends AVM2Item {
 
     //public GraphTargetItem value;
-    public String type;
+    public GraphTargetItem type;
 
-    public ConvertAVM2Item(AVM2Instruction instruction, GraphTargetItem value, String type) {
+    public ConvertAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, NOPRECEDENCE);
         this.value = value;
         this.type = type;
@@ -47,7 +47,7 @@ public class ConvertAVM2Item extends AVM2Item {
 
     @Override
     public Object getResult() {
-        switch (type) {
+        switch (type.toString()) {
             case "Boolean":
                 return EcmaScript.toBoolean(value.getResult());
             case "Number":
@@ -76,7 +76,7 @@ public class ConvertAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(type);
+        return type;
     }
 
     @Override

@@ -33,9 +33,9 @@ import com.jpexs.decompiler.graph.model.LocalData;
 public class DeclarationAVM2Item extends AVM2Item {
 
     public GraphTargetItem assignment;
-    public String type;
+    public GraphTargetItem type;
 
-    public DeclarationAVM2Item(GraphTargetItem assignment, String type) {
+    public DeclarationAVM2Item(GraphTargetItem assignment, GraphTargetItem type) {
         super(assignment.src, assignment.getPrecedence());
         this.type = type;
         this.assignment = assignment;
@@ -49,15 +49,18 @@ public class DeclarationAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (assignment instanceof SetLocalAVM2Item) {
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
-            String type = "*";
+            GraphTargetItem coerType = TypeItem.UNBOUNDED;
             if (lti.value instanceof CoerceAVM2Item) {
-                type = ((CoerceAVM2Item) lti.value).type;
+                coerType = ((CoerceAVM2Item) lti.value).typeObj;
             }
             if (lti.value instanceof ConvertAVM2Item) {
-                type = ((ConvertAVM2Item) lti.value).type;
+                coerType = ((ConvertAVM2Item) lti.value).type;
             }
             writer.append("var ");
-            writer.append(localRegName(localData.localRegNames, lti.regIndex) + ":" + type + " = ");
+            writer.append(localRegName(localData.localRegNames, lti.regIndex));
+            writer.append(":");
+            coerType.appendTo(writer, localData);
+            writer.append(" = ");
             return lti.value.toString(writer, localData);
         }
         if (assignment instanceof SetSlotAVM2Item) {
@@ -65,7 +68,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             writer.append("var ");
             ssti.getName(writer, localData);
             writer.append(":");
-            writer.append(type);
+            type.appendTo(writer, localData);
             writer.append(" = ");
             return ssti.value.toString(writer, localData);
         }
@@ -75,7 +78,7 @@ public class DeclarationAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(type);
+        return type;
     }
 
     @Override

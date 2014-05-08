@@ -37,16 +37,14 @@ public class TypeItem extends GraphTargetItem {
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
 
     public String fullTypeName;
-    public List<String> subtypes = new ArrayList<>();
 
     public TypeItem(String fullTypeName) {
-        this(fullTypeName, new ArrayList<String>());
+        this(fullTypeName, new ArrayList<GraphTargetItem>());
     }
 
-    public TypeItem(String fullTypeName, List<String> subtypes) {
+    public TypeItem(String fullTypeName, List<GraphTargetItem> subtypes) {
         super(null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
-        this.subtypes.addAll(subtypes);
     }
 
     @Override
@@ -73,7 +71,16 @@ public class TypeItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append(fullTypeName);
+        if(localData.fullyQualifiedNames.contains(fullTypeName)){
+            writer.append(fullTypeName);
+        }else{
+            String simpleName = fullTypeName;
+            if(simpleName.contains(".")){
+                simpleName = simpleName.substring(simpleName.lastIndexOf(".")+1);
+            }
+            writer.append(simpleName);
+        }
+        
         return writer;
     }
 
@@ -89,13 +96,7 @@ public class TypeItem extends GraphTargetItem {
 
     @Override
     public String toString() {
-        String add = "";
-        if (!subtypes.isEmpty()) {
-            add += ".<";
-            add += Helper.joinStrings(subtypes, ",");
-            add += ">";
-        }
-        return fullTypeName + add;
+        return fullTypeName;
     }
 
     @Override
