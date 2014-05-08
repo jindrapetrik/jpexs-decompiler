@@ -230,6 +230,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         try {
             sos.writeUI16(spriteId);
             sos.writeUI16(frameCount);
+            sos.writeTags(subTags);
             if (hasEndTag) {
                 sos.writeUI16(0);
             }
