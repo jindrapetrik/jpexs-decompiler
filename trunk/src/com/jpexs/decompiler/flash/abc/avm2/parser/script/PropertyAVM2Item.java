@@ -309,7 +309,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                     for (ABC a : abcs) {
                         for (InstanceInfo ii : a.instance_info) {
                             Multiname m = ii.getName(a.constants);
-                            if (m.getNameWithNamespace(a.constants).equals(objType)) {
+                            if (multinameToType(ii.name_index, a.constants).equals(objType)) {
                                 Reference<String> outName = new Reference<>("");
                                 Reference<String> outNs = new Reference<>("");
                                 Reference<String> outPropNs = new Reference<>("");

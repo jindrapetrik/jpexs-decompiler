@@ -94,7 +94,7 @@ public class ABC {
         constants.constant_double.add(null);
         constants.constant_int.add(null);
         constants.constant_uint.add(null);
-        constants.constant_string.add("");
+        constants.constant_string.add(null);
         constants.constant_multiname.add(null);
         constants.constant_namespace.add(null);
         constants.constant_namespace_set.add(null);

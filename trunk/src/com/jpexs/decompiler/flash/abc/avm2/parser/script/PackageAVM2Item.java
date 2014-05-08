@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,9 +32,13 @@ public class PackageAVM2Item extends AVM2Item {
 
     public List<GraphTargetItem> items;
     public String packageName;
+    public List<String> importedClasses=new ArrayList<String>();
+    public int publicNs = 0;
 
-    public PackageAVM2Item(String packageName, List<GraphTargetItem> items) {
+    public PackageAVM2Item(int publicNs,List<String> importedClasses, String packageName, List<GraphTargetItem> items) {
         super(null, NOPRECEDENCE);
+        this.publicNs = publicNs;
+        this.importedClasses = importedClasses;
         this.items = items;
         this.packageName = packageName;
     }

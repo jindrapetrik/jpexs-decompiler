@@ -276,7 +276,7 @@ public class MethodInfo {
             if (optional != null) {
                 if (i >= param_types.length - optional.length) {
                     int optionalIndex = i - (param_types.length - optional.length);
-                    writer.appendNoHilight("=");
+                    writer.appendNoHilight(" = ");
                     writer.hilightSpecial(optional[optionalIndex].toString(constants), "optional", optionalIndex);
                 }
             }

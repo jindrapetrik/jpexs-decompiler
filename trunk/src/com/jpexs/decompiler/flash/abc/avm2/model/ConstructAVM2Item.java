@@ -40,7 +40,13 @@ public class ConstructAVM2Item extends AVM2Item {
             return object.toString(writer, localData);
         }
         writer.append("new ");
+        if(object.getPrecedence()>getPrecedence()){
+            writer.append("(");
+        }
         object.toString(writer, localData);
+        if(object.getPrecedence()>getPrecedence()){
+            writer.append(")");
+        }
         writer.spaceBeforeCallParenthesies(args.size());
         if(object instanceof InitVectorAVM2Item){
            return writer; 

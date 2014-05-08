@@ -361,7 +361,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             String fname = Helper.joinStrings(parts.subList(0, i + 1), ".");
             for (ABC a : allAbcs) {
                 for (int c = 0; c < a.instance_info.size(); c++) {
-                    if (fname.equals(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants))) {
+                    if (a.instance_info.get(c).name_index>0 && fname.equals(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants))) {
                         if (!subtypes.isEmpty() && parts.size() > i + 1) {
                             continue;
                         }
@@ -395,9 +395,14 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         //Search for types in opened namespaces        
         for (int ni : openedNamespaces) {
             Namespace ons = abc.constants.getNamespace(ni);
+            if(ons == null){
+                continue;
+            }
             for (ABC a : allAbcs) {
                 for (int c = 0; c < a.instance_info.size(); c++) {
-                    if ((a == abc && a.instance_info.get(c).getName(a.constants).namespace_index == ni) || (ons.kind != Namespace.KIND_PRIVATE && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants).hasName(ons.getName(abc.constants), a.constants))) {
+                    if ((a.instance_info.get(c).getName(a.constants)!=null && a == abc && a.instance_info.get(c).getName(a.constants).namespace_index == ni) 
+                            || 
+                            (ons.kind != Namespace.KIND_PRIVATE && a.instance_info.get(c).getName(a.constants)!=null &&a.instance_info.get(c).getName(a.constants).getNamespace(a.constants)!=null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants).hasName(ons.getName(abc.constants), a.constants))) {
                         String cname = a.instance_info.get(c).getName(a.constants).getName(a.constants, new ArrayList<String>());
                         if (parts.get(0).equals(cname)) {
                             if (!subtypes.isEmpty() && parts.size() > 1) {

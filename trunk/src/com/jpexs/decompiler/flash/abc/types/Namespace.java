@@ -101,6 +101,13 @@ public class Namespace {
         }
         return constants.getString(name_index);
     }
+    
+    public boolean hasName(ConstantPool constants,String name){
+        if(name == null){
+            return name_index == 0;
+        }
+        return name.equals(getName(constants));
+    }
 
     public boolean hasName(String name, ConstantPool constants) {
         if (name == null && name_index == 0) {

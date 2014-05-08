@@ -213,6 +213,9 @@ public class ConstantPool {
 
     public int getDoubleId(double value) {
         for (int i = 1; i < constant_double.size(); i++) {
+            if(Double.isNaN(value) && Double.isNaN(constant_double.get(i))){
+                return i;
+            }
             if (Double.compare(constant_double.get(i), value) == 0) {
                 return i;
             }

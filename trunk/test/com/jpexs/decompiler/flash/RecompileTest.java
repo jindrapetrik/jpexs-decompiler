@@ -123,14 +123,25 @@ public class RecompileTest {
         Configuration.autoDeobfuscate.set(false);
         try{SWF swf = new SWF(new BufferedInputStream(new FileInputStream(TESTDATADIR + File.separator + filename)), false);
         if (swf.fileAttributes.actionScript3) {
+            boolean dotest=false;
             List<ABC> allAbcs = new ArrayList<>();
             for (ABCContainerTag ct : swf.abcList) {
                 allAbcs.add(ct.getABC());
             }
             for (ABC abc : allAbcs) {
                 for (int s = 0; s < abc.script_info.size(); s++) {
+                    
+                    String startAfter=null;
                     HilightedTextWriter htw = new HilightedTextWriter(new CodeFormatting(), false);
                     MyEntry<ClassPath, ScriptPack> en = abc.script_info.get(s).getPacks(abc, s).get(0);
+                    if(startAfter==null || en.key.toString().equals(startAfter)){
+                        dotest = true;
+                    }
+                    if(!dotest){
+                        System.out.println("Skipped:"+en.key.toString());
+                        continue;
+                    }
+                    
                     System.out.println("Recompiling:"+en.key.toString()+"...");
                     en.value.toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
                     String original = htw.toString();

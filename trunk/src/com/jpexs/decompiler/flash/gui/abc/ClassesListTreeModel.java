@@ -125,7 +125,7 @@ public class ClassesListTreeModel implements TreeModel, TreeElementItem {
                 }
             }
             //String nsName = path.contains(".") ? path.substring(path.lastIndexOf(".") + 1) : path;
-            //String packageName = path.contains(".") ? path.substring(0, path.lastIndexOf(".")) : "";
+            //String packageName = path.contains(".") ? path.substring(0, path.lastIndexOf(".")) : "";            
             classTree.add(item.key.className, item.key.packageStr, item.value);
         }
     }

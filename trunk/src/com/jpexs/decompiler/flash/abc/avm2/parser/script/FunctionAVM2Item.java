@@ -46,9 +46,11 @@ public class FunctionAVM2Item extends AVM2Item {
     public boolean hasRest;
     public boolean needsActivation;
     public boolean isInterface;
+    public String pkg;
 
-    public FunctionAVM2Item(boolean isInterface, boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+    public FunctionAVM2Item(String pkg,boolean isInterface, boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
         super(null, NOPRECEDENCE);
+        this.pkg = pkg;
         this.needsActivation = needsActivation;
         this.namespace = namespace;
         this.paramNames = paramNames;

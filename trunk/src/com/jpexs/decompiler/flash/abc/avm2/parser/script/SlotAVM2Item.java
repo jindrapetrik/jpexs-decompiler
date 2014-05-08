@@ -33,7 +33,8 @@ public class SlotAVM2Item extends AVM2Item {
     public GraphTargetItem type;
     public String customNamespace;
     public int line;
-
+    public String pkg;
+    
     public int getNamespace() {
         return namespace;
     }
@@ -42,8 +43,9 @@ public class SlotAVM2Item extends AVM2Item {
         return isStatic;
     }
 
-    public SlotAVM2Item(String customNamespace, boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value, int line) {
+    public SlotAVM2Item(String pkg,String customNamespace, boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value, int line) {
         super(null, NOPRECEDENCE);
+        this.pkg = pkg;
         this.line = line;
         this.namespace = namespace;
         this.value = value;
