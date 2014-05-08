@@ -209,6 +209,7 @@ public class ActionScript3Test {
                 + "trace(\"new line \\r\\n hello!\");\r\n", false);
     }
 
+    @Test
     public void testContinueLevels() {
         decompileMethod("testContinueLevels", "var b:* = undefined;\r\n"
                 + "var c:* = undefined;\r\n"
@@ -808,7 +809,7 @@ public class ActionScript3Test {
     public void testStringConcat() {
         decompileMethod("testStringConcat", "var k:* = 8;\r\n"
                 + "this.traceIt(\"hello\" + 5 * 6);\r\n"
-                + "this.traceIt(\"hello\" + (k-1));\r\n"
+                + "this.traceIt(\"hello\" + (k - 1));\r\n"
                 + "this.traceIt(\"hello\" + 5 + 6);\r\n", false);
     }
 
@@ -887,6 +888,12 @@ public class ActionScript3Test {
                 + "{\r\n"
                 + "}\r\n"
                 + "return 4;\r\n", false);
+    }
+
+    @Test
+    public void testVector2() {
+        decompileMethod("testVector2", "var a:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();\r\n"
+                + "var b:Vector.<int> = new <int>[10,20,30];\r\n", false);
     }
 
     @Test

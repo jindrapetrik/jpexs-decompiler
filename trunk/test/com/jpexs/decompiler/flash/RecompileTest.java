@@ -131,12 +131,11 @@ public class RecompileTest {
                 for (int s = 0; s < abc.script_info.size(); s++) {
                     HilightedTextWriter htw = new HilightedTextWriter(new CodeFormatting(), false);
                     MyEntry<ClassPath, ScriptPack> en = abc.script_info.get(s).getPacks(abc, s).get(0);
-                    System.out.print("Recompiling:"+en.key.toString()+"...");
+                    System.out.println("Recompiling:"+en.key.toString()+"...");
                     en.value.toSource(htw, swf.abcList, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
                     String original = htw.toString();
                     ABC nabc = new ABC(swf);
-                    com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc,allAbcs, false, en.key.className + ".as");                                        
-                    System.out.println("OK");
+                    com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, nabc,allAbcs, false, en.key.className + ".as");                                                            
                 }
             }
         } else {

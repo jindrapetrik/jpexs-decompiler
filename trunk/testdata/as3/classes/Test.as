@@ -881,5 +881,11 @@
 		public function testOptionalParameters(p1:Event=null, p2:Number=1, p3:Number=-1, p4:Number=-1.1, p5:Number=-1.1, p6:String="a")
 		{
 		}
+		
+		public function testVector2()
+		{
+			var a:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();
+         	var b:Vector.<int> = new <int>[10,20,30];
+		}
 	}
 }
