@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -62,7 +63,12 @@ public class UnLoadMovieNumActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        return toSourceMerge(localData, generator, new ActionPush(""), new AddActionItem(src, asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(0, false, true));
+        if((num instanceof DirectValueActionItem)&&(((DirectValueActionItem)num).value instanceof Long)){
+            return toSourceMerge(localData, generator, new ActionGetURL("","_level"+((DirectValueActionItem)num).value ));
+        }else{
+            return toSourceMerge(localData, generator, new ActionPush(""), new AddActionItem(src, asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(0, false, true));
+        }
+        
     }
 
     @Override

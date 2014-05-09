@@ -243,4 +243,15 @@ public class DirectValueActionItem extends ActionItem {
     public boolean hasReturnValue() {
         return true;
     }
+    
+    public boolean isString(){
+        return (value instanceof String)||(value instanceof ConstantIndex);
+    }
+    
+    public String getAsString(){
+        if(!isString()){
+            return null;
+        }
+        return (String)getResult();
+    }
 }

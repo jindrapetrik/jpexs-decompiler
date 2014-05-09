@@ -17,6 +17,9 @@
 package com.jpexs.decompiler.flash.action.swf3;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
+import com.jpexs.decompiler.flash.action.model.GotoFrameActionItem;
 import com.jpexs.decompiler.flash.action.model.PlayActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -36,6 +39,11 @@ public class ActionPlay extends Action {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        output.add(new PlayActionItem(this));
+        if(!output.isEmpty() && (output.get(output.size()-1) instanceof GotoFrameActionItem)){
+            GotoFrameActionItem gta=(GotoFrameActionItem)output.remove(output.size()-1);
+            output.add(new GotoFrame2ActionItem(this, new DirectValueActionItem(gta.frame+1), false, true, 0));
+        }else{
+            output.add(new PlayActionItem(this));
+        }
     }
 }

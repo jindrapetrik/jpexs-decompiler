@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.swf3.ActionGotoFrame;
+import com.jpexs.decompiler.flash.action.swf3.ActionPlay;
 import com.jpexs.decompiler.flash.action.swf4.ActionGotoFrame2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -72,8 +74,12 @@ public class GotoFrame2ActionItem extends ActionItem {
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSourceMerge(localData, generator, frame, new ActionGotoFrame2(playFlag, sceneBiasFlag, sceneBias));
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {        
+        if(!sceneBiasFlag && (frame instanceof DirectValueActionItem) && (((DirectValueActionItem)frame).value instanceof Long)){            
+            return toSourceMerge(localData, generator, frame, new ActionGotoFrame((int)((long)(Long)((DirectValueActionItem)frame).value)-1),playFlag?new ActionPlay():null);
+        }else{
+            return toSourceMerge(localData, generator, frame, new ActionGotoFrame2(playFlag, sceneBiasFlag, sceneBias));
+        }
     }
 
     @Override

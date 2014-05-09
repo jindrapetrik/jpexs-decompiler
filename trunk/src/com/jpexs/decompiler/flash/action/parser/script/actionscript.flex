@@ -232,6 +232,7 @@ SingleCharacter = [^\r\n\'\\]
   "print"                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.PRINT,yytext()); }
   "unloadMovie"                  { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.UNLOADMOVIE,yytext()); }
   "unloadMovieNum"               { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.UNLOADMOVIENUM,yytext()); }
+  "fscommand"                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.FSCOMMAND,yytext()); }
   
 
   /* operators */

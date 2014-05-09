@@ -29,6 +29,8 @@ import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
 import com.jpexs.decompiler.flash.action.model.DeleteActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EvalActionItem;
+import com.jpexs.decompiler.flash.action.model.FSCommand2ActionItem;
+import com.jpexs.decompiler.flash.action.model.FSCommandActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetTimeActionItem;
@@ -579,6 +581,11 @@ public class ActionScriptParser {
             return null;
         }
         switch (s.type) {
+            case FSCOMMAND:
+                expectedType(SymbolType.PARENT_OPEN);
+                ret = new FSCommandActionItem(null, expression(registerVars, inFunction, inMethod, true, variables));
+                expectedType(SymbolType.PARENT_CLOSE);
+                break;
             case CALL:
                 expectedType(SymbolType.PARENT_OPEN);
                 ret = new CallActionItem(null, (expression(registerVars, inFunction, inMethod, true, variables)));
@@ -815,7 +822,7 @@ public class ActionScriptParser {
                 } else {
                     lexer.pushback(s);
                 }
-                ret = new GotoFrame2ActionItem(null, gtpFrame, true, false, 0);
+                ret = new GotoFrame2ActionItem(null, gtpFrame, false, true, 0);
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
 
@@ -838,7 +845,7 @@ public class ActionScriptParser {
                     lockCenter = (expression(registerVars, inFunction, inMethod, true, variables));
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
-                        constrain = new DirectValueActionItem(null, 0, Boolean.TRUE, new ArrayList<String>());
+                        constrain = new DirectValueActionItem(null, 0, new Long(1), new ArrayList<String>());
                         x1 = (expression(registerVars, inFunction, inMethod, true, variables));
                         s = lex();
                         if (s.type == SymbolType.COMMA) {
@@ -867,12 +874,12 @@ public class ActionScriptParser {
                         }
                     } else {
                         lexer.pushback(s);
-                        constrain = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<String>());
+                        constrain = new DirectValueActionItem(null, 0, new Long(0), new ArrayList<String>());
                         //ret.add(new ActionPush(Boolean.FALSE));
                     }
                 } else {
-                    lockCenter = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<String>());
-                    constrain = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<String>());
+                    lockCenter = new DirectValueActionItem(null, 0, new Long(0), new ArrayList<String>());
+                    constrain = new DirectValueActionItem(null, 0, new Long(0), new ArrayList<String>());
                     lexer.pushback(s);
                 }
                 expectedType(SymbolType.PARENT_CLOSE);

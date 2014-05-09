@@ -18,8 +18,10 @@ package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.swf3.ActionSetTarget;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetTarget2;
+import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -67,8 +69,12 @@ public class TellTargetActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
-        ret.addAll(target.toSource(localData, generator));
-        ret.add(new ActionSetTarget2());
+        if((target instanceof DirectValueActionItem)&&((((DirectValueActionItem)target).value instanceof String) || (((DirectValueActionItem)target).value instanceof ConstantIndex))){
+            ret.add(new ActionSetTarget((String)target.getResult()));
+        }else{
+            ret.addAll(target.toSource(localData, generator));
+            ret.add(new ActionSetTarget2());
+        }
         ret.addAll(generator.generate(localData, commands));
         ret.add(new ActionSetTarget(""));
         return ret;

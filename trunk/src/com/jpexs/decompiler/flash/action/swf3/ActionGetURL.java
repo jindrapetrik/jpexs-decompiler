@@ -84,7 +84,7 @@ public class ActionGetURL extends Action {
         String fsCommandPrefix = "FSCommand:";
         if (urlString.startsWith(fsCommandPrefix) && targetString.isEmpty()) {
             String command = urlString.substring(fsCommandPrefix.length());
-            output.add(new FSCommandActionItem(this, command));
+            output.add(new FSCommandActionItem(this, new DirectValueActionItem(command)));
             return;
         }
         String levelPrefix = "_level";
