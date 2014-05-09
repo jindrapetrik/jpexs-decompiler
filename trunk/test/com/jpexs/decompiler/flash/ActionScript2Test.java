@@ -795,4 +795,14 @@ public class ActionScript2Test extends ActionStript2TestBase {
         );
     }
 
+    @Test
+    public void frame59_unaryOpTest() {
+        compareSrc(59, "trace(\"unaryOpTest\");\r\n"
+                + "var a = 5;\r\n"
+                + "var c = ~a;\r\n"
+                + "var d = ~(a + c);\r\n"
+                + "var e = - c;\r\n"
+        );
+    }
+
 }

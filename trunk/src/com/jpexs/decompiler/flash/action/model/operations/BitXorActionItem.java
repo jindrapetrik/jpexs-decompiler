@@ -17,13 +17,16 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitXor;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
@@ -38,6 +41,25 @@ public class BitXorActionItem extends BinaryOpItem {
         return ((long) (double) EcmaScript.toNumber(leftSide.getResult())) ^ ((long) (double) EcmaScript.toNumber(rightSide.getResult()));
     }
 
+    @Override
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        if((rightSide instanceof DirectValueActionItem)&&(((DirectValueActionItem)rightSide).value.equals(4.294967295E9))){
+            writer.append("~");
+            if(leftSide.getPrecedence()>PRECEDENCE_UNARY){
+                writer.append("(");
+            }
+            leftSide.appendTo(writer, localData);
+            if(leftSide.getPrecedence()>PRECEDENCE_UNARY){
+                writer.append(")");
+            }
+            return writer;
+        }else{
+            return super.appendTo(writer, localData);
+        }
+    }
+
+    
+    
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide, new ActionBitXor());

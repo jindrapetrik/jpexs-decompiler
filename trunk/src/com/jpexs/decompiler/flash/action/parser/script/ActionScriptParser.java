@@ -1481,6 +1481,11 @@ public class ActionScriptParser {
         boolean existsRemainder = false;
         boolean assocRight = false;
         switch (s.type) {
+            case NEGATE:
+                ret = expression(registerVars, inFunction, inMethod, false, variables);
+                ret = new BitXorActionItem(null, ret, new DirectValueActionItem(4.294967295E9));
+                existsRemainder = true;
+                break;
             case MINUS:
                 s = lex();
                 if (s.isType(SymbolType.DOUBLE)) {

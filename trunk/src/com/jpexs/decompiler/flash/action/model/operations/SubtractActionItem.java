@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -42,24 +43,34 @@ public class SubtractActionItem extends BinaryOpItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (rightSide.getPrecedence() >= precedence) { // >=  add or subtract too
-            String ret = "";
-            if (leftSide.getPrecedence() > precedence) {
-                writer.append("(");
-                leftSide.toString(writer, localData);
-                writer.append(")");
-            } else {
-                leftSide.toString(writer, localData);
-            }
-            writer.append(" ");
+        if ((leftSide instanceof DirectValueActionItem)
+                && (((((DirectValueActionItem) leftSide).value instanceof Float) && (((Float) ((DirectValueActionItem) leftSide).value) == 0f))
+                || ((((DirectValueActionItem) leftSide).value instanceof Double) && (((Double) ((DirectValueActionItem) leftSide).value) == 0.0))
+                || ((((DirectValueActionItem) leftSide).value instanceof Long) && (((Long) ((DirectValueActionItem) leftSide).value) == 0L)))) {
             writer.append(operator);
             writer.append(" ");
-
-            writer.append("(");
-            rightSide.toString(writer, localData);
-            return writer.append(")");
+            rightSide.appendTo(writer, localData);
+            return writer;
         } else {
-            return super.appendTo(writer, localData);
+            if (rightSide.getPrecedence() >= precedence) { // >=  add or subtract too
+
+                if (leftSide.getPrecedence() > precedence) {
+                    writer.append("(");
+                    leftSide.toString(writer, localData);
+                    writer.append(")");
+                } else {
+                    leftSide.toString(writer, localData);
+                }
+                writer.append(" ");
+                writer.append(operator);
+                writer.append(" ");
+
+                writer.append("(");
+                rightSide.toString(writer, localData);
+                return writer.append(")");
+            } else {
+                return super.appendTo(writer, localData);
+            }
         }
     }
 
