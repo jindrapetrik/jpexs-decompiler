@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.treenodes;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class SWFNode extends SWFContainerNode {
     private final String name;
     public List<TreeNode> list;
     public TreeNode scriptsNode;
+    public DefineBinaryDataTag binaryData;
 
     public SWFNode(SWF swf, String name) {
         super(swf);

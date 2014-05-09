@@ -47,8 +47,8 @@ public class ExportAssetsTag extends Tag {
     public List<String> names;
     public static final int ID = 56;
 
-    public ExportAssetsTag() {
-        super(null, ID, "ExportAssets", new byte[0], new byte[0], 0);
+    public ExportAssetsTag(SWF swf) {
+        super(swf, ID, "ExportAssets", new byte[0], new byte[0], 0);
         tags = new ArrayList<>();
         names = new ArrayList<>();
     }

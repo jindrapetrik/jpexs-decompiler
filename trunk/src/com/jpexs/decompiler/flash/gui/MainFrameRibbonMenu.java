@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
+import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Cache;
@@ -510,7 +511,7 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         closeFileMenu.setEnabled(swfLoaded);
         closeAllFilesMenu.setEnabled(swfLoaded);
 
-        boolean isBundle = swfLoaded && (swf.swfList != null) && swf.swfList.isBundle;
+        boolean isBundle = swfLoaded && (swf.swfList != null) && swf.swfList.isBundle;        
         saveCommandButton.setEnabled(swfLoaded && !isBundle);
         saveasCommandButton.setEnabled(swfLoaded);
         saveasexeCommandButton.setEnabled(swfLoaded);
@@ -668,7 +669,18 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                 break;
             case ACTION_SAVE: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
-                if (swf.file == null) {
+                SWFNode snode = ((TagTreeModel)mainFrame.panel.tagTree.getModel()).getSwfNode(swf);
+                if(snode.binaryData!=null){
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        swf.saveTo(baos);
+                        snode.binaryData.binaryData = baos.toByteArray();
+                        snode.binaryData.setModified(true);
+                    } catch (IOException ex) {
+                        Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                    }
+                }
+                else if (swf.file == null) {
                     saveAs(swf, SaveFileMode.SAVEAS);
                 } else {
                     try {

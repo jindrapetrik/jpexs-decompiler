@@ -680,7 +680,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                             new ShowFrameTag(swf).writeTag(sos2);
                         }
                     } else if (tagObj instanceof DefineSoundTag) {
-                        ExportAssetsTag ea = new ExportAssetsTag();
+                        ExportAssetsTag ea = new ExportAssetsTag(swf);
                         DefineSoundTag ds = (DefineSoundTag) tagObj;
                         ea.tags.add(ds.soundId);
                         ea.names.add("my_define_sound");

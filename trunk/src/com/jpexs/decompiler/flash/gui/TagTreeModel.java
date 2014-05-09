@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.treenodes.ClassesListNode;
 import com.jpexs.decompiler.flash.gui.abc.treenodes.TreeElement;
@@ -25,6 +26,7 @@ import com.jpexs.decompiler.flash.gui.treenodes.SWFContainerNode;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.gui.treenodes.StringNode;
 import com.jpexs.decompiler.flash.gui.treenodes.TagTreeRoot;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
@@ -38,6 +40,11 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.FrameNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
+import com.jpexs.helpers.Helper;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -153,7 +160,20 @@ public class TagTreeModel implements TreeModel {
                     sounds.add(new TagNode(t));
                     break;
                 case BINARY_DATA:
-                    binaryData.add(new TagNode(t));
+                    TagNode bt;
+                    binaryData.add(bt = new TagNode(t));
+                    
+                    DefineBinaryDataTag b=(DefineBinaryDataTag)t;
+                    
+                    try {
+                        SWF bswf=new SWF(new ByteArrayInputStream(b.binaryData),Configuration.parallelSpeedUp.get());
+                        bswf.fileTitle = "(SWF Data)";
+                        SWFNode snode=createSwfNode(bswf);
+                        snode.binaryData = b;
+                        bt.subNodes.add(snode);
+                    } catch (IOException | InterruptedException ex) {
+                        //ignore
+                    }   
                     break;
                 default:
                     if (!actionScriptTags.contains(t) && !ShowFrameTag.isNestedTagType(t.getId())) {

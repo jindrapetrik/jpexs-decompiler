@@ -2324,11 +2324,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         TreeItem treeItem = treeNode.getItem();
         if (!(treeItem instanceof SWFList)) {
             SWF swf = treeItem.getSwf();
-            if (swfs.contains(swf.swfList)) {
+            /*if (swfs.contains(swf.swfList)) { //why?
                 updateUi(swf);
             } else {
                 updateUi();
-            }
+            }*/
+            updateUi(swf);
         } else {
             updateUi();
         }
@@ -2510,7 +2511,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 timelined = parentSprite;
             }
             previewPanel.showImagePanel(timelined, swf, fn.getFrame() - 1);
-        } else if (((tagObj instanceof SoundTag) && isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
+        } else if ((tagObj instanceof SoundTag)){ //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             showCard(CARDPREVIEWPANEL);
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
             previewPanel.setImageReplaceButtonVisible(tagObj instanceof DefineSoundTag);
