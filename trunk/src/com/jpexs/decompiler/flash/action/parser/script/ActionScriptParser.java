@@ -1514,10 +1514,8 @@ public class ActionScriptParser {
                     }
                 }
                 break;
-            case TYPEOF:
-                expectedType(SymbolType.PARENT_OPEN);
-                ret = new TypeOfActionItem(null, expression(registerVars, inFunction, inMethod, true, variables));
-                expectedType(SymbolType.PARENT_CLOSE);
+            case TYPEOF:                
+                ret = new TypeOfActionItem(null, expression(registerVars, inFunction, inMethod, false, variables));              
                 existsRemainder = true;
                 break;
             case TRUE:
