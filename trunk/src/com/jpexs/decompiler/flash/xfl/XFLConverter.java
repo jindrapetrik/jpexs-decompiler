@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.MovieExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
@@ -392,20 +393,24 @@ public class XFLConverter {
     }
 
     public static String convertMatrix(MATRIX m) {
+        return convertMatrix(new Matrix(m));
+    }
+    
+    public static String convertMatrix(Matrix m) {
         String ret = "";
         if (m == null) {
-            m = new MATRIX();
+            m = new Matrix();
         }
         ret += "<Matrix ";
         ret += "tx=\"" + (((float) m.translateX) / 20.0) + "\" ";
         ret += "ty=\"" + (((float) m.translateY) / 20.0) + "\" ";
-        if (m.hasScale) {
-            ret += "a=\"" + m.getScaleXFloat() + "\" ";
-            ret += "d=\"" + m.getScaleYFloat() + "\" ";
+        if (m.scaleX!=1.0 || m.scaleY!=1.0) {
+            ret += "a=\"" + m.scaleX+ "\" ";
+            ret += "d=\"" + m.scaleY + "\" ";
         }
-        if (m.hasRotate) {
-            ret += "b=\"" + m.getRotateSkew0Float() + "\" ";
-            ret += "c=\"" + m.getRotateSkew1Float() + "\" ";
+        if (m.rotateSkew0!=0.0 || m.rotateSkew1!=0.0) {
+            ret += "b=\"" + m.rotateSkew0 + "\" ";
+            ret += "c=\"" + m.rotateSkew1 + "\" ";
         }
         ret += "/>";
         return ret;
@@ -1447,9 +1452,8 @@ public class XFLConverter {
                         format += 1;
                     }
                     format += 4; //quality best
-                    SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), swf.version);
                     try {
-                        MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
+                        MP3SOUNDDATA s = new MP3SOUNDDATA(new ByteArrayInputStream(soundData), false);
                         //sis.readSI16();
                         //MP3FRAME frame = new MP3FRAME(sis);
                         MP3FRAME frame = s.frames.get(0);
@@ -2295,11 +2299,13 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertText(String instanceName, List<Tag> tags, TextTag tag, MATRIX matrix, List<FILTER> filters, CLIPACTIONS clipActions) {
+    public static String convertText(String instanceName, List<Tag> tags, TextTag tag, MATRIX m, List<FILTER> filters, CLIPACTIONS clipActions) {
         String ret = "";
-        if (matrix == null) {
-            matrix = new MATRIX();
+        
+        if (m == null) {
+            m = new MATRIX();
         }
+        Matrix matrix=new Matrix(m);
         CSMTextSettingsTag csmts = null;
         String filterStr = "";
         if (filters != null) {
@@ -2331,18 +2337,12 @@ public class XFLConverter {
         }
         String matStr = "";
         matStr += "<matrix>";
+        String left = "";
         RECT bounds = tag.getBounds();
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
-            MATRIX textMatrix = tag.getTextMatrix();
-            matrix = matrix.merge(textMatrix);
-        } else {
-            matrix.translateX += bounds.Xmin;
-            matrix.translateY += bounds.Ymin;
-
-            //I do not know why, but there is (always?) 2px difference
-            matrix.translateX += 2 * 20;
-            matrix.translateY += 2 * 20;
-        }
+            MATRIX textMatrix = tag.getTextMatrix();                  
+            left = " left=\""+doubleToString((textMatrix.translateX)/SWF.unitDivisor)+"\"";
+        } 
         matStr += convertMatrix(matrix);
         matStr += "</matrix>";
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
@@ -2352,7 +2352,7 @@ public class XFLConverter {
             } else if (tag instanceof DefineText2Tag) {
                 textRecords = ((DefineText2Tag) tag).textRecords;
             }
-
+      
             looprec:
             for (TEXTRECORD rec : textRecords) {
                 if (rec.styleFlagsHasFont) {
@@ -2371,6 +2371,7 @@ public class XFLConverter {
             }
 
             ret += "<DOMStaticText";
+            ret += left;
             if (fontRenderingMode != null) {
                 ret += " fontRenderingMode=\"" + fontRenderingMode + "\"";
             }
