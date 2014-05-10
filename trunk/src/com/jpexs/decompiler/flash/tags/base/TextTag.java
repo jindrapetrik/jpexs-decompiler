@@ -153,10 +153,9 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 } else {
                     leading = ((double) font.getLeading() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);
                     ascent = ((double) font.getAscent() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);
-                    descent = ((double) font.getDescent() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);
+                    descent = ((double) font.getDescent() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);                    
                     lineDistance = ascent + descent;
                 }
-
             }
             currentLeftMargin = 0;
             if (rec.styleFlagsHasXOffset) {
@@ -165,12 +164,12 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
             }
             if (rec.styleFlagsHasYOffset) {
                 if (!firstLine) {
-                    top += lineDistance;
-                    int topint = (int) Math.round(SWF.unitDivisor * top);
-                    lineSpacing = rec.yOffset - topint;
-                    top += lineSpacing / SWF.unitDivisor;
+                    top += ascent + descent;
+                    int topint = (int) (Math.round(top)*SWF.unitDivisor);
+                    lineSpacing = rec.yOffset - topint;                                                            
+                    top += lineSpacing/SWF.unitDivisor;
                 } else {
-                    top = ascent - 2.0; //I don't know why, but there are always 2 pixels
+                    top = ascent;
                 }
                 y = rec.yOffset;
             }
@@ -212,7 +211,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         att.put("lineSpacing", lineSpacing);
         att.put("textBounds", textBounds);
         att.put("allLeftMargins", allLeftMargins);
-        att.put("allLetterSpacings", allLetterSpacings);
+        att.put("allLetterSpacings", allLetterSpacings);                
         return att;
     }
 
