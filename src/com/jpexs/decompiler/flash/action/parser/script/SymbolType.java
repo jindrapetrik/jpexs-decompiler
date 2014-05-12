@@ -92,6 +92,8 @@ public enum SymbolType {
     STRICT_NOT_EQUAL,
     AND,
     OR,
+    FULLAND,
+    FULLOR,
     INCREMENT,
     DECREMENT,
     PLUS,

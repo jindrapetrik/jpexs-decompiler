@@ -17,7 +17,8 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.action.swf4.ActionStringEquals;
+import com.jpexs.decompiler.flash.action.swf4.ActionNot;
+import com.jpexs.decompiler.flash.action.swf4.ActionStringLess;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -27,10 +28,10 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 import java.util.Set;
 
-public class StringEqActionItem extends BinaryOpItem implements Inverted {
+public class StringLeActionItem extends BinaryOpItem implements Inverted{
 
-    public StringEqActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "eq");
+    public StringLeActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "le");
     }
 
     @Override
@@ -40,7 +41,7 @@ public class StringEqActionItem extends BinaryOpItem implements Inverted {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSourceMerge(localData, generator, leftSide, rightSide, new ActionStringEquals());
+        return toSourceMerge(localData, generator, rightSide, leftSide, new ActionStringLess(), new ActionNot());
     }
 
     @Override
@@ -50,6 +51,6 @@ public class StringEqActionItem extends BinaryOpItem implements Inverted {
 
     @Override
     public GraphTargetItem invert() {
-        return new StringNeActionItem(src, leftSide, rightSide);
+        return new StringGtActionItem(src, leftSide, rightSide);
     }
 }

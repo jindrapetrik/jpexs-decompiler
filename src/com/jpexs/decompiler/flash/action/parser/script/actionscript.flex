@@ -259,7 +259,7 @@ SingleCharacter = [^\r\n\'\\]
   "<="                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.LOWER_EQUAL,yytext());  }  
   ">="                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.GREATER_EQUAL,yytext());  }  
   "!=="                          { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.STRICT_NOT_EQUAL,yytext());  }    
-  "!="                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.NOT_EQUAL,yytext());  }  
+  "!=" | "<>"                    { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.NOT_EQUAL,yytext());  }  
   "&&"                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.AND,yytext());  }  
   "||"                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.OR,yytext());  }  
   "++"                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.INCREMENT,yytext());  }  
@@ -295,6 +295,8 @@ SingleCharacter = [^\r\n\'\\]
   "typeof"                       { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.TYPEOF,yytext());  } 
   "void"                         { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.VOID,yytext());  } 
   "@"                            { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.ATTRIBUTE,yytext());  } 
+  "and"                          { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.FULLAND,yytext());  } 
+  "or"                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.FULLOR,yytext());  } 
   
   /* string literal */
   \"                             {  

@@ -107,6 +107,13 @@ import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem
 import com.jpexs.decompiler.flash.action.model.operations.RShiftActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictEqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictNeqActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StringAddActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StringEqActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StringGeActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StringGtActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StringLeActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StringLtActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StringNeActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.SubtractActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.URShiftActionItem;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
@@ -1396,19 +1403,48 @@ public class ActionScriptParser {
                 lexer.pushback(s);
                 ret = memberOrCall(expr, registerVars, inFunction, inMethod, variables);
                 break;
-
-            default:
-                lexer.pushback(s);
-                if (expr instanceof ParenthesisItem) {
-                    if (isType(((ParenthesisItem) expr).value)) {
-                        GraphTargetItem expr2 = expression(false, registerVars, inFunction, inMethod, true, variables);
-                        if (expr2 != null) {
-                            ret = new CastOpActionItem(null, ((ParenthesisItem) expr).value, expr2);
-                        }
+            case IDENTIFIER:
+                switch(s.value.toString()){
+                    case "add":
+                        ret = new StringAddActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
+                        break;
+                    case "eq":
+                        ret = new StringEqActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
+                        break;
+                    case "ne":
+                        ret = new StringNeActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
+                        break;
+                    case "lt":
+                        ret = new StringLtActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
+                        break;
+                    case "ge":
+                        ret = new StringGeActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
+                        break;
+                    case "gt":
+                        ret = new StringGtActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
+                        break;
+                    case "le":
+                        ret = new StringLeActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
+                        break;
+                    default:
+                        lexer.pushback(s);    
+                }
+                break;
+            default:                
+                lexer.pushback(s);                
+        }
+        
+        if(ret == null){
+            if (expr instanceof ParenthesisItem) {
+                if (isType(((ParenthesisItem) expr).value)) {
+                    GraphTargetItem expr2 = expression(false, registerVars, inFunction, inMethod, true, variables);
+                    if (expr2 != null) {
+                        ret = new CastOpActionItem(null, ((ParenthesisItem) expr).value, expr2);
                     }
                 }
-
+            }
         }
+        
         ret = fixPrecedence(ret);
         return ret;
     }
@@ -1639,22 +1675,20 @@ public class ActionScriptParser {
                 }
                 existsRemainder = true;
                 break;
+            case EVAL:   
+                expectedType(SymbolType.PARENT_OPEN);
+                GraphTargetItem evar = new EvalActionItem(null, expression(registerVars, inFunction, inMethod, true, variables));
+                expectedType(SymbolType.PARENT_CLOSE);
+                evar = memberOrCall(evar, registerVars, inFunction, inMethod, variables);
+                ret = evar;
+                existsRemainder = true;
+                break;                
             case IDENTIFIER:
             case THIS:
-            case SUPER:
-            case EVAL:
-                GraphTargetItem var;
-                if (s.type == SymbolType.EVAL) {
-                    expectedType(SymbolType.PARENT_OPEN);
-                    var = new EvalActionItem(null, expression(registerVars, inFunction, inMethod, true, variables));
-                    expectedType(SymbolType.PARENT_CLOSE);
-                    var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
-
-                } else {
-                    lexer.pushback(s);
-                    var = variable(registerVars, inFunction, inMethod, variables);
-                    var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
-                }
+            case SUPER:                                                            
+                lexer.pushback(s);
+                GraphTargetItem var = variable(registerVars, inFunction, inMethod, variables);
+                var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
                 ret = var;
                 existsRemainder = true;
                 break;

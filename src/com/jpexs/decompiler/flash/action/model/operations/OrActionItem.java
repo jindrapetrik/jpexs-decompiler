@@ -30,7 +30,7 @@ import java.util.List;
 public class OrActionItem extends BinaryOpItem {
 
     public OrActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||");
+        super(instruction, PRECEDENCE_LOGICALOR, leftSide, rightSide, "or");
     }
 
     @Override
