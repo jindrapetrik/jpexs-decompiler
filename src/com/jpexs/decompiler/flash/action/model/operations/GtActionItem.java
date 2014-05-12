@@ -17,6 +17,9 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionLess;
+import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -46,7 +49,11 @@ public class GtActionItem extends BinaryOpItem implements LogicalOpItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSourceMerge(localData, generator, leftSide, rightSide, new ActionGreater());
+        ActionSourceGenerator g = (ActionSourceGenerator)generator;
+        if(g.getSwfVersion()>=6){
+            return toSourceMerge(localData, generator, leftSide, rightSide, new ActionGreater());
+        }
+        return toSourceMerge(localData, generator, rightSide, leftSide, g.getSwfVersion()>=5?new ActionLess2():new ActionLess());
     }
 
     @Override

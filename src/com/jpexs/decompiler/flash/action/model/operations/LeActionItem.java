@@ -17,12 +17,16 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionLess;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
+import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import static com.jpexs.decompiler.graph.GraphTargetItem.toSourceMerge;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
@@ -53,8 +57,12 @@ public class LeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSourceMerge(localData, generator, leftSide, rightSide, new ActionGreater(), new ActionNot());
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {        
+        ActionSourceGenerator g = (ActionSourceGenerator)generator;
+        if(g.getSwfVersion()>=6){
+            return toSourceMerge(localData, generator, leftSide, rightSide, new ActionGreater(), new ActionNot());
+        }
+        return toSourceMerge(localData, generator, rightSide, leftSide, g.getSwfVersion()>=5?new ActionLess2():new ActionLess(), new ActionNot());
     }
 
     @Override

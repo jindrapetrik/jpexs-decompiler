@@ -1686,10 +1686,14 @@ public class ActionScriptParser {
             case IDENTIFIER:
             case THIS:
             case SUPER:                                                            
-                lexer.pushback(s);
-                GraphTargetItem var = variable(registerVars, inFunction, inMethod, variables);
-                var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
-                ret = var;
+                if(s.value.equals("not")){
+                    ret = new NotItem(null, expression(registerVars, inFunction, inMethod, false, variables));                    
+                }else{
+                    lexer.pushback(s);
+                    GraphTargetItem var = variable(registerVars, inFunction, inMethod, variables);
+                    var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
+                    ret = var;
+                }
                 existsRemainder = true;
                 break;
             default:
@@ -1753,8 +1757,8 @@ public class ActionScriptParser {
         return retTree;
     }
 
-    public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
-        ActionSourceGenerator gen = new ActionSourceGenerator(constantPool);
+    public List<Action> actionsFromTree(int swfVersion, List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
+        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool);
         List<Action> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<String, Integer>(), 0, Boolean.FALSE, 0);
@@ -1768,9 +1772,9 @@ public class ActionScriptParser {
         return ret;
     }
 
-    public List<Action> actionsFromString(String s) throws ParseException, IOException, CompilationException {
+    public List<Action> actionsFromString(int swfVersion,String s) throws ParseException, IOException, CompilationException {
         List<String> constantPool = new ArrayList<>();
         List<GraphTargetItem> tree = treeFromString(s, constantPool);
-        return actionsFromTree(tree, constantPool);
+        return actionsFromTree(swfVersion,tree, constantPool);
     }
 }

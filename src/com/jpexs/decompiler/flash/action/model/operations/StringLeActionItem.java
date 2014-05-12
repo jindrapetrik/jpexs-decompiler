@@ -17,11 +17,14 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionStringLess;
+import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import static com.jpexs.decompiler.graph.GraphTargetItem.toSourceMerge;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
@@ -41,6 +44,12 @@ public class StringLeActionItem extends BinaryOpItem implements Inverted{
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        
+        ActionSourceGenerator g = (ActionSourceGenerator)generator;
+        if(g.getSwfVersion()>=6){
+            return toSourceMerge(localData, generator, leftSide, rightSide, new ActionStringGreater(), new ActionNot());
+        }
+        
         return toSourceMerge(localData, generator, rightSide, leftSide, new ActionStringLess(), new ActionNot());
     }
 
