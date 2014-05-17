@@ -16,10 +16,18 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Image;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.Timer;
-import javax.swing.ImageIcon;
+import java.util.TimerTask;
 import javax.swing.JPanel;
 
 /**
@@ -29,40 +37,110 @@ import javax.swing.JPanel;
  */
 public class LoadingPanel extends JPanel {
 
-    private int pos = 0;
-    private final Image animationImage;
-    private final int iconWidth;
-    private final int iconHeight;
-
-    /**
-     * Constructor
-     *
-     * @param iconWidth Width of displayed icon
-     * @param iconHeight Height of displayed icon
-     */
-    public LoadingPanel(int iconWidth, int iconHeight) {
-        this.iconWidth = iconWidth;
-        this.iconHeight = iconHeight;
-        ImageIcon icon = View.getIcon("loading");
-        animationImage = icon.getImage();
-        Timer timer = new Timer();
-        timer.schedule(new java.util.TimerTask() {
-            @Override
-            public void run() {
-                pos = (pos + 1) % 12;
-                repaint();
-            }
-        }, 100, 100);
+    BufferedImage lastImage;
+    int lastSize = 0;
+    Color col;
+    double rotation = 0;
+    Timer drawTimer;
+    
+    public LoadingPanel(int width,int height){
+        this.col = new Color(0,0,255);   
+        setPreferredSize(new Dimension(width,height));
     }
 
-    /**
-     * Paints component
-     *
-     * @param g Graphics to paint on
-     */
+    private synchronized void setRotation(double rotation) {
+        this.rotation = rotation;
+    }            
+
+    private synchronized double getRotation() {
+        return rotation;
+    }
+
+    private synchronized int getLastSize() {
+        return lastSize;
+    }
+    
+    
+    
+    
+    
+    
+    private synchronized void redrawImage(int size){
+        if(drawTimer!=null){
+                drawTimer.cancel();;
+                drawTimer = null;
+            }
+            BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D big = bi.createGraphics();
+            big.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            big.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            big.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            int br = size/16;
+            if(br<2){
+                br = 2;
+            }
+            int border = 2;
+            int r = size / 2 - br - border;
+
+            int o = (int) Math.round(Math.PI * 2 * r);
+            double max = Math.PI * 2;
+            double skip = max / o;
+
+            
+            big.setComposite(AlphaComposite.Src);
+            for (int i = 0; i < o; i++) {
+                int c = i * 256 / o;
+                double alfa = skip * i;
+                double x = border + br + r + Math.round(Math.sin(alfa) * r);
+                double y = border + br + r + Math.round(Math.cos(alfa) * r);
+                big.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), c));
+                big.fill(new Ellipse2D.Double(x - br, y - br, 2 * br, 2 * br));
+            }
+            lastImage = bi;
+            lastSize = size;
+            drawTimer = new Timer();
+            int timeSpin = 1000;
+            double delay = 0;
+            delay = timeSpin/o; 
+            while(delay<10){                           
+               o--;
+               delay = timeSpin/o; 
+            }
+            final int segments = o;
+            int idelay = (int)Math.round(delay);
+            drawTimer.schedule(new TimerTask() {
+
+                @Override
+                public void run() {
+                    double rot2 = rotation - Math.PI*2/segments;
+                    if(rot2<0){
+                        rot2+=Math.PI*2;
+                    }
+                    setRotation(rot2);
+                    repaint();
+                }
+            }, idelay,idelay);
+    }
+    
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(animationImage, getWidth() / 2 - iconWidth / 2, getHeight() / 2 - iconHeight / 2, getWidth() / 2 + iconWidth / 2, getHeight() / 2 + iconHeight / 2, pos * 100, 0, (pos + 1) * 100, 100, this);
+
+        Graphics2D g2 = (Graphics2D) g;
+
+        int size = Math.min(getWidth(), getHeight());
+        if (lastImage == null || getLastSize()!=size) {
+            redrawImage(size);            
+        }
+
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        AffineTransform t = AffineTransform.getRotateInstance(getRotation(), size/2, size/2);
+        g2.setTransform(t);
+        g2.drawImage(lastImage, 0, 0, this);
     }
+
 }
