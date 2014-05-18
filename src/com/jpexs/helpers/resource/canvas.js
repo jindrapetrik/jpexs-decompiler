@@ -984,6 +984,5 @@ function drawPath(ctx,p){
                 }
                 break;
         }
-    }
-    ctx.closePath();
+    }    
 }
