@@ -45,7 +45,7 @@ public class ActionScript2ParserTest extends ActionStript2TestBase {
     private void parseAS2(String script) {
         DoActionTag asm = getFirstActionTag();
         try {
-            ActionScriptParser par = new ActionScriptParser();
+            ActionScriptParser par = new ActionScriptParser(SWF.DEFAULT_VERSION);
             asm.setActions(par.actionsFromString(script));
         } catch (IOException | CompilationException | ParseException ex) {
             fail("Unable to parse: " + script);

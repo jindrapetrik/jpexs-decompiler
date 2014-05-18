@@ -76,7 +76,7 @@ public class RecompileTest {
         }
     }
 
-    private void testAS2DirectEditingOneRecursive(List<TreeNode> nodeList) {
+    private void testAS2DirectEditingOneRecursive(int swfVersion,List<TreeNode> nodeList) {
         for (TreeNode node : nodeList) {
             if (node.subNodes.isEmpty()) {
                 TreeItem item = node.getItem();
@@ -87,7 +87,7 @@ public class RecompileTest {
                         Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                         String as = writer.toString();
                         as = asm.removePrefixAndSuffix(as);
-                        ActionScriptParser par = new ActionScriptParser();
+                        ActionScriptParser par = new ActionScriptParser(swfVersion);
                         try {
                             asm.setActions(par.actionsFromString(as));
                         } catch (ParseException | CompilationException ex) {
@@ -113,7 +113,7 @@ public class RecompileTest {
                     }
                 }
             } else {
-                testAS2DirectEditingOneRecursive(node.subNodes);
+                testAS2DirectEditingOneRecursive(swfVersion,node.subNodes);
             }
         }
     }
@@ -155,7 +155,7 @@ public class RecompileTest {
             List<TreeNode> list = SWF.createASTagList(list2, null);
 
             TagNode.setExport(list, true);
-            testAS2DirectEditingOneRecursive(list);
+            testAS2DirectEditingOneRecursive(swf.version,list);
         }
         }catch(Exception ex){
             System.out.println("FAIL");
