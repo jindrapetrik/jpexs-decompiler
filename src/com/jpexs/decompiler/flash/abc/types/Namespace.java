@@ -33,6 +33,7 @@ public class Namespace {
     public static final String[] namePrefixes = new String[]{"", "private", "public", "", "protected", "explicit", "protected"};
     public int kind;
     public int name_index;
+    public boolean deleted;
 
     public static String kindToStr(int kind) {
         for (int i = 0; i < nameSpaceKinds.length; i++) {

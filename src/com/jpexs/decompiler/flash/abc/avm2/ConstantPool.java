@@ -179,6 +179,17 @@ public class ConstantPool {
     public int getStringCount() {
         return constant_string.size();
     }
+    
+    public int getNamespaceSubIndex(int namespaceId){
+        Namespace ns = constant_namespace.get(namespaceId);
+        int index=0;
+        for (int n = 1; n < namespaceId; n++) {
+            if(constant_namespace.get(n).name_index == ns.name_index && constant_namespace.get(n).kind == ns.kind){
+                index++;
+            }
+        }
+        return index;
+    }
 
     public int getNamespaceId(Namespace val, int index) {
         for (int n = 1; n < constant_namespace.size(); n++) {

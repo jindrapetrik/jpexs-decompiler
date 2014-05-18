@@ -907,7 +907,7 @@ public class ActionScriptParser {
         }else{
             publicNs = gpublicNs;
         }
-
+        
         openedNamespaces.add(privateNs = abc.constants.addNamespace(new Namespace(Namespace.KIND_PRIVATE, 0))); //abc.constants.getStringId(fileName + "$", true)
         
 
@@ -2374,5 +2374,5 @@ public class ActionScriptParser {
         }
         System.exit(0);
     }
-
+    
 }

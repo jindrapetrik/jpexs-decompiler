@@ -115,6 +115,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     }
     
     public void resolve(SourceGeneratorLocalData localData, Reference<GraphTargetItem> objectType, Reference<GraphTargetItem> propertyType, Reference<Integer> propertyIndex, Reference<ValueKind> propertyValue) {
+        GraphTargetItem thisType = new TypeItem(localData.getFullClass());
         GraphTargetItem objType = null;
         GraphTargetItem objSubType = null;
         ValueKind propValue = null;
@@ -179,6 +180,64 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                      }
                      }*/
                 }
+                
+                GraphTargetItem ttype = objType;
+                if(ttype == null){
+                    ttype = thisType;
+                }
+                
+                
+                
+                {
+                    List<ABC> abcs = new ArrayList<>();
+                    abcs.add(abc);
+                    abcs.addAll(otherABCs);
+                    if (ttype.equals(new TypeItem("__AS3__.vec.Vector"))) {
+                        switch ("" + objSubType) {
+                            case "int":
+                                ttype = new TypeItem("__AS3__.vec.Vector$int");
+                                break;
+                            case "Number":
+                                ttype = new TypeItem("__AS3__.vec.Vector$double");
+                                break;
+                            case "uint":
+                                ttype = new TypeItem("__AS3__.vec.Vector$uint");
+                                break;
+                            default:
+                                ttype = new TypeItem("__AS3__.vec.Vector$object");
+                        }
+                    }
+                    loopa:
+                    for (ABC a : abcs) {
+                        for (InstanceInfo ii : a.instance_info) {
+                            if(ii.deleted){
+                                continue;
+                            }
+                            Multiname m = ii.getName(a.constants);
+                            if (multinameToType(ii.name_index, a.constants).equals(ttype)) {
+                                Reference<String> outName = new Reference<>("");
+                                Reference<String> outNs = new Reference<>("");
+                                Reference<String> outPropNs = new Reference<>("");
+                                Reference<Integer> outPropNsKind = new Reference<>(1);
+                                Reference<Integer> outPropNsIndex = new Reference<>(0);
+                                Reference<GraphTargetItem> outPropType = new Reference<>(null);
+                                Reference<ValueKind> outPropValue = new Reference<>(null);
+                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants), m.getName(a.constants, new ArrayList<String>()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+                                    objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
+                                    propType = outPropType.getVal();
+                                    propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
+                                            abc.constants.getStringId(propertyName, true),
+                                            abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<Integer>()), true
+                                    );
+                                    propValue = outPropValue.getVal();
+
+                                    break loopa;
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 if (objType == null) {
                     for (MethodBody b : callStack) {
                         for (int i = 0; i < b.traits.traits.size(); i++) {
@@ -213,6 +272,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             }
                             if (name_index > 0) {
                                 for (int c = 0; c < abc.instance_info.size(); c++) {
+                                    if(abc.instance_info.get(c).deleted){
+                                        continue;
+                                    }
                                     for (Trait t : abc.instance_info.get(c).instance_traits.traits) {
                                         if (t.name_index == name_index) {
                                             objType = multinameToType(abc.instance_info.get(c).name_index, abc.constants);
@@ -240,7 +302,10 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 }
 
                                 for (ScriptInfo si : abc.script_info) {
-                                    for (Trait t : si.traits.traits) {
+                                    if(si.deleted){
+                                        continue;
+                                    }
+                                    for (Trait t : si.traits.traits) {                                        
                                         if (t.name_index == name_index) {
                                             objType = new TypeItem("Object");
                                             propType = AVM2SourceGenerator.getTraitReturnType(abc, t);
@@ -261,21 +326,26 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 loopabc:
                                 for (ABC a : otherABCs) {
                                     for (int h = 0; h < a.instance_info.size(); h++) {
-                                        InstanceInfo ii = a.instance_info.get(h);
+                                        InstanceInfo ii = a.instance_info.get(h);                                        
+                                        if(ii.deleted){
+                                            continue;
+                                        }
                                         Multiname n = a.constants.constant_multiname.get(ii.name_index);
                                         if (n.getNamespace(a.constants).kind == Namespace.KIND_PACKAGE && n.getNamespace(a.constants).getName(a.constants).equals(nsname)) {
                                             Reference<String> outName = new Reference<>("");
                                             Reference<String> outNs = new Reference<>("");
                                             Reference<String> outPropNs = new Reference<>("");
                                             Reference<Integer> outPropNsKind = new Reference<>(1);
+                                            Reference<Integer> outPropNsIndex = new Reference<>(0);
                                             Reference<GraphTargetItem> outPropType = new Reference<>(null);
                                             Reference<ValueKind> outPropValue = new Reference<>(null);
-                                            if (propertyName != null && AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, n.getName(a.constants, new ArrayList<String>()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
+                                            
+                                            if (propertyName != null && AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, n.getName(a.constants, new ArrayList<String>()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
                                                 objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
                                                 propType = outPropType.getVal();
                                                 propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
                                                         abc.constants.getStringId(propertyName, true),
-                                                        abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), 0, true), 0, 0, new ArrayList<Integer>()), true
+                                                        abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<Integer>()), true
                                                 );
                                                 propValue = outPropValue.getVal();
                                                 break loopobjType;
@@ -286,51 +356,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             }
                         }
                     }
-                } else {
-                    List<ABC> abcs = new ArrayList<>();
-                    abcs.add(abc);
-                    abcs.addAll(otherABCs);
-                    if (objType.equals("__AS3__.vec.Vector")) {
-                        switch ("" + objSubType) {
-                            case "int":
-                                objType = new TypeItem("__AS3__.vec.Vector$int");
-                                break;
-                            case "Number":
-                                objType = new TypeItem("__AS3__.vec.Vector$double");
-                                break;
-                            case "uint":
-                                objType = new TypeItem("__AS3__.vec.Vector$uint");
-                                break;
-                            default:
-                                objType = new TypeItem("__AS3__.vec.Vector$object");
-                        }
-                    }
-                    loopa:
-                    for (ABC a : abcs) {
-                        for (InstanceInfo ii : a.instance_info) {
-                            Multiname m = ii.getName(a.constants);
-                            if (multinameToType(ii.name_index, a.constants).equals(objType)) {
-                                Reference<String> outName = new Reference<>("");
-                                Reference<String> outNs = new Reference<>("");
-                                Reference<String> outPropNs = new Reference<>("");
-                                Reference<Integer> outPropNsKind = new Reference<>(1);
-                                Reference<GraphTargetItem> outPropType = new Reference<>(null);
-                                Reference<ValueKind> outPropValue = new Reference<>(null);
-                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants), m.getName(a.constants, new ArrayList<String>()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
-                                    objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
-                                    propType = outPropType.getVal();
-                                    propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
-                                            abc.constants.getStringId(propertyName, true),
-                                            abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), 0, true), 0, 0, new ArrayList<Integer>()), true
-                                    );
-                                    propValue = outPropValue.getVal();
-
-                                    break loopa;
-                                }
-                            }
-                        }
-                    }
                 }
+                
             }
         }
 
@@ -595,21 +622,19 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             String cname;
             String pkgName = "";
             cname = localData.currentClass;
-            if (cname != null && cname.contains(".")) {
-                pkgName = cname.substring(0, cname.lastIndexOf('.'));
-                cname = cname.substring(cname.lastIndexOf('.') + 1);
-            }
+            pkgName = localData.pkg;
             Reference<String> outName = new Reference<>("");
             Reference<String> outNs = new Reference<>("");
             Reference<String> outPropNs = new Reference<>("");
             Reference<Integer> outPropNsKind = new Reference<>(1);
+            Reference<Integer> outPropNsIndex = new Reference<>(0);
             Reference<GraphTargetItem> outPropType = new Reference<>(null);
             Reference<ValueKind> outPropValue = new Reference<>(null);
             List<ABC> abcs = new ArrayList<>();
             abcs.add(abc);
             abcs.addAll(otherABCs);
-            if (cname != null && AVM2SourceGenerator.searchPrototypeChain(true, abcs, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
-                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, openedNamespaces);
+            if (cname != null && AVM2SourceGenerator.searchPrototypeChain(true, abcs, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
+                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;
             } else {

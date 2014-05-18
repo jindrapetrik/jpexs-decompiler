@@ -76,20 +76,18 @@ public class CallAVM2Item extends AVM2Item {
             allAbcs.addAll(g.allABCs);
             String cname;
             String pkgName = "";
-            cname = localData.currentClass;
-            if (cname!=null && cname.contains(".")) {
-                pkgName = cname.substring(0, cname.lastIndexOf('.'));
-                cname = cname.substring(cname.lastIndexOf('.') + 1);
-            }
+            cname = localData.currentClass;            
+            pkgName = localData.pkg;
             GraphTargetItem obj = null;
             Reference<String> outName = new Reference<>("");
             Reference<String> outNs = new Reference<>("");
             Reference<String> outPropNs = new Reference<>("");
-            Reference<Integer> outPropNsKind = new Reference<>(1);
+            Reference<Integer> outPropNsKind = new Reference<>(1);            
+            Reference<Integer> outPropNsIndex = new Reference<>(0);
             Reference<GraphTargetItem> outPropType = new Reference<>(null);
             Reference<ValueKind> outPropValue = new Reference<>(null);
-            if (cname!=null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue)) {
-                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), n.line, "this", null, false, n.openedNamespaces);
+            if (cname!=null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind,outPropNsIndex, outPropType, outPropValue)) {
+                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), n.line, "this", null, false, n.openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;
             }
@@ -116,18 +114,16 @@ public class CallAVM2Item extends AVM2Item {
                 String cname;
                 String pkgName = "";
                 cname = localData.currentClass;
-                if (cname!=null && cname.contains(".")) {
-                    pkgName = cname.substring(0, cname.lastIndexOf('.'));
-                    cname = cname.substring(cname.lastIndexOf('.') + 1);
-                }
+                pkgName = localData.pkg;
                 Reference<String> outName = new Reference<>("");
                 Reference<String> outNs = new Reference<>("");
                 Reference<String> outPropNs = new Reference<>("");
-                Reference<Integer> outPropNsKind = new Reference<>(1);
+                Reference<Integer> outPropNsKind = new Reference<>(1);                
+                Reference<Integer> outPropNsIndex = new Reference<>(0);
                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                 Reference<ValueKind> outPropValue = new Reference<>(null);
-                if (cname!=null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
-                    NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.currentClass), 0, "this", null, false, new ArrayList<Integer>());
+                if (cname!=null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
+                    NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, new ArrayList<Integer>());
                     nobj.setRegNumber(0);
                     obj = nobj;
                 }

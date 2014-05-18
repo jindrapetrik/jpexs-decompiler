@@ -748,8 +748,8 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                 break;
             case ACTION_SAVE_DECOMPILED:
                 try {
-                    ActionScriptParser par = new ActionScriptParser();
-                    src.setActions(par.actionsFromString(mainPanel.getCurrentSwf().version,decompiledEditor.getText()));
+                    ActionScriptParser par = new ActionScriptParser(mainPanel.getCurrentSwf().version);
+                    src.setActions(par.actionsFromString(decompiledEditor.getText()));
                     src.setModified();
                     setSource(src, false);
 

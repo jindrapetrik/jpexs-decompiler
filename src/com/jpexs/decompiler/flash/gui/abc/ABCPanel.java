@@ -684,6 +684,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 boolean isDocumentClass = documentClass.equals(pack.getPath().toString());
 
                 try {
+                    abc.script_info.get(oldIndex).delete(abc, true);
                     ActionScriptParser.compile(decompiledTextArea.getText(), abc,new ArrayList<ABC>(), isDocumentClass, scriptName);
                     //Move newly added script to its position
                     abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
@@ -701,10 +702,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     View.showMessageDialog(this, AppStrings.translate("message.action.saved"));
                     //reload();
                 } catch (ParseException ex) {
+                    abc.script_info.get(oldIndex).delete(abc, false);
                     ex.printStackTrace();
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     decompiledTextArea.gotoLine((int) ex.line);
                 } catch (CompilationException ex) {
+                    abc.script_info.get(oldIndex).delete(abc, false);
                     ex.printStackTrace();
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     decompiledTextArea.gotoLine((int) ex.line);

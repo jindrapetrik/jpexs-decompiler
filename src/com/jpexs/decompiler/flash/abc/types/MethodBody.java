@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 
 public class MethodBody implements Cloneable, Serializable {
 
+    public boolean deleted;
     boolean debugMode = false;
     public int method_info;
     public int max_stack;

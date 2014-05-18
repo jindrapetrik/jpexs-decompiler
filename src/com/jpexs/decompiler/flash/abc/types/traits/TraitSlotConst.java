@@ -38,6 +38,11 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     public int value_index;
     public int value_kind;
     public GraphTargetItem assignedValue;
+    
+    @Override
+    public void delete(ABC abc,boolean d) {
+        abc.constants.constant_multiname.get(name_index).deleted = d;        
+    }
 
     @Override
     public int getSlotIndex() {

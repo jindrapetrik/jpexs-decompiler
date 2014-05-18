@@ -41,6 +41,7 @@ public class Multiname {
     public int namespace_set_index = -1;
     public int qname_index = -1; //for TypeName
     public List<Integer> params; //for TypeName
+    public boolean deleted;
 
     public boolean validType() {
         boolean cnt = false;

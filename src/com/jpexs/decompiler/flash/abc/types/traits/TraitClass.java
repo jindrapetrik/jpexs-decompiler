@@ -50,6 +50,25 @@ public class TraitClass extends Trait implements TraitWithSlot {
     private boolean classInitializerIsEmpty;
 
     @Override
+    public void delete(ABC abc, boolean d) {
+        abc.class_info.get(class_info).deleted = d;
+        abc.instance_info.get(class_info).deleted = d;
+        
+        
+        abc.class_info.get(class_info).static_traits.delete(abc,d);
+        abc.method_info.get(abc.class_info.get(class_info).cinit_index).delete(abc, d);
+        
+        abc.instance_info.get(class_info).instance_traits.delete(abc,d);
+        abc.method_info.get(abc.instance_info.get(class_info).iinit_index).delete(abc, d);
+        
+        abc.constants.constant_namespace.get(abc.instance_info.get(class_info).protectedNS).deleted = d;
+        
+        abc.constants.constant_multiname.get(name_index).deleted = d;
+    }
+
+    
+    
+    @Override
     public int getSlotIndex() {
         return slot_id;
     }

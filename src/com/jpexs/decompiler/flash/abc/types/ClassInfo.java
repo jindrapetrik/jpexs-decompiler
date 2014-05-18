@@ -25,7 +25,7 @@ public class ClassInfo {
     public int cinit_index; //MethodInfo - static initializer
     public Traits static_traits = new Traits();
 
-    ;
+    public boolean deleted;
 
     @Override
     public String toString() {

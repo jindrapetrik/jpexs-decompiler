@@ -47,6 +47,8 @@ public abstract class Trait implements Serializable {
     public static final int TRAIT_FUNCTION = 5;
     public static final int TRAIT_CONST = 6;
 
+    public abstract void delete(ABC abc,boolean d);
+    
     public String getModifiers(List<ABCContainerTag> abcTags, ABC abc, boolean isStatic) {
         String ret = "";
         if ((kindFlags & ATTR_Override) > 0) {

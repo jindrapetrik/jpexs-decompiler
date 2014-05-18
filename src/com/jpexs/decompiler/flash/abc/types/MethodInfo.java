@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.helpers.Helper;
@@ -26,6 +28,19 @@ import java.util.List;
 
 public class MethodInfo {
 
+    
+    private boolean deleted;
+    
+    public void delete(ABC abc,boolean d){
+        this.deleted = true;        
+        if(body!=null){
+            for(AVM2Instruction ins:body.code.code){
+                if(ins.definition instanceof NewFunctionIns){
+                    abc.method_info.get(ins.operands[0]).delete(abc,d);
+                }
+            }
+        }
+    }
     public int[] param_types;
     public int ret_type;
     public int name_index; //0=no name

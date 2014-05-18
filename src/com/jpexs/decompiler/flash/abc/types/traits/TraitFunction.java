@@ -33,6 +33,15 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     public int method_info;
 
     @Override
+    public void delete(ABC abc,boolean d) {
+        abc.constants.constant_multiname.get(name_index).deleted = d;
+        abc.method_info.get(method_info).delete(abc,d);
+    }
+
+    
+    
+    
+    @Override
     public int getSlotIndex() {
         return slot_id;
     }

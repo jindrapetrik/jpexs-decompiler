@@ -37,6 +37,13 @@ public class Traits implements Serializable {
 
     public List<Trait> traits = new ArrayList<>();
 
+    
+    public void delete(ABC abc,boolean d){
+        for(Trait t:traits){
+            t.delete(abc,d);
+        }
+    }
+    
     public int addTrait(Trait t) {
         traits.add(t);
         return traits.size() - 1;

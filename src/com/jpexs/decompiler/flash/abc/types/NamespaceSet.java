@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 
 public class NamespaceSet {
 
+    public boolean deleted;
     public int[] namespaces;
 
     public NamespaceSet() {

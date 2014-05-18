@@ -154,6 +154,12 @@ import java.util.List;
  */
 public class ActionScriptParser {
 
+    private int swfVersion;
+    
+    public ActionScriptParser(int swfVersion){
+        this.swfVersion = swfVersion;
+    }
+    
     private long uniqLast = 0;
     private final boolean debugMode = false;
 
@@ -1517,7 +1523,8 @@ public class ActionScriptParser {
         boolean existsRemainder = false;
         boolean assocRight = false;
         switch (s.type) {
-            case NEGATE:
+            case NEGATE:          
+                versionRequired(s,5);
                 ret = expression(registerVars, inFunction, inMethod, false, variables);
                 ret = new BitXorActionItem(null, ret, new DirectValueActionItem(4.294967295E9));
                 existsRemainder = true;
@@ -1757,8 +1764,8 @@ public class ActionScriptParser {
         return retTree;
     }
 
-    public List<Action> actionsFromTree(int swfVersion, List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
-        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool);
+    public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
+        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion,constantPool);
         List<Action> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<String, Integer>(), 0, Boolean.FALSE, 0);
@@ -1772,9 +1779,30 @@ public class ActionScriptParser {
         return ret;
     }
 
-    public List<Action> actionsFromString(int swfVersion,String s) throws ParseException, IOException, CompilationException {
+    public List<Action> actionsFromString(String s) throws ParseException, IOException, CompilationException {
         List<String> constantPool = new ArrayList<>();
         List<GraphTargetItem> tree = treeFromString(s, constantPool);
-        return actionsFromTree(swfVersion,tree, constantPool);
+        return actionsFromTree(tree, constantPool);
+    }
+    
+    
+    private void versionRequired(ParsedSymbol s, int min) throws ParseException{
+        versionRequired(s.value.toString(), min, Integer.MAX_VALUE);
+    }
+    
+    private void versionRequired(ParsedSymbol s, int min,int max) throws ParseException{
+        versionRequired(s.value.toString(), min, max);
+    }
+    
+    private void versionRequired(String type, int min,int max) throws ParseException{
+        if(min == max && swfVersion!=min){
+            throw new ParseException(type+" requires SWF version "+min, lexer.yyline());
+        }
+        if(swfVersion<min){                        
+            throw new ParseException(type+" requires at least SWF version "+min, lexer.yyline());
+        }
+        if(swfVersion>max){                        
+            throw new ParseException(type+" requires SWF version lower than "+max, lexer.yyline());
+        }
     }
 }
