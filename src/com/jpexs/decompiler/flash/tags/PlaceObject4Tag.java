@@ -250,7 +250,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
             sos.writeUB(1, placeFlagHasBlendMode ? 1 : 0);
             sos.writeUB(1, placeFlagHasFilterList ? 1 : 0);
             sos.writeUI16(depth);
-            if (placeFlagHasClassName) {
+            if (placeFlagHasClassName || (placeFlagHasImage&&placeFlagHasCharacter)) {
                 sos.writeString(className);
             }
             if (placeFlagHasCharacter) {
@@ -327,7 +327,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
         placeFlagHasFilterList = sis.readUB(1) == 1;
 
         depth = sis.readUI16();
-        if (placeFlagHasClassName) {
+        if (placeFlagHasClassName || (placeFlagHasImage&&placeFlagHasCharacter)) {
             className = sis.readString();
         }
         if (placeFlagHasCharacter) {
