@@ -689,7 +689,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     //Move newly added script to its position
                     abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
                     abc.script_info.remove(newIndex);
-                    ((Tag) abc.parentTag).setModified(true);
+                    abc.pack(); //removes old classes/methods
+                    ((Tag) abc.parentTag).setModified(true);                    
                     lastDecompiled = decompiledTextArea.getText();                   
                     mainPanel.updateClassesList();
                     List<MyEntry<ClassPath,ScriptPack>> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);

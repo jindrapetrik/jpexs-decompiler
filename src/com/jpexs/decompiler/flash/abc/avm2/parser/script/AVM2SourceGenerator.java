@@ -2154,7 +2154,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 return PropertyAVM2Item.multinameToType(abc.method_info.get(tmgs.method_info).ret_type,abc.constants);
             }
             if (tmgs.kindType == Trait.TRAIT_SETTER) {
-                return PropertyAVM2Item.multinameToType(abc.method_info.get(tmgs.method_info).param_types[0],abc.constants);
+                if(abc.method_info.get(tmgs.method_info).param_types.length>0){
+                    return PropertyAVM2Item.multinameToType(abc.method_info.get(tmgs.method_info).param_types[0],abc.constants);
+                }else{
+                    return TypeItem.UNBOUNDED;
+                }                
             }
         }
         if (t instanceof TraitFunction) {

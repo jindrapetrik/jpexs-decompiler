@@ -29,7 +29,7 @@ import java.util.List;
 public class MethodInfo {
 
     
-    private boolean deleted;
+    public boolean deleted;
     
     public void delete(ABC abc,boolean d){
         this.deleted = true;        
