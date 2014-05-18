@@ -277,7 +277,7 @@
     </target>
     
     <target name="-nightly-suffix" if="NIGHTLY">        
-        <property name="VERSIONSUFFIX" value="_${GITTAG}"/>         
+        <property name="VERSIONSUFFIX" value="_${GITSHORTTAG}"/>         
     </target>
     
     <target name="-nonightly-suffix" unless="NIGHTLY">
@@ -293,7 +293,20 @@
             <arg value="rev-parse"/>
             <arg value="HEAD"/>
         </exec>  
+        <echo message="${GITTAG}" file="${REVFILE}"/>
+        
+        
+        <loadfile srcfile="${REVFILE}" property="GITSHORTTAG">
+            <filterchain>
+               <headfilter lines="1" skip="0"/>
+               <tokenfilter>
+                  <replaceregex pattern="[0-9a-f]{33}$" replace="" flags="gi"/>
+               </tokenfilter>
+               <striplinebreaks/>
+            </filterchain>
+        </loadfile>
         <echo message="Git tag:${GITTAG}"/>
+        <echo message="Git shorttag:${GITSHORTTAG}"/>
         <echo message="Version: ${VERSION}"/>
     </target>
     

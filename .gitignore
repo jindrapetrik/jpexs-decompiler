@@ -21,3 +21,4 @@
 /libsrc/jsyntaxpane/jsyntaxpane/src/target/
 hs_err_pid*.log
 *.~*
+/revision.txt
