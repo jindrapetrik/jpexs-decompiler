@@ -95,6 +95,7 @@ public class ActionDeobfuscation {
                     String changedName = deobfuscateName(name, false, "instance", namesMap, renameType, selected);
                     if (changedName != null) {
                         po.setInstanceName(changedName);
+                        ((Tag)po).setModified(true);
                     }
                 }
                 String className = po.getClassName();
@@ -102,6 +103,7 @@ public class ActionDeobfuscation {
                     String changedClassName = deobfuscateNameWithPackage(className, namesMap, renameType, selected);
                     if (changedClassName != null) {
                         po.setClassName(changedClassName);
+                        ((Tag)po).setModified(true);
                     }
                 }
             }

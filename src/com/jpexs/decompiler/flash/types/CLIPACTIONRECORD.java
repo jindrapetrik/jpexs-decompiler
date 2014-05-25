@@ -280,4 +280,11 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     public String getExportFileName() {
         return eventFlags.getHeader(keyCode, true);
     }
+
+    @Override
+    public Tag getSourceTag() {
+        return tag;
+    }
+    
+    
 }

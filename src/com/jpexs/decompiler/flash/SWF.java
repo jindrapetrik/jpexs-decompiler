@@ -149,14 +149,18 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import gnu.jpdf.PDFJob;
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -1290,6 +1294,7 @@ public final class SWF implements TreeItem, Timelined {
             }
         }
     }
+    
 
     public void exportMovies(AbortRetryIgnoreHandler handler, String outdir, MovieExportSettings settings) throws IOException {
         new MovieExporter().exportMovies(handler, outdir, tags, settings);
@@ -1298,7 +1303,7 @@ public final class SWF implements TreeItem, Timelined {
     public void exportSounds(AbortRetryIgnoreHandler handler, String outdir, SoundExportSettings settings) throws IOException {
         new SoundExporter().exportSounds(handler, outdir, tags, settings);
     }
-
+    
     public void exportFonts(AbortRetryIgnoreHandler handler, String outdir, FontExportSettings settings) throws IOException {
         new FontExporter().exportFonts(handler, outdir, tags, settings);
     }
@@ -1501,7 +1506,7 @@ public final class SWF implements TreeItem, Timelined {
             }
             return ret;
         }
-
+                
         if (settings.mode == FramesExportMode.CANVAS) {
             final Timeline ftim = tim;
             final Color fbackgroundColor = backgroundColor;
@@ -1632,6 +1637,31 @@ public final class SWF implements TreeItem, Timelined {
                         }
                     }, handler).run();
                 }
+                break;
+            case PDF:
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        File f = new File(foutdir + File.separator + "frames.pdf");
+                        PDFJob job=new PDFJob(new FileOutputStream(f));   
+                        PageFormat pf=new PageFormat();
+                        pf.setOrientation(PageFormat.PORTRAIT);
+                        Paper p = new Paper();
+                        
+                        p.setSize(frameImages.get(0).getWidth()+10,frameImages.get(0).getHeight()+10);
+                        pf.setPaper(p);                      
+                        
+                        for(int i=0;i<frameImages.size();i++){
+                            BufferedImage img=frameImages.get(i);
+                            Graphics g = job.getGraphics(pf);
+                            g.drawImage(img, 5, 5,img.getWidth(),img.getHeight(), null);
+                            g.dispose();
+                        }
+
+                        job.end();
+                        ret.add(f);
+                    }
+                }, handler).run();
                 break;
             case AVI:
                 new RetryTask(new RunnableIOEx() {
@@ -1878,11 +1908,13 @@ public final class SWF implements TreeItem, Timelined {
         for (Tag tag : tags) {
             if (tag instanceof ABCContainerTag) {
                 ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(deobfuscated, renameType, true);
+                tag.setModified(true);
             }
         }
         for (Tag tag : tags) {
             if (tag instanceof ABCContainerTag) {
                 ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(deobfuscated, renameType, false);
+                tag.setModified(true);
             }
         }
         for (Tag tag : tags) {
@@ -1894,6 +1926,7 @@ public final class SWF implements TreeItem, Timelined {
                         sc.names[i] = newname;
                     }
                 }
+                sc.setModified(true);
             }
         }
         deobfuscation.deobfuscateInstanceNames(deobfuscated, renameType, tags, new HashMap<String, String>());
@@ -2074,6 +2107,7 @@ public final class SWF implements TreeItem, Timelined {
                         }
                     }
                 }
+                t.setModified(true);
             }
         }
 
@@ -2609,7 +2643,7 @@ public final class SWF implements TreeItem, Timelined {
             g.setColor(backGroundColor);
             g.fill(new Rectangle(image.getWidth(), image.getHeight()));
         }
-        Matrix m = new Matrix();
+        Matrix m = transformation.clone();
         m.translate(-rect.Xmin, -rect.Ymin);
         frameToImage(timeline, frame, time, stateUnderCursor, mouseButton, image, m, colorTransform);
         putToCache(key, image);

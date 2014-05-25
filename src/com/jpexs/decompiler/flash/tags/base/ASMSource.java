@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.List;
 
@@ -84,4 +85,6 @@ public interface ASMSource extends TreeItem {
     public int getPrefixLineCount();
 
     public String removePrefixAndSuffix(String source);
+    
+    public Tag getSourceTag();
 }

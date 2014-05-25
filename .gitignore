@@ -22,3 +22,4 @@
 hs_err_pid*.log
 *.~*
 /revision.txt
+/libsrc/gnujpdf/dist/

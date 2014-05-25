@@ -311,4 +311,11 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
     public String getExportFileName() {
         return getHeader(true);
     }
+
+    @Override
+    public Tag getSourceTag() {
+        return tag;
+    }
+    
+    
 }

@@ -375,4 +375,9 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     public void resetTimeline() {
         timeline = null;
     }
+
+    @Override
+    public Tag getSourceTag() {
+        return this;
+    }
 }

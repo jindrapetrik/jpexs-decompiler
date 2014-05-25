@@ -187,4 +187,11 @@ public class DoActionTag extends Tag implements ASMSource {
     public String removePrefixAndSuffix(String source) {
         return source;
     }
+
+    @Override
+    public Tag getSourceTag() {
+        return this;
+    }
+    
+    
 }

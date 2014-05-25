@@ -332,7 +332,7 @@ public class ABC {
                     }
                 }
             }
-        }
+        }        
     }
 
     public ABC(InputStream is, SWF swf, ABCContainerTag tag) throws IOException {
