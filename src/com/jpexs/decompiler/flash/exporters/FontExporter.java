@@ -69,7 +69,7 @@ public class FontExporter {
             if (t instanceof FontTag) {
                 final FontTag st = (FontTag) t;
                 String ext = ".ttf";
-                if(settings.mode == FontExportMode.WOFF){
+                if (settings.mode == FontExportMode.WOFF) {
                     ext = ".woff";
                 }
                 final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ext);
@@ -110,17 +110,16 @@ public class FontExporter {
 
     public void exportFont(final FontTag t, FontExportMode mode, File file) throws IOException {
         List<SHAPE> shapes = t.getGlyphShapeTable();
-        
+
         File ttfFile = file;
-        
-        if(mode == FontExportMode.WOFF){
+
+        if (mode == FontExportMode.WOFF) {
             ttfFile = File.createTempFile("ffdec_export", ".ttf");
         }
-        
-        
+
         Fontastic f = new Fontastic(t.getFontName(), ttfFile);
         String cop = t.getCopyright();
-        
+
         f.getEngine().setCopyrightYear(cop == null ? "" : cop);
         f.setAuthor(ApplicationInfo.shortApplicationVerName);
         f.setVersion("1.0");
@@ -195,11 +194,11 @@ public class FontExporter {
 
         }
         f.buildFont();
-        
-        if(mode == FontExportMode.WOFF){
-            FontFactory fontFactory = FontFactory.getInstance();	
+
+        if (mode == FontExportMode.WOFF) {
+            FontFactory fontFactory = FontFactory.getInstance();
             byte[] fontBytes = new byte[0];
-            try(FileInputStream fis = new FileInputStream(ttfFile)){
+            try (FileInputStream fis = new FileInputStream(ttfFile)) {
                 fontBytes = new byte[(int) ttfFile.length()];
                 fis.read(fontBytes);
             }
@@ -209,13 +208,13 @@ public class FontExporter {
 
             Font font = fontArray[0];
 
-            try(FileOutputStream fos = new FileOutputStream(file)){
+            try (FileOutputStream fos = new FileOutputStream(file)) {
                 WoffWriter w = new WoffWriter();
                 WritableFontData woffData = w.convert(font);
                 woffData.copyTo(fos);
             }
             ttfFile.delete();
-            
+
         }
     }
 }

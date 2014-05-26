@@ -51,7 +51,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -81,12 +80,22 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
     public static final int MAX_RATIO = 65535;
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<>();
-        ret.addAll(morphFillStyles.getNeededCharacters());
-        ret.addAll(startEdges.getNeededCharacters());
-        ret.addAll(endEdges.getNeededCharacters());
-        return ret;
+    public void getNeededCharacters(Set<Integer> needed) {
+        morphFillStyles.getNeededCharacters(needed);
+        startEdges.getNeededCharacters(needed);
+        endEdges.getNeededCharacters(needed);
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        modified |= morphFillStyles.removeCharacter(characterId);
+        modified |= startEdges.removeCharacter(characterId);
+        modified |= endEdges.removeCharacter(characterId);
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
     }
 
     @Override

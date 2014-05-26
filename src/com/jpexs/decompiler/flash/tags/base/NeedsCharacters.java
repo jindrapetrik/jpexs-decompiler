@@ -24,5 +24,7 @@ import java.util.Set;
  */
 public interface NeedsCharacters {
 
-    public Set<Integer> getNeededCharacters();
+    public void getNeededCharacters(Set<Integer> needed);
+
+    public boolean removeCharacter(int characterId);
 }

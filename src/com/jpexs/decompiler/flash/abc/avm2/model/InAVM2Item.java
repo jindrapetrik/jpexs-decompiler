@@ -58,8 +58,7 @@ public class InAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSourceMerge(localData, generator, object,collection,ins(new InIns()));
+        return toSourceMerge(localData, generator, object, collection, ins(new InIns()));
     }
-    
-    
+
 }

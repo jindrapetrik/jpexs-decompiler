@@ -18,11 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ApplyTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -74,21 +70,20 @@ public class ApplyTypeAVM2Item extends AVM2Item {
     @Override
     public boolean hasReturnValue() {
         return true;
-    }       
+    }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {                       
-            //int qname = AVM2SourceGenerator.resolveType(localData,object,((AVM2SourceGenerator)generator).abc,((AVM2SourceGenerator)generator).allABCs);
-            List<GraphSourceItem> nparams=new ArrayList<>();
-            for(GraphTargetItem i:params){
-                nparams.addAll(i.toSource(localData, generator));//ins(new GetLexIns(),AVM2SourceGenerator.resolveType(localData,i,((AVM2SourceGenerator)generator).abc,((AVM2SourceGenerator)generator).allABCs)));
-            }
-            return toSourceMerge(localData, generator,
-                    object,
-                    nparams,
-                    ins(new ApplyTypeIns(),params.size())
-            );
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        //int qname = AVM2SourceGenerator.resolveType(localData,object,((AVM2SourceGenerator)generator).abc,((AVM2SourceGenerator)generator).allABCs);
+        List<GraphSourceItem> nparams = new ArrayList<>();
+        for (GraphTargetItem i : params) {
+            nparams.addAll(i.toSource(localData, generator));//ins(new GetLexIns(),AVM2SourceGenerator.resolveType(localData,i,((AVM2SourceGenerator)generator).abc,((AVM2SourceGenerator)generator).allABCs)));
+        }
+        return toSourceMerge(localData, generator,
+                object,
+                nparams,
+                ins(new ApplyTypeIns(), params.size())
+        );
     }
-    
-    
+
 }

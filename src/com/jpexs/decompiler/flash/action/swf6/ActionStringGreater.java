@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.swf6;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.model.operations.GtActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StringGtActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;

@@ -34,7 +34,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -127,10 +126,14 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
     }
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<>();
-        ret.add(characterId);
-        return ret;
+    public void getNeededCharacters(Set<Integer> needed) {
+        needed.add(characterId);
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        // the place object tag will be removed
+        return false;
     }
 
     @Override

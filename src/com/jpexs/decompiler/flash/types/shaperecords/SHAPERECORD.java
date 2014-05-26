@@ -41,7 +41,6 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JPanel;
@@ -58,9 +57,12 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     public abstract void calculateBits();
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<>();
-        return ret;
+    public void getNeededCharacters(Set<Integer> needed) {
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        return false;
     }
 
     public abstract int changeX(int x);

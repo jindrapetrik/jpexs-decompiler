@@ -38,7 +38,7 @@ public class InterfaceAVM2Item extends AVM2Item {
     public String pkg;
     public List<String> importedClasses;
 
-    public InterfaceAVM2Item(List<String> importedClasses,String pkg,List<Integer> openedNamespaces, boolean isFinal, int namespace, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
+    public InterfaceAVM2Item(List<String> importedClasses, String pkg, List<Integer> openedNamespaces, boolean isFinal, int namespace, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.importedClasses = importedClasses;
         this.pkg = pkg;

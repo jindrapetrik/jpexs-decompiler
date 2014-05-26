@@ -66,62 +66,62 @@ public class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> openMultipleFiles = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> decompile = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("decompilation")
     public static final ConfigurationItem<Boolean> parallelSpeedUp = null;
-    
+
     @ConfigurationDefaultInt(20)
     @ConfigurationCategory("decompilation")
     public static final ConfigurationItem<Integer> parallelThreadCount = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> autoDeobfuscate = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("decompilation")
     public static final ConfigurationItem<Boolean> cacheOnDisk = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static final ConfigurationItem<Boolean> internalFlashViewer = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> gotoMainClassOnStartup = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> autoRenameIdentifiers = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     public static final ConfigurationItem<Boolean> offeredAssociation = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> decimalAddress = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> showAllAddresses = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
     public static final ConfigurationItem<Boolean> useFrameCache = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> useRibbonInterface = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> openFolderAfterFlaExport = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> useDetailedLogging = null;
@@ -187,26 +187,26 @@ public class Configuration {
 
     @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastSaveDir = null;
-    
+
     @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastOpenDir = null;
-    
+
     @ConfigurationDefaultString(".")
     public static final ConfigurationItem<String> lastExportDir = null;
-    
+
     @ConfigurationDefaultString("en")
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<String> locale = null;
-    
+
     @ConfigurationDefaultString("_loc%d_")
     @ConfigurationCategory("script")
     public static final ConfigurationItem<String> registerNameFormat = null;
-    
+
     @ConfigurationDefaultInt(10)
     public static final ConfigurationItem<Integer> maxRecentFileCount = null;
-    
+
     public static final ConfigurationItem<String> recentFiles = null;
-    
+
     public static final ConfigurationItem<String> fontPairing = null;
 
     public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
@@ -236,7 +236,7 @@ public class Configuration {
     @ConfigurationDefaultInt(3)
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
-    
+
     @ConfigurationDefaultInt(1024 * 100/*100KB*/)
     @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> syntaxHighlightLimit = null;

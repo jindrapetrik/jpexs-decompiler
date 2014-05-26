@@ -63,12 +63,12 @@ public class UnLoadMovieNumActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        if((num instanceof DirectValueActionItem)&&(((DirectValueActionItem)num).value instanceof Long)){
-            return toSourceMerge(localData, generator, new ActionGetURL("","_level"+((DirectValueActionItem)num).value ));
-        }else{
+        if ((num instanceof DirectValueActionItem) && (((DirectValueActionItem) num).value instanceof Long)) {
+            return toSourceMerge(localData, generator, new ActionGetURL("", "_level" + ((DirectValueActionItem) num).value));
+        } else {
             return toSourceMerge(localData, generator, new ActionPush(""), new AddActionItem(src, asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(0, false, true));
         }
-        
+
     }
 
     @Override

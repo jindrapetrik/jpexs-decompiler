@@ -68,12 +68,12 @@ public abstract class ShapeTag extends CharacterTag implements BoundedTag, Drawa
     }
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret= super.getNeededCharacters();
-        ret.addAll(getShapes().getNeededCharacters());
-        return ret;
+    public void getNeededCharacters(Set<Integer> needed) {
+        getShapes().getNeededCharacters(needed);
     }
-    
-    
 
+    @Override
+    public boolean removeCharacter(int characterId) {
+        return getShapes().removeCharacter(characterId);
+    }
 }

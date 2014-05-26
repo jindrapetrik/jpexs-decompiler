@@ -226,13 +226,13 @@ public class ABCInputStream extends InputStream {
         } else if ((kind == Multiname.RTQNAME) || (kind == Multiname.RTQNAMEA)) {
             name_index = readU30();
         } else if ((kind == Multiname.RTQNAMEL) || (kind == Multiname.RTQNAMELA)) {
-        
+
         } else if ((kind == Multiname.MULTINAME) || (kind == Multiname.MULTINAMEA)) {
             name_index = readU30();
             namespace_set_index = readU30();
         } else if ((kind == Multiname.MULTINAMEL) || (kind == Multiname.MULTINAMELA)) {
             namespace_set_index = readU30();
-        } else if (kind == Multiname.TYPENAME) {           
+        } else if (kind == Multiname.TYPENAME) {
             qname_index = readU30(); //Multiname index!!!
             int paramsLength = readU30();
             for (int i = 0; i < paramsLength; i++) {

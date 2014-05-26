@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -30,12 +29,19 @@ public class MORPHFILLSTYLEARRAY implements NeedsCharacters, Serializable {
     public MORPHFILLSTYLE[] fillStyles;
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<>();
+    public void getNeededCharacters(Set<Integer> needed) {
         for (MORPHFILLSTYLE fs : fillStyles) {
-            ret.addAll(fs.getNeededCharacters());
+            fs.getNeededCharacters(needed);
         }
-        return ret;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        for (MORPHFILLSTYLE fs : fillStyles) {
+            modified |= fs.removeCharacter(characterId);
+        }
+        return modified;
     }
 
     public FILLSTYLEARRAY getFillStylesAt(int ratio) {

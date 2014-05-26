@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.gui;
 
 import java.awt.event.ActionEvent;
@@ -30,13 +29,15 @@ import org.pushingpixels.substance.flamingo.common.ui.SubstanceCommandButtonUI;
 
 /**
  *
- * Own CommandButtonUI because original Flamingo UI throws Exception in some cases
- * 
+ * Own CommandButtonUI because original Flamingo UI throws Exception in some
+ * cases
+ *
  * @author JPEXS
  */
-public class MyCommandButtonUI extends SubstanceCommandButtonUI{
+public class MyCommandButtonUI extends SubstanceCommandButtonUI {
+
     public static ComponentUI createUI(JComponent comp) {
-        return new MyCommandButtonUI((JCommandButton)comp);
+        return new MyCommandButtonUI((JCommandButton) comp);
     }
 
     public MyCommandButtonUI(JCommandButton jcb) {
@@ -50,7 +51,7 @@ public class MyCommandButtonUI extends SubstanceCommandButtonUI{
         this.disposePopupsActionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(commandButton == null){ //Added by JPEXS
+                if (commandButton == null) { //Added by JPEXS
                     return;
                 }
                 boolean toDismiss = !Boolean.TRUE.equals(commandButton
@@ -90,6 +91,4 @@ public class MyCommandButtonUI extends SubstanceCommandButtonUI{
         this.commandButton.addActionListener(disposePopupsActionListener);
     }
 
-    
-    
 }

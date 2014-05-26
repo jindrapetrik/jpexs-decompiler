@@ -119,28 +119,25 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 }
             }
         }
-        
-        if(obj.getThroughDuplicate() instanceof ConstructAVM2Item){
-            ConstructAVM2Item c = (ConstructAVM2Item)obj.getThroughDuplicate();
-            if(c.object instanceof ApplyTypeAVM2Item){
-                ApplyTypeAVM2Item at = (ApplyTypeAVM2Item)c.object;
+
+        if (obj.getThroughDuplicate() instanceof ConstructAVM2Item) {
+            ConstructAVM2Item c = (ConstructAVM2Item) obj.getThroughDuplicate();
+            if (c.object instanceof ApplyTypeAVM2Item) {
+                ApplyTypeAVM2Item at = (ApplyTypeAVM2Item) c.object;
                 c.args.clear();
-                List<GraphTargetItem> vals=new ArrayList<>();
+                List<GraphTargetItem> vals = new ArrayList<>();
                 vals.add(value);
-                c.object = new InitVectorAVM2Item(c.instruction,at.params.get(0),vals);
+                c.object = new InitVectorAVM2Item(c.instruction, at.params.get(0), vals);
                 return;
-            }
-            else
-            if(c.object instanceof InitVectorAVM2Item){
-                InitVectorAVM2Item iv = (InitVectorAVM2Item)c.object;
+            } else if (c.object instanceof InitVectorAVM2Item) {
+                InitVectorAVM2Item iv = (InitVectorAVM2Item) c.object;
                 iv.arguments.add(value);
                 return;
             }
         }
-        
+
         output.add(new SetPropertyAVM2Item(ins, obj, multiname, value));
-        
-        
+
     }
 
     @Override

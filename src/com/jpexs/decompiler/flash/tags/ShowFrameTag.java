@@ -46,7 +46,6 @@ public class ShowFrameTag extends Tag {
              add(SoundStreamHead2Tag.ID);*/
         }
     };
-    public List<Tag> innerTags;
 
     /**
      * Constructor

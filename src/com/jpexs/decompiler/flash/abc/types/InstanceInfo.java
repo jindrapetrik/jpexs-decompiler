@@ -36,7 +36,7 @@ public class InstanceInfo {
     public static final int CLASS_FINAL = 2;
     public static final int CLASS_INTERFACE = 4;
     public static final int CLASS_PROTECTEDNS = 8;
-    
+
     public boolean deleted;
 
     @Override

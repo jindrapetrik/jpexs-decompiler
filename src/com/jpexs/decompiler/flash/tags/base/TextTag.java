@@ -153,7 +153,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                 } else {
                     leading = ((double) font.getLeading() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);
                     ascent = ((double) font.getAscent() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);
-                    descent = ((double) font.getDescent() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);                    
+                    descent = ((double) font.getDescent() * textHeight / 1024.0 / font.getDivider() / SWF.unitDivisor);
                     lineDistance = ascent + descent;
                 }
             }
@@ -165,9 +165,9 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
             if (rec.styleFlagsHasYOffset) {
                 if (!firstLine) {
                     top += ascent + descent;
-                    int topint = (int) (Math.round(top)*SWF.unitDivisor);
-                    lineSpacing = rec.yOffset - topint;                                                            
-                    top += lineSpacing/SWF.unitDivisor;
+                    int topint = (int) (Math.round(top) * SWF.unitDivisor);
+                    lineSpacing = rec.yOffset - topint;
+                    top += lineSpacing / SWF.unitDivisor;
                 } else {
                     top = ascent;
                 }
@@ -202,7 +202,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
                     defaultAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(entry.glyphIndex), nextEntry == null ? null : font.glyphToChar(nextEntry.glyphIndex)));
                 }
                 letterSpacing = adv - defaultAdvance;
-                x += adv/(font.getDivider());
+                x += adv / (font.getDivider());
             }
             allLetterSpacings.add(letterSpacing);
         }
@@ -211,7 +211,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         att.put("lineSpacing", lineSpacing);
         att.put("textBounds", textBounds);
         att.put("allLeftMargins", allLeftMargins);
-        att.put("allLetterSpacings", allLetterSpacings);                
+        att.put("allLetterSpacings", allLetterSpacings);
         return att;
     }
 
@@ -322,8 +322,8 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
         int fontId = -1;
         int textHeight = 12;
         int x = 0;
-        int y = 0;        
-        
+        int y = 0;
+
         List<SHAPE> glyphs = new ArrayList<>();
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
@@ -348,15 +348,14 @@ public abstract class TextTag extends CharacterTag implements BoundedTag, Drawab
 
             double rat = textHeight / 1024.0 / font.getDivider();
 
-            
-            ret += "\tvar textColor = "+CanvasShapeExporter.color(textColor)+";\r\n";
+            ret += "\tvar textColor = " + CanvasShapeExporter.color(textColor) + ";\r\n";
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 Matrix mat = (new Matrix(textMatrix).concatenate(Matrix.getTranslateInstance(x, y))).concatenate(Matrix.getScaleInstance(rat));
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
                     ret += "\tctx.save();\r\n";
                     ret += "\tctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
-                    ret += "\tfont"+fontId+"(ctx,\""+(""+font.glyphToChar(entry.glyphIndex)).replace("\\", "\\\\").replace("\"", "\\\"")+"\",textColor);\r\n";
+                    ret += "\tfont" + fontId + "(ctx,\"" + ("" + font.glyphToChar(entry.glyphIndex)).replace("\\", "\\\\").replace("\"", "\\\"") + "\",textColor);\r\n";
                     ret += "\tctx.restore();\r\n";
                     x += entry.glyphAdvance;
                 }

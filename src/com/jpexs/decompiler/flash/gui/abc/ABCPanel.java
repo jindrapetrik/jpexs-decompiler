@@ -685,17 +685,17 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
                 try {
                     abc.script_info.get(oldIndex).delete(abc, true);
-                    ActionScriptParser.compile(decompiledTextArea.getText(), abc,new ArrayList<ABC>(), isDocumentClass, scriptName);
+                    ActionScriptParser.compile(decompiledTextArea.getText(), abc, new ArrayList<ABC>(), isDocumentClass, scriptName);
                     //Move newly added script to its position
                     abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
                     abc.script_info.remove(newIndex);
                     abc.pack(); //removes old classes/methods
-                    ((Tag) abc.parentTag).setModified(true);                    
-                    lastDecompiled = decompiledTextArea.getText();                   
+                    ((Tag) abc.parentTag).setModified(true);
+                    lastDecompiled = decompiledTextArea.getText();
                     mainPanel.updateClassesList();
-                    List<MyEntry<ClassPath,ScriptPack>> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
-                    if(!packs.isEmpty()){
-                        hilightScript(swf,packs.get(0).key.toString());
+                    List<MyEntry<ClassPath, ScriptPack>> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex);
+                    if (!packs.isEmpty()) {
+                        hilightScript(swf, packs.get(0).key.toString());
                     }
                     //decompiledTextArea.setClassIndex(-1);
                     //navigator.setClassIndex(-1, oldIndex);

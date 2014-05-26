@@ -83,6 +83,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -555,7 +556,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         }
 
                         Tag t = (Tag) item;
-                        Set<Integer> needed = t.getDeepNeededCharacters(swf.characters);
+                        Set<Integer> needed = new HashSet<>();
+                        t.getNeededCharactersDeep(needed);
                         for (int n : needed) {
                             if (!doneCharacters.contains(n)) {
                                 classicTag(swf.characters.get(n)).writeTag(sos2);
@@ -603,7 +605,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         }
                     } else if (tagObj instanceof AloneTag) {
                     } else {
-                        Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(swf.characters);
+                        Set<Integer> needed = new HashSet<>();
+                        ((Tag) tagObj).getNeededCharactersDeep(needed);
                         for (int n : needed) {
                             classicTag(swf.characters.get(n)).writeTag(sos2);
                         }

@@ -28,7 +28,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import static com.jpexs.decompiler.graph.GraphTargetItem.toSourceMerge;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.helpers.Helper;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,9 +60,9 @@ public class FSCommandActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        ActionSourceGenerator asg=(ActionSourceGenerator)generator;
-        if((command instanceof DirectValueActionItem)&&((DirectValueActionItem)command).isString()){
-            return toSourceMerge(localData, generator, new ActionGetURL("FSCommand:" + ((DirectValueActionItem)command).getAsString(), ""));
+        ActionSourceGenerator asg = (ActionSourceGenerator) generator;
+        if ((command instanceof DirectValueActionItem) && ((DirectValueActionItem) command).isString()) {
+            return toSourceMerge(localData, generator, new ActionGetURL("FSCommand:" + ((DirectValueActionItem) command).getAsString(), ""));
         }
         return toSourceMerge(localData, generator, new AddActionItem(null, asg.pushConstTargetItem("FSCommand:"), command, true), asg.pushConstTargetItem(""), new ActionGetURL2(1/*GET*/, false, false));
     }

@@ -206,7 +206,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
                     ins = ins(new ConvertUIns());
                     break;
                 default:
-                    int type_index = AVM2SourceGenerator.resolveType(localData,ttype, ((AVM2SourceGenerator) generator).abc,((AVM2SourceGenerator) generator).allABCs);
+                    int type_index = AVM2SourceGenerator.resolveType(localData, ttype, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
                     ins = ins(new CoerceIns(), type_index);
                     break;
             }
@@ -237,7 +237,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
             if (slotNumber > -1) {
                 return toSourceMerge(localData, generator,
                         ins(new GetScopeObjectIns(), slotScope),
-                        assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData,generator, type) : null, needsReturn
+                        assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData, generator, type) : null, needsReturn
                         ? dupSetTemp(localData, generator, ret_temp) : null, generateSetLoc(regNumber), slotNumber > -1
                         ? ins(new SetSlotIns(), slotNumber)
                         : null,
@@ -245,7 +245,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
                         killTemp(localData, generator, Arrays.asList(ret_temp)));
             } else {
 
-                return toSourceMerge(localData, generator, assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData,generator, type) : null, needsReturn
+                return toSourceMerge(localData, generator, assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData, generator, type) : null, needsReturn
                         ? ins(new DupIns()) : null, generateSetLoc(regNumber));
             }
         } else {

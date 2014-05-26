@@ -254,116 +254,113 @@ public class Filtering {
     private static BufferedImage gradientBevel(BufferedImage src, Color[] colors, float[] ratios, int blurX, int blurY, float strength, int type, float angle, float distance, boolean knockout, int iterations) {
         int width = src.getWidth();
         int height = src.getHeight();
-        BufferedImage retImg = new BufferedImage(width,height,src.getType());
+        BufferedImage retImg = new BufferedImage(width, height, src.getType());
         int srcPixels[] = getRGB(src, 0, 0, width, height);
 
         int revPixels[] = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
-            revPixels[i] = (srcPixels[i]&0xffffff)+((255-((srcPixels[i]>>24) & 0xff))<<24);
-        }  
+            revPixels[i] = (srcPixels[i] & 0xffffff) + ((255 - ((srcPixels[i] >> 24) & 0xff)) << 24);
+        }
 
-        BufferedImage gradient = new BufferedImage(512, 1,src.getType());            
+        BufferedImage gradient = new BufferedImage(512, 1, src.getType());
         Graphics2D gg = gradient.createGraphics();
-        
-        
+
         Point p1 = new Point(0, 0);
         Point p2 = new Point(511, 0);
-        gg.setPaint(new LinearGradientPaint(p1,p2, ratios, colors));
+        gg.setPaint(new LinearGradientPaint(p1, p2, ratios, colors));
         gg.fill(new Rectangle(512, 1));
         int[] gradientPixels = getRGB(gradient, 0, 0, gradient.getWidth(), gradient.getHeight());
-        
+
         BufferedImage shadowInner = null;
         BufferedImage hilightInner = null;
-        if(type!=OUTER){
-            BufferedImage hilightIm = dropShadow(src,0, 0, angle, distance, Color.red, true, iterations, strength, true);//new DropShadowFilter(blurX, blurY, strength, inner ? highlightColor : shadowColor, angle, distance, inner, true, iterations).filter(src
+        if (type != OUTER) {
+            BufferedImage hilightIm = dropShadow(src, 0, 0, angle, distance, Color.red, true, iterations, strength, true);//new DropShadowFilter(blurX, blurY, strength, inner ? highlightColor : shadowColor, angle, distance, inner, true, iterations).filter(src
             BufferedImage shadowIm = dropShadow(src, 0, 0, angle + 180, distance, Color.blue, true, iterations, strength, true); //new DropShadowFilter(blurX, blurY, strength, inner ? shadowColor : highlightColor, angle + 180, distance, inner, true, iterations).filter(src);            
             BufferedImage h2 = new BufferedImage(width, height, src.getType());
             BufferedImage s2 = new BufferedImage(width, height, src.getType());
-            Graphics2D hc=h2.createGraphics();
-            Graphics2D sc=s2.createGraphics();
-            hc.drawImage(hilightIm,0,0,null);
+            Graphics2D hc = h2.createGraphics();
+            Graphics2D sc = s2.createGraphics();
+            hc.drawImage(hilightIm, 0, 0, null);
             hc.setComposite(AlphaComposite.DstOut);
-            hc.drawImage(shadowIm,0,0,null);
+            hc.drawImage(shadowIm, 0, 0, null);
 
-            sc.drawImage(shadowIm,0,0,null);
+            sc.drawImage(shadowIm, 0, 0, null);
             sc.setComposite(AlphaComposite.DstOut);
-            sc.drawImage(hilightIm,0,0,null);
+            sc.drawImage(hilightIm, 0, 0, null);
             shadowInner = s2;
-            hilightInner = h2;     
+            hilightInner = h2;
         }
         BufferedImage shadowOuter = null;
         BufferedImage hilightOuter = null;
-        if(type!=INNER){
-            BufferedImage hilightIm = dropShadow(src,0, 0, angle + 180, distance, Color.red, false, iterations, strength, true);//new DropShadowFilter(blurX, blurY, strength, inner ? highlightColor : shadowColor, angle, distance, inner, true, iterations).filter(src
+        if (type != INNER) {
+            BufferedImage hilightIm = dropShadow(src, 0, 0, angle + 180, distance, Color.red, false, iterations, strength, true);//new DropShadowFilter(blurX, blurY, strength, inner ? highlightColor : shadowColor, angle, distance, inner, true, iterations).filter(src
             BufferedImage shadowIm = dropShadow(src, 0, 0, angle, distance, Color.blue, false, iterations, strength, true); //new DropShadowFilter(blurX, blurY, strength, inner ? shadowColor : highlightColor, angle + 180, distance, inner, true, iterations).filter(src);            
             BufferedImage h2 = new BufferedImage(width, height, src.getType());
             BufferedImage s2 = new BufferedImage(width, height, src.getType());
-            Graphics2D hc=h2.createGraphics();
-            Graphics2D sc=s2.createGraphics();
-            hc.drawImage(hilightIm,0,0,null);
+            Graphics2D hc = h2.createGraphics();
+            Graphics2D sc = s2.createGraphics();
+            hc.drawImage(hilightIm, 0, 0, null);
             hc.setComposite(AlphaComposite.DstOut);
-            hc.drawImage(shadowIm,0,0,null);
+            hc.drawImage(shadowIm, 0, 0, null);
 
-            sc.drawImage(shadowIm,0,0,null);
+            sc.drawImage(shadowIm, 0, 0, null);
             sc.setComposite(AlphaComposite.DstOut);
-            sc.drawImage(hilightIm,0,0,null);
+            sc.drawImage(hilightIm, 0, 0, null);
             shadowOuter = s2;
             hilightOuter = h2;
         }
 
         BufferedImage hilightIm = null;
         BufferedImage shadowIm = null;
-        switch(type)
-        {               
-           case OUTER:
-              hilightIm = hilightOuter;
-              shadowIm = shadowOuter;
-              break;
-           case INNER:
-              hilightIm = hilightInner;
-              shadowIm = shadowInner;
-              break;
-           case FULL:
-              hilightIm = hilightInner;
-              shadowIm = shadowInner;
-              Graphics2D hc=hilightIm.createGraphics();
-              hc.setComposite(AlphaComposite.SrcOver);
-              hc.drawImage(hilightOuter,0,0,null);
-              Graphics2D sc=shadowIm.createGraphics();
-              sc.setComposite(AlphaComposite.SrcOver);
-              sc.drawImage(shadowOuter,0,0,null);
-              break;
+        switch (type) {
+            case OUTER:
+                hilightIm = hilightOuter;
+                shadowIm = shadowOuter;
+                break;
+            case INNER:
+                hilightIm = hilightInner;
+                shadowIm = shadowInner;
+                break;
+            case FULL:
+                hilightIm = hilightInner;
+                shadowIm = shadowInner;
+                Graphics2D hc = hilightIm.createGraphics();
+                hc.setComposite(AlphaComposite.SrcOver);
+                hc.drawImage(hilightOuter, 0, 0, null);
+                Graphics2D sc = shadowIm.createGraphics();
+                sc.setComposite(AlphaComposite.SrcOver);
+                sc.drawImage(shadowOuter, 0, 0, null);
+                break;
         }
 
         int mask[] = null;
-        if(type == INNER){
+        if (type == INNER) {
             mask = srcPixels;
         }
-        if(type == OUTER){
+        if (type == OUTER) {
             mask = revPixels;
-        }                                   
+        }
 
         Graphics2D retc = retImg.createGraphics();
         retc.setColor(Color.black);
-        retc.fillRect(0,0,width,height);
+        retc.fillRect(0, 0, width, height);
         retc.setComposite(AlphaComposite.SrcOver);
-        retc.drawImage(shadowIm,0,0,null);
-        retc.drawImage(hilightIm,0,0,null);
+        retc.drawImage(shadowIm, 0, 0, null);
+        retc.drawImage(hilightIm, 0, 0, null);
 
         /*if(true)
-        return retImg;
-        */
-        retImg = blur(retImg,blurX,blurY,iterations,mask);
+         return retImg;
+         */
+        retImg = blur(retImg, blurX, blurY, iterations, mask);
         int ret[] = getRGB(retImg, 0, 0, width, height);
 
         for (int i = 0; i < srcPixels.length; i++) {
-            int ah = (int) (new Color(ret[i]).getRed()* strength);
+            int ah = (int) (new Color(ret[i]).getRed() * strength);
             int as = (int) (new Color(ret[i]).getBlue() * strength);
-            int ra = cut(ah-as,-255,255);
+            int ra = cut(ah - as, -255, 255);
             ret[i] = gradientPixels[255 + ra];
         }
         setRGB(retImg, 0, 0, width, height, ret);
-
 
         if (!knockout) {
             Graphics2D g = retImg.createGraphics();
@@ -397,7 +394,7 @@ public class Filtering {
         int[] srcPixels = getRGB(src, 0, 0, width, height);
         int shadow[] = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
-            int alpha = (srcPixels[i]>>24) & 0xff;
+            int alpha = (srcPixels[i] >> 24) & 0xff;
             if (inner) {
                 alpha = 255 - alpha;
             }
@@ -418,11 +415,11 @@ public class Filtering {
         shadow = getRGB(retCanvas, 0, 0, width, height);
 
         for (int i = 0; i < shadow.length; i++) {
-            int mask = (srcPixels[i]>>24) & 0xff;
+            int mask = (srcPixels[i] >> 24) & 0xff;
             if (!inner) {
                 mask = 255 - mask;
             }
-            shadow[i] = shadow[i] & 0xffffff + ((mask * ((shadow[i]>>24) & 0xff) / 255)<<24);
+            shadow[i] = shadow[i] & 0xffffff + ((mask * ((shadow[i] >> 24) & 0xff) / 255) << 24);
         }
         setRGB(retCanvas, 0, 0, width, height, shadow);
 
@@ -440,76 +437,70 @@ public class Filtering {
     }
 
     private static BufferedImage gradientGlow(BufferedImage src, int blurX, int blurY, float angle, double distance, Color[] colors, float[] ratios, int type, int iterations, float strength, boolean knockout) {
-        
+
         int width = src.getWidth();
         int height = src.getHeight();
         BufferedImage retCanvas = new BufferedImage(width, height, src.getType());
         Graphics2D retImg = retCanvas.createGraphics();
 
-        BufferedImage gradCanvas = new BufferedImage(256,1,src.getType());
+        BufferedImage gradCanvas = new BufferedImage(256, 1, src.getType());
 
         Graphics2D gg = gradCanvas.createGraphics();
-        
-        
+
         Point p1 = new Point(0, 0);
         Point p2 = new Point(255, 0);
-        gg.setPaint(new LinearGradientPaint(p1,p2, ratios, colors));
+        gg.setPaint(new LinearGradientPaint(p1, p2, ratios, colors));
         gg.fill(new Rectangle(256, 1));
         int[] gradientPixels = getRGB(gradCanvas, 0, 0, gradCanvas.getWidth(), gradCanvas.getHeight());
-        
+
         double angleRad = angle / 180 * Math.PI;
         double moveX = (distance * Math.cos(angleRad));
-        double moveY = (distance * Math.sin(angleRad));            
+        double moveY = (distance * Math.sin(angleRad));
         int srcPixels[] = getRGB(src, 0, 0, width, height);
         int revPixels[] = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
-            revPixels[i] = (srcPixels[i]&0xffffff)+((255-((srcPixels[i]>>24) & 0xff))<<24);
-        }            
+            revPixels[i] = (srcPixels[i] & 0xffffff) + ((255 - ((srcPixels[i] >> 24) & 0xff)) << 24);
+        }
         int shadow[] = new int[srcPixels.length];
         for (int i = 0; i < srcPixels.length; i++) {
-            shadow[i] = 0+((cut(strength*((srcPixels[i]>>24) & 0xff)))<<24);
+            shadow[i] = 0 + ((cut(strength * ((srcPixels[i] >> 24) & 0xff))) << 24);
         }
-        Color colorAlpha = new Color(0,0,0,0);
+        Color colorAlpha = new Color(0, 0, 0, 0);
         shadow = moveRGB(width, height, shadow, moveX, moveY, colorAlpha);
 
         setRGB(retCanvas, 0, 0, width, height, shadow);
 
         int mask[] = null;
-        if(type == INNER){
+        if (type == INNER) {
             mask = srcPixels;
         }
-        if(type == OUTER){
+        if (type == OUTER) {
             mask = revPixels;
         }
 
-
-        retCanvas = blur(retCanvas, blurX, blurY, iterations,mask);
+        retCanvas = blur(retCanvas, blurX, blurY, iterations, mask);
         shadow = getRGB(retCanvas, 0, 0, width, height);
 
-        if(mask!=null){
-           for (int i = 0; i < mask.length; i++) {
-               int m = (mask[i]>>24);
-              if(m == 0){
-                 shadow[i] = 0;
-              }
-           }
+        if (mask != null) {
+            for (int i = 0; i < mask.length; i++) {
+                int m = (mask[i] >> 24);
+                if (m == 0) {
+                    shadow[i] = 0;
+                }
+            }
         }
-
-
-
-
 
         for (int i = 0; i < shadow.length; i++) {
-           int a = (shadow[i]>>24) & 0xff;
-           shadow[i] = gradientPixels[a];              
+            int a = (shadow[i] >> 24) & 0xff;
+            shadow[i] = gradientPixels[a];
         }
 
-        setRGB(retCanvas,0,0,width,height,shadow);
+        setRGB(retCanvas, 0, 0, width, height, shadow);
 
         if (!knockout) {
-           retImg = retCanvas.createGraphics();
-           retImg.setComposite(AlphaComposite.DstOver);
-           retImg.drawImage(src,0,0,null);
+            retImg = retCanvas.createGraphics();
+            retImg.setComposite(AlphaComposite.DstOver);
+            retImg.drawImage(src, 0, 0, null);
         }
 
         return retCanvas;

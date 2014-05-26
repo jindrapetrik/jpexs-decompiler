@@ -54,8 +54,17 @@ public class DefineShape4Tag extends ShapeTag {
     }
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        return shapes.getNeededCharacters();
+    public void getNeededCharacters(Set<Integer> needed) {
+        shapes.getNeededCharacters(needed);
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = shapes.removeCharacter(characterId);
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
     }
 
     @Override

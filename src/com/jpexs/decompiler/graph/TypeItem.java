@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
-import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -71,16 +70,16 @@ public class TypeItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if(localData.fullyQualifiedNames.contains(fullTypeName)){
+        if (localData.fullyQualifiedNames.contains(fullTypeName)) {
             writer.append(fullTypeName);
-        }else{
+        } else {
             String simpleName = fullTypeName;
-            if(simpleName.contains(".")){
-                simpleName = simpleName.substring(simpleName.lastIndexOf(".")+1);
+            if (simpleName.contains(".")) {
+                simpleName = simpleName.substring(simpleName.lastIndexOf('.') + 1);
             }
             writer.append(simpleName);
         }
-        
+
         return writer;
     }
 

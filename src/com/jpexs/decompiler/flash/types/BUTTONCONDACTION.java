@@ -316,6 +316,5 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
     public Tag getSourceTag() {
         return tag;
     }
-    
-    
+
 }

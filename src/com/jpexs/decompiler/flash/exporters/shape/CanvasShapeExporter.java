@@ -44,7 +44,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected static final String DRAW_COMMAND_L = "L";
     protected static final String DRAW_COMMAND_Q = "Q";
     protected String currentDrawCommand = "";
-    
+
     protected String pathData = "";
     protected String shapeData = "";
     protected String html = "";
@@ -62,13 +62,13 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected String lineLastRadColor = null;
     protected Matrix lineFillMatrix = null;
     protected int lineRepeatCnt = 0;
-    protected int fillWidth=0;
-    protected int fillHeight=0;
+    protected int fillWidth = 0;
+    protected int fillHeight = 0;
 
     public static String getJsPrefix() {
         return "<script>var canvas=document.getElementById(\"myCanvas\");\r\n"
                 + "var ctx=canvas.getContext(\"2d\");\r\n"
-                + "enhanceContext(ctx);\r\n"                            
+                + "enhanceContext(ctx);\r\n"
                 + "var ctrans = new cxform(0,0,0,0,255,255,255,255);\r\n";
     }
 
@@ -81,14 +81,14 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 + "<style type=\"text/css\">"
                 + "#resizable {position:relative; display:inline-block; margin:0; padding:0;font-size:0px;} "
                 + "#width_size {width:10px; position:absolute; right:-5px; top:0px; bottom:0px; cursor:e-resize;"
-                + "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"+
-                "} "
-                + "#height_size {height:10px; position:absolute; bottom:-5px; left:0px; right:0px; cursor:n-resize;"+
-                "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"
-                +"} "
+                + "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"
+                + "} "
+                + "#height_size {height:10px; position:absolute; bottom:-5px; left:0px; right:0px; cursor:n-resize;"
+                + "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"
+                + "} "
                 /*+ "#both_size {height:10px; width:10px; position:absolute; bottom:-5px; right:-5px; cursor:nw-resize;"+
-                "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"
-                +"} "*/
+                 "-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"
+                 +"} "*/
                 + "#myCanvas {margin:0; padding:0;} "
                 + "</style>"
                 + "</head>"
@@ -103,26 +103,26 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
     }
 
-    public static String getJsSuffix(){
+    public static String getJsSuffix() {
         return "</script>\r\n";
     }
-    
+
     public static String getHtmlSuffix() {
         return "</body>\r\n"
                 + "</html>";
     }
-    
-    public static String getDrawJs(int width,int height,String data){
-        return "var originalWidth="+width+";\r\nvar originalHeight="+height+";\r\n function drawFrame(){\r\n"
-                + "\tctx.save();\r\n\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n"+data +"\tctx.restore();\r\n}\r\n\tdrawFrame();\r\n";
+
+    public static String getDrawJs(int width, int height, String data) {
+        return "var originalWidth=" + width + ";\r\nvar originalHeight=" + height + ";\r\n function drawFrame(){\r\n"
+                + "\tctx.save();\r\n\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n" + data + "\tctx.restore();\r\n}\r\n\tdrawFrame();\r\n";
     }
 
     public String getHtml(String needed) {
         RECT r = shape.getBounds();
         int width = (int) (r.getWidth() / unitDivisor);
         int height = (int) (r.getHeight() / unitDivisor);
-                
-        return getHtmlPrefix(width, height) + getJsPrefix() + needed +getDrawJs(width,height,shapeData) + getJsSuffix() + getHtmlSuffix();
+
+        return getHtmlPrefix(width, height) + getJsPrefix() + needed + getDrawJs(width, height, shapeData) + getJsSuffix() + getHtmlSuffix();
     }
 
     public String getShapeData() {
@@ -169,7 +169,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         finalizePath();
         if (color == null) {
             fillData += "\tctx.fillStyle=defaultFill;\r\n";
-        }else{
+        } else {
             fillData += "\tctx.fillStyle=" + color(color) + ";\r\n";
         }
     }
@@ -248,7 +248,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 ImageTag i = (ImageTag) t;
                 if (i.getCharacterId() == bitmapId) {
                     image = i;
-                    SerializableImage im=i.getImage();
+                    SerializableImage im = i.getImage();
                     fillWidth = im.getWidth();
                     fillHeight = im.getHeight();
                     break;
@@ -469,12 +469,12 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 pathData += "\tctx.save();\r\n";
                 pathData += "\tctx.clip();\r\n";
                 pathData += "\tctx.transform(" + Helper.doubleStr(fillMatrix.scaleX) + "," + Helper.doubleStr(fillMatrix.rotateSkew0) + "," + Helper.doubleStr(fillMatrix.rotateSkew1) + "," + Helper.doubleStr(fillMatrix.scaleY) + "," + Helper.doubleStr(fillMatrix.translateX) + "," + Helper.doubleStr(fillMatrix.translateY) + ");\r\n";
-                if(fillWidth>0){//repeating bitmap glitch fix
+                if (fillWidth > 0) {//repeating bitmap glitch fix
                     //make bitmap 1px wider
-                    double s_w = (fillWidth+1)/(double)fillWidth;
-                    double s_h = (fillHeight+1)/(double)fillHeight;
-                    
-                    pathData += "\tctx.transform("+(s_w)+",0,0,"+s_h+",-0.5,-0.5);\r\n";
+                    double s_w = (fillWidth + 1) / (double) fillWidth;
+                    double s_h = (fillHeight + 1) / (double) fillHeight;
+
+                    pathData += "\tctx.transform(" + (s_w) + ",0,0," + s_h + ",-0.5,-0.5);\r\n";
                 }
                 pathData += fillData;
                 pathData += "\tctx.fillRect(" + (-16384 - 32768 * repeatCnt) + "," + (-16384 - 32768 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + "," + (2 * 16384 + 32768 * 2 * repeatCnt) + ");\r\n";
@@ -505,10 +505,9 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         lineFillData = null;
         lineLastRadColor = null;
         lineFillMatrix = null;
-        
+
         fillWidth = 0;
         fillHeight = 0;
     }
-    
-  
+
 }

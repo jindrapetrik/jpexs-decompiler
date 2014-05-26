@@ -80,12 +80,15 @@ public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     public int numLineBits;
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = super.getNeededCharacters();
+    public void getNeededCharacters(Set<Integer> needed) {
         if (stateNewStyles) {
-            ret.addAll(fillStyles.getNeededCharacters());
+            fillStyles.getNeededCharacters(needed);
         }
-        return ret;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        return fillStyles.removeCharacter(characterId);
     }
 
     @Override

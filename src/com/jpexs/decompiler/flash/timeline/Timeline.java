@@ -61,7 +61,7 @@ public class Timeline {
                 if (depth > max_depth) {
                     max_depth = depth;
                 }
-                if(f.layers.get(depth).clipDepth > max_depth){
+                if (f.layers.get(depth).clipDepth > max_depth) {
                     max_depth = f.layers.get(depth).clipDepth;
                 }
             }
@@ -83,15 +83,23 @@ public class Timeline {
         this.displayRect = displayRect;
         this.frameRate = swf.frameRate;
         Frame frame = new Frame(this);
+        boolean tagAdded = false;
         for (Tag t : tags) {
+            if (ShowFrameTag.isNestedTagType(t.getId())) {
+                frame.innerTags.add(t);
+                tagAdded = true;
+            }
             if (t instanceof StartSoundTag) {
                 frame.sounds.add(((StartSoundTag) t).soundId);
+                tagAdded = true;
             }
             if (t instanceof StartSound2Tag) {
                 frame.soundClasses.add(((StartSound2Tag) t).soundClassName);
+                tagAdded = true;
             }
             if (t instanceof SetBackgroundColorTag) {
                 frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
+                tagAdded = true;
             }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
@@ -153,19 +161,26 @@ public class Timeline {
                     fl.clipDepth = po.getClipDepth();
                 }
                 fl.key = true;
+                tagAdded = true;
             }
             if (t instanceof RemoveTag) {
                 RemoveTag r = (RemoveTag) t;
                 int depth = r.getDepth();
                 frame.layers.remove(depth);
+                tagAdded = true;
             }
             if (t instanceof DoActionTag) {
                 frame.action = (DoActionTag) t;
+                tagAdded = true;
             }
             if (t instanceof ShowFrameTag) {
                 frames.add(frame);
                 frame = new Frame(frame);
+                tagAdded = false;
             }
+        }
+        if (tagAdded) {
+            frames.add(frame);
         }
     }
 

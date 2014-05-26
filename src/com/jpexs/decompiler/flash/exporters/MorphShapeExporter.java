@@ -91,11 +91,13 @@ public class MorphShapeExporter {
                                     int deltaY = -Math.min(mst.getStartBounds().Ymin, mst.getEndBounds().Ymin);
                                     CanvasMorphShapeExporter cse = new CanvasMorphShapeExporter(((Tag) mst).getSwf(), mst.getShapeAtRatio(0), mst.getShapeAtRatio(DefineMorphShapeTag.MAX_RATIO), new CXFORMWITHALPHA(), SWF.unitDivisor, deltaX, deltaY);
                                     cse.export();
-                                    Set<Integer> needed=new HashSet<>();
-                                    SWF.getNeededCharacters(((Tag)mst).getSwf(), ((CharacterTag)mst).getCharacterId(), needed);
-                                    ByteArrayOutputStream baos=new ByteArrayOutputStream();
-                                    SWF.writeLibrary(((Tag)mst).getSwf(), needed, baos);
-                                    fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(),"UTF-8"))));
+                                    Set<Integer> needed = new HashSet<>();
+                                    CharacterTag ct = ((CharacterTag) mst);
+                                    needed.add(ct.getCharacterId());
+                                    ct.getNeededCharactersDeep(needed);
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                    SWF.writeLibrary(ct.getSwf(), needed, baos);
+                                    fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), "UTF-8"))));
                                 }
                                 break;
                         }
@@ -105,8 +107,8 @@ public class MorphShapeExporter {
                 ret.add(file);
             }
         }
-        
-        if(settings.mode == MorphShapeExportMode.CANVAS){
+
+        if (settings.mode == MorphShapeExportMode.CANVAS) {
             File fcanvas = new File(foutdir + File.separator + "canvas.js");
             Helper.saveStream(SWF.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/canvas.js"), fcanvas);
             ret.add(fcanvas);

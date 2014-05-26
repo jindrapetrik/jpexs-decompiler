@@ -285,6 +285,5 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
     public Tag getSourceTag() {
         return tag;
     }
-    
-    
+
 }

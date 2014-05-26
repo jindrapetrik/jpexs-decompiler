@@ -32,6 +32,8 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.FrameNodeItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.StringItem;
@@ -40,10 +42,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.treenodes.FrameNode;
 import com.jpexs.decompiler.flash.treenodes.TagNode;
 import com.jpexs.decompiler.flash.treenodes.TreeNode;
-import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,14 +123,9 @@ public class TagTreeModel implements TreeModel {
         List<Tag> actionScriptTags = new ArrayList<>();
         SWF.getTagsFromTreeNodes(actionScript, actionScriptTags);
 
-        int frameCnt = 0;
         for (Tag t : list) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
             switch (ttype) {
-                case SHOW_FRAME:
-                    ShowFrameTag showFrameTag = (ShowFrameTag) t;
-                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, showFrameTag, true), showFrameTag.innerTags, false));
-                    break;
                 case SHAPE:
                     shapes.add(new TagNode(t));
                     break;
@@ -162,18 +156,18 @@ public class TagTreeModel implements TreeModel {
                 case BINARY_DATA:
                     TagNode bt;
                     binaryData.add(bt = new TagNode(t));
-                    
-                    DefineBinaryDataTag b=(DefineBinaryDataTag)t;
-                    
+
+                    DefineBinaryDataTag b = (DefineBinaryDataTag) t;
+
                     try {
-                        SWF bswf=new SWF(new ByteArrayInputStream(b.binaryData),Configuration.parallelSpeedUp.get());
+                        SWF bswf = new SWF(new ByteArrayInputStream(b.binaryData), Configuration.parallelSpeedUp.get());
                         bswf.fileTitle = "(SWF Data)";
-                        SWFNode snode=createSwfNode(bswf);
+                        SWFNode snode = createSwfNode(bswf);
                         snode.binaryData = b;
                         bt.subNodes.add(snode);
                     } catch (IOException | InterruptedException ex) {
                         //ignore
-                    }   
+                    }
                     break;
                 default:
                     if (!actionScriptTags.contains(t) && !ShowFrameTag.isNestedTagType(t.getId())) {
@@ -181,6 +175,11 @@ public class TagTreeModel implements TreeModel {
                     }
                     break;
             }
+        }
+
+        Timeline timeline = swf.getTimeline();
+        for (int i = 0; i < timeline.getFrameCount(); i++) {
+            frames.add(new FrameNode(new FrameNodeItem(swf, i + 1, parent, true), timeline.frames.get(i).innerTags, false));
         }
 
         for (int i = 0; i < sounds.size(); i++) {
@@ -292,14 +291,9 @@ public class TagTreeModel implements TreeModel {
         List<TreeNode> frames = new ArrayList<>();
         List<TreeNode> others = new ArrayList<>();
 
-        int frameCnt = 0;
         for (Tag t : list) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
             switch (ttype) {
-                case SHOW_FRAME:
-                    ShowFrameTag showFrameTag = (ShowFrameTag) t;
-                    frames.add(new FrameNode(new FrameNodeItem(t.getSwf(), ++frameCnt, parent, showFrameTag, true), showFrameTag.innerTags, false));
-                    break;
                 default:
                     if (!actionScriptTags.contains(t) && !ShowFrameTag.isNestedTagType(t.getId())) {
                         if (!(t instanceof SoundStreamHeadTypeTag)) {
@@ -307,6 +301,13 @@ public class TagTreeModel implements TreeModel {
                         }
                     }
                     break;
+            }
+        }
+
+        if (parent instanceof Timelined) {
+            Timeline timeline = ((Timelined) parent).getTimeline();
+            for (int i = 0; i < timeline.getFrameCount(); i++) {
+                frames.add(new FrameNode(new FrameNodeItem(swf, i + 1, parent, true), timeline.frames.get(i).innerTags, false));
             }
         }
 

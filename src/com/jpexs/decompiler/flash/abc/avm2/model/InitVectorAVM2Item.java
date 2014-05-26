@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -44,12 +43,12 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class InitVectorAVM2Item extends AVM2Item{
+public class InitVectorAVM2Item extends AVM2Item {
 
     public GraphTargetItem subtype;
     public List<GraphTargetItem> arguments;
     List<Integer> openedNamespaces;
-    
+
     private int allNsSet(ABC abc) {
         int nssa[] = new int[openedNamespaces.size()];
         for (int i = 0; i < openedNamespaces.size(); i++) {
@@ -57,28 +56,28 @@ public class InitVectorAVM2Item extends AVM2Item{
         }
         return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
     }
-   
-     public InitVectorAVM2Item(AVM2Instruction ins, GraphTargetItem subtype,List<GraphTargetItem> arguments){
-         super(ins,PRECEDENCE_PRIMARY);
-         this.subtype = subtype;
-         this.arguments = arguments;
-     }
-    
-    public InitVectorAVM2Item(GraphTargetItem subtype,List<GraphTargetItem> arguments, List<Integer> openedNamespaces) {
+
+    public InitVectorAVM2Item(AVM2Instruction ins, GraphTargetItem subtype, List<GraphTargetItem> arguments) {
+        super(ins, PRECEDENCE_PRIMARY);
+        this.subtype = subtype;
+        this.arguments = arguments;
+    }
+
+    public InitVectorAVM2Item(GraphTargetItem subtype, List<GraphTargetItem> arguments, List<Integer> openedNamespaces) {
         super(null, PRECEDENCE_PRIMARY);
         this.subtype = subtype;
         this.arguments = arguments;
         this.openedNamespaces = openedNamespaces;
     }
 
-    @Override   
+    @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("<");
         subtype.appendTo(writer, localData);
         writer.append(">");
         writer.append("[");
-        for(int i=0;i<arguments.size();i++){
-            if(i>0){
+        for (int i = 0; i < arguments.size(); i++) {
+            if (i > 0) {
                 writer.append(",");
             }
             arguments.get(i).appendTo(writer, localData);
@@ -94,33 +93,31 @@ public class InitVectorAVM2Item extends AVM2Item{
 
     @Override
     public GraphTargetItem returnType() {
-        List<GraphTargetItem> pars=new ArrayList<>();
+        List<GraphTargetItem> pars = new ArrayList<>();
         pars.add(subtype);
-        return new ApplyTypeAVM2Item(null,new TypeItem("__AS3__.vec.Vector"), pars);
+        return new ApplyTypeAVM2Item(null, new TypeItem("__AS3__.vec.Vector"), pars);
     }
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        AVM2SourceGenerator g=(AVM2SourceGenerator)generator;
-        List<GraphSourceItem> ret= toSourceMerge(localData, generator, 
-                ins(new FindPropertyStrictIns(),g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abc.constants.getStringId("Vector", true), 0, g.abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("__AS3__.vec", true)), 0,true)}), true), 0, new ArrayList<Integer>()), true)),
-                ins(new GetPropertyIns(),g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abc.constants.getStringId("Vector", true), 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+        AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        List<GraphSourceItem> ret = toSourceMerge(localData, generator,
+                ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abc.constants.getStringId("Vector", true), 0, g.abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("__AS3__.vec", true)), 0, true)}), true), 0, new ArrayList<Integer>()), true)),
+                ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abc.constants.getStringId("Vector", true), 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
                 subtype,
-                ins(new ApplyTypeIns(),1),
-                new IntegerValueAVM2Item(null, (long)arguments.size()),
-                ins(new ConstructIns(),1)                
-                );
-        for(int i=0;i<arguments.size();i++){
-            ret.addAll(toSourceMerge(localData, generator, 
+                ins(new ApplyTypeIns(), 1),
+                new IntegerValueAVM2Item(null, (long) arguments.size()),
+                ins(new ConstructIns(), 1)
+        );
+        for (int i = 0; i < arguments.size(); i++) {
+            ret.addAll(toSourceMerge(localData, generator,
                     ins(new DupIns()),
-                    new IntegerValueAVM2Item(null, (long)i),
+                    new IntegerValueAVM2Item(null, (long) i),
                     arguments.get(i),
-                    ins(new SetPropertyIns(),g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, g.abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("", true)), 0, true)}), true), precedence, openedNamespaces), true))
-                    ));
+                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, g.abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("", true)), 0, true)}), true), precedence, openedNamespaces), true))
+            ));
         }
         return ret;
     }
-    
-    
-    
+
 }

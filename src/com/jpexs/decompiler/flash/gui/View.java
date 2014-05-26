@@ -133,7 +133,6 @@ public class View {
                     UIManager.put("TextField.background", Color.WHITE);
                     UIManager.put("FormattedTextField.background", Color.WHITE);
                     UIManager.put("CommandButtonUI", MyCommandButtonUI.class.getName());
-                    
 
                     FontPolicy pol = SubstanceLookAndFeel.getFontPolicy();
                     final FontSet fs = pol.getFontSet("Substance", null);

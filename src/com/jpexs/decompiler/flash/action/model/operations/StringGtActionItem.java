@@ -42,8 +42,8 @@ public class StringGtActionItem extends BinaryOpItem implements Inverted {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        ActionSourceGenerator g = (ActionSourceGenerator)generator;
-        if(g.getSwfVersion()>=6){
+        ActionSourceGenerator g = (ActionSourceGenerator) generator;
+        if (g.getSwfVersion() >= 6) {
             return toSourceMerge(localData, generator, leftSide, rightSide, new ActionStringGreater());
         }
         return toSourceMerge(localData, generator, rightSide, leftSide, new ActionStringLess());

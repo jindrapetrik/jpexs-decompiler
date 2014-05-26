@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 import java.util.Set;
 
-public class StringLtActionItem extends BinaryOpItem implements Inverted{
+public class StringLtActionItem extends BinaryOpItem implements Inverted {
 
     public StringLtActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "lt");

@@ -22,9 +22,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ApplyTypeIns;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -32,7 +29,6 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,36 +65,36 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
         GraphTargetItem resname = name;
         if (resname instanceof UnresolvedAVM2Item) {
             resname = ((UnresolvedAVM2Item) resname).resolved;
-        }        
-        
+        }
+
         if (resname instanceof TypeItem) {
-            TypeItem prop = (TypeItem) resname;            
-            int type_index = AVM2SourceGenerator.resolveType(localData,resname,((AVM2SourceGenerator)generator).abc,((AVM2SourceGenerator)generator).allABCs);
+            TypeItem prop = (TypeItem) resname;
+            int type_index = AVM2SourceGenerator.resolveType(localData, resname, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
             return toSourceMerge(localData, generator,
                     new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index, arguments.size()}, new byte[0]), arguments,
                     new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index, arguments.size()}, new byte[0])
-            );            
-        }
-                        
-        if (resname instanceof PropertyAVM2Item) {
-            PropertyAVM2Item prop=(PropertyAVM2Item)resname;            
-            return toSourceMerge(localData, generator, prop.resolveObject(localData, generator),arguments,
-                ins(new ConstructPropIns(), prop.resolveProperty(localData),arguments.size())
             );
         }
-        
+
+        if (resname instanceof PropertyAVM2Item) {
+            PropertyAVM2Item prop = (PropertyAVM2Item) resname;
+            return toSourceMerge(localData, generator, prop.resolveObject(localData, generator), arguments,
+                    ins(new ConstructPropIns(), prop.resolveProperty(localData), arguments.size())
+            );
+        }
+
         if (resname instanceof NameAVM2Item) {
-            return toSourceMerge(localData, generator, resname,arguments,ins(new ConstructIns(),arguments.size()));
+            return toSourceMerge(localData, generator, resname, arguments, ins(new ConstructIns(), arguments.size()));
         }
-        
-        if(resname instanceof IndexAVM2Item){
-            return ((IndexAVM2Item)resname).toSource(localData, generator, true, false, arguments, false, true);
+
+        if (resname instanceof IndexAVM2Item) {
+            return ((IndexAVM2Item) resname).toSource(localData, generator, true, false, arguments, false, true);
         }
-        
-        if(resname instanceof NamespacedAVM2Item){
-            return ((NamespacedAVM2Item)resname).toSource(localData, generator, true, false, arguments, false, true);
+
+        if (resname instanceof NamespacedAVM2Item) {
+            return ((NamespacedAVM2Item) resname).toSource(localData, generator, true, false, arguments, false, true);
         }
-        return toSourceMerge(localData, generator, resname, arguments, ins(new ConstructIns(),arguments.size()));
+        return toSourceMerge(localData, generator, resname, arguments, ins(new ConstructIns(), arguments.size()));
     }
 
 }

@@ -65,8 +65,8 @@ public class GeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        ActionSourceGenerator g = (ActionSourceGenerator)generator;
-        return toSourceMerge(localData, generator, leftSide, rightSide, g.getSwfVersion()>=5?new ActionLess2():new ActionLess(), new ActionNot());
+        ActionSourceGenerator g = (ActionSourceGenerator) generator;
+        return toSourceMerge(localData, generator, leftSide, rightSide, g.getSwfVersion() >= 5 ? new ActionLess2() : new ActionLess(), new ActionNot());
     }
 
     @Override

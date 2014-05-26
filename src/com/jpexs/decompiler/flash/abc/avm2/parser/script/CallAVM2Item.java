@@ -60,7 +60,6 @@ public class CallAVM2Item extends AVM2Item {
         return writer;
     }
 
-   
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
 
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
@@ -76,17 +75,17 @@ public class CallAVM2Item extends AVM2Item {
             allAbcs.addAll(g.allABCs);
             String cname;
             String pkgName = "";
-            cname = localData.currentClass;            
+            cname = localData.currentClass;
             pkgName = localData.pkg;
             GraphTargetItem obj = null;
             Reference<String> outName = new Reference<>("");
             Reference<String> outNs = new Reference<>("");
             Reference<String> outPropNs = new Reference<>("");
-            Reference<Integer> outPropNsKind = new Reference<>(1);            
+            Reference<Integer> outPropNsKind = new Reference<>(1);
             Reference<Integer> outPropNsIndex = new Reference<>(0);
             Reference<GraphTargetItem> outPropType = new Reference<>(null);
             Reference<ValueKind> outPropValue = new Reference<>(null);
-            if (cname!=null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind,outPropNsIndex, outPropType, outPropValue)) {
+            if (cname != null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), n.line, "this", null, false, n.openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;
@@ -99,7 +98,7 @@ public class CallAVM2Item extends AVM2Item {
         int propIndex = -1;
         if (callable instanceof TypeItem) {
             TypeItem t = (TypeItem) callable;
-            propIndex = AVM2SourceGenerator.resolveType(localData,t, ((AVM2SourceGenerator) generator).abc,((AVM2SourceGenerator) generator).allABCs);
+            propIndex = AVM2SourceGenerator.resolveType(localData, t, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
         }
         Object obj = null;
 
@@ -118,11 +117,11 @@ public class CallAVM2Item extends AVM2Item {
                 Reference<String> outName = new Reference<>("");
                 Reference<String> outNs = new Reference<>("");
                 Reference<String> outPropNs = new Reference<>("");
-                Reference<Integer> outPropNsKind = new Reference<>(1);                
+                Reference<Integer> outPropNsKind = new Reference<>(1);
                 Reference<Integer> outPropNsIndex = new Reference<>(0);
                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                 Reference<ValueKind> outPropValue = new Reference<>(null);
-                if (cname!=null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
+                if (cname != null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, new ArrayList<Integer>());
                     nobj.setRegNumber(0);
                     obj = nobj;
@@ -136,18 +135,18 @@ public class CallAVM2Item extends AVM2Item {
                 obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propIndex}, new byte[0]);
             }
             return toSourceMerge(localData, generator, obj, arguments,
-                    ins(needsReturn?new CallPropertyIns():new CallPropVoidIns(), propIndex, arguments.size())
+                    ins(needsReturn ? new CallPropertyIns() : new CallPropVoidIns(), propIndex, arguments.size())
             );
         }
 
-        if(callable instanceof IndexAVM2Item){
-            return ((IndexAVM2Item)callable).toSource(localData, generator, needsReturn, true, arguments,false,false);
+        if (callable instanceof IndexAVM2Item) {
+            return ((IndexAVM2Item) callable).toSource(localData, generator, needsReturn, true, arguments, false, false);
         }
-        if(callable instanceof NamespacedAVM2Item){
-            return ((NamespacedAVM2Item)callable).toSource(localData, generator, needsReturn, true, arguments,false,false);
+        if (callable instanceof NamespacedAVM2Item) {
+            return ((NamespacedAVM2Item) callable).toSource(localData, generator, needsReturn, true, arguments, false, false);
         }
-        
-        return toSourceMerge(localData, generator, callable, ins(new GetGlobalScopeIns()),arguments,ins(new CallIns(),arguments.size()));
+
+        return toSourceMerge(localData, generator, callable, ins(new GetGlobalScopeIns()), arguments, ins(new CallIns(), arguments.size()));
     }
 
     @Override
@@ -155,8 +154,6 @@ public class CallAVM2Item extends AVM2Item {
         return toSource(localData, generator, true);
     }
 
-    
-    
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false);

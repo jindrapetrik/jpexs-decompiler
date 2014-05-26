@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 
 /**
@@ -29,15 +28,13 @@ public class FrameNodeItem implements TreeItem {
     private final SWF swf;
     private final int frame;
     private final Tag parent;
-    private final ShowFrameTag showFrameTag;
     private final boolean display;
 
-    public FrameNodeItem(SWF swf, int frame, Tag parent, ShowFrameTag showFrameTag, boolean display) {
+    public FrameNodeItem(SWF swf, int frame, Tag parent, boolean display) {
 
         this.swf = swf;
         this.frame = frame;
         this.parent = parent;
-        this.showFrameTag = showFrameTag;
         this.display = display;
     }
 
@@ -61,9 +58,5 @@ public class FrameNodeItem implements TreeItem {
 
     public Tag getParent() {
         return parent;
-    }
-
-    public ShowFrameTag getShowFrameTag() {
-        return showFrameTag;
     }
 }

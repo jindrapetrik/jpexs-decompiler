@@ -307,9 +307,9 @@ public class ASM3Parser {
                 namespace_index = parseNamespace(constants, lexer);
                 expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
                 ParsedSymbol name = lexer.lex();
-                if(name.type == ParsedSymbol.TYPE_KEYWORD_NULL){
+                if (name.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                     name_index = 0;
-                }else{
+                } else {
                     expected(name, ParsedSymbol.TYPE_STRING, "String");
                     name_index = constants.getStringId((String) name.value, true);
                 }
@@ -319,9 +319,9 @@ public class ASM3Parser {
             case ParsedSymbol.TYPE_KEYWORD_RTQNAMEA:
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 ParsedSymbol rtqName = lexer.lex();
-                if(rtqName.type == ParsedSymbol.TYPE_KEYWORD_NULL){
+                if (rtqName.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                     name_index = 0;
-                }else{
+                } else {
                     expected(rtqName, ParsedSymbol.TYPE_STRING, "String");
                     name_index = constants.getStringId((String) rtqName.value, true);
                 }
@@ -336,9 +336,9 @@ public class ASM3Parser {
             case ParsedSymbol.TYPE_KEYWORD_MULTINAMEA:
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 ParsedSymbol mName = lexer.lex();
-                if(mName.type == ParsedSymbol.TYPE_KEYWORD_NULL){
+                if (mName.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                     name_index = 0;
-                }else{
+                } else {
                     expected(mName, ParsedSymbol.TYPE_STRING, "String");
                     name_index = constants.getStringId((String) mName.value, true);
                 }

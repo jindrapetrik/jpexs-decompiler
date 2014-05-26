@@ -49,11 +49,11 @@ public class GtActionItem extends BinaryOpItem implements LogicalOpItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        ActionSourceGenerator g = (ActionSourceGenerator)generator;
-        if(g.getSwfVersion()>=6){
+        ActionSourceGenerator g = (ActionSourceGenerator) generator;
+        if (g.getSwfVersion() >= 6) {
             return toSourceMerge(localData, generator, leftSide, rightSide, new ActionGreater());
         }
-        return toSourceMerge(localData, generator, rightSide, leftSide, g.getSwfVersion()>=5?new ActionLess2():new ActionLess());
+        return toSourceMerge(localData, generator, rightSide, leftSide, g.getSwfVersion() >= 5 ? new ActionLess2() : new ActionLess());
     }
 
     @Override

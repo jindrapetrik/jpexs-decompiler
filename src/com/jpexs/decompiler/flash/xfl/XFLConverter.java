@@ -395,7 +395,7 @@ public class XFLConverter {
     public static String convertMatrix(MATRIX m) {
         return convertMatrix(new Matrix(m));
     }
-    
+
     public static String convertMatrix(Matrix m) {
         String ret = "";
         if (m == null) {
@@ -404,11 +404,11 @@ public class XFLConverter {
         ret += "<Matrix ";
         ret += "tx=\"" + (((float) m.translateX) / 20.0) + "\" ";
         ret += "ty=\"" + (((float) m.translateY) / 20.0) + "\" ";
-        if (m.scaleX!=1.0 || m.scaleY!=1.0) {
-            ret += "a=\"" + m.scaleX+ "\" ";
+        if (m.scaleX != 1.0 || m.scaleY != 1.0) {
+            ret += "a=\"" + m.scaleX + "\" ";
             ret += "d=\"" + m.scaleY + "\" ";
         }
-        if (m.rotateSkew0!=0.0 || m.rotateSkew1!=0.0) {
+        if (m.rotateSkew0 != 0.0 || m.rotateSkew1 != 0.0) {
             ret += "b=\"" + m.rotateSkew0 + "\" ";
             ret += "c=\"" + m.rotateSkew1 + "\" ";
         }
@@ -2301,11 +2301,11 @@ public class XFLConverter {
 
     public static String convertText(String instanceName, List<Tag> tags, TextTag tag, MATRIX m, List<FILTER> filters, CLIPACTIONS clipActions) {
         String ret = "";
-        
+
         if (m == null) {
             m = new MATRIX();
         }
-        Matrix matrix=new Matrix(m);
+        Matrix matrix = new Matrix(m);
         CSMTextSettingsTag csmts = null;
         String filterStr = "";
         if (filters != null) {
@@ -2340,9 +2340,9 @@ public class XFLConverter {
         String left = "";
         RECT bounds = tag.getBounds();
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
-            MATRIX textMatrix = tag.getTextMatrix();                  
-            left = " left=\""+doubleToString((textMatrix.translateX)/SWF.unitDivisor)+"\"";
-        } 
+            MATRIX textMatrix = tag.getTextMatrix();
+            left = " left=\"" + doubleToString((textMatrix.translateX) / SWF.unitDivisor) + "\"";
+        }
         matStr += convertMatrix(matrix);
         matStr += "</matrix>";
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
@@ -2352,7 +2352,7 @@ public class XFLConverter {
             } else if (tag instanceof DefineText2Tag) {
                 textRecords = ((DefineText2Tag) tag).textRecords;
             }
-      
+
             looprec:
             for (TEXTRECORD rec : textRecords) {
                 if (rec.styleFlagsHasFont) {

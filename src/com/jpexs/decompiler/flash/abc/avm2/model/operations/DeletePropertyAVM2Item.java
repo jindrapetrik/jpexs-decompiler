@@ -67,20 +67,20 @@ public class DeletePropertyAVM2Item extends AVM2Item {
             p = ((UnresolvedAVM2Item) p).resolved;
         }
         if (p instanceof PropertyAVM2Item) {
-            PropertyAVM2Item prop=(PropertyAVM2Item)p;            
+            PropertyAVM2Item prop = (PropertyAVM2Item) p;
             return toSourceMerge(localData, generator, prop.resolveObject(localData, generator),
-                ins(new DeletePropertyIns(), prop.resolveProperty(localData))
+                    ins(new DeletePropertyIns(), prop.resolveProperty(localData))
             );
         }
-        if(p instanceof IndexAVM2Item){
-            IndexAVM2Item ind=(IndexAVM2Item)p;
-            return ind.toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(), true,false);
+        if (p instanceof IndexAVM2Item) {
+            IndexAVM2Item ind = (IndexAVM2Item) p;
+            return ind.toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(), true, false);
         }
-        if(p instanceof NamespacedAVM2Item){
-            NamespacedAVM2Item n=(NamespacedAVM2Item)p;
-            return n.toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(), true,false);
+        if (p instanceof NamespacedAVM2Item) {
+            NamespacedAVM2Item n = (NamespacedAVM2Item) p;
+            return n.toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(), true, false);
         }
-        
+
         throw new CompilationException("Not a property", line); //TODO: handle line better way        
     }
 

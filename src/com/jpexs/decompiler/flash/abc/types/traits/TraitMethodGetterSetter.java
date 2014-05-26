@@ -32,13 +32,12 @@ public class TraitMethodGetterSetter extends Trait {
     public int disp_id; //compiler assigned value that helps overriding
     public int method_info;
 
-    
     @Override
-    public void delete(ABC abc,boolean d) {
+    public void delete(ABC abc, boolean d) {
         abc.constants.constant_multiname.get(name_index).deleted = true;
-        abc.method_info.get(method_info).delete(abc,d);
+        abc.method_info.get(method_info).delete(abc, d);
     }
-    
+
     @Override
     public String toString(ABC abc, List<String> fullyQualifiedNames) {
         return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " MethodGetterSetter " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " disp_id=" + disp_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);

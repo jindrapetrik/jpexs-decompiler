@@ -18,25 +18,30 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
+import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  *
  * @author JPEXS
  */
-public class LINESTYLE implements Serializable {
+public class LINESTYLE implements NeedsCharacters, Serializable {
 
     @SWFType(BasicType.UI16)
     public int width;
 
     @ConditionalType(tags = {DefineShape3Tag.ID, DefineShape4Tag.ID}, type = RGBA.class)
     public RGB color;
-    
-    public Set<Integer> getNeededCharacters() {
-        return new HashSet<>();
+
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        return false;
     }
 }

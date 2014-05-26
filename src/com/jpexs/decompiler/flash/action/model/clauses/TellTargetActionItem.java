@@ -69,9 +69,9 @@ public class TellTargetActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
-        if((target instanceof DirectValueActionItem)&&((((DirectValueActionItem)target).value instanceof String) || (((DirectValueActionItem)target).value instanceof ConstantIndex))){
-            ret.add(new ActionSetTarget((String)target.getResult()));
-        }else{
+        if ((target instanceof DirectValueActionItem) && ((((DirectValueActionItem) target).value instanceof String) || (((DirectValueActionItem) target).value instanceof ConstantIndex))) {
+            ret.add(new ActionSetTarget((String) target.getResult()));
+        } else {
             ret.addAll(target.toSource(localData, generator));
             ret.add(new ActionSetTarget2());
         }

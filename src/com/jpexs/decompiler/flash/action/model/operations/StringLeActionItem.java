@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 import java.util.Set;
 
-public class StringLeActionItem extends BinaryOpItem implements Inverted{
+public class StringLeActionItem extends BinaryOpItem implements Inverted {
 
     public StringLeActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "le");
@@ -44,12 +44,12 @@ public class StringLeActionItem extends BinaryOpItem implements Inverted{
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        
-        ActionSourceGenerator g = (ActionSourceGenerator)generator;
-        if(g.getSwfVersion()>=6){
+
+        ActionSourceGenerator g = (ActionSourceGenerator) generator;
+        if (g.getSwfVersion() >= 6) {
             return toSourceMerge(localData, generator, leftSide, rightSide, new ActionStringGreater(), new ActionNot());
         }
-        
+
         return toSourceMerge(localData, generator, rightSide, leftSide, new ActionStringLess(), new ActionNot());
     }
 

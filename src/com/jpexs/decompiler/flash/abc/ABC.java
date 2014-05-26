@@ -332,7 +332,7 @@ public class ABC {
                     }
                 }
             }
-        }        
+        }
     }
 
     public ABC(InputStream is, SWF swf, ABCContainerTag tag) throws IOException {
@@ -579,7 +579,7 @@ public class ABC {
         for (int i = 1; i < constants.getMultinameCount(); i++) {
             aos.writeMultiname(constants.getMultiname(i));
         }
-                        
+
         aos.writeU30(method_info.size());
         for (MethodInfo mi : method_info) {
             aos.writeMethodInfo(mi);
@@ -596,7 +596,7 @@ public class ABC {
                 aos.writeU30(mi.values[j]);
             }
         }
-                        
+
         aos.writeU30(class_info.size());
         for (InstanceInfo ii : instance_info) {
             aos.writeInstanceInfo(ii);
@@ -945,128 +945,126 @@ public class ABC {
         }
         return null;
     }
-    
-    private void removeClassFromTraits(Traits traits,int index){
-        for(Trait t:traits.traits){
-             if(t instanceof TraitClass){
-                 TraitClass tc=(TraitClass)t;
-                 removeClassFromTraits(instance_info.get(tc.class_info).instance_traits,index);
-                 removeClassFromTraits(class_info.get(tc.class_info).static_traits,index);
-                 if(tc.class_info>index){
-                     tc.class_info--;
-                 }                 
-             }
+
+    private void removeClassFromTraits(Traits traits, int index) {
+        for (Trait t : traits.traits) {
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass) t;
+                removeClassFromTraits(instance_info.get(tc.class_info).instance_traits, index);
+                removeClassFromTraits(class_info.get(tc.class_info).static_traits, index);
+                if (tc.class_info > index) {
+                    tc.class_info--;
+                }
+            }
         }
     }
-    
-    public void removeClass(int index){        
-        for(MethodBody b:bodies){
-            for(AVM2Instruction ins:b.code.code){
-                for(int i=0;i<ins.definition.operands.length;i++){
-                    if(ins.definition.operands[i]==AVM2Code.DAT_CLASS_INDEX){
-                        if(ins.operands[i]>index){
+
+    public void removeClass(int index) {
+        for (MethodBody b : bodies) {
+            for (AVM2Instruction ins : b.code.code) {
+                for (int i = 0; i < ins.definition.operands.length; i++) {
+                    if (ins.definition.operands[i] == AVM2Code.DAT_CLASS_INDEX) {
+                        if (ins.operands[i] > index) {
                             ins.operands[i]--;
                         }
                     }
                 }
             }
         }
-        for(ScriptInfo si:script_info){
+        for (ScriptInfo si : script_info) {
             removeClassFromTraits(si.traits, index);
         }
         instance_info.remove(index);
         class_info.remove(index);
     }
-    
-    
-    private void removeMethodFromTraits(Traits traits,int index){
-        for(Trait t:traits.traits){
-             if(t instanceof TraitClass){
-                 TraitClass tc=(TraitClass)t;
-                 removeMethodFromTraits(instance_info.get(tc.class_info).instance_traits,index);
-                 removeMethodFromTraits(class_info.get(tc.class_info).static_traits,index);                                 
-             }
-             if(t instanceof TraitMethodGetterSetter){
-                 TraitMethodGetterSetter tmgs=(TraitMethodGetterSetter)t;
-                 if(tmgs.method_info>index){
-                     tmgs.method_info--;
-                 }
-             }
-             if(t instanceof TraitFunction){
-                 TraitFunction tf=(TraitFunction)t;
-                 if(tf.method_info>index){
-                     tf.method_info--;
-                 }
-             }
+
+    private void removeMethodFromTraits(Traits traits, int index) {
+        for (Trait t : traits.traits) {
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass) t;
+                removeMethodFromTraits(instance_info.get(tc.class_info).instance_traits, index);
+                removeMethodFromTraits(class_info.get(tc.class_info).static_traits, index);
+            }
+            if (t instanceof TraitMethodGetterSetter) {
+                TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) t;
+                if (tmgs.method_info > index) {
+                    tmgs.method_info--;
+                }
+            }
+            if (t instanceof TraitFunction) {
+                TraitFunction tf = (TraitFunction) t;
+                if (tf.method_info > index) {
+                    tf.method_info--;
+                }
+            }
         }
     }
-    
-    public void removeMethod(int index){
-        
-        int bindex=-1;
-        for(int b=0;b<bodies.size();b++){
-            if(bodies.get(b).method_info == index){
-                bodies.remove(b);                
+
+    public void removeMethod(int index) {
+
+        int bindex = -1;
+        for (int b = 0; b < bodies.size(); b++) {
+            if (bodies.get(b).method_info == index) {
+                bodies.remove(b);
                 bindex = b;
-                b--;                
+                b--;
             }
         }
-                
-        
-        for(MethodBody b:bodies){
-            if(b.method_info>index){
+
+        for (MethodBody b : bodies) {
+            if (b.method_info > index) {
                 b.method_info--;
             }
-            for(AVM2Instruction ins:b.code.code){
-                for(int i=0;i<ins.definition.operands.length;i++){
-                    if(ins.definition.operands[i]==AVM2Code.DAT_METHOD_INDEX){
-                        if(ins.operands[i]>index){
+            for (AVM2Instruction ins : b.code.code) {
+                for (int i = 0; i < ins.definition.operands.length; i++) {
+                    if (ins.definition.operands[i] == AVM2Code.DAT_METHOD_INDEX) {
+                        if (ins.operands[i] > index) {
                             ins.operands[i]--;
                         }
                     }
                 }
             }
         }
-        
-        for(int c=0;c<instance_info.size();c++){
-            InstanceInfo ii=instance_info.get(c);
-            if(ii.iinit_index>index){
+
+        for (int c = 0; c < instance_info.size(); c++) {
+            InstanceInfo ii = instance_info.get(c);
+            if (ii.iinit_index > index) {
                 ii.iinit_index--;
             }
-            ClassInfo ci=class_info.get(c);
-            if(ci.cinit_index>index){
+            ClassInfo ci = class_info.get(c);
+            if (ci.cinit_index > index) {
                 ci.cinit_index--;
             }
         }
-        
-        for(ScriptInfo si:script_info){
-            if(si.init_index>index){
-               si.init_index--; 
+
+        for (ScriptInfo si : script_info) {
+            if (si.init_index > index) {
+                si.init_index--;
             }
             removeMethodFromTraits(si.traits, index);
         }
-                
-        if(bindex>-1){
-            for(int mi=0;mi<bodyIdxFromMethodIdx.size();mi++){
-                if(bodyIdxFromMethodIdx.get(mi)>bindex){
-                    bodyIdxFromMethodIdx.set(mi, bodyIdxFromMethodIdx.get(mi)-1);
-                }            
+
+        if (bindex > -1) {
+            for (int mi = 0; mi < bodyIdxFromMethodIdx.size(); mi++) {
+                if (bodyIdxFromMethodIdx.get(mi) > bindex) {
+                    bodyIdxFromMethodIdx.set(mi, bodyIdxFromMethodIdx.get(mi) - 1);
+                }
             }
         }
         bodyIdxFromMethodIdx.remove(index);
-        
+
         method_info.remove(index);
     }
-    
-    public void pack(){
-        for(int c= 0;c<instance_info.size();c++){
-            if(instance_info.get(c).deleted){
+
+    public void pack() {
+        for (int c = 0; c < instance_info.size(); c++) {
+            if (instance_info.get(c).deleted) {
                 removeClass(c);
                 c--;
             }
         }
-        for(int m= 0;m<method_info.size();m++){
-            if(method_info.get(m).deleted){
+        for (int m = 0; m < method_info.size(); m++) {
+            if (method_info.get(m).deleted) {
                 removeMethod(m);
                 m--;
             }

@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -499,14 +498,28 @@ public class DefineTextTag extends TextTag {
     }
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<>();
+    public void getNeededCharacters(Set<Integer> needed) {
         for (TEXTRECORD tr : textRecords) {
             if (tr.styleFlagsHasFont) {
-                ret.add(tr.fontId);
+                needed.add(tr.fontId);
             }
         }
-        return ret;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        for (TEXTRECORD tr : textRecords) {
+            if (tr.fontId == characterId) {
+                tr.styleFlagsHasFont = false;
+                tr.fontId = 0;
+                modified = true;
+            }
+        }
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
     }
 
     @Override

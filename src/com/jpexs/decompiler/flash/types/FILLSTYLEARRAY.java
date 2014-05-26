@@ -30,11 +30,18 @@ public class FILLSTYLEARRAY implements NeedsCharacters, Serializable {
     public FILLSTYLE[] fillStyles;
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<>();
+    public void getNeededCharacters(Set<Integer> needed) {
         for (FILLSTYLE fs : fillStyles) {
-            ret.addAll(fs.getNeededCharacters());
+            fs.getNeededCharacters(needed);
         }
-        return ret;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        for (FILLSTYLE fs : fillStyles) {
+            modified |= fs.removeCharacter(characterId);
+        }
+        return modified;
     }
 }

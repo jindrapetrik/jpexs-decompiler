@@ -433,7 +433,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             timer.cancel();
         }
         timelined = null;
-        loaded = true;        
+        loaded = true;
         stillFrame = true;
         iconPanel.setImg(image);
         iconPanel.setOutlines(new ArrayList<DepthState>(), new ArrayList<Shape>());
@@ -535,7 +535,7 @@ public final class ImagePanel extends JPanel implements ActionListener, MediaDis
             return;
         }
         Timeline timeline = timelined.getTimeline();
-        if (frame>=timeline.frames.size()) {
+        if (frame >= timeline.frames.size()) {
             return;
         }
 

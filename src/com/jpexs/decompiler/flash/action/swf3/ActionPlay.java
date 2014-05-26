@@ -39,10 +39,10 @@ public class ActionPlay extends Action {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        if(!output.isEmpty() && (output.get(output.size()-1) instanceof GotoFrameActionItem)){
-            GotoFrameActionItem gta=(GotoFrameActionItem)output.remove(output.size()-1);
-            output.add(new GotoFrame2ActionItem(this, new DirectValueActionItem(gta.frame+1), false, true, 0));
-        }else{
+        if (!output.isEmpty() && (output.get(output.size() - 1) instanceof GotoFrameActionItem)) {
+            GotoFrameActionItem gta = (GotoFrameActionItem) output.remove(output.size() - 1);
+            output.add(new GotoFrame2ActionItem(this, new DirectValueActionItem(gta.frame + 1), false, true, 0));
+        } else {
             output.add(new PlayActionItem(this));
         }
     }

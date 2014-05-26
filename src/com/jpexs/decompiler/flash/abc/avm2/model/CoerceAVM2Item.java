@@ -45,11 +45,10 @@ public class CoerceAVM2Item extends AVM2Item {
     public GraphTargetItem typeObj;
 
     /*public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, String type) {
-        super(instruction, value.getPrecedence());
-        this.value = value;
-        this.type = type;
-    }*/
-
+     super(instruction, value.getPrecedence());
+     this.value = value;
+     this.type = type;
+     }*/
     public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem typeObj) {
         super(instruction, value.getPrecedence());
         this.value = value;
@@ -132,7 +131,7 @@ public class CoerceAVM2Item extends AVM2Item {
                 ins = new AVM2Instruction(0, new ConvertDIns(), new int[]{}, new byte[0]);
                 break;
             default:
-                int type_index = AVM2SourceGenerator.resolveType(localData, typeObj, ((AVM2SourceGenerator) generator).abc,(((AVM2SourceGenerator) generator).allABCs));
+                int type_index = AVM2SourceGenerator.resolveType(localData, typeObj, ((AVM2SourceGenerator) generator).abc, (((AVM2SourceGenerator) generator).allABCs));
                 ins = new AVM2Instruction(0, new CoerceIns(), new int[]{type_index}, new byte[0]);
                 break;
         }

@@ -42,7 +42,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -248,8 +247,8 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
             sos.writeUB(1, placeFlagHasBlendMode ? 1 : 0);
             sos.writeUB(1, placeFlagHasFilterList ? 1 : 0);
             sos.writeUI16(depth);
-            
-            if (placeFlagHasClassName || (placeFlagHasImage&&placeFlagHasCharacter)) {
+
+            if (placeFlagHasClassName || (placeFlagHasImage && placeFlagHasCharacter)) {
                 sos.writeString(className);
             }
             if (placeFlagHasCharacter) {
@@ -326,7 +325,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
         placeFlagHasFilterList = sis.readUB(1) == 1;
 
         depth = sis.readUI16();
-        if (placeFlagHasClassName || (placeFlagHasImage&&placeFlagHasCharacter)) {
+        if (placeFlagHasClassName || (placeFlagHasImage && placeFlagHasCharacter)) {
             className = sis.readString();
         }
         if (placeFlagHasCharacter) {
@@ -403,12 +402,16 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
     }
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<>();
+    public void getNeededCharacters(Set<Integer> needed) {
         if (placeFlagHasCharacter) {
-            ret.add(characterId);
+            needed.add(characterId);
         }
-        return ret;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        // the place object tag will be removed
+        return false;
     }
 
     @Override

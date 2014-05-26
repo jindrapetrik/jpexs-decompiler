@@ -148,7 +148,7 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
         for (String name : keys) {
             Field field = fields.get(name);
             ConfigurationCategory cat = field.getAnnotation(ConfigurationCategory.class);
-            String scat = cat == null?"other":cat.value();
+            String scat = cat == null ? "other" : cat.value();
             if (!categorized.containsKey(scat)) {
                 categorized.put(scat, new HashMap<String, Field>());
             }
@@ -156,7 +156,7 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
         }
 
         JTabbedPane tabPane = new JTabbedPane();
-        Map<String,Component> tabs=new HashMap<>();
+        Map<String, Component> tabs = new HashMap<>();
         for (String cat : categorized.keySet()) {
             JPanel configPanel = new JPanel(new SpringLayout());
             for (String name : categorized.get(cat).keySet()) {
@@ -180,7 +180,7 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                     if (defaultValue != null) {
                         description += " (" + translate("default") + ": " + defaultValue + ")";
                     }
-                //model.addRow(new Object[]{locName, item.get(), description});
+                    //model.addRow(new Object[]{locName, item.get(), description});
 
                     JLabel l = new JLabel(locName, JLabel.TRAILING);
                     l.setToolTipText(description);
@@ -199,7 +199,7 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                             tf.setText(val.toString());
                         }
                         tf.setToolTipText(description);
-                        tf.setMaximumSize(new Dimension(Integer.MAX_VALUE,tf.getPreferredSize().height));
+                        tf.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
                         c = tf;
                     }
                     if (itemType == Boolean.class) {
@@ -221,22 +221,19 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                     categorized.get(cat).size(), 2, //rows, cols
                     6, 6, //initX, initY
                     6, 6);       //xPad, yPad
-            tabs.put(cat,new JScrollPane(configPanel));            
+            tabs.put(cat, new JScrollPane(configPanel));
         }
 
-        
-        String catOrder[] = new String[]{"ui","display","decompilation","script","format","export","limit","update","debug","other"};
-        
-        for(String cat:catOrder){
-            if(!tabs.containsKey(cat)){
+        String catOrder[] = new String[]{"ui", "display", "decompilation", "script", "format", "export", "limit", "update", "debug", "other"};
+
+        for (String cat : catOrder) {
+            if (!tabs.containsKey(cat)) {
                 continue;
             }
-            tabPane.add(translate("config.group.name."+cat),tabs.get(cat));
-            tabPane.setToolTipTextAt(tabPane.getTabCount()-1, translate("config.group.description."+cat));
+            tabPane.add(translate("config.group.name." + cat), tabs.get(cat));
+            tabPane.setToolTipTextAt(tabPane.getTabCount() - 1, translate("config.group.description." + cat));
         }
-        
-        
-        
+
         cnt.add(tabPane, BorderLayout.CENTER);
         pack();
     }
@@ -310,7 +307,7 @@ public class AdvancedSettingsDialog extends AppDialog implements ActionListener 
                             value = Float.parseFloat(((JTextField) c).getText());
                         }
                     } catch (NumberFormatException nfe) {
-                        if (!((JTextField) c).getText().equals("")) {
+                        if (!((JTextField) c).getText().isEmpty()) {
                             c.requestFocusInWindow();
                             return;
                         }//else null

@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -32,13 +31,22 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
     public LINESTYLEARRAY lineStyles;
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<>();
-        ret.addAll(fillStyles.getNeededCharacters());
-        ret.addAll(lineStyles.getNeededCharacters());
+    public void getNeededCharacters(Set<Integer> needed) {
+        fillStyles.getNeededCharacters(needed);
+        lineStyles.getNeededCharacters(needed);
         for (SHAPERECORD r : shapeRecords) {
-            ret.addAll(r.getNeededCharacters());
+            r.getNeededCharacters(needed);
         }
-        return ret;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        modified |= fillStyles.removeCharacter(characterId);
+        modified |= lineStyles.removeCharacter(characterId);
+        for (SHAPERECORD r : shapeRecords) {
+            modified |= r.removeCharacter(characterId);
+        }
+        return modified;
     }
 }

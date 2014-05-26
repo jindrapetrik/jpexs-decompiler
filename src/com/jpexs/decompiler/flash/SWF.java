@@ -600,7 +600,6 @@ public final class SWF implements TreeItem, Timelined {
         this.tags = tags;
         if (!checkOnly) {
             checkInvalidSprites();
-            updateInnerTagsForShowFrameTags();
             updateCharacters();
             assignExportNamesToSymbols();
             assignClassesToSymbols();
@@ -615,49 +614,6 @@ public final class SWF implements TreeItem, Timelined {
             }
             if (!hasNonUnknownTag) {
                 throw new IOException("Invalid SWF file. No known tag found.");
-            }
-        }
-    }
-
-    public void updateInnerTagsForShowFrameTags() {
-        Map<Long, Tag> tagMap = new HashMap<>();
-        Map<Long, List<Long>> tagPositionsInFrames = new HashMap<>();
-        createTagMap(tagMap, tagPositionsInFrames, tags);
-        addInnerTagsForShowFrameTags(tagPositionsInFrames, tagMap, tags);
-    }
-
-    private void createTagMap(Map<Long, Tag> tagMap, Map<Long, List<Long>> tagPositionsInFrames, List<Tag> tags) {
-        List<Long> tagPositionsInFrame = new ArrayList<>();
-        for (Tag tag : tags) {
-            long pos = tag.getPos();
-            tagMap.put(pos, tag);
-            if (ShowFrameTag.isNestedTagType(tag.getId())) {
-                tagPositionsInFrame.add(pos);
-            } else if (tag.getId() == ShowFrameTag.ID) {
-                tagPositionsInFrames.put(pos, tagPositionsInFrame);
-                tagPositionsInFrame = new ArrayList<>();
-            }
-
-            if (tag instanceof DefineSpriteTag) {
-                createTagMap(tagMap, tagPositionsInFrames, tag.getSubTags());
-            }
-        }
-    }
-
-    private void addInnerTagsForShowFrameTags(Map<Long, List<Long>> tagPositionsInFrames, Map<Long, Tag> tagMap, List<Tag> tags) {
-        for (Tag tag : tags) {
-            if (tag instanceof ShowFrameTag) {
-                ShowFrameTag showFrameTag = (ShowFrameTag) tag;
-                List<Long> tagPositions = tagPositionsInFrames.get(tag.getPos());
-                if (tagPositions != null) {
-                    List<Tag> innerTags = new ArrayList<>();
-                    for (long tagPos : tagPositions) {
-                        innerTags.add(tagMap.get(tagPos));
-                    }
-                    showFrameTag.innerTags = innerTags;
-                }
-            } else if (tag instanceof DefineSpriteTag) {
-                addInnerTagsForShowFrameTags(tagPositionsInFrames, tagMap, tag.getSubTags());
             }
         }
     }
@@ -687,16 +643,15 @@ public final class SWF implements TreeItem, Timelined {
         return new File(title).getName();
     }
 
-    private void findABCTags(){
-         List<ContainerItem> objs = new ArrayList<>();
-            objs.addAll(tags);
+    private void findABCTags() {
+        List<ContainerItem> objs = new ArrayList<>();
+        objs.addAll(tags);
 
-            ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();
-            getABCTags(objs, newAbcList);
-            this.abcList = newAbcList;
+        ArrayList<ABCContainerTag> newAbcList = new ArrayList<>();
+        getABCTags(objs, newAbcList);
+        this.abcList = newAbcList;
     }
-    
-    
+
     private static void getABCTags(List<ContainerItem> list, List<ABCContainerTag> actionScripts) {
         for (ContainerItem t : list) {
             if (t instanceof Container) {
@@ -707,7 +662,7 @@ public final class SWF implements TreeItem, Timelined {
             }
         }
     }
-    
+
     private void findFileAttributes() {
         for (Tag t : tags) {
             if (t instanceof FileAttributesTag) {
@@ -1098,7 +1053,7 @@ public final class SWF implements TreeItem, Timelined {
             TreeNode addNode = null;
             if (t instanceof ShowFrameTag) {
                 // do not add PlaceObjects (+etc) to script nodes
-                FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, (ShowFrameTag) t, false), null, true);
+                FrameNode tti = new FrameNode(new FrameNodeItem(t.getSwf(), frame, parent, false), null, true);
 
                 for (int r = ret.size() - 1; r >= 0; r--) {
                     if (!(ret.get(r).getItem() instanceof DefineSpriteTag)) {
@@ -1294,7 +1249,6 @@ public final class SWF implements TreeItem, Timelined {
             }
         }
     }
-    
 
     public void exportMovies(AbortRetryIgnoreHandler handler, String outdir, MovieExportSettings settings) throws IOException {
         new MovieExporter().exportMovies(handler, outdir, tags, settings);
@@ -1303,7 +1257,7 @@ public final class SWF implements TreeItem, Timelined {
     public void exportSounds(AbortRetryIgnoreHandler handler, String outdir, SoundExportSettings settings) throws IOException {
         new SoundExporter().exportSounds(handler, outdir, tags, settings);
     }
-    
+
     public void exportFonts(AbortRetryIgnoreHandler handler, String outdir, FontExportSettings settings) throws IOException {
         new FontExporter().exportFonts(handler, outdir, tags, settings);
     }
@@ -1404,42 +1358,40 @@ public final class SWF implements TreeItem, Timelined {
         return "character";
     }
 
-    
-    public static void writeLibrary(SWF fswf,Set<Integer> library,OutputStream fos) throws IOException{
+    public static void writeLibrary(SWF fswf, Set<Integer> library, OutputStream fos) throws IOException {
         for (int c : library) {
-                            CharacterTag ch = fswf.characters.get(c);
-                            if(ch instanceof FontTag){
-                                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ch,textColor){\r\n"));
-                                fos.write(Utf8Helper.getBytes(((FontTag) ch).toHtmlCanvas(1)));
-                                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
-                            }
-                            else if (ch instanceof ImageTag) {
-                                ImageTag image = (ImageTag) ch;
-                                String format = image.getImageFormat();
-                                InputStream imageStream = image.getImageData();
-                                byte[] imageData;
-                                if (imageStream != null) {
-                                    imageData = Helper.readStream(image.getImageData());
-                                } else {
-                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                    try {
-                                        ImageIO.write(image.getImage().getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
-                                    } catch (IOException ex) {
-                                    }
-                                    imageData = baos.toByteArray();
-                                }
-                                String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
-                                fos.write(Utf8Helper.getBytes("var image" + c + " = document.createElement(\"img\");\r\nimage" + c + ".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
-                            } else {
-                                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ctrans,frame,ratio,time){\r\n"));
-                                if (ch instanceof DrawableTag) {
-                                    fos.write(Utf8Helper.getBytes(((DrawableTag) ch).toHtmlCanvas(1)));
-                                }
-                                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
-                            }
-                        }
+            CharacterTag ch = fswf.characters.get(c);
+            if (ch instanceof FontTag) {
+                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ch,textColor){\r\n"));
+                fos.write(Utf8Helper.getBytes(((FontTag) ch).toHtmlCanvas(1)));
+                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+            } else if (ch instanceof ImageTag) {
+                ImageTag image = (ImageTag) ch;
+                String format = image.getImageFormat();
+                InputStream imageStream = image.getImageData();
+                byte[] imageData;
+                if (imageStream != null) {
+                    imageData = Helper.readStream(image.getImageData());
+                } else {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        ImageIO.write(image.getImage().getBufferedImage(), format.toUpperCase(Locale.ENGLISH), baos);
+                    } catch (IOException ex) {
+                    }
+                    imageData = baos.toByteArray();
+                }
+                String base64ImgData = DatatypeConverter.printBase64Binary(imageData);
+                fos.write(Utf8Helper.getBytes("var image" + c + " = document.createElement(\"img\");\r\nimage" + c + ".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
+            } else {
+                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ctrans,frame,ratio,time){\r\n"));
+                if (ch instanceof DrawableTag) {
+                    fos.write(Utf8Helper.getBytes(((DrawableTag) ch).toHtmlCanvas(1)));
+                }
+                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+            }
+        }
     }
-    
+
     public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, int containerId, List<Integer> frames, final FramesExportSettings settings) throws IOException {
         final List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
@@ -1506,7 +1458,7 @@ public final class SWF implements TreeItem, Timelined {
             }
             return ret;
         }
-                
+
         if (settings.mode == FramesExportMode.CANVAS) {
             final Timeline ftim = tim;
             final Color fbackgroundColor = backgroundColor;
@@ -1517,7 +1469,7 @@ public final class SWF implements TreeItem, Timelined {
                     File fcanvas = new File(foutdir + File.separator + "canvas.js");
                     Helper.saveStream(SWF.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/canvas.js"), fcanvas);
                     ret.add(fcanvas);
-                    
+
                     File f = new File(foutdir + File.separator + "frames.js");
                     File fmin = new File(foutdir + File.separator + "frames.min.js");
                     int width = (int) (ftim.displayRect.getWidth() / SWF.unitDivisor);
@@ -1527,13 +1479,13 @@ public final class SWF implements TreeItem, Timelined {
                         Set<Integer> library = new HashSet<>();
                         getNeededCharacters(ftim, fframes, library);
 
-                        writeLibrary(fswf,library,fos);
+                        writeLibrary(fswf, library, fos);
 
                         String currentName = ftim.id == 0 ? "main" : getTypePrefix(fswf.characters.get(ftim.id)) + ftim.id;
 
                         fos.write(Utf8Helper.getBytes("function " + currentName + "(ctx,ctrans,frame,ratio,time){\r\n"));
                         fos.write(Utf8Helper.getBytes("\tctx.save();\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tctx.transform(1,0,0,1,"+(-ftim.displayRect.Xmin/unitDivisor)+","+(-ftim.displayRect.Ymin/unitDivisor)+");\r\n"));
+                        fos.write(Utf8Helper.getBytes("\tctx.transform(1,0,0,1," + (-ftim.displayRect.Xmin / unitDivisor) + "," + (-ftim.displayRect.Ymin / unitDivisor) + ");\r\n"));
                         fos.write(Utf8Helper.getBytes(framesToHtmlCanvas(unitDivisor, ftim, fframes, 0, null, 0, ftim.displayRect, new ColorTransform(), fbackgroundColor)));
                         fos.write(Utf8Helper.getBytes("\tctx.restore();\r\n"));
                         fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
@@ -1545,24 +1497,24 @@ public final class SWF implements TreeItem, Timelined {
                             fos.write(Utf8Helper.getBytes("frames.push(" + i + ");\r\n"));
                         }
                         fos.write(Utf8Helper.getBytes("\r\n"));
-                        RGB backgroundColor = new RGB(255,255,255);
-                        for(Tag t:fswf.tags){
-                            if(t instanceof SetBackgroundColorTag){
-                                SetBackgroundColorTag sb=(SetBackgroundColorTag)t;
+                        RGB backgroundColor = new RGB(255, 255, 255);
+                        for (Tag t : fswf.tags) {
+                            if (t instanceof SetBackgroundColorTag) {
+                                SetBackgroundColorTag sb = (SetBackgroundColorTag) t;
                                 backgroundColor = sb.backgroundColor;
                             }
                         }
-                        
-                        fos.write(Utf8Helper.getBytes("var backgroundColor = \""+backgroundColor.toHexRGB()+"\";\r\n"));
-                        fos.write(Utf8Helper.getBytes("var originalWidth = "+width+";\r\n"));
-                        fos.write(Utf8Helper.getBytes("var originalHeight= "+height+";\r\n"));
+
+                        fos.write(Utf8Helper.getBytes("var backgroundColor = \"" + backgroundColor.toHexRGB() + "\";\r\n"));
+                        fos.write(Utf8Helper.getBytes("var originalWidth = " + width + ";\r\n"));
+                        fos.write(Utf8Helper.getBytes("var originalHeight= " + height + ";\r\n"));
                         fos.write(Utf8Helper.getBytes("function nextFrame(ctx,ctrans){\r\n"));
                         fos.write(Utf8Helper.getBytes("\tvar oldframe = frame;\r\n"));
                         fos.write(Utf8Helper.getBytes("\tframe = (frame+1)%frames.length;\r\n"));
-                        fos.write(Utf8Helper.getBytes("\tif(frame==oldframe){time++;}else{time=0;};\r\n"));                       
+                        fos.write(Utf8Helper.getBytes("\tif(frame==oldframe){time++;}else{time=0;};\r\n"));
                         fos.write(Utf8Helper.getBytes("\tdrawFrame();\r\n"));
-                        fos.write(Utf8Helper.getBytes("}\r\n\r\n"));         
-                        
+                        fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+
                         fos.write(Utf8Helper.getBytes("function drawFrame(){\r\n"));
                         fos.write(Utf8Helper.getBytes("\tctx.fillStyle = backgroundColor;\r\n"));
                         fos.write(Utf8Helper.getBytes("\tctx.fillRect(0,0,canvas.width,canvas.height);\r\n"));
@@ -1575,13 +1527,13 @@ public final class SWF implements TreeItem, Timelined {
                     }
 
                     if (Configuration.packJavaScripts.get()) {
-                        try{
+                        try {
                             JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
                             f.delete();
-                        }catch(Exception|Error e){ //Something wrong in the packer
+                        } catch (Exception | Error e) { //Something wrong in the packer
                             Logger.getLogger(SWF.class.getName()).log(Level.WARNING, "JPacker: Cannot minimize script");
                             f.renameTo(fmin);
-                        }                                                
+                        }
                     } else {
                         f.renameTo(fmin);
                     }
@@ -1643,18 +1595,18 @@ public final class SWF implements TreeItem, Timelined {
                     @Override
                     public void run() throws IOException {
                         File f = new File(foutdir + File.separator + "frames.pdf");
-                        PDFJob job=new PDFJob(new FileOutputStream(f));   
-                        PageFormat pf=new PageFormat();
+                        PDFJob job = new PDFJob(new FileOutputStream(f));
+                        PageFormat pf = new PageFormat();
                         pf.setOrientation(PageFormat.PORTRAIT);
                         Paper p = new Paper();
-                        
-                        p.setSize(frameImages.get(0).getWidth()+10,frameImages.get(0).getHeight()+10);
-                        pf.setPaper(p);                      
-                        
-                        for(int i=0;i<frameImages.size();i++){
-                            BufferedImage img=frameImages.get(i);
+
+                        p.setSize(frameImages.get(0).getWidth() + 10, frameImages.get(0).getHeight() + 10);
+                        pf.setPaper(p);
+
+                        for (int i = 0; i < frameImages.size(); i++) {
+                            BufferedImage img = frameImages.get(i);
                             Graphics g = job.getGraphics(pf);
-                            g.drawImage(img, 5, 5,img.getWidth(),img.getHeight(), null);
+                            g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
                             g.dispose();
                         }
 
@@ -2261,18 +2213,6 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public static void getNeededCharacters(SWF swf,int id,Set<Integer> usedCharacters){
-        if(!swf.characters.containsKey(id)){ //maybe imported?
-            return; 
-        }
-        CharacterTag character = swf.characters.get(id);        
-        usedCharacters.add(id);        
-        Set<Integer> needed = character.getNeededCharacters();
-        for(int n:needed){
-            getNeededCharacters(swf, n, usedCharacters);
-        }
-    }
-    
     private static void getNeededCharacters(Timeline timeline, List<Integer> frames, Set<Integer> usedCharacters) {
         if (frames == null) {
             frames = new ArrayList<>();
@@ -2284,19 +2224,22 @@ public final class SWF implements TreeItem, Timelined {
             Frame frameObj = timeline.frames.get(frame);
             for (int depth : frameObj.layers.keySet()) {
                 DepthState layer = frameObj.layers.get(depth);
-                if (!timeline.swf.characters.containsKey(layer.characterId)) {
-                    continue;
+                if (layer.characterId != -1) {
+                    if (!timeline.swf.characters.containsKey(layer.characterId)) {
+                        continue;
+                    }
+                    usedCharacters.add(layer.characterId);
+                    timeline.swf.characters.get(layer.characterId).getNeededCharactersDeep(usedCharacters);
                 }
-                getNeededCharacters(timeline.swf,layer.characterId,usedCharacters);                
             }
         }
 
     }
 
-    private static String jsArrColor(RGB rgb){
-        return "["+rgb.red+","+rgb.green+","+rgb.blue+","+((rgb instanceof RGBA)?((RGBA)rgb).getAlphaFloat():1)+"]";
+    private static String jsArrColor(RGB rgb) {
+        return "[" + rgb.red + "," + rgb.green + "," + rgb.blue + "," + ((rgb instanceof RGBA) ? ((RGBA) rgb).getAlphaFloat() : 1) + "]";
     }
-    
+
     public static String framesToHtmlCanvas(double unitDivisor, Timeline timeline, List<Integer> frames, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, ColorTransform colorTransform, Color backGroundColor) {
         StringBuilder sb = new StringBuilder();
         if (frames == null) {
@@ -2310,17 +2253,17 @@ public final class SWF implements TreeItem, Timelined {
         sb.append("\tframe = frame % frame_cnt;\r\n");
         sb.append("\tswitch(frame){\r\n");
         int maxDepth = timeline.getMaxDepth();
-        Stack<Integer> clipDepths=new Stack<>();
+        Stack<Integer> clipDepths = new Stack<>();
         for (int frame = 0; frame < frames.size(); frame++) {
             sb.append("\t\tcase ").append(frame).append(":\r\n");
             Frame frameObj = timeline.frames.get(frame);
-            for (int i = 1; i <= maxDepth+1; i++) {
-                while(!clipDepths.isEmpty() && clipDepths.peek()<=i){
+            for (int i = 1; i <= maxDepth + 1; i++) {
+                while (!clipDepths.isEmpty() && clipDepths.peek() <= i) {
                     clipDepths.pop();
                     sb.append("\t\t\tvar o = clips.pop();\r\n");
-                    sb.append("\t\t\tctx.globalCompositeOperation = \"destination-in\";\r\n"); 
-                    sb.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");  
-                    sb.append("\t\t\tctx.drawImage(o.clipCanvas,0,0);\r\n");                                        
+                    sb.append("\t\t\tctx.globalCompositeOperation = \"destination-in\";\r\n");
+                    sb.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");
+                    sb.append("\t\t\tctx.drawImage(o.clipCanvas,0,0);\r\n");
                     sb.append("\t\t\tvar ms=o.ctx._matrices.slice();\r\n");
                     sb.append("\t\t\to.ctx.setTransform(1,0,0,1,0,0);\r\n");
                     sb.append("\t\t\to.ctx.globalCompositeOperation = \"source-over\";\r\n");
@@ -2351,73 +2294,72 @@ public final class SWF implements TreeItem, Timelined {
                 placeMatrix.rotateSkew1 /= unitDivisor;
                 placeMatrix.translateX /= unitDivisor;
                 placeMatrix.translateY /= unitDivisor;
-                
 
                 int f = 0;
                 String fstr = "0";
                 if (character instanceof DefineSpriteTag) {
                     DefineSpriteTag sp = (DefineSpriteTag) character;
                     Timeline tim = sp.getTimeline();
-                    if(tim.getFrameCount()>0){
+                    if (tim.getFrameCount() > 0) {
                         f = layer.time % tim.getFrameCount();
-                        fstr = "("+f+"+time)%" + tim.getFrameCount();
+                        fstr = "(" + f + "+time)%" + tim.getFrameCount();
                     }
-                }                                                         
-                
-                if(layer.clipDepth!=-1){
-                    clipDepths.push(layer.clipDepth);                   
-                    sb.append("\t\t\tclips.push({ctx:ctx,canvas:canvas});\r\n");                    
-                    sb.append("\t\t\tvar ccanvas = createCanvas(canvas.width,canvas.height);\r\n");                    
+                }
+
+                if (layer.clipDepth != -1) {
+                    clipDepths.push(layer.clipDepth);
+                    sb.append("\t\t\tclips.push({ctx:ctx,canvas:canvas});\r\n");
+                    sb.append("\t\t\tvar ccanvas = createCanvas(canvas.width,canvas.height);\r\n");
                     sb.append("\t\t\tvar cctx = ccanvas.getContext(\"2d\");\r\n");
                     sb.append("\t\t\tenhanceContext(cctx);\r\n");
                     sb.append("\t\t\tcctx.applyTransforms(ctx._matrices);\r\n");
                     sb.append("\t\t\tcanvas = ccanvas;\r\n");
                     sb.append("\t\t\tctx = cctx;\r\n");
                 }
-                
-                if(layer.filters!=null){
+
+                if (layer.filters != null) {
                     sb.append("\t\t\tvar oldctx = ctx;\r\n");
                     sb.append("\t\t\tvar fcanvas = createCanvas(canvas.width,canvas.height);");
                     sb.append("\t\t\tvar fctx = fcanvas.getContext(\"2d\");\r\n");
                     sb.append("\t\t\tenhanceContext(fctx);\r\n");
                     sb.append("\t\t\tfctx.applyTransforms(ctx._matrices);\r\n");
-                    sb.append("\t\t\tctx = fctx;\r\n");                    
+                    sb.append("\t\t\tctx = fctx;\r\n");
                 }
-                
-                ColorTransform ctrans =layer.colorTransForm;
+
+                ColorTransform ctrans = layer.colorTransForm;
                 String ctrans_str = "ctrans";
-                if(ctrans==null){
+                if (ctrans == null) {
                     ctrans = new ColorTransform();
-                }else{
-                    ctrans_str = "ctrans.merge(new cxform("+
-                            ctrans.getRedAdd()+","+ctrans.getGreenAdd()+","+ctrans.getBlueAdd()+","+ctrans.getAlphaAdd()+","+
-                            ctrans.getRedMulti()+","+ctrans.getGreenMulti()+","+ctrans.getBlueMulti()+","+ctrans.getAlphaMulti()
-                            +"))";
+                } else {
+                    ctrans_str = "ctrans.merge(new cxform("
+                            + ctrans.getRedAdd() + "," + ctrans.getGreenAdd() + "," + ctrans.getBlueAdd() + "," + ctrans.getAlphaAdd() + ","
+                            + ctrans.getRedMulti() + "," + ctrans.getGreenMulti() + "," + ctrans.getBlueMulti() + "," + ctrans.getAlphaMulti()
+                            + "))";
                 }
                 sb.append("\t\t\tplace(\"").append(getTypePrefix(character)).append(layer.characterId).append("\",canvas,ctx,[").append(placeMatrix.scaleX).append(",")
-                                                                .append(placeMatrix.rotateSkew0).append(",")
-                                                                .append(placeMatrix.rotateSkew1).append(",")
-                                                                .append(placeMatrix.scaleY).append(",")
-                                                                .append(placeMatrix.translateX).append(",")
-                                                                .append(placeMatrix.translateY).append("],").append(ctrans_str).append(",").append(""+(layer.blendMode<1?1:layer.blendMode)).append(",").append(fstr).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(",time").append(");\r\n");                                
-                
-                if(layer.filters!=null){
-                    for(FILTER filter:layer.filters){
-                        if(filter instanceof COLORMATRIXFILTER){
-                            COLORMATRIXFILTER cmf = (COLORMATRIXFILTER)filter;
+                        .append(placeMatrix.rotateSkew0).append(",")
+                        .append(placeMatrix.rotateSkew1).append(",")
+                        .append(placeMatrix.scaleY).append(",")
+                        .append(placeMatrix.translateX).append(",")
+                        .append(placeMatrix.translateY).append("],").append(ctrans_str).append(",").append("").append(layer.blendMode < 1 ? 1 : layer.blendMode).append(",").append(fstr).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(",time").append(");\r\n");
+
+                if (layer.filters != null) {
+                    for (FILTER filter : layer.filters) {
+                        if (filter instanceof COLORMATRIXFILTER) {
+                            COLORMATRIXFILTER cmf = (COLORMATRIXFILTER) filter;
                             String mat = "[";
-                            for(int k=0;k<cmf.matrix.length;k++){
-                                if(k>0){
-                                    mat+=",";
+                            for (int k = 0; k < cmf.matrix.length; k++) {
+                                if (k > 0) {
+                                    mat += ",";
                                 }
                                 mat += cmf.matrix[k];
                             }
-                            mat+="]";
-                            sb.append("\t\t\tfcanvas = Filters.colorMatrix(fcanvas,fcanvas.getContext(\"2d\"),"+mat+");\r\n");
+                            mat += "]";
+                            sb.append("\t\t\tfcanvas = Filters.colorMatrix(fcanvas,fcanvas.getContext(\"2d\"),").append(mat).append(");\r\n");
                         }
-                        
-                        if(filter instanceof CONVOLUTIONFILTER){
-                            CONVOLUTIONFILTER cf=(CONVOLUTIONFILTER)filter;
+
+                        if (filter instanceof CONVOLUTIONFILTER) {
+                            CONVOLUTIONFILTER cf = (CONVOLUTIONFILTER) filter;
                             int height = cf.matrix.length;
                             int width = cf.matrix[0].length;
                             float[] matrix2 = new float[width * height];
@@ -2427,95 +2369,95 @@ public final class SWF implements TreeItem, Timelined {
                                 }
                             }
                             String mat = "[";
-                            for(int k=0;k<matrix2.length;k++){
-                                if(k>0){
-                                    mat+=",";
+                            for (int k = 0; k < matrix2.length; k++) {
+                                if (k > 0) {
+                                    mat += ",";
                                 }
                                 mat += matrix2[k];
                             }
-                            mat+="]";
-                            sb.append("\t\t\tfcanvas = Filters.convolution(fcanvas,fcanvas.getContext(\"2d\"),"+mat+",false);\r\n");
+                            mat += "]";
+                            sb.append("\t\t\tfcanvas = Filters.convolution(fcanvas,fcanvas.getContext(\"2d\"),").append(mat).append(",false);\r\n");
                         }
-                        
-                        if(filter instanceof GLOWFILTER){
-                            GLOWFILTER gf = (GLOWFILTER)filter;
-                            sb.append("\t\t\tfcanvas = Filters.glow(fcanvas,fcanvas.getContext(\"2d\"),"+gf.blurX+","+gf.blurY+","+gf.strength+","+jsArrColor(gf.glowColor)+","+(gf.innerGlow?"true":"false")+","+(gf.knockout?"true":"false")+","+gf.passes+");\r\n");
+
+                        if (filter instanceof GLOWFILTER) {
+                            GLOWFILTER gf = (GLOWFILTER) filter;
+                            sb.append("\t\t\tfcanvas = Filters.glow(fcanvas,fcanvas.getContext(\"2d\"),").append(gf.blurX).append(",").append(gf.blurY).append(",").append(gf.strength).append(",").append(jsArrColor(gf.glowColor)).append(",").append(gf.innerGlow ? "true" : "false").append(",").append(gf.knockout ? "true" : "false").append(",").append(gf.passes).append(");\r\n");
                         }
-                        
-                        if(filter instanceof DROPSHADOWFILTER){
-                            DROPSHADOWFILTER ds=(DROPSHADOWFILTER)filter;
-                            sb.append("\t\t\tfcanvas = Filters.dropShadow(fcanvas,fcanvas.getContext(\"2d\"),"+ds.blurX+","+ds.blurY+","+(int) (ds.angle * 180 / Math.PI)+","+ds.distance+","+jsArrColor(ds.dropShadowColor)+","+(ds.innerShadow?"true":"false")+","+ds.passes+","+ds.strength+","+(ds.knockout?"true":"false")+");\r\n");                        
+
+                        if (filter instanceof DROPSHADOWFILTER) {
+                            DROPSHADOWFILTER ds = (DROPSHADOWFILTER) filter;
+                            sb.append("\t\t\tfcanvas = Filters.dropShadow(fcanvas,fcanvas.getContext(\"2d\"),").append(ds.blurX).append(",").append(ds.blurY).append(",").append((int) (ds.angle * 180 / Math.PI)).append(",").append(ds.distance).append(",").append(jsArrColor(ds.dropShadowColor)).append(",").append(ds.innerShadow ? "true" : "false").append(",").append(ds.passes).append(",").append(ds.strength).append(",").append(ds.knockout ? "true" : "false").append(");\r\n");
                         }
-                        if(filter instanceof BEVELFILTER){
-                            BEVELFILTER bv=(BEVELFILTER)filter;                           
+                        if (filter instanceof BEVELFILTER) {
+                            BEVELFILTER bv = (BEVELFILTER) filter;
                             String type = "Filters.INNER";
                             if (bv.onTop && !bv.innerShadow) {
                                 type = "Filters.FULL";
                             } else if (!bv.innerShadow) {
                                 type = "Filters.OUTER";
                             }
-                            sb.append("\t\t\tfcanvas = Filters.bevel(fcanvas,fcanvas.getContext(\"2d\"),"+bv.blurX+","+bv.blurY+","+bv.strength+","+type+","+jsArrColor(bv.highlightColor)+","+jsArrColor(bv.shadowColor)+","+(int) (bv.angle * 180 / Math.PI)+","+bv.distance+","+(bv.knockout?"true":"false")+","+bv.passes+");\r\n");
+                            sb.append("\t\t\tfcanvas = Filters.bevel(fcanvas,fcanvas.getContext(\"2d\"),").append(bv.blurX).append(",").append(bv.blurY).append(",").append(bv.strength).append(",").append(type).append(",").append(jsArrColor(bv.highlightColor)).append(",").append(jsArrColor(bv.shadowColor)).append(",").append((int) (bv.angle * 180 / Math.PI)).append(",").append(bv.distance).append(",").append(bv.knockout ? "true" : "false").append(",").append(bv.passes).append(");\r\n");
                         }
-                        
-                        if(filter instanceof GRADIENTBEVELFILTER){
-                            GRADIENTBEVELFILTER gbf = (GRADIENTBEVELFILTER)filter;
+
+                        if (filter instanceof GRADIENTBEVELFILTER) {
+                            GRADIENTBEVELFILTER gbf = (GRADIENTBEVELFILTER) filter;
                             String colArr = "[";
                             String ratArr = "[";
-                            for(int k=0;k<gbf.gradientColors.length;k++){
-                                if(k>0){
-                                    colArr+=",";
-                                    ratArr+=",";
+                            for (int k = 0; k < gbf.gradientColors.length; k++) {
+                                if (k > 0) {
+                                    colArr += ",";
+                                    ratArr += ",";
                                 }
-                                colArr+=jsArrColor(gbf.gradientColors[k]);
-                                ratArr+=gbf.gradientRatio[k] / 255f;
+                                colArr += jsArrColor(gbf.gradientColors[k]);
+                                ratArr += gbf.gradientRatio[k] / 255f;
                             }
-                            colArr+="]";
-                            ratArr+="]";                
+                            colArr += "]";
+                            ratArr += "]";
                             String type = "Filters.INNER";
                             if (gbf.onTop && !gbf.innerShadow) {
                                 type = "Filters.FULL";
                             } else if (!gbf.innerShadow) {
                                 type = "Filters.OUTER";
                             }
-                            
-                            sb.append("\t\t\tfcanvas = Filters.gradientBevel(fcanvas,fcanvas.getContext(\"2d\"),"+colArr+","+ratArr+","+gbf.blurX+","+gbf.blurY+","+gbf.strength+","+type+","+(int) (gbf.angle * 180 / Math.PI)+","+gbf.distance+","+(gbf.knockout?"true":"false")+","+gbf.passes+");\r\n");
+
+                            sb.append("\t\t\tfcanvas = Filters.gradientBevel(fcanvas,fcanvas.getContext(\"2d\"),").append(colArr).append(",").append(ratArr).append(",").append(gbf.blurX).append(",").append(gbf.blurY).append(",").append(gbf.strength).append(",").append(type).append(",").append((int) (gbf.angle * 180 / Math.PI)).append(",").append(gbf.distance).append(",").append(gbf.knockout ? "true" : "false").append(",").append(gbf.passes).append(");\r\n");
                         }
-                        
-                        if(filter instanceof GRADIENTGLOWFILTER){
-                            GRADIENTGLOWFILTER ggf = (GRADIENTGLOWFILTER)filter;
+
+                        if (filter instanceof GRADIENTGLOWFILTER) {
+                            GRADIENTGLOWFILTER ggf = (GRADIENTGLOWFILTER) filter;
                             String colArr = "[";
                             String ratArr = "[";
-                            for(int k=0;k<ggf.gradientColors.length;k++){
-                                if(k>0){
-                                    colArr+=",";
-                                    ratArr+=",";
+                            for (int k = 0; k < ggf.gradientColors.length; k++) {
+                                if (k > 0) {
+                                    colArr += ",";
+                                    ratArr += ",";
                                 }
-                                colArr+=jsArrColor(ggf.gradientColors[k]);
-                                ratArr+=ggf.gradientRatio[k] / 255f;
+                                colArr += jsArrColor(ggf.gradientColors[k]);
+                                ratArr += ggf.gradientRatio[k] / 255f;
                             }
-                            colArr+="]";
-                            ratArr+="]";                
+                            colArr += "]";
+                            ratArr += "]";
                             String type = "Filters.INNER";
                             if (ggf.onTop && !ggf.innerShadow) {
                                 type = "Filters.FULL";
                             } else if (!ggf.innerShadow) {
                                 type = "Filters.OUTER";
                             }
-                                                             
-                            sb.append("\t\t\tfcanvas = Filters.gradientGlow(fcanvas,fcanvas.getContext(\"2d\"),"+ggf.blurX+","+ggf.blurY+","+(int) (ggf.angle * 180 / Math.PI)+","+ggf.distance+","+colArr+","+ratArr+","+type+","+ggf.passes+","+ggf.strength+","+(ggf.knockout?"true":"false")+");\r\n");
+
+                            sb.append("\t\t\tfcanvas = Filters.gradientGlow(fcanvas,fcanvas.getContext(\"2d\"),").append(ggf.blurX).append(",").append(ggf.blurY).append(",").append((int) (ggf.angle * 180 / Math.PI)).append(",").append(ggf.distance).append(",").append(colArr).append(",").append(ratArr).append(",").append(type).append(",").append(ggf.passes).append(",").append(ggf.strength).append(",").append(ggf.knockout ? "true" : "false").append(");\r\n");
                         }
                     }
-                    sb.append("\t\t\tctx = oldctx;\r\n");  
+                    sb.append("\t\t\tctx = oldctx;\r\n");
                     sb.append("\t\t\tvar ms=ctx._matrices;\r\n");
-                    sb.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");  
+                    sb.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");
                     sb.append("\t\t\tctx.drawImage(fcanvas,0,0);\r\n");
-                    sb.append("\t\t\tctx.applyTransforms(ms);\r\n");  
-                    
+                    sb.append("\t\t\tctx.applyTransforms(ms);\r\n");
+
                 }
-                if(layer.clipDepth!=-1){
-                    sb.append("\t\t\tclips[clips.length-1].clipCanvas = canvas;\r\n");                    
-                    sb.append("\t\t\tcanvas = createCanvas(canvas.width,canvas.height);\r\n");   
-                    sb.append("\t\t\tvar nctx = canvas.getContext(\"2d\");\r\n");  
+                if (layer.clipDepth != -1) {
+                    sb.append("\t\t\tclips[clips.length-1].clipCanvas = canvas;\r\n");
+                    sb.append("\t\t\tcanvas = createCanvas(canvas.width,canvas.height);\r\n");
+                    sb.append("\t\t\tvar nctx = canvas.getContext(\"2d\");\r\n");
                     sb.append("\t\t\tenhanceContext(nctx);\r\n");
                     sb.append("\t\t\tnctx.applyTransforms(ctx._matrices);\r\n");
                     sb.append("\t\t\tctx = nctx;\r\n");
@@ -2903,7 +2845,8 @@ public final class SWF implements TreeItem, Timelined {
                 Tag t = timeline.get(i);
                 if (t instanceof CharacterIdTag) {
                     CharacterIdTag c = (CharacterIdTag) t;
-                    Set<Integer> needed = t.getNeededCharacters();
+                    Set<Integer> needed = new HashSet<>();
+                    t.getNeededCharacters(needed);
                     if (needed.contains(characterId)) {
                         dependingChars.add(c.getCharacterId());
                     }
@@ -2946,7 +2889,8 @@ public final class SWF implements TreeItem, Timelined {
                     continue;
                 }
             }
-            Set<Integer> needed = t.getNeededCharacters();
+            Set<Integer> needed = new HashSet<>();
+            t.getNeededCharacters(needed);
             for (int dep : dependingChars) {
                 if (needed.contains(dep)) {
                     timeline.remove(i);

@@ -60,7 +60,7 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         AVM2Instruction ins = null;
         if (value >= -128 && value <= 127) {
-            ins = new AVM2Instruction(0, new PushByteIns(), new int[]{(int)(long)value}, new byte[0]);
+            ins = new AVM2Instruction(0, new PushByteIns(), new int[]{(int) (long) value}, new byte[0]);
         } else if (value >= -32768 && value <= 32767) {
             ins = new AVM2Instruction(0, new PushShortIns(), new int[]{((int) (long) value) & 0xffff}, new byte[0]);
         } else {

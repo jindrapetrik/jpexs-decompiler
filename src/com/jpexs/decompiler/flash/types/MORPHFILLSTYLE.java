@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -66,15 +65,28 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
     public MATRIX endBitmapMatrix;
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<>();
+    public void getNeededCharacters(Set<Integer> needed) {
         if ((fillStyleType == REPEATING_BITMAP)
                 || (fillStyleType == CLIPPED_BITMAP)
                 || (fillStyleType == NON_SMOOTHED_REPEATING_BITMAP)
                 || (fillStyleType == NON_SMOOTHED_CLIPPED_BITMAP)) {
-            ret.add(bitmapId);
+            needed.add(bitmapId);
         }
-        return ret;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        if (bitmapId == characterId) {
+            if ((fillStyleType == REPEATING_BITMAP)
+                || (fillStyleType == CLIPPED_BITMAP)
+                || (fillStyleType == NON_SMOOTHED_REPEATING_BITMAP)
+                || (fillStyleType == NON_SMOOTHED_CLIPPED_BITMAP)) {
+                fillStyleType = SOLID;
+            }
+            bitmapId = 0;
+            return true;
+        }
+        return false;
     }
 
     private MATRIX morphMatrix(MATRIX a, MATRIX b, int ratio) {

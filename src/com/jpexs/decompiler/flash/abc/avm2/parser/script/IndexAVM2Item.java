@@ -118,8 +118,6 @@ public class IndexAVM2Item extends AssignableAVM2Item {
         );
 
     }
-    
-   
 
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn, boolean call, List<GraphTargetItem> callargs, boolean delete, boolean construct) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
@@ -138,12 +136,12 @@ public class IndexAVM2Item extends AssignableAVM2Item {
         } else {
             return toSourceMerge(localData, generator,
                     object,
-                    call?ins(new DupIns()):null,
+                    call ? ins(new DupIns()) : null,
                     index,
-                    construct?callargs:null,
-                    ins(construct?new ConstructPropIns():delete?new DeletePropertyIns():new GetPropertyIns(), indexPropIndex, construct?callargs.size():null),
-                    call?callargs:null,
-                    call?ins(new CallIns(),callargs.size()):null,                    
+                    construct ? callargs : null,
+                    ins(construct ? new ConstructPropIns() : delete ? new DeletePropertyIns() : new GetPropertyIns(), indexPropIndex, construct ? callargs.size() : null),
+                    call ? callargs : null,
+                    call ? ins(new CallIns(), callargs.size()) : null,
                     needsReturn ? null : ins(new PopIns()));
         }
 
@@ -151,12 +149,12 @@ public class IndexAVM2Item extends AssignableAVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(),false,false);
+        return toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(), false, false);
     }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSource(localData, generator, false, false, new ArrayList<GraphTargetItem>(),false,false);
+        return toSource(localData, generator, false, false, new ArrayList<GraphTargetItem>(), false, false);
     }
 
 }

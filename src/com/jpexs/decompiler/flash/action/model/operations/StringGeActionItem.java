@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionStringLess;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -29,7 +28,7 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 import java.util.Set;
 
-public class StringGeActionItem extends BinaryOpItem implements Inverted{
+public class StringGeActionItem extends BinaryOpItem implements Inverted {
 
     public StringGeActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "ge");

@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
@@ -40,7 +39,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -416,20 +414,35 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     }
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        return new HashSet<>();
+    public void getNeededCharacters(Set<Integer> needed) {
     }
 
-    public Set<Integer> getDeepNeededCharacters(Map<Integer, CharacterTag> characters) {
-        Set<Integer> ret = new HashSet<>();
-        Set<Integer> needed = getNeededCharacters();
-        for (int ch : needed) {
-            if (!characters.containsKey(ch)) { //TODO: use Import tag (?)
-                continue;
+    @Override
+    public boolean removeCharacter(int characterId) {
+        return false;
+    }
+
+    public void getNeededCharactersDeep(Set<Integer> needed) {
+        Set<Integer> visited = new HashSet<>();
+        Set<Integer> needed2 = new HashSet<>();
+        getNeededCharacters(needed2);
+
+        while (visited.size() != needed2.size()) {
+            for (Integer characterId : needed2) {
+                if (!visited.contains(characterId)) {
+                    visited.add(characterId);
+                    if (swf.characters.containsKey(characterId)) {
+                        swf.characters.get(characterId).getNeededCharacters(needed2);
+                        break;
+                    }
+                }
             }
-            ret.add(ch);
-            ret.addAll(characters.get(ch).getDeepNeededCharacters(characters));
         }
-        return ret;
+
+        for (Integer characterId : needed2) {
+            if (swf.characters.containsKey(characterId)) {
+                needed.add(characterId);
+            }
+        }
     }
 }

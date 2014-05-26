@@ -49,7 +49,7 @@ public class ApplicationInfo {
             build = prop.getProperty("build");
             nightly = prop.getProperty("nightly").equals("true");
             if (nightly) {
-                version = version + " nightly build " + build.substring(0,7);
+                version = version + " nightly build " + build.substring(0, 7);
             }
         } catch (IOException | NullPointerException ex) {
             //ignore

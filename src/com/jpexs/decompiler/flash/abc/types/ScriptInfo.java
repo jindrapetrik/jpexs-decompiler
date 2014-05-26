@@ -78,10 +78,10 @@ public class ScriptInfo {
     public String toString(ABC abc, List<String> fullyQualifiedNames) {
         return "method_index=" + init_index + "\r\n" + traits.toString(abc, fullyQualifiedNames);
     }
-    
-    public void delete(ABC abc,boolean d){
+
+    public void delete(ABC abc, boolean d) {
         deleted = d;
-        abc.method_info.get(init_index).delete(abc,d);
-        traits.delete(abc,d);
+        abc.method_info.get(init_index).delete(abc, d);
+        traits.delete(abc, d);
     }
 }

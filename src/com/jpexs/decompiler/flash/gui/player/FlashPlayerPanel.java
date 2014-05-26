@@ -340,7 +340,7 @@ public class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
                 if (plays) {
                     play();
                 }
-                
+
                 return;
             }
             writeToPipe(new byte[]{CMD_REWIND});

@@ -28,15 +28,14 @@ import java.util.List;
 
 public class MethodInfo {
 
-    
     public boolean deleted;
-    
-    public void delete(ABC abc,boolean d){
-        this.deleted = true;        
-        if(body!=null){
-            for(AVM2Instruction ins:body.code.code){
-                if(ins.definition instanceof NewFunctionIns){
-                    abc.method_info.get(ins.operands[0]).delete(abc,d);
+
+    public void delete(ABC abc, boolean d) {
+        this.deleted = true;
+        if (body != null) {
+            for (AVM2Instruction ins : body.code.code) {
+                if (ins.definition instanceof NewFunctionIns) {
+                    abc.method_info.get(ins.operands[0]).delete(abc, d);
                 }
             }
         }

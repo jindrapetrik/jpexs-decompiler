@@ -85,6 +85,6 @@ public interface ASMSource extends TreeItem {
     public int getPrefixLineCount();
 
     public String removePrefixAndSuffix(String source);
-    
+
     public Tag getSourceTag();
 }

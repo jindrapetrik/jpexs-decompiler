@@ -43,23 +43,21 @@ public class BitXorActionItem extends BinaryOpItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if((rightSide instanceof DirectValueActionItem)&&(((DirectValueActionItem)rightSide).value.equals(4.294967295E9))){
+        if ((rightSide instanceof DirectValueActionItem) && (((DirectValueActionItem) rightSide).value.equals(4.294967295E9))) {
             writer.append("~");
-            if(leftSide.getPrecedence()>PRECEDENCE_UNARY){
+            if (leftSide.getPrecedence() > PRECEDENCE_UNARY) {
                 writer.append("(");
             }
             leftSide.appendTo(writer, localData);
-            if(leftSide.getPrecedence()>PRECEDENCE_UNARY){
+            if (leftSide.getPrecedence() > PRECEDENCE_UNARY) {
                 writer.append(")");
             }
             return writer;
-        }else{
+        } else {
             return super.appendTo(writer, localData);
         }
     }
 
-    
-    
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide, new ActionBitXor());

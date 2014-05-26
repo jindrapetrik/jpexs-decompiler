@@ -601,10 +601,8 @@ public class ActionSourceGenerator implements SourceGenerator {
     public int getSwfVersion() {
         return swfVersion;
     }
-    
-    
 
-    public ActionSourceGenerator(int swfVersion,List<String> constantPool) {
+    public ActionSourceGenerator(int swfVersion, List<String> constantPool) {
         this.constantPool = constantPool;
         this.swfVersion = swfVersion;
     }

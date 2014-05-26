@@ -112,11 +112,12 @@ public class ShapeExporter {
                                     int deltaY = -shp.getBounds().Ymin;
                                     CanvasShapeExporter cse = new CanvasShapeExporter(null, SWF.unitDivisor, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
                                     cse.export();
-                                    Set<Integer> needed=new HashSet<>();
-                                    SWF.getNeededCharacters(st.getSwf(), st.getCharacterId(), needed);
-                                    ByteArrayOutputStream baos=new ByteArrayOutputStream();
+                                    Set<Integer> needed = new HashSet<>();
+                                    needed.add(st.getCharacterId());
+                                    st.getNeededCharactersDeep(needed);
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                     SWF.writeLibrary(st.getSwf(), needed, baos);
-                                    fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(),"UTF-8"))));
+                                    fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), "UTF-8"))));
                                 }
                                 break;
                         }
@@ -126,7 +127,7 @@ public class ShapeExporter {
                 ret.add(file);
             }
         }
-        if(settings.mode == ShapeExportMode.CANVAS){
+        if (settings.mode == ShapeExportMode.CANVAS) {
             File fcanvas = new File(foutdir + File.separator + "canvas.js");
             Helper.saveStream(SWF.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/canvas.js"), fcanvas);
             ret.add(fcanvas);

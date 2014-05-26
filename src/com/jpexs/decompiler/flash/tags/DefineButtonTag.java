@@ -48,7 +48,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -219,13 +218,28 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     }
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> needed = new HashSet<>();
+    public void getNeededCharacters(Set<Integer> needed) {
         for (BUTTONRECORD r : characters) {
             needed.add(r.characterId);
         }
-        return needed;
     }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        for (int i = 0; i < characters.size(); i++) {
+            if (characters.get(i).characterId == characterId) {
+                characters.remove(i);
+                modified = true;
+                i--;
+            }
+        }
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
+    }
+
     private static final Cache<RECT> rectCache = Cache.getInstance(true);
 
     @Override

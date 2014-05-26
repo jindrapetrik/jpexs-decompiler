@@ -240,6 +240,5 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     public Tag getSourceTag() {
         return this;
     }
-   
-    
+
 }

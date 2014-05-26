@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassAVM2Item extends AVM2Item implements Block {
-    
+
     public List<GraphTargetItem> traits;
     public GraphTargetItem extendsOp;
     public List<GraphTargetItem> implementsOp;
@@ -44,7 +44,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
     public List<String> importedClasses;
 
     public String pkg;
-    
+
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
@@ -54,7 +54,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         return ret;
     }
 
-    public ClassAVM2Item(List<String> importedClasses,String pkg,List<Integer> openedNamespaces, int protectedNs, boolean isDynamic, boolean isFinal, int namespace, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> staticInit, boolean staticInitActivation, List<AssignableAVM2Item> sinitVariables, GraphTargetItem constructor, List<GraphTargetItem> traits) {
+    public ClassAVM2Item(List<String> importedClasses, String pkg, List<Integer> openedNamespaces, int protectedNs, boolean isDynamic, boolean isFinal, int namespace, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> staticInit, boolean staticInitActivation, List<AssignableAVM2Item> sinitVariables, GraphTargetItem constructor, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.importedClasses = importedClasses;
         this.pkg = pkg;

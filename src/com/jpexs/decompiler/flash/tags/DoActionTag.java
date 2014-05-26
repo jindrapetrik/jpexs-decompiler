@@ -192,6 +192,5 @@ public class DoActionTag extends Tag implements ASMSource {
     public Tag getSourceTag() {
         return this;
     }
-    
-    
+
 }

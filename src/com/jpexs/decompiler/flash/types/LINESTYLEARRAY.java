@@ -16,23 +16,31 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  *
  * @author JPEXS
  */
-public class LINESTYLEARRAY implements Serializable {
+public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
 
     public LINESTYLE[] lineStyles = new LINESTYLE[0];
-    
-    public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<>();
+
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
         for (LINESTYLE ls : lineStyles) {
-            ret.addAll(ls.getNeededCharacters());
+            ls.getNeededCharacters(needed);
         }
-        return ret;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        for (LINESTYLE ls : lineStyles) {
+            modified |= ls.removeCharacter(characterId);
+        }
+        return modified;
     }
 }

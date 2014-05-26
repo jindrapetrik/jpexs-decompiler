@@ -50,9 +50,9 @@ public class SourceGeneratorLocalData implements Serializable {
     public List<GraphTargetItem> scopeStack = new ArrayList<GraphTargetItem>();
     public boolean documentClass;
     public ScriptInfo currentScript;
-    
-    public String getFullClass(){
-        return pkg==null||pkg.isEmpty()?currentClass:pkg+"."+currentClass;
+
+    public String getFullClass() {
+        return pkg == null || pkg.isEmpty() ? currentClass : pkg + "." + currentClass;
     }
 
     public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {

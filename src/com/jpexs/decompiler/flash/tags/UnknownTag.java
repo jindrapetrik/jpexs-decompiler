@@ -30,7 +30,7 @@ public class UnknownTag extends Tag {
 
     @Override
     public String toString() {
-        return super.toString()+" (ID="+id+")";
+        return super.toString() + " (ID=" + id + ")";
     }
-    
+
 }

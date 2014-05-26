@@ -121,17 +121,17 @@ public abstract class AVM2Item extends GraphTargetItem {
     }
 
     public static AVM2Instruction ins(InstructionDefinition def, Integer... operands) {
-        List<Integer> ops=new ArrayList<>();
-        for(Integer o:operands){
-            if(o!=null){
+        List<Integer> ops = new ArrayList<>();
+        for (Integer o : operands) {
+            if (o != null) {
                 ops.add(o);
             }
         }
-        int opArr[]=new int[ops.size()];
-        for(int i=0;i<ops.size();i++){
+        int opArr[] = new int[ops.size()];
+        for (int i = 0; i < ops.size(); i++) {
             opArr[i] = ops.get(i);
         }
-        
+
         return new AVM2Instruction(0, def, opArr, new byte[0]);
     }
 

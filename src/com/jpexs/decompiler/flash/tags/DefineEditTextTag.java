@@ -53,7 +53,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -752,14 +751,23 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> needed = new HashSet<>();
+    public void getNeededCharacters(Set<Integer> needed) {
         if (hasFont) {
             needed.add(fontId);
         }
-        return needed;
     }
 
+    @Override
+    public boolean removeCharacter(int characterId) {
+        if (fontId == characterId) {
+            hasFont = false;
+            fontId = 0;
+            setModified(true);
+            return true;
+        }
+        return false;
+    }
+    
     @Override
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
         render(false, image, transformation, colorTransform);

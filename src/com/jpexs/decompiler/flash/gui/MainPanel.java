@@ -684,7 +684,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         swfs.add(newSwfs);
 
         for (SWF swf : newSwfs) {
-           
 
             boolean hasAbc = !swf.abcList.isEmpty();
             swf.isAS3 = hasAbc;
@@ -926,8 +925,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
         }
     }
-
-    
 
     public static void getMorphShapes(List<ContainerItem> list, List<Tag> morphShapes) {
         for (ContainerItem t : list) {
@@ -2041,11 +2038,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         previewPanel.clear();
         showCard(CARDEMPTYPANEL);
         TreeItem treeItem = tagTree.getCurrentTreeItem();
-        for (SWFList sWFList : swfs) {
-            for (SWF swf : sWFList.swfs) {
-                swf.updateInnerTagsForShowFrameTags();
-            }
-        }
         View.refreshTree(tagTree, new TagTreeModel(mainFrame, swfs));
         if (treeItem != null) {
             setTreeItem(treeItem);
@@ -2259,7 +2251,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         tagsToRemove.add((Tag) tag);
                     } else if (tag instanceof FrameNodeItem) {
                         FrameNodeItem frame = (FrameNodeItem) tag;
-                        tagsToRemove.add(frame.getShowFrameTag());
+                        // todo: honfika: remove frame
+                        //tagsToRemove.add(frame.getShowFrameTag());
                     }
                 }
 
@@ -2325,10 +2318,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         if (!(treeItem instanceof SWFList)) {
             SWF swf = treeItem.getSwf();
             /*if (swfs.contains(swf.swfList)) { //why?
-                updateUi(swf);
-            } else {
-                updateUi();
-            }*/
+             updateUi(swf);
+             } else {
+             updateUi();
+             }*/
             updateUi(swf);
         } else {
             updateUi();
@@ -2511,7 +2504,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                 timelined = parentSprite;
             }
             previewPanel.showImagePanel(timelined, swf, fn.getFrame() - 1);
-        } else if ((tagObj instanceof SoundTag)){ //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
+        } else if ((tagObj instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             showCard(CARDPREVIEWPANEL);
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
             previewPanel.setImageReplaceButtonVisible(tagObj instanceof DefineSoundTag);

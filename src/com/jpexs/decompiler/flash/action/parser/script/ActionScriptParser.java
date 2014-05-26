@@ -29,7 +29,6 @@ import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
 import com.jpexs.decompiler.flash.action.model.DeleteActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EvalActionItem;
-import com.jpexs.decompiler.flash.action.model.FSCommand2ActionItem;
 import com.jpexs.decompiler.flash.action.model.FSCommandActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
@@ -155,11 +154,11 @@ import java.util.List;
 public class ActionScriptParser {
 
     private int swfVersion;
-    
-    public ActionScriptParser(int swfVersion){
+
+    public ActionScriptParser(int swfVersion) {
         this.swfVersion = swfVersion;
     }
-    
+
     private long uniqLast = 0;
     private final boolean debugMode = false;
 
@@ -1410,7 +1409,7 @@ public class ActionScriptParser {
                 ret = memberOrCall(expr, registerVars, inFunction, inMethod, variables);
                 break;
             case IDENTIFIER:
-                switch(s.value.toString()){
+                switch (s.value.toString()) {
                     case "add":
                         ret = new StringAddActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
                         break;
@@ -1433,14 +1432,14 @@ public class ActionScriptParser {
                         ret = new StringLeActionItem(null, expr, expression(registerVars, inFunction, inMethod, allowRemainder, variables));
                         break;
                     default:
-                        lexer.pushback(s);    
+                        lexer.pushback(s);
                 }
                 break;
-            default:                
-                lexer.pushback(s);                
+            default:
+                lexer.pushback(s);
         }
-        
-        if(ret == null){
+
+        if (ret == null) {
             if (expr instanceof ParenthesisItem) {
                 if (isType(((ParenthesisItem) expr).value)) {
                     GraphTargetItem expr2 = expression(false, registerVars, inFunction, inMethod, true, variables);
@@ -1450,7 +1449,7 @@ public class ActionScriptParser {
                 }
             }
         }
-        
+
         ret = fixPrecedence(ret);
         return ret;
     }
@@ -1523,8 +1522,8 @@ public class ActionScriptParser {
         boolean existsRemainder = false;
         boolean assocRight = false;
         switch (s.type) {
-            case NEGATE:          
-                versionRequired(s,5);
+            case NEGATE:
+                versionRequired(s, 5);
                 ret = expression(registerVars, inFunction, inMethod, false, variables);
                 ret = new BitXorActionItem(null, ret, new DirectValueActionItem(4.294967295E9));
                 existsRemainder = true;
@@ -1562,8 +1561,8 @@ public class ActionScriptParser {
                     }
                 }
                 break;
-            case TYPEOF:                
-                ret = new TypeOfActionItem(null, expression(registerVars, inFunction, inMethod, false, variables));              
+            case TYPEOF:
+                ret = new TypeOfActionItem(null, expression(registerVars, inFunction, inMethod, false, variables));
                 existsRemainder = true;
                 break;
             case TRUE:
@@ -1682,20 +1681,20 @@ public class ActionScriptParser {
                 }
                 existsRemainder = true;
                 break;
-            case EVAL:   
+            case EVAL:
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem evar = new EvalActionItem(null, expression(registerVars, inFunction, inMethod, true, variables));
                 expectedType(SymbolType.PARENT_CLOSE);
                 evar = memberOrCall(evar, registerVars, inFunction, inMethod, variables);
                 ret = evar;
                 existsRemainder = true;
-                break;                
+                break;
             case IDENTIFIER:
             case THIS:
-            case SUPER:                                                            
-                if(s.value.equals("not")){
-                    ret = new NotItem(null, expression(registerVars, inFunction, inMethod, false, variables));                    
-                }else{
+            case SUPER:
+                if (s.value.equals("not")) {
+                    ret = new NotItem(null, expression(registerVars, inFunction, inMethod, false, variables));
+                } else {
                     lexer.pushback(s);
                     GraphTargetItem var = variable(registerVars, inFunction, inMethod, variables);
                     var = memberOrCall(var, registerVars, inFunction, inMethod, variables);
@@ -1765,7 +1764,7 @@ public class ActionScriptParser {
     }
 
     public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
-        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion,constantPool);
+        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool);
         List<Action> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<String, Integer>(), 0, Boolean.FALSE, 0);
@@ -1784,25 +1783,24 @@ public class ActionScriptParser {
         List<GraphTargetItem> tree = treeFromString(s, constantPool);
         return actionsFromTree(tree, constantPool);
     }
-    
-    
-    private void versionRequired(ParsedSymbol s, int min) throws ParseException{
+
+    private void versionRequired(ParsedSymbol s, int min) throws ParseException {
         versionRequired(s.value.toString(), min, Integer.MAX_VALUE);
     }
-    
-    private void versionRequired(ParsedSymbol s, int min,int max) throws ParseException{
+
+    private void versionRequired(ParsedSymbol s, int min, int max) throws ParseException {
         versionRequired(s.value.toString(), min, max);
     }
-    
-    private void versionRequired(String type, int min,int max) throws ParseException{
-        if(min == max && swfVersion!=min){
-            throw new ParseException(type+" requires SWF version "+min, lexer.yyline());
+
+    private void versionRequired(String type, int min, int max) throws ParseException {
+        if (min == max && swfVersion != min) {
+            throw new ParseException(type + " requires SWF version " + min, lexer.yyline());
         }
-        if(swfVersion<min){                        
-            throw new ParseException(type+" requires at least SWF version "+min, lexer.yyline());
+        if (swfVersion < min) {
+            throw new ParseException(type + " requires at least SWF version " + min, lexer.yyline());
         }
-        if(swfVersion>max){                        
-            throw new ParseException(type+" requires SWF version lower than "+max, lexer.yyline());
+        if (swfVersion > max) {
+            throw new ParseException(type + " requires SWF version lower than " + max, lexer.yyline());
         }
     }
 }

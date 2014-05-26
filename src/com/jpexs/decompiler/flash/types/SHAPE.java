@@ -24,7 +24,6 @@ import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -41,12 +40,19 @@ public class SHAPE implements NeedsCharacters, Serializable {
     public List<SHAPERECORD> shapeRecords;
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<>();
+    public void getNeededCharacters(Set<Integer> needed) {
         for (SHAPERECORD r : shapeRecords) {
-            ret.addAll(r.getNeededCharacters());
+            r.getNeededCharacters(needed);
         }
-        return ret;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        for (SHAPERECORD r : shapeRecords) {
+            modified |= r.removeCharacter(characterId);
+        }
+        return modified;
     }
 
     public RECT getBounds() {

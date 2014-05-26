@@ -480,8 +480,8 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
                 break;
             case ACTION_SAVE: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
-                SWFNode snode = ((TagTreeModel)mainFrame.panel.tagTree.getModel()).getSwfNode(swf);
-                if(snode.binaryData!=null){
+                SWFNode snode = ((TagTreeModel) mainFrame.panel.tagTree.getModel()).getSwfNode(swf);
+                if (snode.binaryData != null) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     try {
                         swf.saveTo(baos);
@@ -490,8 +490,7 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
                     } catch (IOException ex) {
                         Logger.getLogger(MainFrameRibbonMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                     }
-                }
-                else if(swf.file == null) {
+                } else if (swf.file == null) {
                     saveAs(swf, SaveFileMode.SAVEAS);
                 } else {
                     try {

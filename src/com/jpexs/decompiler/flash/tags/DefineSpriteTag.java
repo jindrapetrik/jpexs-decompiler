@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
@@ -273,12 +274,29 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     }
 
     @Override
-    public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<>();
+    public void getNeededCharacters(Set<Integer> needed) {
         for (Tag t : subTags) {
-            ret.addAll(t.getNeededCharacters());
+            if (t instanceof CharacterIdTag) {
+                needed.add(((CharacterIdTag) t).getCharacterId());
+            }
         }
-        return ret;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        for (int i = 0; i < subTags.size(); i++) {
+            Tag t = subTags.get(i);
+            if (t instanceof CharacterIdTag && ((CharacterIdTag) t).getCharacterId() == characterId) {
+                subTags.remove(i);
+                i--;
+                modified = true;
+            }
+        }
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
     }
 
     @Override

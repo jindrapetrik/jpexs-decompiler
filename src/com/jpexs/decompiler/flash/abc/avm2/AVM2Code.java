@@ -187,14 +187,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.DXNSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.DXNSLateIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXAttrIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXElemIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
@@ -206,7 +202,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.WithAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -1383,7 +1378,7 @@ public class AVM2Code implements Serializable {
                         //addr = pos2adr(ip);
                         insAfter = code.get(ip + 1);
                     }
-                    
+
                     boolean isAnd;
                     if (processJumps && (insAfter.definition instanceof IfFalseIns)) {
                         //stack.add("(" + stack.pop() + ")&&");
@@ -1664,7 +1659,7 @@ public class AVM2Code implements Serializable {
                     for (int t = 0; t < body.traits.traits.size(); t++) {
                         if (body.traits.traits.get(t).getName(abc) == sl.multiname) {
                             if (body.traits.traits.get(t) instanceof TraitSlotConst) {
-                                type = PropertyAVM2Item.multinameToType(((TraitSlotConst) body.traits.traits.get(t)).type_index,abc.constants);
+                                type = PropertyAVM2Item.multinameToType(((TraitSlotConst) body.traits.traits.get(t)).type_index, abc.constants);
                             }
                         }
                     }
@@ -1997,7 +1992,7 @@ public class AVM2Code implements Serializable {
                 if (code.get(maxIp).definition instanceof JumpIns) {
                     nextIp = adr2pos(pos2adr(nextIp) + code.get(maxIp).operands[0]);
                 }
-                if(nextIp<stats.instructionStats.length){
+                if (nextIp < stats.instructionStats.length) {
                     int origScopePos = stats.instructionStats[nextIp].scopepos;
                     int origStackPos = stats.instructionStats[nextIp].stackpos;
 
