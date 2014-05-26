@@ -170,7 +170,7 @@ public class TagTreeModel implements TreeModel {
                     }
                     break;
                 default:
-                    if (!actionScriptTags.contains(t) && !ShowFrameTag.isNestedTagType(t.getId())) {
+                    if (!actionScriptTags.contains(t) && t.getId() != ShowFrameTag.ID && !ShowFrameTag.isNestedTagType(t.getId())) {
                         others.add(new TagNode(t));
                     }
                     break;
@@ -295,7 +295,7 @@ public class TagTreeModel implements TreeModel {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
             switch (ttype) {
                 default:
-                    if (!actionScriptTags.contains(t) && !ShowFrameTag.isNestedTagType(t.getId())) {
+                    if (!actionScriptTags.contains(t) && t.getId() != ShowFrameTag.ID && !ShowFrameTag.isNestedTagType(t.getId())) {
                         if (!(t instanceof SoundStreamHeadTypeTag)) {
                             others.add(new TagNode(t));
                         }
