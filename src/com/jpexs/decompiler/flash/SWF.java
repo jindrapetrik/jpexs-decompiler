@@ -272,7 +272,19 @@ public final class SWF implements TreeItem, Timelined {
     private Timeline timeline;
 
     public void updateCharacters() {
+        characters.clear();
         parseCharacters(new ArrayList<ContainerItem>(tags));
+    }
+
+    public void resetTimelines(Timelined timelined) {
+        timelined.resetTimeline();
+        List<Tag> tags = timelined.getTimeline().tags;
+        for (int i = 0; i < tags.size(); i++) {
+            Tag t = tags.get(i);
+            if (t instanceof Timelined) {
+                resetTimelines((Timelined) t);
+            }
+        }
     }
 
     private void parseCharacters(List<ContainerItem> list) {
@@ -1477,7 +1489,7 @@ public final class SWF implements TreeItem, Timelined {
                     try (FileOutputStream fos = new FileOutputStream(f)) {
                         fos.write(Utf8Helper.getBytes("\r\n"));
                         Set<Integer> library = new HashSet<>();
-                        getNeededCharacters(ftim, fframes, library);
+                        ftim.getNeededCharacters(fframes, library);
 
                         writeLibrary(fswf, library, fos);
 
@@ -2213,29 +2225,6 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    private static void getNeededCharacters(Timeline timeline, List<Integer> frames, Set<Integer> usedCharacters) {
-        if (frames == null) {
-            frames = new ArrayList<>();
-            for (int i = 0; i < timeline.getFrameCount(); i++) {
-                frames.add(i);
-            }
-        }
-        for (int frame = 0; frame < frames.size(); frame++) {
-            Frame frameObj = timeline.frames.get(frame);
-            for (int depth : frameObj.layers.keySet()) {
-                DepthState layer = frameObj.layers.get(depth);
-                if (layer.characterId != -1) {
-                    if (!timeline.swf.characters.containsKey(layer.characterId)) {
-                        continue;
-                    }
-                    usedCharacters.add(layer.characterId);
-                    timeline.swf.characters.get(layer.characterId).getNeededCharactersDeep(usedCharacters);
-                }
-            }
-        }
-
-    }
-
     private static String jsArrColor(RGB rgb) {
         return "[" + rgb.red + "," + rgb.green + "," + rgb.blue + "," + ((rgb instanceof RGBA) ? ((RGBA) rgb).getAlphaFloat() : 1) + "]";
     }
@@ -2831,7 +2820,7 @@ public final class SWF implements TreeItem, Timelined {
         g.setTransform(AffineTransform.getScaleInstance(1, 1));
     }
 
-    public void removeTagFromTimeline(Tag toRemove, List<Tag> timeline) {
+    private void removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline) {
         int characterId = 0;
         if (toRemove instanceof CharacterTag) {
             characterId = ((CharacterTag) toRemove).getCharacterId();
@@ -2841,8 +2830,8 @@ public final class SWF implements TreeItem, Timelined {
         Set<Integer> dependingChars = new HashSet<>();
         if (characterId != 0) {
             dependingChars.add(characterId);
-            for (int i = 0; i < timeline.size(); i++) {
-                Tag t = timeline.get(i);
+            for (int i = 0; i < timeline.tags.size(); i++) {
+                Tag t = timeline.tags.get(i);
                 if (t instanceof CharacterIdTag) {
                     CharacterIdTag c = (CharacterIdTag) t;
                     Set<Integer> needed = new HashSet<>();
@@ -2851,18 +2840,18 @@ public final class SWF implements TreeItem, Timelined {
                         dependingChars.add(c.getCharacterId());
                     }
                 }
-
             }
         }
 
-        for (int i = 0; i < timeline.size(); i++) {
-            Tag t = timeline.get(i);
+        for (int i = 0; i < timeline.tags.size(); i++) {
+            Tag t = timeline.tags.get(i);
             if (t instanceof RemoveTag) {
                 RemoveTag rt = (RemoveTag) t;
-                int currentCharId = stage.get(rt.getDepth());
-                stage.remove(rt.getDepth());
+                int depth = rt.getDepth();
+                int currentCharId = stage.get(depth);
+                stage.remove(depth);
                 if (dependingChars.contains(currentCharId)) {
-                    timeline.remove(i);
+                    timeline.tags.remove(i);
                     i--;
                     continue;
                 }
@@ -2870,13 +2859,13 @@ public final class SWF implements TreeItem, Timelined {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int placeCharId = po.getCharacterId();
-                int placeDepth = po.getDepth();
+                int depth = po.getDepth();
                 if (placeCharId != 0) {
-                    stage.put(placeDepth, placeCharId);
+                    stage.put(depth, placeCharId);
                 }
-                int currentCharId = stage.get(placeDepth);
+                int currentCharId = stage.get(depth);
                 if (dependingChars.contains(currentCharId)) {
-                    timeline.remove(i);
+                    timeline.tags.remove(i);
                     i--;
                     continue;
                 }
@@ -2884,7 +2873,7 @@ public final class SWF implements TreeItem, Timelined {
             if (t instanceof CharacterIdTag) {
                 CharacterIdTag c = (CharacterIdTag) t;
                 if (dependingChars.contains(c.getCharacterId())) {
-                    timeline.remove(i);
+                    timeline.tags.remove(i);
                     i--;
                     continue;
                 }
@@ -2893,38 +2882,78 @@ public final class SWF implements TreeItem, Timelined {
             t.getNeededCharacters(needed);
             for (int dep : dependingChars) {
                 if (needed.contains(dep)) {
-                    timeline.remove(i);
+                    timeline.tags.remove(i);
                     i--;
                     continue;
                 }
             }
             if (t == toRemove) {
-                timeline.remove(i);
+                timeline.tags.remove(i);
                 i--;
                 continue;
             }
-            if (t instanceof DefineSpriteTag) {
-                DefineSpriteTag spr = (DefineSpriteTag) t;
-                removeTagFromTimeline(toRemove, spr.subTags);
+            if (t instanceof Timelined) {
+                removeTagWithDependenciesFromTimeline(toRemove, ((Timelined) t).getTimeline());
             }
-
         }
     }
 
-    public void removeTag(Tag t) {
-        List<Tag> tags;
-        Timelined timelined = t.getTimelined();
-        if (timelined instanceof DefineSpriteTag) {
-            tags = ((DefineSpriteTag) timelined).getSubTags();
-        } else {
-            tags = this.tags;
+    private boolean removeTagFromTimeline(Tag toRemove, Timeline timeline) {
+        boolean modified = false;
+        int characterId = -1;
+        if (toRemove instanceof CharacterTag) {
+            characterId = ((CharacterTag) toRemove).getCharacterId();
+            modified = timeline.removeCharacter(characterId);
         }
+        for (int i = 0; i < timeline.tags.size(); i++) {
+            Tag t = timeline.tags.get(i);
+            if (t == toRemove) {
+                timeline.tags.remove(t);
+                i--;
+                continue;
+            }
+            
+            if (toRemove instanceof CharacterTag){
+                if (t.removeCharacter(characterId)) {
+                    modified = true;
+                    i = -1;
+                    continue;
+                }
+            }
+
+            if (t instanceof DefineSpriteTag) {
+                DefineSpriteTag spr = (DefineSpriteTag) t;
+                boolean sprModified = removeTagFromTimeline(toRemove, spr.getTimeline());
+                if (sprModified) {
+                    spr.setModified(true);
+                }
+                modified |= sprModified;
+            }
+        }
+        return modified;
+    }
+    
+    public void removeTag(Tag t, boolean removeDependencies) {
+        Timelined timelined = t.getTimelined();
         if (t instanceof ShowFrameTag || ShowFrameTag.isNestedTagType(t.getId())) {
+            List<Tag> tags;
+            if (timelined instanceof DefineSpriteTag) {
+                tags = ((DefineSpriteTag) timelined).getSubTags();
+            } else {
+                tags = this.tags;
+            }
             tags.remove(t);
             timelined.resetTimeline();
         } else {
-            removeTagFromTimeline(t, tags);
+            // timeline shuold be always the swf here
+            if (removeDependencies) {
+                removeTagWithDependenciesFromTimeline(t, timelined.getTimeline());
+            } else {
+                removeTagFromTimeline(t, timeline);
+            }
         }
+        resetTimelines(timelined);
+        updateCharacters();
         clearImageCache();
     }
 }

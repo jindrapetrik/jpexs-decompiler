@@ -250,6 +250,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
     public static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
     public static final String ACTION_REPLACE = "REPLACE";
     private static final String ACTION_REMOVE_ITEM = "REMOVEITEM";
+    private static final String ACTION_REMOVE_ITEM_WITH_DEPENDENCIES = "REMOVEITEMWITHDEPENDENCIES";
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
     private static final String ACTION_EXPAND_RECURSIVE = "EXPANDRECURSIVE";
 
@@ -310,6 +311,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         removeMenuItem.addActionListener(this);
         removeMenuItem.setActionCommand(ACTION_REMOVE_ITEM);
         contextPopupMenu.add(removeMenuItem);
+
+        final JMenuItem removeWithDependenciesMenuItem = new JMenuItem(translate("contextmenu.removeWithDependencies"));
+        removeWithDependenciesMenuItem.addActionListener(this);
+        removeWithDependenciesMenuItem.setActionCommand(ACTION_REMOVE_ITEM_WITH_DEPENDENCIES);
+        contextPopupMenu.add(removeWithDependenciesMenuItem);
 
         final JMenuItem exportSelectionMenuItem = new JMenuItem(translate("menu.file.export.selection"));
         exportSelectionMenuItem.setActionCommand(MainFrameRibbonMenu.ACTION_EXPORT_SEL);
@@ -2028,7 +2034,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         for (Tag tag : tags) {
             System.out.println(tag.getClass());
             if (!(tag instanceof ABCContainerTag || tag instanceof ASMSource)) {
-                swf.removeTag(tag);
+                swf.removeTag(tag, true);
             }
         }
         refreshTree();
@@ -2080,11 +2086,6 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             View.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
         }
         return false;
-    }
-
-    public void removeTag(Tag tag) {
-        tag.getSwf().removeTag(tag);
-        refreshTree();
     }
 
     @Override
@@ -2242,6 +2243,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
             }
             break;
             case ACTION_REMOVE_ITEM:
+            case ACTION_REMOVE_ITEM_WITH_DEPENDENCIES:
                 List<TreeNode> sel = getSelected(tagTree);
 
                 List<Tag> tagsToRemove = new ArrayList<>();
@@ -2256,16 +2258,17 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     }
                 }
 
+                boolean removeDependencies = e.getActionCommand().equals(ACTION_REMOVE_ITEM_WITH_DEPENDENCIES);
                 if (tagsToRemove.size() == 1) {
                     Tag tag = tagsToRemove.get(0);
                     if (View.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tag.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                        tag.getSwf().removeTag(tag);
+                        tag.getSwf().removeTag(tag, removeDependencies);
                         refreshTree();
                     }
                 } else if (tagsToRemove.size() > 1) {
                     if (View.showConfirmDialog(this, translate("message.confirm.removemultiple").replace("%count%", Integer.toString(tagsToRemove.size())), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                         for (Tag tag : tagsToRemove) {
-                            tag.getSwf().removeTag(tag);
+                            tag.getSwf().removeTag(tag, removeDependencies);
                         }
                         refreshTree();
                     }

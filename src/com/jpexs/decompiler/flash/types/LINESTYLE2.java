@@ -63,6 +63,9 @@ public class LINESTYLE2 extends LINESTYLE implements Serializable {
 
     @Override
     public boolean removeCharacter(int characterId) {
-        return fillType.removeCharacter(characterId);
+        if (fillType != null) {
+            return fillType.removeCharacter(characterId);
+        }
+        return false;
     }
 }

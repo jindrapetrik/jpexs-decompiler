@@ -284,15 +284,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
 
     @Override
     public boolean removeCharacter(int characterId) {
-        boolean modified = false;
-        for (int i = 0; i < subTags.size(); i++) {
-            Tag t = subTags.get(i);
-            if (t instanceof CharacterIdTag && ((CharacterIdTag) t).getCharacterId() == characterId) {
-                subTags.remove(i);
-                i--;
-                modified = true;
-            }
-        }
+        boolean modified = getTimeline().removeCharacter(characterId);
         if (modified) {
             setModified(true);
         }

@@ -88,7 +88,10 @@ public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
 
     @Override
     public boolean removeCharacter(int characterId) {
-        return fillStyles.removeCharacter(characterId);
+        if (fillStyles != null){
+            return fillStyles.removeCharacter(characterId);
+        }
+        return false;
     }
 
     @Override

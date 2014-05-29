@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -40,6 +41,7 @@ import java.awt.Shape;
 import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -53,6 +55,7 @@ public class Timeline {
     public SWF swf;
     public RECT displayRect;
     public int frameRate;
+    public List<Tag> tags;
 
     public int getMaxDepth() {
         int max_depth = 0;
@@ -82,6 +85,7 @@ public class Timeline {
         this.swf = swf;
         this.displayRect = displayRect;
         this.frameRate = swf.frameRate;
+        this.tags = tags;
         Frame frame = new Frame(this);
         boolean tagAdded = false;
         for (Tag t : tags) {
@@ -182,6 +186,45 @@ public class Timeline {
         if (tagAdded) {
             frames.add(frame);
         }
+    }
+
+    public void getNeededCharacters(Set<Integer> usedCharacters) {
+        for (int i = 0; i < getFrameCount(); i++) {
+            getNeededCharacters(i, usedCharacters);
+        }
+    }
+    
+    public void getNeededCharacters(List<Integer> frames, Set<Integer> usedCharacters) {
+        for (int frame = 0; frame < frames.size(); frame++) {
+            getNeededCharacters(frame, usedCharacters);
+        }
+    }
+    
+    public void getNeededCharacters(int frame, Set<Integer> usedCharacters) {
+        Frame frameObj = frames.get(frame);
+        for (int depth : frameObj.layers.keySet()) {
+            DepthState layer = frameObj.layers.get(depth);
+            if (layer.characterId != -1) {
+                if (!swf.characters.containsKey(layer.characterId)) {
+                    continue;
+                }
+                usedCharacters.add(layer.characterId);
+                swf.characters.get(layer.characterId).getNeededCharactersDeep(usedCharacters);
+            }
+        }
+    }
+    
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        for (int i = 0; i < tags.size(); i++) {
+            Tag t = tags.get(i);
+            if (t instanceof CharacterIdTag && ((CharacterIdTag) t).getCharacterId() == characterId) {
+                tags.remove(i);
+                i--;
+                modified = true;
+            }
+        }
+        return modified;
     }
 
     public void toImage(int frame, int time, int ratio, DepthState stateUnderCursor, int mouseButton, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
