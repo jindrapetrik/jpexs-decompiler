@@ -476,7 +476,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
             if (tagObj instanceof FrameNodeItem) {
                 FrameNodeItem fn = (FrameNodeItem) tagObj;
                 swf = fn.getSwf();
-                if (fn.getParent() == null) {
+                if (fn.getParent() == swf) {
                     for (Tag t : swf.tags) {
                         if (t instanceof SetBackgroundColorTag) {
                             backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
@@ -530,15 +530,8 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
                 if (tagObj instanceof FrameNodeItem) {
                     FrameNodeItem fn = (FrameNodeItem) tagObj;
-                    Tag parent = fn.getParent();
-                    List<ContainerItem> subs = new ArrayList<>();
-                    if (parent == null) {
-                        subs.addAll(swf.tags);
-                    } else {
-                        if (parent instanceof Container) {
-                            subs = ((Container) parent).getSubItems();
-                        }
-                    }
+                    Timelined parent = fn.getParent();
+                    List<Tag> subs = parent.getTimeline().tags;
                     List<Integer> doneCharacters = new ArrayList<>();
                     int frameCnt = 1;
                     for (ContainerItem item : subs) {

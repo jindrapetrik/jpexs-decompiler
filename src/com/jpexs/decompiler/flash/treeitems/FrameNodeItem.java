@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 
 /**
  *
@@ -27,10 +27,10 @@ public class FrameNodeItem implements TreeItem {
 
     private final SWF swf;
     private final int frame;
-    private final Tag parent;
+    private final Timelined parent;
     private final boolean display;
 
-    public FrameNodeItem(SWF swf, int frame, Tag parent, boolean display) {
+    public FrameNodeItem(SWF swf, int frame, Timelined parent, boolean display) {
 
         this.swf = swf;
         this.frame = frame;
@@ -56,7 +56,7 @@ public class FrameNodeItem implements TreeItem {
         return frame;
     }
 
-    public Tag getParent() {
+    public Timelined getParent() {
         return parent;
     }
 }

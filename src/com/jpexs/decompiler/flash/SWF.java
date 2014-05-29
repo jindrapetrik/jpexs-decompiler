@@ -1052,7 +1052,7 @@ public final class SWF implements TreeItem, Timelined {
         return ret;
     }
 
-    public static List<TreeNode> createASTagList(List<? extends ContainerItem> list, Tag parent) {
+    public static List<TreeNode> createASTagList(List<? extends ContainerItem> list, Timelined parent) {
         List<TreeNode> ret = new ArrayList<>();
         int frame = 1;
         List<TreeNode> frames = new ArrayList<>();
@@ -1093,8 +1093,8 @@ public final class SWF implements TreeItem, Timelined {
                     ContainerNode tti = new ContainerNode(t);
                     List<ContainerItem> subItems = ((Container) t).getSubItems();
 
-                    Tag tag = t instanceof Tag ? (Tag) t : null;
-                    tti.subNodes = createASTagList(subItems, tag);
+                    Timelined timelined = t instanceof Timelined ? (Timelined) t : null;
+                    tti.subNodes = createASTagList(subItems, timelined);
                     addNode = tti;
                     //ret.add(tti);
                 }
@@ -2945,7 +2945,7 @@ public final class SWF implements TreeItem, Timelined {
             tags.remove(t);
             timelined.resetTimeline();
         } else {
-            // timeline shuold be always the swf here
+            // timeline should be always the swf here
             if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(t, timelined.getTimeline());
             } else {

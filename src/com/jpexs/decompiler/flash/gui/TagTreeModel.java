@@ -93,7 +93,7 @@ public class TagTreeModel implements TreeModel {
     private SWFNode createSwfNode(SWF swf) {
         ClassesListTreeModel classTreeModel = new ClassesListTreeModel(swf);
         SWFNode swfNode = new SWFNode(swf, swf.getShortFileName());
-        swfNode.list = createTagList(swf.tags, null, swf, swfNode, classTreeModel);
+        swfNode.list = createTagList(swf.tags, swf, swfNode, classTreeModel);
         swfToSwfNode.put(swf, swfNode);
         return swfNode;
     }
@@ -102,7 +102,7 @@ public class TagTreeModel implements TreeModel {
         return mainFrame.translate(key);
     }
 
-    private List<TreeNode> createTagList(List<Tag> list, Tag parent, SWF swf, SWFNode swfNode, ClassesListTreeModel classTreeModel) {
+    private List<TreeNode> createTagList(List<Tag> list, SWF swf, SWFNode swfNode, ClassesListTreeModel classTreeModel) {
         boolean hasAbc = swf.abcList != null && !swf.abcList.isEmpty();
 
         List<TreeNode> ret = new ArrayList<>();
@@ -179,7 +179,7 @@ public class TagTreeModel implements TreeModel {
 
         Timeline timeline = swf.getTimeline();
         for (int i = 0; i < timeline.getFrameCount(); i++) {
-            frames.add(new FrameNode(new FrameNodeItem(swf, i + 1, parent, true), timeline.frames.get(i).innerTags, false));
+            frames.add(new FrameNode(new FrameNodeItem(swf, i + 1, swf, true), timeline.frames.get(i).innerTags, false));
         }
 
         for (int i = 0; i < sounds.size(); i++) {
@@ -193,8 +193,8 @@ public class TagTreeModel implements TreeModel {
         }
 
         for (TreeNode n : sprites) {
-            Tag tag = n.getItem() instanceof Tag ? (Tag) n.getItem() : null;
-            n.subNodes = createSubTagList(((DefineSpriteTag) n.getItem()).subTags, tag, swf, actionScriptTags);
+            Timelined timelined = n.getItem() instanceof Timelined ? (Timelined) n.getItem() : null;
+            n.subNodes = createSubTagList(((DefineSpriteTag) n.getItem()).subTags, timelined, swf, actionScriptTags);
         }
 
         StringNode textsNode = new StringNode(new StringItem(translate("node.texts"), FOLDER_TEXTS, swf));
@@ -286,7 +286,7 @@ public class TagTreeModel implements TreeModel {
         return ret;
     }
 
-    private List<TreeNode> createSubTagList(List<Tag> list, Tag parent, SWF swf, List<Tag> actionScriptTags) {
+    private List<TreeNode> createSubTagList(List<Tag> list, Timelined parent, SWF swf, List<Tag> actionScriptTags) {
         List<TreeNode> ret = new ArrayList<>();
         List<TreeNode> frames = new ArrayList<>();
         List<TreeNode> others = new ArrayList<>();
@@ -304,11 +304,9 @@ public class TagTreeModel implements TreeModel {
             }
         }
 
-        if (parent instanceof Timelined) {
-            Timeline timeline = ((Timelined) parent).getTimeline();
-            for (int i = 0; i < timeline.getFrameCount(); i++) {
-                frames.add(new FrameNode(new FrameNodeItem(swf, i + 1, parent, true), timeline.frames.get(i).innerTags, false));
-            }
+        Timeline timeline = ((Timelined) parent).getTimeline();
+        for (int i = 0; i < timeline.getFrameCount(); i++) {
+            frames.add(new FrameNode(new FrameNodeItem(swf, i + 1, parent, true), timeline.frames.get(i).innerTags, false));
         }
 
         ret.addAll(frames);

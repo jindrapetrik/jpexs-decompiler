@@ -178,6 +178,7 @@ public class Timeline {
                 tagAdded = true;
             }
             if (t instanceof ShowFrameTag) {
+                frame.showFrameTag = (ShowFrameTag) t;
                 frames.add(frame);
                 frame = new Frame(frame);
                 tagAdded = false;

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -37,6 +38,7 @@ public class Frame {
     public List<Integer> sounds = new ArrayList<>();
     public List<String> soundClasses = new ArrayList<>();
     public List<Tag> innerTags = new ArrayList<>();
+    public ShowFrameTag showFrameTag = null; // can be null for the last frame
 
     public Frame(Timeline timeline) {
         this.timeline = timeline;

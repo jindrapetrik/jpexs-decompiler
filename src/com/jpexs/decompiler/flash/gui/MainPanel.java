@@ -1242,11 +1242,11 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         if (!fn.scriptsNode) {
 
                             FrameNodeItem fni = (FrameNodeItem) d.getItem();
-                            Tag par = fni.getParent();
+                            Timelined parent = fni.getParent();
                             int frame = fni.getFrame() - 1; //Fix to zero based
                             int parentId = 0;
-                            if (par != null) {
-                                parentId = ((CharacterTag) par).getCharacterId();
+                            if (parent instanceof CharacterTag) {
+                                parentId = ((CharacterTag) parent).getCharacterId();
                             }
                             if (!frames.containsKey(parentId)) {
                                 frames.put(parentId, new ArrayList<Integer>());
@@ -2252,9 +2252,14 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                     if (tag instanceof Tag) {
                         tagsToRemove.add((Tag) tag);
                     } else if (tag instanceof FrameNodeItem) {
-                        FrameNodeItem frame = (FrameNodeItem) tag;
-                        // todo: honfika: remove frame
-                        //tagsToRemove.add(frame.getShowFrameTag());
+                        FrameNodeItem frameNode = (FrameNodeItem) tag;
+                        Frame frame = frameNode.getParent().getTimeline().frames.get(frameNode.getFrame() - 1);
+                        if (frame.showFrameTag != null) {
+                            tagsToRemove.add(frame.showFrameTag);
+                        } else {
+                            // this should be the last frame, so remove the inner tags
+                            tagsToRemove.addAll(frame.innerTags);
+                        }
                     }
                 }
 
