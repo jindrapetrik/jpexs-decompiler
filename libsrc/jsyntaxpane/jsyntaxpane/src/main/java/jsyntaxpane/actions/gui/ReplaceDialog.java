@@ -54,6 +54,7 @@ public class ReplaceDialog extends javax.swing.JDialog
 		getRootPane().setDefaultButton(jBtnNext);
 		SwingUtils.addEscapeListener(this);
 		jBtnReplaceAll.setEnabled(text.isEditable() && text.isEnabled());
+                jChkWrap.setSelected(dsd.isWrap());
 	}
 
 	/**
@@ -79,6 +80,7 @@ public class ReplaceDialog extends javax.swing.JDialog
 	private void updateFinder() {
 		String regex = (String) jCmbFind.getSelectedItem();
 		try {
+                        dsd.setWrap(jChkWrap.isSelected());
 			dsd.setPattern(regex,
 				jChkRegex.isSelected(),
 				jChkIgnoreCase.isSelected());
