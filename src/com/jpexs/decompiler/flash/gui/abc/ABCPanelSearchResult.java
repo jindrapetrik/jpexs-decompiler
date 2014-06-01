@@ -27,4 +27,11 @@ public class ABCPanelSearchResult {
 
     public ScriptPack scriptPack;
     public ClassPath classPath;
+
+    @Override
+    public String toString() {
+        return classPath.toString();
+    }
+    
+    
 }

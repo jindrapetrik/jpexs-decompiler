@@ -104,7 +104,13 @@ public class TextPanel extends JPanel implements ActionListener {
 
     public void updateSearchPos() {
         textValue.setCaretPosition(0);
-        textSearchPanel.showQuickFindDialog(textValue);
+        View.execInEventDispatchLater(new Runnable() {
+
+            @Override
+            public void run() {                
+                textSearchPanel.showQuickFindDialog(textValue);
+            }
+        });
     }
 
     @Override

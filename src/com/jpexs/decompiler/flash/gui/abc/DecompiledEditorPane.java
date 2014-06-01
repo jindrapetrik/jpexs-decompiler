@@ -74,7 +74,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return isStatic;
     }
 
-    public void setNoTrait() {
+    public void setNoTrait() {                
         abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null);
     }
 
@@ -424,10 +424,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     public DecompiledEditorPane(ABCPanel abcPanel) {
+        super();
         setEditable(false);
         getCaret().setVisible(true);
         addCaretListener(this);
-        this.abcPanel = abcPanel;
+        this.abcPanel = abcPanel;                 
     }
     private List<ABCContainerTag> abcList;
 
@@ -513,7 +514,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     @Override
-    public void setText(String t) {
+    public void setText(String t) {        
         super.setText(t);
         setCaretPosition(0);
     }

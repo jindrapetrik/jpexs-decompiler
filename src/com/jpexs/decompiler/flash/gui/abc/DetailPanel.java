@@ -138,35 +138,42 @@ public class DetailPanel extends JPanel implements ActionListener {
         }
     }
 
-    public void showCard(String name, Trait trait) {
-        CardLayout layout = (CardLayout) innerPanel.getLayout();
-        layout.show(innerPanel, name);
-        boolean b = cardMap.get(name) instanceof TraitDetail;
-        buttonsPanel.setVisible(b);
+    public void showCard(final String name, final Trait trait) {
+        View.execInEventDispatch(new Runnable() {
 
-        TraitDetail newDetail = null;
-        if (b) {
-            newDetail = (TraitDetail) cardMap.get(name);
-        }
-        for (JComponent v : cardMap.values()) {
-            if (v instanceof TraitDetail) {
-                if (v != newDetail) {
-                    TraitDetail oldDetail = (TraitDetail) v;
-                    oldDetail.setActive(false);
+            @Override
+            public void run() {
+                CardLayout layout = (CardLayout) innerPanel.getLayout();
+                layout.show(innerPanel, name);
+                boolean b = cardMap.get(name) instanceof TraitDetail;
+                buttonsPanel.setVisible(b);
+
+                TraitDetail newDetail = null;
+                if (b) {
+                    newDetail = (TraitDetail) cardMap.get(name);
+                }
+                for (JComponent v : cardMap.values()) {
+                    if (v instanceof TraitDetail) {
+                        if (v != newDetail) {
+                            TraitDetail oldDetail = (TraitDetail) v;
+                            oldDetail.setActive(false);
+                        }
+                    }
+                }
+                if (newDetail != null) {
+                    newDetail.setActive(true);
+                }
+
+                selectedCard = name;
+                selectedLabel.setText(selectedCard);
+                if (trait == null) {
+                    traitNameLabel.setText("-");
+                } else {
+                    traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, new ArrayList<String>()));
                 }
             }
-        }
-        if (newDetail != null) {
-            newDetail.setActive(true);
-        }
+        });
 
-        selectedCard = name;
-        selectedLabel.setText(selectedCard);
-        if (trait == null) {
-            traitNameLabel.setText("-");
-        } else {
-            traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, new ArrayList<String>()));
-        }
     }
 
     @Override

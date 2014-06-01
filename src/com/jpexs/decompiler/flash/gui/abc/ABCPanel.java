@@ -42,8 +42,10 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
+import com.jpexs.decompiler.flash.gui.QuickFindPanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
+import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.DecimalTableModel;
@@ -107,6 +109,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.actions.DocumentSearchData;
+import jsyntaxpane.actions.QuickFindAction;
 
 public class ABCPanel extends JPanel implements ItemListener, ActionListener, SearchListener<ABCPanelSearchResult>, Freed {
 
@@ -128,7 +132,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
     public DetailPanel detailPanel;
     public JPanel navPanel;
     public JTabbedPane tabbedPane;
-    public SearchPanel<ABCPanelSearchResult> searchPanel;
+    public SearchPanel<ABCPanelSearchResult> searchPanel;    
     private NewTraitDialog newTraitDialog;
     public JLabel scriptNameLabel;
 
@@ -143,7 +147,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
     static final String ACTION_ADD_TRAIT = "ADDTRAIT";
 
-    public boolean search(String txt, boolean ignoreCase, boolean regexp) {
+    public boolean search(final String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
             TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
@@ -192,8 +196,25 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
             System.gc();
             Main.stopWork();
+            
             searchPanel.setSearchText(txt);
-            return searchPanel.setResults(found);
+            
+            final ABCPanel that=this;
+            View.execInEventDispatch(new Runnable() {
+
+                @Override
+                public void run() {
+                    SearchResultsDialog<ABCPanelSearchResult> sr=new SearchResultsDialog<ABCPanelSearchResult>(txt,that);
+                    sr.setResults(found);
+                    sr.setVisible(true);     
+                }
+            });
+             
+            
+            
+            return true;
+            
+            //return searchPanel.setResults(found);
         }
         return false;
     }
@@ -379,7 +400,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         iconDecPanel.add(scriptNameLabel);
         iconDecPanel.add(iconsPanel);
         iconDecPanel.add(decompiledScrollPane);
-
+        
         JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
         decButtonsPan.add(editDecompiledButton);
@@ -583,7 +604,14 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         hilightScript(pack);
         decompiledTextArea.setCaretPosition(0);
 
-        searchPanel.showQuickFindDialog(decompiledTextArea);
+        View.execInEventDispatchLater(new Runnable() {
+
+            @Override
+            public void run() {                
+                searchPanel.showQuickFindDialog(decompiledTextArea);
+            }
+        });
+        
     }
 
     public String lastDecompiled = null;

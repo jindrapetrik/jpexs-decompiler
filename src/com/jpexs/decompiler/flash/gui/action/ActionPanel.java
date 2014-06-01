@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
+import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
@@ -79,7 +80,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 
-public class ActionPanel extends JPanel implements ActionListener, SearchListener<ASMSource> {
+public class ActionPanel extends JPanel implements ActionListener, SearchListener<ActionSearchResult> {
 
     static final String ACTION_GRAPH = "GRAPH";
     static final String ACTION_HEX = "HEX";
@@ -119,7 +120,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     private HilightedText srcHexOnly;
     private String lastDecompiled = "";
     private ASMSource lastASM;
-    public SearchPanel<ASMSource> searchPanel;
+    public SearchPanel<ActionSearchResult> searchPanel;
     private Cache<CachedScript> cache = Cache.getInstance(true);
     private CancellableWorker setSourceWorker;
 
@@ -216,13 +217,13 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
         }
     }
 
-    public boolean search(String txt, boolean ignoreCase, boolean regexp) {
+    public boolean search(final String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
             List<TreeNode> list = SWF.createASTagList(mainPanel.getCurrentSwf().tags, null);
             Map<String, ASMSource> asms = new HashMap<>();
             getASMs("", list, asms);
-            List<ASMSource> found = new ArrayList<>();
+            final List<ActionSearchResult> found = new ArrayList<>();
             Pattern pat = null;
             if (regexp) {
                 pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
@@ -244,13 +245,24 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
                     break;
                 }
                 if (pat.matcher(getCached(item.getValue()).text).find()) {
-                    found.add(item.getValue());
+                    found.add(new ActionSearchResult(item.getValue(),item.getKey()));
                 }
             }
 
             Main.stopWork();
             searchPanel.setSearchText(txt);
-            return searchPanel.setResults(found);
+            final ActionPanel that=this;
+            View.execInEventDispatch(new Runnable() {
+
+                @Override
+                public void run() {
+                    SearchResultsDialog<ActionSearchResult> sr=new SearchResultsDialog<ActionSearchResult>(txt,that);
+                    sr.setResults(found);
+                    sr.setVisible(true);     
+                }
+            });
+            return true;
+            //return searchPanel.setResults(found);
         }
         return false;
     }
@@ -524,7 +536,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
 
         JPanel decPanel = new JPanel(new BorderLayout());
         decPanel.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
-        decPanel.add(searchPanel, BorderLayout.NORTH);
+        //decPanel.add(searchPanel, BorderLayout.NORTH);
 
         JPanel panA = new JPanel();
         panA.setLayout(new BorderLayout());
@@ -773,14 +785,20 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
     }
 
     @Override
-    public void updateSearchPos(ASMSource item) {
+    public void updateSearchPos(ActionSearchResult item) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        TreePath tp = ttm.getTagPath(item);
+        TreePath tp = ttm.getTagPath(item.src);
         mainPanel.tagTree.setSelectionPath(tp);
         mainPanel.tagTree.scrollPathToVisible(tp);
         decompiledEditor.setCaretPosition(0);
 
-        searchPanel.showQuickFindDialog(decompiledEditor);
+        View.execInEventDispatchLater(new Runnable() {
+
+            @Override
+            public void run() {                
+                searchPanel.showQuickFindDialog(decompiledEditor);
+            }
+        });
     }
 
     private void uncache(ASMSource pack) {

@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -79,15 +80,16 @@ public class QuickFindDialog extends javax.swing.JDialog
 		initComponents();
 		SwingUtils.addEscapeListener(this);
 		dsd = new WeakReference<DocumentSearchData>(data);
+                getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+                
 	}
 
 	public void showFor(final JTextComponent target) {
 		oldCaretPosition = target.getCaretPosition();
 		Container view = target.getParent();
-		Dimension wd = getSize();
-                //JPEXS fix:
+		Dimension wd = getPreferredSize();
 		//wd.width = target.getVisibleRect().width;
-		Point loc = new Point(0, view.getHeight()-getHeight()/*JPEXS fix*/);
+		Point loc = new Point(0, view.getHeight());
 		setSize(wd);
 		setLocationRelativeTo(view);
 		SwingUtilities.convertPointToScreen(loc, view);
@@ -149,8 +151,8 @@ public class QuickFindDialog extends javax.swing.JDialog
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(java.awt.Color.darkGray);
         setName("QuickFindDialog"); // NOI18N
-        setResizable(false);
         setUndecorated(true);
+        setResizable(false);
 
         jToolBar1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jToolBar1.setFloatable(false);
@@ -166,7 +168,7 @@ public class QuickFindDialog extends javax.swing.JDialog
         jTxtFind.setColumns(30);
         jTxtFind.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jTxtFind.setMaximumSize(new java.awt.Dimension(200, 24));
-        jTxtFind.setMinimumSize(new java.awt.Dimension(60, 24));
+        jTxtFind.setMinimumSize(new java.awt.Dimension(200, 24));
         jToolBar1.add(jTxtFind);
         jToolBar1.add(jSeparator3);
 
@@ -306,8 +308,10 @@ public class QuickFindDialog extends javax.swing.JDialog
 			if (!d.doFindNext(t)) {
 				jLblStatus.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
 			} else {
-				jLblStatus.setText(null);
+				jLblStatus.setText(null);                                
 			}
+                        setSize(getPreferredSize());
+                        pack();
 		} catch (PatternSyntaxException e) {
 			jLblStatus.setText(e.getDescription());
 		}
