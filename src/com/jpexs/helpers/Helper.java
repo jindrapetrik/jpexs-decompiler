@@ -795,7 +795,7 @@ public class Helper {
         writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError")).newLine();
         writer.appendNoHilight(" * ").appendNoHilight(MessageFormat.format(AppStrings.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
         writer.appendNoHilight(" */").newLine();
-        writer.appendNoHilight("throw new IllegalOperationError(\"").
+        writer.appendNoHilight("throw new flash.errors.IllegalOperationError(\"").
                 appendNoHilight(AppStrings.translate("decompilationError.timeout.description")).
                 appendNoHilight("\");").newLine();
     }
@@ -807,7 +807,7 @@ public class Helper {
         writer.appendNoHilight(" * ").appendNoHilight(AppStrings.translate("decompilationError.errorType")).
                 appendNoHilight(": " + ex.getClass().getSimpleName()).newLine();
         writer.appendNoHilight(" */").newLine();
-        writer.appendNoHilight("throw new IllegalOperationError(\"").
+        writer.appendNoHilight("throw new flash.errors.IllegalOperationError(\"").
                 appendNoHilight(AppStrings.translate("decompilationError.error.description")).
                 appendNoHilight("\");").newLine();
     }
