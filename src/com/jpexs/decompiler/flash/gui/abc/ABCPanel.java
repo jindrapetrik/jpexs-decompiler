@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -67,6 +68,7 @@ import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
@@ -74,8 +76,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -87,17 +93,25 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BoxLayout;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
@@ -107,10 +121,13 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.actions.DocumentSearchData;
 import jsyntaxpane.actions.QuickFindAction;
+import jsyntaxpane.actions.SyntaxAction;
 
 public class ABCPanel extends JPanel implements ItemListener, ActionListener, SearchListener<ABCPanelSearchResult>, Freed {
 
@@ -449,7 +466,32 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         });
         decompiledTextArea.setContentType("text/actionscript");
         decompiledTextArea.setFont(new Font("Monospaced", Font.PLAIN, decompiledTextArea.getFont().getSize()));
-
+        
+        
+              
+        View.addEditorAction(decompiledTextArea, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                 int multinameIndex = decompiledTextArea.getMultinameUnderCursor();
+                if(multinameIndex>-1){
+                    UsageFrame usageFrame = new UsageFrame(swf.abcList, abc, multinameIndex, ABCPanel.this,false);
+                    usageFrame.setVisible(true);
+                }
+            }
+        }, "find-usages", AppStrings.translate("abc.action.find-usages"), "control U");
+        
+        View.addEditorAction(decompiledTextArea, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                 gotoDeclaration();
+            }
+        }, "find-declaration",  AppStrings.translate("abc.action.find-declaration"), "control B");
+        
+        CtrlClickHandler cch = new CtrlClickHandler();
+        decompiledTextArea.addKeyListener(cch);
+        decompiledTextArea.addMouseListener(cch);
+        decompiledTextArea.addMouseMotionListener(cch);
+        
         JPanel pan2 = new JPanel();
         pan2.setLayout(new BorderLayout());
         pan2.add((abcComboBox = new JComboBox<>(new ABCComboBoxModel(new ArrayList<ABCContainerTag>()))), BorderLayout.NORTH);
@@ -473,32 +515,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         });
 
         Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
-
-        /* splitPaneTreeVSNavigator = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-         treePanel,
-         navPanel);
-         splitPaneTreeVSNavigator.setResizeWeight(0.5);
-         splitPaneTreeVSNavigator.setContinuousLayout(true);*/
+      
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab(AppStrings.translate("traits"), navPanel);
-        //tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
-
-        //pan2.add(tabbedPane, BorderLayout.CENTER);
         abcComboBox.addItemListener(this);
-        /*
-
-         splitPaneTreeNavVSDecompiledDetail = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-         pan2,
-         splitPaneDecompiledVSDetail);
-         splitPaneTreeNavVSDecompiledDetail.setResizeWeight(0);
-         splitPaneTreeNavVSDecompiledDetail.setContinuousLayout(true);
-         //pan2.setPreferredSize(new Dimension(300, 200));
-
-
-
-
-
-         add(splitPaneTreeNavVSDecompiledDetail, BorderLayout.CENTER);*/
         add(splitPane, BorderLayout.CENTER);
 
         JPanel panConstants = new JPanel();
@@ -523,7 +543,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                         }
                         int multinameIndex = constantTable.convertRowIndexToModel(rowIndex);
                         if (multinameIndex > 0) {
-                            UsageFrame usageFrame = new UsageFrame(t.swf.abcList, abc, multinameIndex, t);
+                            UsageFrame usageFrame = new UsageFrame(t.swf.abcList, abc, multinameIndex, t, false);
                             usageFrame.setVisible(true);
                         }
                     }
@@ -534,6 +554,99 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
         panConstants.add(constantTypeList, BorderLayout.NORTH);
         panConstants.add(new JScrollPane(constantTable), BorderLayout.CENTER);
         tabbedPane.addTab(AppStrings.translate("constants"), panConstants);
+    }
+    
+    private void gotoDeclaration(){
+        int multinameIndex = decompiledTextArea.getMultinameUnderCursor();
+        if(multinameIndex>-1){
+            List<MultinameUsage> usages = abc.findMultinameDefinition(swf.abcList,multinameIndex);
+            
+            Multiname m = abc.constants.constant_multiname.get(multinameIndex);
+            //search other ABC tags if this is not private multiname
+            if(m.namespace_index>0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE)
+            {
+                for(ABCContainerTag at:swf.abcList){
+                    ABC a = at.getABC();
+                    if(a == abc){
+                        continue;
+                    }            
+                    int mid=a.constants.getMultinameId(m,false);            
+                    if(mid>0){
+                        usages.addAll(a.findMultinameDefinition(swf.abcList, mid));
+                    }
+                }
+            }
+            
+            //more than one? display list
+            if(usages.size()>1){
+                UsageFrame usageFrame = new UsageFrame(swf.abcList, abc, multinameIndex, ABCPanel.this,true);
+                usageFrame.setVisible(true);
+            }else if(!usages.isEmpty()){ //one
+                UsageFrame.gotoUsage(ABCPanel.this, usages.get(0));
+            }
+        }
+    }
+    
+    private class CtrlClickHandler extends KeyAdapter implements MouseListener, MouseMotionListener {
+
+        private boolean ctrlDown = false;
+            
+        @Override
+        public void keyPressed(KeyEvent e) {                
+            if(e.getKeyCode() == 17 && !decompiledTextArea.isEditable()){
+                ctrlDown = true;
+                decompiledTextArea.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if(e.getKeyCode() == 17){
+                ctrlDown = false;
+                decompiledTextArea.setCursor(Cursor.getDefaultCursor());
+            }
+        }
+        
+        @Override
+        public void mouseClicked(MouseEvent e) {
+           if(ctrlDown && e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 1 && !decompiledTextArea.isEditable()){
+                ctrlDown = false;
+                decompiledTextArea.setCursor(Cursor.getDefaultCursor());
+                gotoDeclaration();                
+           } 
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {            
+            
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            ctrlDown = false;
+            decompiledTextArea.setCursor(Cursor.getDefaultCursor());
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            if(ctrlDown && decompiledTextArea.isEditable()){
+                ctrlDown = false;
+                decompiledTextArea.setCursor(Cursor.getDefaultCursor());
+            }
+        }
+        
     }
 
     public void reload() {
@@ -732,12 +845,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                     //reload();
                 } catch (ParseException ex) {
                     abc.script_info.get(oldIndex).delete(abc, false);
-                    ex.printStackTrace();
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     decompiledTextArea.gotoLine((int) ex.line);
                 } catch (CompilationException ex) {
                     abc.script_info.get(oldIndex).delete(abc, false);
-                    ex.printStackTrace();
                     View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     decompiledTextArea.gotoLine((int) ex.line);
                 } catch (IOException | InterruptedException ex) {
@@ -847,4 +958,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
                 break;
         }
     }
+    
+    
 }

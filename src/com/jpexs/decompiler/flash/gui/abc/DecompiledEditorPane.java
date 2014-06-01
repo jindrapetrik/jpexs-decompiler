@@ -61,7 +61,23 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private boolean isStatic = false;
     private final Cache<CachedDecompilation> cache = Cache.getInstance(true);
     private Trait currentTrait = null;
+    
+    private List<Runnable> scriptListeners = new ArrayList<Runnable>();
+    
+    public void addScriptListener(Runnable l){
+        scriptListeners.add(l);
+    }
+    
+    public void removeScriptListener(Runnable l){
+        scriptListeners.remove(l);
+    }
 
+    public void fireScript(){
+        for(int i=0;i<scriptListeners.size();i++){
+            scriptListeners.get(i).run();
+        }
+    }
+    
     public Trait getCurrentTrait() {
         return currentTrait;
     }
@@ -143,7 +159,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
     }
 
-    public void setClassIndex(int classIndex) {
+    public synchronized void setClassIndex(int classIndex) {
         this.classIndex = classIndex;
     }
 
@@ -491,6 +507,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             setContentType("text/actionscript");
             setText(hilightedCode);
         }
+        fireScript();
     }
 
     public void reloadClass() {

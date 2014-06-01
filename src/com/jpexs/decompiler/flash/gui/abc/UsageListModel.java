@@ -30,32 +30,14 @@ import javax.swing.DefaultListModel;
  */
 public class UsageListModel extends DefaultListModel<Object> {
 
-    private final ABC abc;
-    private final List<ABCContainerTag> abcTags;
-
-    public UsageListModel(List<ABCContainerTag> abcTags, ABC abc) {
-        this.abc = abc;
-        this.abcTags = abcTags;
-    }
-
     @Override
     public Object get(int index) {
-        try {
-            return ((MultinameUsage) super.get(index)).toString(abcTags, abc);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(UsageListModel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return ((MultinameUsage) super.get(index)).toString();
     }
 
     @Override
     public Object getElementAt(int index) {
-        try {
-            return ((MultinameUsage) super.getElementAt(index)).toString(abcTags, abc);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(UsageListModel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return ((MultinameUsage) super.getElementAt(index)).toString();
     }
 
     public MultinameUsage getUsage(int index) {

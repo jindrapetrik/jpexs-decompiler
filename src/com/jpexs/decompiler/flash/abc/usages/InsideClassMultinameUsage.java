@@ -29,13 +29,14 @@ public abstract class InsideClassMultinameUsage extends MultinameUsage {
     public int multinameIndex;
     public int classIndex;
 
-    public InsideClassMultinameUsage(int multinameIndex, int classIndex) {
+    public InsideClassMultinameUsage(List<ABCContainerTag> abcTags, ABC abc,int multinameIndex, int classIndex) {
+        super(abcTags, abc);
         this.multinameIndex = multinameIndex;
         this.classIndex = classIndex;
     }
 
     @Override
-    public String toString(List<ABCContainerTag> abcTags, ABC abc) throws InterruptedException {
+    public String toString(){
         return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants);
     }
 

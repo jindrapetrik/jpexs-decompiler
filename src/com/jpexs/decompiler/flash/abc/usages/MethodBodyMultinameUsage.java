@@ -27,12 +27,12 @@ import java.util.List;
  */
 public class MethodBodyMultinameUsage extends MethodMultinameUsage {
 
-    public MethodBodyMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
-        super(multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex);
+    public MethodBodyMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
+        super(abcTags,abc,multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex);
     }
 
     @Override
-    public String toString(List<ABCContainerTag> abcTags, ABC abc) throws InterruptedException {
-        return super.toString(abcTags, abc) + " body";
+    public String toString() {
+        return super.toString() + " body";
     }
 }

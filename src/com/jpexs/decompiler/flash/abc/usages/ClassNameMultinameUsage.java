@@ -24,14 +24,14 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ClassNameMultinameUsage extends InsideClassMultinameUsage {
+public class ClassNameMultinameUsage extends InsideClassMultinameUsage implements DefinitionUsage {
 
-    public ClassNameMultinameUsage(int multinameIndex, int classIndex) {
-        super(multinameIndex, classIndex);
+    public ClassNameMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex) {
+        super(abcTags,abc,multinameIndex, classIndex);
     }
 
     @Override
-    public String toString(List<ABCContainerTag> abcTags, ABC abc) {
+    public String toString() {
         return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants);
     }
 }

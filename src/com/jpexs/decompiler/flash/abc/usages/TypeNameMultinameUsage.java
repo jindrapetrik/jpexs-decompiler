@@ -29,12 +29,13 @@ public class TypeNameMultinameUsage extends MultinameUsage {
 
     public int typename_index;
 
-    public TypeNameMultinameUsage(int typename_index) {
+    public TypeNameMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int typename_index) {
+        super(abcTags, abc);
         this.typename_index = typename_index;
     }
 
     @Override
-    public String toString(List<ABCContainerTag> abcTags, ABC abc) {
+    public String toString() {
         return "TypeName " + abc.constants.getMultiname(typename_index).toString(abc.constants, new ArrayList<String>());
     }
 }

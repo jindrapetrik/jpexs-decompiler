@@ -25,14 +25,14 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage {
+public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage implements DefinitionUsage {
 
-    public ConstVarNameMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-        super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+    public ConstVarNameMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
+        super(abcTags,abc,multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
     }
 
     @Override
-    public String toString(List<ABCContainerTag> abcTags, ABC abc) throws InterruptedException {
-        return super.toString(abcTags, abc) + " name";
+    public String toString() {
+        return super.toString() + " name";
     }
 }

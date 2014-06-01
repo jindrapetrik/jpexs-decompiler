@@ -27,6 +27,8 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -34,12 +36,12 @@ import java.util.List;
  */
 public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
 
-    public ConstVarMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-        super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+    public ConstVarMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
+        super(abcTags,abc,multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
     }
 
     @Override
-    public String toString(List<ABCContainerTag> abcTags, ABC abc) throws InterruptedException {
+    public String toString() {
         NulWriter nulWriter = new NulWriter();
         if (parentTraitIndex > -1) {
             if (isStatic) {
@@ -48,10 +50,14 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
                 ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
             }
         }
-        ((TraitSlotConst) traits.traits.get(traitIndex)).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
+        try {
+            ((TraitSlotConst) traits.traits.get(traitIndex)).convertHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<String>(), false);
+        } catch (InterruptedException ex) {
+            //ignore
+        }
 
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-        writer.appendNoHilight(super.toString(abcTags, abc) + " ");
+        writer.appendNoHilight(super.toString() + " ");
         if (parentTraitIndex > -1) {
             if (isStatic) {
                 ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
@@ -59,7 +65,11 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
                 ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
             }
         }
-        ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+        try {
+            ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(null, "", abcTags, abc, isStatic, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<String>(), false);
+        } catch (InterruptedException ex) {
+           //ignore
+        }
         return writer.toString();
     }
 

@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.abc.usages;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import java.util.List;
 
 /**
  *
@@ -29,8 +32,8 @@ public abstract class TraitMultinameUsage extends InsideClassMultinameUsage {
     public Traits traits;
     public int parentTraitIndex;
 
-    public TraitMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-        super(multinameIndex, classIndex);
+    public TraitMultinameUsage(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
+        super(abcTags,abc,multinameIndex, classIndex);
         this.traitIndex = traitIndex;
         this.isStatic = isStatic;
         this.traits = traits;

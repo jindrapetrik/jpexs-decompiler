@@ -43,16 +43,21 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
@@ -62,6 +67,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.basic.BasicColorChooserUI;
+import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
@@ -497,5 +503,21 @@ public class View {
         } else {
             tree.collapsePath(parent);
         }
+    }
+    
+    public static void addEditorAction(JEditorPane editor,AbstractAction a,String key, String name, String keyStroke){        
+        KeyStroke ks = KeyStroke.getKeyStroke(keyStroke);
+        a.putValue(Action.ACCELERATOR_KEY, ks);
+        a.putValue(Action.NAME, name);
+        
+        String actionName = key;
+        ActionMap amap = editor.getActionMap();
+        InputMap imap = editor.getInputMap(JTextComponent.WHEN_FOCUSED);
+        imap.put(ks, actionName);
+        amap.put(actionName, a);
+        
+        JPopupMenu pmenu = editor.getComponentPopupMenu();
+        JMenuItem findUsagesMenu = new JMenuItem(a);
+        pmenu.add(findUsagesMenu);
     }
 }

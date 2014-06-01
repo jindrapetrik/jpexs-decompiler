@@ -25,6 +25,12 @@ import java.util.List;
  * @author JPEXS
  */
 public abstract class MultinameUsage {
+    public List<ABCContainerTag> abcTags;
+    public ABC abc;
 
-    public abstract String toString(List<ABCContainerTag> abcTags, ABC abc) throws InterruptedException;
+    public MultinameUsage(List<ABCContainerTag> abcTags, ABC abc) {
+        this.abcTags = abcTags;
+        this.abc = abc;
+    }
+    
 }

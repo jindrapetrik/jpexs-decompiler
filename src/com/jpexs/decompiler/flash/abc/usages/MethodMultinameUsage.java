@@ -35,8 +35,8 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
     public boolean isInitializer;
 
-    public MethodMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
-        super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+    public MethodMultinameUsage(List<ABCContainerTag> abcTags, ABC abc,int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
+        super(abcTags,abc,multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
         this.isInitializer = isInitializer;
     }
 
@@ -45,7 +45,7 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
     }
 
     @Override
-    public String toString(List<ABCContainerTag> abcTags, ABC abc) throws InterruptedException {
+    public String toString() {
         NulWriter nulWriter = new NulWriter();
         if (!isInitializer) {
             if (parentTraitIndex > -1) {
@@ -59,7 +59,7 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
         }
 
         HilightedTextWriter writer = new HilightedTextWriter(Configuration.getCodeFormatting(), false);
-        writer.appendNoHilight(super.toString(abcTags, abc));
+        writer.appendNoHilight(super.toString());
         writer.appendNoHilight(" ");
         if (isInitializer) {
             if (isStatic) {
