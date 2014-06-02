@@ -175,6 +175,7 @@ import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1314,15 +1315,16 @@ public final class SWF implements TreeItem, Timelined {
         fos.write(chunkBytes);
     }
 
-    private static void makeAVI(List<BufferedImage> images, int frameRate, File file) throws IOException {
-        if (images.isEmpty()) {
+    private static void makeAVI(Iterator<BufferedImage> images, int frameRate, File file) throws IOException {
+        if (!images.hasNext()) {
             return;
         }
         AVIWriter out = new AVIWriter(file);
-        out.addVideoTrack(VideoFormatKeys.ENCODING_AVI_PNG, 1, frameRate, images.get(0).getWidth(), images.get(0).getHeight(), 0, 0);
+        BufferedImage img0 = images.next();
+        out.addVideoTrack(VideoFormatKeys.ENCODING_AVI_PNG, 1, frameRate, img0.getWidth(), img0.getHeight(), 0, 0);
         try {
-            for (BufferedImage img : images) {
-                out.write(0, img, 1);
+            while (images.hasNext()) {
+                out.write(0, images.next(), 1);
             }
         } finally {
             out.close();
@@ -1330,15 +1332,17 @@ public final class SWF implements TreeItem, Timelined {
 
     }
 
-    private static void makeGIF(List<BufferedImage> images, int frameRate, File file) throws IOException {
-        if (images.isEmpty()) {
+    private static void makeGIF(Iterator<BufferedImage> images, int frameRate, File file) throws IOException {
+        if (!images.hasNext()) {
             return;
         }
         try (ImageOutputStream output = new FileImageOutputStream(file)) {
-            GifSequenceWriter writer = new GifSequenceWriter(output, images.get(0).getType(), 1000 / frameRate, true);
-
-            for (BufferedImage img : images) {
-                writer.writeToSequence(img);
+            BufferedImage img0=images.next();
+            GifSequenceWriter writer = new GifSequenceWriter(output, img0.getType(), 1000 / frameRate, true);
+            writer.writeToSequence(img0);
+            
+            while (images.hasNext()) {
+                writer.writeToSequence(images.next());
             }
 
             writer.close();
@@ -1573,11 +1577,27 @@ public final class SWF implements TreeItem, Timelined {
 
             return ret;
         }
+        
+        final Timeline ftim=tim;
+        final Color fbackgroundColor=backgroundColor;
+        final Iterator<BufferedImage> frameImages = new Iterator<BufferedImage>() {
 
-        final List<BufferedImage> frameImages = new ArrayList<>();
-        for (int frame : frames) {
-            frameImages.add(frameToImageGet(tim, frame, 0, null, 0, tim.displayRect, new Matrix(), new ColorTransform(), backgroundColor).getBufferedImage());
-        }
+            private int pos=0;
+            
+            @Override
+            public boolean hasNext() {
+                return fframes.size()>pos;
+            }
+
+            @Override
+            public BufferedImage next() {
+                if(!hasNext()){
+                    return null;
+                }
+                return frameToImageGet(ftim, fframes.get(pos), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor,false).getBufferedImage();
+            }
+        };
+
         switch (settings.mode) {
             case GIF:
                 new RetryTask(new RunnableIOEx() {
@@ -1590,13 +1610,13 @@ public final class SWF implements TreeItem, Timelined {
                 }, handler).run();
                 break;
             case PNG:
-                for (int i = 0; i < frameImages.size(); i++) {
+                for (int i = 0; frameImages.hasNext(); i++) {
                     final int fi = i;
                     new RetryTask(new RunnableIOEx() {
                         @Override
                         public void run() throws IOException {
                             File f = new File(foutdir + File.separator + fframes.get(fi) + ".png");
-                            ImageIO.write(frameImages.get(fi), "PNG", f);
+                            ImageIO.write(frameImages.next(), "PNG", f);
                             ret.add(f);
                         }
                     }, handler).run();
@@ -1611,12 +1631,12 @@ public final class SWF implements TreeItem, Timelined {
                         PageFormat pf = new PageFormat();
                         pf.setOrientation(PageFormat.PORTRAIT);
                         Paper p = new Paper();
-
-                        p.setSize(frameImages.get(0).getWidth() + 10, frameImages.get(0).getHeight() + 10);
+                        BufferedImage img0 = frameImages.next();
+                        p.setSize(img0.getWidth() + 10, img0.getHeight() + 10);
                         pf.setPaper(p);
 
-                        for (int i = 0; i < frameImages.size(); i++) {
-                            BufferedImage img = frameImages.get(i);
+                        for (int i = 0; frameImages.hasNext(); i++) {
+                            BufferedImage img = frameImages.next();
                             Graphics g = job.getGraphics(pf);
                             g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
                             g.dispose();
@@ -2552,11 +2572,14 @@ public final class SWF implements TreeItem, Timelined {
         return exporter.getUniqueId("tag");
     }
 
-    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor) {
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, boolean useCache) {
         String key = "frame_" + frame + "_" + timeline.id + "_" + timeline.swf.hashCode();
-        SerializableImage image = getFromCache(key);
-        if (image != null) {
-            return image;
+        SerializableImage image;
+        if(useCache){
+            image = getFromCache(key);
+            if (image != null) {
+                return image;
+            }
         }
 
         if (timeline.frames.isEmpty()) {
