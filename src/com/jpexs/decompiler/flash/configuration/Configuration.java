@@ -381,10 +381,17 @@ public class Configuration {
                     String path = "." + applicationId + "/";
                     directory = new File(userHome, path);
                 }
+            }else{
+                //no home, then use application directory
+                directory = new File(".");
             }
         }
         if (!directory.exists()) {
-            directory.mkdirs();
+            if (!directory.mkdirs()) {
+                 if (!directory.exists()) {
+                     directory = new File("."); //fallback to current directory
+                 }
+            }
         }
         String ret = directory.getAbsolutePath();
         if (!ret.endsWith(File.separator)) {
@@ -492,7 +499,7 @@ public class Configuration {
                 replacements.add(r);
             }
         } catch (IOException e) {
-            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Error during load replacements", e);
+            //ignore
         }
     }
 
@@ -510,10 +517,9 @@ public class Configuration {
 
             @SuppressWarnings("unchecked")
             HashMap<String, Object> cfg = (HashMap<String, Object>) ois.readObject();
-            config = cfg;
-        } catch (FileNotFoundException ex) {
-        } catch (ClassNotFoundException cnf) {
-        } catch (IOException ex) {
+            config = cfg;        
+        } catch (ClassNotFoundException | IOException ex) {
+            //ignore
         }
         if (replacementsFile != null) {
             loadReplacements(replacementsFile);
@@ -542,6 +548,7 @@ public class Configuration {
         try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
             oos.writeObject(config);
         } catch (IOException ex) {
+            //TODO: move this to GUI
             JOptionPane.showMessageDialog(null, "Cannot save configuration.", "Error", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(Configuration.class.getName()).severe("Configuration directory is read only.");
         }
@@ -558,7 +565,7 @@ public class Configuration {
         try {
             saveToFile(getConfigFile(), getReplacementsFile());
         } catch (IOException ex) {
-            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
+            //ignore
         }
     }
 
