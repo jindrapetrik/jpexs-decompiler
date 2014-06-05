@@ -2326,7 +2326,7 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append("\t\t\tctx = cctx;\r\n");
                 }
 
-                if (layer.filters != null) {
+                if (layer.filters != null && layer.filters.size() > 0) {
                     sb.append("\t\t\tvar oldctx = ctx;\r\n");
                     sb.append("\t\t\tvar fcanvas = createCanvas(canvas.width,canvas.height);");
                     sb.append("\t\t\tvar fctx = fcanvas.getContext(\"2d\");\r\n");
@@ -2352,7 +2352,7 @@ public final class SWF implements TreeItem, Timelined {
                         .append(placeMatrix.translateX).append(",")
                         .append(placeMatrix.translateY).append("],").append(ctrans_str).append(",").append("").append(layer.blendMode < 1 ? 1 : layer.blendMode).append(",").append(fstr).append(",").append(layer.ratio < 0 ? 0 : layer.ratio).append(",time").append(");\r\n");
 
-                if (layer.filters != null) {
+                if (layer.filters != null && layer.filters.size() > 0) {
                     for (FILTER filter : layer.filters) {
                         if (filter instanceof COLORMATRIXFILTER) {
                             COLORMATRIXFILTER cmf = (COLORMATRIXFILTER) filter;
@@ -2461,8 +2461,8 @@ public final class SWF implements TreeItem, Timelined {
                     sb.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");
                     sb.append("\t\t\tctx.drawImage(fcanvas,0,0);\r\n");
                     sb.append("\t\t\tctx.applyTransforms(ms);\r\n");
-
                 }
+
                 if (layer.clipDepth != -1) {
                     sb.append("\t\t\tclips[clips.length-1].clipCanvas = canvas;\r\n");
                     sb.append("\t\t\tcanvas = createCanvas(canvas.width,canvas.height);\r\n");
@@ -2688,7 +2688,7 @@ public final class SWF implements TreeItem, Timelined {
                 ExportRectangle rect = new ExportRectangle(boundRect);
                 rect = mat.transform(rect);
                 Matrix m = mat.clone();
-                if (layer.filters != null) {
+                if (layer.filters != null && layer.filters.size() > 0) {
                     // calculate size after applying the filters
                     double deltaXMax = 0;
                     double deltaYMax = 0;
@@ -2704,6 +2704,8 @@ public final class SWF implements TreeItem, Timelined {
                     rect.yMax += deltaYMax * SWF.unitDivisor;
                 }
 
+                rect.xMin -= SWF.unitDivisor;
+                rect.yMin -= SWF.unitDivisor;
                 rect.xMin = Math.max(0, rect.xMin);
                 rect.yMin = Math.max(0, rect.yMin);
 
@@ -2871,12 +2873,14 @@ public final class SWF implements TreeItem, Timelined {
             if (t instanceof RemoveTag) {
                 RemoveTag rt = (RemoveTag) t;
                 int depth = rt.getDepth();
-                int currentCharId = stage.get(depth);
-                stage.remove(depth);
-                if (dependingChars.contains(currentCharId)) {
-                    timeline.tags.remove(i);
-                    i--;
-                    continue;
+                if (stage.containsKey(depth)) {
+                    int currentCharId = stage.get(depth);
+                    stage.remove(depth);
+                    if (dependingChars.contains(currentCharId)) {
+                        timeline.tags.remove(i);
+                        i--;
+                        continue;
+                    }
                 }
             }
             if (t instanceof PlaceObjectTypeTag) {
@@ -2885,12 +2889,11 @@ public final class SWF implements TreeItem, Timelined {
                 int depth = po.getDepth();
                 if (placeCharId != 0) {
                     stage.put(depth, placeCharId);
-                }
-                int currentCharId = stage.get(depth);
-                if (dependingChars.contains(currentCharId)) {
-                    timeline.tags.remove(i);
-                    i--;
-                    continue;
+                    if (dependingChars.contains(placeCharId)) {
+                        timeline.tags.remove(i);
+                        i--;
+                        continue;
+                    }
                 }
             }
             if (t instanceof CharacterIdTag) {

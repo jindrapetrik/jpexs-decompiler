@@ -342,7 +342,7 @@ public class Configuration {
         return id;
     }
 
-    public static String getFFDecHome() throws IOException {
+    public static String getFFDecHome() {
         if (directory == unspecifiedFile) {
             directory = null;
             String userHome = null;
@@ -384,11 +384,7 @@ public class Configuration {
             }
         }
         if (!directory.exists()) {
-            if (!directory.mkdirs()) {
-                if (!directory.exists()) {
-                    throw new IOException("cannot create directory " + directory);
-                }
-            }
+            directory.mkdirs();
         }
         String ret = directory.getAbsolutePath();
         if (!ret.endsWith(File.separator)) {
@@ -653,17 +649,12 @@ public class Configuration {
     }
 
     public static File getFlashLibPath() {
-        try {
-            String home = getFFDecHome();
-            File libsdir = new File(home + "flashlib");
-            if (!libsdir.exists()) {
-                libsdir.mkdirs();
-            }
-            return libsdir;
-        } catch (IOException ex) {
-            return null;
+        String home = getFFDecHome();
+        File libsdir = new File(home + "flashlib");
+        if (!libsdir.exists()) {
+            libsdir.mkdirs();
         }
-
+        return libsdir;
     }
 
     public static File getPlayerSWC() {

@@ -186,8 +186,8 @@ public class PreviewImage extends JPanel {
         } else if (treeItem instanceof BoundedTag) {
             BoundedTag boundedTag = (BoundedTag) treeItem;
             RECT rect = boundedTag.getRect();
-            width = (int) (rect.getWidth() / SWF.unitDivisor);
-            height = (int) (rect.getHeight() / SWF.unitDivisor);
+            width = (int) (rect.getWidth() / SWF.unitDivisor) + 1;
+            height = (int) (rect.getHeight() / SWF.unitDivisor) + 1;
             m.translate(-rect.Xmin, -rect.Ymin);
         }
 
