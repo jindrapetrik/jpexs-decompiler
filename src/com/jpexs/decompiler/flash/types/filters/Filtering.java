@@ -32,6 +32,11 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -283,7 +288,7 @@ public class Filtering {
             hc.drawImage(hilightIm, 0, 0, null);
             hc.setComposite(AlphaComposite.DstOut);
             hc.drawImage(shadowIm, 0, 0, null);
-
+            
             sc.drawImage(shadowIm, 0, 0, null);
             sc.setComposite(AlphaComposite.DstOut);
             sc.drawImage(hilightIm, 0, 0, null);
@@ -398,7 +403,7 @@ public class Filtering {
             if (inner) {
                 alpha = 255 - alpha;
             }
-            shadow[i] = new Color(color.getRed(), color.getGreen(), color.getBlue(), cut(color.getAlpha() * alpha * strength)).getRGB();
+            shadow[i] = new Color(color.getRed(), color.getGreen(), color.getBlue(), cut(color.getAlpha() * alpha / 255 * strength)).getRGB();
         }
         Color colorFirst = Color.BLACK;
         Color colorAlpha = new Color(0, 0, 0, 0);
