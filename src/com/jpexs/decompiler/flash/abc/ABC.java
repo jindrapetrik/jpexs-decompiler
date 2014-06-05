@@ -947,6 +947,37 @@ public class ABC {
         }
         return -1;
     }
+    
+    public List<ScriptPack> findScriptPacksByPath(String name) {
+        List<ScriptPack> ret = new ArrayList<>();
+        List<MyEntry<ClassPath, ScriptPack>> allPacks = getScriptPacks();
+        if(name.endsWith(".**")||name.equals("**")||name.endsWith(".++") || name.equals("++")){
+            name = name.substring(0,name.length()-2);
+            
+            for (MyEntry<ClassPath, ScriptPack> en : allPacks) {
+                if (en.key.toString().startsWith(name)) {
+                    ret.add(en.value);
+                }
+            }
+        } else if(name.endsWith(".*")||name.equals("*")||name.endsWith(".+")||name.equals("+")){
+            name = name.substring(0,name.length()-1);
+            for (MyEntry<ClassPath, ScriptPack> en : allPacks) {
+                if (en.key.toString().startsWith(name)) {
+                    String rem = name.isEmpty()?en.key.toString():en.key.toString().substring(name.length());
+                    if(!rem.contains(".")){
+                        ret.add(en.value);
+                    }
+                }
+            }
+        } else {
+            ScriptPack p = findScriptPackByPath(name);
+            if(p!=null){
+                ret.add(p);
+            }            
+        }
+        return ret;
+              
+    }
 
     public ScriptPack findScriptPackByPath(String name) {
         List<MyEntry<ClassPath, ScriptPack>> packs = getScriptPacks();

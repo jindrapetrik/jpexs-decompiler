@@ -848,10 +848,13 @@ public final class SWF implements TreeItem, Timelined {
                 abcTags.add(cnt);
             }
         }
+        
+        boolean exported = false;
+        
         for (int i = 0; i < abcTags.size(); i++) {
             ABC abc = abcTags.get(i).getABC();
-            ScriptPack scr = abc.findScriptPackByPath(className);
-            if (scr != null) {
+            List<ScriptPack> scrs = abc.findScriptPacksByPath(className);
+            for(ScriptPack scr:scrs) {
                 String cnt = "";
                 if (abc.script_info.size() > 1) {
                     cnt = "script " + (i + 1) + "/" + abc.script_info.size() + " ";
@@ -860,11 +863,11 @@ public final class SWF implements TreeItem, Timelined {
                 informListeners("exporting", exStr);
                 scr.export(outdir, abcTags, exportMode, parallel);
                 exStr = "Exported " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + scr.getPath() + " ...";
-                informListeners("exported", exStr);
-                return true;
-            }
+                informListeners("exported", exStr);      
+                exported = true;
+            }            
         }
-        return false;
+        return exported;       
     }
 
     private List<MyEntry<ClassPath, ScriptPack>> uniqueAS3Packs(List<MyEntry<ClassPath, ScriptPack>> packs) {
