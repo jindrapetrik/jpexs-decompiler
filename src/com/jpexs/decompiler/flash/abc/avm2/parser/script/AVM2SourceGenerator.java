@@ -2421,4 +2421,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         return name_index;
     }
+
+    @Override
+    public List<GraphSourceItem> generateDiscardValue(SourceGeneratorLocalData localData, GraphTargetItem item) throws CompilationException {
+        List<GraphSourceItem> ret=item.toSource(localData, this);
+        ret.add(ins(new PopIns()));
+        return ret;
+    }
+    
+    
 }

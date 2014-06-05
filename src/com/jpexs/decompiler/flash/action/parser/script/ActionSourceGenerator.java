@@ -777,4 +777,13 @@ public class ActionSourceGenerator implements SourceGenerator {
         return new ArrayList<>();
     }
 
+    @Override
+    public List<GraphSourceItem> generateDiscardValue(SourceGeneratorLocalData localData, GraphTargetItem item) throws CompilationException {
+        List<GraphSourceItem> ret=item.toSource(localData, this);
+        ret.add(new ActionPop());
+        return ret;
+    }
+    
+    
+
 }

@@ -206,7 +206,10 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSource(localData, generator);
+        if(!hasReturnValue()){
+            return toSource(localData, generator);
+        }
+        return generator.generateDiscardValue(localData, this);
     }
 
     protected List<GraphSourceItem> toSourceBinary(BinaryOp op, GraphSourceItem action) {

@@ -1522,12 +1522,18 @@ public class XFLConverter {
                 mediaLinkStr += "\"";
                 mediaLinkStr += " exportFormat=\"" + format + "\" exportBits=\"" + bits + "\" sampleCount=\"" + soundSampleCount + "\"";
 
+                boolean linkageExportForAS = false;
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
-                    mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
+                    linkageExportForAS = true;
+                    mediaLinkStr += " linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
                 }
 
                 if (characterVariables.containsKey(symbol.getCharacterId())) {
-                    mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
+                    linkageExportForAS = true;
+                    mediaLinkStr += " linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
+                }
+                if (linkageExportForAS) {
+                    mediaLinkStr += " linkageExportForAS=\"true\"";
                 }
 
                 mediaLinkStr += "/>\n";
@@ -1589,11 +1595,17 @@ public class XFLConverter {
                     mediaLinkStr += " height=\"" + video.height + "\"";
                     double len = ((double) video.numFrames) / ((double) swf.frameRate);
                     mediaLinkStr += " length=\"" + len + "\"";
+                    boolean linkageExportForAS = false;
                     if (characterClasses.containsKey(symbol.getCharacterId())) {
-                        mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
+                        linkageExportForAS = true;
+                        mediaLinkStr += " linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
                     }
                     if (characterVariables.containsKey(symbol.getCharacterId())) {
-                        mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
+                        linkageExportForAS = true;
+                        mediaLinkStr += " linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
+                    }
+                    if(linkageExportForAS){
+                        mediaLinkStr += " linkageExportForAS=\"true\"";
                     }
                     mediaLinkStr += "/>\n";
                 }
