@@ -272,6 +272,12 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         }
     }
 
+    public MainFrame getMainFrame() {
+        return mainFrame;
+    }
+    
+    
+
     static {
         try {
             File.createTempFile("temp", ".swf").delete(); //First call to this is slow, so make it first
@@ -1388,7 +1394,7 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public void searchAs() {
         if (searchDialog == null) {
-            searchDialog = new SearchDialog();
+            searchDialog = new SearchDialog(getMainFrame().getWindow());
         }
         searchDialog.setVisible(true);
         if (searchDialog.result) {

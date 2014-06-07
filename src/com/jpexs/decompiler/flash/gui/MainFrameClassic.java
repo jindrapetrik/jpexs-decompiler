@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
@@ -118,4 +119,11 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
     public MainPanel getPanel() {
         return panel;
     }
+
+    @Override
+    public Window getWindow() {
+        return this;
+    }
+    
+    
 }

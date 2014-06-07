@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import java.awt.Window;
+
 /**
  *
  * @author JPEXS
@@ -31,4 +33,6 @@ public interface MainFrame {
     public boolean isVisible();
 
     public void setVisible(boolean b);
+    
+    public Window getWindow();
 }

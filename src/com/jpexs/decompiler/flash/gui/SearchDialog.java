@@ -20,6 +20,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -52,7 +53,8 @@ public class SearchDialog extends AppDialog implements ActionListener {
     public JRadioButton searchInTextsRadioButton = new JRadioButton(translate("checkbox.searchText"));
     public boolean result = false;
 
-    public SearchDialog() {
+    public SearchDialog(Window owner) {
+        super(owner);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         Container cnt = getContentPane();
         setSize(400, 150);

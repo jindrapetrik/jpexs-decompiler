@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.gui.ErrorLogFrame;
 import com.jpexs.decompiler.flash.gui.ExportDialog;
 import com.jpexs.decompiler.flash.gui.FontEmbedDialog;
 import com.jpexs.decompiler.flash.gui.FontPreviewDialog;
-import com.jpexs.decompiler.flash.gui.GraphFrame;
+import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.LoadFromCacheFrame;
 import com.jpexs.decompiler.flash.gui.LoadFromMemoryFrame;
 import com.jpexs.decompiler.flash.gui.LoadingDialog;
@@ -59,7 +59,7 @@ public class CheckResources {
             ExportDialog.class,
             FontEmbedDialog.class,
             FontPreviewDialog.class,
-            GraphFrame.class,
+            GraphDialog.class,
             // GraphTreeFrame.class, // empty
             LoadFromCacheFrame.class,
             LoadFromMemoryFrame.class,

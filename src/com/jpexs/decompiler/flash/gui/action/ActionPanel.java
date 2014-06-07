@@ -28,7 +28,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.gui.GraphFrame;
+import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -251,12 +251,11 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
 
             Main.stopWork();
             searchPanel.setSearchText(txt);
-            final ActionPanel that=this;
             View.execInEventDispatch(new Runnable() {
 
                 @Override
                 public void run() {
-                    SearchResultsDialog<ActionSearchResult> sr=new SearchResultsDialog<ActionSearchResult>(txt,that);
+                    SearchResultsDialog<ActionSearchResult> sr=new SearchResultsDialog<>(ActionPanel.this.mainPanel.getMainFrame().getWindow(),txt,ActionPanel.this);
                     sr.setResults(found);
                     sr.setVisible(true);     
                 }
@@ -705,7 +704,7 @@ public class ActionPanel extends JPanel implements ActionListener, SearchListene
             case ACTION_GRAPH:
                 if (lastCode != null) {
                     try {
-                        GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
+                        GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(),new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
                         gf.setVisible(true);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);

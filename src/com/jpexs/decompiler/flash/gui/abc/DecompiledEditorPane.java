@@ -67,6 +67,12 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     public void addScriptListener(Runnable l){
         scriptListeners.add(l);
     }
+
+    public ABCPanel getAbcPanel() {
+        return abcPanel;
+    }
+    
+    
     
     public void removeScriptListener(Runnable l){
         scriptListeners.remove(l);

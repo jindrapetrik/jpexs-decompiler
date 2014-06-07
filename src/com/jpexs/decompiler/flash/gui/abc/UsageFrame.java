@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.usages.InsideClassMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
+import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -44,7 +45,7 @@ import javax.swing.JScrollPane;
  *
  * @author JPEXS
  */
-public class UsageFrame extends AppFrame implements ActionListener, MouseListener {
+public class UsageFrame extends AppDialog implements ActionListener, MouseListener {
 
     static final String ACTION_GOTO = "GOTO";
     static final String ACTION_CANCEL = "CANCEL";
@@ -56,6 +57,7 @@ public class UsageFrame extends AppFrame implements ActionListener, MouseListene
     private final ABCPanel abcPanel;
 
     public UsageFrame(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, ABCPanel abcPanel, boolean definitions) {
+        super(abcPanel.getMainPanel().getMainFrame().getWindow());
         this.abcPanel = abcPanel;
         List<MultinameUsage> usages = definitions?abc.findMultinameDefinition(abcTags,multinameIndex):abc.findMultinameUsage(abcTags,multinameIndex);
         Multiname m = abc.constants.constant_multiname.get(multinameIndex);

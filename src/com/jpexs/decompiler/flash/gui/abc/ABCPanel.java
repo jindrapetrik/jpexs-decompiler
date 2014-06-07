@@ -164,6 +164,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
 
     static final String ACTION_ADD_TRAIT = "ADDTRAIT";
 
+    public MainPanel getMainPanel() {
+        return mainPanel;
+    }
+
+    
+    
+    
     public boolean search(final String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.isEmpty())) {
             searchPanel.setOptions(ignoreCase, regexp);
@@ -216,12 +223,11 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Se
             
             searchPanel.setSearchText(txt);
             
-            final ABCPanel that=this;
             View.execInEventDispatch(new Runnable() {
 
                 @Override
                 public void run() {
-                    SearchResultsDialog<ABCPanelSearchResult> sr=new SearchResultsDialog<ABCPanelSearchResult>(txt,that);
+                    SearchResultsDialog<ABCPanelSearchResult> sr=new SearchResultsDialog<>(ABCPanel.this.mainPanel.getMainFrame().getWindow(),txt,ABCPanel.this);
                     sr.setResults(found);
                     sr.setVisible(true);     
                 }

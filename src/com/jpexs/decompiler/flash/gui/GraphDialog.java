@@ -26,6 +26,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Window;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ import javax.swing.JScrollPane;
  *
  * @author JPEXS
  */
-public class GraphFrame extends AppFrame {
+public class GraphDialog extends AppDialog {
 
     private class GraphPanel extends JPanel {
 
@@ -246,7 +247,8 @@ public class GraphFrame extends AppFrame {
     int frameWidthDiff;
     int frameHeightDiff;
 
-    public GraphFrame(Graph graph, String name) throws InterruptedException {
+    public GraphDialog(Window owner,Graph graph, String name) throws InterruptedException {
+        super(owner);
         setSize(500, 500);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());

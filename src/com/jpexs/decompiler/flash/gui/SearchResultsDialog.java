@@ -21,6 +21,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -48,7 +49,8 @@ public class SearchResultsDialog<E> extends AppDialog implements ActionListener{
     private final JButton gotoButton = new JButton(translate("button.goto"));
     private final JButton closeButton = new JButton(translate("button.close"));
     
-    public SearchResultsDialog(String text,SearchListener<E> listener) {
+    public SearchResultsDialog(Window owner,String text,SearchListener<E> listener) {
+        super(owner);
         setTitle(translate("dialog.title").replace("%text%", text));
         Container cnt=getContentPane();       
         model = new DefaultListModel<>();
@@ -80,7 +82,6 @@ public class SearchResultsDialog<E> extends AppDialog implements ActionListener{
         cnt.add(sp,BorderLayout.CENTER);        
         cnt.add(buttonsPanel,BorderLayout.SOUTH);
         pack();
-        setAlwaysOnTop(true);
         View.centerScreen(this);
         View.setWindowIcon(this);
     }

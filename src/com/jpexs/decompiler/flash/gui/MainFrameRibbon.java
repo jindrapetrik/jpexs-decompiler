@@ -23,8 +23,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
@@ -115,6 +118,8 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
         });
 
         View.centerScreen(this);
+        
+        
     }
 
     private static void getApplicationMenuButtons(Component comp, List<JRibbonApplicationMenuButton> ret) {
@@ -215,4 +220,11 @@ public final class MainFrameRibbon extends AppRibbonFrame implements MainFrame {
     public MainPanel getPanel() {
         return panel;
     }
+
+    @Override
+    public Window getWindow() {        
+        return this;
+    }
+    
+    
 }
