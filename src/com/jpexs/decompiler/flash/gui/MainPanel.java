@@ -95,6 +95,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
@@ -249,6 +250,8 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
     public static final String ACTION_SELECT_BKCOLOR = "SELECTCOLOR";
     public static final String ACTION_REPLACE = "REPLACE";
+    private static final String ACTION_RAW_EDIT = "RAWEDIT";
+    private static final String ACTION_JUMP_TO_CHARACTER = "JUMPTOCHARACTER";
     private static final String ACTION_REMOVE_ITEM = "REMOVEITEM";
     private static final String ACTION_REMOVE_ITEM_WITH_DEPENDENCIES = "REMOVEITEMWITHDEPENDENCIES";
     private static final String ACTION_CLOSE_SWF = "CLOSESWF";
@@ -333,13 +336,24 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
         replaceSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(replaceSelectionMenuItem);
 
+        final JMenuItem rawEditMenuItem = new JMenuItem(translate("contextmenu.rawEdit"));
+        rawEditMenuItem.setActionCommand(ACTION_RAW_EDIT);
+        rawEditMenuItem.addActionListener(this);
+        rawEditMenuItem.setVisible(false);
+        contextPopupMenu.add(rawEditMenuItem);
+
+        final JMenuItem jumpToCharacterMenuItem = new JMenuItem(translate("contextmenu.jumpToCharacter"));
+        jumpToCharacterMenuItem.setActionCommand(ACTION_JUMP_TO_CHARACTER);
+        jumpToCharacterMenuItem.addActionListener(this);
+        jumpToCharacterMenuItem.setVisible(false);
+        contextPopupMenu.add(jumpToCharacterMenuItem);
+
         final JMenuItem closeSelectionMenuItem = new JMenuItem(translate("contextmenu.closeSwf"));
         closeSelectionMenuItem.setActionCommand(ACTION_CLOSE_SWF);
         closeSelectionMenuItem.addActionListener(this);
         contextPopupMenu.add(closeSelectionMenuItem);
 
         final JMenu moveTagMenu = new JMenu(translate("contextmenu.moveTag"));
-        moveTagMenu.addActionListener(this);
         contextPopupMenu.add(moveTagMenu);
 
         tagTree.addMouseListener(new MouseAdapter() {
@@ -420,6 +434,10 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
 
                         TreeModel model = tagTree.getModel();
                         expandRecursiveMenuItem.setVisible(model.getChildCount(treeNode) > 0);
+
+                        jumpToCharacterMenuItem.setVisible(item instanceof CharacterIdTag && !(item instanceof CharacterTag));
+                        
+                        rawEditMenuItem.setVisible(item instanceof Tag);
                     }
 
                     removeMenuItem.setVisible(allSelectedIsTagOrFrame);
@@ -2238,6 +2256,26 @@ public final class MainPanel extends JPanel implements ActionListener, TreeSelec
                         reload(true);
                     }
                 }
+            }
+            break;
+            case ACTION_RAW_EDIT: {
+                TreeItem item = tagTree.getCurrentTreeItem();
+                if (item == null) {
+                    return;
+                }
+                
+                showCard(CARDPREVIEWPANEL);
+                previewPanel.showGenericTagPanel((Tag) item);
+            }
+            break;
+            case ACTION_JUMP_TO_CHARACTER: {
+                TreeItem item = tagTree.getCurrentTreeItem();
+                if (item == null || !(item instanceof CharacterIdTag)) {
+                    return;
+                }
+                
+                CharacterIdTag characterIdTag = (CharacterIdTag) item;
+                setTreeItem(item.getSwf().characters.get(characterIdTag.getCharacterId()));
             }
             break;
             case ACTION_EXPAND_RECURSIVE: {
