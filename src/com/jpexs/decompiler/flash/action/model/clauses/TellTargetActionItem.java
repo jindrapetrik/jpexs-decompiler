@@ -53,7 +53,7 @@ public class TellTargetActionItem extends ActionItem {
         writer.append("{").newLine();
         writer.indent();
         for (GraphTargetItem ti : commands) {
-            ti.toString(writer, localData).newLine();
+            ti.toStringSemicoloned(writer, localData).newLine();
         }
         writer.unindent();
         return writer.append("}");
@@ -80,6 +80,11 @@ public class TellTargetActionItem extends ActionItem {
         return ret;
     }
 
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
+    
     @Override
     public boolean hasReturnValue() {
         return false;
