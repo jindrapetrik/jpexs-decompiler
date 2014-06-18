@@ -16,12 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types.sound;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import lt.dkd.nellymoser.CodecImpl;
 
 /**

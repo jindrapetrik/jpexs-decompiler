@@ -18,7 +18,6 @@
 package com.jpexs.decompiler.flash.types.sound;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /**

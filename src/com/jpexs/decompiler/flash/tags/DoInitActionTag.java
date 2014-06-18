@@ -57,6 +57,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      *
      * @param swf
      * @param headerData
+     * @param length
      * @param data Data bytes
      * @param pos
      * @throws IOException

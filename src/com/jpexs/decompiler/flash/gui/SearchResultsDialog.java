@@ -37,6 +37,7 @@ import javax.swing.SwingUtilities;
 /**
  *
  * @author JPEXS
+ * @param <E>
  */
 public class SearchResultsDialog<E> extends AppDialog implements ActionListener{
     private final JList<E> resultsList;

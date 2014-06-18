@@ -37,6 +37,7 @@ public class SoundStreamBlockTag extends Tag {
      *
      * @param swf
      * @param headerData
+     * @param length
      * @param data Data bytes
      * @param pos
      * @throws IOException

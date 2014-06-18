@@ -97,6 +97,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      *
      * @param swf
      * @param headerData
+     * @param length
      * @param data Data bytes
      * @param pos
      * @throws IOException

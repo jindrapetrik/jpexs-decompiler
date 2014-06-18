@@ -300,6 +300,7 @@ public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceO
      *
      * @param swf
      * @param headerData
+     * @param length
      * @param data Data bytes
      * @param pos
      * @throws IOException

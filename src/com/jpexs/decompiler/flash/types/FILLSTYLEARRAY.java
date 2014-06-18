@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**

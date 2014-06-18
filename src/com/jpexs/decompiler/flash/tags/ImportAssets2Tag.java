@@ -60,6 +60,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
      *
      * @param swf
      * @param headerData
+     * @param length
      * @param data Data bytes
      * @param pos
      * @throws IOException

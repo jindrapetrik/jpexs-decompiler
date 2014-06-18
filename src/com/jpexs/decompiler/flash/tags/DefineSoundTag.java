@@ -97,6 +97,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
      *
      * @param swf
      * @param headerData
+     * @param length
      * @param data Data bytes
      * @param pos
      * @throws IOException

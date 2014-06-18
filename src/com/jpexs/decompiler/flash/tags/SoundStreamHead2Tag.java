@@ -138,6 +138,7 @@ public class SoundStreamHead2Tag extends CharacterIdTag implements SoundStreamHe
      *
      * @param swf
      * @param headerData
+     * @param length
      * @param data Data bytes
      * @param pos
      * @throws IOException

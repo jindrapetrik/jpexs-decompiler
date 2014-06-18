@@ -134,6 +134,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
      *
      * @param swf
      * @param headerData
+     * @param length
      * @param data Data bytes
      * @param pos
      * @throws IOException

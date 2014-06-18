@@ -17,10 +17,8 @@
 package com.jpexs.decompiler.flash.types.sound;
 
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;

@@ -98,6 +98,7 @@ public class DefineButton2Tag extends ButtonTag implements Container {
      *
      * @param swf
      * @param headerData
+     * @param length
      * @param data Data bytes
      * @param pos
      * @throws IOException

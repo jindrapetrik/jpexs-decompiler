@@ -16,11 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types.sound;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javazoom.jl.decoder.Bitstream;

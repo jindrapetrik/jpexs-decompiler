@@ -101,6 +101,7 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
      *
      * @param swf
      * @param headerData
+     * @param length
      * @param data Data bytes
      * @param pos
      * @throws IOException

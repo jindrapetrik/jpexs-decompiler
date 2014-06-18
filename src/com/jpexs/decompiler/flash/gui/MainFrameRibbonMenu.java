@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.gui.treenodes.SWFNode;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.jpexs.process.ProcessTools;
