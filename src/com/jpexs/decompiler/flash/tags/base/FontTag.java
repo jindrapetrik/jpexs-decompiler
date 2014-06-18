@@ -55,8 +55,8 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
 
     protected final int previewSize = 500;
 
-    public FontTag(SWF swf, int id, String name, byte[] headerData, byte[] data, long pos) {
-        super(swf, id, name, headerData, data, pos);
+    public FontTag(SWF swf, int id, String name, long pos, int length) {
+        super(swf, id, name, pos, length);
     }
 
     public abstract int getFontId();

@@ -16,8 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
@@ -29,7 +28,6 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -137,9 +135,8 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
      * @param pos
      * @throws IOException
      */
-    public SoundStreamHeadTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "SoundStreamHead", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public SoundStreamHeadTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "SoundStreamHead", pos, length);
         reserved = (int) sis.readUB(4);
         playBackSoundRate = (int) sis.readUB(2);
         playBackSoundSize = sis.readUB(1) == 1;
@@ -221,9 +218,9 @@ public class SoundStreamHeadTag extends CharacterIdTag implements SoundStreamHea
         try {
             for (SoundStreamBlockTag block : blocks) {
                 if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
-                    baos.write(block.data, 4, block.data.length - 4);
+                    baos.write(block.streamSoundData, 4, block.streamSoundData.length - 4);
                 } else {
-                    baos.write(block.data);
+                    baos.write(block.streamSoundData);
                 }
             }
         } catch (IOException ex) {

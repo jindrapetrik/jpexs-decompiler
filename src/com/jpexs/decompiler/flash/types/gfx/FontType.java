@@ -42,7 +42,6 @@ public class FontType implements Serializable {
     public List<KerningPairType> kerning;
 
     public FontType(GFxInputStream sis) throws IOException {
-        sis = new GFxInputStream(sis);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int val;
         while ((val = sis.readUI8()) > 0) {

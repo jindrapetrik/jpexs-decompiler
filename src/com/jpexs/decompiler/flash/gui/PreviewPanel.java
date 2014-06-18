@@ -515,7 +515,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
 
             byte[] data;
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                SWFOutputStream sos2 = new SWFOutputStream(baos, 10);
+                SWFOutputStream sos2 = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
                 int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
                 int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
                 sos2.writeRECT(swf.displayRect);
@@ -684,7 +684,7 @@ public class PreviewPanel extends JSplitPane implements ActionListener {
                         List<Action> actions;
                         DoActionTag doa;
 
-                        doa = new DoActionTag(swf, new byte[0], new byte[0], 0);
+                        doa = new DoActionTag(swf, 0, 0);
                         actions = ASMParser.parse(0, 0, false,
                                 "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
                                 + "Push \"_root\"\n"

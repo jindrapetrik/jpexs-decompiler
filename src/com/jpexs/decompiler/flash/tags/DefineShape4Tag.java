@@ -16,15 +16,13 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Set;
 
@@ -77,9 +75,8 @@ public class DefineShape4Tag extends ShapeTag {
         return shapeBounds;
     }
 
-    public DefineShape4Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineShape4", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public DefineShape4Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DefineShape4", pos, length);
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();
         edgeBounds = sis.readRECT();

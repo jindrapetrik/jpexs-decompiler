@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.Helper;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,9 +101,8 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
      * @param pos
      * @throws IOException
      */
-    public DefineSoundTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineSound", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public DefineSoundTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DefineSound", pos, length);
         soundId = sis.readUI16();
         soundFormat = (int) sis.readUB(4);
         soundRate = (int) sis.readUB(2);
@@ -238,7 +236,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
                     }
                 }
                 try {
-                    MP3SOUNDDATA snd = new MP3SOUNDDATA(new ByteArrayInputStream(mp3data), true);
+                    MP3SOUNDDATA snd = new MP3SOUNDDATA(mp3data, swf.version, true);
                     if (!snd.frames.isEmpty()) {
                         MP3FRAME fr = snd.frames.get(0);
                         newSoundRate = fr.getSamplingRate();
@@ -308,7 +306,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     @Override
     public byte[] getRawSoundData() {
         if (soundFormat == SoundFormat.FORMAT_MP3) {
-            return Arrays.copyOfRange(soundData, 2, soundData.length - 2);
+            return Arrays.copyOfRange(soundData, 2, soundData.length);
         }
         return soundData;
     }

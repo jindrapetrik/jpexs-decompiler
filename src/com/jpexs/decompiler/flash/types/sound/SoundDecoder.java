@@ -36,9 +36,9 @@ public abstract class SoundDecoder {
 
     public byte[] decode(byte[] data) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        decode(new ByteArrayInputStream(data), baos);
+        decode(data, baos);
         return baos.toByteArray();
     }
 
-    public abstract void decode(InputStream is, OutputStream os) throws IOException;
+    public abstract void decode(byte[] data, OutputStream os) throws IOException;
 }

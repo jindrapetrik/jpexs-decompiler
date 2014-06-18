@@ -16,14 +16,12 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,11 +57,10 @@ public class ImportAssetsTag extends Tag implements ImportTag {
      * @param pos
      * @throws IOException
      */
-    public ImportAssetsTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "ImportAssets", headerData, data, pos);
+    public ImportAssetsTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "ImportAssets", pos, length);
         tags = new ArrayList<>();
         names = new ArrayList<>();
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         url = sis.readString();
         int count = sis.readUI16();
         for (int i = 0; i < count; i++) {

@@ -418,12 +418,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeTags(List<Tag> tags) throws IOException {
         for (Tag tag : tags) {
-            //try {
             tag.writeTag(this);
-            /*} catch (NotSameException nse) {
-             throw new RuntimeException("error in tag "+tag+" at pos "+Helper.formatHex((int)tag.getPos(), 8), nse);
-             }*/
-            //NotSameException must be processed in order to catch it elsewhere
         }
     }
 

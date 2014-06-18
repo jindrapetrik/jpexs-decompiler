@@ -16,15 +16,13 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.gfx.FONTINFO;
 import com.jpexs.decompiler.flash.types.gfx.GFxInputStream;
 import com.jpexs.decompiler.flash.types.gfx.GFxOutputStream;
 import com.jpexs.decompiler.flash.types.gfx.TEXGLYPH;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -92,9 +90,8 @@ public class FontTextureInfo extends Tag {
      * @param pos
      * @throws IOException
      */
-    public FontTextureInfo(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "FontTextureInfo", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public FontTextureInfo(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "FontTextureInfo", pos, length);
         textureID = sis.readUI32();
         textureFormat = sis.readUI16();
         int fileNameLen = sis.readUI8();
@@ -106,12 +103,12 @@ public class FontTextureInfo extends Tag {
         int numTexGlyphs = sis.readUI16();
         texGlyphs = new TEXGLYPH[numTexGlyphs];
         for (int i = 0; i < numTexGlyphs; i++) {
-            texGlyphs[i] = new TEXGLYPH(new GFxInputStream(sis));
+            texGlyphs[i] = new TEXGLYPH(new GFxInputStream(sis.getBaseStream()));
         }
         int numFonts = sis.readUI16();
         fonts = new FONTINFO[numFonts];
         for (int i = 0; i < numFonts; i++) {
-            fonts[i] = new FONTINFO(new GFxInputStream(sis));
+            fonts[i] = new FONTINFO(new GFxInputStream(sis.getBaseStream()));
         }
     }
 }

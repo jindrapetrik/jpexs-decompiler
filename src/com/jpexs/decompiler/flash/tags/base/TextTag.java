@@ -67,8 +67,8 @@ import org.w3c.dom.Element;
  */
 public abstract class TextTag extends CharacterTag implements BoundedTag, DrawableTag {
 
-    public TextTag(SWF swf, int id, String name, byte[] headerData, byte[] data, long pos) {
-        super(swf, id, name, headerData, data, pos);
+    public TextTag(SWF swf, int id, String name, long pos, int length) {
+        super(swf, id, name, pos, length);
     }
 
     public abstract MATRIX getTextMatrix();

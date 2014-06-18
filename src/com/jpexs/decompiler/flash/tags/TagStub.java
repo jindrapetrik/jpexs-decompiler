@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,14 +41,7 @@ public class TagStub extends Tag {
      */
     @Override
     public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        /*try {
-         //sos.write
-         } catch (IOException e) {
-         }*/
-        return baos.toByteArray();
+        return getOriginalData();
     }
 
     /**
@@ -59,9 +53,8 @@ public class TagStub extends Tag {
      * @param pos
      * @throws IOException
      */
-    public TagStub(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "" /*TODO:Insert name here*/, headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public TagStub(SWF swf, long pos, int length) throws IOException {
+        super(swf, ID, "" /*TODO:Insert name here*/, pos, length);
 
     }
 }

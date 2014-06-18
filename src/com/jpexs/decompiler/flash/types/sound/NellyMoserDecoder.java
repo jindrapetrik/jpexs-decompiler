@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import lt.dkd.nellymoser.CodecImpl;
 
 /**
@@ -38,15 +39,16 @@ public class NellyMoserDecoder extends SoundDecoder {
     }
 
     @Override
-    public void decode(InputStream is, OutputStream os) throws IOException {
+    public void decode(byte[] data, OutputStream os) throws IOException {
         soundFormat.stereo = false;
         float audioD[] = new float[NELLY_SAMPLES];
 
         final float[] state = new float[64];
 
-        SWFInputStream sis = new SWFInputStream(is, SWF.DEFAULT_VERSION);
-        while (sis.available() > 0) {
-            byte[] block = sis.readBytes(NELLY_BLOCK_LEN);
+        byte[] block = new byte[NELLY_BLOCK_LEN];
+        int blockCount = data.length / NELLY_BLOCK_LEN;
+        for (int j = 0; j < blockCount; j++) {
+            System.arraycopy(data, j * NELLY_BLOCK_LEN, block, 0, NELLY_BLOCK_LEN);
             CodecImpl.decode(state, block, audioD);
             short audio[] = new short[NELLY_SAMPLES];
             for (int i = 0; i < audioD.length; i++) {

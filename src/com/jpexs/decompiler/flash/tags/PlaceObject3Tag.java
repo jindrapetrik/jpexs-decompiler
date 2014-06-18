@@ -17,8 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -226,7 +225,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
@@ -304,9 +303,8 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
      * @param pos
      * @throws IOException
      */
-    public PlaceObject3Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "PlaceObject3", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public PlaceObject3Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "PlaceObject3", pos, length);
         placeFlagHasClipActions = sis.readUB(1) == 1;
         placeFlagHasClipDepth = sis.readUB(1) == 1;
         placeFlagHasName = sis.readUB(1) == 1;

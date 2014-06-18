@@ -17,8 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -102,9 +101,8 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      * @param pos
      * @throws IOException
      */
-    public DefineButtonTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineButton", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public DefineButtonTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DefineButton", pos, length);
         buttonId = sis.readUI16();
         characters = sis.readBUTTONRECORDList(false);
         //actions = sis.readActionList();
@@ -122,7 +120,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
@@ -171,15 +169,8 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     @Override
     public List<Action> getActions() throws InterruptedException {
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int prevLength = 0;
-            if (previousTag != null) {
-                byte[] prevData = previousTag.getData();
-                baos.write(prevData);
-                prevLength = prevData.length;
-            }
-            baos.write(actionBytes);
-            MemoryInputStream rri = new MemoryInputStream(baos.toByteArray());
+            int prevLength = (int) (getPos() + hdrSize);
+            MemoryInputStream rri = new MemoryInputStream(swf.uncompressedData);
             rri.seek(prevLength);
 
             List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + hdrSize - prevLength, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);

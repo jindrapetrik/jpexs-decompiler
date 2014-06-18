@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -150,7 +150,7 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
@@ -191,7 +191,7 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
     }
 
     public PlaceObject2Tag(SWF swf, boolean placeFlagHasClipActions, boolean placeFlagHasClipDepth, boolean placeFlagHasName, boolean placeFlagHasRatio, boolean placeFlagHasColorTransform, boolean placeFlagHasMatrix, boolean placeFlagHasCharacter, boolean placeFlagMove, int depth, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, CLIPACTIONS clipActions) {
-        super(swf, ID, "PlaceObject2", null, null, 0);
+        super(swf, ID, "PlaceObject2", 0, 0);
         this.placeFlagHasClipActions = placeFlagHasClipActions;
         this.placeFlagHasClipDepth = placeFlagHasClipDepth;
         this.placeFlagHasName = placeFlagHasName;
@@ -219,9 +219,8 @@ public class PlaceObject2Tag extends CharacterIdTag implements Container, PlaceO
      * @param pos
      * @throws IOException
      */
-    public PlaceObject2Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "PlaceObject2", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public PlaceObject2Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "PlaceObject2", pos, length);
         placeFlagHasClipActions = sis.readUB(1) == 1;
         placeFlagHasClipDepth = sis.readUB(1) == 1;
         placeFlagHasName = sis.readUB(1) == 1;

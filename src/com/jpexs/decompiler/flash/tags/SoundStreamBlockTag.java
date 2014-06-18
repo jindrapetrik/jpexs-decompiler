@@ -16,7 +16,8 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.io.IOException;
 
 /**
@@ -28,6 +29,9 @@ public class SoundStreamBlockTag extends Tag {
 
     public static final int ID = 19;
 
+    @Internal
+    public byte[] streamSoundData;
+
     /**
      * Constructor
      *
@@ -37,8 +41,9 @@ public class SoundStreamBlockTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public SoundStreamBlockTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "SoundStreamBlock", headerData, data, pos);
+    public SoundStreamBlockTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "SoundStreamBlock", pos, length);
         //all data is streamSoundData
+        streamSoundData = sis.readBytesEx(sis.available());
     }
 }

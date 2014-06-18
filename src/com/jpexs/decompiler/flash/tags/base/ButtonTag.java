@@ -42,8 +42,8 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     public static int FRAME_DOWN = 2;
     public static int FRAME_HITTEST = 3;
 
-    public ButtonTag(SWF swf, int id, String name, byte[] headerData, byte[] data, long pos) {
-        super(swf, id, name, headerData, data, pos);
+    public ButtonTag(SWF swf, int id, String name, long pos, int length) {
+        super(swf, id, name, pos, length);
     }
 
     public abstract List<BUTTONRECORD> getRecords();

@@ -32,12 +32,8 @@ public class NoDecoder extends SoundDecoder {
     }
 
     @Override
-    public void decode(InputStream is, OutputStream os) throws IOException {
-        byte buf[] = new byte[1024];
-        int cnt;
-        while ((cnt = is.read(buf)) > 0) {
-            os.write(buf, 0, cnt);
-        }
+    public void decode(byte[] data, OutputStream os) throws IOException {
+        os.write(data);
     }
 
 }

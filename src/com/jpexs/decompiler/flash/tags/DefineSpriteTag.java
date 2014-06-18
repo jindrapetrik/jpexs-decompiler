@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -201,9 +202,8 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public DefineSpriteTag(SWF swf, byte[] headerData, byte[] data, int level, long pos, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
-        super(swf, ID, "DefineSprite", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version, pos);
+    public DefineSpriteTag(SWFLimitedInputStream sis, int level, long pos, int length, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
+        super(sis.swf, ID, "DefineSprite", pos, length);
         spriteId = sis.readUI16();
         frameCount = sis.readUI16();
         List<Tag> subTags = sis.readTagList(swf, this, level + 1, parallel, skipUnusualTags, true, swf.gfx);
@@ -225,7 +225,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
+            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -68,9 +69,8 @@ public class VideoFrameTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public VideoFrameTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "VideoFrame", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public VideoFrameTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "VideoFrame", pos, length);
         streamID = sis.readUI16();
         frameNum = sis.readUI16();
         videoData = sis.readBytesEx(sis.available()); //TODO: Parse video packets

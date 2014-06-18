@@ -107,10 +107,9 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
         hdrPos = 0;
     }
 
-    public CLIPACTIONRECORD(SWF swf, InputStream is, long pos, Tag tag) throws IOException {
+    public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, long pos, Tag tag) throws IOException {
         this.swf = swf;
         this.tag = tag;
-        SWFInputStream sis = new SWFInputStream(is, swf.version);
         eventFlags = sis.readCLIPEVENTFLAGS();
         if (eventFlags.isClear()) {
             return;
@@ -123,7 +122,6 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable, ContainerItem, S
         hdrPos = sis.getPos();
         actionBytes = sis.readBytesEx(actionRecordSize);
         this.pos = pos;
-
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 
 /**
  *
@@ -24,7 +25,7 @@ import com.jpexs.decompiler.flash.SWF;
  */
 public abstract class CharacterTag extends CharacterIdTag {
 
-    public CharacterTag(SWF swf, int id, String name, byte[] headerData, byte[] data, long pos) {
-        super(swf, id, name, headerData, data, pos);
+    public CharacterTag(SWF swf, int id, String name, long pos, int length) {
+        super(swf, id, name, pos, length);
     }
 }

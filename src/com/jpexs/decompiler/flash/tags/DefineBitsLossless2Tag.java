@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
@@ -107,9 +109,8 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         setModified(true);
     }
 
-    public DefineBitsLossless2Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineBitsLossless2", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public DefineBitsLossless2Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DefineBitsLossless2", pos, length);
         characterID = sis.readUI16();
         bitmapFormat = sis.readUI8();
         bitmapWidth = sis.readUI16();
@@ -139,7 +140,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     private void uncompressData() {
         try {
-            SWFInputStream sis = new SWFInputStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData)), 10);
+            SWFInputStream sis = new SWFInputStream(Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData))), SWF.DEFAULT_VERSION);
             if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
                 colorMapData = sis.readALPHACOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight);
             }

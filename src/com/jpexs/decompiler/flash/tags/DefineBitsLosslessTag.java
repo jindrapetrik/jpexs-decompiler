@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -29,6 +30,7 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
@@ -169,7 +171,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     private void uncompressData() {
         try {
-            SWFInputStream sis = new SWFInputStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData)), 10);
+            SWFInputStream sis = new SWFInputStream(Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData))), SWF.DEFAULT_VERSION);
             if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
                 colorMapData = sis.readCOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight);
             }
@@ -181,9 +183,8 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         decompressed = true;
     }
 
-    public DefineBitsLosslessTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineBitsLossless", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public DefineBitsLosslessTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DefineBitsLossless", pos, length);
         characterID = sis.readUI16();
         bitmapFormat = sis.readUI8();
         bitmapWidth = sis.readUI16();

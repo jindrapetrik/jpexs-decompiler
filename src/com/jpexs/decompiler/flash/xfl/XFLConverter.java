@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -1393,7 +1394,7 @@ public class XFLConverter {
                     for (Tag t : tags) {
                         if (found && (t instanceof SoundStreamBlockTag)) {
                             SoundStreamBlockTag bl = (SoundStreamBlockTag) t;
-                            soundData = bl.getData();
+                            soundData = bl.streamSoundData;
                             break;
                         }
                         if (t == symbol) {
@@ -1437,7 +1438,7 @@ public class XFLConverter {
                     bits = 18;
                 }
                 if (soundFormat == SoundFormat.FORMAT_ADPCM) {
-                    SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), swf.version);
+                    SWFInputStream sis = new SWFInputStream(soundData, swf.version);
                     exportFormat = "wav";
                     try {
                         int adpcmCodeSize = (int) sis.readUB(2);
@@ -1453,7 +1454,7 @@ public class XFLConverter {
                     }
                     format += 4; //quality best
                     try {
-                        MP3SOUNDDATA s = new MP3SOUNDDATA(new ByteArrayInputStream(soundData), false);
+                        MP3SOUNDDATA s = new MP3SOUNDDATA(soundData, swf.version, false);
                         //sis.readSI16();
                         //MP3FRAME frame = new MP3FRAME(sis);
                         MP3FRAME frame = s.frames.get(0);
@@ -2845,8 +2846,8 @@ public class XFLConverter {
                 + "    <AS3ConfigConst>CONFIG::FLASH_AUTHORING=&quot;true&quot;;</AS3ConfigConst>\n"
                 + "    <DebuggingPermitted>0</DebuggingPermitted>\n"
                 + "    <DebuggingPassword></DebuggingPassword>\n"
-                + "    <CompressMovie>" + (swf.compressed ? "1" : "0") + "</CompressMovie>\n"
-                + "    <CompressionType>" + (swf.lzma ? "1" : "0") + "</CompressionType>\n"
+                + "    <CompressMovie>" + (swf.compression == SWFCompression.NONE ? "0" : "1") + "</CompressMovie>\n"
+                + "    <CompressionType>" + (swf.compression == SWFCompression.LZMA ? "1" : "0") + "</CompressionType>\n"
                 + "    <InvisibleLayer>1</InvisibleLayer>\n"
                 + "    <DeviceSound>0</DeviceSound>\n"
                 + "    <StreamUse8kSampleRate>0</StreamUse8kSampleRate>\n"

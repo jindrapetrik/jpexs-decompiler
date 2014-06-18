@@ -61,10 +61,9 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
         return pos;
     }
 
-    public BUTTONCONDACTION(SWF swf, InputStream is, long containerOffset, Tag tag) throws IOException {
+    public BUTTONCONDACTION(SWF swf, SWFInputStream sis, long containerOffset, Tag tag) throws IOException {
         this.swf = swf;
         this.tag = tag;
-        SWFInputStream sis = new SWFInputStream(is, swf.version);
         pos = containerOffset;
         int condActionSize = sis.readUI16();
         isLast = condActionSize <= 0;

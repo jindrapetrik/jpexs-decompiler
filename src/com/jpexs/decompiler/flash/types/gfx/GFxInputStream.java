@@ -24,7 +24,7 @@ import java.io.InputStream;
  *
  * @author JPEXS
  */
-public class GFxInputStream extends InputStream {
+public class GFxInputStream {
 
     private final ReReadableInputStream is;
     private static final int MaxUInt7 = (1 << 7) - 1;
@@ -33,7 +33,6 @@ public class GFxInputStream extends InputStream {
         this.is = new ReReadableInputStream(is);
     }
 
-    @Override
     public int available() throws IOException {
         return is.available();
     }
@@ -46,7 +45,6 @@ public class GFxInputStream extends InputStream {
         return is.getPos();
     }
 
-    @Override
     public int read() throws IOException {
         return is.read();
     }
@@ -159,5 +157,9 @@ public class GFxInputStream extends InputStream {
             ret[i] = (byte) read();
         }
         return ret;
+    }
+
+    void read(byte[] bytes) throws IOException {
+        is.read(bytes);
     }
 }

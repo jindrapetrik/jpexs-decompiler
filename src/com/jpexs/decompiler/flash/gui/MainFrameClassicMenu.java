@@ -500,11 +500,13 @@ public class MainFrameClassicMenu implements MainFrameMenu, ActionListener {
                         View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
+                swf.clearModified();
             }
             break;
             case ACTION_SAVE_AS: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
                 saveAs(swf, SaveFileMode.SAVEAS);
+                swf.clearModified();
             }
             break;
             case ACTION_SAVE_AS_EXE: {

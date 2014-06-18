@@ -539,15 +539,6 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
         }
     }
 
-    private void clearModified(SWF swf) {
-        for (Tag tag : swf.tags) {
-            if (tag.isModified()) {
-                tag.createOriginalData();
-                tag.setModified(false);
-            }
-        }
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -689,13 +680,13 @@ public class MainFrameRibbonMenu implements MainFrameMenu, ActionListener {
                         View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
-                clearModified(swf);
+                swf.clearModified();
             }
             break;
             case ACTION_SAVE_AS: {
                 SWF swf = mainFrame.panel.getCurrentSwf();
                 saveAs(swf, SaveFileMode.SAVEAS);
-                clearModified(swf);
+                swf.clearModified();
             }
             break;
             case ACTION_SAVE_AS_EXE: {

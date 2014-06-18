@@ -16,15 +16,13 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -66,11 +64,10 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
      * @param pos
      * @throws IOException
      */
-    public ImportAssets2Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "ImportAssets2", headerData, data, pos);
+    public ImportAssets2Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "ImportAssets2", pos, length);
         tags = new ArrayList<>();
         names = new ArrayList<>();
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
         url = sis.readString();
         reserved1 = sis.readUI8();//reserved, must be 1
         reserved2 = sis.readUI8();//reserved, must be 0

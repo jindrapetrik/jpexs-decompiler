@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -30,7 +30,6 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Optional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -106,9 +105,8 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
      * @param pos
      * @throws IOException
      */
-    public PlaceObjectTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "PlaceObject", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public PlaceObjectTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "PlaceObject", pos, length);
         characterId = sis.readUI16();
         depth = sis.readUI16();
         matrix = sis.readMatrix();
@@ -118,7 +116,7 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
     }
 
     public PlaceObjectTag(SWF swf, int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
-        super(swf, ID, "PlaceObject", null, null, 0);
+        super(swf, ID, "PlaceObject", 0, 0);
         this.characterId = characterId;
         this.depth = depth;
         this.matrix = matrix;

@@ -51,7 +51,6 @@ public class ZippedSWFBundle implements SWFBundle {
                         || entry.getName().toLowerCase().endsWith(".gfx")) {
                     keySet.add(entry.getName());
                 }
-                //streamMap.put(, is)
             }
         } catch (IOException ex) {
             Logger.getLogger(ZippedSWFBundle.class.getName()).log(Level.SEVERE, null, ex);

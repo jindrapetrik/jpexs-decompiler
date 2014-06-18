@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -31,7 +31,6 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -186,7 +185,7 @@ public class DefineFont2Tag extends FontTag {
     }
 
     public DefineFont2Tag(SWF swf) throws IOException {
-        super(swf, ID, "DefineFont2", null, null, 0);
+        super(swf, ID, "DefineFont2", 0, 0);
     }
 
     /**
@@ -198,9 +197,8 @@ public class DefineFont2Tag extends FontTag {
      * @param pos
      * @throws IOException
      */
-    public DefineFont2Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineFont2", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public DefineFont2Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DefineFont2", pos, length);
         fontId = sis.readUI16();
         fontFlagsHasLayout = sis.readUB(1) == 1;
         fontFlagsShiftJIS = sis.readUB(1) == 1;

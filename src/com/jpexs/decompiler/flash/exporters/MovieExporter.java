@@ -102,7 +102,7 @@ public class MovieExporter {
 
             if ((videoStream.codecID == DefineVideoStreamTag.CODEC_VP6)
                     || (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA)) {
-                SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), swf.version);
+                SWFInputStream sis = new SWFInputStream(tag.videoData, swf.version);
                 if (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA) {
                     sis.readUI24(); //offsetToAlpha
                 }
@@ -136,7 +136,7 @@ public class MovieExporter {
                 sos.writeUB(4, verticalAdjustment);
             }
             if (videoStream.codecID == DefineVideoStreamTag.CODEC_SORENSON_H263) {
-                SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), swf.version);
+                SWFInputStream sis = new SWFInputStream(tag.videoData, swf.version);
                 sis.readUB(17);//pictureStartCode
                 sis.readUB(5); //version
                 sis.readUB(8); //temporalReference

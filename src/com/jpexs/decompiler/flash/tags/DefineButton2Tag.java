@@ -16,8 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -103,9 +102,8 @@ public class DefineButton2Tag extends ButtonTag implements Container {
      * @param pos
      * @throws IOException
      */
-    public DefineButton2Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineButton2", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public DefineButton2Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DefineButton2", pos, length);
         buttonId = sis.readUI16();
         reserved = (int) sis.readUB(7);
         trackAsMenu = sis.readUB(1) == 1;
@@ -123,11 +121,10 @@ public class DefineButton2Tag extends ButtonTag implements Container {
      */
     @Override
     public byte[] getData() {
-        ByteArrayInputStream bais = new ByteArrayInputStream(super.data);
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
+            ByteArrayInputStream bais = new ByteArrayInputStream(getOriginalData());
             os = new CopyOutputStream(os, bais);
         }
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
@@ -137,39 +134,16 @@ public class DefineButton2Tag extends ButtonTag implements Container {
             sos.writeUB(1, trackAsMenu ? 1 : 0);
 
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-            OutputStream os2 = baos2;
-            byte[] origbrdata = null;
-            if (Configuration.debugCopy.get()) {
-                SWFInputStream sis = new SWFInputStream(bais, getVersion());
-                int len = sis.readUI16();
-                if (len != 0) {
-                    origbrdata = sis.readBytesEx(len - 2);
-                    os2 = new CopyOutputStream(os2, new ByteArrayInputStream(origbrdata));
-                }
-            }
-            try (SWFOutputStream sos2 = new SWFOutputStream(os2, getVersion())) {
+            try (SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion())) {
                 sos2.writeBUTTONRECORDList(characters, true);
             }
             byte[] brdata = baos2.toByteArray();
-            if (Configuration.debugCopy.get()) {
-                if (origbrdata != null) {
-                    if (origbrdata.length != brdata.length) {
-                        /*throw nso*/
-                    }
-                }
-            }
-            if (Configuration.debugCopy.get()) {
-                sos = new SWFOutputStream(baos, getVersion());
-            }
             if ((actions == null) || (actions.isEmpty())) {
                 sos.writeUI16(0);
             } else {
                 sos.writeUI16(2 + brdata.length);
             }
             sos.write(brdata);
-            if (Configuration.debugCopy.get()) {
-                sos = new SWFOutputStream(new CopyOutputStream(baos, bais), getVersion());
-            }
             sos.writeBUTTONCONDACTIONList(actions);
             sos.close();
         } catch (IOException e) {

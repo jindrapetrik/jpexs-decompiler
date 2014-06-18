@@ -132,7 +132,7 @@ public class SoundExporter {
 
                 int ms = (int) (1000.0f / ((float) ((Tag) st).getSwf().frameRate));
                 for (int b = 0; b < blocks.size(); b++) {
-                    byte[] data = blocks.get(b).getData();
+                    byte[] data = blocks.get(b).streamSoundData;
                     if (st.getSoundFormatId() == 2) { //MP3
                         data = Arrays.copyOfRange(data, 4, data.length);
                     }
@@ -140,7 +140,7 @@ public class SoundExporter {
                 }
             }
         } else {
-            fmt.createWav(new ByteArrayInputStream(st.getRawSoundData()), fos);
+            fmt.createWav(st.getRawSoundData(), fos);
         }
     }
 

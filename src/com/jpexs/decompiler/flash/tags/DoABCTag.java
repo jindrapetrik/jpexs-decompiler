@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -59,10 +58,9 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      * @param pos
      * @throws IOException
      */
-    public DoABCTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DoABC", headerData, data, pos);
-        InputStream is = new ByteArrayInputStream(data);
-        abc = new ABC(is, swf, this);
+    public DoABCTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DoABC", pos, length);
+        abc = new ABC(sis.getBaseStream(), swf, this);
     }
 
     /**
@@ -76,7 +74,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             OutputStream os = bos;
             if (Configuration.debugCopy.get()) {
-                os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
+                os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
             }
             try (SWFOutputStream sos = new SWFOutputStream(os, getVersion())) {
                 abc.saveToStream(sos);

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -54,9 +56,22 @@ public class DoActionTag extends Tag implements ASMSource {
      * @param data Data bytes
      * @param pos
      */
-    public DoActionTag(SWF swf, byte[] headerData, byte[] data, long pos) {
-        super(swf, ID, "DoAction", headerData, data, pos);
-        actionBytes = data;
+    public DoActionTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DoAction", pos, length);
+        actionBytes = sis.readBytesEx(sis.available());
+    }
+
+    /**
+     * Constructor
+     *
+     * @param swf
+     * @param headerData
+     * @param data Data bytes
+     * @param pos
+     */
+    public DoActionTag(SWF swf, long pos, int length) {
+        super(swf, ID, "DoAction", pos, length);
+        actionBytes = new byte[0];
     }
 
     /**
@@ -108,18 +123,8 @@ public class DoActionTag extends Tag implements ASMSource {
     @Override
     public List<Action> getActions() throws InterruptedException {
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int prevLength = 0;
-            if (previousTag != null) {
-                byte[] prevData = previousTag.getData();
-                baos.write(prevData);
-                prevLength = prevData.length;
-                byte[] header = getHeader(data);
-                baos.write(header);
-                prevLength += header.length;
-            }
-            baos.write(actionBytes);
-            MemoryInputStream rri = new MemoryInputStream(baos.toByteArray());
+            int prevLength = (int) getPos();
+            MemoryInputStream rri = new MemoryInputStream(swf.uncompressedData);
             rri.seek(prevLength);
             List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() - prevLength, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
             return list;

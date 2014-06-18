@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -449,18 +450,29 @@ public class Helper {
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        copyStream(is, baos, Long.MAX_VALUE);
+        return baos.toByteArray();
+    }
+
+    public static void copyStream(InputStream is, OutputStream os, long maxLength) {
         try {
-            byte[] buf = new byte[4096];
+            final int bufSize = 4096;
+            byte[] buf = new byte[bufSize];
             int cnt = 0;
             while ((cnt = is.read(buf)) > 0) {
-                baos.write(buf, 0, cnt);
+                os.write(buf, 0, cnt);
+                maxLength -= cnt;
+                
+                // last chunk is smaller
+                if (maxLength < bufSize) {
+                    buf = new byte[(int) maxLength];
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return baos.toByteArray();
     }
-
+    
     public static void writeFile(String file, byte[]  
         ... data) {
         try (FileOutputStream fos = new FileOutputStream(file)) {

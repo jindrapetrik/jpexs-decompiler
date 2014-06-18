@@ -89,22 +89,18 @@ public class SoundFormat {
         }
     }
 
-    public boolean decode(InputStream is, OutputStream os) {
+    public boolean decode(byte[] data, OutputStream os) {
         try {
-            getDecoder().decode(is, os);
+            getDecoder().decode(data, os);
             return true;
         } catch (IOException ex) {
             return false;
         }
     }
 
-    public boolean play(byte data[]) {
-        return play(new ByteArrayInputStream(data));
-    }
-
-    public boolean play(InputStream is) {
+    public boolean play(byte[] data) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        if (!decode(is, baos)) {
+        if (!decode(data, baos)) {
             return false;
         }
 
@@ -113,8 +109,8 @@ public class SoundFormat {
                 audioFormat);
         try (SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info)) {
             line.open(audioFormat);
-            byte data[] = baos.toByteArray();
-            line.write(data, 0, data.length);
+            byte[] outData = baos.toByteArray();
+            line.write(outData, 0, outData.length);
             line.drain();
             line.stop();
             return true;
@@ -167,10 +163,10 @@ public class SoundFormat {
         }
     }
 
-    public boolean createWav(InputStream is, OutputStream os) {
+    public boolean createWav(byte[] data, OutputStream os) {
         ensureFormat();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        decode(is, baos);
+        decode(data, baos);
         try {
             createWavFromPcmData(os, samplingRate, true, stereo, baos.toByteArray());
             return true;

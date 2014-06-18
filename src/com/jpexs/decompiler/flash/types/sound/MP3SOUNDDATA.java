@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.types.sound;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -34,15 +35,15 @@ public class MP3SOUNDDATA {
     public int seekSamples;
     public List<MP3FRAME> frames;
 
-    public MP3SOUNDDATA(InputStream is, boolean raw) throws IOException {
-        SWFInputStream sis = new SWFInputStream(is, SWF.DEFAULT_VERSION);
+    public MP3SOUNDDATA(byte[] data, int version, boolean raw) throws IOException {
+        SWFInputStream sis = new SWFInputStream(data, version);
         if (!raw) {
             seekSamples = sis.readSI16();
         }
         frames = new ArrayList<>();
         MP3FRAME f;
         Decoder decoder = new Decoder();
-        Bitstream bitstream = new Bitstream(is);
+        Bitstream bitstream = new Bitstream(new ByteArrayInputStream(data, 2, data.length - 2));
         while ((f = MP3FRAME.readFrame(bitstream, decoder)) != null) {
             frames.add(f);
         }

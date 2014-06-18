@@ -16,14 +16,18 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import java.io.IOException;
 
 public class JPEGTablesTag extends Tag {
 
     public static final int ID = 8;
+    @Internal
+    public byte[] jpegData;
 
-    public JPEGTablesTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "JPEGTables", headerData, data, pos);
+    public JPEGTablesTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "JPEGTables", pos, length);
+        jpegData = sis.readBytesEx(sis.available());
     }
 }

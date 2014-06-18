@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ContainerItem;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
@@ -51,24 +52,22 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
      */
     protected int id;
     /**
-     * Original header data in the tag
-     */
-    protected byte[] headerData;
-    /**
-     * Data in the tag
-     */
-    protected byte[] data;
-    /**
      * If true, then Tag is written to the stream as longer than 0x3f even if it
      * is not
      */
     @Internal
     public boolean forceWriteAsLong = false;
+    /**
+     * Original position in the SWF file
+     */
     @Internal
     private final long pos;
-    protected String tagName;
+    /**
+     * Original tag length
+     */
     @Internal
-    public Tag previousTag;
+    private final int length;
+    protected String tagName;
     @Internal
     protected transient SWF swf;
     @Internal
@@ -118,25 +117,22 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf The SWF
      * @param id Tag type identifier
      * @param name Tag name
-     * @param headerData
-     * @param data Bytes of data
-     * @param pos
+     * @param pos Original position in the SWF file
+     * @param length Original tag length
      */
-    public Tag(SWF swf, int id, String name, byte[] headerData, byte[] data, long pos) {
+    public Tag(SWF swf, int id, String name, long pos, int length) {
         this.id = id;
         this.tagName = name;
-        this.headerData = headerData;
-        this.data = data;
         this.pos = pos;
+        this.length = length;
         this.swf = swf;
         if (swf == null) {
             throw new Error("swf parameter cannot be null.");
         }
-        if (data == null) { // it is tag build by constructor        
-            this.data = new byte[0];
+        if (pos == 0) { // it is tag build by constructor        
             modified = true;
         }
     }
@@ -287,43 +283,11 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         return requiredTagIds;
     }
 
-    /**
-     * Gets data bytes
-     *
-     * @return Bytes of data
-     */
-    public byte[] getData() {
-        return data;
-    }
-
     public int getVersion() {
         if (swf == null) {
             return SWF.DEFAULT_VERSION;
         }
         return swf.version;
-    }
-
-    /**
-     * Gets original read header data
-     *
-     * @return Bytes of data
-     */
-    public byte[] getOriginalHeaderData() {
-        return headerData;
-    }
-
-    /**
-     * Gets original read data
-     *
-     * @return Bytes of data
-     */
-    public byte[] getOriginalData() {
-        return data;
-    }
-
-    public void createOriginalData() {
-        data = getData();
-        headerData = getHeader(data);
     }
 
     protected byte[] getHeader(byte[] data) {
@@ -368,15 +332,19 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
      * @throws IOException
      */
     public void writeTag(SWFOutputStream sos) throws IOException {
+        int newLength;
         if (isModified()) {
             byte[] newData = getData();
-            sos.write(getHeader(newData));
+            byte[] newHeaderData = getHeader(newData);
+            sos.write(newHeaderData);
             sos.write(newData);
-            return;
+            newLength = newData.length + newHeaderData.length;
+        } else {
+            sos.write(swf.uncompressedData, (int) pos, length);
+            newLength = length;
         }
-
-        sos.write(headerData);
-        sos.write(data);
+        
+        //todo: honfika: update pos and length during save
     }
 
     /**
@@ -389,8 +357,33 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         return getName();
     }
 
-    public final long getOrigDataLength() {
-        return data.length;
+    /**
+     * Gets data bytes
+     *
+     * @return Bytes of data
+     */
+    public byte[] getData() {
+        return getOriginalData();
+    }
+
+    public final byte[] getOriginalData() {
+        // todo honfika: do not copy data
+        int dataLength = getOriginalDataLength();
+        byte[] data = new byte[dataLength];
+        System.arraycopy(swf.uncompressedData, (int) (pos + length - dataLength), data, 0, dataLength);
+        return data;
+    }
+
+    public final int getOriginalLength() {
+        return length;
+    }
+
+    public final int getOriginalDataLength() {
+        int shortLength = swf.uncompressedData[(int) pos] & 0x003F;
+        if (shortLength == 0x3f) {
+            return length - 6;
+        }
+        return length - 2;
     }
 
     public boolean hasSubTags() {

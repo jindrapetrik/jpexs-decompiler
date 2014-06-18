@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -110,9 +110,8 @@ public class DefineFont3Tag extends FontTag {
         return codeTable.indexOf((int) c);
     }
 
-    public DefineFont3Tag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineFont3", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public DefineFont3Tag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DefineFont3", pos, length);
         fontId = sis.readUI16();
         fontFlagsHasLayout = sis.readUB(1) == 1;
         fontFlagsShiftJIS = sis.readUB(1) == 1;
@@ -187,7 +186,7 @@ public class DefineFont3Tag extends FontTag {
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         if (Configuration.debugCopy.get()) {
-            sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(data)), 10);
+            sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(getOriginalData())), getVersion());
         }
         try {
             List<Long> offsetTable = new ArrayList<>();

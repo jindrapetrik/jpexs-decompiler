@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.AppStrings;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -39,7 +39,6 @@ import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -426,7 +425,7 @@ public class DefineTextTag extends TextTag {
     }
 
     public DefineTextTag(SWF swf, int characterID, RECT textBounds, MATRIX textMatrix, List<TEXTRECORD> textRecords) {
-        super(swf, ID, "DefineText", null, null, 0);
+        super(swf, ID, "DefineText", 0, 0);
         this.characterID = characterID;
         this.textBounds = textBounds;
         this.textMatrix = textMatrix;
@@ -477,9 +476,8 @@ public class DefineTextTag extends TextTag {
      * @param pos
      * @throws IOException
      */
-    public DefineTextTag(SWF swf, byte[] headerData, byte[] data, long pos) throws IOException {
-        super(swf, ID, "DefineText", headerData, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), swf.version);
+    public DefineTextTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
+        super(sis.swf, ID, "DefineText", pos, length);
         characterID = sis.readUI16();
         textBounds = sis.readRECT();
         textMatrix = sis.readMatrix();
