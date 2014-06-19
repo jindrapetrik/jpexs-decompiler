@@ -1046,6 +1046,12 @@ public class Main {
     }
 
     public static boolean checkForUpdates() {
+        String currentVersion = ApplicationInfo.version;
+        if (currentVersion.equals("unknown")) {
+            // sometimes during development the version information is not available
+            return false;
+        }
+        
         List<String> accepted = new ArrayList<>();
         if (Configuration.checkForUpdatesStable.get()) {
             accepted.add("stable");
@@ -1069,7 +1075,7 @@ public class Main {
             Socket sock = new Socket("www.free-decompiler.com", 80);
             OutputStream os = sock.getOutputStream();
             String currentLoc = Configuration.locale.get("en");
-            os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(ApplicationInfo.version, "UTF-8") + "&currentBuild=" + URLEncoder.encode(ApplicationInfo.build, "UTF-8") + "&currentNightly=" + (ApplicationInfo.nightly ? "1" : "0") + " HTTP/1.1\r\n"
+            os.write(("GET /flash/update.html?action=check&currentVersion=" + URLEncoder.encode(currentVersion, "UTF-8") + "&currentBuild=" + URLEncoder.encode(ApplicationInfo.build, "UTF-8") + "&currentNightly=" + (ApplicationInfo.nightly ? "1" : "0") + " HTTP/1.1\r\n"
                     + "Host: www.free-decompiler.com\r\n"
                     + "X-Accept-Versions: " + acceptVersions + "\r\n"
                     + "X-Update-Major: " + UPDATE_SYSTEM_MAJOR + "\r\n"

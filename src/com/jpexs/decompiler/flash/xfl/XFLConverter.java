@@ -1437,7 +1437,7 @@ public class XFLConverter {
                     bits = 18;
                 }
                 if (soundFormat == SoundFormat.FORMAT_ADPCM) {
-                    SWFInputStream sis = new SWFInputStream(soundData, swf.version);
+                    SWFInputStream sis = new SWFInputStream(swf, soundData);
                     exportFormat = "wav";
                     try {
                         int adpcmCodeSize = (int) sis.readUB(2);
@@ -1453,7 +1453,7 @@ public class XFLConverter {
                     }
                     format += 4; //quality best
                     try {
-                        MP3SOUNDDATA s = new MP3SOUNDDATA(soundData, swf.version, false);
+                        MP3SOUNDDATA s = new MP3SOUNDDATA(swf, soundData, false);
                         //sis.readSI16();
                         //MP3FRAME frame = new MP3FRAME(sis);
                         MP3FRAME frame = s.frames.get(0);

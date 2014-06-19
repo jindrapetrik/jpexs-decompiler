@@ -55,9 +55,8 @@ public class ExportAssetsTag extends Tag {
     /**
      * Constructor
      *
-     * @param swf
-     * @param headerData
-     * @param data Data bytes
+     * @param sis
+     * @param length
      * @param pos
      * @throws IOException
      */

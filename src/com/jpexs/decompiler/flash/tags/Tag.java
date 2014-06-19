@@ -331,16 +331,13 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
      * @throws IOException
      */
     public void writeTag(SWFOutputStream sos) throws IOException {
-        int newLength;
         if (isModified()) {
             byte[] newData = getData();
             byte[] newHeaderData = getHeader(newData);
             sos.write(newHeaderData);
             sos.write(newData);
-            newLength = newData.length + newHeaderData.length;
         } else {
             sos.write(swf.uncompressedData, (int) pos, length);
-            newLength = length;
         }
         
         //todo: honfika: update pos and length during save
@@ -365,6 +362,10 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         return getOriginalData();
     }
 
+    public final int getOriginalLength() {
+        return length;
+    }
+
     public final byte[] getOriginalData() {
         // todo honfika: do not copy data
         int dataLength = getOriginalDataLength();
@@ -373,16 +374,13 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
         return data;
     }
 
-    public final int getOriginalLength() {
-        return length;
+    public final int getOriginalDataLength() {
+        return length - (isLongOriginal() ? 6 : 2);
     }
 
-    public final int getOriginalDataLength() {
+    public final boolean isLongOriginal() {
         int shortLength = swf.uncompressedData[(int) pos] & 0x003F;
-        if (shortLength == 0x3f) {
-            return length - 6;
-        }
-        return length - 2;
+        return shortLength == 0x3f;
     }
 
     public boolean hasSubTags() {
@@ -395,6 +393,10 @@ public class Tag implements NeedsCharacters, Exportable, ContainerItem, Serializ
 
     public long getPos() {
         return pos;
+    }
+
+    public long getDataPos() {
+        return pos + (isLongOriginal() ? 6 : 2);
     }
 
     public void setModified(boolean value) {

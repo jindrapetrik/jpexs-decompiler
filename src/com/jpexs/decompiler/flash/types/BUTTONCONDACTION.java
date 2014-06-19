@@ -31,7 +31,6 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -192,7 +191,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable, ContainerItem, S
     @Override
     public List<Action> getActions() throws InterruptedException {
         try {
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + 4, new MemoryInputStream(actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() + 4, new SWFInputStream(swf, actionBytes), swf.version, 0, -1, toString()/*FIXME?*/);
             return list;
 
         } catch (InterruptedException ex) {

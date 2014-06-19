@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -191,9 +192,8 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
     /**
      * Constructor
      *
-     * @param swf
-     * @param headerData
-     * @param data Data bytes
+     * @param sis
+     * @param length
      * @param level
      * @param pos
      * @param parallel
@@ -230,7 +230,9 @@ public class DefineSpriteTag extends CharacterTag implements Container, Drawable
         try {
             sos.writeUI16(spriteId);
             sos.writeUI16(frameCount);
-            sos.writeTags(subTags);
+            Map<Tag, Long> tagPositions = new HashMap<>();
+            Map<Tag, Integer> tagLengths = new HashMap<>();
+            sos.writeTags(subTags, tagPositions, tagLengths);
             if (hasEndTag) {
                 sos.writeUI16(0);
             }

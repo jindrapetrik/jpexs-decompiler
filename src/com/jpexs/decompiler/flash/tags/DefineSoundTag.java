@@ -95,10 +95,8 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     /**
      * Constructor
      *
-     * @param swf
-     * @param headerData
+     * @param sis
      * @param length
-     * @param data Data bytes
      * @param pos
      * @throws IOException
      */
@@ -237,7 +235,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
                     }
                 }
                 try {
-                    MP3SOUNDDATA snd = new MP3SOUNDDATA(mp3data, swf.version, true);
+                    MP3SOUNDDATA snd = new MP3SOUNDDATA(swf, mp3data, true);
                     if (!snd.frames.isEmpty()) {
                         MP3FRAME fr = snd.frames.get(0);
                         newSoundRate = fr.getSamplingRate();

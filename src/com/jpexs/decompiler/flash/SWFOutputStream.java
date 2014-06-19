@@ -79,6 +79,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -414,11 +415,17 @@ public class SWFOutputStream extends OutputStream {
      * Writes list of Tag values to the stream
      *
      * @param tags List of tag values
+     * @param tagPositions
+     * @param tagLengths
      * @throws IOException
      */
-    public void writeTags(List<Tag> tags) throws IOException {
+    public void writeTags(List<Tag> tags, Map<Tag, Long> tagPositions, Map<Tag, Integer> tagLengths) throws IOException {
         for (Tag tag : tags) {
+            long pos = getPos();
             tag.writeTag(this);
+            int length = (int) (getPos() - pos);
+            tagPositions.put(tag, pos);
+            tagLengths.put(tag, length);
         }
     }
 

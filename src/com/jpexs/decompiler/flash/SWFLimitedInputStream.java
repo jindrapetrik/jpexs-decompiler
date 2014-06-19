@@ -48,10 +48,12 @@ import java.util.List;
 public class SWFLimitedInputStream {
 
     private SWFInputStream sis;
+    private long limit;
     public SWF swf;
     
-    public SWFLimitedInputStream(SWF swf, SWFInputStream sis, long limit) {
+    public SWFLimitedInputStream(SWF swf, SWFInputStream sis,  long limit) {
         this.swf = swf;
+        this.limit = limit;
         this.sis = sis;
     }
 

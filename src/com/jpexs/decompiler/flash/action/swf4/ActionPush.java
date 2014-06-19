@@ -77,7 +77,7 @@ public class ActionPush extends Action {
         super(0x96, actionLength);
         int type;
         values = new ArrayList<>();
-        sis = new SWFInputStream(sis.readBytesEx(actionLength), version);
+        sis = new SWFInputStream(sis.swf, sis.readBytesEx(actionLength));
         try {
             while (sis.available() > 0) {
                 type = sis.readUI8();

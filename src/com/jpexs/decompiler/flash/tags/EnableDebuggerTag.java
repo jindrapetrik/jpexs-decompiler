@@ -57,10 +57,8 @@ public class EnableDebuggerTag extends Tag {
     /**
      * Constructor
      *
-     * @param swf
-     * @param headerData
+     * @param sis
      * @param length
-     * @param data Data bytes
      * @param pos
      * @throws IOException
      */

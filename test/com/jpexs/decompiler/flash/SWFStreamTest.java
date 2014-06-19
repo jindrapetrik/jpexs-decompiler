@@ -56,7 +56,7 @@ public class SWFStreamTest {
         try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION)) {
             sos.writeFB(20, f);
         }
-        try (SWFInputStream sis = new SWFInputStream(baos.toByteArray(), SWF.DEFAULT_VERSION)) {
+        try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
             assertTrue(Double.compare(f, sis.readFB(20)) == 0);
         }
     }
@@ -71,7 +71,7 @@ public class SWFStreamTest {
             sos.writeUB(8, 4);
             sos.writeUB(9, 5);
         }
-        try (SWFInputStream sis = new SWFInputStream(baos.toByteArray(), SWF.DEFAULT_VERSION)) {
+        try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
             assertEquals(1, sis.readUB(5));
             assertEquals(2, sis.readUB(6));
             assertEquals(3, sis.readUB(7));
@@ -90,7 +90,7 @@ public class SWFStreamTest {
             sos.writeSB(8, 4);
             sos.writeSB(9, -5);
         }
-        try (SWFInputStream sis = new SWFInputStream(baos.toByteArray(), SWF.DEFAULT_VERSION)) {
+        try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
             assertEquals(-1, sis.readSB(5));
             assertEquals(2, sis.readSB(6));
             assertEquals(-3, sis.readSB(7));
@@ -106,7 +106,7 @@ public class SWFStreamTest {
         float f = 5.25f;
         sos.writeFLOAT(f);
         sos.close();
-        SWFInputStream sis = new SWFInputStream(baos.toByteArray(), SWF.DEFAULT_VERSION);
+        SWFInputStream sis = new SWFInputStream(null, baos.toByteArray());
         assertEquals(f, sis.readFLOAT());
         sis.close();
 
@@ -115,7 +115,7 @@ public class SWFStreamTest {
         f = 5.25f;
         sos.writeFLOAT16(f);
         sos.close();
-        sis = new SWFInputStream(baos.toByteArray(), SWF.DEFAULT_VERSION);
+        sis = new SWFInputStream(null, baos.toByteArray());
         assertEquals(f, sis.readFLOAT16());
         sis.close();
 
@@ -124,7 +124,7 @@ public class SWFStreamTest {
         double d = 5.25;
         sos.writeDOUBLE(d);
         sos.close();
-        sis = new SWFInputStream(baos.toByteArray(), SWF.DEFAULT_VERSION);
+        sis = new SWFInputStream(null, baos.toByteArray());
         assertEquals(d, sis.readDOUBLE());
         sis.close();
     }
@@ -133,7 +133,7 @@ public class SWFStreamTest {
     public void testFIXEDandFIXED8() throws IOException {
         //example from specification
         byte[] data = new byte[]{(byte) 0x00, (byte) 0x80, (byte) 0x07, (byte) 0x00};
-        SWFInputStream sis = new SWFInputStream(data, SWF.DEFAULT_VERSION);
+        SWFInputStream sis = new SWFInputStream(null, data);
         assertTrue(Double.compare(7.5, sis.readFIXED()) == 0);
         sis.close();
 
@@ -142,7 +142,7 @@ public class SWFStreamTest {
         double dd = 5.25;
         sos.writeFIXED(dd);
         sos.close();
-        sis = new SWFInputStream(baos.toByteArray(), SWF.DEFAULT_VERSION);
+        sis = new SWFInputStream(null, baos.toByteArray());
         assertTrue(Double.compare(dd, sis.readFIXED()) == 0);
         sis.close();
 
@@ -151,7 +151,7 @@ public class SWFStreamTest {
         float ff = 5.25f;
         sos.writeFIXED8(ff);
         sos.close();
-        sis = new SWFInputStream(baos.toByteArray(), SWF.DEFAULT_VERSION);
+        sis = new SWFInputStream(null, baos.toByteArray());
         assertEquals(ff, sis.readFIXED8());
         sis.close();
     }
@@ -164,7 +164,7 @@ public class SWFStreamTest {
             rect = new RECT(-0x80000000, 0x7FFFFFFF, -0x80000000, 0x7FFFFFFF);
             sos.writeRECT(rect);
         }
-        try (SWFInputStream sis = new SWFInputStream(baos.toByteArray(), SWF.DEFAULT_VERSION)) {
+        try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
             RECT readRECT = sis.readRECT();
             assertEquals(readRECT.Xmin, -0x3FFFFFFF);
             assertEquals(readRECT.Xmax, 0x3FFFFFFF);

@@ -46,7 +46,6 @@ import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,7 +77,7 @@ public class ActionListReader {
      *
      * @param listeners
      * @param containerSWFOffset
-     * @param mis
+     * @param sis
      * @param version
      * @param ip
      * @param endIp
@@ -88,13 +87,13 @@ public class ActionListReader {
      * @throws java.lang.InterruptedException
      * @throws java.util.concurrent.TimeoutException
      */
-    public static List<Action> readActionListTimeout(final List<DisassemblyListener> listeners, final long containerSWFOffset, final MemoryInputStream mis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
+    public static List<Action> readActionListTimeout(final List<DisassemblyListener> listeners, final long containerSWFOffset, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
         try {
             return CancellableWorker.call(new Callable<List<Action>>() {
 
                 @Override
                 public List<Action> call() throws IOException, InterruptedException {
-                    return readActionList(listeners, containerSWFOffset, mis, version, ip, endIp, path);
+                    return readActionList(listeners, containerSWFOffset, sis, version, ip, endIp, path);
                 }
             }, Configuration.decompilationTimeoutSingleMethod.get(), TimeUnit.SECONDS);
         } catch (ExecutionException ex) {
@@ -116,7 +115,7 @@ public class ActionListReader {
      *
      * @param listeners
      * @param containerSWFOffset
-     * @param mis
+     * @param sis
      * @param version
      * @param ip
      * @param endIp
@@ -125,12 +124,10 @@ public class ActionListReader {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, MemoryInputStream mis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
+    public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, SWFInputStream sis, int version, int ip, int endIp, String path) throws IOException, InterruptedException {
         boolean deobfuscate = Configuration.autoDeobfuscate.get();
 
         ConstantPool cpool = new ConstantPool();
-
-        SWFInputStream sis = new SWFInputStream(mis, version);
 
         // List of the actions. N. item contains the action which starts in offset N.
         List<Action> actionMap = new ArrayList<>();

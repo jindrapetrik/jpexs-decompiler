@@ -204,7 +204,7 @@ public class AdpcmDecoder extends SoundDecoder {
     @Override
     public void decode(byte[] data, OutputStream os) throws IOException {
         int adpcm_code_size;
-        SWFInputStream sis = new SWFInputStream(data, SWF.DEFAULT_VERSION);
+        SWFInputStream sis = new SWFInputStream(null, data);
         SWFOutputStream sos = new SWFOutputStream(os, SWF.DEFAULT_VERSION);
         adpcm_code_size = (int) sis.readUB(2);
         int bits_per_code = adpcm_code_size + 2;

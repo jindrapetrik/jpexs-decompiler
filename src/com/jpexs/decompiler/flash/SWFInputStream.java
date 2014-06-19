@@ -291,14 +291,10 @@ public class SWFInputStream implements AutoCloseable {
 
     private SeekableInputStream is;
     private long pos;
-    private int version;
     private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
     private final List<ProgressListener> listeners = new ArrayList<>();
     private long percentMax;
-
-    public int getVersion() {
-        return version;
-    }
+    public SWF swf;
 
     public void addPercentListener(ProgressListener listener) {
         listeners.add(listener);
@@ -318,12 +314,12 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Constructor
      *
+     * @param swf SWF to read
      * @param data SWF data
-     * @param version Version of SWF to read
      * @param startingPos
      */
-    public SWFInputStream(byte[] data, int version, long startingPos) {
-        this.version = version;
+    public SWFInputStream(SWF swf, byte[] data, long startingPos) {
+        this.swf = swf;
         this.is = new MemoryInputStream(data);
         pos = startingPos;
     }
@@ -331,34 +327,11 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Constructor
      *
+     * @param swf SWF to read
      * @param data SWF data
-     * @param version Version of SWF to read
      */
-    public SWFInputStream(byte[] data, int version) {
-        this(data, version, 0L);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param is Existing inputstream
-     * @param version Version of SWF to read
-     * @param startingPos
-     */
-    public SWFInputStream(SeekableInputStream is, int version, long startingPos) {
-        this.version = version;
-        this.is = is;
-        pos = startingPos;
-    }
-
-    /**
-     * Constructor
-     *
-     * @param is Existing inputstream
-     * @param version Version of SWF to read
-     */
-    public SWFInputStream(SeekableInputStream is, int version) {
-        this(is, version, 0L);
+    public SWFInputStream(SWF swf, byte[] data) {
+        this(swf, data, 0L);
     }
 
     /**
@@ -888,7 +861,7 @@ public class SWFInputStream implements AutoCloseable {
                 tags.add(tag);
             }
             if (Configuration.dumpTags.get() && level == 0) {
-                dumpTag(System.out, version, tag, level);
+                dumpTag(System.out, swf.version, tag, level);
             }
 
             boolean doParse;
@@ -970,7 +943,7 @@ public class SWFInputStream implements AutoCloseable {
         byte[] data = tag.getData();
         long pos = tag.getPos();
         int length = tag.getOriginalLength();
-        SWFLimitedInputStream sis = new SWFLimitedInputStream(swf, new SWFInputStream(data, swf.version), length);
+        SWFLimitedInputStream sis = new SWFLimitedInputStream(swf, new SWFInputStream(swf, data, tag.getDataPos()), length);
         
         try {
             switch (tag.getId()) {
@@ -1354,7 +1327,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x81:
                     return new ActionGotoFrame(actionLength, this);
                 case 0x83:
-                    return new ActionGetURL(actionLength, this, version);
+                    return new ActionGetURL(actionLength, this, swf.version);
                 case 0x04:
                     return new ActionNextFrame();
                 case 0x05:
@@ -1370,12 +1343,12 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x8A:
                     return new ActionWaitForFrame(actionLength, this, cpool);
                 case 0x8B:
-                    return new ActionSetTarget(actionLength, this, version);
+                    return new ActionSetTarget(actionLength, this, swf.version);
                 case 0x8C:
-                    return new ActionGoToLabel(actionLength, this, version);
+                    return new ActionGoToLabel(actionLength, this, swf.version);
                 //SWF4 Actions
                 case 0x96:
-                    return new ActionPush(actionLength, this, version);
+                    return new ActionPush(actionLength, this, swf.version);
                 case 0x17:
                     return new ActionPop();
                 case 0x0A:
@@ -1462,9 +1435,9 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x52:
                     return new ActionCallMethod();
                 case 0x88:
-                    return new ActionConstantPool(actionLength, this, version);
+                    return new ActionConstantPool(actionLength, this, swf.version);
                 case 0x9B:
-                    return new ActionDefineFunction(actionLength, this, version);
+                    return new ActionDefineFunction(actionLength, this, swf.version);
                 case 0x3C:
                     return new ActionDefineLocal();
                 case 0x41:
@@ -1492,7 +1465,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x45:
                     return new ActionTargetPath();
                 case 0x94:
-                    return new ActionWith(actionLength, this, version);
+                    return new ActionWith(actionLength, this, swf.version);
                 case 0x4A:
                     return new ActionToNumber();
                 case 0x4B:
@@ -1542,7 +1515,7 @@ public class SWFInputStream implements AutoCloseable {
                     return new ActionStringGreater();
                 //SWF7 Actions
                 case 0x8E:
-                    return new ActionDefineFunction2(actionLength, this, version);
+                    return new ActionDefineFunction2(actionLength, this, swf.version);
                 case 0x69:
                     return new ActionExtends();
                 case 0x2B:
@@ -1550,7 +1523,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x2C:
                     return new ActionImplementsOp();
                 case 0x8F:
-                    return new ActionTry(actionLength, this, version);
+                    return new ActionTry(actionLength, this, swf.version);
                 case 0x2A:
                     return new ActionThrow();
                 default:
@@ -1677,7 +1650,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.clipEventPress = readUB(1) == 1;
         ret.clipEventInitialize = readUB(1) == 1;
         ret.clipEventData = readUB(1) == 1;
-        if (version >= 6) {
+        if (swf.version >= 6) {
             ret.reserved = (int) readUB(5);
             ret.clipEventConstruct = readUB(1) == 1;
             ret.clipEventKeyPress = readUB(1) == 1;

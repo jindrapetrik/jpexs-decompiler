@@ -83,9 +83,8 @@ public final class DefineCompactedFont extends FontTag implements DrawableTag {
     /**
      * Constructor
      *
-     * @param swf
-     * @param headerData
-     * @param data Data bytes
+     * @param sis
+     * @param length
      * @param pos
      * @throws IOException
      */

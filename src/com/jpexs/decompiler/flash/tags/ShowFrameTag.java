@@ -51,10 +51,8 @@ public class ShowFrameTag extends Tag {
      * Constructor
      *
      * @param swf
-     * @param headerData
      * @param length
      * @param pos
-     * @param data
      */
     public ShowFrameTag(SWF swf, long pos, int length) {
         super(swf, ID, "ShowFrame", pos, length);

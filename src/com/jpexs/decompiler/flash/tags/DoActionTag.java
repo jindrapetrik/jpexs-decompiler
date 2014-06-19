@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
@@ -26,7 +27,6 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,22 +50,22 @@ public class DoActionTag extends Tag implements ASMSource {
     /**
      * Constructor
      *
-     * @param swf
-     * @param headerData
-     * @param data Data bytes
+     * @param sis
+     * @param length
      * @param pos
+     * @throws java.io.IOException
      */
     public DoActionTag(SWFLimitedInputStream sis, long pos, int length) throws IOException {
         super(sis.swf, ID, "DoAction", pos, length);
-        actionBytes = sis.readBytesEx(sis.available());
+        //do not load actionBytes. Disassebler will use the original SWF stream in this case
+        //actionBytes = sis.readBytesEx(sis.available());
     }
 
     /**
      * Constructor
      *
      * @param swf
-     * @param headerData
-     * @param data Data bytes
+     * @param length
      * @param pos
      */
     public DoActionTag(SWF swf, long pos, int length) {
@@ -96,7 +96,7 @@ public class DoActionTag extends Tag implements ASMSource {
         if (actions == null) {
             actions = getActions();
         }
-        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, getPos(), toString()/*FIXME?*/);
+        return Action.actionsToString(listeners, 0, actions, null, swf.version, exportMode, writer, getDataPos(), toString()/*FIXME?*/);
     }
 
     /**
@@ -122,10 +122,17 @@ public class DoActionTag extends Tag implements ASMSource {
     @Override
     public List<Action> getActions() throws InterruptedException {
         try {
-            int prevLength = (int) getPos();
-            MemoryInputStream rri = new MemoryInputStream(swf.uncompressedData);
-            rri.seek(prevLength);
-            List<Action> list = ActionListReader.readActionListTimeout(listeners, getPos() - prevLength, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
+            int prevLength;
+            SWFInputStream rri;
+            if (actionBytes == null) {
+                prevLength = (int) getDataPos();
+                rri = new SWFInputStream(swf, swf.uncompressedData);
+                rri.seek(prevLength);
+            } else {
+                prevLength = 0;
+                rri = new SWFInputStream(swf, actionBytes);
+            }
+            List<Action> list = ActionListReader.readActionListTimeout(listeners, getDataPos() - prevLength, rri, getVersion(), prevLength, -1, toString()/*FIXME?*/);
             return list;
         } catch (InterruptedException ex) {
             throw ex;

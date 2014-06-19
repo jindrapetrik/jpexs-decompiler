@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFLimitedInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -140,7 +139,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     private void uncompressData() {
         try {
-            SWFInputStream sis = new SWFInputStream(Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData))), SWF.DEFAULT_VERSION);
+            SWFInputStream sis = new SWFInputStream(swf, Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData))));
             if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
                 colorMapData = sis.readALPHACOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight);
             }

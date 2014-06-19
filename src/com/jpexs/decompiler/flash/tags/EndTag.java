@@ -41,9 +41,7 @@ public class EndTag extends Tag {
      * Constructor
      *
      * @param swf
-     * @param headerData
      * @param length
-     * @param data Data bytes
      * @param pos
      * @throws IOException
      */

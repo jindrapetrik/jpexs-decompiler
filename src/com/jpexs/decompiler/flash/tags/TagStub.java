@@ -42,8 +42,7 @@ public class TagStub extends Tag {
      * Constructor
      *
      * @param swf
-     * @param headerData
-     * @param data Data bytes
+     * @param length
      * @param pos
      * @throws IOException
      */

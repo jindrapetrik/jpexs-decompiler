@@ -381,7 +381,9 @@ public final class SWF implements TreeItem, Timelined {
             sos.writeUI8(frameRate);
             sos.writeUI16(frameCount);
 
-            sos.writeTags(tags);
+            Map<Tag, Long> tagPositions = new HashMap<>();
+            Map<Tag, Integer> tagLengths = new HashMap<>();
+            sos.writeTags(tags, tagPositions, tagLengths);
             if (hasEndTag) {
                 sos.writeUI16(0);
             }
@@ -507,7 +509,7 @@ public final class SWF implements TreeItem, Timelined {
         compression = header.compression;
         uncompressedData = baos.toByteArray();
 
-        SWFInputStream sis = new SWFInputStream(uncompressedData, version);
+        SWFInputStream sis = new SWFInputStream(this, uncompressedData);
         sis.read(new byte[8], 0, 8); // skip the header
         if (listener != null) {
             sis.addPercentListener(listener);
@@ -703,7 +705,7 @@ public final class SWF implements TreeItem, Timelined {
         }
 
         int version = hdr[3];
-        SWFInputStream sis = new SWFInputStream(Arrays.copyOfRange(hdr, 4, 8), version, 4);
+        SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(hdr, 4, 8), 4);
         long fileSize = sis.readUI32();
         SWFHeader header = new SWFHeader();
         header.version = version;

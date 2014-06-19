@@ -65,10 +65,8 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
     /**
      * Constructor
      *
-     * @param swf
-     * @param headerData
+     * @param sis
      * @param length
-     * @param data Data bytes
      * @param pos
      * @throws IOException
      */

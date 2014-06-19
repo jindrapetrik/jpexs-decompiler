@@ -77,6 +77,9 @@ public class FILLSTYLE implements NeedsCharacters, Serializable {
                 || (fillStyleType == NON_SMOOTHED_REPEATING_BITMAP)
                 || (fillStyleType == NON_SMOOTHED_CLIPPED_BITMAP)) {
                 fillStyleType = SOLID;
+                if (color == null) {
+                    color = inShape3 ? new RGBA(0, 0, 0, 0) : new RGB(0, 0, 0);
+                }
             }
             bitmapId = 0;
             return true;

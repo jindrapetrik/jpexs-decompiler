@@ -147,10 +147,8 @@ public class DefineMorphShape2Tag extends CharacterTag implements MorphShapeTag 
     /**
      * Constructor
      *
-     * @param swf
-     * @param headerData
+     * @param sis
      * @param length
-     * @param data Data bytes
      * @param pos
      * @throws IOException
      */
